@@ -1,0 +1,1197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="generator" content="JsDoc Toolkit" />
+		
+		<title>JsDoc Reference - DisplayObject</title>
+
+		<style type="text/css">
+			/* default.css */
+body
+{
+	font: 12px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
+	width: 800px;
+}
+
+.header
+{
+	clear: both;
+	background-color: #ccc;
+	padding: 8px;
+}
+
+h1
+{
+	font-size: 150%;
+	font-weight: bold;
+	padding: 0;
+	margin: 1em 0 0 .3em;
+}
+
+hr
+{
+	border: none 0;
+	border-top: 1px solid #7F8FB1;
+	height: 1px;
+}
+
+pre.code
+{
+	display: block;
+	padding: 8px;
+	border: 1px dashed #ccc;
+}
+
+#index
+{
+	margin-top: 24px;
+	float: left;
+	width: 160px;
+	position: absolute;
+	left: 8px;
+	background-color: #F3F3F3;
+	padding: 8px;
+}
+
+#content
+{
+	margin-left: 190px;
+	width: 600px;
+}
+
+.classList
+{
+	list-style-type: none;
+	padding: 0;
+	margin: 0 0 0 8px;
+	font-family: arial, sans-serif;
+	font-size: 1em;
+	overflow: auto;
+}
+
+.classList li
+{
+	padding: 0;
+	margin: 0 0 8px 0;
+}
+
+.summaryTable { width: 100%; }
+
+h1.classTitle
+{
+	font-size:170%;
+	line-height:130%;
+}
+
+h2 { font-size: 110%; }
+caption, div.sectionTitle
+{
+	background-color: #7F8FB1;
+	color: #fff;
+	font-size:130%;
+	text-align: left;
+	padding: 2px 6px 2px 6px;
+	border: 1px #7F8FB1 solid;
+}
+
+div.sectionTitle { margin-bottom: 8px; }
+.summaryTable thead { display: none; }
+
+.summaryTable td
+{
+	vertical-align: top;
+	padding: 4px;
+	border-bottom: 1px #7F8FB1 solid;
+	border-right: 1px #7F8FB1 solid;
+}
+
+/*col#summaryAttributes {}*/
+.summaryTable td.attributes
+{
+	border-left: 1px #7F8FB1 solid;
+	width: 140px;
+	text-align: right;
+}
+
+td.attributes, .fixedFont
+{
+	line-height: 15px;
+	color: #002EBE;
+	font-family: "Courier New",Courier,monospace;
+	font-size: 13px;
+}
+
+.summaryTable td.nameDescription
+{
+	text-align: left;
+	font-size: 13px;
+	line-height: 15px;
+}
+
+.summaryTable td.nameDescription, .description
+{
+	line-height: 15px;
+	padding: 4px;
+	padding-left: 4px;
+}
+
+.summaryTable { margin-bottom: 8px; }
+
+ul.inheritsList
+{
+	list-style: square;
+	margin-left: 20px;
+	padding-left: 0;
+}
+
+.detailList {
+	margin-left: 20px; 
+	line-height: 15px;
+}
+.detailList dt { margin-left: 20px; }
+
+.detailList .heading
+{
+	font-weight: bold;
+	padding-bottom: 6px;
+	margin-left: 0;
+}
+
+.light, td.attributes, .light a:link, .light a:visited
+{
+	color: #777;
+	font-style: italic;
+}
+
+.fineprint
+{
+	text-align: right;
+	font-size: 10px;
+}
+		</style>
+	</head>
+
+	<body>
+<!-- ============================== header ================================= -->	
+		<!-- begin static/header.html -->
+		<div id="header">
+</div>
+		<!-- end static/header.html -->
+
+<!-- ============================== classes index ============================ -->
+		<div id="index">
+			<!-- begin publish.classesIndex -->
+			<div align="center"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+<hr />
+<h2>Classes</h2>
+<ul class="classList">
+	
+	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	
+	<li><a href="../symbols/Bitmap.html">Bitmap</a></li>
+	
+	<li><a href="../symbols/BitmapSequence.html">BitmapSequence</a></li>
+	
+	<li><a href="../symbols/Container.html">Container</a></li>
+	
+	<li><a href="../symbols/CoordTransform.html">CoordTransform</a></li>
+	
+	<li><a href="../symbols/DisplayObject.html">DisplayObject</a></li>
+	
+	<li><a href="../symbols/Graphics.html">Graphics</a></li>
+	
+	<li><a href="../symbols/Matrix2D.html">Matrix2D</a></li>
+	
+	<li><a href="../symbols/Point.html">Point</a></li>
+	
+	<li><a href="../symbols/Rectangle.html">Rectangle</a></li>
+	
+	<li><a href="../symbols/Shadow.html">Shadow</a></li>
+	
+	<li><a href="../symbols/Shape.html">Shape</a></li>
+	
+	<li><a href="../symbols/SpriteSheet.html">SpriteSheet</a></li>
+	
+	<li><a href="../symbols/SpriteSheetUtils.html">SpriteSheetUtils</a></li>
+	
+	<li><a href="../symbols/Stage.html">Stage</a></li>
+	
+	<li><a href="../symbols/Text.html">Text</a></li>
+	
+	<li><a href="../symbols/Tick.html">Tick</a></li>
+	
+	<li><a href="../symbols/UID.html">UID</a></li>
+	
+</ul>
+<hr />
+			<!-- end publish.classesIndex -->
+		</div>
+		
+		<div id="content">
+<!-- ============================== class title ============================ -->
+			<h1 class="classTitle">
+				
+				Class DisplayObject
+			</h1>
+
+<!-- ============================== class summary ========================== -->			
+			<p class="description">
+				
+				
+			
+				DisplayObject is the base class for all display classes in the CanvasDisplay library. It defines the core properties and methods that are shared between all display objects. It should not be instantiated directly.
+				
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/display_DisplayObject.js.html">DisplayObject.js</a>.
+				
+			</p>
+
+<!-- ============================== constructor summary ==================== -->			
+			
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class DisplayObject.">
+				<caption>Class Summary</caption>
+				<thead>
+					<tr>
+						<th scope="col">Constructor Attributes</th>
+						<th scope="col">Constructor Name and Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="attributes">&nbsp;</td>
+						<td class="nameDescription" >
+							<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#constructor">DisplayObject</a></b>()
+							</div>
+							<div class="description">DisplayObject is an abstract class that should not be constructed directly.</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+
+<!-- ============================== properties summary ===================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class DisplayObject.">
+					<caption>Field Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Field Attributes</th>
+							<th scope="col">Field Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#alpha">alpha</a></b>
+								</div>
+								<div class="description">The alpha (transparency) for this display object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#cacheCanvas">cacheCanvas</a></b>
+								</div>
+								<div class="description">If a cache is active, this returns the canvas that holds the cached version of this display object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#id">id</a></b>
+								</div>
+								<div class="description">Unique ID for this display object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#mouseEnabled">mouseEnabled</a></b>
+								</div>
+								<div class="description">Indicates whether to include this object when running Stage.getObjectsUnderPoint().</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#name">name</a></b>
+								</div>
+								<div class="description">An optional name for this display object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#parent">parent</a></b>
+								</div>
+								<div class="description">A reference to the Sprite or Stage object that contains this display object, or null if it has not been added to one.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#regX">regX</a></b>
+								</div>
+								<div class="description">The x offset for this display object's registration point.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#regY">regY</a></b>
+								</div>
+								<div class="description">The y offset for this display object's registration point.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#rotation">rotation</a></b>
+								</div>
+								<div class="description">The rotation in degrees for this display object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#scaleX">scaleX</a></b>
+								</div>
+								<div class="description">The factor to stretch this display object horizontally.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#scaleY">scaleY</a></b>
+								</div>
+								<div class="description">The factor to stretch this display object vertically.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#shadow">shadow</a></b>
+								</div>
+								<div class="description">A shadow object that defines the shadow to render on this display object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#visible">visible</a></b>
+								</div>
+								<div class="description">Indicates whether this display object should be rendered to the canvas and included when running Stage.getObjectsUnderPoint().</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#x">x</a></b>
+								</div>
+								<div class="description">The x (horizontal) position of the display object, relative to its parent.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/DisplayObject.html#y">y</a></b>
+								</div>
+								<div class="description">The y (vertical) position of the display object, relative to its parent.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
+
+<!-- ============================== methods summary ======================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class DisplayObject.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/DisplayObject.html#cache">cache</a></b>(x, y, width, height)
+								</div>
+								<div class="description">Draws the display object into a new canvas, which is then used for subsequent draws.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/DisplayObject.html#clone">clone</a></b>()
+								</div>
+								<div class="description">Returns a clone of this DisplayObject.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/DisplayObject.html#draw">draw</a></b>(ctx, ignoreCache)
+								</div>
+								<div class="description">NOTE: This method is mainly for internal use, though it may be useful for advanced developers extending the capabilities of the CanvasDisplay library.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/DisplayObject.html#getStage">getStage</a></b>()
+								</div>
+								<div class="description">Returns the stage that this display object will be rendered on, or null if it has not been added to one.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/DisplayObject.html#revertContext">revertContext</a></b>()
+								</div>
+								<div class="description">NOTE: This method is mainly for internal use, though it may be useful for advanced developers extending the capabilities of the CanvasDisplay library.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/DisplayObject.html#toString">toString</a></b>()
+								</div>
+								<div class="description">Returns a string representation of this object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/DisplayObject.html#uncache">uncache</a></b>()
+								</div>
+								<div class="description">Clears the current cache.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/DisplayObject.html#updateContext">updateContext</a></b>(ctx, ignoreShadows)
+								</div>
+								<div class="description">NOTE: This method is mainly for internal use, though it may be useful for advanced developers extending the capabilities of the CanvasDisplay library.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
+<!-- ============================== events summary ======================== -->
+			
+
+<!-- ============================== constructor details ==================== -->		
+			
+			<div class="details"><a name="constructor"> </a>
+				<div class="sectionTitle">
+					Class Detail
+				</div>
+				
+				<div class="fixedFont">
+						<b>DisplayObject</b>()
+				</div>
+				
+				<div class="description">
+					DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as Sprite, Bitmap, and Shape.
+					
+				</div>
+				
+				
+				
+				
+					
+					
+					
+					
+					
+					
+					
+
+			</div>
+			
+
+<!-- ============================== field details ========================== -->		
+			
+				<div class="sectionTitle">
+					Field Detail
+				</div>
+				
+					<a name="alpha"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>alpha</b>
+					
+					</div>
+					<div class="description">
+						The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="cacheCanvas"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>cacheCanvas</b>
+					
+					</div>
+					<div class="description">
+						If a cache is active, this returns the canvas that holds the cached version of this display object. See cache() for more information. READ-ONLY. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="id"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>id</b>
+					
+					</div>
+					<div class="description">
+						Unique ID for this display object. Makes display objects easier for some uses. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="mouseEnabled"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>mouseEnabled</b>
+					
+					</div>
+					<div class="description">
+						Indicates whether to include this object when running Stage.getObjectsUnderPoint(). Setting this to true for Sprites will cause the Sprite to be returned (not its children) regardless of whether it's mouseChildren property is true. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="name"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>name</b>
+					
+					</div>
+					<div class="description">
+						An optional name for this display object. Included in toString(). Useful for debugging. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="parent"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>parent</b>
+					
+					</div>
+					<div class="description">
+						A reference to the Sprite or Stage object that contains this display object, or null if it has not been added to one. READ-ONLY. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="regX"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>regX</b>
+					
+					</div>
+					<div class="description">
+						The x offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around it's center, you would set regX and regY to 50. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="regY"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>regY</b>
+					
+					</div>
+					<div class="description">
+						The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around it's center, you would set regX and regY to 50. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="rotation"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>rotation</b>
+					
+					</div>
+					<div class="description">
+						The rotation in degrees for this display object. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="scaleX"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>scaleX</b>
+					
+					</div>
+					<div class="description">
+						The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display object to twice it's nominal width. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="scaleY"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>scaleY</b>
+					
+					</div>
+					<div class="description">
+						The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display object to half it's nominal height. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="shadow"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>shadow</b>
+					
+					</div>
+					<div class="description">
+						A shadow object that defines the shadow to render on this display object. Set to null to remove a shadow. Note that nested shadows can result in unexpected behaviour (ex. if both a child and a parent have a shadow set). *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="visible"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>visible</b>
+					
+					</div>
+					<div class="description">
+						Indicates whether this display object should be rendered to the canvas and included when running Stage.getObjectsUnderPoint(). *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="x"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>x</b>
+					
+					</div>
+					<div class="description">
+						The x (horizontal) position of the display object, relative to its parent. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="y"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>y</b>
+					
+					</div>
+					<div class="description">
+						The y (vertical) position of the display object, relative to its parent. *
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					
+				
+			
+
+<!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name="cache"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>cache</b>(x, y, width, height)
+					
+					</div>
+					<div class="description">
+						Draws the display object into a new canvas, which is then used for subsequent draws. For complex content that does not change frequently (ex. a Sprite with many children that do not move, or a complex vector Shape), this can provide for much faster rendering because the content does not need to be rerendered each tick. The cached display object can be moved, rotated, faded, etc freely, however if it's content changes, you must manually update the cache by calling cache() again. Do not call uncache before the subsequent cache call. You must specify the cache area via the x, y, w, and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates. For example if you defined a Shape that drew a circle at 0,0 with a radius of 25, you could call myShape.cache(-25,-25,50,50) to cache the full shape.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>x</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>y</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>width</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>height</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="clone"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>clone</b>()
+					
+					</div>
+					<div class="description">
+						Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are reverted to their defaults (for example .parent).
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="draw"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>draw</b>(ctx, ignoreCache)
+					
+					</div>
+					<div class="description">
+						NOTE: This method is mainly for internal use, though it may be useful for advanced developers extending the capabilities of the CanvasDisplay library.
+Draws the display object into the specified context if it is visible.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>ctx</b>
+									
+								</dt>
+								<dd>The canvas 2D context object to draw into.</dd>
+							
+								<dt>
+									<b>ignoreCache</b>
+									
+								</dt>
+								<dd>Indicates whether the draw operation should ignore any current cache. For example, used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="getStage"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>getStage</b>()
+					
+					</div>
+					<div class="description">
+						Returns the stage that this display object will be rendered on, or null if it has not been added to one.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="revertContext"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>revertContext</b>()
+					
+					</div>
+					<div class="description">
+						NOTE: This method is mainly for internal use, though it may be useful for advanced developers extending the capabilities of the CanvasDisplay library.
+Reverts the last context that was updated with updateContext(), restoring it to the state it was in prior to the update.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="toString"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>toString</b>()
+					
+					</div>
+					<div class="description">
+						Returns a string representation of this object.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="uncache"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>uncache</b>()
+					
+					</div>
+					<div class="description">
+						Clears the current cache. See cache() for more information.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="updateContext"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>updateContext</b>(ctx, ignoreShadows)
+					
+					</div>
+					<div class="description">
+						NOTE: This method is mainly for internal use, though it may be useful for advanced developers extending the capabilities of the CanvasDisplay library.
+Updates the specified context based on this display object's properties.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>ctx</b>
+									
+								</dt>
+								<dd>The canvas 2D context object to update.</dd>
+							
+								<dt>
+									<b>ignoreShadows</b>
+									
+								</dt>
+								<dd>Indicates whether the shadow property should be applied. Passing false will ignore the shadow, resulting in faster rendering for uses like hit testing.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					
+				
+			
+			
+<!-- ============================== event details ========================= -->		
+			
+			
+			<hr />
+		</div>
+
+		
+<!-- ============================== footer ================================= -->
+		<div class="fineprint" style="clear:both">
+			
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Wed Jan 12 2011 09:21:03 GMT-0700 (MST)
+		</div>
+	</body>
+</html>

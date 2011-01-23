@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Test performance of different Graphics implementations</title>
+
+<link href="styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../easeljs/display/Graphics.js"></script>
+<script src="../easeljs/utils/Tick.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var canvas;
+var ctx;
+
+function run() {
+	//find canvas and load images, wait for last image to load
+	canvas = document.getElementById("testCanvas");
+	ctx = canvas.getContext("2d");
+
+	var a = [];
+	
+	var t = Tick.getTime();
+	for (var i=0; i<120; i++) {
+		var g = new Graphics();
+		
+		g.beginFill(Graphics.getHSL(i/120*360, 50, 50));
+		for (var j=0; j<120; j++) {
+			g.drawRect(i*5,j*5,5,5);
+		}
+		
+		a.push(g);
+	}
+	
+	for (i=0; i<120; i++) {
+		a[i].draw(ctx);
+	}
+	
+	out(Tick.getTime()-t);
+}
+
+function out(str) {
+	try {
+		console.log(str);
+	} catch(e) {
+		alert(str);
+	}
+}
+
+</script>
+</head>
+	
+<body onLoad="run();">
+	<div class="description">
+	<a href="javascript:run();">RUN</a>. Demo showing how a <strong>Graphics</strong> object can be used to draw vector graphics without an associated <strong>Shape</strong>.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="600" height="600"></canvas>
+	</div>
+</body>
+</html>

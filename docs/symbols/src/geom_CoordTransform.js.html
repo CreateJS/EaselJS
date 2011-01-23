@@ -1,0 +1,129 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span> * CoordTransform by Grant Skinner. Dec 5, 2010
+<span class='line'>  3</span> * Visit www.gskinner.com/blog for documentation, updates and more free code.
+<span class='line'>  4</span> *
+<span class='line'>  5</span> *
+<span class='line'>  6</span> * Copyright (c) 2010 Grant Skinner
+<span class='line'>  7</span> * 
+<span class='line'>  8</span> * Permission is hereby granted, free of charge, to any person
+<span class='line'>  9</span> * obtaining a copy of this software and associated documentation
+<span class='line'> 10</span> * files (the "Software"), to deal in the Software without
+<span class='line'> 11</span> * restriction, including without limitation the rights to use,
+<span class='line'> 12</span> * copy, modify, merge, publish, distribute, sublicense, and/or sell
+<span class='line'> 13</span> * copies of the Software, and to permit persons to whom the
+<span class='line'> 14</span> * Software is furnished to do so, subject to the following
+<span class='line'> 15</span> * conditions:
+<span class='line'> 16</span> * 
+<span class='line'> 17</span> * The above copyright notice and this permission notice shall be
+<span class='line'> 18</span> * included in all copies or substantial portions of the Software.
+<span class='line'> 19</span> * 
+<span class='line'> 20</span> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+<span class='line'> 21</span> * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+<span class='line'> 22</span> * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+<span class='line'> 23</span> * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+<span class='line'> 24</span> * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+<span class='line'> 25</span> * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class='line'> 26</span> * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+<span class='line'> 27</span> * OTHER DEALINGS IN THE SOFTWARE.
+<span class='line'> 28</span> **/</span><span class="WHIT">
+<span class='line'> 29</span> 
+<span class='line'> 30</span> </span><span class="COMM">// GDS: revisit optimizing these methods.</span><span class="WHIT">
+<span class='line'> 31</span> 
+<span class='line'> 32</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="COMM">// constructor:</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'> 35</span> 	* The CoordTransform class uses a static interface and should not be instantiated.
+<span class='line'> 36</span> 	* @class The CoordTransform class is a collection of methods used to transform coordinates between different display object's coordinate spaces.
+<span class='line'> 37</span> 	**/</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">	</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">CoordTransform</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="WHIT">		</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">"CoordTransform cannot be instantiated"</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'> 40</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="COMM">// public static methods:</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'> 44</span> 	* Transforms the specified x and y position from the coordinate space of the source display object
+<span class='line'> 45</span> 	* to the global (stage) coordinate space. For example, this could be used to position an HTML label
+<span class='line'> 46</span> 	* over a specific point on a nested display object. Returns a Point instance with x and y properties
+<span class='line'> 47</span> 	* correlating to the tranformed coordinates on the stage.
+<span class='line'> 48</span> 	* @param x The x position in the source display object to transform.
+<span class='line'> 49</span> 	* @param y The y position in the source display object to transform.
+<span class='line'> 50</span> 	* @param target The source display object.
+<span class='line'> 51</span> 	* @static
+<span class='line'> 52</span> 	**/</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="WHIT">	</span><span class="NAME">CoordTransform.localToGlobal</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">y</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">source</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">mtx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">CoordTransform.getConcatenatedMatrix</span><span class="PUNC">(</span><span class="NAME">source</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">mtx</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">mtx2</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Matrix2D</span><span class="PUNC">(</span><span class="NUMB">1</span><span class="PUNC">,</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="NUMB">1</span><span class="PUNC">,</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">		</span><span class="NAME">mtx2.concatMatrix</span><span class="PUNC">(</span><span class="NAME">mtx</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Point</span><span class="PUNC">(</span><span class="NAME">mtx2.tx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">mtx2.ty</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'> 62</span> 	* Transforms the specified x and y position from the global (stage) coordinate space to the
+<span class='line'> 63</span> 	* coordinate space of the target display object. For example, this could be used to determine
+<span class='line'> 64</span> 	* the current mouse position within a specific display object. Returns a Point instance with x and y properties
+<span class='line'> 65</span> 	* correlating to the tranformed position in the target's coordinate space.
+<span class='line'> 66</span> 	* @param x The x position on the stage to transform.
+<span class='line'> 67</span> 	* @param y The y position on the stage to transform.
+<span class='line'> 68</span> 	* @param target The target display object.
+<span class='line'> 69</span> 	* @static
+<span class='line'> 70</span> 	**/</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">	</span><span class="NAME">CoordTransform.globalToLocal</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">y</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">mtx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">CoordTransform.getConcatenatedMatrix</span><span class="PUNC">(</span><span class="NAME">target</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">mtx</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">		</span><span class="NAME">mtx.invert</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">mtx2</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Matrix2D</span><span class="PUNC">(</span><span class="NUMB">1</span><span class="PUNC">,</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="NUMB">1</span><span class="PUNC">,</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">		</span><span class="NAME">mtx2.concatMatrix</span><span class="PUNC">(</span><span class="NAME">mtx</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Point</span><span class="PUNC">(</span><span class="NAME">mtx2.tx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">mtx2.ty</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'> 81</span> 	* Transforms the specified x and y position from the coordinate space of the source display object to the
+<span class='line'> 82</span> 	* coordinate space of the target display object. Returns a Point instance with x and y properties
+<span class='line'> 83</span> 	* correlating to the tranformed position in the target's coordinate space. Effectively the same as calling
+<span class='line'> 84</span> 	* var pt = localToGlobal(x, y, source); pt = globalToLocal(pt.x, pt.y, target);
+<span class='line'> 85</span> 	* @param x The x position in the source display object to transform.
+<span class='line'> 86</span> 	* @param y The y position on the stage to transform.
+<span class='line'> 87</span> 	* @param source The display object that the original position is relative to.
+<span class='line'> 88</span> 	* @param target The target display object to which the coordinates will be transformed.
+<span class='line'> 89</span> 	* @static
+<span class='line'> 90</span> 	**/</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">	</span><span class="NAME">CoordTransform.localToLocal</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">y</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">source</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">		</span><span class="COMM">// GDS: this could be optimized to find the nearest shared parent, and pass it in as the goal.</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pt</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">CoordTransform.localToGlobal</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">y</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">source</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">CoordTransform.globalToLocal</span><span class="PUNC">(</span><span class="NAME">pt.x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pt.y</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'> 98</span> 	* Generates a concatenated Matrix2D object representing the combined tranform of
+<span class='line'> 99</span> 	* the target display object and all of its parent Containers. This can be used to transform
+<span class='line'>100</span> 	* positions between coordinate spaces, as with localToGlobal and globalToLocal.
+<span class='line'>101</span> 	* @param target The target display object to which the coordinates will be transformed.
+<span class='line'>102</span> 	* @param goal Optional parameter specifying the parent Container to concanate to. If it is not included, or is not a valid parent of the target, then the matrix will be concatenated to the highest level parent (usually the stage).
+<span class='line'>103</span> 	* @static
+<span class='line'>104</span> 	**/</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">	</span><span class="NAME">CoordTransform.getConcatenatedMatrix</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">target</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">goal</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">path</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">target</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">		</span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">target</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">target.parent</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">			</span><span class="NAME">path.push</span><span class="PUNC">(</span><span class="NAME">target</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">target</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">goal</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">l</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">path.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">stage</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">path</span><span class="PUNC">[</span><span class="NAME">l</span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>113</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="PUNC">(</span><span class="NAME">stage</span><span class="WHIT"> </span><span class="KEYW">instanceof</span><span class="WHIT"> </span><span class="NAME">Stage</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">mtx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Matrix2D</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">		</span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">l</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">target</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">path</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">			</span><span class="NAME">mtx.concatTransform</span><span class="PUNC">(</span><span class="NAME">target.x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target.y</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target.scaleX</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target.scaleY</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target.rotation</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target.regX</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target.regY</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">mtx</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>122</span> </span><span class="WHIT">	</span></pre></body></html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Flipping a sprite sheet</title>
+
+<link href="styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../easeljs/display/SpriteSheet.js"></script>
+<script src="../easeljs/utils/SpriteSheetUtils.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var imgSeq = new Image();		//bmp of the sprite sheet
+var results;					//frame data to be displayed
+
+function init() {
+	//wait for the image to load
+	imgSeq.onload = handleImageLoad;
+	imgSeq.src = "img/testSeq.png";
+}
+
+function handleImageLoad() {
+	// create a new sprite sheet from the loaded image, and define the animation sequences in it.
+	// for example, {walkUpRight:[0,19]} defines an animation sequence called "walkUpRight" that
+	// will play back frames 0 to 19 inclusive.
+	var spriteSheet = new SpriteSheet(imgSeq, 64, 68, {walkUpRight:[0,19], walkDownRight:[20,40], walkRight:[41,59]});
+	
+	// generate a new sprite sheet based on the old one, but adding new flipped animation sequences.
+	// the second param defines what new sequences to create, and how to flip them. It uses the format:
+	// {nameOfFlippedSequence:["derivativeSequence", flipHorizontally, flipVertically, optionNameOfNextSequence]}
+	spriteSheet = SpriteSheetUtils.flip(spriteSheet, {walkUpLeft:["walkUpRight",true,false], walkDownLeft:["walkDownRight",true,false], walkLeft:["walkRight",true,false], upsideDown:["walkRight",false,true]});
+	
+	// add the newly created sprite sheet to the bottom of this document:
+	document.body.appendChild(spriteSheet.image);
+	results = SpriteSheetUtils.frameDataToString(spriteSheet.frameData);
+}
+
+</script>
+</head>
+	
+<body onload="init();" bgcolor="#FFFFFF">
+	<!-- allow for alert of frame data-->
+	<div class="description">
+	Tests using the <strong>SpriteSheetUtils.flip()</strong> method to extend a loaded sprite sheet with horizontally flipped frames. The top row of frames is from the original sprite sheet, the bottom is the generated frames. <a href="javascript:alert(results)">Click here</a> to view the resulting frameData.
+	</div>
+	<br/><br/>
+	Original sprite sheet:<br/>
+	<img src="img/testSeq.png"><br/><br/><br/>
+	Generated sprite sheet:<br/>
+</body>
+</html>

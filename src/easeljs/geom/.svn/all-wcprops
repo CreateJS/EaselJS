@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/Internal/!svn/ver/1326/Easel/EaselJS/src/easeljs/geom
+END
+Rectangle.js
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/Internal/!svn/ver/1326/Easel/EaselJS/src/easeljs/geom/Rectangle.js
+END
+Point.js
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/Internal/!svn/ver/1326/Easel/EaselJS/src/easeljs/geom/Point.js
+END
+Matrix2D.js
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/Internal/!svn/ver/1316/Easel/EaselJS/src/easeljs/geom/Matrix2D.js
+END
+CoordTransform.js
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/Internal/!svn/ver/1326/Easel/EaselJS/src/easeljs/geom/CoordTransform.js
+END

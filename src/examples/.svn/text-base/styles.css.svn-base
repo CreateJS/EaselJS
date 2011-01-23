@@ -1,0 +1,23 @@
+body {
+	background-color: #111;
+	font-family: sans-serif;
+	font-size: 14px;
+	color: #CCC;
+}
+
+
+.canvasHolder {
+	width: 980px;
+	border: solid 15px #222;
+}
+
+.description {
+	background-color: #222;
+	width: 980px;
+	padding: 15px;
+	margin-bottom:1px;
+}
+
+strong {
+	color: #FFF;
+}

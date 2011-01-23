@@ -1,0 +1,33 @@
+Version 0.2.2 [Not released]
+********************************************************************************
+- adding a listener to Tick twice will now move it to the end of the listener list
+- added Tick.getMeasuredFPS()
+- added Tick.setFPS()
+- made the pauseable param "true" by default on Tick.addListener()
+- renamed Rectangle.w & h to width & height
+
+Version 0.2.1 [Jan 12, 2011]
+********************************************************************************
+- optimized Graphics: reduced overhead by 80-90%
+- added drawPolyStar method to Graphics
+- fixed bug with using canvas as an image source for Bitmap
+- made mouseChildren true by default for stage
+- fixed major bug with Tick.getTime()
+
+Version 0.2 [Jan 6, 2011]
+********************************************************************************
+Focus on vector graphics and text.
+- repackaged all class files to "easeljs" instead of "com.gskinner"
+- added Graphics API, and revised Shape to use a Graphics instance
+- added Text class
+- added Point class and updated CoordTransform to use it
+- added Rectangle class
+- fixed minor issue with Tick
+- added initial implementation of Stage.mouseX/Y (likely to change)
+- added new examples, updated others to work with revised APIs
+- minor tweaks, fixes to code and documentation
+- added support for multiple params on Container.addChild, addChildAt, removeChild & removeChildAt
+
+Version 0.1 [Dec 17, 2010]
+********************************************************************************
+Initial release.
