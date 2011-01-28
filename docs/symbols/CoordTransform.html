@@ -221,7 +221,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/Text.html">Text</a></li>
 	
-	<li><a href="../symbols/Tick.html">Tick</a></li>
+	<li><a href="../symbols/Ticker.html">Ticker</a></li>
 	
 	<li><a href="../symbols/UID.html">UID</a></li>
 	
@@ -295,7 +295,8 @@ ul.inheritsList
 							<td class="nameDescription">
 								<div class="fixedFont">CoordTransform.<b><a href="../symbols/CoordTransform.html#.getConcatenatedMatrix">getConcatenatedMatrix</a></b>(target, goal)
 								</div>
-								<div class="description">Generates a concatenated Matrix2D object representing the combined tranform ofthe target display object and all of its parent Containers.</div>
+								<div class="description">Generates a concatenated Matrix2D object representing the combined tranform of
+the target display object and all of its parent Containers.</div>
 							</td>
 						</tr>
 					
@@ -304,7 +305,8 @@ ul.inheritsList
 							<td class="nameDescription">
 								<div class="fixedFont">CoordTransform.<b><a href="../symbols/CoordTransform.html#.globalToLocal">globalToLocal</a></b>(x, y, target)
 								</div>
-								<div class="description">Transforms the specified x and y position from the global (stage) coordinate space to thecoordinate space of the target display object.</div>
+								<div class="description">Transforms the specified x and y position from the global (stage) coordinate space to the
+coordinate space of the target display object.</div>
 							</td>
 						</tr>
 					
@@ -313,7 +315,8 @@ ul.inheritsList
 							<td class="nameDescription">
 								<div class="fixedFont">CoordTransform.<b><a href="../symbols/CoordTransform.html#.localToGlobal">localToGlobal</a></b>(x, y, target)
 								</div>
-								<div class="description">Transforms the specified x and y position from the coordinate space of the source display objectto the global (stage) coordinate space.</div>
+								<div class="description">Transforms the specified x and y position from the coordinate space of the source display object
+to the global (stage) coordinate space.</div>
 							</td>
 						</tr>
 					
@@ -322,7 +325,8 @@ ul.inheritsList
 							<td class="nameDescription">
 								<div class="fixedFont">CoordTransform.<b><a href="../symbols/CoordTransform.html#.localToLocal">localToLocal</a></b>(x, y, source, target)
 								</div>
-								<div class="description">Transforms the specified x and y position from the coordinate space of the source display object to thecoordinate space of the target display object.</div>
+								<div class="description">Transforms the specified x and y position from the coordinate space of the source display object to the
+coordinate space of the target display object.</div>
 							</td>
 						</tr>
 					
@@ -382,7 +386,9 @@ ul.inheritsList
 					
 					</div>
 					<div class="description">
-						Generates a concatenated Matrix2D object representing the combined tranform ofthe target display object and all of its parent Containers. This can be used to transformpositions between coordinate spaces, as with localToGlobal and globalToLocal.
+						Generates a concatenated Matrix2D object representing the combined tranform of
+the target display object and all of its parent Containers. This can be used to transform
+positions between coordinate spaces, as with localToGlobal and globalToLocal.
 						
 						
 					</div>
@@ -424,7 +430,10 @@ ul.inheritsList
 					
 					</div>
 					<div class="description">
-						Transforms the specified x and y position from the global (stage) coordinate space to thecoordinate space of the target display object. For example, this could be used to determinethe current mouse position within a specific display object. Returns a Point instance with x and y propertiescorrelating to the tranformed position in the target's coordinate space.
+						Transforms the specified x and y position from the global (stage) coordinate space to the
+coordinate space of the target display object. For example, this could be used to determine
+the current mouse position within a specific display object. Returns a Point instance with x and y properties
+correlating to the tranformed position in the target's coordinate space.
 						
 						
 					</div>
@@ -472,7 +481,10 @@ ul.inheritsList
 					
 					</div>
 					<div class="description">
-						Transforms the specified x and y position from the coordinate space of the source display objectto the global (stage) coordinate space. For example, this could be used to position an HTML labelover a specific point on a nested display object. Returns a Point instance with x and y propertiescorrelating to the tranformed coordinates on the stage.
+						Transforms the specified x and y position from the coordinate space of the source display object
+to the global (stage) coordinate space. For example, this could be used to position an HTML label
+over a specific point on a nested display object. Returns a Point instance with x and y properties
+correlating to the tranformed coordinates on the stage.
 						
 						
 					</div>
@@ -520,7 +532,10 @@ ul.inheritsList
 					
 					</div>
 					<div class="description">
-						Transforms the specified x and y position from the coordinate space of the source display object to thecoordinate space of the target display object. Returns a Point instance with x and y propertiescorrelating to the tranformed position in the target's coordinate space. Effectively the same as callingvar pt = localToGlobal(x, y, source); pt = globalToLocal(pt.x, pt.y, target);
+						Transforms the specified x and y position from the coordinate space of the source display object to the
+coordinate space of the target display object. Returns a Point instance with x and y properties
+correlating to the tranformed position in the target's coordinate space. Effectively the same as calling
+var pt = localToGlobal(x, y, source); pt = globalToLocal(pt.x, pt.y, target);
 						
 						
 					</div>

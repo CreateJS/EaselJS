@@ -16,7 +16,7 @@
 <script src="../../easeljs/display/Graphics.js"></script>
 <script src="../../easeljs/display/Shape.js"></script>
 <script src="../../easeljs/display/Text.js"></script>
-<script src="../../easeljs/utils/Tick.js"></script>
+<script src="../../easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
 
 <!-- Game script below -->
@@ -133,7 +133,7 @@ function restart() {
 	stage.addChild(ship);
 	
 	//start game timer
-	Tick.addListener(window);
+	Ticker.addListener(window);
 }
 
 function tick() {

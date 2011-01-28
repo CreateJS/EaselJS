@@ -14,7 +14,7 @@
 <script src="../easeljs/display/Container.js"></script>
 <script src="../easeljs/display/Stage.js"></script>
 <script src="../easeljs/display/BitmapSequence.js"></script>
-<script src="../easeljs/utils/Tick.js"></script>
+<script src="../easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
 
 <script>
@@ -90,9 +90,9 @@ function handleImageLoad() {
 	
 	
 	// we want to do some work before we update the canvas,
-	// otherwise we could use Tick.addListener(stage);
-	Tick.setInterval(200);
-	Tick.addListener(stage);
+	// otherwise we could use Ticker.addListener(stage);
+	Ticker.setInterval(200);
+	Ticker.addListener(stage);
 }
 
 </script>

@@ -8,7 +8,7 @@
 
 <!-- Import EaselJS Framework -->
 <script src="../easeljs/display/Graphics.js"></script>
-<script src="../easeljs/utils/Tick.js"></script>
+<script src="../easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
 
 <script>
@@ -22,7 +22,7 @@ function run() {
 
 	var a = [];
 	
-	var t = Tick.getTime();
+	var t = Ticker.getTime();
 	for (var i=0; i<120; i++) {
 		var g = new Graphics();
 		
@@ -38,7 +38,7 @@ function run() {
 		a[i].draw(ctx);
 	}
 	
-	out(Tick.getTime()-t);
+	out(Ticker.getTime()-t);
 }
 
 function out(str) {

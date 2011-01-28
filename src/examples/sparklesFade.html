@@ -17,7 +17,7 @@
 <script src="../easeljs/display/BitmapSequence.js"></script>
 <script src="../easeljs/display/Graphics.js"></script>
 <script src="../easeljs/display/Shape.js"></script>
-<script src="../easeljs/utils/Tick.js"></script>
+<script src="../easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
 
 <script>
@@ -61,7 +61,7 @@ function handleImageLoad() {
 	bmpSeq.regY = bmpSeq.frameHeight/2|0;
 	
 	// start the tick and point it at the window so we can do some work before updating the stage:
-	Tick.addListener(window);
+	Ticker.addListener(window);
 }
 
 function tick() {
