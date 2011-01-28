@@ -17,7 +17,7 @@
 <script src="../easeljs/display/BitmapSequence.js"></script>
 <script src="../easeljs/display/Shape.js"></script>
 <script src="../easeljs/display/Text.js"></script>
-<script src="../easeljs/utils/Tick.js"></script>
+<script src="../easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
 
 <script>
@@ -58,8 +58,8 @@ function handleImageLoad() {
 	fpsLabel.y = 20;
 	
 	// start the tick and point it at the window so we can do some work before updating the stage:
-	Tick.setFPS(20);
-	Tick.addListener(window);
+	Ticker.setFPS(20);
+	Ticker.addListener(window);
 }
 
 
@@ -85,7 +85,7 @@ function tick() {
 		}
 	}
 	
-	fpsLabel.text = Math.round(Tick.getMeasuredFPS())+" fps";
+	fpsLabel.text = Math.round(Ticker.getMeasuredFPS())+" fps";
 	
 	// draw the updates to stage
 	stage.tick();
@@ -135,7 +135,7 @@ function addSparkles(count, x, y, speed) {
 	
 <body onload="init();">
 	<div class="description">
-	Example showing how to use simple animated <strong>BitmapSequence</strong> elements. Move your mouse and click on the canvas. It also demonstrates displaying the current measured framerate with <strong>Tick.getMeasuredFramerate()</strong> and <strong>Text</strong>. Click repeatedly to generate lots of sparkles and slow down the framerate.<br/>
+	Example showing how to use simple animated <strong>BitmapSequence</strong> elements. Move your mouse and click on the canvas. It also demonstrates displaying the current measured framerate with <strong>Ticker.getMeasuredFramerate()</strong> and <strong>Text</strong>. Click repeatedly to generate lots of sparkles and slow down the framerate.<br/>
 	</div>
 	<div class="canvasHolder">
 		<canvas id="testCanvas" width="980" height="680" style="background:#000000"></canvas>

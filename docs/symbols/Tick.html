@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - Tick</title>
+		<title>JsDoc Reference - Ticker</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -221,7 +221,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/Text.html">Text</a></li>
 	
-	<li><a href="../symbols/Tick.html">Tick</a></li>
+	<li><a href="../symbols/Ticker.html">Ticker</a></li>
 	
 	<li><a href="../symbols/UID.html">UID</a></li>
 	
@@ -234,7 +234,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class Tick
+				Class Ticker
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -245,13 +245,13 @@ ul.inheritsList
 				Provides a centralized tick or heartbeat. Listeners can subscribe to the tick, and identify whether they are pausable or not.
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/utils_Tick.js.html">Tick.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/utils_Ticker.js.html">Ticker.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Tick.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Ticker.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -264,9 +264,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/Tick.html#constructor">Tick</a></b>()
+								<b><a href="../symbols/Ticker.html#constructor">Ticker</a></b>()
 							</div>
-							<div class="description">The Tick class uses a static interface (ex.</div>
+							<div class="description">The Ticker class uses a static interface (ex.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -280,7 +280,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Tick.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Ticker.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -293,7 +293,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Tick.<b><a href="../symbols/Tick.html#.addListener">addListener</a></b>(o, pausable)
+								<div class="fixedFont">Ticker.<b><a href="../symbols/Ticker.html#.addListener">addListener</a></b>(o, pausable)
 								</div>
 								<div class="description">Adds a listener to the tick.</div>
 							</td>
@@ -302,7 +302,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Tick.<b><a href="../symbols/Tick.html#.getFPS">getFPS</a></b>()
+								<div class="fixedFont">Ticker.<b><a href="../symbols/Ticker.html#.getFPS">getFPS</a></b>()
 								</div>
 								<div class="description">Returns the frame rate in frames per second (FPS).</div>
 							</td>
@@ -311,7 +311,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Tick.<b><a href="../symbols/Tick.html#.getInterval">getInterval</a></b>()
+								<div class="fixedFont">Ticker.<b><a href="../symbols/Ticker.html#.getInterval">getInterval</a></b>()
 								</div>
 								<div class="description">Returns the current time between ticks, as set with setInterval.</div>
 							</td>
@@ -320,34 +320,34 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Tick.<b><a href="../symbols/Tick.html#.getPaused">getPaused</a></b>()
+								<div class="fixedFont">Ticker.<b><a href="../symbols/Ticker.html#.getPaused">getPaused</a></b>()
 								</div>
-								<div class="description">Returns a boolean indicating whether Tick is currently paused, as set with setPaused.</div>
+								<div class="description">Returns a boolean indicating whether Ticker is currently paused, as set with setPaused.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Tick.<b><a href="../symbols/Tick.html#.getTicks">getTicks</a></b>(pauseable)
+								<div class="fixedFont">Ticker.<b><a href="../symbols/Ticker.html#.getTickers">getTickers</a></b>(pauseable)
 								</div>
-								<div class="description">Returns the number of ticks that have elapsed while Tick was active.</div>
+								<div class="description">Returns the number of ticks that have elapsed while Ticker was active.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Tick.<b><a href="../symbols/Tick.html#.getTime">getTime</a></b>(pauseable)
+								<div class="fixedFont">Ticker.<b><a href="../symbols/Ticker.html#.getTime">getTime</a></b>(pauseable)
 								</div>
-								<div class="description">Returns the number of milliseconds that have elapsed since Tick was loaded.</div>
+								<div class="description">Returns the number of milliseconds that have elapsed since Ticker was loaded.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Tick.<b><a href="../symbols/Tick.html#.removeAllListeners">removeAllListeners</a></b>()
+								<div class="fixedFont">Ticker.<b><a href="../symbols/Ticker.html#.removeAllListeners">removeAllListeners</a></b>()
 								</div>
 								<div class="description">Removes all listeners.</div>
 							</td>
@@ -356,7 +356,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Tick.<b><a href="../symbols/Tick.html#.removeListener">removeListener</a></b>(o)
+								<div class="fixedFont">Ticker.<b><a href="../symbols/Ticker.html#.removeListener">removeListener</a></b>(o)
 								</div>
 								<div class="description">Removes the specified listener.</div>
 							</td>
@@ -365,7 +365,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Tick.<b><a href="../symbols/Tick.html#.setInterval">setInterval</a></b>(interval)
+								<div class="fixedFont">Ticker.<b><a href="../symbols/Ticker.html#.setInterval">setInterval</a></b>(interval)
 								</div>
 								<div class="description">Sets the time (in milliseconds) between ticks.</div>
 							</td>
@@ -374,9 +374,9 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Tick.<b><a href="../symbols/Tick.html#.setPaused">setPaused</a></b>(value)
+								<div class="fixedFont">Ticker.<b><a href="../symbols/Ticker.html#.setPaused">setPaused</a></b>(value)
 								</div>
-								<div class="description">While Tick is paused, pausable listeners are not ticked.</div>
+								<div class="description">While Ticker is paused, pausable listeners are not ticked.</div>
 							</td>
 						</tr>
 					
@@ -397,11 +397,11 @@ ul.inheritsList
 				</div>
 				
 				<div class="fixedFont">
-						<b>Tick</b>()
+						<b>Ticker</b>()
 				</div>
 				
 				<div class="description">
-					The Tick class uses a static interface (ex. Tick.getPaused()) and should not be instantiated.
+					The Ticker class uses a static interface (ex. Ticker.getPaused()) and should not be instantiated.
 					
 				</div>
 				
@@ -432,7 +432,7 @@ ul.inheritsList
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">Tick.</span><b>addListener</b>(o, pausable)
+					<span class="light">Ticker.</span><b>addListener</b>(o, pausable)
 					
 					</div>
 					<div class="description">
@@ -457,7 +457,7 @@ ul.inheritsList
 									<b>pausable</b>
 									
 								</dt>
-								<dd>If false, the listener will continue to have tick called even when Tick is paused via Tick.pause(). Default is false.</dd>
+								<dd>If false, the listener will continue to have tick called even when Ticker is paused via Ticker.pause(). Default is false.</dd>
 							
 							</dl>
 						
@@ -474,7 +474,7 @@ ul.inheritsList
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">Tick.</span><b>getFPS</b>()
+					<span class="light">Ticker.</span><b>getFPS</b>()
 					
 					</div>
 					<div class="description">
@@ -499,7 +499,7 @@ ul.inheritsList
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">Tick.</span><b>getInterval</b>()
+					<span class="light">Ticker.</span><b>getInterval</b>()
 					
 					</div>
 					<div class="description">
@@ -524,11 +524,11 @@ ul.inheritsList
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">Tick.</span><b>getPaused</b>()
+					<span class="light">Ticker.</span><b>getPaused</b>()
 					
 					</div>
 					<div class="description">
-						Returns a boolean indicating whether Tick is currently paused, as set with setPaused.
+						Returns a boolean indicating whether Ticker is currently paused, as set with setPaused.
 						
 						
 					</div>
@@ -545,15 +545,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name=".getTicks"> </a>
+					<a name=".getTickers"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">Tick.</span><b>getTicks</b>(pauseable)
+					<span class="light">Ticker.</span><b>getTickers</b>(pauseable)
 					
 					</div>
 					<div class="description">
-						Returns the number of ticks that have elapsed while Tick was active.
+						Returns the number of ticks that have elapsed while Ticker was active.
 						
 						
 					</div>
@@ -585,11 +585,11 @@ ul.inheritsList
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">Tick.</span><b>getTime</b>(pauseable)
+					<span class="light">Ticker.</span><b>getTime</b>(pauseable)
 					
 					</div>
 					<div class="description">
-						Returns the number of milliseconds that have elapsed since Tick was loaded. For example, you could use this in a time synchronized animation to determine the exact amount of time that has elapsed.
+						Returns the number of milliseconds that have elapsed since Ticker was loaded. For example, you could use this in a time synchronized animation to determine the exact amount of time that has elapsed.
 						
 						
 					</div>
@@ -604,7 +604,7 @@ ul.inheritsList
 									<b>pauseable</b>
 									
 								</dt>
-								<dd>Indicates whether to return the elapsed time for pauseable, or unpauseable listeners. If true, time that elapsed while Tick was paused is not included.</dd>
+								<dd>Indicates whether to return the elapsed time for pauseable, or unpauseable listeners. If true, time that elapsed while Ticker was paused is not included.</dd>
 							
 							</dl>
 						
@@ -621,7 +621,7 @@ ul.inheritsList
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">Tick.</span><b>removeAllListeners</b>()
+					<span class="light">Ticker.</span><b>removeAllListeners</b>()
 					
 					</div>
 					<div class="description">
@@ -646,7 +646,7 @@ ul.inheritsList
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">Tick.</span><b>removeListener</b>(o)
+					<span class="light">Ticker.</span><b>removeListener</b>(o)
 					
 					</div>
 					<div class="description">
@@ -682,7 +682,7 @@ ul.inheritsList
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">Tick.</span><b>setInterval</b>(interval)
+					<span class="light">Ticker.</span><b>setInterval</b>(interval)
 					
 					</div>
 					<div class="description">
@@ -718,11 +718,11 @@ ul.inheritsList
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">Tick.</span><b>setPaused</b>(value)
+					<span class="light">Ticker.</span><b>setPaused</b>(value)
 					
 					</div>
 					<div class="description">
-						While Tick is paused, pausable listeners are not ticked. See addListener for more information.
+						While Ticker is paused, pausable listeners are not ticked. See addListener for more information.
 						
 						
 					</div>
@@ -737,7 +737,7 @@ ul.inheritsList
 									<b>value</b>
 									
 								</dt>
-								<dd>Indicates whether to pause (true) or unpause (false) Tick.</dd>
+								<dd>Indicates whether to pause (true) or unpause (false) Ticker.</dd>
 							
 							</dl>
 						

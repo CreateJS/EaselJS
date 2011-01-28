@@ -41,7 +41,7 @@ There are also a few helper classes included:
 Shadow
 Defines all of the properties needed to display a shadow on a display object.
 
-Tick
+Ticker
 Provides a pausable centralized tick manager for ticking Stage instances or other time based code.
 
 UID

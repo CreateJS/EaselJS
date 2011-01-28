@@ -18,7 +18,7 @@
 <script src="../easeljs/display/BitmapSequence.js"></script>
 <script src="../easeljs/display/Graphics.js"></script>
 <script src="../easeljs/display/Shape.js"></script>
-<script src="../easeljs/utils/Tick.js"></script>
+<script src="../easeljs/utils/Ticker.js"></script>
 <script src="../easeljs/geom/Matrix2D.js"></script>
 <script src="../easeljs/geom/CoordTransform.js"></script>
 <!-- End EaselJS Imports -->
@@ -75,8 +75,8 @@ function init() {
 	stage.addChild(spin1);
 	
 	//start ticking
-	Tick.setInterval(20);		// 20ms = 50fps
-	Tick.addListener(window);
+	Ticker.setInterval(20);		// 20ms = 50fps
+	Ticker.addListener(window);
 }
 
 function tick() {

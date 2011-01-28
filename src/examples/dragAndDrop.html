@@ -17,7 +17,7 @@
 <script src="../easeljs/display/Bitmap.js"></script>
 <script src="../easeljs/display/BitmapSequence.js"></script>
 <script src="../easeljs/display/Shape.js"></script>
-<script src="../easeljs/utils/Tick.js"></script>
+<script src="../easeljs/utils/Ticker.js"></script>
 <script src="../easeljs/geom/Matrix2D.js"></script>
 <!-- End EaselJS Imports -->
 
@@ -42,7 +42,7 @@ function init() {
 	canvas.onmouseup = onMouseUp;
 	
 	// assign a tick listener directly to this window:
-	Tick.addListener(window);
+	Ticker.addListener(window);
 	
 	// load the source image:
 	var image = new Image();
@@ -82,7 +82,7 @@ function tick() {
 			// this will return the top-most display object under the mouse position:
 			mouseTarget = stage.getObjectUnderPoint(stage.mouseX, stage.mouseY);
 		} catch (e) {
-			Tick.removeListener(window);
+			Ticker.removeListener(window);
 			alert("An error occurred because this browser does not support reading pixel data in local files. Please read 'SECURITY_ERROR_README.txt' included with the EaselJS for details");
 		}
 		if(mouseTarget){
@@ -101,7 +101,7 @@ function tick() {
 		mouseTarget.y = stage.mouseY+offset.y;
 	}
 	
-	//Tick the display list (draw everything)
+	//Ticker the display list (draw everything)
 	stage.tick();
 }
 

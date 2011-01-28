@@ -32,7 +32,10 @@
 // constructor:
 	/**
 	* The Ticker class uses a static interface (ex. Ticker.getPaused()) and should not be instantiated.
-	* @class Provides a centralized tick or heartbeat. Listeners can subscribe to the tick, and identify whether they are pausable or not.
+	* @class Provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe 
+	* to the tick event to be notified when a set time interval has elapsed.
+	* Note that the interval that the tick event is called is a target interval, and may be broadcast 
+	* at a slower interval during times of high CPU load.
 	**/
 	function Ticker() {
 		throw "Ticker cannot be instantiated.";
@@ -51,9 +54,9 @@
 	Ticker._startTime = 0;
 	/** @private **/
 	Ticker._pausedTime=0;
-	/** @private **/
+	/** @private : number of ticks that have passed **/
 	Ticker._ticks = 0;
-	/** @private **/
+	/** @private : number of ticks that have passed while Ticker has been paused **/
 	Ticker._pausedTickers = 0;
 	/** @private **/
 	Ticker._interval = 50; // READ-ONLY
@@ -66,9 +69,13 @@
 	
 // public static methods:
 	/**
-	* Adds a listener to the tick. The listener object must expose a .tick() method, which will be called once each tick. The exposed tick method can optionally accept a single parameter, which will include the elapsed time between the previous tick and the current one.
+	* Adds a listener for the tick event. The listener object must expose a .tick() method, which will be called once 
+	* each tick / interval. The interval is specified via the .setInterval(ms) method.
+	* The exposed tick method is passed a single parameter, which include the elapsed time between the 
+	* previous tick and the current one.
 	* @param o The object to add as a listener.
-	* @param pausable If false, the listener will continue to have tick called even when Ticker is paused via Ticker.pause(). Default is false.
+	* @param pausable If false, the listener will continue to have tick called even when Ticker is paused via 
+	* Ticker.pause(). Default is false.
 	* @static
 	**/
 	Ticker.addListener = function(o, pauseable) {
@@ -83,7 +90,7 @@
 	
 	/**
 	* Removes the specified listener.
-	* @param o The listener to remove.
+	* @param o The object to remove from listening from the tick event.
 	* @static
 	**/
 	Ticker.removeListener = function(o) {
@@ -105,7 +112,8 @@
 	}
 	
 	/**
-	* Sets the time (in milliseconds) between ticks. Default is 50 (20 FPS).
+	* Sets the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
+	* Note actual time between ticks may be more than requested depending on CPU load.
 	* @param interval Time in milliseconds between ticks.
 	* @static
 	**/
@@ -117,7 +125,7 @@
 	}
 	
 	/**
-	* Returns the current time between ticks, as set with setInterval.
+	* Returns the current target time between ticks, as set with setInterval.
 	* @static
 	**/
 	Ticker.getInterval = function() {
@@ -125,19 +133,33 @@
 	}
 	
 	/**
-	* Returns the frame rate in frames per second (FPS). For example, with an interval of 40, getFPS() will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
+	* Returns the target frame rate in frames per second (FPS). For example, with an interval of 40, getFPS() will 
+	* return 25 (1000ms per second divided by 40 ms per tick = 25fps).
 	* @static
 	**/
 	Ticker.getFPS = function() {
 		return 1000/Ticker._interval;
 	}
 	
+	/**
+	* Sets the target frame rate in frames per second (FPS). For example, with an interval of 40, getFPS() will 
+	* return 25 (1000ms per second divided by 40 ms per tick = 25fps).
+	* @param value Target number of ticks broadcast per second.
+	* @static
+	**/	
 	Ticker.setFPS = function(value) {
 		Ticker.setInterval(1000/value);
 	}
 	
+	/**
+	* Returns the actual frames / ticks per second.
+	* @param ticks Optional. The number of previous ticks over which to measure the actual frames / ticks per second. 
+	* @static
+	**/
 	Ticker.getMeasuredFPS = function(ticks) {
 		if (Ticker._times.length < 2) { return -1; }
+		
+		// x >> 1 : use bitwise to divide by two (int math)
 		if (ticks == null) { ticks = Ticker.getFPS()>>1; }
 		ticks = Math.min(Ticker._times.length-1,ticks);
 		return 1000/((Ticker._times[0]-Ticker._times[ticks])/ticks);
@@ -161,8 +183,10 @@
 	}
 	
 	/**
-	* Returns the number of milliseconds that have elapsed since Ticker was loaded. For example, you could use this in a time synchronized animation to determine the exact amount of time that has elapsed.
-	* @param pauseable Indicates whether to return the elapsed time for pauseable, or unpauseable listeners. If true, time that elapsed while Ticker was paused is not included.
+	* Returns the number of milliseconds that have elapsed since Ticker was loaded. For example, you could use this in 
+	* a time synchronized animation to determine the exact amount of time that has elapsed.
+	* @param pauseable Indicates whether to return the elapsed time for pauseable, or unpauseable listeners. If true, 
+	* time that elapsed while Ticker was paused is not included.
 	* @static
 	**/
 	Ticker.getTime = function(pauseable) {
@@ -174,7 +198,7 @@
 	* @param pauseable Indicates whether to return the elapsed ticks for pauseable, or unpauseable listeners.
 	* @static
 	**/
-	Ticker.getTickers = function(pauseable) {
+	Ticker.getTicks = function(pauseable) {
 		return  Ticker._ticks - (pauseable ?Ticker._pausedTickers : 0);
 	}
 	
