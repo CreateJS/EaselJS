@@ -98,7 +98,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 			if (this.currentFrame >= ttlFrames) {
 				if (this.spriteSheet.loop) { this.currentFrame = 0; }
 				else {
-					this.currentFrame = ttllFrames;
+					this.currentFrame = ttlFrames;
 					this.paused = true;
 				}
 				if (this.callback) { this.callback(this); }

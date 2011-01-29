@@ -50,14 +50,14 @@ var p = Shadow.prototype;
 	Shadow.identity = null; // set at bottom of class definition.
 	
 // public properties:
-	/** The blur of the shadow. **/
-	p.blur = 0;
 	/** The color of the shadow. **/
-	p.color = 0;
+	p.color = null;
 	/** The x offset of the shadow. **/
 	p.offsetX = 0;
 	/** The y offset of the shadow. **/
 	p.offsetY = 0;
+	/** The blur of the shadow. **/
+	p.blur = 0;
 	
 // constructor:
 	/** @private **/
@@ -85,7 +85,7 @@ var p = Shadow.prototype;
 	}
 	
 	// this has to be populated after the class is defined:
-	Shadow.identity = new Shadow(0, 0, 0, 0);
+	Shadow.identity = new Shadow(null, 0, 0, 0);
 	
 window.Shadow = Shadow;
 }(window));

@@ -1,10 +1,30 @@
-Version 0.2.2 [Not released]
+Version 0.3 [Not released]
 ********************************************************************************
+- renamed Tick to Ticker
 - adding a listener to Ticker twice will now move it to the end of the listener list
 - added Ticker.getMeasuredFPS()
 - added Ticker.setFPS()
 - made the pauseable param "true" by default on Ticker.addListener()
 - renamed Rectangle.w & h to width & height
+- improvements to commenting and documentation
+- changed color to null instead of 0 in Shadow.IDENTITY
+- fixed an error with simple sprite sheets that weren't set to loop
+
+* implement new inheritance model.
+* rework interaction model:
+	- MouseInteraction.enable(stage)
+	- onPress, onClick events for all DOs
+	- eliminate mouseChildren
+	- mouseEnabled true by default
+	- stage onMouseDown, onMouseUp, and onMouseMove events
+	- add hitTest method to DOs?
+	- add suppressCrossDomainErrors property
+* multi-line support for text
+* preliminary support for getBounds on Text, Bitmap, BitmapSequence
+* loading support for SpriteSheet / Bitmap? (ie. pass url string in constructor)
+* implement "tiny" instructions for Graphics. (ex. f("#0FF").c(x,y,r) )
+* google closure?
+* separate stage.tick (ticks children) and stage.update/render (renders children)?
 
 Version 0.2.1 [Jan 12, 2011]
 ********************************************************************************
