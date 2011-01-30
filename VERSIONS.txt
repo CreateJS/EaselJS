@@ -11,6 +11,7 @@ Version 0.3 [Not released]
 - fixed an error with simple sprite sheets that weren't set to loop
 - implemented "tiny" instructions for Graphics. (ex. myGraphics.f("#0FF").c(x,y,r) )
 - fixed problems with Graphics.clone()
+- fixed bug with passing instructions to a Graphics object constructor
 - formalized inheritance model to make code more readable
 - renamed Stage.tick to Stage.update and made Stage.tick point to Stage.update
 

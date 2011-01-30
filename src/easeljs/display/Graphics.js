@@ -132,7 +132,7 @@ var p = Graphics.prototype;
 	p.initialize = function(instructions) {
 		this.clear();
 		this._ctx = Graphics._ctx;
-		eval(instructions);
+		with (this) { eval(instructions); }
 	}
 	
 // public methods:
