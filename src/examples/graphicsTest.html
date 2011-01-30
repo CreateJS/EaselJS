@@ -17,15 +17,15 @@ var ctx;
 var img = new Image();
 
 function init() {
+	//find canvas and load images, wait for last image to load
+	canvas = document.getElementById("testCanvas");
+	ctx = canvas.getContext("2d");
+	
 	img.onload = run;
 	img.src = "img/daisy.png";
 }
 
 function run() {
-	//find canvas and load images, wait for last image to load
-	canvas = document.getElementById("testCanvas");
-	ctx = canvas.getContext("2d");
-	
 	// create a new Graphics object. Note that Graphics can be used without any dependency on the rest of Easel.
 	var g = new Graphics();
 	

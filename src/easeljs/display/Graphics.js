@@ -553,7 +553,60 @@ var p = Graphics.prototype;
 		return "[Graphics]";
 	}
 	
-// GDS: clip?, isPointInPath?
+	
+// tiny API:
+	/** Shortcut to moveTo. **/
+	p.mt = p.moveTo;
+	/** Shortcut to lineTo. **/
+	p.lt = p.lineTo;
+	/** Shortcut to arcTo. **/
+	p.at = p.arcTo;
+	/** Shortcut to bezierCurveTo. **/
+	p.bt = p.bezierCurveTo;
+	/** Shortcut to quadraticCurveTo / curveTo. **/
+	p.qt = p.quadraticCurveTo;
+	/** Shortcut to arc. **/
+	p.a = p.arc;
+	/** Shortcut to rect. **/
+	p.r = p.rect;
+	/** Shortcut to closePath. **/
+	p.cp = p.closePath;
+	/** Shortcut to clear. **/
+	p.c = p.clear;
+	/** Shortcut to beginFill. **/
+	p.f = p.beginFill;
+	/** Shortcut to beginLinearGradientFill. **/
+	p.lf = p.beginLinearGradientFill;
+	/** Shortcut to beginRadialGradientFill. **/
+	p.rf = p.beginRadialGradientFill;
+	/** Shortcut to beginBitmapFill. **/
+	p.bf = p.beginBitmapFill;
+	/** Shortcut to endFill. **/
+	p.ef = p.endFill;
+	/** Shortcut to setStrokeStyle. **/
+	p.ss = p.setStrokeStyle;
+	/** Shortcut to beginStroke. **/
+	p.s = p.beginStroke;
+	/** Shortcut to beginLinearGradientStroke. **/
+	p.ls = p.beginLinearGradientStroke;
+	/** Shortcut to beginRadialGradientStroke. **/
+	p.rs = p.beginRadialGradientStroke;
+	/** Shortcut to beginBitmapStroke. **/
+	p.bs = p.beginBitmapStroke;
+	/** Shortcut to endStroke. **/
+	p.es = p.endStroke;
+	/** Shortcut to drawRect. **/
+	p.dr = p.drawRect;
+	/** Shortcut to drawRoundRect. **/
+	p.rr = p.drawRoundRect;
+	/** Shortcut to drawRoundRectComplex. **/
+	p.rc = p.drawRoundRectComplex;
+	/** Shortcut to drawCircle. **/
+	p.dc = p.drawCircle;
+	/** Shortcut to drawEllipse. **/
+	p.de = p.drawEllipse;
+	/** Shortcut to drawPolyStar. **/
+	p.dp = p.drawPolyStar;
 	
 	
 // private methods:

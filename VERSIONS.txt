@@ -9,6 +9,7 @@ Version 0.3 [Not released]
 - improvements to commenting and documentation
 - changed color to null instead of 0 in Shadow.IDENTITY
 - fixed an error with simple sprite sheets that weren't set to loop
+- implement "tiny" instructions for Graphics. (ex. myGraphics.f("#0FF").c(x,y,r) )
 
 * implement new inheritance model.
 * rework interaction model:
@@ -22,7 +23,6 @@ Version 0.3 [Not released]
 * multi-line support for text
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * loading support for SpriteSheet / Bitmap? (ie. pass url string in constructor)
-* implement "tiny" instructions for Graphics. (ex. f("#0FF").c(x,y,r) )
 * google closure?
 * separate stage.tick (ticks children) and stage.update/render (renders children)?
 
