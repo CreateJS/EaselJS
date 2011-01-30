@@ -86,6 +86,22 @@ var p = Graphics.prototype;
 		}
 	}
 	
+	/**
+	* Maps numeric values for the caps parameter of setStrokeStyle to corresponding string values.
+	* This is primarily for use with the tiny API. The mappings are as follows: 0 to "butt",
+	* 1 to "round", and 2 to "square".
+	* For example, myGraphics.ss(16, 2) would set the line caps to "square".
+	**/
+	Graphics.STROKE_CAPS_MAP = ["butt", "round", "square"];
+	
+	/**
+	* Maps numeric values for the joints parameter of setStrokeStyle to corresponding string values.
+	* This is primarily for use with the tiny API. The mappings are as follows: 0 to "miter",
+	* 1 to "round", and 2 to "bevel".
+	* For example, myGraphics.ss(16, 0, 2) would set the line joints to "bevel".
+	**/
+	Graphics.STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
+	
 	Graphics._canvas = document.createElement("canvas");
 	Graphics._ctx = Graphics._canvas.getContext("2d");
 	
@@ -327,17 +343,17 @@ var p = Graphics.prototype;
 	* Sets the stroke style for the current subpath. Like all drawing methods, this can be chained, so you can define the stroke style and color in a single line of code like so:
 	* myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
 	* @param thickness The width of the stroke.
-	* @param caps Optional. Indicates the type of caps to use at the end of lines. One of butt, round, or square. Defaults to "butt".
-	* @param joints Optional. Specifies the type of joints that should be used where two lines meet. One of bevel, round, or miter. Defaults to "miter".
+	* @param caps Optional. Indicates the type of caps to use at the end of lines. One of butt, round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with the tiny API.
+	* @param joints Optional. Specifies the type of joints that should be used where two lines meet. One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel) for use with the tiny API.
 	* @param miter Optional. If joints is set to "miter", then you can specify a miter limit ratio which controls at what point a mitered joint will be clipped.
 	**/
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
 		if (this._active) { this._newPath(); }
 		this._strokeStyleInstructions = [
-			new Command(this._setProp, ["lineWidth", (thickness != null ? thickness : "1")]),
-			new Command(this._setProp, ["lineCap", (caps ? caps : "butt")]),
-			new Command(this._setProp, ["lineJoin", (joints ? joints : "miter")]),
-			new Command(this._setProp, ["miterLimit", (miterLimit ? miterLimit : "10")])
+			new Command(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)]),
+			new Command(this._setProp, ["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))]),
+			new Command(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))]),
+			new Command(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)])
 			];
 		return this;
 	}

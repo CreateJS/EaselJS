@@ -9,7 +9,7 @@ Version 0.3 [Not released]
 - improvements to commenting and documentation
 - changed color to null instead of 0 in Shadow.IDENTITY
 - fixed an error with simple sprite sheets that weren't set to loop
-- implement "tiny" instructions for Graphics. (ex. myGraphics.f("#0FF").c(x,y,r) )
+- implemented "tiny" instructions for Graphics. (ex. myGraphics.f("#0FF").c(x,y,r) )
 
 * implement new inheritance model.
 * rework interaction model:
