@@ -1,6 +1,8 @@
 Version 0.3 [Not released]
 ********************************************************************************
 - renamed Tick to Ticker
+- renamed Stage.tick to Stage.update
+- renamed easeljs.js to easel.js
 - adding a listener to Ticker twice will now move it to the end of the listener list
 - added Ticker.getMeasuredFPS()
 - added Ticker.setFPS()
