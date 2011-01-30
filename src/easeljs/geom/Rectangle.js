@@ -38,7 +38,7 @@
 * @class Represents a rectangle as defined by the points (x,y) and (x+width,y+height).
 **/
 function Rectangle(x, y, width, height) {
-  this.init(x, y, width, height);
+  this.initialize(x, y, width, height);
 }
 var p = Rectangle.prototype;
 	
@@ -54,7 +54,7 @@ var p = Rectangle.prototype;
 	
 // constructor:
 	/** @private **/
-	p.init = function(x, y, width, height) {
+	p.initialize = function(x, y, width, height) {
 		this.x = (x == null ? 0 : x);
 		this.y = (y == null ? 0 : y);
 		this.width = (width == null ? 0 : width);

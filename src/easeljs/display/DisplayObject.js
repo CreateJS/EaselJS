@@ -34,7 +34,7 @@
 * @class DisplayObject is the base class for all display classes in the CanvasDisplay library. It defines the core properties and methods that are shared between all display objects. It should not be instantiated directly.
 **/
 function DisplayObject() {
-  this.init();
+  this.initialize();
 }
 var p = DisplayObject.prototype;
 
@@ -93,7 +93,7 @@ var p = DisplayObject.prototype;
 // constructor:
 	// separated so it can be easily addressed in subclasses:
 	/** @private **/
-	p.init = function() {
+	p.initialize = function() {
 		this.id = UID.get();
 		this.children = [];
 	}

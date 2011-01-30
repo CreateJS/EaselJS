@@ -38,7 +38,7 @@
 * @augments DisplayObject
 **/
 function Text(text, font, color) {
-  this.init(text, font, color);
+  this.initialize(text, font, color);
 }
 var p = Text.prototype = new DisplayObject();
 
@@ -64,19 +64,19 @@ Text._workingContext = canvas.getContext("2d");
 	
 // constructor:
 	/** @private **/
-	p._init = p.init;
+	p.DisplayObject_initialize = p.initialize;
 	/** @private **/
-	p.init = function(text, font, color) {
-		this._init();
+	p.initialize = function(text, font, color) {
+		this.DisplayObject_initialize();
 		this.text = text;
 		this.font = font;
 		this.color = color ? color : "#000";
 	}
 	
 // public methods:
-	p._draw = p.draw;
+	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
-		if (!this._draw(ctx,ignoreCache) || this.text == null || this.text.length == 0) { return false; }
+		if (!this.DisplayObject_draw(ctx,ignoreCache) || this.text == null || this.text.length == 0) { return false; }
 		
 		if (this.outline) { ctx.strokeStyle = this.color; }
 		else { ctx.fillStyle = this.color; }
@@ -111,10 +111,10 @@ Text._workingContext = canvas.getContext("2d");
 // private methods:
 	
 	/** @private **/
-	p._cloneProps = p.cloneProps;
+	p.DisplayObject_cloneProps = p.cloneProps;
 	/** @private **/
 	p.cloneProps = function(o) {
-		this._cloneProps(o);
+		this.DisplayObject_cloneProps(o);
 		o.textAlign = this.textAlign;
 		o.textBaseline = this.textBaseline;
 		o.maxWidth = this.maxWidth;

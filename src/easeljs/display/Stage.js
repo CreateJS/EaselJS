@@ -36,7 +36,7 @@
 * @augments Container
 **/
 function Stage(canvas) {
-  this.init(canvas);
+  this.initialize(canvas);
 }
 var p = Stage.prototype = new Container();
 
@@ -55,10 +55,10 @@ var p = Stage.prototype = new Container();
 	
 // constructor:
 	/** @private **/
-	p.__init = p.init;
+	p.Container_initialize = p.initialize;
 	/** @private **/
-	p.init = function(canvas) {
-		this.__init();
+	p.initialize = function(canvas) {
+		this.Container_initialize();
 		this.canvas = canvas;
 		this.mouseChildren = true;
 		
@@ -74,9 +74,9 @@ var p = Stage.prototype = new Container();
 	
 // public methods:
 	/**
-	* Each time tick is called, the stage will render its entire display list to the canvas.
+	* Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapSequence) and render its entire display list to the canvas.
 	**/
-	p.tick = function() {
+	p.update = function() {
 		if (this.canvas == null) { return; }
 		var ctx = this.canvas.getContext("2d");
 		if (this.autoClear) { this.clear(); }
@@ -84,6 +84,11 @@ var p = Stage.prototype = new Container();
 		this.draw(ctx);
 		this.revertContext();
 	}
+	
+	/**
+	* Calls the update method. Useful for adding stage as a listener to Ticker directly.
+	**/
+	p.tick = p.update;
 	
 	/**
 	* Clears the target canvas. Useful if autoClear is set to false.
@@ -125,7 +130,7 @@ var p = Stage.prototype = new Container();
 	
 // private methods:
 	/** @private **/
-	p.__getObjectsUnderPoint = p._getObjectsUnderPoint;
+	p._Container_getObjectsUnderPoint = p._getObjectsUnderPoint;
 	/** @private **/
 	p._getObjectsUnderPoint = function(x,y,arr) {
 		if (this._tmpCanvas == null) { this._tmpCanvas = document.createElement("canvas"); }
@@ -135,7 +140,7 @@ var p = Stage.prototype = new Container();
 		var ctx = this._tmpCanvas.getContext("2d");
 		
 		this.updateContext(ctx,true);
-		var results = this.__getObjectsUnderPoint(x,y,ctx,arr);
+		var results = this._Container_getObjectsUnderPoint(x,y,ctx,arr);
 		this.revertContext();
 		
 		return results;

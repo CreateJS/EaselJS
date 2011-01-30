@@ -38,7 +38,7 @@
 * @class Encapsulates the properties required to define a shadow to apply to a DisplayObject via it's .shadow property.
 **/
 function Shadow(color, offsetX, offsetY, blur) {
-  this.init(color, offsetX, offsetY, blur);
+  this.initialize(color, offsetX, offsetY, blur);
 }
 var p = Shadow.prototype;
 	
@@ -61,7 +61,7 @@ var p = Shadow.prototype;
 	
 // constructor:
 	/** @private **/
-	p.init = function(color, offsetX, offsetY, blur) {
+	p.initialize = function(color, offsetX, offsetY, blur) {
 		this.color = color;
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;

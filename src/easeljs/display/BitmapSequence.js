@@ -36,7 +36,7 @@
 * @augments DisplayObject
 **/
 function BitmapSequence(spriteSheet) {
-  this.init(spriteSheet);
+  this.initialize(spriteSheet);
 }
 var p = BitmapSequence.prototype = new DisplayObject();
 
@@ -60,22 +60,22 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	
 // constructor:
 	/** @private **/
-	p._init = p.init;
+	p.DisplayObject_initialize = p.initialize;
 	/** @private **/
-	p.init = function(spriteSheet) {
-		this._init();
+	p.initialize = function(spriteSheet) {
+		this.DisplayObject_initialize();
 		this.spriteSheet = spriteSheet;
 	}
 	
 // public methods:
-	p._draw = p.draw;
+	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
 		var image = this.spriteSheet.image;
 		var frameWidth = this.spriteSheet.frameWidth;
 		var frameHeight = this.spriteSheet.frameHeight;
 		
 		if (image == null || !(image.complete || image.getContext) || this.currentFrame < 0) { return false; }
-		if (!this._draw(ctx,ignoreCache)) { return false; }
+		if (!this.DisplayObject_draw(ctx,ignoreCache)) { return false; }
 		
 		var cols = image.width/frameWidth|0;
 		var rows = image.height/frameHeight|0;
@@ -156,10 +156,10 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	
 // private methods:
 	/** @private **/
-	p._cloneProps = p.cloneProps;
+	p.DisplayObject_cloneProps = p.cloneProps;
 	/** @private **/
 	p.cloneProps = function(o) {
-		this._cloneProps(o);
+		this.DisplayObject_cloneProps(o);
 		o.callback = this.callback;
 		o.currentFrame = this.currentFrame;
 		o.currentStartFrame = this.currentStartFrame;

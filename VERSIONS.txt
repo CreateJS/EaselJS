@@ -1,8 +1,6 @@
 Version 0.3 [Not released]
 ********************************************************************************
 - renamed Tick to Ticker
-- renamed Stage.tick to Stage.update
-- renamed easeljs.js to easel.js
 - adding a listener to Ticker twice will now move it to the end of the listener list
 - added Ticker.getMeasuredFPS()
 - added Ticker.setFPS()
@@ -12,8 +10,10 @@ Version 0.3 [Not released]
 - changed color to null instead of 0 in Shadow.IDENTITY
 - fixed an error with simple sprite sheets that weren't set to loop
 - implemented "tiny" instructions for Graphics. (ex. myGraphics.f("#0FF").c(x,y,r) )
+- fixed problems with Graphics.clone()
+- formalized inheritance model to make code more readable
+- renamed Stage.tick to Stage.update and made Stage.tick point to Stage.update
 
-* implement new inheritance model.
 * rework interaction model:
 	- MouseInteraction.enable(stage)
 	- onPress, onClick events for all DOs
@@ -24,9 +24,8 @@ Version 0.3 [Not released]
 	- add suppressCrossDomainErrors property
 * multi-line support for text
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
-* loading support for SpriteSheet / Bitmap? (ie. pass url string in constructor)
 * google closure?
-* separate stage.tick (ticks children) and stage.update/render (renders children)?
+* rename easeljs.js to easel.js
 
 Version 0.2.1 [Jan 12, 2011]
 ********************************************************************************

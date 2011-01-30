@@ -36,7 +36,7 @@
 * @class Represents a point with x / y coordinates.
 **/
 function Point(x, y) {
-  this.init(x, y);
+  this.initialize(x, y);
 }
 var p = Point.prototype;
 	
@@ -48,7 +48,7 @@ var p = Point.prototype;
 	
 // constructor:
 	/** @private **/
-	p.init = function(x, y) {
+	p.initialize = function(x, y) {
 		this.x = (x == null ? 0 : x);
 		this.y = (y == null ? 0 : y);
 	}

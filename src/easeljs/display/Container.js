@@ -35,7 +35,7 @@
 * @augments DisplayObject
 **/
 function Container() {
-  this.init();
+  this.initialize();
 }
 var p = Container.prototype = new DisplayObject();
 
@@ -47,19 +47,19 @@ var p = Container.prototype = new DisplayObject();
 
 // constructor:
 	/** @private **/
-	p._init = p.init;
+	p.DisplayObject_initialize = p.initialize;
 	/** @private **/
-	p.init = function() {
-		this._init();
+	p.initialize = function() {
+		this.DisplayObject_initialize();
 		this.children = [];
 	}
 	
 // public methods:
 	/** @private **/
-	p._draw = p.draw;
+	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
 		if (this.children.length == 0) { return false; }
-		if (!this._draw(ctx,ignoreCache)) { return false; }
+		if (!this.DisplayObject_draw(ctx,ignoreCache)) { return false; }
 		var l=this.children.length;
 		// GDS: this fixes issues with display list changes that occur during a draw, but may have performance implications:
 		var list = this.children.slice(0);
@@ -261,10 +261,10 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 	/** @private **/
-	p._cloneProps = p.cloneProps;
+	p.DisplayObject_cloneProps = p.cloneProps;
 	/** @private **/
 	p.cloneProps = function(o) {
-		this._cloneProps(o);
+		this.DisplayObject_cloneProps(o);
 		o.mouseChildren = this.mouseChildren;
 	}
 

@@ -40,7 +40,7 @@
 * @class Represents an affine tranformation matrix, and provides tools for constructing and concatenating matrixes.
 **/
 function Matrix2D(a,b,c,d,tx,ty) {
-  this.init(a,b,c,d,tx,ty);
+  this.initialize(a,b,c,d,tx,ty);
 }
 var p = Matrix2D.prototype;
 	
@@ -67,7 +67,7 @@ var p = Matrix2D.prototype;
 	
 // constructor:
 	/** @private **/
-	p.init = function(a,b,c,d,tx,ty) {
+	p.initialize = function(a,b,c,d,tx,ty) {
 		if (a != null) { this.a = a; }
 		if (b != null) { this.b = b; }
 		if (c != null) { this.c = c; }

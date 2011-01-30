@@ -46,7 +46,7 @@ Command.prototype.exec = function(scope) { this.f.apply(scope,this.params); }
 * myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
 **/
 function Graphics(instructions) {
-	this.init(instructions);
+	this.initialize(instructions);
 }
 var p = Graphics.prototype;
 
@@ -129,7 +129,7 @@ var p = Graphics.prototype;
 	
 // constructor:
 	/** @private **/
-	p.init = function(instructions) {
+	p.initialize = function(instructions) {
 		this.clear();
 		this._ctx = Graphics._ctx;
 		eval(instructions);
@@ -553,12 +553,13 @@ var p = Graphics.prototype;
 	}
 	
 	p.clone = function() {
-		var o = new Graphics(this._instructions);
-		o._activeIntructions = this._activeInstructions;
-		o._oldInstructions = this._oldInstructions;
-		o._fillInstructions = this._fillInstructions;
-		o._strokeInstructions = this._strokeInstructions;
-		o._strokeStyleInstructions = this._strokeStyleInstructions;
+		var o = new Graphics();
+		o._instructions = this._instructions.slice();
+		o._activeIntructions = this._activeInstructions.slice();
+		o._oldInstructions = this._oldInstructions.slice();
+		o._fillInstructions = this._fillInstructions.slice();
+		o._strokeInstructions = this._strokeInstructions.slice();
+		o._strokeStyleInstructions = this._strokeStyleInstructions.slice();
 		o._active = this._active;
 		o._dirty = this._dirty;
 		o._assets = this._assets;

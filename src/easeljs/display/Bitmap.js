@@ -36,7 +36,7 @@
 * @augments DisplayObject
 **/
 function Bitmap(image) {
-  this.init(image);
+  this.initialize(image);
 }
 var p = Bitmap.prototype = new DisplayObject();
 
@@ -46,19 +46,19 @@ var p = Bitmap.prototype = new DisplayObject();
 	
 // constructor:
 	/** @private **/
-	p._init = p.init;
+	p.DisplayObject_initialize = p.initialize;
 	/** @private **/
-	p.init = function(image) {
-		this._init();
+	p.initialize = function(image) {
+		this.DisplayObject_initialize();
 		this.image = image;
 	}
 	
 // public methods:
 	/** @borrows DisplayObject#draw as this.draw **/
-	p._draw = p.draw;
+	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
 		if (this.image == null || !(this.image.complete || this.image.getContext)) { return false; }
-		if (!this._draw(ctx,ignoreCache)) { return false; }
+		if (!this.DisplayObject_draw(ctx,ignoreCache)) { return false; }
 		ctx.drawImage(this.image,0,0);
 	}
 	

@@ -38,7 +38,7 @@
 * @augments DisplayObject
 **/
 function Shape(graphics) {
-  this.init(graphics);
+  this.initialize(graphics);
 }
 var p = Shape.prototype = new DisplayObject();
 
@@ -48,18 +48,18 @@ var p = Shape.prototype = new DisplayObject();
 	
 // constructor:
 	/** @private **/
-	p._init = p.init;
+	p.DisplayObject_initialize = p.initialize;
 	/** @private **/
-	p.init = function(graphics) {
-		this._init();
+	p.initialize = function(graphics) {
+		this.DisplayObject_initialize();
 		this.graphics = graphics ? graphics : new Graphics();
 	}
 	
 // public methods:
-	p._draw = p.draw;
+	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
 		if (this.cacheCanvas == null && this.graphics == null) { return false; }
-		if (!this._draw(ctx,ignoreCache)) { return false; }
+		if (!this.DisplayObject_draw(ctx,ignoreCache)) { return false; }
 		this.graphics.draw(ctx);
 	}
 	

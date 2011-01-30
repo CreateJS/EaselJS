@@ -40,7 +40,7 @@
 * More complex sprite sheets include a frameData property, which provides named frames and animations which can be played and sequenced together. See frameData for more information.
 **/
 function SpriteSheet(image, frameWidth, frameHeight, frameData) {
-  this.init(image, frameWidth, frameHeight, frameData);
+  this.initialize(image, frameWidth, frameHeight, frameData);
 }
 var p = SpriteSheet.prototype;
 	
@@ -61,7 +61,7 @@ var p = SpriteSheet.prototype;
 	
 // constructor:
 	/** @private **/
-	p.init = function(image, frameWidth, frameHeight, frameData) {
+	p.initialize = function(image, frameWidth, frameHeight, frameData) {
 		this.image = image;
 		this.frameWidth = frameWidth;
 		this.frameHeight = frameHeight;
