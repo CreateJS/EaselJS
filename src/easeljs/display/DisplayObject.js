@@ -38,6 +38,11 @@ function DisplayObject() {
 }
 var p = DisplayObject.prototype;
 
+/** @private **/
+DisplayObject._hitTestCanvas = document.createElement("canvas");
+DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
+DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
+
 // public properties:
 	/** The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque. **/
 	p.alpha = 1;

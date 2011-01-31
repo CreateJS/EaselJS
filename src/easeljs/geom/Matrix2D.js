@@ -187,6 +187,25 @@ var p = Matrix2D.prototype;
 		this.tx = (c1*this.ty-d1*tx1)/n;
 		this.ty = -(a1*this.ty-b1*tx1)/n;
 	}
+
+	/**
+	 * Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that this these values
+	 * may not match the transform properties you used to generate the matrix (because affine matrices can be decomposed
+	 * to produce multiple possible transforms, all of which produce the same visual results.
+	 * @param target The object to apply the transform properties to. If null, then a new object will be returned.
+	 */
+	p.decompose = function(target) {
+		if (target == null) { target = {}; }
+		target.x = this.tx;
+		target.y = this.ty;
+		target.scaleX = Math.sqrt(this.a * this.a + this.b * this.b) * (this.a < 0 && this.d > 0 ? -1 : 1);
+		target.scaleY = Math.sqrt(this.c * this.c + this.d * this.d) * (this.d < 0 && this.a > 0 ? -1 : 1);
+		target.rotation = Math.atan2(this.b, this.a)/Math.PI*180;
+		if (this.a < 0 && this.d >= 0) {
+			target.rotation += (target.rotation <= 0) ? 180 : -180;
+		}
+		return target;
+	}
 	
 	/**
 	* Returns a clone of this Matrix.
