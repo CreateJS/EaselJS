@@ -37,6 +37,11 @@
 	function SpriteSheetUtils() {
 		throw "SpriteSheetUtils cannot be instantiated"; 
 	}
+
+	/** @private **/
+	SpriteSheetUtils._workingCanvas = document.createElement("canvas");
+	/** @private **/
+	SpriteSheetUtils._workingContext = SpriteSheetUtils._workingCanvas.getContext("2d");
 	
 // public static methods:
 	/**
@@ -89,10 +94,10 @@
 		}
 		
 		// get the canvas ready:
-		var canvas = document.createElement("canvas");
+		var canvas = SpriteSheetUtils._workingCanvas;
 		canvas.width = image.width;
 		canvas.height = Math.ceil(rows+frCount/cols)*frameHeight;
-		var ctx = canvas.getContext("2d");
+		var ctx = SpriteSheetUtils._workingContext;
 		ctx.drawImage(image, 0, 0, cols*frameWidth, rows*frameHeight, 0, 0, cols*frameWidth, rows*frameHeight);
 		
 		// draw the new frames, and update the new frameData:
@@ -156,6 +161,30 @@
 		}
 		str = count+" sequences, min="+min+", max="+max+str;
 		return str;
+	}
+
+	/**
+	 * Returns a single frame of the specified sprite sheet as a new PNG image.
+	 * @param spriteSheet The SpriteSheet instance to extract a frame from.
+	 * @param frame The frame number or sequence name to extract. If a sequence name is specified, only the first frame of the sequence will be extracted.
+	 */
+	SpriteSheetUtils.extractFrame = function(spriteSheet, frame) {
+		var image = spriteSheet.image;
+		var frameWidth = spriteSheet.frameWidth;
+		var frameHeight = spriteSheet.frameHeight;
+		var cols = image.width/frameWidth|0;
+		if (isNaN(frame)) {
+			var data = spriteSheet.frameData[frame];
+			if (data instanceof Array) { frame = data[0]; }
+			else { frame = data; }
+		}
+		var canvas = SpriteSheetUtils._workingCanvas;
+		canvas.width = frameWidth;
+		canvas.height = frameHeight;
+		SpriteSheetUtils._workingContext.drawImage(image, (frame%cols)*frameWidth, (frame/cols|0)*frameHeight, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight);
+		var img = new Image();
+		img.src = canvas.toDataURL("image/png");
+		return img;
 	}
 
 window.SpriteSheetUtils = SpriteSheetUtils;

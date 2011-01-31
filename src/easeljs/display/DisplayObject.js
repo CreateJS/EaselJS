@@ -41,6 +41,7 @@ var p = DisplayObject.prototype;
 /** @private **/
 DisplayObject._hitTestCanvas = document.createElement("canvas");
 DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
+/** @private **/
 DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 
 // public properties:

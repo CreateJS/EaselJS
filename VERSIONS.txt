@@ -19,12 +19,12 @@ Version 0.3 [Not released]
 - added .decompose() method to Matrix2D
 
 * rework interaction model:
-	- onPress, onClick events for all DOs
-	- eliminate mouseChildren
-	- mouseEnabled true by default
+	* onPress, onClick events for all DOs
+	* eliminate mouseChildren
+	* mouseEnabled true by default
 	- stage onMouseDown, onMouseUp, and onMouseMove events
-	- add hitTest method to DOs?
-	- add suppressCrossDomainErrors property
+	* add hitTest method to DOs?
+	* add suppressCrossDomainErrors property
 * multi-line support for text
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
