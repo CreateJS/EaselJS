@@ -4,6 +4,7 @@ Version 0.3 [Not released]
 - adding a listener to Ticker twice will now move it to the end of the listener list
 - added Ticker.getMeasuredFPS()
 - added Ticker.setFPS()
+- added Stage.toImage(mimeType, backgroundColor)
 - made the pauseable param "true" by default on Ticker.addListener()
 - renamed Rectangle.w & h to width & height
 - improvements to commenting and documentation

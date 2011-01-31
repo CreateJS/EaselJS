@@ -123,6 +123,62 @@ var p = Stage.prototype = new Container();
 		return this._getObjectsUnderPoint(x,y);
 	}
 	
+	/**
+	* Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be 
+	* specified as the src value of an image element.
+	* @param mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
+	* is passed in, or if the browser does not support the specified MIME type, the default value will be used.
+	* @param backgroundColor The background color to be used for the generated image. The value can be any value HTML color
+	* value, including HEX colors, rgb and rgba. The default value is a transparent background.
+	* @returns a Base64 encoded image.
+	* @type String
+	**/	
+	p.toImage = function(mimeType, backgroundColor)
+	{
+		if(!mimeType)
+		{
+			mimeType = "image/png";
+		}
+
+		var ctx = this.canvas.getContext('2d');
+		var w = this.canvas.width;
+		var h = this.canvas.height;
+
+		var data = ctx.getImageData(0, 0, w, h);		
+
+		if(backgroundColor)
+		{
+			//store the current globalCompositeOperation
+			var compositeOperation = ctx.globalCompositeOperation;
+
+			//set to draw behind current content
+			ctx.globalCompositeOperation = "destination-over";
+
+			//set background color
+			ctx.fillStyle = backgroundColor;
+
+			//draw background on entire canvas
+			ctx.fillRect(0,0,w,h);
+		}
+
+		//get the image data from the canvas
+		var imageData = this.canvas.toDataURL(mimeType);
+
+		if(backgroundColor)
+		{
+			//clear the canvas
+			ctx.clearRect (0,0,w,h);
+
+			//restore it with original settings
+			ctx.putImageData(data, 0,0);		
+
+			//reset the globalCompositeOperation to what it was
+			ctx.globalCompositeOperation = compositeOperation;
+		}
+
+		return imageData;
+	}
+	
 	p.clone = function() {
 		var o = new Stage(null);
 		this.cloneProps(o);
