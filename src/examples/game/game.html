@@ -87,7 +87,7 @@ function init() {
 function watchRestart() {
 	//watch for clicks
 	stage.addChild(messageField);
-	stage.tick(); 	//update the stage to show text
+	stage.update(); 	//update the stage to show text
 	canvas.onclick = handleClick;
 }
 
@@ -263,7 +263,7 @@ function tick() {
 	
 	//call sub ticks
 	ship.tick();
-	stage.tick();
+	stage.update();
 }
 
 function outOfBounds(o, bounds) {
