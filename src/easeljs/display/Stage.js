@@ -133,10 +133,8 @@ var p = Stage.prototype = new Container();
 	* @returns a Base64 encoded image.
 	* @type String
 	**/	
-	p.toImage = function(mimeType, backgroundColor)
-	{
-		if(!mimeType)
-		{
+	p.toImage = function(mimeType, backgroundColor) {
+		if(!mimeType) {
 			mimeType = "image/png";
 		}
 
@@ -146,8 +144,7 @@ var p = Stage.prototype = new Container();
 
 		var data = ctx.getImageData(0, 0, w, h);		
 
-		if(backgroundColor)
-		{
+		if(backgroundColor) {
 			//store the current globalCompositeOperation
 			var compositeOperation = ctx.globalCompositeOperation;
 
@@ -164,8 +161,7 @@ var p = Stage.prototype = new Container();
 		//get the image data from the canvas
 		var imageData = this.canvas.toDataURL(mimeType);
 
-		if(backgroundColor)
-		{
+		if(backgroundColor) {
 			//clear the canvas
 			ctx.clearRect (0,0,w,h);
 
