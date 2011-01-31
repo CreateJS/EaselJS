@@ -2,7 +2,7 @@
 
 //
 function Ship() {
-  this.init();
+  this.initialize();
 }
 var p = Ship.prototype = new Container();
 
@@ -25,10 +25,10 @@ var p = Ship.prototype = new Container();
 	p.hit;
 	
 // constructor:
-	p.initContainer = p.init;	//unique to avoid overiding base class
+	p.Container_initialize = p.initialize;	//unique to avoid overiding base class
 	
-	p.init = function() {
-		this.initContainer();
+	p.initialize = function() {
+		this.Container_initialize();
 		
 		this.shipFlame = new Shape();
 		this.shipBody = new Shape();

@@ -47,11 +47,15 @@ var p = Stage.prototype = new Container();
 	p.canvas = null;
 	p.mouseX = null;
 	p.mouseY = null;
-	
+	p.mouseEventsEnabled = false;
+	p.onMouseMove = null;
+	p.onMouseUp = null;
+	p.onMouseDown = null;
 	
 // private properties:
 	/** @private **/
 	p._tmpCanvas = null;
+	p._activeMouseEvent = null;
 	
 // constructor:
 	/** @private **/
@@ -64,12 +68,13 @@ var p = Stage.prototype = new Container();
 		
 		var o = this;
 		if (window.addEventListener) {
-			window.addEventListener('mousemove', function(e) { o._handleMouseMove(e); }, false); 
+			window.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
 		} else if (document.addEventListener) {
-			 document.addEventListener('mousemove', function(e) { o._handleMouseMove(e); }, false); 
-		} else if (window.attachEvent) {
-			window.attachEvent('mousemove', function(e) { o._handleMouseMove(e); }); 
+			document.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
 		}
+		
+		canvas.addEventListener("mousemove", function(e) { o._handleMouseMove(e); });
+		canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); });
 	}
 	
 // public methods:
@@ -153,6 +158,22 @@ var p = Stage.prototype = new Container();
 		}
 		this.mouseX = e.pageX-this.canvas.offsetLeft;
 		this.mouseY = e.pageY-this.canvas.offsetTop;
+		
+		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY);
+		if (this.onMouseMove) { this.onMouseMove(evt); }
+		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
+	}
+	
+	p._handleMouseUp = function(e) {
+		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
+		if (this.onMouseUp) { this.onMouseUp(evt); }
+		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
+		console.log("up");
+	}
+	
+	p._handleMouseDown = function(e) {
+		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
+		console.log("down");
 	}
 
 window.Stage = Stage;

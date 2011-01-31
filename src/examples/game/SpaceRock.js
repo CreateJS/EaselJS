@@ -2,7 +2,7 @@
 
 //
 function SpaceRock(size) {
-	this.init(size);
+	this.initialize(size);
 }
 
 var p = SpaceRock.prototype = new Shape();
@@ -27,10 +27,10 @@ var p = SpaceRock.prototype = new Shape();
 	p.active;	//is it active
 	
 // constructor:
-	p.initShape = p.init;	//unique to avoid overiding base class
+	p.Shape_initialize = p.initialize;	//unique to avoid overiding base class
 	
-	p.init = function(size) {
-		this.initShape(); // super call
+	p.initialize = function(size) {
+		this.Shape_initialize(); // super call
 		
 		this.activate(size);
 	}

@@ -16,7 +16,6 @@ Version 0.3 [Not released]
 - renamed Stage.tick to Stage.update and made Stage.tick point to Stage.update
 
 * rework interaction model:
-	- MouseInteraction.enable(stage)
 	- onPress, onClick events for all DOs
 	- eliminate mouseChildren
 	- mouseEnabled true by default
@@ -27,6 +26,7 @@ Version 0.3 [Not released]
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js
+* contains(child);
 
 Version 0.2.1 [Jan 12, 2011]
 ********************************************************************************
