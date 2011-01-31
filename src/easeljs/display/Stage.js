@@ -142,9 +142,13 @@ var p = Stage.prototype = new Container();
 		var w = this.canvas.width;
 		var h = this.canvas.height;
 
-		var data = ctx.getImageData(0, 0, w, h);		
+		var data;		
 
 		if(backgroundColor) {
+			
+			//get the current ImageData for the canvas.
+			data = ctx.getImageData(0, 0, w, h);
+			
 			//store the current globalCompositeOperation
 			var compositeOperation = ctx.globalCompositeOperation;
 
