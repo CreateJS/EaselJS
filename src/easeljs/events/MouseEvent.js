@@ -36,9 +36,9 @@
 * @class This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, and onClick handlers on DisplayObject instances.
 **/
 function MouseEvent(type, stageX, stageY) {
-  this.initialize(type stageX, stageY);
+  this.initialize(type, stageX, stageY);
 }
-var p = Point.prototype;
+var p = MouseEvent.prototype;
 	
 // public properties:
 	/** The mouseX position on the stage. **/
@@ -75,5 +75,5 @@ var p = Point.prototype;
 		return "[MouseEvent (type="+this.type+" stageX="+this.stageX+" stageY="+this.stageY+")]";
 	}
 	
-window.Point = Point;
+window.MouseEvent = MouseEvent;
 }(window));

@@ -168,12 +168,10 @@ var p = Stage.prototype = new Container();
 		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
-		console.log("up");
 	}
 	
 	p._handleMouseDown = function(e) {
 		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
-		console.log("down");
 	}
 
 window.Stage = Stage;
