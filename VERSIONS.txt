@@ -14,6 +14,7 @@ Version 0.3 [Not released]
 - fixed bug with passing instructions to a Graphics object constructor
 - formalized inheritance model to make code more readable
 - renamed Stage.tick to Stage.update and made Stage.tick point to Stage.update
+- added Container.contains(child) method
 
 * rework interaction model:
 	- onPress, onClick events for all DOs
@@ -26,7 +27,6 @@ Version 0.3 [Not released]
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js
-* contains(child);
 
 Version 0.2.1 [Jan 12, 2011]
 ********************************************************************************

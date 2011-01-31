@@ -180,6 +180,18 @@ var p = Container.prototype = new DisplayObject();
 		return this.children.length;
 	}
 	
+	/**
+	* Returns true if the specified display object either is this container or is a descendent
+	* (child, grandchild, etc) of this container.
+	**/
+	p.contains = function(child) {
+		while (child) {
+			if (child == this) { return true; }
+			child = child.parent;
+		}
+		return false;
+	}
+	
 	p.clone = function() {
 		var o = new Container();
 		this.cloneProps(o);
