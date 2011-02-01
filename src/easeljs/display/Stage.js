@@ -133,7 +133,7 @@ var p = Stage.prototype = new Container();
 	* @returns a Base64 encoded image.
 	* @type String
 	**/	
-	p.toImageData = function(backgroundColor, mimeType) {
+	p.toDataURL = function(backgroundColor, mimeType) {
 		if(!mimeType) {
 			mimeType = "image/png";
 		}
@@ -163,7 +163,7 @@ var p = Stage.prototype = new Container();
 		}
 
 		//get the image data from the canvas
-		var imageData = this.canvas.toDataURL(mimeType);
+		var dataURL = this.canvas.toDataURL(mimeType);
 
 		if(backgroundColor) {
 			//clear the canvas
@@ -176,7 +176,7 @@ var p = Stage.prototype = new Container();
 			ctx.globalCompositeOperation = compositeOperation;
 		}
 
-		return imageData;
+		return dataURL;
 	}
 	
 	p.clone = function() {
