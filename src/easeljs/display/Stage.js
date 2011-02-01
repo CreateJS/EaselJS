@@ -73,8 +73,8 @@ var p = Stage.prototype = new Container();
 			document.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
 		}
 		
-		canvas.addEventListener("mousemove", function(e) { o._handleMouseMove(e); });
-		canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); });
+		canvas.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
+		canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
 	}
 	
 // public methods:

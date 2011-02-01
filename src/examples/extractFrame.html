@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>EaselJS Example: Flipping a sprite sheet</title>
+<title>EaselJS Example: Extracting a frame from a sprite sheet</title>
 
 <link href="styles.css" rel="stylesheet" type="text/css" />
 
@@ -28,6 +28,7 @@ function handleImageLoad() {
 	var spriteSheet = new SpriteSheet(imgSeq, 64, 68, {walkUpRight:[0,19], walkDownRight:[20,40], walkRight:[41,59]});
 
 	// extract the first frame of the walkRight sequence as a new image:
+	// could alternately use the frame number.
 	img = SpriteSheetUtils.extractFrame(spriteSheet, "walkRight");
 
 	// add the newly created image to the bottom of this document:
