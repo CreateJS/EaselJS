@@ -133,7 +133,7 @@ var p = Stage.prototype = new Container();
 	* @returns a Base64 encoded image.
 	* @type String
 	**/	
-	p.toImage = function(backgroundColor, mimeType) {
+	p.toImageData = function(backgroundColor, mimeType) {
 		if(!mimeType) {
 			mimeType = "image/png";
 		}
