@@ -126,14 +126,14 @@ var p = Stage.prototype = new Container();
 	/**
 	* Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be 
 	* specified as the src value of an image element.
-	* @param mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
-	* is passed in, or if the browser does not support the specified MIME type, the default value will be used.
 	* @param backgroundColor The background color to be used for the generated image. The value can be any value HTML color
 	* value, including HEX colors, rgb and rgba. The default value is a transparent background.
+	* @param mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
+	* is passed in, or if the browser does not support the specified MIME type, the default value will be used.
 	* @returns a Base64 encoded image.
 	* @type String
 	**/	
-	p.toImage = function(mimeType, backgroundColor) {
+	p.toImage = function(backgroundColor, mimeType) {
 		if(!mimeType) {
 			mimeType = "image/png";
 		}
@@ -142,9 +142,13 @@ var p = Stage.prototype = new Container();
 		var w = this.canvas.width;
 		var h = this.canvas.height;
 
-		var data = ctx.getImageData(0, 0, w, h);		
+		var data;		
 
 		if(backgroundColor) {
+			
+			//get the current ImageData for the canvas.
+			data = ctx.getImageData(0, 0, w, h);
+			
 			//store the current globalCompositeOperation
 			var compositeOperation = ctx.globalCompositeOperation;
 
