@@ -245,13 +245,9 @@ var p = Container.prototype = new DisplayObject();
 			}
 			*/
 
-			ctx.save();
-			var mtx = CoordTransform.getConcatenatedMatrix(child);
+			var mtx = child.getConcatenatedMatrix();
 			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
-
 			child.draw(ctx);
-			
-			ctx.restore();
 
 			if (!this._testHit(ctx)) { continue; }
 			canvas.width = 0;

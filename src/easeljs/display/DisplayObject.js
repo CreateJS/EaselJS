@@ -176,7 +176,7 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 	* @param width
 	* @param height
 	**/
-	p.cache = function(x, y, w, h) {
+	p.cache = function(x, y, width, height) {
 		// draw to canvas.
 		var ctx;
 		if (this.cacheCanvas == null) {
@@ -185,8 +185,8 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 		} else {
 			ctx = this.cacheCanvas.getContext("2d");
 		}
-		this.cacheCanvas.width = w;
-		this.cacheCanvas.height = h;
+		this.cacheCanvas.width = width;
+		this.cacheCanvas.height = height;
 		ctx.translate(-x,-y);
 		this.draw(ctx,true);
 		this._cacheOffsetX = x;
@@ -261,7 +261,7 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 
 	/**
 	* Generates a concatenated Matrix2D object representing the combined transform of
-	* the target display object and all of its parent Containers up to the stage. This can be used to transform
+	* the display object and all of its parent Containers up to the stage. This can be used to transform
 	* positions between coordinate spaces, such as with localToGlobal and globalToLocal.
 	* Returns null if the target is not on stage.
 	**/
@@ -270,6 +270,8 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 		var target = this;
 		while (true) {
 			mtx.appendTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.regX, target.regY);
+			mtx.alpha *= target.alpha;
+			if (target.shadow && !mtx.shadow) { mtx.shadow = target.shadow; }
 			if ((p = target.parent) == null) { break; }
 			target = p;
 		}

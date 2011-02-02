@@ -17,7 +17,6 @@
 <script src="../easeljs/display/Shape.js"></script>
 <script src="../easeljs/utils/Ticker.js"></script>
 <script src="../easeljs/geom/Matrix2D.js"></script>
-<script src="../easeljs/geom/CoordTransform.js"></script>
 <!-- End EaselJS Imports -->
 
 <script>
@@ -85,7 +84,7 @@ function tick() {
 		graphics.moveTo(lastPt.x,lastPt.y);
 		
 		// calculate the new position in the shape's local coordinate space:
-		lastPt = CoordTransform.globalToLocal(_mouseX,_mouseY,shape);
+		lastPt = shape.globalToLocal(_mouseX,_mouseY);
 		
 		// draw the line, and close the path:
 		graphics.lineTo(lastPt.x,lastPt.y);
@@ -97,11 +96,11 @@ function tick() {
 
 //start drawing
 function mouseDown(e) {
-	if(!e){ var e = window.event; }
+	if(!e){ e = window.event; }
 	_mouseIsDown = true;
 	
 	// set up the first point in the new draw, and choose a random color:
-	lastPt = CoordTransform.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop,shape);
+	lastPt = shape.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop);
 	color = "#"+(Math.random()*0xFFFFFF|0).toString(16);
 	
 	// clear the cache, so the vector data is drawn each tick:
@@ -118,7 +117,7 @@ function mouseUp() {
 
 //update mouse positions
 function mouseMove(e) {
-	if(!e){ var e = window.event; }
+	if(!e){ e = window.event; }
 	_mouseX = e.pageX-canvas.offsetLeft;
 	_mouseY = e.pageY-canvas.offsetTop;
 }

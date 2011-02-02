@@ -65,7 +65,7 @@ var p = Matrix2D.prototype;
 	/** Position 2,1 in an affine transformation Matrix. Translation along the y axis **/
 	p.ty = 0;
 	/** Property representing the alpha that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values. **/
-	p.alpha = null;
+	p.alpha = 1;
 	/** Property representing the shadow that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values. **/
 	p.shadow  = null;
 	

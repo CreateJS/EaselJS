@@ -19,7 +19,6 @@
 <script src="../easeljs/display/BitmapSequence.js"></script>
 <script src="../easeljs/display/Shape.js"></script>
 <script src="../easeljs/utils/Ticker.js"></script>
-<script src="../easeljs/geom/CoordTransform.js"></script>
 <script src="../easeljs/geom/Matrix2D.js"></script>
 <!-- End EaselJS Imports -->
 
@@ -84,16 +83,14 @@ function tick() {
 	if(!dragStarted && stage.mouseX && stage.mouseY){
 		// when running local files, most browsers throw a security error when reading pixel data
 		// (which getObjectUnderPoint uses) so we'll put it in a try/catch block:
-		var t = (new Date()).getTime();
-		mouseTarget = stage.getObjectUnderPoint(stage.mouseX, stage.mouseY);
+
 		try {
 			// this will return the top-most display object under the mouse position:
-
+			mouseTarget = stage.getObjectUnderPoint(stage.mouseX, stage.mouseY);
 		} catch (e) {
 			Ticker.removeListener(window);
 			alert("An error occurred because this browser does not support reading pixel data in local files. Please read 'SECURITY_ERROR_README.txt' included with the EaselJS for details");
 		}
-		console.log((new Date()).getTime()-t);
 		if(mouseTarget){
 			// if we found a target, call mouseOver with it:
 			onMouseOver(mouseTarget);
@@ -111,7 +108,9 @@ function tick() {
 	}
 	
 	//Update the display list (draw everything)
+	var t = (new Date()).getTime();
 	stage.update();
+	console.log((new Date()).getTime()-t);
 }
 
 

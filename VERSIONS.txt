@@ -34,8 +34,6 @@ Version 0.3 [Not released]
 * support for skewX/Y
 
 [[
-Add support for "goal" and "useMatrixCache" to getConcatenatedMatrix
-Move all CoordTransform methods to DisplayObject
 Rewrite core interaction logic.
 Rewrite core draw logic.
 ]]
