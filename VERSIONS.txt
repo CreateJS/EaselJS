@@ -30,6 +30,15 @@ Version 0.3 [Not released]
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js
+* complete rewrite of the render engine to be faster
+* support for skewX/Y
+
+[[
+Add support for "goal" and "useMatrixCache" to getConcatenatedMatrix
+Move all CoordTransform methods to DisplayObject
+Rewrite core interaction logic.
+Rewrite core draw logic.
+]]
 
 Version 0.2.1 [Jan 12, 2011]
 ********************************************************************************

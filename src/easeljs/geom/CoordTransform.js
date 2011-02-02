@@ -33,7 +33,7 @@
 // constructor:
 	/**
 	* The CoordTransform class uses a static interface and should not be instantiated.
-	* @class The CoordTransform class is a collection of methods used to transform coordinates between different display object's coordinate spaces.
+	* @class CoordTransform class is a collection of methods used to transform coordinates between different display object's coordinate spaces.
 	**/
 	function CoordTransform() {
 		throw "CoordTransform cannot be instantiated"; 
@@ -47,14 +47,14 @@
 	* correlating to the tranformed coordinates on the stage.
 	* @param x The x position in the source display object to transform.
 	* @param y The y position in the source display object to transform.
-	* @param target The source display object.
+	* @param source The source display object.
 	* @static
 	**/
 	CoordTransform.localToGlobal = function(x, y, source) {
 		var mtx = CoordTransform.getConcatenatedMatrix(source);
 		if (mtx == null) { return null; }
 		var mtx2 = new Matrix2D(1,0,0,1,x,y);
-		mtx2.concatMatrix(mtx);
+		mtx2.appendMatrix(mtx);
 		return new Point(mtx2.tx, mtx2.ty);
 	}
 	
@@ -73,7 +73,7 @@
 		if (mtx == null) { return null; }
 		mtx.invert();
 		var mtx2 = new Matrix2D(1,0,0,1,x,y);
-		mtx2.concatMatrix(mtx);
+		mtx2.appendMatrix(mtx);
 		return new Point(mtx2.tx, mtx2.ty);
 	}
 	
@@ -89,33 +89,27 @@
 	* @static
 	**/
 	CoordTransform.localToLocal = function(x, y, source, target) {
-		// GDS: this could be optimized to find the nearest shared parent, and pass it in as the goal.
+		// TODO: this could be optimized to find the nearest shared parent, and pass it in as the goal.
 		var pt = CoordTransform.localToGlobal(x, y, source);
 		return CoordTransform.globalToLocal(pt.x, pt.y, target);
 	}
 	
 	/**
-	* Generates a concatenated Matrix2D object representing the combined tranform of
+	* Generates a concatenated Matrix2D object representing the combined transform of
 	* the target display object and all of its parent Containers. This can be used to transform
 	* positions between coordinate spaces, as with localToGlobal and globalToLocal.
+	 * Returns null if the target is not on stage.
 	* @param target The target display object to which the coordinates will be transformed.
-	* @param goal Optional parameter specifying the parent Container to concanate to. If it is not included, or is not a valid parent of the target, then the matrix will be concatenated to the highest level parent (usually the stage).
 	* @static
 	**/
-	CoordTransform.getConcatenatedMatrix = function(target, goal) {
-		var path = [target];
-		while (target = target.parent) {
-			path.push(target);
-			if (target == goal) { break; }
+	CoordTransform.getConcatenatedMatrix = function(target) {
+		mtx = new Matrix2D();
+		while (true) {
+			mtx.appendTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.regX, target.regY);
+			if ((p = target.parent) == null) { break; }
+			target = p;
 		}
-		var l = path.length;
-		var stage = path[l-1];
-		if (!(stage instanceof Stage)) { return null; }
-		var mtx = new Matrix2D();
-		for (var i=0; i<l; i++) {
-			var target = path[i];
-			mtx.concatTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.regX, target.regY);
-		}
+		if (!target instanceof Stage) { return null; }
 		return mtx;
 	}
 	

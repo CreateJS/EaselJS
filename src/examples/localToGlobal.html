@@ -99,7 +99,7 @@ function tick() {
 	
 	// calculate the global (stage) position of the end of the red bar,
 	// and move the HTML "whee" button to that position:
-	var pt = CoordTransform.localToGlobal(0, 130, bar3);
+	var pt = bar3.localToGlobal(0, 130);
 	whee.style.left = Math.round(pt.x+canvas.offsetLeft-10) + "px";
 	whee.style.top = Math.round(pt.y+canvas.offsetTop-10) + "px";
 	

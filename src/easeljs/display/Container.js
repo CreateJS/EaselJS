@@ -31,7 +31,7 @@
 
 /**
 * Constructs a new Container instance.
-* @class Containers are nestable display lists that allow you to work with compound display elements. For example you could group arm, leg, torso and head Bitmaps together into a Person Container, and transform them as a group, while still being able to move the individual parts relative to each other. Children of containers have their transform and alpha properties concatenated with their parent Container. For example, a Shape with x=100 and alpha=0.5, placed in a Container with x=50 and alpha=0.7 will be rendered to the canvas at x=150 and alpha=0.35. Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
+* @class Container are nestable display lists that allow you to work with compound display elements. For example you could group arm, leg, torso and head Bitmaps together into a Person Container, and transform them as a group, while still being able to move the individual parts relative to each other. Children of containers have their transform and alpha properties concatenated with their parent Container. For example, a Shape with x=100 and alpha=0.5, placed in a Container with x=50 and alpha=0.7 will be rendered to the canvas at x=150 and alpha=0.35. Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
 * @augments DisplayObject
 **/
 function Container() {
@@ -42,8 +42,6 @@ var p = Container.prototype = new DisplayObject();
 // public properties:
 	/** The array of children in the display list. You should usually use the child management methods, rather than accessing this directly, but it is included for advanced users. **/
 	p.children = null;
-	/** Indicates whether the children of this Container should be tested in getObjectsUnderPoint() and getObjectUnderPoint() calls. It is false by default, except on Stage instances where it is true by default. **/
-	p.mouseChildren = false;
 
 // constructor:
 	/** @private **/
@@ -206,11 +204,11 @@ var p = Container.prototype = new DisplayObject();
 	/** @private **/
 	p._getObjectsUnderPoint = function(x,y,ctx,arr) {
 		
-		if (visible = false || ctx == null || !(this.mouseChildren||this.mouseEnabled) || this.children.length == 0) { return null; }
-		
-		var canvas = ctx.canvas;
+		if (!this.visible || !this.mouseEnabled || this.children.length == 0) { return null; }
+		ctx = DisplayObject._hitTestContext;
+		var canvas = DisplayObject._hitTestCanvas;
 		var w = canvas.width;
-		
+		/*
 		// if we have a cache handy, we can use it to do a quick check:
 		if (this.cacheCanvas) {
 			this._draw(ctx);
@@ -225,16 +223,16 @@ var p = Container.prototype = new DisplayObject();
 				return null;
 			}
 		}
+		*/
 		
 		// draw children one at a time, and check if we get a hit:
-		var a = ctx.globalAlpha;
 		var l = this.children.length;
 		for (var i=l-1;i>=0;i--) {
 			var child = this.children[i];
-			if (child == null || !(child.mouseEnabled || this.mouseEnabled || child.mouseChildren)) { continue; }
-			
-			child.updateContext(ctx,true);
-			
+
+			if (child == null || !(child.mouseEnabled || this.mouseEnabled) || child.alpha <= 0) { continue; }
+
+			/*
 			if (child instanceof Container) {
 				var result = child._getObjectsUnderPoint(x,y,ctx,this.mouseEnabled ? null : arr);
 				child.revertContext();
@@ -245,27 +243,30 @@ var p = Container.prototype = new DisplayObject();
 				if (result != null && arr == null) { return result; }
 				continue;
 			}
-			
+			*/
+
+			ctx.save();
+			var mtx = CoordTransform.getConcatenatedMatrix(child);
+			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
+
 			child.draw(ctx);
-			child.revertContext();
-			if (!this._testHit(x,y,ctx)) { continue; }
+			
+			ctx.restore();
+
+			if (!this._testHit(ctx)) { continue; }
 			canvas.width = 0;
 			canvas.width = w;
-			if (this.mouseEnabled) {
-				if (arr) { arr.push(this); }
-				return this;
-			} else if (arr) { arr.push(child); }
-			else {
-				return child;
-			}
+			if (arr) { arr.push(child); }
+			else { return child; }
+
 		}
 		return null;
 	}
 	
 	/** @private **/
-	p._testHit = function(x,y,ctx) {
+	p._testHit = function(ctx) {
 		try {
-			var hit = ctx.getImageData(x,y,1,1).data[3] > 1;
+			var hit = ctx.getImageData(0,0,1,1).data[3] > 1;
 		} catch (e) {
 			throw "An error has occured. This is likely due to security restrictions on using getObjectsUnderPoint on a canvas with local or cross-domain images.";
 		}

@@ -52,7 +52,7 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 	/** Unique ID for this display object. Makes display objects easier for some uses. **/
 	p.id = -1;
 	/** Indicates whether to include this object when running Stage.getObjectsUnderPoint(). Setting this to true for Sprites will cause the Sprite to be returned (not its children) regardless of whether it's mouseChildren property is true. **/
-	p.mouseEnabled = false;
+	p.mouseEnabled = true;
 	/** An optional name for this display object. Included in toString(). Useful for debugging. **/
 	p.name = null;
 	/** A reference to the Sprite or Stage object that contains this display object, or null if it has not been added to one. READ-ONLY. **/
@@ -212,6 +212,70 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 		if (o instanceof Stage) { return o; }
 		return null;
 	}
+
+	/**
+	* Transforms the specified x and y position from the coordinate space of the display object
+	* to the global (stage) coordinate space. For example, this could be used to position an HTML label
+	* over a specific point on a nested display object. Returns a Point instance with x and y properties
+	* correlating to the transformed coordinates on the stage.
+	* @param x The x position in the source display object to transform.
+	* @param y The y position in the source display object to transform.
+	**/
+	p.localToGlobal = function(x, y) {
+		var mtx = this.getConcatenatedMatrix();
+		if (mtx == null) { return null; }
+		mtx.prepend(1,0,0,1,x,y);
+		return new Point(mtx.tx, mtx.ty);
+	}
+
+	/**
+	* Transforms the specified x and y position from the global (stage) coordinate space to the
+	* coordinate space of the display object. For example, this could be used to determine
+	* the current mouse position within the display object. Returns a Point instance with x and y properties
+	* correlating to the transformed position in the display object's coordinate space.
+	* @param x The x position on the stage to transform.
+	* @param y The y position on the stage to transform.
+	**/
+	p.globalToLocal = function(x, y) {
+		var mtx = this.getConcatenatedMatrix();
+		if (mtx == null) { return null; }
+		mtx.invert();
+		mtx.prepend(1,0,0,1,x,y);
+		return new Point(mtx.tx, mtx.ty);
+	}
+
+	/**
+	* Transforms the specified x and y position from the coordinate space of this display object to the
+	* coordinate space of the target display object. Returns a Point instance with x and y properties
+	* correlating to the transformed position in the target's coordinate space. Effectively the same as calling
+	* var pt = this.localToGlobal(x, y); pt = target.globalToLocal(pt.x, pt.y);
+	* @param x The x position in the source display object to transform.
+	* @param y The y position on the stage to transform.
+	* @param target The target display object to which the coordinates will be transformed.
+	**/
+	p.localToLocal = function(x, y, target) {
+		// TODO: this could potentially be optimized to find the nearest shared parent, and pass it in as the goal.
+		var pt = this.localToGlobal(x, y);
+		return target.globalToLocal(pt.x, pt.y);
+	}
+
+	/**
+	* Generates a concatenated Matrix2D object representing the combined transform of
+	* the target display object and all of its parent Containers up to the stage. This can be used to transform
+	* positions between coordinate spaces, such as with localToGlobal and globalToLocal.
+	* Returns null if the target is not on stage.
+	**/
+	p.getConcatenatedMatrix = function() {
+		mtx = new Matrix2D();
+		var target = this;
+		while (true) {
+			mtx.appendTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.regX, target.regY);
+			if ((p = target.parent) == null) { break; }
+			target = p;
+		}
+		if (!target instanceof Stage) { return null; }
+		return mtx;
+	}
 	
 	/**
 	* Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are reverted to their defaults (for example .parent).
@@ -230,7 +294,7 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 	}
 	
 // private methods:
-	// separated so it can be used easily in subclasses:
+	// separated so it can be used more easily in subclasses:
 	/** @private **/
 	p.cloneProps = function(o) {
 		o.alpha = this.alpha;

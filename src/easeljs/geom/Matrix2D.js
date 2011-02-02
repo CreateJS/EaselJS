@@ -64,6 +64,10 @@ var p = Matrix2D.prototype;
 	p.tx = 0;
 	/** Position 2,1 in an affine transformation Matrix. Translation along the y axis **/
 	p.ty = 0;
+	/** Property representing the alpha that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values. **/
+	p.alpha = null;
+	/** Property representing the shadow that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values. **/
+	p.shadow  = null;
 	
 // constructor:
 	/** @private **/
@@ -80,24 +84,47 @@ var p = Matrix2D.prototype;
 	/**
 	* Concatenates the specified matrix properties with this matrix. You must provide values for all of the parameters.
 	**/
-	p.concat = function(a, b, c, d, tx, ty) {
-		var a1 = this.a;
-		var c1 = this.c;
+	p.append = function(a, b, c, d, tx, ty) {
 		var tx1 = this.tx;
-		
-		this.a = a1*a+this.b*c;
-		this.b = a1*b+this.b*d;
-		this.c = c1*a+this.d*c;
-		this.d = c1*b+this.d*d;
+		if (a != 1 || b != 0 || c != 0 || d != 1) {
+			var a1 = this.a;
+			var c1 = this.c;
+			this.a  = a1*a+this.b*c;
+			this.b  = a1*b+this.b*d;
+			this.c  = c1*a+this.d*c;
+			this.d  = c1*b+this.d*d;
+		}
 		this.tx = tx1*a+this.ty*c+tx;
 		this.ty = tx1*b+this.ty*d+ty;
+	}
+
+	p.prepend = function(a, b, c, d, tx, ty) {
+		var a1 = this.a;
+		var b1 = this.b;
+		var c1 = this.c;
+		var d1 = this.d;
+		
+		this.a  = a*a1+b*c1;
+		this.b  = a*b1+b*d1;
+		this.c  = c*a1+d*c1;
+		this.d  = c*b1+d*d1;
+		this.tx = tx*a1+ty*c1+this.tx;
+		this.ty = tx*b1+ty*d1+this.ty;
 	}
 	
 	/**
 	* Concatenates the specified matrix with this matrix.
 	**/
-	p.concatMatrix = function(matrix) {
-		return this.concat(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
+	p.appendMatrix = function(matrix) {
+		this.alpha *= matrix.alpha;
+		this.shadow = matrix.shadow;
+		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
+	}
+
+	p.prependMatrix = function(matrix) {
+		this.alpha *= matrix.alpha;
+		this.shadow = matrix.shadow;
+		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	}
 	
 	/**
@@ -111,7 +138,8 @@ var p = Matrix2D.prototype;
 	* @param regX Optional.
 	* @param regY Optional.
 	**/
-	p.concatTransform = function(x, y, scaleX, scaleY, rotation, regX, regY) {
+	p.appendTransform = function(x, y, scaleX, scaleY, rotation, regX, regY) {
+		// TODO: add skew.
 		if (rotation%360) {
 			var r = rotation*Math.PI/180;
 			var cos = Math.cos(r);
@@ -120,10 +148,31 @@ var p = Matrix2D.prototype;
 			cos = 1;
 			sin = 0;
 		}
-		if (regX || regY) { this.tx -= regX; this.ty -= regY; }
-		this.concat(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		if (regX || regY) {
+			// append the registration offset:
+			this.tx -= regX; this.ty -= regY;
+		}
+		this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
 	}
-	
+
+	p.prependTransform = function(x, y, scaleX, scaleY, rotation, regX, regY) {
+		// TODO: add skew.
+		if (rotation%360) {
+			var r = rotation*Math.PI/180;
+			var cos = Math.cos(r);
+			var sin = Math.sin(r);
+		} else {
+			cos = 1;
+			sin = 0;
+		}
+		this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		if (regX || regY) {
+			// prepend the registration offset:
+			this.tx -= regX*this.a+regY*this.c;
+			this.ty -= regX*this.b+regY*this.d;
+		}
+	}
+
 	/**
 	* Applies a rotation transformation to the matrix.
 	**/
@@ -195,6 +244,7 @@ var p = Matrix2D.prototype;
 	 * @param target The object to apply the transform properties to. If null, then a new object will be returned.
 	 */
 	p.decompose = function(target) {
+		// TODO: add Skew:
 		if (target == null) { target = {}; }
 		target.x = this.tx;
 		target.y = this.ty;
@@ -211,7 +261,10 @@ var p = Matrix2D.prototype;
 	* Returns a clone of this Matrix.
 	**/
 	p.clone = function() {
-		return new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
+		var mtx = new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
+		mtx.shadow = this.shadow;
+		mtx.alpha = this.alpha;
+		return
 	}
 
 	/**
@@ -220,7 +273,7 @@ var p = Matrix2D.prototype;
 	p.toString = function() {
 		return "[Matrix2D (a="+this.a+" b="+this.b+" c="+this.c+" d="+this.d+" tx="+this.tx+" ty="+this.ty+")]";
 	}
-	
+
 	// this has to be populated after the class is defined:
 	Matrix2D.identity = new Matrix2D(1, 0, 0, 1, 0, 0);
 	

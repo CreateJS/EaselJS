@@ -19,6 +19,7 @@
 <script src="../easeljs/display/BitmapSequence.js"></script>
 <script src="../easeljs/display/Shape.js"></script>
 <script src="../easeljs/utils/Ticker.js"></script>
+<script src="../easeljs/geom/CoordTransform.js"></script>
 <script src="../easeljs/geom/Matrix2D.js"></script>
 <!-- End EaselJS Imports -->
 
@@ -35,7 +36,7 @@ function init() {
 	// create stage and point it to the canvas:
 	canvas = document.getElementById("testCanvas");
 	stage = new Stage(canvas);
-	stage.mouseChildren = true;
+	stage.mouseEnabled = true;
 	
 	// attach mouse handlers directly to the source canvas:
 	canvas.onmousemove = onMouseMove;
@@ -47,7 +48,7 @@ function init() {
 	
 	// load the source image:
 	var image = new Image();
-	image.src = "img/daisy.png"
+	image.src = "img/daisy.png";
 	image.onload = handleImageLoad;
 }
 
@@ -56,16 +57,20 @@ function handleImageLoad(event) {
 	var bitmap;
 	
 	// create and populate the screen with random daisies:
-	for(var i = 0; i < 30; i++){
+	for(var i = 0; i < 1000; i++){
 		bitmap = new Bitmap(image);
 		bitmap.x = canvas.width * Math.random()|0;
 		bitmap.y = canvas.height * Math.random()|0;
 		bitmap.rotation = 360 * Math.random()|0;
 		bitmap.regX = bitmap.image.width/2|0;
 		bitmap.regY = bitmap.image.height/2|0;
+		bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;//Math.random()+0.6;
 		bitmap.mouseEnabled = true;
 		stage.addChild(bitmap);
 	}
+	
+	//stage.scaleX = 2;
+	document.body.appendChild(DisplayObject._hitTestCanvas);
 }
 
 function tick() {
@@ -79,13 +84,16 @@ function tick() {
 	if(!dragStarted && stage.mouseX && stage.mouseY){
 		// when running local files, most browsers throw a security error when reading pixel data
 		// (which getObjectUnderPoint uses) so we'll put it in a try/catch block:
+		var t = (new Date()).getTime();
+		mouseTarget = stage.getObjectUnderPoint(stage.mouseX, stage.mouseY);
 		try {
 			// this will return the top-most display object under the mouse position:
-			mouseTarget = stage.getObjectUnderPoint(stage.mouseX, stage.mouseY);
+
 		} catch (e) {
 			Ticker.removeListener(window);
 			alert("An error occurred because this browser does not support reading pixel data in local files. Please read 'SECURITY_ERROR_README.txt' included with the EaselJS for details");
 		}
+		console.log((new Date()).getTime()-t);
 		if(mouseTarget){
 			// if we found a target, call mouseOver with it:
 			onMouseOver(mouseTarget);
@@ -112,7 +120,7 @@ function tick() {
 **********************************/
 // on mouse move, update the stage's mouseX/mouseY:
 function onMouseMove(e) {
-	if(!e){ var e = window.event; }
+	if(!e){ e = window.event; }
 	stage.mouseX = e.pageX-canvas.offsetLeft;
 	stage.mouseY = e.pageY-canvas.offsetTop;
 }
@@ -130,11 +138,11 @@ function onMouseUp() {
 
 // scale Display Objects on mouseOver / Out:
 function onMouseOver(target){
-	target.scaleX = target.scaleY = 1.1; 
+	target.scaleX = target.scaleY = target.scale * 1.1;
 }
 
 function onMouseOut(target){
-	target.scaleX = target.scaleY = 1; 
+	target.scaleX = target.scaleY = target.scale; 
 }
 
 
@@ -146,7 +154,7 @@ function onMouseOut(target){
 	Example of implementing rollover and drag &amp; drop operations via the <strong>Stage.getObjectUnderPoint()</strong> method. This functionality is likely to be included in the core library in a future version. Some browsers do not allow access to pixel data when running local files, and may throw a security error.
 	</div>
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="980" height="580"></canvas>
+		<canvas id="testCanvas" width="980" height="580" style="background-color:#00FF00"></canvas>
 	</div>
 </body>
 </html>

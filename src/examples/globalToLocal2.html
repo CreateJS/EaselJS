@@ -21,7 +21,6 @@
 <script src="../easeljs/display/Shape.js"></script>
 <script src="../easeljs/utils/Ticker.js"></script>
 <script src="../easeljs/geom/Matrix2D.js"></script>
-<script src="../easeljs/geom/CoordTransform.js"></script>
 <!-- End EaselJS Imports -->
 
 <script>
@@ -89,7 +88,7 @@ function tick() {
 	if(_mouseIsDown) {
 		graphics.setStrokeStyle(Math.random()*20,"round").beginStroke(color);
 		graphics.moveTo(0,0);
-		lastPt = CoordTransform.globalToLocal(_mouseX,_mouseY,shape);
+		lastPt = shape.globalToLocal(_mouseX,_mouseY);
 		graphics.lineTo(lastPt.x,lastPt.y);
 		
 		// draw the new vector line to the canvas:
@@ -105,7 +104,7 @@ function mouseDown(e) {
 	if(!e){ var e = window.event; }
 	if (_mouseIsDown) { return; }
 	_mouseIsDown = true;
-	lastPt = CoordTransform.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop,shape);
+	lastPt = shape.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop);
 	color = "#"+(Math.random()*0xFFFFFF|0).toString(16);
 }
 
