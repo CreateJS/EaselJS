@@ -19,6 +19,7 @@ Version 0.3 [Not released]
 - added .decompose() method to Matrix2D
 - added SpriteSheetUtils.extractFrame(spriteSheet,frame) method
 - added basic multi-line support for Text
+- complete rewrite of the render engine to be cleaner and more flexible
 
 * rework interaction model:
 	* onPress, onClick events for all DOs
@@ -30,12 +31,10 @@ Version 0.3 [Not released]
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js
-* complete rewrite of the render engine to be faster
 * support for skewX/Y
 
 [[
 Rewrite core interaction logic.
-Rewrite core draw logic.
 ]]
 
 Version 0.2.1 [Jan 12, 2011]
