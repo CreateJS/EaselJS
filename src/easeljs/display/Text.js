@@ -121,6 +121,7 @@ Text._workingContext = canvas.getContext("2d");
 			this._drawTextLine(ctx, str, y); // Draw remaining text
 			y += lineHeight;
 		}
+		return true;
 	}
 	
 	/**

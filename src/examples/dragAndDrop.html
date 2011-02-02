@@ -38,7 +38,7 @@ function init() {
 	stage.mouseEnabled = true;
 	
 	// attach mouse handlers directly to the source canvas:
-	canvas.onmousemove = onMouseMove;
+	stage.onmousemove = onMouseMove;
 	canvas.onmousedown = onMouseDown;
 	canvas.onmouseup = onMouseUp;
 
@@ -52,9 +52,11 @@ function init() {
 function handleImageLoad(event) {
 	var image = event.target;
 	var bitmap;
+	var container = new Container();
+	stage.addChild(container);
 	
 	// create and populate the screen with random daisies:
-	for(var i = 0; i < 1000; i++){
+	for(var i = 0; i < 100; i++){
 		bitmap = new Bitmap(image);
 		bitmap.x = canvas.width * Math.random()|0;
 		bitmap.y = canvas.height * Math.random()|0;
@@ -63,7 +65,7 @@ function handleImageLoad(event) {
 		bitmap.regY = bitmap.image.height/2|0;
 		bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;//Math.random()+0.6;
 		bitmap.mouseEnabled = true;
-		stage.addChild(bitmap);
+		container.addChild(bitmap);
 	}
 
 	// assign a tick listener directly to this window:

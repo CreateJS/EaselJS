@@ -84,8 +84,7 @@ var p = Stage.prototype = new Container();
 	p.update = function() {
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
-		var ctx = this.canvas.getContext("2d");
-		this.draw(ctx, false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
+		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
 	}
 	
 	/**
@@ -132,7 +131,7 @@ var p = Stage.prototype = new Container();
 	* is passed in, or if the browser does not support the specified MIME type, the default value will be used.
 	* @returns a Base64 encoded image.
 	* @type String
-	**/	
+	**/
 	p.toDataURL = function(backgroundColor, mimeType) {
 		if(!mimeType) {
 			mimeType = "image/png";
@@ -145,10 +144,10 @@ var p = Stage.prototype = new Container();
 		var data;
 
 		if(backgroundColor) {
-			
+
 			//get the current ImageData for the canvas.
 			data = ctx.getImageData(0, 0, w, h);
-			
+
 			//store the current globalCompositeOperation
 			var compositeOperation = ctx.globalCompositeOperation;
 
@@ -170,7 +169,7 @@ var p = Stage.prototype = new Container();
 			ctx.clearRect (0,0,w,h);
 
 			//restore it with original settings
-			ctx.putImageData(data, 0,0);		
+			ctx.putImageData(data, 0,0);
 
 			//reset the globalCompositeOperation to what it was
 			ctx.globalCompositeOperation = compositeOperation;

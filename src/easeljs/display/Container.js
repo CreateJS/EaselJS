@@ -55,16 +55,16 @@ var p = Container.prototype = new DisplayObject();
 // public methods:
 
 	p.isVisible = function() {
-		return this.visible && this.alpha > 0 && this.children.length && this.scaleX != 0 && this.scaleY != 0
+		return this.visible && this.alpha > 0 && this.children.length && this.scaleX != 0 && this.scaleY != 0;
 	}
 
 	/** @private **/
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx, ignoreCache, _mtx) {
+		if (!_mtx) { _mtx = new Matrix2D(); }
 		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
-		if (!_mtx) { _mtx = this.getConcatenatedMatrix(); }
 		var l = this.children.length;
-		// this fixes issues with display list changes that occur during a draw:
+		// this ensures we don't have issues with display list changes that occur during a draw:
 		var list = this.children.slice(0);
 		for (var i=0; i<l; i++) {
 			var child = list[i];
@@ -215,60 +215,56 @@ var p = Container.prototype = new DisplayObject();
 	
 // private properties:
 	/** @private **/
-	p._getObjectsUnderPoint = function(x,y,arr) {
-		
-		if (!this.visible || !this.mouseEnabled || this.children.length == 0) { return null; }
+	p._getObjectsUnderPoint = function(x, y, arr, handler) {
+
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;
 		var mtx = DisplayObject._workingMatrix;
+		var hasHandler = handler && (this[handler] != null);
 
-		var w = canvas.width;
-		/*
 		// if we have a cache handy, we can use it to do a quick check:
 		if (this.cacheCanvas) {
-			this._draw(ctx);
-			if (this._testHit(x,y,ctx)) {
+			this.getConcatenatedMatrix(mtx);
+			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
+			ctx.globalAlpha = mtx.alpha;
+			this.draw(ctx);
+			if (this._testHit(ctx)) {
 				canvas.width = 0;
-				canvas.width = w;
-				if (this.mouseEnabled) {
-					if (arr) { arr.push(this); }
-					return this;
-				}
+				canvas.width = 1;
+				if (hasHandler) { return this; }
 			} else {
 				return null;
 			}
 		}
-		*/
 		
 		// draw children one at a time, and check if we get a hit:
 		var l = this.children.length;
 		for (var i=l-1;i>=0;i--) {
 			var child = this.children[i];
-			if (!child.isVisible()) { continue; }
-
-			/*
-			if (child instanceof Container) {
-				var result = child._getObjectsUnderPoint(x,y,ctx,this.mouseEnabled ? null : arr);
-				child.revertContext();
-				if (this.mouseEnabled) {
-					result = child;
-					if (arr) { arr.push(result); }
-				}
-				if (result != null && arr == null) { return result; }
-				continue;
-			}
-			*/
+			if (!child.isVisible() || !child.mouseEnabled) { continue; }
 			
-			child.getConcatenatedMatrix(mtx);
-			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
-			child.draw(ctx);
-
-			if (!this._testHit(ctx)) { continue; }
-			canvas.width = 0;
-			canvas.width = w;
-			if (arr) { arr.push(child); }
-			else { return child; }
-
+			if (child instanceof Container) {
+				var result;
+				if (hasHandler) {
+					// only concerned about the first hit, because this container is going to claim it anyway:
+					result = child._getObjectsUnderPoint(x,y);
+					if (result) { return result; }
+				} else {
+					result = child._getObjectsUnderPoint(x,y,arr,handler);
+					if (!arr && result) { return result; }
+				}
+			} else if (!handler || (handler && child[handler])) {
+				// either no handler is specified, or child has the handler, so we should test it.
+				child.getConcatenatedMatrix(mtx);
+				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
+				ctx.globalAlpha = mtx.alpha;
+				child.draw(ctx);
+				if (!this._testHit(ctx)) { continue; }
+				canvas.width = 0;
+				canvas.width = 1;
+				if (arr) { arr.push(child); }
+				else { return child; }
+			}
 		}
 		return null;
 	}

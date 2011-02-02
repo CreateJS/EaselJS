@@ -23,8 +23,8 @@ Version 0.3 [Not released]
 
 * rework interaction model:
 	* onPress, onClick events for all DOs
-	* eliminate mouseChildren
-	* mouseEnabled true by default
+	- eliminate mouseChildren
+	- mouseEnabled true by default
 	- stage onMouseDown, onMouseUp, and onMouseMove events
 	* add hitTest method to DOs?
 	* add suppressCrossDomainErrors property
@@ -35,6 +35,7 @@ Version 0.3 [Not released]
 
 [[
 Rewrite core interaction logic.
+Support getObjectsUnderPoint from any Container?
 ]]
 
 Version 0.2.1 [Jan 12, 2011]
