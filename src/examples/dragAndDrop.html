@@ -12,6 +12,7 @@
 <script src="../easeljs/geom/Point.js"></script>
 <script src="../easeljs/display/SpriteSheet.js"></script>
 <script src="../easeljs/display/Shadow.js"></script>
+<script src="../easeljs/geom/Matrix2D.js"></script>
 <script src="../easeljs/display/DisplayObject.js"></script>
 <script src="../easeljs/display/Container.js"></script>
 <script src="../easeljs/display/Stage.js"></script>
@@ -19,7 +20,6 @@
 <script src="../easeljs/display/BitmapSequence.js"></script>
 <script src="../easeljs/display/Shape.js"></script>
 <script src="../easeljs/utils/Ticker.js"></script>
-<script src="../easeljs/geom/Matrix2D.js"></script>
 <!-- End EaselJS Imports -->
 
 <script>
@@ -41,9 +41,7 @@ function init() {
 	canvas.onmousemove = onMouseMove;
 	canvas.onmousedown = onMouseDown;
 	canvas.onmouseup = onMouseUp;
-	
-	// assign a tick listener directly to this window:
-	Ticker.addListener(window);
+
 	
 	// load the source image:
 	var image = new Image();
@@ -70,6 +68,9 @@ function handleImageLoad(event) {
 	
 	//stage.scaleX = 2;
 	document.body.appendChild(DisplayObject._hitTestCanvas);
+
+	// assign a tick listener directly to this window:
+	Ticker.addListener(window);
 }
 
 function tick() {
@@ -84,9 +85,9 @@ function tick() {
 		// when running local files, most browsers throw a security error when reading pixel data
 		// (which getObjectUnderPoint uses) so we'll put it in a try/catch block:
 
+			mouseTarget = stage.getObjectUnderPoint(stage.mouseX, stage.mouseY);
 		try {
 			// this will return the top-most display object under the mouse position:
-			mouseTarget = stage.getObjectUnderPoint(stage.mouseX, stage.mouseY);
 		} catch (e) {
 			Ticker.removeListener(window);
 			alert("An error occurred because this browser does not support reading pixel data in local files. Please read 'SECURITY_ERROR_README.txt' included with the EaselJS for details");
@@ -108,9 +109,11 @@ function tick() {
 	}
 	
 	//Update the display list (draw everything)
+
 	var t = (new Date()).getTime();
 	stage.update();
 	console.log((new Date()).getTime()-t);
+
 }
 
 

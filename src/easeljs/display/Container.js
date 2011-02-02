@@ -53,22 +53,30 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 // public methods:
+
+	p.isVisible = function() {
+		return this.visible && this.alpha > 0 && this.children.length && this.scaleX != 0 && this.scaleY != 0
+	}
+
 	/** @private **/
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
-		if (this.children.length == 0) { return false; }
-		if (!this.DisplayObject_draw(ctx,ignoreCache)) { return false; }
-		var l=this.children.length;
-		// GDS: this fixes issues with display list changes that occur during a draw, but may have performance implications:
+		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
+		var l = this.children.length;
+		var mtx = DisplayObject._workingMatrix;
+		// this fixes issues with display list changes that occur during a draw:
 		var list = this.children.slice(0);
 		for (var i=0; i<l; i++) {
 			var child = list[i];
-			if (child == null) { continue; }
 			if (child.tick) { child.tick(); }
-			child.updateContext(ctx);
+			if (!child.isVisible()) { continue; }
+			child.getConcatenatedMatrix(mtx);
+			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+			ctx.globalAlpha = mtx.alpha;
+			if (mtx.shadow) { this.applyShadow(ctx, mtx.shadow); }
 			child.draw(ctx);
-			child.revertContext();
 		}
+		return true;
 	}
 	
 	/**
@@ -202,11 +210,13 @@ var p = Container.prototype = new DisplayObject();
 	
 // private properties:
 	/** @private **/
-	p._getObjectsUnderPoint = function(x,y,ctx,arr) {
+	p._getObjectsUnderPoint = function(x,y,arr) {
 		
 		if (!this.visible || !this.mouseEnabled || this.children.length == 0) { return null; }
-		ctx = DisplayObject._hitTestContext;
+		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;
+		var mtx = DisplayObject._workingMatrix;
+
 		var w = canvas.width;
 		/*
 		// if we have a cache handy, we can use it to do a quick check:
@@ -244,8 +254,8 @@ var p = Container.prototype = new DisplayObject();
 				continue;
 			}
 			*/
-
-			var mtx = child.getConcatenatedMatrix();
+			
+			child.getConcatenatedMatrix(mtx);
 			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 			child.draw(ctx);
 

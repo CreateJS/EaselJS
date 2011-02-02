@@ -43,6 +43,8 @@ DisplayObject._hitTestCanvas = document.createElement("canvas");
 DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
 /** @private **/
 DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
+/** @private **/
+DisplayObject._workingMatrix = new Matrix2D();
 
 // public properties:
 	/** The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque. **/
@@ -106,67 +108,28 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 	
 // public methods:
 	/**
-	* NOTE: This method is mainly for internal use, though it may be useful for advanced developers extending the capabilities of the CanvasDisplay library.
-	* Updates the specified context based on this display object's properties.
-	* @param ctx The canvas 2D context object to update.
-	* @param ignoreShadows Indicates whether the shadow property should be applied. Passing false will ignore the shadow, resulting in faster rendering for uses like hit testing.
-	**/
-	p.updateContext = function(ctx,ignoreShadows) {
-		if (this.visible != true || ctx == null || this.alpha <= 0) { return false; }
-		// apply context changes:
-		this._activeContext = ctx;
-		
-		if (this._restoreContext = (this.rotation%360 || this.scaleX != 1 || this.scaleY != 1)) {
-			ctx.save();
-			// GDS: might be worth benchmarking implicit vs explicit boolean tests here:
-			if (this.x || this.y) { ctx.translate(this.x, this.y); }
-			if (this.rotation%360) { ctx.rotate(this.rotation%360/180*Math.PI); }
-			// this 0.00000001 hack is a fix for FF not supporting scales of 0.
-			if (this.scaleX != 1 || this.scaleY != 1) { ctx.scale(this.scaleX == 0 ? 0.00000001 : this.scaleX, this.scaleY == 0 ? 0.00000001 : this.scaleY); }
-			if (this.regX || this.regY) { ctx.translate(-this.regX, -this.regY); }
-		} else {
-			ctx.translate(-(this._restoreX = -this.x+this.regX), -(this._restoreY = -this.y+this.regY));
-		}
-		
-		this._revertAlpha = ctx.globalAlpha;
-		ctx.globalAlpha *= this.alpha;
-		if (this._revertShadow = (this.shadow && !ignoreShadows)) {
-			this.applyShadow(ctx, this.shadow);
-		}
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced developers.
+	 * Returns true or falsee indicating whether the display object would be visible if drawn to a canvas.
+	 * This does not account for whether it would be visible within the boundaries of the stage.
+	 **/
+	p.isVisible = function() {
+		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0;
 	}
 	
 	/**
-	* NOTE: This method is mainly for internal use, though it may be useful for advanced developers extending the capabilities of the CanvasDisplay library.
-	* Draws the display object into the specified context if it is visible.
-	* @param ctx The canvas 2D context object to draw into.
-	* @param ignoreCache Indicates whether the draw operation should ignore any current cache. For example, used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
-	**/
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced developers.
+	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	 * Returns true if the draw was handled (useful for overriding functionality).
+	 * @param ctx The canvas 2D context object to draw into.
+	 * @param ignoreCache Indicates whether the draw operation should ignore any current cache. For example,
+	 * used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
+	 **/
 	p.draw = function(ctx,ignoreCache) {
-		// can't use _activeContext because sometimes we need to draw without an updateContext being called (ex. caching)
-		if (this.visible != true || ctx == null || this.alpha <= 0) { return false; }
-		if (this.cacheCanvas && !ignoreCache) {
-			ctx.translate(this._cacheOffsetX,this._cacheOffsetY);
-			ctx.drawImage(this.cacheCanvas,0,0);
-			ctx.translate(-this._cacheOffsetX,-this._cacheOffsetY);
-			return false;
-		}
+		if (ignoreCache || !this.cacheCanvas) { return false; }
+		ctx.translate(this._cacheOffsetX,this._cacheOffsetY);
+		ctx.drawImage(this.cacheCanvas,0,0);
+		ctx.translate(-this._cacheOffsetX,-this._cacheOffsetY);
 		return true;
-	}
-	
-	/**
-	* NOTE: This method is mainly for internal use, though it may be useful for advanced developers extending the capabilities of the CanvasDisplay library.
-	* Reverts the last context that was updated with updateContext(), restoring it to the state it was in prior to the update.
-	**/
-	p.revertContext = function() {
-		if (this._activeContext == null) { return; }
-		this._activeContext.globalAlpha = this._revertAlpha;
-		if (this._revertShadow) {
-			// GDS: instead, we could save out the shadow properties in update, and restore them here.
-			this.applyShadow(this._activeContext, Shadow.identity);
-		}
-		if (this._restoreContext) { this._activeContext.restore(); }
-		else { this._activeContext.translate(this._restoreX, this._restoreY); }
-		this._activeContext = null
 	}
 	
 	/**
@@ -260,18 +223,23 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 	}
 
 	/**
-	* Generates a concatenated Matrix2D object representing the combined transform of
-	* the display object and all of its parent Containers up to the stage. This can be used to transform
-	* positions between coordinate spaces, such as with localToGlobal and globalToLocal.
-	* Returns null if the target is not on stage.
-	**/
-	p.getConcatenatedMatrix = function() {
-		mtx = new Matrix2D();
+	 * Generates a concatenated Matrix2D object representing the combined transform of
+	 * the display object and all of its parent Containers up to the stage. This can be used to transform
+	 * positions between coordinate spaces, such as with localToGlobal and globalToLocal.
+	 * Returns null if the target is not on stage.
+	 * @param mtx Optional. A Matrix2D object to reuse, instead of creating a new instance.
+	 **/
+	p.getConcatenatedMatrix = function(mtx) {
+		if (mtx) {
+			mtx.identity();
+		} else {
+			mtx = new Matrix2D();
+		}
 		var target = this;
 		while (true) {
 			mtx.appendTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.regX, target.regY);
 			mtx.alpha *= target.alpha;
-			if (target.shadow && !mtx.shadow) { mtx.shadow = target.shadow; }
+			mtx.shadow = mtx.shadow || target.shadow;
 			if ((p = target.parent) == null) { break; }
 			target = p;
 		}

@@ -85,9 +85,7 @@ var p = Stage.prototype = new Container();
 		if (this.canvas == null) { return; }
 		var ctx = this.canvas.getContext("2d");
 		if (this.autoClear) { this.clear(); }
-		this.updateContext(ctx);
 		this.draw(ctx);
-		this.revertContext();
 	}
 	
 	/**
@@ -100,7 +98,7 @@ var p = Stage.prototype = new Container();
 	**/
 	p.clear = function() {
 		if (this.canvas == null) { return; }
-		this.canvas.getContext("2d").clearRect(0,0,this.canvas.width,this.canvas.height);
+		this.canvas.width = this.canvas.width;
 	}
 	
 	/**
@@ -190,22 +188,6 @@ var p = Stage.prototype = new Container();
 	}
 	
 // private methods:
-	/** @private **/
-	p._Container_getObjectsUnderPoint = p._getObjectsUnderPoint;
-	/** @private **/
-	p._getObjectsUnderPoint = function(x,y,arr) {
-		if (this._tmpCanvas == null) { this._tmpCanvas = document.createElement("canvas"); }
-		this._tmpCanvas.width = this.canvas.width;
-		this._tmpCanvas.height = this.canvas.height;
-
-		var ctx = this._tmpCanvas.getContext("2d");
-		
-		this.updateContext(ctx,true);
-		var results = this._Container_getObjectsUnderPoint(x,y,ctx,arr);
-		this.revertContext();
-		
-		return results;
-	}
 	
 	p._handleMouseMove = function(e) {
 		if (!this.canvas) {

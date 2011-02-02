@@ -54,11 +54,15 @@ var p = Bitmap.prototype = new DisplayObject();
 	}
 	
 // public methods:
+
+	p.isVisible = function() {
+		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.image && (this.image.complete || this.image.getContext);
+	}
+
 	/** @borrows DisplayObject#draw as this.draw **/
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
-		if (this.image == null || !(this.image.complete || this.image.getContext)) { return false; }
-		if (!this.DisplayObject_draw(ctx,ignoreCache)) { return false; }
+		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
 		ctx.drawImage(this.image,0,0);
 	}
 	
