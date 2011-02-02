@@ -214,8 +214,9 @@ var p = Matrix2D.prototype;
 	* Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
 	**/
 	p.identity = function() {
-		this.a = this.d = 1;
+		this.alpha = this.a = this.d = 1;
 		this.b = this.c = this.tx = this.ty = 0;
+		this.shadow = null;
 	}
 	
 	/**

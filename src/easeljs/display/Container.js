@@ -274,7 +274,9 @@ var p = Container.prototype = new DisplayObject();
 		try {
 			var hit = ctx.getImageData(0,0,1,1).data[3] > 1;
 		} catch (e) {
-			throw "An error has occured. This is likely due to security restrictions on using getObjectsUnderPoint on a canvas with local or cross-domain images.";
+			if (!Stage.suppressCrossDomainErrors) {
+				throw "An error has occured. This is most likely due to security restrictions on reading canvas pixel data with local or cross-domain images.";
+			}
 		}
 		return hit;
 	}

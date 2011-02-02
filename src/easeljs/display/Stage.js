@@ -40,6 +40,10 @@ function Stage(canvas) {
 }
 var p = Stage.prototype = new Container();
 
+// static properties:
+	/** Suppresses errors generated when using features like getObjectsUnderPoint with cross domain content. **/
+	Stage.suppressCrossDomainErrors = false;
+
 // public properties:
 	/** Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for example). **/
 	p.autoClear = true;
@@ -56,6 +60,7 @@ var p = Stage.prototype = new Container();
 	/** @private **/
 	p._tmpCanvas = null;
 	p._activeMouseEvent = null;
+	p._activeMouseTarget = null;
 	
 // constructor:
 	/** @private **/
@@ -195,6 +200,7 @@ var p = Stage.prototype = new Container();
 			this.mouseX = this.mouseY = null;
 			return;
 		}
+		if(!e){ e = window.event; }
 		this.mouseX = e.pageX-this.canvas.offsetLeft;
 		this.mouseY = e.pageY-this.canvas.offsetTop;
 		
@@ -207,10 +213,22 @@ var p = Stage.prototype = new Container();
 		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
+		if (this._activeMouseTarget && this._activeMouseTarget.onClick &&
+			 this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, "onClick") == this._activeMouseTarget) { // TODO: switch to a hitTest.
+			this._activeMouseTarget.onClick(new MouseEvent("onClick", this.mouseX, this.mouseY));
+		}
+		this._activeMouseEvent = this.activeMouseTarget = null;
 	}
 	
 	p._handleMouseDown = function(e) {
 		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
+		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, "onPress");
+		if (target) {
+			var evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
+			target.onPress(evt);
+			if (evt.onMouseMove || evt.onMouseUp) { this._activeMouseEvent = evt; }
+			this._activeMouseTarget = target;
+		}
 	}
 
 window.Stage = Stage;
