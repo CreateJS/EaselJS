@@ -84,7 +84,7 @@ var p = Matrix2D.prototype;
 	/**
 	* Concatenates the specified matrix properties with this matrix. You must provide values for all of the parameters.
 	**/
-	p.append = function(a, b, c, d, tx, ty) {
+	p.prepend = function(a, b, c, d, tx, ty) {
 		var tx1 = this.tx;
 		if (a != 1 || b != 0 || c != 0 || d != 1) {
 			var a1 = this.a;
@@ -98,7 +98,7 @@ var p = Matrix2D.prototype;
 		this.ty = tx1*b+this.ty*d+ty;
 	}
 
-	p.prepend = function(a, b, c, d, tx, ty) {
+	p.append = function(a, b, c, d, tx, ty) {
 		var a1 = this.a;
 		var b1 = this.b;
 		var c1 = this.c;
@@ -115,16 +115,16 @@ var p = Matrix2D.prototype;
 	/**
 	* Concatenates the specified matrix with this matrix.
 	**/
-	p.appendMatrix = function(matrix) {
-		this.alpha *= matrix.alpha;
-		this.shadow = matrix.shadow;
-		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-	}
-
 	p.prependMatrix = function(matrix) {
 		this.alpha *= matrix.alpha;
 		this.shadow = matrix.shadow;
 		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
+	}
+
+	p.appendMatrix = function(matrix) {
+		this.alpha *= matrix.alpha;
+		this.shadow = matrix.shadow;
+		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	}
 	
 	/**
@@ -138,7 +138,7 @@ var p = Matrix2D.prototype;
 	* @param regX Optional.
 	* @param regY Optional.
 	**/
-	p.appendTransform = function(x, y, scaleX, scaleY, rotation, regX, regY) {
+	p.prependTransform = function(x, y, scaleX, scaleY, rotation, regX, regY) {
 		// TODO: add skew.
 		if (rotation%360) {
 			var r = rotation*Math.PI/180;
@@ -152,10 +152,10 @@ var p = Matrix2D.prototype;
 			// append the registration offset:
 			this.tx -= regX; this.ty -= regY;
 		}
-		this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
 	}
 
-	p.prependTransform = function(x, y, scaleX, scaleY, rotation, regX, regY) {
+	p.appendTransform = function(x, y, scaleX, scaleY, rotation, regX, regY) {
 		// TODO: add skew.
 		if (rotation%360) {
 			var r = rotation*Math.PI/180;
@@ -165,7 +165,7 @@ var p = Matrix2D.prototype;
 			cos = 1;
 			sin = 0;
 		}
-		this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
 		if (regX || regY) {
 			// prepend the registration offset:
 			this.tx -= regX*this.a+regY*this.c;
@@ -264,7 +264,7 @@ var p = Matrix2D.prototype;
 		var mtx = new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
 		mtx.shadow = this.shadow;
 		mtx.alpha = this.alpha;
-		return
+		return mtx;
 	}
 
 	/**

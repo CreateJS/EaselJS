@@ -63,7 +63,8 @@ var p = Bitmap.prototype = new DisplayObject();
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
 		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
-		ctx.drawImage(this.image,0,0);
+		//ctx.drawImage(this.image,0,0);
+		return true;
 	}
 	
 	/**

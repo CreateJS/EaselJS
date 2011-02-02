@@ -60,21 +60,26 @@ var p = Container.prototype = new DisplayObject();
 
 	/** @private **/
 	p.DisplayObject_draw = p.draw;
-	p.draw = function(ctx,ignoreCache) {
+	p.draw = function(ctx, ignoreCache, _mtx) {
 		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
+		if (!_mtx) { _mtx = this.getConcatenatedMatrix(); }
 		var l = this.children.length;
-		var mtx = DisplayObject._workingMatrix;
 		// this fixes issues with display list changes that occur during a draw:
 		var list = this.children.slice(0);
 		for (var i=0; i<l; i++) {
 			var child = list[i];
 			if (child.tick) { child.tick(); }
 			if (!child.isVisible()) { continue; }
-			child.getConcatenatedMatrix(mtx);
+
+			var mtx = _mtx.clone();
+			mtx.appendTransform(child.x, child.y, child.scaleX, child.scaleY, child.rotation, child.regX, child.regY);
+			mtx.alpha *= child.alpha;
+			mtx.shadow = mtx.shadow || child.shadow;
+
 			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 			ctx.globalAlpha = mtx.alpha;
 			if (mtx.shadow) { this.applyShadow(ctx, mtx.shadow); }
-			child.draw(ctx);
+			child.draw(ctx, false, mtx);
 		}
 		return true;
 	}
@@ -239,8 +244,7 @@ var p = Container.prototype = new DisplayObject();
 		var l = this.children.length;
 		for (var i=l-1;i>=0;i--) {
 			var child = this.children[i];
-
-			if (child == null || !(child.mouseEnabled || this.mouseEnabled) || child.alpha <= 0) { continue; }
+			if (!child.isVisible()) { continue; }
 
 			/*
 			if (child instanceof Container) {

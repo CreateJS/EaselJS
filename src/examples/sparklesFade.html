@@ -8,6 +8,7 @@
 
 <!-- Import EaselJS Framework -->
 <script src="../easeljs/utils/UID.js"></script>
+<script src="../easeljs/geom/Matrix2D.js"></script>
 <script src="../easeljs/events/MouseEvent.js"></script>
 <script src="../easeljs/display/SpriteSheet.js"></script>
 <script src="../easeljs/display/Shadow.js"></script>
@@ -70,7 +71,7 @@ function tick() {
 	
 	// loop through all of the active sparkles on stage:
 	var l = stage.getNumChildren();
-	for (var i=l-1; i>1; i--) {
+	for (var i=l-1; i>0; i--) {
 		var sparkle = stage.getChildAt(i);
 		
 		// apply gravity and friction

@@ -82,10 +82,10 @@ var p = Stage.prototype = new Container();
 	* Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapSequence) and render its entire display list to the canvas.
 	**/
 	p.update = function() {
-		if (this.canvas == null) { return; }
-		var ctx = this.canvas.getContext("2d");
+		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
-		this.draw(ctx);
+		var ctx = this.canvas.getContext("2d");
+		this.draw(ctx, false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
 	}
 	
 	/**
@@ -97,8 +97,10 @@ var p = Stage.prototype = new Container();
 	* Clears the target canvas. Useful if autoClear is set to false.
 	**/
 	p.clear = function() {
-		if (this.canvas == null) { return; }
-		this.canvas.width = this.canvas.width;
+		if (!this.canvas) { return; }
+		var ctx = this.canvas.getContext("2d");
+		ctx.setTransform(1,0,0,1,0,0);
+		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 	
 	/**

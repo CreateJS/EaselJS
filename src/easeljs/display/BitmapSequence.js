@@ -68,15 +68,18 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	}
 	
 // public methods:
+	p.isVisible = function() {
+		var image = this.spriteSheet ? this.spriteSheet.image : null;
+		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && image && this.currentFrame >= 0 && (image.complete || image.getContext);
+	}
+
 	p.DisplayObject_draw = p.draw;
-	p.draw = function(ctx,ignoreCache) {
+	p.draw = function(ctx, ignoreCache) {
+		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
+		
 		var image = this.spriteSheet.image;
 		var frameWidth = this.spriteSheet.frameWidth;
 		var frameHeight = this.spriteSheet.frameHeight;
-		
-		if (image == null || !(image.complete || image.getContext) || this.currentFrame < 0) { return false; }
-		if (!this.DisplayObject_draw(ctx,ignoreCache)) { return false; }
-		
 		var cols = image.width/frameWidth|0;
 		var rows = image.height/frameHeight|0;
 		
@@ -91,7 +94,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 				if (this.callback) { this.callback(this); }
 			}
 		} else if (this.spriteSheet.frameData) {
-			// sequence data is set, but we haven't played a sequence yet:
+			// sequence data is set, but we haven't actually played a sequence yet:
 			this.paused = true;
 		} else {
 			var ttlFrames = this.spriteSheet.totalFrames || cols*rows;
@@ -109,6 +112,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 			var row = this.currentFrame/cols|0;
 			ctx.drawImage(image, frameWidth*col, frameHeight*row, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight);
 		}
+		return true;
 	}
 	
 	/**

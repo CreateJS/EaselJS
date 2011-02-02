@@ -187,7 +187,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.localToGlobal = function(x, y) {
 		var mtx = this.getConcatenatedMatrix();
 		if (mtx == null) { return null; }
-		mtx.prepend(1,0,0,1,x,y);
+		mtx.append(1,0,0,1,x,y);
 		return new Point(mtx.tx, mtx.ty);
 	}
 
@@ -203,7 +203,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		var mtx = this.getConcatenatedMatrix();
 		if (mtx == null) { return null; }
 		mtx.invert();
-		mtx.prepend(1,0,0,1,x,y);
+		mtx.append(1,0,0,1,x,y);
 		return new Point(mtx.tx, mtx.ty);
 	}
 
@@ -227,7 +227,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	 * the display object and all of its parent Containers up to the stage. This can be used to transform
 	 * positions between coordinate spaces, such as with localToGlobal and globalToLocal.
 	 * Returns null if the target is not on stage.
-	 * @param mtx Optional. A Matrix2D object to reuse, instead of creating a new instance.
+	 * @param mtx Optional. A Matrix2D object to populate with the calculated values. If null, a new Matrix object is returned.
 	 **/
 	p.getConcatenatedMatrix = function(mtx) {
 		if (mtx) {
@@ -237,7 +237,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		}
 		var target = this;
 		while (true) {
-			mtx.appendTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.regX, target.regY);
+			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.regX, target.regY);
 			mtx.alpha *= target.alpha;
 			mtx.shadow = mtx.shadow || target.shadow;
 			if ((p = target.parent) == null) { break; }

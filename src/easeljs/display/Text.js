@@ -80,9 +80,13 @@ Text._workingContext = canvas.getContext("2d");
 	}
 	
 // public methods:
+	p.isVisible = function() {
+		return Boolean(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.text != null && this.text != "");
+	}
+
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
-		if (!this.DisplayObject_draw(ctx,ignoreCache) || this.text == null || this.text.length == 0) { return false; }
+		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
 		
 		if (this.outline) { ctx.strokeStyle = this.color; }
 		else { ctx.fillStyle = this.color; }
@@ -90,7 +94,7 @@ Text._workingContext = canvas.getContext("2d");
 		ctx.textAlign = this.textAlign ? this.textAlign : "start";
 		ctx.textBaseline = this.textBaseline ? this.textBaseline : "alphabetic";
 
-		var lines = this.text.split(/(?:\r\n|\r|\n)/);
+		var lines = String(this.text).split(/(?:\r\n|\r|\n)/);
 		var lineHeight = (this.lineHeight == null) ? this.getMeasuredLineHeight() : this.lineHeight;
 		var y = 0;
 		for (var i=0, l=lines.length; i<l; i++) {

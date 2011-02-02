@@ -54,13 +54,17 @@ var p = Shape.prototype = new DisplayObject();
 		this.DisplayObject_initialize();
 		this.graphics = graphics ? graphics : new Graphics();
 	}
-	
+
 // public methods:
+	p.isVisible = function() {
+		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.graphics;
+	}
+
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
-		if (this.cacheCanvas == null && this.graphics == null) { return false; }
-		if (!this.DisplayObject_draw(ctx,ignoreCache)) { return false; }
+		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
 		this.graphics.draw(ctx);
+		return true;
 	}
 	
 	p.clone = function() {
