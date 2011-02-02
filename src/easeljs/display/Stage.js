@@ -132,8 +132,8 @@ var p = Stage.prototype = new Container();
 	* is passed in, or if the browser does not support the specified MIME type, the default value will be used.
 	* @returns a Base64 encoded image.
 	* @type String
-	**/
-	p.toImageData = function(backgroundColor, mimeType) {
+	**/	
+	p.toDataURL = function(backgroundColor, mimeType) {
 		if(!mimeType) {
 			mimeType = "image/png";
 		}
@@ -145,10 +145,10 @@ var p = Stage.prototype = new Container();
 		var data;
 
 		if(backgroundColor) {
-
+			
 			//get the current ImageData for the canvas.
 			data = ctx.getImageData(0, 0, w, h);
-
+			
 			//store the current globalCompositeOperation
 			var compositeOperation = ctx.globalCompositeOperation;
 
@@ -163,7 +163,7 @@ var p = Stage.prototype = new Container();
 		}
 
 		//get the image data from the canvas
-		var imageData = this.canvas.toDataURL(mimeType);
+		var dataURL = this.canvas.toDataURL(mimeType);
 
 		if(backgroundColor) {
 			//clear the canvas
@@ -176,7 +176,7 @@ var p = Stage.prototype = new Container();
 			ctx.globalCompositeOperation = compositeOperation;
 		}
 
-		return imageData;
+		return dataURL;
 	}
 	
 	p.clone = function() {
