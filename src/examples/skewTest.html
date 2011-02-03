@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Text</title>
+
+<link href="styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../easeljs/utils/UID.js"></script>
+<script src="../easeljs/geom/Matrix2D.js"></script>
+<script src="../easeljs/events/MouseEvent.js"></script>
+<script src="../easeljs/display/DisplayObject.js"></script>
+<script src="../easeljs/display/Container.js"></script>
+<script src="../easeljs/display/Text.js"></script>
+<script src="../easeljs/display/Graphics.js"></script>
+<script src="../easeljs/display/Shape.js"></script>
+<script src="../easeljs/display/Stage.js"></script>
+<script src="../easeljs/utils/Ticker.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var canvas;
+var stage;
+
+var txt;
+var shape;
+var count = 0;
+
+function init() {
+	//find canvas and load images, wait for last image to load
+	canvas = document.getElementById("testCanvas");
+	stage = new Stage(canvas);
+
+	
+	// this shape will be the background for the text:
+	shape = new Shape();
+	shape.x = 100;
+	shape.y = 100;
+	shape.regX = shape.regY = 50;
+	shape.graphics.beginFill("#F00").drawRect(0, 0, 100, 100).beginFill("#FFF").drawRect(90,0,10,100);
+	//shape.skewX = 45;
+	shape.skewY = 360;
+	stage.addChild(shape);
+
+	shape = new Shape();
+	shape.x = 100;
+	shape.y = 100;
+	shape.graphics.beginFill("#FFF").drawRect(-1, -10, 2, 20).drawRect(-10,-1,20,2);
+	stage.addChild(shape);
+	
+	stage.update();
+}
+
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+		Simple sample showing how to use <strong>Text</strong> elements, and the <strong>Text.getMeasuredWidth()</strong> method.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580"></canvas>
+	</div>
+</body>
+</html>

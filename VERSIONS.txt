@@ -28,7 +28,7 @@ Version 0.3 [Not released]
 	- stage onMouseDown, onMouseUp, and onMouseMove events
 
 * add hitTest method to DOs
-* support .getObjectsUnderPoint on any Container
+* support .getObjectsUnderPoint on any Container (already works?)
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js

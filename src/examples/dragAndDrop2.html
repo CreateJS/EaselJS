@@ -72,7 +72,7 @@ function handleImageLoad(event) {
 			target.scaleX = target.scaleY = target.scale*1.2;
 			container.addChild(target);
 			Ticker.addListener(stage);
-			var offset = {x:target.x-evt.stageX, y:target.y-evt.stageY}
+			var offset = {x:target.x-evt.stageX, y:target.y-evt.stageY};
 
 			evt.onMouseMove = function(ev) {
 				target.x = ev.stageX+offset.x;
@@ -80,10 +80,10 @@ function handleImageLoad(event) {
 				console.log("move!");
 			}
 			evt.onMouseUp = function() {
-				console.log("up!");
 				target.scaleX = target.scaleY = target.scale;
 				stage.update();
 				Ticker.removeListener(stage);
+				console.log("up!");
 			}
 		}})(bitmap);
 		bitmap.onClick = function() { console.log("click!"); }
@@ -97,7 +97,7 @@ function handleImageLoad(event) {
 	
 <body onload="init();">
 	<div class="description">
-	Example of implementing rollover and drag &amp; drop operations via the <strong>Stage.getObjectUnderPoint()</strong> method. This functionality is likely to be included in the core library in a future version. Some browsers do not allow access to pixel data when running local files, and may throw a security error.
+	Example of implementing drag &amp; drop using mouse events. Some browsers do not allow access to pixel data when running local files, and may throw a security error.
 	</div>
 	<div class="canvasHolder">
 		<canvas id="testCanvas" width="980" height="580" style="background-color:#00FF00"></canvas>

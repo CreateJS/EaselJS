@@ -72,7 +72,7 @@ var p = Container.prototype = new DisplayObject();
 			if (!child.isVisible()) { continue; }
 
 			var mtx = _mtx.clone();
-			mtx.appendTransform(child.x, child.y, child.scaleX, child.scaleY, child.rotation, child.regX, child.regY);
+			mtx.appendTransform(child.x, child.y, child.scaleX, child.scaleY, child.rotation, child.regX, child.regY, child.skewX, child.skewY);
 			mtx.alpha *= child.alpha;
 			mtx.shadow = mtx.shadow || child.shadow;
 

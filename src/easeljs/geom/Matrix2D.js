@@ -50,6 +50,10 @@ var p = Matrix2D.prototype;
 	* @static
 	**/
 	Matrix2D.identity = null; // set at bottom of class definition.
+
+	// TODO: doc.
+	Matrix2D.DEG_TO_RAD = Math.PI/180;
+
 	
 // public properties:
 	/** Position 0,0 in an affine transformation Matrix. Maps roughly to scaleX, but is also involved in rotation. **/
@@ -128,20 +132,21 @@ var p = Matrix2D.prototype;
 	}
 	
 	/**
-	* Generates matrix properties from the specified display object transform properties, and concatenates them with this matrix.
-	* For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D(); mtx.concatTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
-	* @param x
-	* @param y
-	* @param scaleX
-	* @param scaleY
-	* @param rotation
-	* @param regX Optional.
-	* @param regY Optional.
+	 * Generates matrix properties from the specified display object transform properties, and concatenates them with this matrix.
+	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D(); mtx.concatTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
+	 * @param x
+	 * @param y
+	 * @param scaleX
+	 * @param scaleY
+	 * @param rotation
+	 * @param regX Optional.
+	 * @param regY Optional.
+	 * @param skewX Optional.
+	 * @param skewY Optional.
 	**/
-	p.prependTransform = function(x, y, scaleX, scaleY, rotation, regX, regY) {
-		// TODO: add skew.
+	p.prependTransform = function(x, y, scaleX, scaleY, rotation, regX, regY, skewX, skewY) {
 		if (rotation%360) {
-			var r = rotation*Math.PI/180;
+			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
 			var sin = Math.sin(r);
 		} else {
@@ -152,20 +157,24 @@ var p = Matrix2D.prototype;
 			// append the registration offset:
 			this.tx -= regX; this.ty -= regY;
 		}
-		this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		skewX = skewX ? Math.atan(skewX*Matrix2D.DEG_TO_RAD) : 0;
+		skewY = skewY ? Math.atan(skewY*Matrix2D.DEG_TO_RAD) : 0;
+		this.prepend(cos*scaleX, sin*scaleX+skewY, -sin*scaleY+skewX, cos*scaleY, x, y);
 	}
 
-	p.appendTransform = function(x, y, scaleX, scaleY, rotation, regX, regY) {
-		// TODO: add skew.
+	// TODO: doc.
+	p.appendTransform = function(x, y, scaleX, scaleY, rotation, regX, regY, skewX, skewY) {
 		if (rotation%360) {
-			var r = rotation*Math.PI/180;
+			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
 			var sin = Math.sin(r);
 		} else {
 			cos = 1;
 			sin = 0;
 		}
-		this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		skewX = skewX ? Math.atan(skewX*Matrix2D.DEG_TO_RAD) : 0;
+		skewY = skewY ? Math.atan(skewY*Matrix2D.DEG_TO_RAD) : 0;
+		this.append(cos*scaleX, sin*scaleX+skewY, -sin*scaleY+skewX, cos*scaleY, x, y);
 		if (regX || regY) {
 			// prepend the registration offset:
 			this.tx -= regX*this.a+regY*this.c;
@@ -190,6 +199,20 @@ var p = Matrix2D.prototype;
 		this.d = c1*sin+this.d*cos;
 		this.tx = tx1*cos-this.ty*sin;
 		this.ty = tx1*sin+this.ty*cos;
+	}
+
+	/**
+	 * Applies a skew transformation to the matrix.
+	 * @param x
+	 * @param y
+	 */
+	p.skew = function(x, y) {
+		var ax = Math.atan(x);
+		var ay = Math.atan(y);
+		this.a += this.c*ay;
+		this.b += this.d*ay;
+		this.c += this.a*ax;
+		this.d += this.b*ax;
 	}
 	
 	/**

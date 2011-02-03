@@ -69,6 +69,10 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.scaleX = 1;
 	/** The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display object to half it's nominal height. **/
 	p.scaleY = 1;
+	// TODO: doc
+	p.skewX = 0;
+	// TODO: doc
+	p.skewY = 0;
 	/** A shadow object that defines the shadow to render on this display object. Set to null to remove a shadow. Note that nested shadows can result in unexpected behaviour (ex. if both a child and a parent have a shadow set). **/
 	p.shadow = null;
 	/** Indicates whether this display object should be rendered to the canvas and included when running Stage.getObjectsUnderPoint(). **/
