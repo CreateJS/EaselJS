@@ -35,6 +35,7 @@ var shape;		// drawing shape
 var color;		// drawing color
 var lastPt;		// last draw position
 var graphics;
+var count = 0;
 
 function init() {
 	// create a new stage and point it at our canvas:
@@ -78,6 +79,12 @@ function tick() {
 	shape.rotation += 3;
 	
 	if(_mouseIsDown) {
+		var color = Graphics.getHSL(
+			Math.cos((count++)*0.1) * 60 + 180, 
+			100, 
+			50, 
+			1.0);		
+		
 		// set up our drawing properties:
 		graphics.setStrokeStyle(Math.random()*20+2,"round").beginStroke(color);
 		
@@ -102,7 +109,8 @@ function mouseDown(e) {
 	
 	// set up the first point in the new draw, and choose a random color:
 	lastPt = shape.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop);
-	color = "#"+(Math.random()*0xFFFFFF|0).toString(16);
+	//color = "#"+(Math.random()*0xFFFFFF|0).toString(16);
+
 	
 	// clear the cache, so the vector data is drawn each tick:
 	shape.uncache();

@@ -5,6 +5,15 @@ body {
 	color: #CCC;
 }
 
+a:active, a:visited, a:link
+{
+	color: #CCC;
+}
+
+a:hover
+{
+	text-decoration:none;
+}
 
 .canvasHolder {
 	width: 980px;

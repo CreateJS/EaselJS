@@ -78,20 +78,10 @@ function test() {
 	stage.addChild(target2);
 
 	var mtx = target.getConcatenatedMatrix();
-	console.log("(a=1.7320556640625, b=0.5, c=-1, d=0.86602783203125, tx=0, ty=0)");
-	console.log(mtx.toString());
-
 	mtx.decompose(target2);
-	console.log(target2.scaleX+" : "+target2.scaleY+" : "+target2.skewX+" : "+target2.skewY);
 	mtx = target2.getConcatenatedMatrix();
-	console.log(mtx.toString());
-	
-	//target.visible = false;
 
 	target.onPress = function(evt) { var pt = target.parent.globalToLocal(evt.stageX,evt.stageY); console.log(pt.x, pt.y); }
-
-	console.log(stage.getObjectsUnderPoint(250,280));
-	console.log(container.getObjectsUnderPoint(100,100));
 	
 	stage.update();
 }
