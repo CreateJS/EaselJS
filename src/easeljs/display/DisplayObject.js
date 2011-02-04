@@ -88,6 +88,9 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.compositeOperation = null;
 	/** Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage. This only applies if the enclosing stage has snapPixelsEnabled set to true, and the display object's composite transform does not include any scaling, rotation, or skewing. The snapToPixels property is true by default for Bitmap and BitmapSequence instances, and false for all other display objects. **/
 	p.snapToPixels = false;
+	// TODO: doc
+	p.onPress = null;
+	p.onClick = null;
 	
 // private properties:
 	/** @private **/

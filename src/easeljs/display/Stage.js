@@ -209,7 +209,6 @@ var p = Stage.prototype = new Container();
 	
 	p._handleMouseDown = function(e) {
 		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
-		// TODO: need to get DOs with onClick events also.
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
 		if (target) {
 			if (target.onPress instanceof Function) {
