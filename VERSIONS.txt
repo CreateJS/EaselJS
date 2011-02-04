@@ -6,7 +6,7 @@ Version 0.3 [Not released]
 - added Ticker.setFPS()
 - added Stage.toImageData(backgroundColor, mimeType)
 - made the pauseable param "true" by default on Ticker.addListener()
-- renamed Rectangle.w & h to width & height
+- renamed Rectangle.w/h to width/height
 - improvements to commenting and documentation
 - changed color to null instead of 0 in Shadow.IDENTITY
 - fixed an error with simple sprite sheets that weren't set to loop
@@ -17,19 +17,21 @@ Version 0.3 [Not released]
 - renamed Stage.tick to Stage.update and made Stage.tick point to Stage.update
 - added Container.contains(child) method
 - added .decompose() method to Matrix2D
+- added .skew() method to Matrix2D
 - added SpriteSheetUtils.extractFrame(spriteSheet,frame) method
 - added basic multi-line support for Text
 - complete rewrite of the render engine to be cleaner and more flexible
 - added stage.suppressCrossDomainErrors property
-- rework interaction model:
-	- onPress, onClick events for all DOs
-	- eliminate mouseChildren
-	- mouseEnabled true by default
-	- stage onMouseDown, onMouseUp, and onMouseMove events
-- support for skewX/Y
+- improved the interaction model:
+	- .onPress, .onClick callbacks on DisplayObject
+	- removed .mouseChildren from Container
+	- .mouseEnabled is now true by default
+	- .onMouseDown, .onMouseUp, and .onMouseMove callbacks on Stage
+- added MouseEvent
+- added .skewX/Y on DisplayObject
+- .getObjectsUnderPoint() has been moved from Stage to Container
 
 * add hitTest method to DOs
-* support .getObjectsUnderPoint on any Container (already works?)
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js

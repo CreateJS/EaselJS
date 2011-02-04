@@ -106,26 +106,6 @@ var p = Stage.prototype = new Container();
 		ctx.setTransform(1,0,0,1,0,0);
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
-
-	/**
-	* Returns an array of all display objects under the specified canvas coordinates that are in this stage's display list. This routine ignores any display objects with mouseEnabled set to false (the default) or that are inside containers with mouseChildren set to false (the default). The array will be sorted in order of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
-	* @param x The x coordinate to test.
-	* @param y The y coordinate to test.
-	**/
-	p.getObjectsUnderPoint = function(x,y) {
-		var arr = [];
-		this._getObjectsUnderPoint(x,y,arr);
-		return arr;
-	}
-
-	/**
-	* Similar to getObjectsUnderPoint(), but returns only the top-most display object. This runs significantly faster than getObjectsUnderPoint(), but is still an expensive operation. See getObjectsUnderPoint() for more information.
-	* @param x The x coordinate to test.
-	* @param y The y coordinate to test.
-	**/
-	p.getObjectUnderPoint = function(x,y) {
-		return this._getObjectsUnderPoint(x,y);
-	}
 	
 	/**
 	* Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be 

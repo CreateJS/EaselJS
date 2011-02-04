@@ -228,17 +228,14 @@ DisplayObject._workingMatrix = new Matrix2D();
 
 	/**
 	 * Generates a concatenated Matrix2D object representing the combined transform of
-	 * the display object and all of its parent Containers up to the stage. This can be used to transform
-	 * positions between coordinate spaces, such as with localToGlobal and globalToLocal.
-	 * Returns null if the target is not on stage.
+	 * the display object and all of its parent Containers up to the highest level ancestor
+	 * (usually the stage). This can be used to transform positions between coordinate spaces,
+	 * such as with localToGlobal and globalToLocal.
 	 * @param mtx Optional. A Matrix2D object to populate with the calculated values. If null, a new Matrix object is returned.
 	 **/
 	p.getConcatenatedMatrix = function(mtx) {
-		if (mtx) {
-			mtx.identity();
-		} else {
-			mtx = new Matrix2D();
-		}
+		if (mtx) { mtx.identity(); }
+		else { mtx = new Matrix2D(); }
 		var target = this;
 		while (true) {
 			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.skewX, target.skewY, target.regX, target.regY);
@@ -247,7 +244,6 @@ DisplayObject._workingMatrix = new Matrix2D();
 			if ((p = target.parent) == null) { break; }
 			target = p;
 		}
-		if (!target instanceof Stage) { return null; }
 		return mtx;
 	}
 	

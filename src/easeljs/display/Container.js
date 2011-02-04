@@ -202,6 +202,28 @@ var p = Container.prototype = new DisplayObject();
 		}
 		return false;
 	}
+
+	/**
+	* Returns an array of all display objects under the specified coordinates that are in this container's display list. This routine ignores any display objects with mouseEnabled set to false (the default) or that are inside containers with mouseChildren set to false (the default). The array will be sorted in order of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
+	* @param x The x position in the container to test.
+	* @param y The y position in the container to test.
+	**/
+	p.getObjectsUnderPoint = function(x, y) {
+		var arr = [];
+		var pt = this.localToGlobal(x, y);
+		this._getObjectsUnderPoint(pt.x, pt.y, arr);
+		return arr;
+	}
+
+	/**
+	* Similar to getObjectsUnderPoint(), but returns only the top-most display object. This runs significantly faster than getObjectsUnderPoint(), but is still an expensive operation. See getObjectsUnderPoint() for more information.
+	* @param x The x position in the container to test.
+	* @param y The y position in the container to test.
+	**/
+	p.getObjectUnderPoint = function(x, y) {
+		var pt = this.localToGlobal(x, y);
+		return this._getObjectsUnderPoint(pt.x, pt.y);
+	}
 	
 	p.clone = function() {
 		var o = new Container();

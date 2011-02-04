@@ -31,6 +31,7 @@ var dragStarted;	// indicates whether we are currently in a drag operation
 var offset = new Point();
 var target;
 var target2;
+var container;
 var ref;
 
 function init() {
@@ -47,7 +48,7 @@ function init() {
 
 
 	// create a container (equivalent to a Sprite)
-	var container = new Container();
+	container = new Container();
 	stage.addChild(container);
 
 	container.x = 100;
@@ -87,7 +88,10 @@ function test() {
 	
 	//target.visible = false;
 
-	target2.onPress = function() { console.log("click"); }
+	target.onPress = function(evt) { var pt = target.parent.globalToLocal(evt.stageX,evt.stageY); console.log(pt.x, pt.y); }
+
+	console.log(stage.getObjectsUnderPoint(250,280));
+	console.log(container.getObjectsUnderPoint(100,100));
 	
 	stage.update();
 }
