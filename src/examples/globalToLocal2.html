@@ -39,7 +39,7 @@ var shape;		// drawing shape
 var color;		// drawing color
 var lastPt;		// last draw position
 var graphics;
-
+var count = 0;
 
 //
 //
@@ -87,6 +87,13 @@ function tick() {
 	shape.rotation += 1.77;
 	
 	if(_mouseIsDown) {
+		
+		var color = Graphics.getHSL(
+			Math.cos((count++)*0.1) * 60 + 180, 
+			100, 
+			50, 
+			0.8);		
+		
 		graphics.setStrokeStyle(Math.random()*20,"round").beginStroke(color);
 		graphics.moveTo(0,0);
 		lastPt = shape.globalToLocal(_mouseX,_mouseY);
@@ -106,7 +113,6 @@ function mouseDown(e) {
 	if (_mouseIsDown) { return; }
 	_mouseIsDown = true;
 	lastPt = shape.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop);
-	color = "#"+(Math.random()*0xFFFFFF|0).toString(16);
 }
 
 //stop drawing
