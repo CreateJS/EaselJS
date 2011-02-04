@@ -32,8 +32,9 @@ Version 0.3 [Not released]
 - Stage.getObjectsUnderPoint() has been moved to Container
 - added Container.contains(child) method
 - added DisplayObject.compositeOperation
+- added appendProperties() and prependProperties methods to Matrix2D
+- added DisplayObject.hitTest() method
 
-* add hitTest method to DOs (use for getObjectsUnderPoint?)
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js

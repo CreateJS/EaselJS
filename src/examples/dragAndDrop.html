@@ -56,7 +56,7 @@ function handleImageLoad(event) {
 	stage.addChild(container);
 	
 	// create and populate the screen with random daisies:
-	for(var i = 0; i < 100; i++){
+	for(var i = 0; i < 1000; i++){
 		bitmap = new Bitmap(image);
 		bitmap.x = canvas.width * Math.random()|0;
 		bitmap.y = canvas.height * Math.random()|0;
@@ -84,7 +84,9 @@ function tick() {
 		// when running local files, most browsers throw a security error when reading pixel data
 		// (which getObjectUnderPoint uses) so we'll put it in a try/catch block:
 
+		var t = (new Date()).getTime();
 			mouseTarget = stage.getObjectUnderPoint(stage.mouseX, stage.mouseY);
+		console.log((new Date()).getTime()-t);
 		try {
 			// this will return the top-most display object under the mouse position:
 		} catch (e) {

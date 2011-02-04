@@ -122,17 +122,13 @@ var p = Matrix2D.prototype;
 	* Concatenates the specified matrix with this matrix.
 	**/
 	p.prependMatrix = function(matrix) {
-		this.alpha *= matrix.alpha;
-		this.shadow = this.shadow || matrix.shadow;
-		this.compositeOperation = this.compositeOperation || matrix.compositeOperation;
 		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
+		this.prependProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
 	}
 
 	p.appendMatrix = function(matrix) {
-		this.alpha *= matrix.alpha;
-		this.shadow = matrix.shadow || this.shadow;
-		this.compositeOperation = matrix.compositeOperation || this.compositeOperation;
 		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
+		this.appendProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
 	}
 	
 	/**
@@ -307,6 +303,20 @@ var p = Matrix2D.prototype;
 			target.skewY = skewY/Matrix2D.DEG_TO_RAD;
 		}
 		return target;
+	}
+
+	// TODO: doc
+	p.appendProperties = function(alpha, shadow, compositeOperation) {
+		this.alpha *= alpha;
+		this.shadow = shadow || this.shadow;
+		this.compositeOperation = compositeOperation || this.compositeOperation;
+	}
+
+	// TODO: doc
+	p.prependProperties = function(alpha, shadow, compositeOperation) {
+		this.alpha *= alpha;
+		this.shadow = this.shadow || shadow;
+		this.compositeOperation = this.compositeOperation || compositeOperation;
 	}
 	
 	/**

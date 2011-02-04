@@ -241,13 +241,31 @@ DisplayObject._workingMatrix = new Matrix2D();
 		var target = this;
 		while (true) {
 			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.skewX, target.skewY, target.regX, target.regY);
-			mtx.alpha *= target.alpha;
-			mtx.shadow = mtx.shadow || target.shadow;
-			mtx.compositeOperation = mtx.compositeOperation || target.compositeOperation;
+			mtx.prependProperties(target.alpha, target.shadow, target.compositeOperation);
 			if ((p = target.parent) == null) { break; }
 			target = p;
 		}
 		return mtx;
+	}
+
+	/**
+	 * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the specified position).
+	 * This ignores the alpha, shadow and compositeOperation of the display object, and all transform properties including regX/Y.
+	 * @param x The x position to check in the display object's local coordinates.
+	 * @param y The y position to check in the display object's local coordinates.
+	 */
+	p.hitTest = function(x, y) {
+		var ctx = DisplayObject._hitTestContext;
+		var canvas = DisplayObject._hitTestCanvas;
+
+		ctx.setTransform(1,  0, 0, 1, -x, -y);
+		this.draw(ctx);
+		
+		var hit = this._testHit(ctx);
+		
+		canvas.width = 0;
+		canvas.width = 1;
+		return hit;
 	}
 	
 	/**
@@ -267,6 +285,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	}
 	
 // private methods:
+
 	// separated so it can be used more easily in subclasses:
 	/** @private **/
 	p.cloneProps = function(o) {
@@ -278,10 +297,13 @@ DisplayObject._workingMatrix = new Matrix2D();
 		o.scaleX = this.scaleX;
 		o.scaleY = this.scaleY;
 		o.shadow = this.shadow;
+		o.skewX = this.skewX;
+		o.skewY = this.skewY;
 		o.visible = this.visible;
 		o.x  = this.x;
 		o.y = this.y;
 		o.mouseEnabled = this.mouseEnabled;
+		o.compositeOperation = this.compositeOperation;
 	}
 	
 	/** @private **/
@@ -290,6 +312,18 @@ DisplayObject._workingMatrix = new Matrix2D();
 		ctx.shadowOffsetX = shadow.offsetX;
 		ctx.shadowOffsetY = shadow.offsetY;
 		ctx.shadowBlur = shadow.blur;
+	}
+
+	/** @private **/
+	p._testHit = function(ctx) {
+		try {
+			var hit = ctx.getImageData(0,0,1,1).data[3] > 1;
+		} catch (e) {
+			if (!Stage.suppressCrossDomainErrors) {
+				throw "An error has occured. This is most likely due to security restrictions on reading canvas pixel data with local or cross-domain images.";
+			}
+		}
+		return hit;
 	}
 
 window.DisplayObject = DisplayObject;

@@ -63,9 +63,7 @@ var p = Container.prototype = new DisplayObject();
 	p.draw = function(ctx, ignoreCache, _mtx) {
 		if (!_mtx) {
 			_mtx = new Matrix2D();
-			_mtx.shadow = this.shadow;
-			_mtx.compositeOperation = this.compositeOperation;
-			_mtx.alpha = this.alpha;
+			_mtx.appendProperties(this.alpha, this.shadow, this.compositeOperation);
 		}
 		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
 		var l = this.children.length;
@@ -78,9 +76,7 @@ var p = Container.prototype = new DisplayObject();
 
 			var mtx = _mtx.clone();
 			mtx.appendTransform(child.x, child.y, child.scaleX, child.scaleY, child.rotation, child.skewX, child.skewY, child.regX, child.regY);
-			mtx.alpha *= child.alpha;
-			mtx.shadow = mtx.shadow || child.shadow;
-			mtx.compositeOperation = mtx.compositeOperation || child.compositeOperation;
+			mtx.appendProperties(child.alpha, child.shadow, child.compositeOperation);
 
 			if (!(child instanceof Container)) {
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
@@ -299,26 +295,7 @@ var p = Container.prototype = new DisplayObject();
 		}
 		return null;
 	}
-	
-	/** @private **/
-	p._testHit = function(ctx) {
-		try {
-			var hit = ctx.getImageData(0,0,1,1).data[3] > 1;
-		} catch (e) {
-			if (!Stage.suppressCrossDomainErrors) {
-				throw "An error has occured. This is most likely due to security restrictions on reading canvas pixel data with local or cross-domain images.";
-			}
-		}
-		return hit;
-	}
-	
-	/** @private **/
-	p.DisplayObject_cloneProps = p.cloneProps;
-	/** @private **/
-	p.cloneProps = function(o) {
-		this.DisplayObject_cloneProps(o);
-		o.mouseChildren = this.mouseChildren;
-	}
+
 
 window.Container = Container;
 }(window));
