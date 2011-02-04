@@ -4,37 +4,42 @@ Version 0.3 [Not released]
 - adding a listener to Ticker twice will now move it to the end of the listener list
 - added Ticker.getMeasuredFPS()
 - added Ticker.setFPS()
-- added Stage.toImageData(backgroundColor, mimeType)
+- renamed Stage.tick to Stage.update and made Stage.tick point to Stage.update
 - made the pauseable param "true" by default on Ticker.addListener()
+- added Stage.toDataURL(backgroundColor, mimeType)
 - renamed Rectangle.w/h to width/height
 - improvements to commenting and documentation
+- formalized inheritance model to make code more readable
 - changed color to null instead of 0 in Shadow.IDENTITY
 - fixed an error with simple sprite sheets that weren't set to loop
 - implemented "tiny" instructions for Graphics. (ex. myGraphics.f("#0FF").c(x,y,r) )
 - fixed problems with Graphics.clone()
 - fixed bug with passing instructions to a Graphics object constructor
-- formalized inheritance model to make code more readable
-- renamed Stage.tick to Stage.update and made Stage.tick point to Stage.update
-- added Container.contains(child) method
+- complete rewrite of the render engine to be cleaner and more flexible
 - added .decompose() method to Matrix2D
 - added .skew() method to Matrix2D
+- added .skewX/Y on DisplayObject
 - added SpriteSheetUtils.extractFrame(spriteSheet,frame) method
 - added basic multi-line support for Text
-- complete rewrite of the render engine to be cleaner and more flexible
-- added stage.suppressCrossDomainErrors property
+- added Stage.suppressCrossDomainErrors property
+- complete rewrite of the hit testing system to be cleaner and run 5-10x faster
 - improved the interaction model:
 	- .onPress, .onClick callbacks on DisplayObject
 	- removed .mouseChildren from Container
 	- .mouseEnabled is now true by default
 	- .onMouseDown, .onMouseUp, and .onMouseMove callbacks on Stage
 - added MouseEvent
-- added .skewX/Y on DisplayObject
-- .getObjectsUnderPoint() has been moved from Stage to Container
+- Stage.getObjectsUnderPoint() has been moved to Container
+- added Container.contains(child) method
+- added DisplayObject.compositeOperation
 
-* add hitTest method to DOs
+* add hitTest method to DOs (use for getObjectsUnderPoint?)
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js
+* fix onClick
+* add snapToPixel to stage (pass forward in renderProps? or append to Container temporarily?)
+* move suppressCrossDomainErrors to stage (not Stage) and use above technique.
 
 
 Version 0.2.1 [Jan 12, 2011]

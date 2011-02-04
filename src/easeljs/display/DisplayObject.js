@@ -81,6 +81,8 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.x = 0;
 	/** The y (vertical) position of the display object, relative to its parent. **/
 	p.y = 0;
+	// TODO: doc
+	p.compositeOperation = null;
 	
 // private properties:
 	/** @private **/
@@ -241,6 +243,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.skewX, target.skewY, target.regX, target.regY);
 			mtx.alpha *= target.alpha;
 			mtx.shadow = mtx.shadow || target.shadow;
+			mtx.compositeOperation = mtx.compositeOperation || target.compositeOperation;
 			if ((p = target.parent) == null) { break; }
 			target = p;
 		}

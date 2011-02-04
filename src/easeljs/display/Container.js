@@ -61,7 +61,12 @@ var p = Container.prototype = new DisplayObject();
 	/** @private **/
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx, ignoreCache, _mtx) {
-		if (!_mtx) { _mtx = new Matrix2D(); }
+		if (!_mtx) {
+			_mtx = new Matrix2D();
+			_mtx.shadow = this.shadow;
+			_mtx.compositeOperation = this.compositeOperation;
+			_mtx.alpha = this.alpha;
+		}
 		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
 		var l = this.children.length;
 		// this ensures we don't have issues with display list changes that occur during a draw:
@@ -75,10 +80,14 @@ var p = Container.prototype = new DisplayObject();
 			mtx.appendTransform(child.x, child.y, child.scaleX, child.scaleY, child.rotation, child.skewX, child.skewY, child.regX, child.regY);
 			mtx.alpha *= child.alpha;
 			mtx.shadow = mtx.shadow || child.shadow;
+			mtx.compositeOperation = mtx.compositeOperation || child.compositeOperation;
 
-			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
-			ctx.globalAlpha = mtx.alpha;
-			if (mtx.shadow) { this.applyShadow(ctx, mtx.shadow); }
+			if (!(child instanceof Container)) {
+				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+				ctx.globalAlpha = mtx.alpha;
+				ctx.globalCompositeOperation = mtx.compositeOperation || "source-over";
+				if (mtx.shadow) { this.applyShadow(ctx, mtx.shadow); }
+			}
 			child.draw(ctx, false, mtx);
 		}
 		return true;

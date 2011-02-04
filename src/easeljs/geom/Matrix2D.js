@@ -72,6 +72,8 @@ var p = Matrix2D.prototype;
 	p.alpha = 1;
 	/** Property representing the shadow that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values. **/
 	p.shadow  = null;
+	/** Property representing the compositeOperation that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated compositeOperation values. **/
+	p.compositeOperation  = null;
 	
 // constructor:
 	/** @private **/
@@ -121,13 +123,15 @@ var p = Matrix2D.prototype;
 	**/
 	p.prependMatrix = function(matrix) {
 		this.alpha *= matrix.alpha;
-		this.shadow = matrix.shadow;
+		this.shadow = this.shadow || matrix.shadow;
+		this.compositeOperation = this.compositeOperation || matrix.compositeOperation;
 		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	}
 
 	p.appendMatrix = function(matrix) {
 		this.alpha *= matrix.alpha;
-		this.shadow = matrix.shadow;
+		this.shadow = matrix.shadow || this.shadow;
+		this.compositeOperation = matrix.compositeOperation || this.compositeOperation;
 		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	}
 	
@@ -253,7 +257,7 @@ var p = Matrix2D.prototype;
 	p.identity = function() {
 		this.alpha = this.a = this.d = 1;
 		this.b = this.c = this.tx = this.ty = 0;
-		this.shadow = null;
+		this.shadow = this.compositeOperation = null;
 	}
 	
 	/**
@@ -312,6 +316,7 @@ var p = Matrix2D.prototype;
 		var mtx = new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
 		mtx.shadow = this.shadow;
 		mtx.alpha = this.alpha;
+		mtx.compositeOperation = this.compositeOperation;
 		return mtx;
 	}
 

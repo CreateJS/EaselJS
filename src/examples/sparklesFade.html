@@ -124,7 +124,8 @@ function addSparkles(count, x, y, speed) {
 		sparkle.rotation = Math.random()*360;
 		sparkle.alpha = Math.random()*0.5+0.5;
 		sparkle.scaleX = sparkle.scaleY = Math.random()+0.3;
-		
+		sparkle.compositeOperation = "lighter";
+
 		// set up velocities:
 		var a = Math.PI*2*Math.random();
 		var v = (Math.random()-0.5)*30*speed;

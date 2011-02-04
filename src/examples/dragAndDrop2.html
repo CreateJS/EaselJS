@@ -52,6 +52,7 @@ function handleImageLoad(event) {
 	var bitmap;
 	var container = new Container();
 	stage.addChild(container);
+	container.compositeOperation = "lighter";
 	
 	// create and populate the screen with random daisies:
 	for(var i = 0; i < 100; i++){
@@ -64,7 +65,7 @@ function handleImageLoad(event) {
 		bitmap.regY = bitmap.image.height/2|0;
 		bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random()+0.6;
 		bitmap.mouseEnabled = true;
-		bitmap.alpha = Math.random()*0.8+0.2;
+		//bitmap.alpha = Math.random()*0.8+0.2;
 		bitmap.name = "bmp_"+i;
 		(function(target) {
 		bitmap.onPress = function(evt) {
