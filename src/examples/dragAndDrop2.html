@@ -52,6 +52,7 @@ function handleImageLoad(event) {
 	var bitmap;
 	var container = new Container();
 	stage.addChild(container);
+	container.compositeOperation = "lighter";
 	
 	// create and populate the screen with random daisies:
 	for(var i = 0; i < 100; i++){
@@ -68,7 +69,7 @@ function handleImageLoad(event) {
 		bitmap.name = "bmp_"+i;
 		(function(target) {
 		bitmap.onPress = function(evt) {
-			//console.log("press!");
+			console.log("press!");
 			target.scaleX = target.scaleY = target.scale*1.2;
 			container.addChild(target);
 			Ticker.addListener(stage);
@@ -77,16 +78,16 @@ function handleImageLoad(event) {
 			evt.onMouseMove = function(ev) {
 				target.x = ev.stageX+offset.x;
 				target.y = ev.stageY+offset.y;
-				//console.log("move!");
+				console.log("move!");
 			}
 			evt.onMouseUp = function() {
 				target.scaleX = target.scaleY = target.scale;
 				stage.update();
 				Ticker.removeListener(stage);
-				//console.log("up!");
+				console.log("up!");
 			}
 		}})(bitmap);
-		bitmap.onClick = function() { //console.log("click!"); }
+		bitmap.onClick = function() { console.log("click!"); }
 	}
 	stage.update();
 }
@@ -94,10 +95,10 @@ function handleImageLoad(event) {
 
 </script>
 </head>
-	
+
 <body onload="init();">
 	<div class="description">
-	Example of implementing drag &amp; drop using mouse events. Some browsers do not allow access to pixel data when running local files, and may throw a security error. If this occurs, just serve the file from a web ser
+	Example of implementing drag &amp; drop using mouse events. Some browsers do not allow access to pixel data when running local files, and may throw a security error.
 	</div>
 	<div class="canvasHolder">
 		<canvas id="testCanvas" width="980" height="580" style="background-color:#00FF00"></canvas>

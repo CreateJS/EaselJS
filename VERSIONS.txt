@@ -21,7 +21,7 @@ Version 0.3 [Not released]
 - added .skewX/Y on DisplayObject
 - added SpriteSheetUtils.extractFrame(spriteSheet,frame) method
 - added basic multi-line support for Text
-- added Stage.suppressCrossDomainErrors property
+- added DisplayObject.suppressCrossDomainErrors property
 - complete rewrite of the hit testing system to be cleaner and run 5-10x faster
 - improved the interaction model:
 	- .onPress, .onClick callbacks on DisplayObject
@@ -34,12 +34,11 @@ Version 0.3 [Not released]
 - added DisplayObject.compositeOperation
 - added appendProperties() and prependProperties methods to Matrix2D
 - added DisplayObject.hitTest() method
+- added stage.snapToPixelsEnabled and displayObject.snapToPixels
 
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js
-* add snapToPixel to stage (pass forward in renderProps? or append to Container temporarily?)
-* move suppressCrossDomainErrors to stage (not Stage) and use above technique.
 
 
 Version 0.2.1 [Jan 12, 2011]

@@ -41,26 +41,32 @@ function Stage(canvas) {
 var p = Stage.prototype = new Container();
 
 // static properties:
-	/** Suppresses errors generated when using features like getObjectsUnderPoint with cross domain content. **/
-	Stage.suppressCrossDomainErrors = false;
+	/** @private **/
+	Stage._snapToPixelsEnabled = false; // snapToPixels is temporarily copied here during a draw to provide global access.
 
 // public properties:
 	/** Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for example). **/
 	p.autoClear = true;
 	/** The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the first stage that will be ticked (or they will clear each other's render). **/
 	p.canvas = null;
+	// TODO: doc
 	p.mouseX = null;
 	p.mouseY = null;
 	p.mouseEventsEnabled = false;
 	p.onMouseMove = null;
 	p.onMouseUp = null;
 	p.onMouseDown = null;
+	/** Indicates whether this stage should use the snapToPixels property of display objects when rendering them. **/
+	p.snapToPixelsEnabled = false;
 	
 // private properties:
 	/** @private **/
 	p._tmpCanvas = null;
+	/** @private **/
 	p._activeMouseEvent = null;
+	/** @private **/
 	p._activeMouseTarget = null;
+	/** @private **/
 	
 // constructor:
 	/** @private **/
@@ -89,6 +95,7 @@ var p = Stage.prototype = new Container();
 	p.update = function() {
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
+		Stage._snapToPixelsEnabled = this.snapToPixelsEnabled;
 		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
 	}
 	

@@ -38,6 +38,9 @@ function DisplayObject() {
 }
 var p = DisplayObject.prototype;
 
+/** Suppresses errors generated when using features like hitTest, onPress/onClick, and getObjectsUnderPoint with cross domain content. **/
+DisplayObject.suppressCrossDomainErrors = false;
+
 /** @private **/
 DisplayObject._hitTestCanvas = document.createElement("canvas");
 DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
@@ -83,6 +86,8 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.y = 0;
 	// TODO: doc
 	p.compositeOperation = null;
+	/** Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage. This only applies if the enclosing stage has snapPixelsEnabled set to true, and the display object's composite transform does not include any scaling, rotation, or skewing. The snapToPixels property is true by default for Bitmap and BitmapSequence instances, and false for all other display objects. **/
+	p.snapToPixels = false;
 	
 // private properties:
 	/** @private **/
@@ -319,7 +324,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		try {
 			var hit = ctx.getImageData(0,0,1,1).data[3] > 1;
 		} catch (e) {
-			if (!Stage.suppressCrossDomainErrors) {
+			if (!DisplayObject.suppressCrossDomainErrors) {
 				throw "An error has occured. This is most likely due to security restrictions on reading canvas pixel data with local or cross-domain images.";
 			}
 		}
