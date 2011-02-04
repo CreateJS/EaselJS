@@ -31,9 +31,14 @@
 
 /**
 * Constructs a new MouseEvent instance.
-* @param stageX The mouseX position on the stage.
-* @param stageY The mouseY position on the stage.
-* @class This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, and onClick handlers on DisplayObject instances.
+* @param type The event type.
+* @param stageX The mouseX position relative to the stage.
+* @param stageY The mouseY position relative to the stage.
+* @class This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, and onClick handlers on 
+* DisplayObject instances.
+* By default, mouse events are disabled for performance reasons. In order to enabled them for a specified stage
+* set mouseEventsEnabled to true on your stage instance.
+* @see Stage#mouseEventsEnabled
 **/
 function MouseEvent(type, stageX, stageY) {
   this.initialize(type, stageX, stageY);
@@ -45,11 +50,19 @@ var p = MouseEvent.prototype;
 	p.stageX = 0;
 	/** The mouseY position on the stage. **/
 	p.stageY = 0;
-	/** The type of mouse event. This will be the same as the handler it maps to (onPress, onMouseDown, onMouseUp, onMouseMove, or onClick). **/
+	/** The type of mouse event. This will be the same as the handler it maps to (onPress, onMouseDown, 
+		onMouseUp, onMouseMove, or onClick). 
+	**/
 	p.type = null;
-	/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseMove property. This handler will be called every time the mouse is moved until the mouse is released. This is useful for operations like drag and drop. **/
+	/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseMove 
+		property. This handler will be called every time the mouse is moved until the mouse is released. 
+		This is useful for operations like drag and drop. 
+	**/
 	p.onMouseMove = null;
-	/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseUp property. This handler will be once when the mouse is released anywhere over the page. This is useful for operations like drag and drop. **/
+	/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseUp property. 
+		This handler will be called a single time when the mouse is released anywhere over the page. This is useful for operations 
+		like drag and drop. 
+	**/
 	p.onMouseUp = null;
 	
 // constructor:
@@ -62,7 +75,7 @@ var p = MouseEvent.prototype;
 	
 // public methods:
 	/**
-	* Returns a clone of this Point.
+	* Returns a clone of the MouseEvent instance.
 	**/
 	p.clone = function() {
 		return new MouseEvent(this.type, this.stageX, this.stageY);
