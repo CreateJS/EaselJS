@@ -192,9 +192,9 @@ var p = Stage.prototype = new Container();
 	p._handleMouseUp = function(e) {
 		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
-		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
+		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp instanceof Function) { this._activeMouseEvent.onMouseUp(evt); }
 		if (this._activeMouseTarget && this._activeMouseTarget.onClick &&
-			 this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, "onClick") == this._activeMouseTarget) {
+			 this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true) == this._activeMouseTarget) {
 			this._activeMouseTarget.onClick(new MouseEvent("onClick", this.mouseX, this.mouseY));
 		}
 		this._activeMouseEvent = this.activeMouseTarget = null;
@@ -203,11 +203,13 @@ var p = Stage.prototype = new Container();
 	p._handleMouseDown = function(e) {
 		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
 		// TODO: need to get DOs with onClick events also.
-		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, "onPress");
+		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
 		if (target) {
-			var evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
-			target.onPress(evt);
-			if (evt.onMouseMove || evt.onMouseUp) { this._activeMouseEvent = evt; }
+			if (target.onPress instanceof Function) {
+				var evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
+				target.onPress(evt);
+				if (evt.onMouseMove || evt.onMouseUp) { this._activeMouseEvent = evt; }
+			}
 			this._activeMouseTarget = target;
 		}
 	}

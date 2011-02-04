@@ -242,12 +242,12 @@ var p = Container.prototype = new DisplayObject();
 	
 // private properties:
 	/** @private **/
-	p._getObjectsUnderPoint = function(x, y, arr, handler) {
+	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
 
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;
 		var mtx = DisplayObject._workingMatrix;
-		var hasHandler = handler && (this[handler] != null);
+		var hasHandler = mouseEvents && (this.onPress || this.onClick);
 
 		// if we have a cache handy, we can use it to do a quick check:
 		if (this.cacheCanvas) {
@@ -274,14 +274,13 @@ var p = Container.prototype = new DisplayObject();
 				var result;
 				if (hasHandler) {
 					// only concerned about the first hit, because this container is going to claim it anyway:
-					result = child._getObjectsUnderPoint(x,y);
+					result = child._getObjectsUnderPoint(x, y);
 					if (result) { return result; }
 				} else {
-					result = child._getObjectsUnderPoint(x,y,arr,handler);
+					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!handler || (handler && child[handler])) {
-				// either no handler is specified, or child has the handler, so we should test it.
+			} else if (!mouseEvents || (mouseEvents && (child.onPress || child.onClick))) {
 				child.getConcatenatedMatrix(mtx);
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				ctx.globalAlpha = mtx.alpha;

@@ -38,7 +38,6 @@ Version 0.3 [Not released]
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js
-* fix onClick
 * add snapToPixel to stage (pass forward in renderProps? or append to Container temporarily?)
 * move suppressCrossDomainErrors to stage (not Stage) and use above technique.
 
