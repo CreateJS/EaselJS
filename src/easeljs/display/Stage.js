@@ -106,7 +106,7 @@ var p = Stage.prototype = new Container();
 		ctx.setTransform(1,0,0,1,0,0);
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
-	
+
 	/**
 	* Returns an array of all display objects under the specified canvas coordinates that are in this stage's display list. This routine ignores any display objects with mouseEnabled set to false (the default) or that are inside containers with mouseChildren set to false (the default). The array will be sorted in order of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
 	* @param x The x coordinate to test.
@@ -117,7 +117,7 @@ var p = Stage.prototype = new Container();
 		this._getObjectsUnderPoint(x,y,arr);
 		return arr;
 	}
-	
+
 	/**
 	* Similar to getObjectsUnderPoint(), but returns only the top-most display object. This runs significantly faster than getObjectsUnderPoint(), but is still an expensive operation. See getObjectsUnderPoint() for more information.
 	* @param x The x coordinate to test.
@@ -214,7 +214,7 @@ var p = Stage.prototype = new Container();
 		if (this.onMouseUp) { this.onMouseUp(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
 		if (this._activeMouseTarget && this._activeMouseTarget.onClick &&
-			 this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, "onClick") == this._activeMouseTarget) { // TODO: switch to a hitTest.
+			 this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, "onClick") == this._activeMouseTarget) {
 			this._activeMouseTarget.onClick(new MouseEvent("onClick", this.mouseX, this.mouseY));
 		}
 		this._activeMouseEvent = this.activeMouseTarget = null;
@@ -222,6 +222,7 @@ var p = Stage.prototype = new Container();
 	
 	p._handleMouseDown = function(e) {
 		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
+		// TODO: need to get DOs with onClick events also.
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, "onPress");
 		if (target) {
 			var evt = new MouseEvent("onPress", this.mouseX, this.mouseY);

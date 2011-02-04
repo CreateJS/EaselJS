@@ -26,13 +26,14 @@ Version 0.3 [Not released]
 	- eliminate mouseChildren
 	- mouseEnabled true by default
 	- stage onMouseDown, onMouseUp, and onMouseMove events
+- support for skewX/Y
 
 * add hitTest method to DOs
 * support .getObjectsUnderPoint on any Container (already works?)
 * preliminary support for getBounds on Text, Bitmap, BitmapSequence
 * google closure?
 * rename easeljs.js to easel.js
-* support for skewX/Y
+
 
 Version 0.2.1 [Jan 12, 2011]
 ********************************************************************************

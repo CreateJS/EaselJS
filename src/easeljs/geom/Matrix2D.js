@@ -139,12 +139,12 @@ var p = Matrix2D.prototype;
 	 * @param scaleX
 	 * @param scaleY
 	 * @param rotation
+	 * @param skewX
+	 * @param skewY
 	 * @param regX Optional.
 	 * @param regY Optional.
-	 * @param skewX Optional.
-	 * @param skewY Optional.
 	**/
-	p.prependTransform = function(x, y, scaleX, scaleY, rotation, regX, regY, skewX, skewY) {
+	p.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
@@ -153,17 +153,25 @@ var p = Matrix2D.prototype;
 			cos = 1;
 			sin = 0;
 		}
+		
 		if (regX || regY) {
 			// append the registration offset:
 			this.tx -= regX; this.ty -= regY;
 		}
-		skewX = skewX ? Math.atan(skewX*Matrix2D.DEG_TO_RAD) : 0;
-		skewY = skewY ? Math.atan(skewY*Matrix2D.DEG_TO_RAD) : 0;
-		this.prepend(cos*scaleX, sin*scaleX+skewY, -sin*scaleY+skewX, cos*scaleY, x, y);
+		if (skewX || skewY) {
+			// TODO: can this be combined into a single prepend operation?
+			skewX *= Matrix2D.DEG_TO_RAD;
+			skewY *= Matrix2D.DEG_TO_RAD;
+			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
+			this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
+		} else {
+			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		}
+
 	}
 
 	// TODO: doc.
-	p.appendTransform = function(x, y, scaleX, scaleY, rotation, regX, regY, skewX, skewY) {
+	p.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
@@ -172,9 +180,17 @@ var p = Matrix2D.prototype;
 			cos = 1;
 			sin = 0;
 		}
-		skewX = skewX ? Math.atan(skewX*Matrix2D.DEG_TO_RAD) : 0;
-		skewY = skewY ? Math.atan(skewY*Matrix2D.DEG_TO_RAD) : 0;
-		this.append(cos*scaleX, sin*scaleX+skewY, -sin*scaleY+skewX, cos*scaleY, x, y);
+
+		if (skewX || skewY) {
+			// TODO: can this be combined into a single append?
+			skewX *= Matrix2D.DEG_TO_RAD;
+			skewY *= Matrix2D.DEG_TO_RAD;
+			this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
+			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
+		} else {
+			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		}
+
 		if (regX || regY) {
 			// prepend the registration offset:
 			this.tx -= regX*this.a+regY*this.c;
@@ -183,8 +199,9 @@ var p = Matrix2D.prototype;
 	}
 
 	/**
-	* Applies a rotation transformation to the matrix.
-	**/
+	 * Applies a rotation transformation to the matrix.
+	 * @param angle The angle in degrees.
+	 **/
 	p.rotate = function(angle) {
 		var cos = Math.cos(angle);
 		var sin = Math.sin(angle);
@@ -203,16 +220,13 @@ var p = Matrix2D.prototype;
 
 	/**
 	 * Applies a skew transformation to the matrix.
-	 * @param x
-	 * @param y
+	 * @param skewX The amount to skew horizontally in degrees.
+	 * @param skewY The amount to skew vertically in degrees.
 	 */
-	p.skew = function(x, y) {
-		var ax = Math.atan(x);
-		var ay = Math.atan(y);
-		this.a += this.c*ay;
-		this.b += this.d*ay;
-		this.c += this.a*ax;
-		this.d += this.b*ax;
+	p.skew = function(skewX, skewY) {
+		skewX = skewX*Matrix2D.DEG_TO_RAD;
+		skewY = skewY*Matrix2D.DEG_TO_RAD;
+		this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
 	}
 	
 	/**
@@ -263,20 +277,30 @@ var p = Matrix2D.prototype;
 
 	/**
 	 * Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that this these values
-	 * may not match the transform properties you used to generate the matrix (because affine matrices can be decomposed
-	 * to produce multiple possible transforms, all of which produce the same visual results.
+	 * may not match the transform properties you used to generate the matrix, though they will produce the same visual
+	 * results.
 	 * @param target The object to apply the transform properties to. If null, then a new object will be returned.
 	 */
 	p.decompose = function(target) {
-		// TODO: add Skew:
+		// TODO: it would be nice to be able to solve for whether the matrix can be decomposed into only scale/rotation even when scale is negative
 		if (target == null) { target = {}; }
 		target.x = this.tx;
 		target.y = this.ty;
-		target.scaleX = Math.sqrt(this.a * this.a + this.b * this.b) * (this.a < 0 && this.d > 0 ? -1 : 1);
-		target.scaleY = Math.sqrt(this.c * this.c + this.d * this.d) * (this.d < 0 && this.a > 0 ? -1 : 1);
-		target.rotation = Math.atan2(this.b, this.a)/Math.PI*180;
-		if (this.a < 0 && this.d >= 0) {
-			target.rotation += (target.rotation <= 0) ? 180 : -180;
+		target.scaleX = Math.sqrt(this.a * this.a + this.b * this.b);
+		target.scaleY = Math.sqrt(this.c * this.c + this.d * this.d);
+
+		var skewX = Math.atan2(-this.c, this.d);
+		var skewY = Math.atan2(this.b, this.a);
+
+		if (skewX == skewY) {
+			target.rotation = skewY/Matrix2D.DEG_TO_RAD;
+			if (this.a < 0 && this.d >= 0) {
+				target.rotation += (target.rotation <= 0) ? 180 : -180;
+			}
+			target.skewX = target.skewY = 0;
+		} else {
+			target.skewX = skewX/Matrix2D.DEG_TO_RAD;
+			target.skewY = skewY/Matrix2D.DEG_TO_RAD;
 		}
 		return target;
 	}

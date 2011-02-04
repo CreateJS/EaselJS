@@ -32,6 +32,11 @@ function init() {
 	canvas = document.getElementById("testCanvas");
 	stage = new Stage(canvas);
 
+	shape = new Shape();
+	shape.x = 100;
+	shape.y = 100;
+	shape.graphics.beginFill("#FFF").drawRect(-1, -10, 2, 20).drawRect(-10,-1,20,2);
+	stage.addChild(shape);
 	
 	// this shape will be the background for the text:
 	shape = new Shape();
@@ -39,16 +44,16 @@ function init() {
 	shape.y = 100;
 	shape.regX = shape.regY = 50;
 	shape.graphics.beginFill("#F00").drawRect(0, 0, 100, 100).beginFill("#FFF").drawRect(90,0,10,100);
-	//shape.skewX = 45;
-	shape.skewY = 360;
-	stage.addChild(shape);
-
-	shape = new Shape();
-	shape.x = 100;
-	shape.y = 100;
-	shape.graphics.beginFill("#FFF").drawRect(-1, -10, 2, 20).drawRect(-10,-1,20,2);
-	stage.addChild(shape);
+	shape.skewX = 0;
+	shape.skewY = 45;
+	shape.onPress = function() { console.log("clicked"); }
+	stage.addChildAt(shape,0);
 	
+	Ticker.addListener(window);
+}
+
+function tick() {
+	//shape.rotation++;
 	stage.update();
 }
 

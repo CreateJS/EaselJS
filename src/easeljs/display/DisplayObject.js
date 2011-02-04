@@ -241,7 +241,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		}
 		var target = this;
 		while (true) {
-			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.regX, target.regY);
+			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.skewX, target.skewY, target.regX, target.regY);
 			mtx.alpha *= target.alpha;
 			mtx.shadow = mtx.shadow || target.shadow;
 			if ((p = target.parent) == null) { break; }
