@@ -56,17 +56,17 @@ var p = Matrix2D.prototype;
 
 	
 // public properties:
-	/** Position 0,0 in an affine transformation Matrix. Maps roughly to scaleX, but is also involved in rotation. **/
+	/** Position 0,0 in a 3x3 affine transformation matrix. **/
 	p.a = 1;
-	/** Position 0,1 in an affine transformation Matrix. Used in rotation (also skewing, but not supported in Easel). **/
+	/** Position 0,1 in a 3x3 affine transformation matrix. **/
 	p.b = 0;
-	/** Position 1,0 in an affine transformation Matrix. Used in rotation (also skewing, but not supported in Easel). **/
+	/** Position 1,0 in a 3x3 affine transformation matrix. **/
 	p.c = 0;
-	/** Position 1,1 in an affine transformation Matrix. Maps roughly to scaleY, but is also involved in rotation. **/
+	/** Position 1,1 in a 3x3 affine transformation matrix. **/
 	p.d = 1;
-	/** Position 2,0 in an affine transformation Matrix. Translation along the x axis. **/
+	/** Position 2,0 in a 3x3 affine transformation matrix. **/
 	p.tx = 0;
-	/** Position 2,1 in an affine transformation Matrix. Translation along the y axis **/
+	/** Position 2,1 in a 3x3 affine transformation matrix. **/
 	p.ty = 0;
 	/** Property representing the alpha that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values. **/
 	p.alpha = 1;
@@ -119,21 +119,24 @@ var p = Matrix2D.prototype;
 	}
 	
 	/**
-	* Concatenates the specified matrix with this matrix.
+	* Prepends the specified matrix with this matrix.
 	**/
 	p.prependMatrix = function(matrix) {
 		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 		this.prependProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
 	}
-
+	
+	/**
+	* Appends the specified matrix with this matrix.
+	**/
 	p.appendMatrix = function(matrix) {
 		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 		this.appendProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
 	}
 	
 	/**
-	 * Generates matrix properties from the specified display object transform properties, and concatenates them with this matrix.
-	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D(); mtx.concatTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
+	 * Generates matrix properties from the specified display object transform properties, and prepends them with this matrix.
+	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D(); mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
 	 * @param x
 	 * @param y
 	 * @param scaleX
@@ -170,7 +173,19 @@ var p = Matrix2D.prototype;
 
 	}
 
-	// TODO: doc.
+	/**
+	 * Generates matrix properties from the specified display object transform properties, and appends them with this matrix.
+	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D(); mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
+	 * @param x
+	 * @param y
+	 * @param scaleX
+	 * @param scaleY
+	 * @param rotation
+	 * @param skewX
+	 * @param skewY
+	 * @param regX Optional.
+	 * @param regY Optional.
+	**/
 	p.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
@@ -305,14 +320,24 @@ var p = Matrix2D.prototype;
 		return target;
 	}
 
-	// TODO: doc
+	/**
+	 * Appends the specified visual properties to the current matrix.
+	 * @param alpha desired alpha value
+	 * @param shadow desired shadow value
+	 * @param compositeOperation desired composite operation value
+	 */
 	p.appendProperties = function(alpha, shadow, compositeOperation) {
 		this.alpha *= alpha;
 		this.shadow = shadow || this.shadow;
 		this.compositeOperation = compositeOperation || this.compositeOperation;
 	}
 
-	// TODO: doc
+	/**
+	 * Prepends the specified visual properties to the current matrix.
+	 * @param alpha desired alpha value
+	 * @param shadow desired shadow value
+	 * @param compositeOperation desired composite operation value
+	 */
 	p.prependProperties = function(alpha, shadow, compositeOperation) {
 		this.alpha *= alpha;
 		this.shadow = this.shadow || shadow;
