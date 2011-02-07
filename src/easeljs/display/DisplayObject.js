@@ -84,7 +84,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.x = 0;
 	/** The y (vertical) position of the display object, relative to its parent. **/
 	p.y = 0;
-	/** The composite operation indicates how the pixels of this display object will be composited with the elements behind it. If null, this property is inherited from the parent container. **/
+	/** The composite operation indicates how the pixels of this display object will be composited with the elements behind it. If null, this property is inherited from the parent container. For more information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">whatwg spec on compositing</a>. **/
 	p.compositeOperation = null;
 	/** Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage. This only applies if the enclosing stage has snapPixelsEnabled set to true, and the display object's composite transform does not include any scaling, rotation, or skewing. The snapToPixels property is true by default for Bitmap and BitmapSequence instances, and false for all other display objects. **/
 	p.snapToPixels = false;
@@ -148,7 +148,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	}
 	
 	/**
-	* Draws the display object into a new canvas, which is then used for subsequent draws. For complex content that does not change frequently (ex. a Sprite with many children that do not move, or a complex vector Shape), this can provide for much faster rendering because the content does not need to be rerendered each tick. The cached display object can be moved, rotated, faded, etc freely, however if it's content changes, you must manually update the cache by calling cache() again. Do not call uncache before the subsequent cache call. You must specify the cache area via the x, y, w, and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates. For example if you defined a Shape that drew a circle at 0,0 with a radius of 25, you could call myShape.cache(-25,-25,50,50) to cache the full shape.
+	* Draws the display object into a new canvas, which is then used for subsequent draws. For complex content that does not change frequently (ex. a Sprite with many children that do not move, or a complex vector Shape), this can provide for much faster rendering because the content does not need to be re-rendered each tick. The cached display object can be moved, rotated, faded, etc freely, however if it's content changes, you must manually update the cache by calling updateCache() or cache() again. You must specify the cache area via the x, y, w, and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates. For example if you defined a Shape that drew a circle at 0,0 with a radius of 25, you could call myShape.cache(-25,-25,50,50) to cache the full shape.
 	* @param x
 	* @param y
 	* @param width
@@ -172,7 +172,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	 * Redraws the display object to its cache. Calling updateCache without an active cache will throw an error.
 	 * If compositeOperation is null the current cache will be cleared prior to drawing. Otherwise the display object
 	 * will be drawn over the existing cache using the specified compositeOperation.
-	 * @param compositeOperation The compositeOperation to use, or null to clear the cache and redraw it.
+	 * @param compositeOperation The compositeOperation to use, or null to clear the cache and redraw it. <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">whatwg spec on compositing</a>.
 	 */
 	p.updateCache = function(compositeOperation) {
 		if (this.cacheCanvas == null) { throw "cache() must be called before updateCache()"; }
