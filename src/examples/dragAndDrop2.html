@@ -10,15 +10,11 @@
 <script src="../easeljs/utils/UID.js"></script>
 <script src="../easeljs/events/MouseEvent.js"></script>
 <script src="../easeljs/geom/Point.js"></script>
-<script src="../easeljs/display/SpriteSheet.js"></script>
-<script src="../easeljs/display/Shadow.js"></script>
 <script src="../easeljs/geom/Matrix2D.js"></script>
 <script src="../easeljs/display/DisplayObject.js"></script>
 <script src="../easeljs/display/Container.js"></script>
 <script src="../easeljs/display/Stage.js"></script>
 <script src="../easeljs/display/Bitmap.js"></script>
-<script src="../easeljs/display/BitmapSequence.js"></script>
-<script src="../easeljs/display/Shape.js"></script>
 <script src="../easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
 
@@ -37,10 +33,6 @@ function init() {
 	stage = new Stage(canvas);
 	stage.mouseEnabled = true;
 	
-	// attach mouse handlers directly to the source canvas:
-	//stage.onMouseMove = onMouseMove;
-
-	
 	// load the source image:
 	var image = new Image();
 	image.src = "img/daisy.png";
@@ -52,7 +44,6 @@ function handleImageLoad(event) {
 	var bitmap;
 	var container = new Container();
 	stage.addChild(container);
-	container.compositeOperation = "lighter";
 	
 	// create and populate the screen with random daisies:
 	for(var i = 0; i < 100; i++){
@@ -63,15 +54,15 @@ function handleImageLoad(event) {
 		bitmap.rotation = 360 * Math.random()|0;
 		bitmap.regX = bitmap.image.width/2|0;
 		bitmap.regY = bitmap.image.height/2|0;
-		bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random()+0.6;
+		bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random()*0.4+0.6;
 		bitmap.mouseEnabled = true;
-		//bitmap.alpha = Math.random()*0.8+0.2;
 		bitmap.name = "bmp_"+i;
 		(function(target) {
 		bitmap.onPress = function(evt) {
 			console.log("press!");
 			target.scaleX = target.scaleY = target.scale*1.2;
 			container.addChild(target);
+			// update the stage while we drag this target:
 			Ticker.addListener(stage);
 			var offset = {x:target.x-evt.stageX, y:target.y-evt.stageY};
 
@@ -82,6 +73,7 @@ function handleImageLoad(event) {
 			}
 			evt.onMouseUp = function() {
 				target.scaleX = target.scaleY = target.scale;
+				// update the stage one last time to render the scale change, then stop updating:
 				stage.update();
 				Ticker.removeListener(stage);
 				console.log("up!");
@@ -89,6 +81,8 @@ function handleImageLoad(event) {
 		}})(bitmap);
 		bitmap.onClick = function() { console.log("click!"); }
 	}
+	
+	// Update once to render the screen. Thereafter, we only update when something is actually being dragged.
 	stage.update();
 }
 
@@ -98,10 +92,10 @@ function handleImageLoad(event) {
 
 <body onload="init();">
 	<div class="description">
-	Example of implementing drag &amp; drop using mouse events. Some browsers do not allow access to pixel data when running local files, and may throw a security error.
+	Example of implementing drag &amp; drop using mouse events such as <strong>onPress</strong>, <strong>onMouseUp</strong>, and <strong>onMouseMove</strong>. Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.
 	</div>
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="980" height="580" style="background-color:#00FF00"></canvas>
+		<canvas id="testCanvas" width="980" height="580"></canvas>
 	</div>
 </body>
 </html>

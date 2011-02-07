@@ -56,7 +56,7 @@ function handleImageLoad(event) {
 	stage.addChild(container);
 	
 	// create and populate the screen with random daisies:
-	for(var i = 0; i < 1000; i++){
+	for(var i = 0; i < 100; i++){
 		bitmap = new Bitmap(image);
 		bitmap.x = canvas.width * Math.random()|0;
 		bitmap.y = canvas.height * Math.random()|0;
@@ -150,10 +150,10 @@ function onMouseOut(target){
 	
 <body onload="init();">
 	<div class="description">
-	Example of implementing rollover and drag &amp; drop operations via the <strong>Stage.getObjectUnderPoint()</strong> method. This functionality is likely to be included in the core library in a future version. Some browsers do not allow access to pixel data when running local files, and may throw a security error.
+	Example of implementing rollover and drag &amp; drop operations via the <strong>Stage.getObjectUnderPoint()</strong> method. See dragAndDrop2.html for an example of how to develop similar functionality more easily with mouse events. Some browsers do not allow access to pixel data when running local files, and may throw a security error.
 	</div>
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="980" height="580" style="background-color:#00FF00"></canvas>
+		<canvas id="testCanvas" width="980" height="580"></canvas>
 	</div>
 </body>
 </html>
