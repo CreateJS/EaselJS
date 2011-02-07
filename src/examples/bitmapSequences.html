@@ -32,10 +32,11 @@ function init() {
 	//find canvas and load images, wait for last image to load
 	canvas = document.getElementById("testCanvas");
 	imgSeq.onload = handleImageLoad;
+	imgSeq.onerror = handleImageError;
 	imgSeq.src = "img/testSeq.png";
 }
 
-function handleImageLoad() {
+function handleImageLoad(e) {
 	// create a new stage and point it at our canvas:
 	stage = new Stage(canvas);
 	
@@ -46,14 +47,28 @@ function handleImageLoad() {
 	// create spritesheet and assign the initial frameData
 	// frameData defines the sequences that can be played
 	// in this format: {nameOfSequence:[startFrame, endFrame, optionalNameOfNextSequence]}
-	var spriteSheet  = new SpriteSheet(imgSeq, 64, 68, {walkUpRt:[0,19,"walkRt"], walkDnRt:[20,39,"walkDnLf"], walkRt:[41,59,"walkDnRt"]});
+	var spriteSheet  = new SpriteSheet(
+			imgSeq, //image to use
+			64, //width of each sprite
+			68, //height of each sprite
+			{	//This object specifies 3 named frames and frame sequences
+				walkUpRt:[0,19,"walkRt"],  
+				walkDnRt:[20,39,"walkDnLf"], 
+				walkRt:[41,59,"walkDnRt"]
+			});
 	
 	// to save file size, the loaded sprite sheet only includes right facing animations
 	// we could flip the display objects with scaleX=-1, but this is expensive in most browsers
 	// instead, we generate a new sprite sheet which includes the flipped animations according to
 	// the flipData, which is in the format:
 	// {nameOfFlippedSequence:["derivativeSequence", flipHorizontally, flipVertically, optionNameOfNextSequence]}
-	spriteSheet = SpriteSheetUtils.flip(spriteSheet, {walkUpLf:["walkUpRt",true,false,"walkUpRt"], walkDnLf:["walkDnRt",true,false,"walkLf"], walkLf:["walkRt",true,false,"walkUpLf"]});
+	spriteSheet = SpriteSheetUtils.flip(
+						spriteSheet, 
+						{
+							walkUpLf:["walkUpRt",true,false,"walkUpRt"], 
+							walkDnLf:["walkDnRt",true,false,"walkLf"], 
+							walkLf:["walkRt",true,false,"walkUpLf"]
+						});
 	
 	// create a BitmapSequence instance to display and play back the sprite sheet:
 	var bmpSeq = new BitmapSequence(spriteSheet);
@@ -98,6 +113,12 @@ function handleImageLoad() {
 	// we want to do some work before we update the canvas,
 	// otherwise we could use Ticker.addListener(stage);
 	Ticker.addListener(window);
+}
+
+//called if there is an error loading the image (usually due to a 404)
+function handleImageError(e)
+{
+	console.log("Error Loading Image : " + e.target.src);
 }
 
 function tick() {
