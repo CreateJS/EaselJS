@@ -86,8 +86,8 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.y = 0;
 	/** The composite operation indicates how the pixels of this display object will be composited with the elements behind it. If null, this property is inherited from the parent container. For more information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">whatwg spec on compositing</a>. **/
 	p.compositeOperation = null;
-	/** Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage. This only applies if the enclosing stage has snapPixelsEnabled set to true, and the display object's composite transform does not include any scaling, rotation, or skewing. The snapToPixels property is true by default for Bitmap and BitmapSequence instances, and false for all other display objects. **/
-	p.snapToPixels = false;
+	/** Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage. This only applies if the enclosing stage has snapPixelsEnabled set to true, and the display object's composite transform does not include any scaling, rotation, or skewing. The snapToPixel property is true by default for Bitmap and BitmapSequence instances, and false for all other display objects. **/
+	p.snapToPixel = false;
 	/** The onPress callback is called when the user presses down on their mouse over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. You can subscribe to the onMouseMove and onMouseUp callbacks of the event object to receive these events until the user releases the mouse button. If an onPress handler is set on a container, it will receive the event if any of its children are clicked. **/
 	p.onPress = null;
 	/** The onClick callback is called when the user presses down on and then releases the mouse button over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an onClick handler is set on a container, it will receive the event if any of its children are clicked. **/

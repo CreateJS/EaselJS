@@ -43,7 +43,7 @@ var p = Bitmap.prototype = new DisplayObject();
 // public properties:
 	/** The image to render. This can be an Image, a Canvas, or a Video. **/
 	p.image = null;
-	p.snapToPixels = true;
+	p.snapToPixel = true;
 	
 // constructor:
 	/** @private **/

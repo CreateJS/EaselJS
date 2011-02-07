@@ -57,7 +57,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	p.paused = false;
 	/** The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame data. See SpriteSheet for more information. **/
 	p.spriteSheet = null;
-	p.snapToPixels = true;
+	p.snapToPixel = true;
 	
 // constructor:
 	/** @private **/

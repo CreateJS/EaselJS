@@ -45,14 +45,15 @@
 	
 // public static methods:
 	/**
-	* Builds a new extended sprite sheet based on the specified image adding flipped frames (vertical, horizontal, or both). Flipping elements on the display list by using setting scaleX/scaleY to -1 is quite expensive in most browsers, so this method allows you to incur the cost of flipping once, in advance, without increasinig the load size of your sprite sheets. Returns a generic object with a property "image" containing the new sprite sheet as an Image instance, and "frameData" which contains the new frame data object.
-	* @param image The sprite sheet (canvas, image or video) to use as the source material image.
-	* @param frameWidth The width of each frame in the sprite sheet.
-	* @param frameHeight The height of each frame in the sprite sheet.
-	* @param frameData The frameData that defines the frames and sequences in the sprite sheet. See BitmapSequence.frameData for more information.
-	* @param flipData A generic object that specifies which frames will be flipped, what to name the flipped result, and how to flip the frames (horizontally, vertically, or both). Each property name indicates the name of a new sequence to create, and should reference an array where the first index is the name of the original sequence to flip, the second index indicates whether to flip it horizontally, the third index indicates whether to flip it vertically, and the fourth indicates what the "next" value for the resulting frame data should be. For example, the following would create a new sequence named "walk_left" consisting of the frames from the original "walk_right" sequence flipped horizontally: {walk_left:["walk_right", true, false]}
-	* @static
-	**/
+	 * Builds a new extended sprite sheet based on the specified sprite sheet by adding flipped frames
+	 * (vertical, horizontal, or both). Flipping elements on the display list by using setting scaleX/scaleY
+	 * to -1 is quite expensive in most browsers, so this method allows you to incur the cost of flipping once,
+	 * in advance, without increasing the load size of your sprite sheets. Returns a new SpriteSheet instance
+	 * containing the generated image and frame data.
+	 * @param spriteSheet The sprite sheet to use as the source.
+	 * @param flipData A generic object that specifies which frames will be flipped, what to name the flipped result, and how to flip the frames (horizontally, vertically, or both). Each property name indicates the name of a new sequence to create, and should reference an array where the first index is the name of the original sequence to flip, the second index indicates whether to flip it horizontally, the third index indicates whether to flip it vertically, and the fourth indicates what the "next" value for the resulting frame data should be. For example, the following would create a new sequence named "walk_left" consisting of the frames from the original "walk_right" sequence flipped horizontally: {walk_left:["walk_right", true, false]}
+	 * @static
+	 **/
 	SpriteSheetUtils.flip = function(spriteSheet, flipData) {
 		var image = spriteSheet.image;
 		var frameData = spriteSheet.frameData;

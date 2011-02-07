@@ -24,17 +24,17 @@ Version 0.3 [Not released]
 - added DisplayObject.suppressCrossDomainErrors property
 - complete rewrite of the hit testing system to be cleaner and run 5-10x faster
 - improved the interaction model:
-	- .onPress, .onClick callbacks on DisplayObject
+	- added .onPress, .onClick callbacks on DisplayObject
 	- removed .mouseChildren from Container
-	- .mouseEnabled is now true by default
-	- .onMouseDown, .onMouseUp, and .onMouseMove callbacks on Stage
-- added MouseEvent
+	- made .mouseEnabled true by default
+	- added .onMouseDown, .onMouseUp, and .onMouseMove callbacks on Stage
+	- added MouseEvent
 - Stage.getObjectsUnderPoint() has been moved to Container
 - added Container.contains(child) method
 - added DisplayObject.compositeOperation
 - added appendProperties() and prependProperties methods to Matrix2D
 - added DisplayObject.hitTest() method
-- added stage.snapToPixelsEnabled and displayObject.snapToPixels
+- added stage.snapToPixelEnabled and displayObject.snapToPixel
 - added DisplayObject.updateCache()
 
 

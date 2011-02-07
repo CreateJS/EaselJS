@@ -248,7 +248,7 @@ var p = Container.prototype = new DisplayObject();
 		var canvas = DisplayObject._hitTestCanvas;
 		var mtx = DisplayObject._workingMatrix;
 		var hasHandler = mouseEvents && (this.onPress || this.onClick);
-		var snap = Stage._snapToPixelsEnabled;
+		var snap = Stage._snapToPixelEnabled;
 
 		// if we have a cache handy, we can use it to do a quick check:
 		if (this.cacheCanvas) {
@@ -283,7 +283,7 @@ var p = Container.prototype = new DisplayObject();
 				}
 			} else if (!mouseEvents || (mouseEvents && (child.onPress || child.onClick))) {
 				child.getConcatenatedMatrix(mtx);
-				if (snap && child.snapToPixels && mtx.a == 1 && mtx.b == 0 && mtx.c == 0 && mtx.d == 1) {
+				if (snap && child.snapToPixel && mtx.a == 1 && mtx.b == 0 && mtx.c == 0 && mtx.d == 1) {
 					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x+0.5|0, mtx.ty-y+0.5|0);
 				} else {
 					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);

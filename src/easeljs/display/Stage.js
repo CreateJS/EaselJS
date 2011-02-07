@@ -42,7 +42,7 @@ var p = Stage.prototype = new Container();
 
 // static properties:
 	/** @private **/
-	Stage._snapToPixelsEnabled = false; // snapToPixels is temporarily copied here during a draw to provide global access.
+	Stage._snapToPixelEnabled = false; // snapToPixelEnabled is temporarily copied here during a draw to provide global access.
 
 // public properties:
 	/** Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for example). **/
@@ -59,8 +59,8 @@ var p = Stage.prototype = new Container();
 	p.onMouseUp = null;
 	/** The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance. **/
 	p.onMouseDown = null;
-	/** Indicates whether this stage should use the snapToPixels property of display objects when rendering them. **/
-	p.snapToPixelsEnabled = false;
+	/** Indicates whether this stage should use the snapToPixel property of display objects when rendering them. **/
+	p.snapToPixelEnabled = false;
 	
 // private properties:
 	/** @private **/
@@ -86,7 +86,6 @@ var p = Stage.prototype = new Container();
 		} else if (document.addEventListener) {
 			document.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
 		}
-		
 		canvas.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
 		canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
 	}
@@ -98,7 +97,7 @@ var p = Stage.prototype = new Container();
 	p.update = function() {
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
-		Stage._snapToPixelsEnabled = this.snapToPixelsEnabled;
+		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
 		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
 	}
 	
