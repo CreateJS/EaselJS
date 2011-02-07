@@ -80,7 +80,7 @@ function test() {
 	mtx.decompose(target2);
 	mtx = target2.getConcatenatedMatrix();
 
-	target.onPress = function(evt) { var pt = target.parent.globalToLocal(evt.stageX,evt.stageY); console.log(pt.x, pt.y); }
+	target.onPress = function(evt) { var pt = target.parent.globalToLocal(evt.stageX,evt.stageY); }
 	
 	stage.update();
 }
