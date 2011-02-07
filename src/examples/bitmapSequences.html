@@ -63,12 +63,12 @@ function handleImageLoad(e) {
 	// the flipData, which is in the format:
 	// {nameOfFlippedSequence:["derivativeSequence", flipHorizontally, flipVertically, optionNameOfNextSequence]}
 	spriteSheet = SpriteSheetUtils.flip(
-						spriteSheet, 
-						{
-							walkUpLf:["walkUpRt",true,false,"walkUpRt"], 
-							walkDnLf:["walkDnRt",true,false,"walkLf"], 
-							walkLf:["walkRt",true,false,"walkUpLf"]
-						});
+			spriteSheet, 
+			{
+				walkUpLf:["walkUpRt",true,false,"walkUpRt"], 
+				walkDnLf:["walkDnRt",true,false,"walkLf"], 
+				walkLf:["walkRt",true,false,"walkUpLf"]
+			});
 	
 	// create a BitmapSequence instance to display and play back the sprite sheet:
 	var bmpSeq = new BitmapSequence(spriteSheet);
@@ -116,8 +116,7 @@ function handleImageLoad(e) {
 }
 
 //called if there is an error loading the image (usually due to a 404)
-function handleImageError(e)
-{
+function handleImageError(e) {
 	console.log("Error Loading Image : " + e.target.src);
 }
 
@@ -135,7 +134,7 @@ function tick() {
 }
 
 function angleChange(bmpSeq) {
-	//after each sequence ends update the rat's headings and adjust velocities to match
+	//after each sequence ends update the rat's heading and adjust velocities to match
 	bmpSeq.direction -= 60;
 	var angle = bmpSeq.direction * (Math.PI/180);
 	bmpSeq.vX = Math.sin(angle) * bmpSeq.speed;

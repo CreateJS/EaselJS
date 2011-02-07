@@ -161,7 +161,7 @@ function init() {
 }
 
 function tick() {
-	// if we are on the last frame of animation, then remove the tick listener, and pause the Ticker
+	// if we are on the last frame of animation then remove the tick listener:
 	if (--count == 1){ Ticker.removeListener(window); }
 	
 	// animate the bars in one at a time:
