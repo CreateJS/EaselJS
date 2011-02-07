@@ -541,7 +541,7 @@ var p = Graphics.prototype;
 		var a = Math.PI/sides;
 		
 		this._activeInstructions.push(new Command(this._ctx.moveTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
-		for (i=0; i<sides; i++) {
+		for (var i=0; i<sides; i++) {
 			angle += a;
 			if (pointSize != 1) {
 				this._activeInstructions.push(new Command(this._ctx.lineTo, [x+Math.cos(angle)*radius*pointSize, y+Math.sin(angle)*radius*pointSize]));

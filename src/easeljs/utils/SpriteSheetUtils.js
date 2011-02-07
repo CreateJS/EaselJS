@@ -104,7 +104,7 @@
 		
 		// draw the new frames, and update the new frameData:
 		var frame = ttlFrames-1;
-		for (i=0; i<map.length; i+=4) {
+		for (var i=0; i<map.length; i+=4) {
 			n = map[i];
 			start = map[i+1];
 			end = map[i+2];
