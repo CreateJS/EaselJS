@@ -51,7 +51,7 @@ function init() {
 	stage.addChild(container);
 
 	container.x = 100;
-	container.y = 200;
+	container.y = 50;
 	container.scaleX = 1;
 	container.skewX = -39;
 
@@ -72,15 +72,14 @@ function test() {
 
 	// create another identical looking target to overlay:
 	target2 = new Shape();
-	target2.alpha = 0.5;
-	target2.graphics.beginFill("#0F0").drawRect(-50,-50,100,100).beginFill("#FFF").drawRect(0,-1,60,2);
+	target2.graphics.beginFill("#00F").drawRect(-50,-50,100,100).beginFill("#FFF").drawRect(0,-1,60,2);
 	stage.addChild(target2);
 
 	var mtx = target.getConcatenatedMatrix();
 	mtx.decompose(target2);
-	mtx = target2.getConcatenatedMatrix();
+	target2.y += 100;
 
-	target.onPress = function(evt) { var pt = target.parent.globalToLocal(evt.stageX,evt.stageY); }
+	target.onPress = function(evt) { alert("Clicked the red shape"); }
 	
 	stage.update();
 }
@@ -93,7 +92,7 @@ function test() {
 	
 <body onload="init();">
 	<div class="description">
-		Grey shape is the original, untransformed shape. Red is the nested shape. Green has transform props set from decomposing the concatenated matrix of red.
+		Test file for Matrix. Grey shape is the original, untransformed shape. Red is the nested shape. Blue has its transform props set from decomposing the concatenated matrix of red and is then moved 100px down. Both shapes will look identical if the test works.
 	</div>
 	<div class="canvasHolder">
 		<canvas id="testCanvas" width="980" height="580" style="background-color:#000"></canvas>
