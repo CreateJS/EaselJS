@@ -40,6 +40,7 @@ var color;		// drawing color
 var lastPt;		// last draw position
 var graphics;
 var count = 0;
+var colorOffset;
 
 //
 //
@@ -89,7 +90,7 @@ function tick() {
 	if(_mouseIsDown) {
 		
 		var color = Graphics.getHSL(
-			Math.cos((count++)*0.1) * 60 + 180, 
+			Math.cos((count++)*0.1) * 30 + colorOffset, 
 			100, 
 			50, 
 			0.8);		
@@ -112,6 +113,7 @@ function mouseDown(e) {
 	if(!e){ var e = window.event; }
 	if (_mouseIsDown) { return; }
 	_mouseIsDown = true;
+	colorOffset = Math.random()*360;
 	lastPt = shape.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop);
 }
 

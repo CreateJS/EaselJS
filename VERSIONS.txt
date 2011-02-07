@@ -1,4 +1,4 @@
-Version 0.3 [Not released]
+Version 0.3 [Feb 8, 2011]
 ********************************************************************************
 - renamed Tick to Ticker
 - adding a listener to Ticker twice will now move it to the end of the listener list
