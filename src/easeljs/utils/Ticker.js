@@ -74,7 +74,7 @@
 	* The exposed tick method is passed a single parameter, which include the elapsed time between the 
 	* previous tick and the current one.
 	* @param o The object to add as a listener.
-	* @param pausable If false, the listener will continue to have tick called even when Ticker is paused via 
+	* @param pauseable If false, the listener will continue to have tick called even when Ticker is paused via
 	* Ticker.pause(). Default is false.
 	* @static
 	**/
