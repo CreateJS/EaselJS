@@ -35,10 +35,7 @@ Version 0.3 [Not released]
 - added appendProperties() and prependProperties methods to Matrix2D
 - added DisplayObject.hitTest() method
 - added stage.snapToPixelsEnabled and displayObject.snapToPixels
-
-* preliminary support for getBounds on Text, Bitmap, BitmapSequence
-* google closure?
-* rename easeljs.js to easel.js
+- added DisplayObject.updateCache()
 
 
 Version 0.2.1 [Jan 12, 2011]
@@ -48,6 +45,7 @@ Version 0.2.1 [Jan 12, 2011]
 - fixed bug with using canvas as an image source for Bitmap
 - made mouseChildren true by default for stage
 - fixed major bug with Ticker.getTime()
+
 
 Version 0.2 [Jan 6, 2011]
 ********************************************************************************

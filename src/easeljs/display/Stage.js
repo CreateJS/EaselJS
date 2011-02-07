@@ -1,6 +1,6 @@
 /**
 * Stage by Grant Skinner. Dec 5, 2010
-* Visit www.gskinner.com/blog for documentation, updates and more free code.
+* Visit http://easeljs.com/ for documentation, updates and examples.
 *
 *
 * Copyright (c) 2010 Grant Skinner
@@ -49,12 +49,15 @@ var p = Stage.prototype = new Container();
 	p.autoClear = true;
 	/** The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the first stage that will be ticked (or they will clear each other's render). **/
 	p.canvas = null;
-	// TODO: doc
+	/** READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas. **/
 	p.mouseX = null;
+	/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas. **/
 	p.mouseY = null;
-	p.mouseEventsEnabled = false;
+	/** The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance. **/
 	p.onMouseMove = null;
+	/** The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler is passed a single param containing the corresponding MouseEvent instance. **/
 	p.onMouseUp = null;
+	/** The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance. **/
 	p.onMouseDown = null;
 	/** Indicates whether this stage should use the snapToPixels property of display objects when rendering them. **/
 	p.snapToPixelsEnabled = false;

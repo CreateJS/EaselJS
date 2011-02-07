@@ -1,6 +1,6 @@
 /**
 * Matrix2D by Grant Skinner. Dec 5, 2010
-* Visit www.gskinner.com/blog for documentation, updates and more free code.
+* Visit http://easeljs.com/ for documentation, updates and examples.
 *
 *
 * Copyright (c) 2010 Grant Skinner
@@ -51,7 +51,7 @@ var p = Matrix2D.prototype;
 	**/
 	Matrix2D.identity = null; // set at bottom of class definition.
 
-	// TODO: doc.
+	/** Multiplier for converting degrees to radians. Used internally by Matrix2D. **/
 	Matrix2D.DEG_TO_RAD = Math.PI/180;
 
 	

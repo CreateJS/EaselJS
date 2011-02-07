@@ -1,6 +1,6 @@
 /**
 * DisplayObject by Grant Skinner. Dec 5, 2010
-* Visit www.gskinner.com/blog for documentation, updates and more free code.
+* Visit http://easeljs.com/ for documentation, updates and examples.
 *
 *
 * Copyright (c) 2010 Grant Skinner
@@ -72,11 +72,11 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.scaleX = 1;
 	/** The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display object to half it's nominal height. **/
 	p.scaleY = 1;
-	// TODO: doc
+	/** The factor to skew this display object horizontally. **/
 	p.skewX = 0;
-	// TODO: doc
+	/** The factor to skew this display object vertically. **/
 	p.skewY = 0;
-	/** A shadow object that defines the shadow to render on this display object. Set to null to remove a shadow. Note that nested shadows can result in unexpected behaviour (ex. if both a child and a parent have a shadow set). **/
+	/** A shadow object that defines the shadow to render on this display object. Set to null to remove a shadow. If null, this property is inherited from the parent container. **/
 	p.shadow = null;
 	/** Indicates whether this display object should be rendered to the canvas and included when running Stage.getObjectsUnderPoint(). **/
 	p.visible = true;
@@ -84,12 +84,13 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.x = 0;
 	/** The y (vertical) position of the display object, relative to its parent. **/
 	p.y = 0;
-	// TODO: doc
+	/** The composite operation indicates how the pixels of this display object will be composited with the elements behind it. If null, this property is inherited from the parent container. **/
 	p.compositeOperation = null;
 	/** Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage. This only applies if the enclosing stage has snapPixelsEnabled set to true, and the display object's composite transform does not include any scaling, rotation, or skewing. The snapToPixels property is true by default for Bitmap and BitmapSequence instances, and false for all other display objects. **/
 	p.snapToPixels = false;
-	// TODO: doc
+	/** The onPress callback is called when the user presses down on their mouse over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. You can subscribe to the onMouseMove and onMouseUp callbacks of the event object to receive these events until the user releases the mouse button. If an onPress handler is set on a container, it will receive the event if any of its children are clicked. **/
 	p.onPress = null;
+	/** The onClick callback is called when the user presses down on and then releases the mouse button over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an onClick handler is set on a container, it will receive the event if any of its children are clicked. **/
 	p.onClick = null;
 	
 // private properties:
@@ -156,18 +157,30 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.cache = function(x, y, width, height) {
 		// draw to canvas.
 		var ctx;
-		if (this.cacheCanvas == null) {
-			this.cacheCanvas = document.createElement("canvas");
-			ctx = this.cacheCanvas.getContext("2d");
-		} else {
-			ctx = this.cacheCanvas.getContext("2d");
-		}
+		if (this.cacheCanvas == null) { this.cacheCanvas = document.createElement("canvas"); }
+		ctx = this.cacheCanvas.getContext("2d");
 		this.cacheCanvas.width = width;
 		this.cacheCanvas.height = height;
-		ctx.translate(-x,-y);
+		ctx.setTransform(1,0,0,1,-x,-y);
+		ctx.clearRect(0,0,width+1,height+1); // because some browsers don't correctly clear if the width/height remain the same.
 		this.draw(ctx,true);
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
+	}
+
+	/**
+	 * Redraws the display object to its cache. Calling updateCache without an active cache will throw an error.
+	 * If compositeOperation is null the current cache will be cleared prior to drawing. Otherwise the display object
+	 * will be drawn over the existing cache using the specified compositeOperation.
+	 * @param compositeOperation The compositeOperation to use, or null to clear the cache and redraw it.
+	 */
+	p.updateCache = function(compositeOperation) {
+		if (this.cacheCanvas == null) { throw "cache() must be called before updateCache()"; }
+		ctx.setTransform(1,0,0,1,-this._cacheOffsetX,-this._cacheOffsetY);
+		if (!composite) { ctx.clearRect(0,0,this.cacheCanvas.width+1,this.cacheCanvas.height+1); }
+		else { ctx.globalCompositeOperation = compositeOperation; }
+		this.draw(ctx,true);
+		if (composite) { ctx.globalCompositeOperation = "source-over"; }
 	}
 	
 	/**
@@ -231,7 +244,6 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* @param target The target display object to which the coordinates will be transformed.
 	**/
 	p.localToLocal = function(x, y, target) {
-		// TODO: this could potentially be optimized to find the nearest shared parent, and pass it in as the goal.
 		var pt = this.localToGlobal(x, y);
 		return target.globalToLocal(pt.x, pt.y);
 	}
