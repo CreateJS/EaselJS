@@ -176,7 +176,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	 */
 	p.updateCache = function(compositeOperation) {
 		if (this.cacheCanvas == null) { throw "cache() must be called before updateCache()"; }
-		ctx = this.cacheCanvas.getContext("2d");
+		var ctx = this.cacheCanvas.getContext("2d");
 		ctx.setTransform(1,0,0,1,-this._cacheOffsetX,-this._cacheOffsetY);
 		if (!compositeOperation) { ctx.clearRect(0,0,this.cacheCanvas.width+1,this.cacheCanvas.height+1); }
 		else { ctx.globalCompositeOperation = compositeOperation; }
