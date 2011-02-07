@@ -66,6 +66,7 @@
 		
 		// clone frameData:
 		var frData = {};
+		var data;
 		for (var n in frameData) {
 			data = frameData[n];
 			if (data instanceof Array) { data = data.slice(0); }
@@ -113,7 +114,7 @@
 			var offH = flipH==-1?frameWidth:0;
 			var offV = flipV==-1?frameHeight:0;
 			
-			for (j=start; j<=end; j++) {
+			for (var j=start; j<=end; j++) {
 				frame++;
 				ctx.save();
 				ctx.translate((frame%cols)*frameWidth+offH, (frame/cols|0)*frameHeight+offV);
@@ -141,6 +142,7 @@
 		var max = 0;
 		var min = 0;
 		var count = 0;
+		var data, next;
 		for (var n in frameData) {
 			count++;
 			data = frameData[n];
