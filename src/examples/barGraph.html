@@ -38,7 +38,7 @@ function init() {
 	canvas = document.getElementById("testCanvas");
 	stage = new Stage(canvas);
 	
-	// generate some random data:
+	// generate some random data (between 4 and 10, the |0 floors (for positive numbers))
 	var numBars = Math.random()*6+4|0;
 	var max = 0; 
 	for (var i=0; i<numBars; i++) {
@@ -92,8 +92,14 @@ function init() {
 		
 		// draw the front panel of the bar, this will be scaled to the right size in drawBar:
 		var front = new Shape();
-		front.graphics.beginLinearGradientFill([Graphics.getHSL(hue,100,60,0.9),Graphics.getHSL(hue,100,20,0.75)],[0,1],0,-100,barWidth,0)
-			.drawRect(0,-100,barWidth,100);
+		front.graphics.beginLinearGradientFill(
+				[Graphics.getHSL(hue,100,60,0.9),
+				Graphics.getHSL(hue,100,20,0.75)],
+				[0,1],
+				0,
+				-100,
+				barWidth,0).drawRect(0,-100,barWidth,
+				100);
 			
 		// draw the top of the bar, this will be positioned vertically in drawBar:
 		var top = new Shape();
@@ -150,13 +156,13 @@ function init() {
 	count = numBars*10;
 	
 	// start the tick and point it at the window so we can do some work before updating the stage:
-	Ticker.setInterval(50);		// 50 ms = 20 fps
+	Ticker.setInterval(50);		// 1000 / 50 ms = 20 fps (You could also call Ticker.setFPS(20))
 	Ticker.addListener(window);
 }
 
 function tick() {
-	// if we are on the last frame of animation, then remove the tick listener:
-	if (--count == 1) { Ticker.removeListener(window); }
+	// if we are on the last frame of animation, then remove the tick listener, and pause the Ticker
+	if (--count == 1){ Ticker.removeListener(window); }
 	
 	// animate the bars in one at a time:
 	var c = bars.length*10-count;
