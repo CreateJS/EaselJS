@@ -1,0 +1,96 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span> * MouseEvent by Grant Skinner. Dec 5, 2010
+<span class='line'>  3</span> * Visit http://easeljs.com/ for documentation, updates and examples.
+<span class='line'>  4</span> *
+<span class='line'>  5</span> *
+<span class='line'>  6</span> * Copyright (c) 2010 Grant Skinner
+<span class='line'>  7</span> * 
+<span class='line'>  8</span> * Permission is hereby granted, free of charge, to any person
+<span class='line'>  9</span> * obtaining a copy of this software and associated documentation
+<span class='line'> 10</span> * files (the "Software"), to deal in the Software without
+<span class='line'> 11</span> * restriction, including without limitation the rights to use,
+<span class='line'> 12</span> * copy, modify, merge, publish, distribute, sublicense, and/or sell
+<span class='line'> 13</span> * copies of the Software, and to permit persons to whom the
+<span class='line'> 14</span> * Software is furnished to do so, subject to the following
+<span class='line'> 15</span> * conditions:
+<span class='line'> 16</span> * 
+<span class='line'> 17</span> * The above copyright notice and this permission notice shall be
+<span class='line'> 18</span> * included in all copies or substantial portions of the Software.
+<span class='line'> 19</span> * 
+<span class='line'> 20</span> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+<span class='line'> 21</span> * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+<span class='line'> 22</span> * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+<span class='line'> 23</span> * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+<span class='line'> 24</span> * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+<span class='line'> 25</span> * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+<span class='line'> 26</span> * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+<span class='line'> 27</span> * OTHER DEALINGS IN THE SOFTWARE.
+<span class='line'> 28</span> */</span><span class="WHIT">
+<span class='line'> 29</span> 
+<span class='line'> 30</span> 
+<span class='line'> 31</span> 
+<span class='line'> 32</span> </span><span class="COMM">/**
+<span class='line'> 33</span> * Constructs a new MouseEvent instance.
+<span class='line'> 34</span> * @param type The event type.
+<span class='line'> 35</span> * @param stageX The mouseX position relative to the stage.
+<span class='line'> 36</span> * @param stageY The mouseY position relative to the stage.
+<span class='line'> 37</span> * @class This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, and onClick handlers on 
+<span class='line'> 38</span> * DisplayObject instances.
+<span class='line'> 39</span> * By default, mouse events are disabled for performance reasons. In order to enabled them for a specified stage
+<span class='line'> 40</span> * set mouseEventsEnabled to true on your stage instance.
+<span class='line'> 41</span> * @see Stage#mouseEventsEnabled
+<span class='line'> 42</span> */</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">MouseEvent</span><span class="PUNC">(</span><span class="NAME">type</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">stageX</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">stageY</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">  </span><span class="NAME">this.initialize</span><span class="PUNC">(</span><span class="NAME">type</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">stageX</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">stageY</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="NAME">this.prototype</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="WHIT">	
+<span class='line'> 47</span> </span><span class="COMM">// public properties:</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT">	</span><span class="COMM">/** The mouseX position on the stage. */</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT">	</span><span class="NAME">this.stageX</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">	</span><span class="COMM">/** The mouseY position on the stage. */</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">	</span><span class="NAME">this.stageY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">	</span><span class="COMM">/** The type of mouse event. This will be the same as the handler it maps to (onPress, onMouseDown, 
+<span class='line'> 53</span> 		onMouseUp, onMouseMove, or onClick). 
+<span class='line'> 54</span> 	*/</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">	</span><span class="NAME">this.type</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">	</span><span class="COMM">/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseMove 
+<span class='line'> 57</span> 		property. This handler will be called every time the mouse is moved until the mouse is released. 
+<span class='line'> 58</span> 		This is useful for operations like drag and drop. 
+<span class='line'> 59</span> 	*/</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">	</span><span class="NAME">this.onMouseMove</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">	</span><span class="COMM">/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseUp property. 
+<span class='line'> 62</span> 		This handler will be called a single time when the mouse is released anywhere over the page. This is useful for operations 
+<span class='line'> 63</span> 		like drag and drop. 
+<span class='line'> 64</span> 	*/</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">	</span><span class="NAME">this.onMouseUp</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">	
+<span class='line'> 67</span> </span><span class="COMM">// constructor:</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">	</span><span class="COMM">/** @private */</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">	</span><span class="NAME">this.initialize</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">type</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">stageX</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">stageY</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">		</span><span class="NAME">this.type</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">type</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">		</span><span class="NAME">this.stageX</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">stageX</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">		</span><span class="NAME">this.stageY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">stageY</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">	
+<span class='line'> 75</span> </span><span class="COMM">// public methods:</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'> 77</span> 	* Returns a clone of the MouseEvent instance.
+<span class='line'> 78</span> 	*/</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">	</span><span class="NAME">this.clone</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">MouseEvent</span><span class="PUNC">(</span><span class="NAME">this.type</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.stageX</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.stageY</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 82</span> 
+<span class='line'> 83</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'> 84</span> 	* Returns a string representation of this object.
+<span class='line'> 85</span> 	*/</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="WHIT">	</span><span class="NAME">this.toString</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 87</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">"[MouseEvent (type="</span><span class="PUNC">+</span><span class="NAME">this.type</span><span class="PUNC">+</span><span class="STRN">" stageX="</span><span class="PUNC">+</span><span class="NAME">this.stageX</span><span class="PUNC">+</span><span class="STRN">" stageY="</span><span class="PUNC">+</span><span class="NAME">this.stageY</span><span class="PUNC">+</span><span class="STRN">")]"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 88</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">	</span><span class="PUNC">}</span></pre></body></html>
