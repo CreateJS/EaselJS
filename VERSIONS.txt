@@ -36,6 +36,8 @@ Version 0.3 [Feb 8, 2011]
 - added DisplayObject.hitTest() method
 - added stage.snapToPixelEnabled and displayObject.snapToPixel
 - added DisplayObject.updateCache()
+- renamed minified file from easeljs.js to easel.js
+- Re-factored directory layou
 
 
 Version 0.2.1 [Jan 12, 2011]
