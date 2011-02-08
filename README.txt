@@ -56,6 +56,9 @@ Encapsulates all the data associated with a sprite sheet to be used with BitmapS
 CoordTransform
 Contains methods for transforming positions between different coordinate spaces.
 
+Matrix2D
+Represents a 3x3 affine transformation matrix. Used internally for calculating concatenated transformations.
+
 Rectangle & Point
 Represent geometric data.
 
