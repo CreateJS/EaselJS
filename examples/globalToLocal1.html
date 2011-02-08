@@ -68,7 +68,7 @@ function init() {
 	stage.addChild(spin1);
 	
 	// start the tick and point it at the window so we can do some work before updating the stage:
-	Ticker.setInterval(50);		// 50 ms = 20 fps
+	Ticker.setFPS(30);
 	Ticker.addListener(window);
 }
 

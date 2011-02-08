@@ -75,7 +75,7 @@
 	* previous tick and the current one.
 	* @param o The object to add as a listener.
 	* @param pauseable If false, the listener will continue to have tick called even when Ticker is paused via
-	* Ticker.pause(). Default is false.
+	* Ticker.pause(). Default is true.
 	* @static
 	**/
 	Ticker.addListener = function(o, pauseable) {
