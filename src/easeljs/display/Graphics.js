@@ -30,6 +30,7 @@
 (function(window) {
 
 // used to create the instruction lists used in Graphics:
+/** @private **/
 function Command(f, params) {
 	this.f = f;
 	this.params = params;
