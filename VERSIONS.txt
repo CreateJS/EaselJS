@@ -1,5 +1,10 @@
+Version 0.3.1 [Not tagged for release]
+****************************************************************************************************
+- fixed issues with hitTest and mouse event callbacks on Container instances.
+
+
 Version 0.3 [Feb 8, 2011]
-********************************************************************************
+****************************************************************************************************
 - renamed Tick to Ticker
 - adding a listener to Ticker twice will now move it to the end of the listener list
 - added Ticker.getMeasuredFPS()
@@ -37,11 +42,11 @@ Version 0.3 [Feb 8, 2011]
 - added stage.snapToPixelEnabled and displayObject.snapToPixel
 - added DisplayObject.updateCache()
 - renamed minified file from easeljs.js to easel.js
-- Re-factored directory layou
+- Re-factored directory layout
 
 
 Version 0.2.1 [Jan 12, 2011]
-********************************************************************************
+****************************************************************************************************
 - optimized Graphics: reduced overhead by 80-90%
 - added drawPolyStar method to Graphics
 - fixed bug with using canvas as an image source for Bitmap
@@ -50,7 +55,7 @@ Version 0.2.1 [Jan 12, 2011]
 
 
 Version 0.2 [Jan 6, 2011]
-********************************************************************************
+****************************************************************************************************
 Focus on vector graphics and text.
 - repackaged all class files to "easeljs" instead of "com.gskinner"
 - added Graphics API, and revised Shape to use a Graphics instance
@@ -64,5 +69,5 @@ Focus on vector graphics and text.
 - added support for multiple params on Container.addChild, addChildAt, removeChild & removeChildAt
 
 Version 0.1 [Dec 17, 2010]
-********************************************************************************
+****************************************************************************************************
 Initial release.

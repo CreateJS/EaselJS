@@ -207,6 +207,11 @@ var p = Container.prototype = new DisplayObject();
 		}
 		return false;
 	}
+	
+	p.hitTest = function(x, y) {
+		// TODO: optimize to use the fast cache check where possible.
+		return (this.getObjectUnderPoint(x,y) != null);
+	}
 
 	/**
 	* Returns an array of all display objects under the specified coordinates that are in this container's display list. This routine ignores any display objects with mouseEnabled set to false (the default) or that are inside containers with mouseChildren set to false (the default). The array will be sorted in order of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
