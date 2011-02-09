@@ -267,7 +267,7 @@ var p = Container.prototype = new DisplayObject();
 		
 		// draw children one at a time, and check if we get a hit:
 		var l = this.children.length;
-		for (var i=l-1;i>=0;i--) {
+		for (var i=l-1; i>=0; i--) {
 			var child = this.children[i];
 			if (!child.isVisible() || !child.mouseEnabled) { continue; }
 			
@@ -276,31 +276,31 @@ var p = Container.prototype = new DisplayObject();
 				if (hasHandler) {
 					// only concerned about the first hit, because this container is going to claim it anyway:
 					result = child._getObjectsUnderPoint(x, y);
-					if (result) { return result; }
+					if (result) { return this; }
 				} else {
 					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!mouseEvents || (mouseEvents && (child.onPress || child.onClick))) {
+			} else if (!mouseEvents || (mouseEvents && (child.onPress || child.onClick || hasHandler))) {
 				child.getConcatenatedMatrix(mtx);
 				if (snap && child.snapToPixel && mtx.a == 1 && mtx.b == 0 && mtx.c == 0 && mtx.d == 1) {
 					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x+0.5|0, mtx.ty-y+0.5|0);
 				} else {
 					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				}
-
+				
 				ctx.globalAlpha = mtx.alpha;
 				child.draw(ctx);
 				if (!this._testHit(ctx)) { continue; }
 				canvas.width = 0;
 				canvas.width = 1;
-				if (arr) { arr.push(child); }
+				if (hasHandler) { return this; }
+				else if (arr) { arr.push(child); }
 				else { return child; }
 			}
 		}
 		return null;
 	}
-
 
 window.Container = Container;
 }(window));
