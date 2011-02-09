@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -41,7 +41,7 @@ function Rectangle(x, y, width, height) {
   this.initialize(x, y, width, height);
 }
 var p = Rectangle.prototype;
-	
+
 // public properties:
 	/** X position. **/
 	p.x = 0;
@@ -51,7 +51,7 @@ var p = Rectangle.prototype;
 	p.width = 0;
 	/** Height. **/
 	p.height = 0;
-	
+
 // constructor:
 	/** @private **/
 	p.initialize = function(x, y, width, height) {
@@ -60,7 +60,7 @@ var p = Rectangle.prototype;
 		this.width = (width == null ? 0 : width);
 		this.height = (height == null ? 0 : height);
 	}
-	
+
 // public methods:
 	/**
 	* Returns a clone of this Rectangle.
@@ -73,8 +73,8 @@ var p = Rectangle.prototype;
 	* Returns a string representation of this object.
 	**/
 	p.toString = function() {
-		return "[Rectangle (x="+this.x+" y="+this.y+" width="+this.width+" height="+this.height+")]";
+		return '[Rectangle (x='+ this.x + ' y='+ this.y + ' width='+ this.width + ' height='+ this.height + ')]';
 	}
-	
+
 window.Rectangle = Rectangle;
 }(window));

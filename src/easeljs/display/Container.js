@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -51,7 +51,7 @@ var p = Container.prototype = new DisplayObject();
 		this.DisplayObject_initialize();
 		this.children = [];
 	}
-	
+
 // public methods:
 
 	p.isVisible = function() {
@@ -65,11 +65,11 @@ var p = Container.prototype = new DisplayObject();
 			_mtx = new Matrix2D();
 			_mtx.appendProperties(this.alpha, this.shadow, this.compositeOperation);
 		}
-		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		var l = this.children.length;
 		// this ensures we don't have issues with display list changes that occur during a draw:
 		var list = this.children.slice(0);
-		for (var i=0; i<l; i++) {
+		for (var i = 0; i < l; i++) {
 			var child = list[i];
 			if (child.tick) { child.tick(); }
 			if (!child.isVisible()) { continue; }
@@ -79,16 +79,16 @@ var p = Container.prototype = new DisplayObject();
 			mtx.appendProperties(child.alpha, child.shadow, child.compositeOperation);
 
 			if (!(child instanceof Container)) {
-				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+				ctx.setTransform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 				ctx.globalAlpha = mtx.alpha;
-				ctx.globalCompositeOperation = mtx.compositeOperation || "source-over";
+				ctx.globalCompositeOperation = mtx.compositeOperation || 'source-over';
 				if (mtx.shadow) { this.applyShadow(ctx, mtx.shadow); }
 			}
 			child.draw(ctx, false, mtx);
 		}
 		return true;
 	}
-	
+
 	/**
 	* Adds a child to the top of the display list. You can also add multiple children, such as "addChild(child1, child2, ...);". Returns the child that was added, or the last child if multiple children were added.
 	* @param child The display object to add.
@@ -96,15 +96,15 @@ var p = Container.prototype = new DisplayObject();
 	p.addChild = function(child) {
 		var l = arguments.length;
 		if (l > 1) {
-			for (var i=0; i<l; i++) { this.addChild(arguments[i]); }
-			return arguments[l-1];
+			for (var i = 0; i < l; i++) { this.addChild(arguments[i]); }
+			return arguments[l - 1];
 		}
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.push(child);
 		return child;
 	}
-	
+
 	/**
 	* Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and setting its parent to this Container. You can also add multiple children, such as "addChildAt(child1, child2, ..., index);". The index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list, you could use: container.addChildAt(myShape, container.getChildIndex(otherShape)). This would also bump otherShape's index up by one. Returns the last child that was added, or the last child if multiple children were added.
 	* @param child The display object to add.
@@ -113,16 +113,16 @@ var p = Container.prototype = new DisplayObject();
 	p.addChildAt = function(child, index) {
 		var l = arguments.length;
 		if (l > 2) {
-			index = arguments[i-1];
-			for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i],index+i); }
-			return arguments[l-2];
+			index = arguments[i - 1];
+			for (var i = 0; i < l - 1; i++) { this.addChildAt(arguments[i], index + i); }
+			return arguments[l - 2];
 		}
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.splice(index, 0, child);
 		return child;
 	}
-	
+
 	/**
 	* Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is already known. You can also remove multiple children, such as "removeChild(child1, child2, ...);". Returns true if the child (or children) was removed, or false if it was not in the display list.
 	* @param child The child to remove.
@@ -131,12 +131,12 @@ var p = Container.prototype = new DisplayObject();
 		var l = arguments.length;
 		if (l > 1) {
 			var good = true;
-			for (var i=0; i<l; i++) { good = good && this.removeChild(arguments[i]); }
+			for (var i = 0; i < l; i++) { good = good && this.removeChild(arguments[i]); }
 			return good;
 		}
 		return this.removeChildAt(this.children.indexOf(child));
 	}
-	
+
 	/**
 	* Removes the child at the specified index from the display list, and sets its parent to null. You can also remove multiple children, such as "removeChildAt(2, 7, ...);". Returns true if the child (or children) was removed, or false if any index was out of range.
 	* @param The index of the child to remove.
@@ -145,26 +145,26 @@ var p = Container.prototype = new DisplayObject();
 		var l = arguments.length;
 		if (l > 1) {
 			var a = [];
-			for (var i=0; i<l; i++) { a[i] = arguments[i]; }
-			a.sort(function(a,b) { return b-a; })
+			for (var i = 0; i < l; i++) { a[i] = arguments[i]; }
+			a.sort(function(a,b) { return b - a; });
 			var good = true;
-			for (var i=0; i<l; i++) { good = good && this.removeChildAt(a[i]); }
+			for (var i = 0; i < l; i++) { good = good && this.removeChildAt(a[i]); }
 			return good;
 		}
-		if (index < 0 || index > this.children.length-1) { return false; }
+		if (index < 0 || index > this.children.length - 1) { return false; }
 		var child = this.children[index];
 		if (child != null) { child.parent = null; }
 		this.children.splice(index, 1);
 		return true;
 	}
-	
+
 	/**
 	* Removes all children from the display list.
 	**/
 	p.removeAllChildren = function() {
 		while (this.children.length) { this.removeChildAt(0); }
 	}
-	
+
 	/**
 	* Returns the child at the specified index.
 	* @param index The index of the child to return.
@@ -172,7 +172,7 @@ var p = Container.prototype = new DisplayObject();
 	p.getChildAt = function(index) {
 		return this.children[index];
 	}
-	
+
 	/**
 	* Performs an array sort operation on the child list.
 	* @sortFunction the function to use to sort the child list. See javascript's Array.sort documentation for details.
@@ -180,7 +180,7 @@ var p = Container.prototype = new DisplayObject();
 	p.sortChildren = function(sortFunction) {
 		this.children.sort(sortFunction);
 	}
-	
+
 	/**
 	* Returns the index of the specified child in the display list, or -1 if it is not in the display list.
 	* @param The child to return the index of.
@@ -188,14 +188,14 @@ var p = Container.prototype = new DisplayObject();
 	p.getChildIndex = function(child) {
 		return this.children.indexOf(child);
 	}
-	
+
 	/**
 	* Returns the number of children in the display list.
 	**/
 	p.getNumChildren = function() {
 		return this.children.length;
 	}
-	
+
 	/**
 	* Returns true if the specified display object either is this container or is a descendent
 	* (child, grandchild, etc) of this container.
@@ -229,17 +229,17 @@ var p = Container.prototype = new DisplayObject();
 		var pt = this.localToGlobal(x, y);
 		return this._getObjectsUnderPoint(pt.x, pt.y);
 	}
-	
+
 	p.clone = function() {
 		var o = new Container();
 		this.cloneProps(o);
 		return o;
 	}
-	
+
 	p.toString = function() {
-		return "[Container (name="+  this.name +")]";
+		return '[Container (name='+ this.name + ')]';
 	}
-	
+
 // private properties:
 	/** @private **/
 	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
@@ -253,7 +253,7 @@ var p = Container.prototype = new DisplayObject();
 		// if we have a cache handy, we can use it to do a quick check:
 		if (this.cacheCanvas) {
 			this.getConcatenatedMatrix(mtx);
-			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
+			ctx.setTransform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx - x, mtx.ty - y);
 			ctx.globalAlpha = mtx.alpha;
 			this.draw(ctx);
 			if (this._testHit(ctx)) {
@@ -264,13 +264,13 @@ var p = Container.prototype = new DisplayObject();
 				return null;
 			}
 		}
-		
+
 		// draw children one at a time, and check if we get a hit:
 		var l = this.children.length;
-		for (var i=l-1;i>=0;i--) {
+		for (var i = l - 1; i >= 0; i--) {
 			var child = this.children[i];
 			if (!child.isVisible() || !child.mouseEnabled) { continue; }
-			
+
 			if (child instanceof Container) {
 				var result;
 				if (hasHandler) {
@@ -284,9 +284,9 @@ var p = Container.prototype = new DisplayObject();
 			} else if (!mouseEvents || (mouseEvents && (child.onPress || child.onClick))) {
 				child.getConcatenatedMatrix(mtx);
 				if (snap && child.snapToPixel && mtx.a == 1 && mtx.b == 0 && mtx.c == 0 && mtx.d == 1) {
-					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x+0.5|0, mtx.ty-y+0.5|0);
+					ctx.setTransform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx - x + 0.5 | 0, mtx.ty - y + 0.5 | 0);
 				} else {
-					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
+					ctx.setTransform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx - x, mtx.ty - y);
 				}
 
 				ctx.globalAlpha = mtx.alpha;

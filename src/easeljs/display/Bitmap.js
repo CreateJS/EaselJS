@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -44,7 +44,7 @@ var p = Bitmap.prototype = new DisplayObject();
 	/** The image to render. This can be an Image, a Canvas, or a Video. **/
 	p.image = null;
 	p.snapToPixel = true;
-	
+
 // constructor:
 	/** @private **/
 	p.DisplayObject_initialize = p.initialize;
@@ -53,7 +53,7 @@ var p = Bitmap.prototype = new DisplayObject();
 		this.DisplayObject_initialize();
 		this.image = image;
 	}
-	
+
 // public methods:
 
 	p.isVisible = function() {
@@ -63,29 +63,29 @@ var p = Bitmap.prototype = new DisplayObject();
 	/** @borrows DisplayObject#draw as this.draw **/
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
-		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
-		ctx.drawImage(this.image,0,0);
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+		ctx.drawImage(this.image, 0, 0);
 		return true;
 	}
-	
+
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	**/
 	p.cache = function() {}
-	
+
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	**/
 	p.uncache = function() {}
-	
+
 	p.clone = function() {
 		var o = new Bitmap(this.image);
 		this.cloneProps(o);
 		return o;
 	}
-	
+
 	p.toString = function() {
-		return "[Bitmap (name="+  this.name +")]";
+		return '[Bitmap (name='+ this.name + ')]';
 	}
 
 window.Bitmap = Bitmap;

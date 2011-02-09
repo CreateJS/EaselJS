@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -61,7 +61,7 @@ var p = Stage.prototype = new Container();
 	p.onMouseDown = null;
 	/** Indicates whether this stage should use the snapToPixel property of display objects when rendering them. **/
 	p.snapToPixelEnabled = false;
-	
+
 // private properties:
 	/** @private **/
 	p._tmpCanvas = null;
@@ -70,7 +70,7 @@ var p = Stage.prototype = new Container();
 	/** @private **/
 	p._activeMouseTarget = null;
 	/** @private **/
-	
+
 // constructor:
 	/** @private **/
 	p.Container_initialize = p.initialize;
@@ -79,17 +79,17 @@ var p = Stage.prototype = new Container();
 		this.Container_initialize();
 		this.canvas = canvas;
 		this.mouseChildren = true;
-		
+
 		var o = this;
 		if (window.addEventListener) {
-			window.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
+			window.addEventListener('mouseup', function(e) { o._handleMouseUp(e); }, false);
 		} else if (document.addEventListener) {
-			document.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
+			document.addEventListener('mouseup', function(e) { o._handleMouseUp(e); }, false);
 		}
-		canvas.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
-		canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
+		canvas.addEventListener('mousemove', function(e) { o._handleMouseMove(e); }, false);
+		canvas.addEventListener('mousedown', function(e) { o._handleMouseDown(e); }, false);
 	}
-	
+
 // public methods:
 	/**
 	* Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapSequence) and render its entire display list to the canvas.
@@ -98,37 +98,37 @@ var p = Stage.prototype = new Container();
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
+		this.draw(this.canvas.getContext('2d'), false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
 	}
-	
+
 	/**
 	* Calls the update method. Useful for adding stage as a listener to Ticker directly.
 	**/
 	p.tick = p.update;
-	
+
 	/**
 	* Clears the target canvas. Useful if autoClear is set to false.
 	**/
 	p.clear = function() {
 		if (!this.canvas) { return; }
-		var ctx = this.canvas.getContext("2d");
-		ctx.setTransform(1,0,0,1,0,0);
+		var ctx = this.canvas.getContext('2d');
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
-	
+
 	/**
-	* Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be 
+	* Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be
 	* specified as the src value of an image element.
 	* @param backgroundColor The background color to be used for the generated image. The value can be any value HTML color
 	* value, including HEX colors, rgb and rgba. The default value is a transparent background.
 	* @param mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
 	* is passed in, or if the browser does not support the specified MIME type, the default value will be used.
-	* @returns a Base64 encoded image.
+	* @return a Base64 encoded image.
 	* @type String
 	**/
 	p.toDataURL = function(backgroundColor, mimeType) {
-		if(!mimeType) {
-			mimeType = "image/png";
+		if (!mimeType) {
+			mimeType = 'image/png';
 		}
 
 		var ctx = this.canvas.getContext('2d');
@@ -137,7 +137,7 @@ var p = Stage.prototype = new Container();
 
 		var data;
 
-		if(backgroundColor) {
+		if (backgroundColor) {
 
 			//get the current ImageData for the canvas.
 			data = ctx.getImageData(0, 0, w, h);
@@ -146,24 +146,24 @@ var p = Stage.prototype = new Container();
 			var compositeOperation = ctx.globalCompositeOperation;
 
 			//set to draw behind current content
-			ctx.globalCompositeOperation = "destination-over";
+			ctx.globalCompositeOperation = 'destination-over';
 
 			//set background color
 			ctx.fillStyle = backgroundColor;
 
 			//draw background on entire canvas
-			ctx.fillRect(0,0,w,h);
+			ctx.fillRect(0, 0, w, h);
 		}
 
 		//get the image data from the canvas
 		var dataURL = this.canvas.toDataURL(mimeType);
 
-		if(backgroundColor) {
+		if (backgroundColor) {
 			//clear the canvas
-			ctx.clearRect (0,0,w,h);
+			ctx.clearRect(0, 0, w, h);
 
 			//restore it with original settings
-			ctx.putImageData(data, 0,0);
+			ctx.putImageData(data, 0, 0);
 
 			//reset the globalCompositeOperation to what it was
 			ctx.globalCompositeOperation = compositeOperation;
@@ -171,50 +171,50 @@ var p = Stage.prototype = new Container();
 
 		return dataURL;
 	}
-	
+
 	p.clone = function() {
 		var o = new Stage(null);
 		this.cloneProps(o);
 		return o;
 	}
-		
+
 	p.toString = function() {
-		return "[Stage (name="+  this.name +")]";
+		return '[Stage (name='+ this.name + ')]';
 	}
-	
+
 // private methods:
-	
+
 	p._handleMouseMove = function(e) {
 		if (!this.canvas) {
 			this.mouseX = this.mouseY = null;
 			return;
 		}
-		if(!e){ e = window.event; }
-		this.mouseX = e.pageX-this.canvas.offsetLeft;
-		this.mouseY = e.pageY-this.canvas.offsetTop;
-		
-		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY);
+		if (!e) { e = window.event; }
+		this.mouseX = e.pageX - this.canvas.offsetLeft;
+		this.mouseY = e.pageY - this.canvas.offsetTop;
+
+		var evt = new MouseEvent('onMouseMove', this.mouseX, this.mouseY);
 		if (this.onMouseMove) { this.onMouseMove(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
 	}
-	
+
 	p._handleMouseUp = function(e) {
-		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
+		var evt = new MouseEvent('onMouseUp', this.mouseX, this.mouseY);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp instanceof Function) { this._activeMouseEvent.onMouseUp(evt); }
 		if (this._activeMouseTarget && this._activeMouseTarget.onClick &&
 			 this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true) == this._activeMouseTarget) {
-			this._activeMouseTarget.onClick(new MouseEvent("onClick", this.mouseX, this.mouseY));
+			this._activeMouseTarget.onClick(new MouseEvent('onClick', this.mouseX, this.mouseY));
 		}
 		this._activeMouseEvent = this.activeMouseTarget = null;
 	}
-	
+
 	p._handleMouseDown = function(e) {
-		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
+		if (this.onMouseDown) { this.onMouseDown(new MouseEvent('onMouseDown', this.mouseX, this.mouseY)); }
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
 		if (target) {
 			if (target.onPress instanceof Function) {
-				var evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
+				var evt = new MouseEvent('onPress', this.mouseX, this.mouseY);
 				target.onPress(evt);
 				if (evt.onMouseMove || evt.onMouseUp) { this._activeMouseEvent = evt; }
 			}

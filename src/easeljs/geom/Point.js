@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -39,20 +39,20 @@ function Point(x, y) {
   this.initialize(x, y);
 }
 var p = Point.prototype;
-	
+
 // public properties:
 	/** X position. **/
 	p.x = 0;
 	/** Y position. **/
 	p.y = 0;
-	
+
 // constructor:
 	/** @private **/
 	p.initialize = function(x, y) {
 		this.x = (x == null ? 0 : x);
 		this.y = (y == null ? 0 : y);
 	}
-	
+
 // public methods:
 	/**
 	* Returns a clone of this Point.
@@ -65,8 +65,8 @@ var p = Point.prototype;
 	* Returns a string representation of this object.
 	**/
 	p.toString = function() {
-		return "[Point (x="+this.x+" y="+this.y+")]";
+		return '[Point (x='+ this.x + ' y='+ this.y + ')]';
 	}
-	
+
 window.Point = Point;
 }(window));

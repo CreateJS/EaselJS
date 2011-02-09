@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -45,12 +45,12 @@ function Text(text, font, color) {
 var p = Text.prototype = new DisplayObject();
 
 /** @private **/
-var canvas = document.createElement("canvas");
-Text._workingContext = canvas.getContext("2d");
+var canvas = document.createElement('canvas');
+Text._workingContext = canvas.getContext('2d');
 
 // public properties:
 	/** The text to display. **/
-	p.text = "";
+	p.text = '';
 	/** The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold 36px Arial"). **/
 	p.font = null;
 	/** The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). **/
@@ -67,7 +67,7 @@ Text._workingContext = canvas.getContext("2d");
 	p.lineHeight = null;
 	/** Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null, the text will not be wrapped. **/
 	p.lineWidth = null;
-	
+
 // constructor:
 	/** @private **/
 	p.DisplayObject_initialize = p.initialize;
@@ -76,28 +76,28 @@ Text._workingContext = canvas.getContext("2d");
 		this.DisplayObject_initialize();
 		this.text = text;
 		this.font = font;
-		this.color = color ? color : "#000";
+		this.color = color ? color : '#000';
 	}
-	
+
 // public methods:
 	p.isVisible = function() {
-		return Boolean(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.text != null && this.text != "");
+		return Boolean(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.text != null && this.text != '');
 	}
 
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
-		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
-		
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+
 		if (this.outline) { ctx.strokeStyle = this.color; }
 		else { ctx.fillStyle = this.color; }
 		ctx.font = this.font;
-		ctx.textAlign = this.textAlign ? this.textAlign : "start";
-		ctx.textBaseline = this.textBaseline ? this.textBaseline : "alphabetic";
+		ctx.textAlign = this.textAlign ? this.textAlign : 'start';
+		ctx.textBaseline = this.textBaseline ? this.textBaseline : 'alphabetic';
 
 		var lines = String(this.text).split(/(?:\r\n|\r|\n)/);
 		var lineHeight = (this.lineHeight == null) ? this.getMeasuredLineHeight() : this.lineHeight;
 		var y = 0;
-		for (var i=0, l=lines.length; i<l; i++) {
+		for (var i = 0, l = lines.length; i < l; i++) {
 			var w = ctx.measureText(lines[i]).width;
 			if (this.lineWidth == null || w < this.lineWidth) {
 				this._drawTextLine(ctx, lines[i], y);
@@ -108,14 +108,14 @@ Text._workingContext = canvas.getContext("2d");
 			// split up the line
 			var words = lines[i].split(/(\s)/);
 			var str = words[0];
-			for (var j=1, jl=words.length; j<jl; j+=2) {
+			for (var j = 1, jl = words.length; j < jl; j += 2) {
 				// Line needs to wrap:
-				if (ctx.measureText(str + words[j] + words[j+1]).width > this.lineWidth) {
+				if (ctx.measureText(str + words[j] + words[j + 1]).width > this.lineWidth) {
 					this._drawTextLine(ctx, str, y);
 					y += lineHeight;
-					str = words[j+1];
+					str = words[j + 1];
 				} else {
-					str += words[j] + words[j+1];
+					str += words[j] + words[j + 1];
 				}
 			}
 			this._drawTextLine(ctx, str, y); // Draw remaining text
@@ -123,7 +123,7 @@ Text._workingContext = canvas.getContext("2d");
 		}
 		return true;
 	}
-	
+
 	/**
 	* Returns the measured, untransformed width of the text.
 	**/
@@ -136,21 +136,21 @@ Text._workingContext = canvas.getContext("2d");
 	 * a "M" character multiplied by 1.2, which approximates em for most fonts.
 	 */
 	p.getMeasuredLineHeight = function() {
-		return this._getWorkingContext().measureText("M").width*1.2;
+		return this._getWorkingContext().measureText('M').width * 1.2;
 	}
-	
+
 	p.clone = function() {
 		var o = new Text(this.text, this.font, this.color);
 		this.cloneProps(o);
 		return o;
 	}
-		
+
 	p.toString = function() {
-		return "[Text (text="+  (this.text.length > 20 ? this.text.substr(0,17)+"..." : this.text) +")]";
+		return '[Text (text='+ (this.text.length > 20 ? this.text.substr(0, 17) + '...' : this.text) + ')]';
 	}
-	
+
 // private methods:
-	
+
 	/** @private **/
 	p.DisplayObject_cloneProps = p.cloneProps;
 	/** @private **/
@@ -167,11 +167,11 @@ Text._workingContext = canvas.getContext("2d");
 	p._getWorkingContext = function() {
 		var ctx = Text._workingContext;
 		ctx.font = this.font;
-		ctx.textAlign = this.textAlign ? this.textAlign : "start";
-		ctx.textBaseline = this.textBaseline ? this.textBaseline : "alphabetic";
+		ctx.textAlign = this.textAlign ? this.textAlign : 'start';
+		ctx.textBaseline = this.textBaseline ? this.textBaseline : 'alphabetic';
 		return ctx;
 	}
-	
+
 	p._drawTextLine = function(ctx, text, y) {
 		if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth); }
 		else { ctx.fillText(text, 0, y, this.maxWidth); }

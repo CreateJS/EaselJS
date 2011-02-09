@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -41,14 +41,14 @@ function Shadow(color, offsetX, offsetY, blur) {
   this.initialize(color, offsetX, offsetY, blur);
 }
 var p = Shadow.prototype;
-	
+
 // static public properties:
 	/**
 	* An identity shadow object (all properties are set to 0). Read-only.
 	* @static
 	**/
 	Shadow.identity = null; // set at bottom of class definition.
-	
+
 // public properties:
 	/** The color of the shadow. **/
 	p.color = null;
@@ -58,7 +58,7 @@ var p = Shadow.prototype;
 	p.offsetY = 0;
 	/** The blur of the shadow. **/
 	p.blur = 0;
-	
+
 // constructor:
 	/** @private **/
 	p.initialize = function(color, offsetX, offsetY, blur) {
@@ -67,25 +67,25 @@ var p = Shadow.prototype;
 		this.offsetY = offsetY;
 		this.blur = blur;
 	}
-	
+
 // public methods:
 	/**
 	* Returns a string representation of this object.
 	**/
 	p.toString = function() {
-		return "[Shadow]";
+		return '[Shadow]';
 	}
-	
-	
+
+
 	/**
 	* Returns a clone of this object.
 	**/
 	p.clone = function() {
 		return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);
 	}
-	
+
 	// this has to be populated after the class is defined:
 	Shadow.identity = new Shadow(null, 0, 0, 0);
-	
+
 window.Shadow = Shadow;
 }(window));

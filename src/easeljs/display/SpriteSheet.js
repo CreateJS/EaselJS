@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -43,8 +43,8 @@ function SpriteSheet(image, frameWidth, frameHeight, frameData) {
   this.initialize(image, frameWidth, frameHeight, frameData);
 }
 var p = SpriteSheet.prototype;
-	
-	
+
+
 // public properties:
 	/** The Image, Canvas, or Video instance to use as a sprite sheet. **/
 	p.image = null;
@@ -58,7 +58,7 @@ var p = SpriteSheet.prototype;
 	p.loop = true;
 	/** Specifies the total number of frames in the sprite sheet if no frameData is specified. This is useful for excluding extraneous frames (for example, if you have 7 frames in a 2x4 sprite sheet). The total frames will be automatically calculated by BitmapSequence based on frame and image dimensions if totalFrames is 0. **/
 	p.totalFrames = 0;
-	
+
 // constructor:
 	/** @private **/
 	p.initialize = function(image, frameWidth, frameHeight, frameData) {
@@ -67,15 +67,15 @@ var p = SpriteSheet.prototype;
 		this.frameHeight = frameHeight;
 		this.frameData = frameData;
 	}
-	
+
 // public methods:
 	/**
 	* Returns a string representation of this object.
 	**/
 	p.toString = function() {
-		return "[SpriteSheet]";
+		return '[SpriteSheet]';
 	}
-	
+
 	/**
 	* Returns a clone of this object.
 	**/
@@ -85,6 +85,6 @@ var p = SpriteSheet.prototype;
 		o.totalFrames = this.totalFrames;
 		return o;
 	}
-	
+
 window.SpriteSheet = SpriteSheet;
 }(window));

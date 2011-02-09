@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -58,7 +58,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	/** The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame data. See SpriteSheet for more information. **/
 	p.spriteSheet = null;
 	p.snapToPixel = true;
-	
+
 // constructor:
 	/** @private **/
 	p.DisplayObject_initialize = p.initialize;
@@ -67,7 +67,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		this.DisplayObject_initialize();
 		this.spriteSheet = spriteSheet;
 	}
-	
+
 // public methods:
 	p.isVisible = function() {
 		var image = this.spriteSheet ? this.spriteSheet.image : null;
@@ -76,14 +76,14 @@ var p = BitmapSequence.prototype = new DisplayObject();
 
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx, ignoreCache) {
-		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
-		
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+
 		var image = this.spriteSheet.image;
 		var frameWidth = this.spriteSheet.frameWidth;
 		var frameHeight = this.spriteSheet.frameHeight;
-		var cols = image.width/frameWidth|0;
-		var rows = image.height/frameHeight|0;
-		
+		var cols = image.width / frameWidth | 0;
+		var rows = image.height / frameHeight | 0;
+
 		if (this.currentEndFrame != null) {
 			if (this.currentFrame > this.currentEndFrame) {
 				if (this.nextSequence) {
@@ -98,7 +98,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 			// sequence data is set, but we haven't actually played a sequence yet:
 			this.paused = true;
 		} else {
-			var ttlFrames = this.spriteSheet.totalFrames || cols*rows;
+			var ttlFrames = this.spriteSheet.totalFrames || cols * rows;
 			if (this.currentFrame >= ttlFrames) {
 				if (this.spriteSheet.loop) { this.currentFrame = 0; }
 				else {
@@ -109,13 +109,13 @@ var p = BitmapSequence.prototype = new DisplayObject();
 			}
 		}
 		if (this.currentFrame >= 0) {
-			var col = this.currentFrame%cols;
-			var row = this.currentFrame/cols|0;
-			ctx.drawImage(image, frameWidth*col, frameHeight*row, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight);
+			var col = this.currentFrame % cols;
+			var row = this.currentFrame / cols | 0;
+			ctx.drawImage(image, frameWidth * col, frameHeight * row, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight);
 		}
 		return true;
 	}
-	
+
 	/**
 	* Advances the currentFrame if paused is not true. This is called automatically when the Stage ticks.
 	**/
@@ -123,7 +123,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		if (this.paused) { return; }
 		this.currentFrame++;
 	}
-	
+
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for BitmapSequence instances.
 	**/
@@ -132,7 +132,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for BitmapSequence instances.
 	**/
 	p.uncache = function() {}
-	
+
 	/**
 	* Sets paused to false and plays the specified sequence name, named frame, or frame number.
 	**/
@@ -140,7 +140,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		this.paused = false;
 		this._goto(frameOrSequence);
 	}
-	
+
 	/**
 	* Sets paused to true and seeks to the specified sequence name, named frame, or frame number.
 	**/
@@ -148,17 +148,17 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		this.paused = true;
 		this._goto(frameOrSequence);
 	}
-	
+
 	p.clone = function() {
 		var o = new BitmapSequence(this.spriteSheet);
 		this.cloneProps(o);
 		return o;
 	}
-		
+
 	p.toString = function() {
-		return "[BitmapSequence (name="+  this.name +")]";
+		return '[BitmapSequence (name='+ this.name + ')]';
 	}
-	
+
 // private methods:
 	/** @private **/
 	p.DisplayObject_cloneProps = p.cloneProps;
@@ -174,7 +174,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		o.paused = this.paused;
 		o.frameData = this.frameData;
 	}
-	
+
 	/** @private **/
 	p._goto = function(frameOrSequence) {
 		if (isNaN(frameOrSequence)) {

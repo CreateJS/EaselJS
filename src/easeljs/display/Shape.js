@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -45,7 +45,7 @@ var p = Shape.prototype = new DisplayObject();
 // public properties:
 	/** The graphics instance to display.  **/
 	p.graphics = null;
-	
+
 // constructor:
 	/** @private **/
 	p.DisplayObject_initialize = p.initialize;
@@ -62,19 +62,19 @@ var p = Shape.prototype = new DisplayObject();
 
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx,ignoreCache) {
-		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this.graphics.draw(ctx);
 		return true;
 	}
-	
+
 	p.clone = function() {
 		var o = new Shape(this.graphics);
 		this.cloneProps(o);
 		return o;
 	}
-		
+
 	p.toString = function() {
-		return "[Shape (name="+  this.name +")]";
+		return '[Shape (name='+ this.name + ')]';
 	}
 
 window.Shape = Shape;

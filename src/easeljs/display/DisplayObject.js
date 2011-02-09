@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -42,10 +42,10 @@ var p = DisplayObject.prototype;
 DisplayObject.suppressCrossDomainErrors = false;
 
 /** @private **/
-DisplayObject._hitTestCanvas = document.createElement("canvas");
+DisplayObject._hitTestCanvas = document.createElement('canvas');
 DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
 /** @private **/
-DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
+DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext('2d');
 /** @private **/
 DisplayObject._workingMatrix = new Matrix2D();
 
@@ -92,7 +92,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.onPress = null;
 	/** The onClick callback is called when the user presses down on and then releases the mouse button over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an onClick handler is set on a container, it will receive the event if any of its children are clicked. **/
 	p.onClick = null;
-	
+
 // private properties:
 	/** @private **/
 	p._cacheOffsetX = 0;
@@ -112,7 +112,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p._revertY = 0;
 	/** @private **/
 	p._revertAlpha = 1;
-	
+
 // constructor:
 	// separated so it can be easily addressed in subclasses:
 	/** @private **/
@@ -120,7 +120,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		this.id = UID.get();
 		this.children = [];
 	}
-	
+
 // public methods:
 	/**
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced developers.
@@ -130,7 +130,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.isVisible = function() {
 		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0;
 	}
-	
+
 	/**
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced developers.
 	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
@@ -141,12 +141,12 @@ DisplayObject._workingMatrix = new Matrix2D();
 	 **/
 	p.draw = function(ctx,ignoreCache) {
 		if (ignoreCache || !this.cacheCanvas) { return false; }
-		ctx.translate(this._cacheOffsetX,this._cacheOffsetY);
-		ctx.drawImage(this.cacheCanvas,0,0);
-		ctx.translate(-this._cacheOffsetX,-this._cacheOffsetY);
+		ctx.translate(this._cacheOffsetX, this._cacheOffsetY);
+		ctx.drawImage(this.cacheCanvas, 0, 0);
+		ctx.translate(-this._cacheOffsetX, -this._cacheOffsetY);
 		return true;
 	}
-	
+
 	/**
 	* Draws the display object into a new canvas, which is then used for subsequent draws. For complex content that does not change frequently (ex. a Sprite with many children that do not move, or a complex vector Shape), this can provide for much faster rendering because the content does not need to be re-rendered each tick. The cached display object can be moved, rotated, faded, etc freely, however if it's content changes, you must manually update the cache by calling updateCache() or cache() again. You must specify the cache area via the x, y, w, and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates. For example if you defined a Shape that drew a circle at 0,0 with a radius of 25, you could call myShape.cache(-25,-25,50,50) to cache the full shape.
 	* @param x
@@ -157,13 +157,13 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.cache = function(x, y, width, height) {
 		// draw to canvas.
 		var ctx;
-		if (this.cacheCanvas == null) { this.cacheCanvas = document.createElement("canvas"); }
-		ctx = this.cacheCanvas.getContext("2d");
+		if (this.cacheCanvas == null) { this.cacheCanvas = document.createElement('canvas'); }
+		ctx = this.cacheCanvas.getContext('2d');
 		this.cacheCanvas.width = width;
 		this.cacheCanvas.height = height;
-		ctx.setTransform(1,0,0,1,-x,-y);
-		ctx.clearRect(0,0,width+1,height+1); // because some browsers don't correctly clear if the width/height remain the same.
-		this.draw(ctx,true);
+		ctx.setTransform(1, 0, 0, 1, -x, -y);
+		ctx.clearRect(0, 0, width + 1, height + 1); // because some browsers don't correctly clear if the width/height remain the same.
+		this.draw(ctx, true);
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
 	}
@@ -175,15 +175,15 @@ DisplayObject._workingMatrix = new Matrix2D();
 	 * @param compositeOperation The compositeOperation to use, or null to clear the cache and redraw it. <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">whatwg spec on compositing</a>.
 	 */
 	p.updateCache = function(compositeOperation) {
-		if (this.cacheCanvas == null) { throw "cache() must be called before updateCache()"; }
-		var ctx = this.cacheCanvas.getContext("2d");
-		ctx.setTransform(1,0,0,1,-this._cacheOffsetX,-this._cacheOffsetY);
-		if (!compositeOperation) { ctx.clearRect(0,0,this.cacheCanvas.width+1,this.cacheCanvas.height+1); }
+		if (this.cacheCanvas == null) { throw 'cache() must be called before updateCache()'; }
+		var ctx = this.cacheCanvas.getContext('2d');
+		ctx.setTransform(1, 0, 0, 1, -this._cacheOffsetX, -this._cacheOffsetY);
+		if (!compositeOperation) { ctx.clearRect(0, 0, this.cacheCanvas.width + 1, this.cacheCanvas.height + 1); }
 		else { ctx.globalCompositeOperation = compositeOperation; }
-		this.draw(ctx,true);
-		if (compositeOperation) { ctx.globalCompositeOperation = "source-over"; }
+		this.draw(ctx, true);
+		if (compositeOperation) { ctx.globalCompositeOperation = 'source-over'; }
 	}
-	
+
 	/**
 	* Clears the current cache. See cache() for more information.
 	**/
@@ -191,7 +191,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		this.cacheCanvas = null;
 		this.cacheOffsetX = this.cacheOffsetY = 0;
 	}
-	
+
 	/**
 	* Returns the stage that this display object will be rendered on, or null if it has not been added to one.
 	**/
@@ -215,7 +215,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.localToGlobal = function(x, y) {
 		var mtx = this.getConcatenatedMatrix();
 		if (mtx == null) { return null; }
-		mtx.append(1,0,0,1,x,y);
+		mtx.append(1, 0, 0, 1, x, y);
 		return new Point(mtx.tx, mtx.ty);
 	}
 
@@ -231,7 +231,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		var mtx = this.getConcatenatedMatrix();
 		if (mtx == null) { return null; }
 		mtx.invert();
-		mtx.append(1,0,0,1,x,y);
+		mtx.append(1, 0, 0, 1, x, y);
 		return new Point(mtx.tx, mtx.ty);
 	}
 
@@ -279,16 +279,16 @@ DisplayObject._workingMatrix = new Matrix2D();
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;
 
-		ctx.setTransform(1,  0, 0, 1, -x, -y);
+		ctx.setTransform(1, 0, 0, 1, -x, -y);
 		this.draw(ctx);
-		
+
 		var hit = this._testHit(ctx);
-		
+
 		canvas.width = 0;
 		canvas.width = 1;
 		return hit;
 	}
-	
+
 	/**
 	* Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are reverted to their defaults (for example .parent).
 	**/
@@ -297,14 +297,14 @@ DisplayObject._workingMatrix = new Matrix2D();
 		this.cloneProps(o);
 		return o;
 	}
-	
+
 	/**
 	* Returns a string representation of this object.
 	**/
 	p.toString = function() {
-		return "[DisplayObject (name="+  this.name +")]";
+		return '[DisplayObject (name='+ this.name + ')]';
 	}
-	
+
 // private methods:
 
 	// separated so it can be used more easily in subclasses:
@@ -321,12 +321,12 @@ DisplayObject._workingMatrix = new Matrix2D();
 		o.skewX = this.skewX;
 		o.skewY = this.skewY;
 		o.visible = this.visible;
-		o.x  = this.x;
+		o.x = this.x;
 		o.y = this.y;
 		o.mouseEnabled = this.mouseEnabled;
 		o.compositeOperation = this.compositeOperation;
 	}
-	
+
 	/** @private **/
 	p.applyShadow = function(ctx, shadow) {
 		ctx.shadowColor = shadow.color;
@@ -338,10 +338,10 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/** @private **/
 	p._testHit = function(ctx) {
 		try {
-			var hit = ctx.getImageData(0,0,1,1).data[3] > 1;
+			var hit = ctx.getImageData(0, 0, 1, 1).data[3] > 1;
 		} catch (e) {
 			if (!DisplayObject.suppressCrossDomainErrors) {
-				throw "An error has occured. This is most likely due to security restrictions on reading canvas pixel data with local or cross-domain images.";
+				throw 'An error has occured. This is most likely due to security restrictions on reading canvas pixel data with local or cross-domain images.';
 			}
 		}
 		return hit;
