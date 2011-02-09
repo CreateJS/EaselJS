@@ -229,11 +229,14 @@ var p = Graphics.prototype;
 	
 	
 	/**
-	* Draws a rectangle at (x,y) with the specified width and height using the current fill and/or stroke.  For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
-	* @param cpx
-	* @param cpy
+	* Draws a rectangle at (x,y) with the specified width and height using the current fill and/or stroke.
+	*  For detailed information, read the 
+	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
+	* whatwg spec</a>.
 	* @param x
 	* @param y
+	* @param w Width of the rectangle
+	* @param h Height of the rectangle
 	**/
 	p.rect = function(x, y, w, h) {
 		this._dirty = this._active = true;
