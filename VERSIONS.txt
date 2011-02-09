@@ -1,6 +1,7 @@
 Version 0.3.1 [Not tagged for release]
 ****************************************************************************************************
 - fixed issues with hitTest and mouse event callbacks on Container instances.
+- added recursive clone option to Container and Shape
 
 
 Version 0.3 [Feb 8, 2011]

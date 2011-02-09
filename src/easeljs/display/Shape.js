@@ -67,8 +67,12 @@ var p = Shape.prototype = new DisplayObject();
 		return true;
 	}
 	
-	p.clone = function() {
-		var o = new Shape(this.graphics);
+	/**
+	* Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to their defaults (for example .parent).
+	* @param recursive If true, this Shape's Graphics instance will also be cloned. If false, the Graphics instance will be shared with the new Shape.
+	**/
+	p.clone = function(recursive) {
+		var o = new Shape((recursive && this.graphics) ? this.graphics.clone() : this.graphics);
 		this.cloneProps(o);
 		return o;
 	}

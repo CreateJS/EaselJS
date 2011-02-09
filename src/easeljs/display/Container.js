@@ -214,7 +214,7 @@ var p = Container.prototype = new DisplayObject();
 	}
 
 	/**
-	* Returns an array of all display objects under the specified coordinates that are in this container's display list. This routine ignores any display objects with mouseEnabled set to false (the default) or that are inside containers with mouseChildren set to false (the default). The array will be sorted in order of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
+	* Returns an array of all display objects under the specified coordinates that are in this container's display list. This routine ignores any display objects with mouseEnabled set to false. The array will be sorted in order of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
 	* @param x The x position in the container to test.
 	* @param y The y position in the container to test.
 	**/
@@ -235,9 +235,19 @@ var p = Container.prototype = new DisplayObject();
 		return this._getObjectsUnderPoint(pt.x, pt.y);
 	}
 	
-	p.clone = function() {
+	/**
+	* Returns a clone of this Container. Some properties that are specific to this instance's current context are reverted to their defaults (for example .parent).
+	* @param recursive If true, all of the descendants of this container will be cloned recursively. If false, the properties of the container will be cloned, but the new instance will not have any children.
+	**/
+	p.clone = function(recursive) {
 		var o = new Container();
 		this.cloneProps(o);
+		if (recursive) {
+			var arr = o.children = [];
+			for (var i=0, l=this.children.length; i<l; i++) {
+				arr.push(this.children[i].clone(recursive));
+			}
+		}
 		return o;
 	}
 	
