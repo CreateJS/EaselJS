@@ -72,7 +72,10 @@ var p = Bitmap.prototype = new DisplayObject();
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	**/
 	p.cache = function() {}
-	
+	/**
+	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+	**/
+	p.updateCache = function() {}
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	**/

@@ -102,7 +102,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 			if (this.currentFrame >= ttlFrames) {
 				if (this.spriteSheet.loop) { this.currentFrame = 0; }
 				else {
-					this.currentFrame = ttlFrames;
+					this.currentFrame = ttlFrames-1;
 					this.paused = true;
 				}
 				if (this.callback) { this.callback(this); }
@@ -128,6 +128,10 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for BitmapSequence instances.
 	**/
 	p.cache = function() {}
+	/**
+	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for BitmapSequence instances.
+	**/
+	p.updateCache() {}
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for BitmapSequence instances.
 	**/
