@@ -131,7 +131,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for BitmapSequence instances.
 	**/
-	p.updateCache() {}
+	p.updateCache = function() {}
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for BitmapSequence instances.
 	**/
