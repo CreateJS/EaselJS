@@ -61,6 +61,7 @@ var p = Container.prototype = new DisplayObject();
 	/** @private **/
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx, ignoreCache, _mtx) {
+		var snap = Stage._snapToPixelEnabled;
 		if (!_mtx) {
 			_mtx = new Matrix2D();
 			_mtx.appendProperties(this.alpha, this.shadow, this.compositeOperation);
@@ -79,7 +80,11 @@ var p = Container.prototype = new DisplayObject();
 			mtx.appendProperties(child.alpha, child.shadow, child.compositeOperation);
 
 			if (!(child instanceof Container)) {
-				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+				if (snap && child.snapToPixel && mtx.a == 1 && mtx.b == 0 && mtx.c == 0 && mtx.d == 1) {
+					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0);
+				} else {
+					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+				}
 				ctx.globalAlpha = mtx.alpha;
 				ctx.globalCompositeOperation = mtx.compositeOperation || "source-over";
 				if (mtx.shadow) { this.applyShadow(ctx, mtx.shadow); }
@@ -263,7 +268,6 @@ var p = Container.prototype = new DisplayObject();
 		var canvas = DisplayObject._hitTestCanvas;
 		var mtx = DisplayObject._workingMatrix;
 		var hasHandler = mouseEvents && (this.onPress || this.onClick);
-		var snap = Stage._snapToPixelEnabled;
 
 		// if we have a cache handy, we can use it to do a quick check:
 		if (this.cacheCanvas) {
@@ -298,12 +302,7 @@ var p = Container.prototype = new DisplayObject();
 				}
 			} else if (!mouseEvents || (mouseEvents && (child.onPress || child.onClick || hasHandler))) {
 				child.getConcatenatedMatrix(mtx);
-				if (snap && child.snapToPixel && mtx.a == 1 && mtx.b == 0 && mtx.c == 0 && mtx.d == 1) {
-					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x+0.5|0, mtx.ty-y+0.5|0);
-				} else {
-					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
-				}
-				
+				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				ctx.globalAlpha = mtx.alpha;
 				child.draw(ctx);
 				if (!this._testHit(ctx)) { continue; }
