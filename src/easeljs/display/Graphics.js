@@ -234,7 +234,6 @@ var p = Graphics.prototype;
 		return this;
 	}
 	
-	
 	/**
 	* Draws a rectangle at (x,y) with the specified width and height using the current fill and/or stroke.
 	*  For detailed information, read the 
