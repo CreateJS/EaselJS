@@ -24,27 +24,30 @@
 <script>
 var canvas;
 var stage;
-var shape
+var shape;
+var circleRadius=20;
 
 function init() {
 	// create a new stage and point it at our canvas:
 	canvas = document.getElementById("testCanvas");
 	stage = new Stage(canvas);
 	
+	// create a large number of slightly complex vector shapes, and give them random positions and velocities:
 	for (var i=0; i<1000; i++) {
-		// create a Shape instance to draw the vectors stars in, and add it to the stage:
 		shape = new Shape();
-		var hue = Math.random()*360;
-		shape.graphics.beginFill(Graphics.getHSL(hue, 100, 50)).drawCircle(0,0,20);
-		shape.graphics.beginFill(Graphics.getHSL(hue+60, 100, 50)).drawCircle(0,0,16);
-		shape.graphics.beginFill(Graphics.getHSL(hue, 100, 50)).drawCircle(0,0,12);
-		shape.graphics.beginFill(Graphics.getHSL(hue+60, 100, 50)).drawCircle(0,0,8);
-		shape.graphics.beginFill(Graphics.getHSL(hue, 100, 50)).drawCircle(0,0,4);
+		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius);
+		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.8);
+		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.6);
+		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.4);
+		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.2);
 		shape.x = Math.random()*canvas.width;
 		shape.y = Math.random()*canvas.height;
-		shape.snapToPixel = true;
 		shape.velX = Math.random()*10-5;
 		shape.velY = Math.random()*10-5;
+		
+		// turn snapToPixel on for all shapes - it's set to false by default on Shape.
+		// it won't do anything until stage.snapToPixelEnabled is set to true.
+		shape.snapToPixel = true;
 		
 		stage.addChild(shape);
 	}
@@ -65,6 +68,7 @@ function tick() {
 	var h = canvas.height;
 	var l = stage.getNumChildren()-1;
 	
+	// iterate through all the children and move them according to their velocity:
 	for (var i=1; i<l; i++) {
 		var shape = stage.getChildAt(i);
 		shape.x = (shape.x+shape.velX+w)%w;
@@ -78,13 +82,13 @@ function tick() {
 }
 
 function toggleCache(value) {
+	// iterate all the children except the fpsLabel, and set up the cache:
 	var l = stage.getNumChildren()-1;
-	if (value) { console.log("yes"); }
 	
 	for (var i=1; i<l; i++) {
 		var shape = stage.getChildAt(i);
 		if (value) {
-			shape.cache(-20, -20, 40, 40);
+			shape.cache(-circleRadius, -circleRadius, circleRadius*2, circleRadius*2);
 		} else {
 			shape.uncache();
 		}
@@ -98,7 +102,7 @@ function toggleCache(value) {
 <body onload="init();">
 	<!-- background isn't set to black to demonstrate how the darkening applies -->
 	<div class="description">
-	This example demonstrates the effect of <strong>DisplayObject.cache()</strong> and <strong>snapToPixel</strong> on performance. Caching speeds things up because the complex vector shapes do not have to be rerendered each tick. The results for snapToPixel vary between browsers, but in general it will have no effect on the uncached shapes, but a significant effect when cached. Also note the slightly less smooth animation when snapToPixel is enabled.
+	This example demonstrates the effect of <strong>DisplayObject.cache()</strong> and <strong>snapToPixel</strong> on performance. Caching speeds things up because the complex vector shapes do not have to be rerendered each tick. The results for snapToPixel vary between browsers, but in general it will have no effect on the uncached shapes, but a significant effect when cached.
 	<br/><br/>
 	<input type="checkbox" onClick="toggleCache(this.value);"/> cache enabled
 	<input type="checkbox" onClick="stage.snapToPixelEnabled = !!this.value;"/> snapToPixel enabled
