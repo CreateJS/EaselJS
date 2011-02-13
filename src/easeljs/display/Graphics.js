@@ -55,7 +55,8 @@ var p = Graphics.prototype;
 	
 	/**
 	* Returns a CSS compatible color string based on the specified RGB numeric color values in the format "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)". For example,
-	* Graphics.getRGB(50,100,150,0.5) will return "rgba(50,100,150,0.5)".
+	* Graphics.getRGB(50,100,150,0.5) will return "rgba(50,100,150,0.5)". It also supports passing a single hex color value as the first param, and an optional alpha value as the second param. For example,
+	* Graphics.getRGB(0xFF00FF, 0.2) will return "rgba(255,0,255,0.2)".
 	* @param r The red component for the color, between 0 and 0xFF (255).
 	* @param g The green component for the color, between 0 and 0xFF (255).
 	* @param b The blue component for the color, between 0 and 0xFF (255).
@@ -63,6 +64,12 @@ var p = Graphics.prototype;
 	* @static
 	**/
 	Graphics.getRGB = function(r, g, b, alpha) {
+		if (r != null && b == null) {
+			alpha = g;
+			b = r&0xFF;
+			g = r>>8&0xFF;
+			r = r>>16&0xFF;
+		}
 		if (alpha == null) {
 			return "rgb("+r+","+g+","+b+")";
 		} else {
