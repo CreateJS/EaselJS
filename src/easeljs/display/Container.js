@@ -34,7 +34,7 @@
 * @class Container are nestable display lists that allow you to work with compound display elements. For example you could group arm, leg, torso and head Bitmaps together into a Person Container, and transform them as a group, while still being able to move the individual parts relative to each other. Children of containers have their transform and alpha properties concatenated with their parent Container. For example, a Shape with x=100 and alpha=0.5, placed in a Container with x=50 and alpha=0.7 will be rendered to the canvas at x=150 and alpha=0.35. Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
 * @augments DisplayObject
 **/
-function Container() {
+Container = function() {
   this.initialize();
 }
 Container.prototype = new DisplayObject();

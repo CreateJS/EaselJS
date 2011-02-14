@@ -35,7 +35,7 @@
 * @param y Y position. Default is 0.
 * @class Represents a point with x / y coordinates.
 **/
-function Point(x, y) {
+Point = function(x, y) {
   this.initialize(x, y);
 }
 	

@@ -39,7 +39,7 @@
  * you can position HTML text above or below the canvas relative to items in the display list using the localToGlobal() method.
 * @augments DisplayObject
 **/
-function Text(text, font, color) {
+Text = function(text, font, color) {
   this.initialize(text, font, color);
 }
 Text.prototype = new DisplayObject();

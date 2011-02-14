@@ -37,7 +37,7 @@
 * @param height Height. Default is 0.
 * @class Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
 **/
-function Rectangle(x, y, width, height) {
+Rectangle = function(x, y, width, height) {
   this.initialize(x, y, width, height);
 }
 	

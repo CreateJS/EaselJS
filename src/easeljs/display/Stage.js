@@ -35,7 +35,7 @@
 * @class A stage is the root level Container for a display list. Each time its tick method is called, it will render its display list to its target canvas.
 * @augments Container
 **/
-function Stage(canvas) {
+Stage = function(canvas) {
   this.initialize(canvas);
 }
 Stage.prototype = new Container();
@@ -124,7 +124,6 @@ Stage.prototype = new Container();
 	* @param mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
 	* is passed in, or if the browser does not support the specified MIME type, the default value will be used.
 	* @returns a Base64 encoded image.
-	* @type String
 	**/
 	Stage.prototype.toDataURL = function(backgroundColor, mimeType) {
 		if(!mimeType) {

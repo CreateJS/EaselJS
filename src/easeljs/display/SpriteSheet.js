@@ -39,7 +39,7 @@
 * The simplest form of sprite sheet has values for the image, frameWidth, and frameHeight properties, but does not include frameData. It will then play all of the frames in the animation and loop if the loop property is true. In this simple mode, you can also set the totalFrames property if you have extraneous frames in your sprite sheet (for example, a 2x4 frame sprite sheet, with only 7 frames used).<br/><br/>
 * More complex sprite sheets include a frameData property, which provides named frames and animations which can be played and sequenced together. See frameData for more information.
 **/
-function SpriteSheet(image, frameWidth, frameHeight, frameData) {
+SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
   this.initialize(image, frameWidth, frameHeight, frameData);
 }
 	

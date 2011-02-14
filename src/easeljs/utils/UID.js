@@ -34,7 +34,7 @@
 	* The UID class uses a static interface (ex. UID.get()) and should not be instantiated.
 	* @class Global utility for generating sequential unique ID numbers.
 	**/
-	function UID() {
+	UID = function() {
 		throw "UID cannot be instantiated"; 
 	}
 	

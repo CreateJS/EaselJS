@@ -39,7 +39,7 @@
 * @param ty Specifies the ty property for the new matrix.
 * @class Represents an affine tranformation matrix, and provides tools for constructing and concatenating matrixes.
 **/
-function Matrix2D(a, b, c, d, tx, ty) {
+Matrix2D = function(a, b, c, d, tx, ty) {
   this.initialize(a, b, c, d, tx, ty);
 }
 	

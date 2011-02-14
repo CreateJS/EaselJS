@@ -33,7 +33,7 @@
 * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as Sprite, Bitmap, and Shape.
 * @class DisplayObject is the base class for all display classes in the CanvasDisplay library. It defines the core properties and methods that are shared between all display objects. It should not be instantiated directly.
 **/
-function DisplayObject() {
+DisplayObject = function() {
   this.initialize();
 }
 

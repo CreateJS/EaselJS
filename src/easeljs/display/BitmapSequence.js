@@ -35,7 +35,7 @@
 * @class Displays frames or sequences of frames from a sprite sheet image. A sprite sheet is a series of images (usually animation frames) combined into a single image on a regular grid. For example, an animation consisting of 8 100x100 images could be combined into a 400x200 sprite sheet (4 frames across by 2 high). You can display individual frames, play sequential frames as an animation, and even sequence animations together. See the SpriteSheet class for more information on setting up frames and animation.
 * @augments DisplayObject
 **/
-function BitmapSequence(spriteSheet) {
+BitmapSequence = function(spriteSheet) {
   this.initialize(spriteSheet);
 }
 BitmapSequence.prototype = new DisplayObject();

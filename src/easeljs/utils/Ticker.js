@@ -37,7 +37,7 @@
 	* Note that the interval that the tick event is called is a target interval, and may be broadcast 
 	* at a slower interval during times of high CPU load.
 	**/
-	function Ticker() {
+	Ticker = function() {
 		throw "Ticker cannot be instantiated.";
 	}
 	

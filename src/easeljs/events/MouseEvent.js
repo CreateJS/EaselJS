@@ -40,7 +40,7 @@
 * set mouseEventsEnabled to true on your stage instance.
 * @see Stage#mouseEventsEnabled
 **/
-function MouseEvent(type, stageX, stageY) {
+MouseEvent = function(type, stageX, stageY) {
   this.initialize(type, stageX, stageY);
 }
 	

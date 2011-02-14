@@ -35,7 +35,7 @@
 * @class A Bitmap represents an Image, Canvas, or Video in the display list.
 * @augments DisplayObject
 **/
-function Bitmap(image) {
+Bitmap = function(image) {
   this.initialize(image);
 }
 Bitmap.prototype = new DisplayObject();

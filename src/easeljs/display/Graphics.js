@@ -46,7 +46,7 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 * Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example, the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then render it to the specified context2D:<br/>
 * myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
 **/
-function Graphics(instructions) {
+Graphics = function(instructions) {
 	this.initialize(instructions);
 }
 

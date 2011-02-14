@@ -37,7 +37,7 @@
 * positions or transforms. If the vector art will not change between draws, you may want to use the cache() method to reduce the rendering cost.
 * @augments DisplayObject
 **/
-function Shape(graphics) {
+Shape = function(graphics) {
   this.initialize(graphics);
 }
 Shape.prototype = new DisplayObject();

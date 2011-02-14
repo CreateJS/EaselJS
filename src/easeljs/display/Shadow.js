@@ -37,7 +37,7 @@
 * @param blur The blur of the shadow.
 * @class Encapsulates the properties required to define a shadow to apply to a DisplayObject via it's .shadow property.
 **/
-function Shadow(color, offsetX, offsetY, blur) {
+Shadow = function(color, offsetX, offsetY, blur) {
   this.initialize(color, offsetX, offsetY, blur);
 }
 	
