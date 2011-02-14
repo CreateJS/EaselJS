@@ -27,6 +27,7 @@ var canvas;
 var stage;
 var starfield
 var moon;
+var sky;
 
 function init() {
 	// create a new stage and point it at our canvas:
@@ -34,7 +35,7 @@ function init() {
 	stage = new Stage(canvas);
 	
 	// draw the sky:
-	var sky = new Shape();
+	sky = new Shape();
 	sky.graphics.beginLinearGradientFill(["#204","#003","#000"], [0,0.15,0.6], 0, canvas.height, 0, 0);
 	sky.graphics.drawRect(0, 0, canvas.width, canvas.height);
 	stage.addChild(sky);
@@ -50,7 +51,6 @@ function init() {
 	moon = new Shape();
 	moon.graphics.beginFill("#CCF").drawCircle(0,0,60);
 	moon.graphics.beginFill("#000").drawEllipse(-35,-57,96,114);
-	moon.x = 0;
 	moon.rotation = -30;
 	stage.addChild(moon);
 	
@@ -73,9 +73,12 @@ function tick() {
 	// because the vector star has already been drawn to the cache, we can clear it right away:
 	starfield.graphics.clear();
 	
+	// darken the sky:
+	sky.alpha -= 0.0005;
+	
 	// move the moon across the sky:
 	var w = canvas.width+200;
-	moon.x = (moon.x+100+2+w)%w-100;
+	moon.x = (moon.x+100+1+w)%w-100;
 	moon.y = 250-Math.sin(moon.x/w*Math.PI)*150;
 	
 	// draw the updates to stage:

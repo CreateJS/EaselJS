@@ -46,9 +46,9 @@ function MouseEvent(type, stageX, stageY) {
 var p = MouseEvent.prototype;
 	
 // public properties:
-	/** The mouseX position on the stage. **/
+	/** The mouseX position on the stage. */
 	p.stageX = 0;
-	/** The mouseY position on the stage. **/
+	/** The mouseY position on the stage. */
 	p.stageY = 0;
 	/** The type of mouse event. This will be the same as the handler it maps to (onPress, onMouseDown, 
 		onMouseUp, onMouseMove, or onClick). 
@@ -66,7 +66,7 @@ var p = MouseEvent.prototype;
 	p.onMouseUp = null;
 	
 // constructor:
-	/** @private **/
+	/** @ignore */
 	p.initialize = function(type, stageX, stageY) {
 		this.type = type;
 		this.stageX = stageX;

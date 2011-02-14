@@ -41,14 +41,14 @@ function Bitmap(image) {
 var p = Bitmap.prototype = new DisplayObject();
 
 // public properties:
-	/** The image to render. This can be an Image, a Canvas, or a Video. **/
+	/** The image to render. This can be an Image, a Canvas, or a Video. */
 	p.image = null;
 	p.snapToPixel = true;
 	
 // constructor:
-	/** @private **/
+	/** @private */
 	p.DisplayObject_initialize = p.initialize;
-	/** @private **/
+	/** @ignore */
 	p.initialize = function(image) {
 		this.DisplayObject_initialize();
 		this.image = image;
@@ -60,11 +60,11 @@ var p = Bitmap.prototype = new DisplayObject();
 		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.image && (this.image.complete || this.image.getContext);
 	}
 
-	/** @borrows DisplayObject#draw as this.draw **/
+	/** @borrows DisplayObject#draw as this.draw */
 	p.DisplayObject_draw = p.draw;
-	p.draw = function(ctx,ignoreCache) {
-		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
-		ctx.drawImage(this.image,0,0);
+	p.draw = function(ctx, ignoreCache) {
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+		ctx.drawImage(this.image, 0, 0);
 		return true;
 	}
 	

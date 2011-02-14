@@ -41,28 +41,28 @@ function BitmapSequence(spriteSheet) {
 var p = BitmapSequence.prototype = new DisplayObject();
 
 // public properties:
-	/** Specifies a funciton to call whenever any sequence reaches its end. **/
+	/** Specifies a funciton to call whenever any sequence reaches its end. */
 	p.callback = null;
-	/** The frame that will be drawn on the next tick. This can also be set, but it will not update the current sequence, so it may result in unexpected behaviour if you are using frameData. **/
+	/** The frame that will be drawn on the next tick. This can also be set, but it will not update the current sequence, so it may result in unexpected behaviour if you are using frameData. */
 	p.currentFrame = -1;
-	/** Returns the currently playing sequence when using frameData. READ-ONLY. **/
+	/** Returns the currently playing sequence when using frameData. READ-ONLY. */
 	p.currentSequence = null; // READ-ONLY
-	/** Returns the last frame of the currently playing sequence when using frameData. READ-ONLY. **/
+	/** Returns the last frame of the currently playing sequence when using frameData. READ-ONLY. */
 	p.currentEndFrame = null; // READ-ONLY
-	/** Returns the first frame of the currently playing sequence when using frameData. READ-ONLY. **/
+	/** Returns the first frame of the currently playing sequence when using frameData. READ-ONLY. */
 	p.currentStartFrame = null; // READ-ONLY
-	/** Returns the name of the next sequence that will be played, or null if it will stop playing after the current sequence. READ-ONLY. **/
+	/** Returns the name of the next sequence that will be played, or null if it will stop playing after the current sequence. READ-ONLY. */
 	p.nextSequence = null;
-	/** Prevents the animation from advancing each tick automatically. For example, you could create a sprite sheet of icons, set paused to true, and display the appropriate icon by setting currentFrame. **/
+	/** Prevents the animation from advancing each tick automatically. For example, you could create a sprite sheet of icons, set paused to true, and display the appropriate icon by setting currentFrame. */
 	p.paused = false;
-	/** The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame data. See SpriteSheet for more information. **/
+	/** The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame data. See SpriteSheet for more information. */
 	p.spriteSheet = null;
 	p.snapToPixel = true;
 	
 // constructor:
-	/** @private **/
+	/** @private */
 	p.DisplayObject_initialize = p.initialize;
-	/** @private **/
+	/** @ignore */
 	p.initialize = function(spriteSheet) {
 		this.DisplayObject_initialize();
 		this.spriteSheet = spriteSheet;
@@ -76,7 +76,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx, ignoreCache) {
-		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		
 		var image = this.spriteSheet.image;
 		var frameWidth = this.spriteSheet.frameWidth;
@@ -164,9 +164,9 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	}
 	
 // private methods:
-	/** @private **/
+	/** @private */
 	p.DisplayObject_cloneProps = p.cloneProps;
-	/** @private **/
+	/** @private */
 	p.cloneProps = function(o) {
 		this.DisplayObject_cloneProps(o);
 		o.callback = this.callback;
@@ -179,7 +179,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		o.frameData = this.frameData;
 	}
 	
-	/** @private **/
+	/** @private */
 	p._goto = function(frameOrSequence) {
 		if (isNaN(frameOrSequence)) {
 			if (frameOrSequence == this.currentSequence) {

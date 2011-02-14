@@ -38,17 +38,16 @@
 function Point(x, y) {
   this.initialize(x, y);
 }
-var p = Point.prototype;
 	
 // public properties:
-	/** X position. **/
-	p.x = 0;
-	/** Y position. **/
-	p.y = 0;
+	/** X position. */
+	Point.prototype.x = 0;
+	/** Y position. */
+	Point.prototype.y = 0;
 	
 // constructor:
-	/** @private **/
-	p.initialize = function(x, y) {
+	/** @private */
+	Point.prototype.initialize = function(x, y) {
 		this.x = (x == null ? 0 : x);
 		this.y = (y == null ? 0 : y);
 	}
@@ -57,14 +56,14 @@ var p = Point.prototype;
 	/**
 	* Returns a clone of this Point.
 	**/
-	p.clone = function() {
+	Point.prototype.clone = function() {
 		return new Point(this.x, this.y);
 	}
 
 	/**
 	* Returns a string representation of this object.
 	**/
-	p.toString = function() {
+	Point.prototype.toString = function() {
 		return "[Point (x="+this.x+" y="+this.y+")]";
 	}
 	

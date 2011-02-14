@@ -41,40 +41,40 @@ function Stage(canvas) {
 var p = Stage.prototype = new Container();
 
 // static properties:
-	/** @private **/
+	/** @private */
 	Stage._snapToPixelEnabled = false; // snapToPixelEnabled is temporarily copied here during a draw to provide global access.
 
 // public properties:
-	/** Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for example). **/
+	/** Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for example). */
 	p.autoClear = true;
-	/** The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the first stage that will be ticked (or they will clear each other's render). **/
+	/** The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the first stage that will be ticked (or they will clear each other's render). */
 	p.canvas = null;
-	/** READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas. **/
+	/** READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas. */
 	p.mouseX = null;
-	/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas. **/
+	/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas. */
 	p.mouseY = null;
-	/** The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance. **/
+	/** The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance. */
 	p.onMouseMove = null;
-	/** The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler is passed a single param containing the corresponding MouseEvent instance. **/
+	/** The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler is passed a single param containing the corresponding MouseEvent instance. */
 	p.onMouseUp = null;
-	/** The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance. **/
+	/** The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance. */
 	p.onMouseDown = null;
-	/** Indicates whether this stage should use the snapToPixel property of display objects when rendering them. **/
+	/** Indicates whether this stage should use the snapToPixel property of display objects when rendering them. */
 	p.snapToPixelEnabled = false;
 	
 // private properties:
-	/** @private **/
+	/** @private */
 	p._tmpCanvas = null;
-	/** @private **/
+	/** @private */
 	p._activeMouseEvent = null;
-	/** @private **/
+	/** @private */
 	p._activeMouseTarget = null;
-	/** @private **/
+	/** @private */
 	
 // constructor:
-	/** @private **/
+	/** @private */
 	p.Container_initialize = p.initialize;
-	/** @private **/
+	/** @ignore */
 	p.initialize = function(canvas) {
 		this.Container_initialize();
 		this.canvas = canvas;
@@ -112,7 +112,7 @@ var p = Stage.prototype = new Container();
 	p.clear = function() {
 		if (!this.canvas) { return; }
 		var ctx = this.canvas.getContext("2d");
-		ctx.setTransform(1,0,0,1,0,0);
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 	
@@ -152,7 +152,7 @@ var p = Stage.prototype = new Container();
 			ctx.fillStyle = backgroundColor;
 
 			//draw background on entire canvas
-			ctx.fillRect(0,0,w,h);
+			ctx.fillRect(0, 0, w, h);
 		}
 
 		//get the image data from the canvas
@@ -160,10 +160,10 @@ var p = Stage.prototype = new Container();
 
 		if(backgroundColor) {
 			//clear the canvas
-			ctx.clearRect (0,0,w,h);
+			ctx.clearRect (0, 0, w, h);
 
 			//restore it with original settings
-			ctx.putImageData(data, 0,0);
+			ctx.putImageData(data, 0, 0);
 
 			//reset the globalCompositeOperation to what it was
 			ctx.globalCompositeOperation = compositeOperation;

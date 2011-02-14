@@ -44,34 +44,34 @@ function Text(text, font, color) {
 }
 var p = Text.prototype = new DisplayObject();
 
-/** @private **/
+/** @private */
 var canvas = document.createElement("canvas");
 Text._workingContext = canvas.getContext("2d");
 
 // public properties:
-	/** The text to display. **/
+	/** The text to display. */
 	p.text = "";
-	/** The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold 36px Arial"). **/
+	/** The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold 36px Arial"). */
 	p.font = null;
-	/** The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). **/
+	/** The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). */
 	p.color = null;
-	/** The horizontal text alignment. Any of start, end, left, right, and center. For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">whatwg spec</a>. **/
+	/** The horizontal text alignment. Any of start, end, left, right, and center. For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">whatwg spec</a>. */
 	p.textAlign = null;
-	/** The vertical alignment point on the font. Any of top, hanging, middle, alphabetic, ideographic, or bottom. For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">whatwg spec</a>. **/
+	/** The vertical alignment point on the font. Any of top, hanging, middle, alphabetic, ideographic, or bottom. For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">whatwg spec</a>. */
 	p.textBaseline = null;
-	/** The maximum width to draw the text. If maxWidth is specified (not null), the text will be condensed or shrunk to make it fit in this width. For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">whatwg spec</a>. **/
+	/** The maximum width to draw the text. If maxWidth is specified (not null), the text will be condensed or shrunk to make it fit in this width. For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">whatwg spec</a>. */
 	p.maxWidth = null;
-	/** If true, the text will be drawn as a stroke (outline). If false, the text will be drawn as a fill. **/
+	/** If true, the text will be drawn as a stroke (outline). If false, the text will be drawn as a fill. */
 	p.outline = false;
-	/** Indicates the line height (vertical distance between baselines) for multi-line text. If null, the value of getMeasuredLineHeight is used. **/
+	/** Indicates the line height (vertical distance between baselines) for multi-line text. If null, the value of getMeasuredLineHeight is used. */
 	p.lineHeight = null;
-	/** Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null, the text will not be wrapped. **/
+	/** Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null, the text will not be wrapped. */
 	p.lineWidth = null;
 	
 // constructor:
-	/** @private **/
+	/** @private */
 	p.DisplayObject_initialize = p.initialize;
-	/** @private **/
+	/** @ignore */
 	p.initialize = function(text, font, color) {
 		this.DisplayObject_initialize();
 		this.text = text;
@@ -85,8 +85,8 @@ Text._workingContext = canvas.getContext("2d");
 	}
 
 	p.DisplayObject_draw = p.draw;
-	p.draw = function(ctx,ignoreCache) {
-		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
+	p.draw = function(ctx, ignoreCache) {
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		
 		if (this.outline) { ctx.strokeStyle = this.color; }
 		else { ctx.fillStyle = this.color; }
@@ -146,14 +146,14 @@ Text._workingContext = canvas.getContext("2d");
 	}
 		
 	p.toString = function() {
-		return "[Text (text="+  (this.text.length > 20 ? this.text.substr(0,17)+"..." : this.text) +")]";
+		return "[Text (text="+  (this.text.length > 20 ? this.text.substr(0, 17)+"..." : this.text) +")]";
 	}
 	
 // private methods:
 	
-	/** @private **/
+	/** @private */
 	p.DisplayObject_cloneProps = p.cloneProps;
-	/** @private **/
+	/** @private */
 	p.cloneProps = function(o) {
 		this.DisplayObject_cloneProps(o);
 		o.textAlign = this.textAlign;

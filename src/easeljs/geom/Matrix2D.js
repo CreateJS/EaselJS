@@ -39,8 +39,8 @@
 * @param ty Specifies the ty property for the new matrix.
 * @class Represents an affine tranformation matrix, and provides tools for constructing and concatenating matrixes.
 **/
-function Matrix2D(a,b,c,d,tx,ty) {
-  this.initialize(a,b,c,d,tx,ty);
+function Matrix2D(a, b, c, d, tx, ty) {
+  this.initialize(a, b, c, d, tx, ty);
 }
 var p = Matrix2D.prototype;
 	
@@ -51,33 +51,33 @@ var p = Matrix2D.prototype;
 	**/
 	Matrix2D.identity = null; // set at bottom of class definition.
 
-	/** Multiplier for converting degrees to radians. Used internally by Matrix2D. **/
+	/** Multiplier for converting degrees to radians. Used internally by Matrix2D. */
 	Matrix2D.DEG_TO_RAD = Math.PI/180;
 
 	
 // public properties:
-	/** Position 0,0 in a 3x3 affine transformation matrix. **/
+	/** Position (0, 0) in a 3x3 affine transformation matrix. */
 	p.a = 1;
-	/** Position 0,1 in a 3x3 affine transformation matrix. **/
+	/** Position (0, 1) in a 3x3 affine transformation matrix. */
 	p.b = 0;
-	/** Position 1,0 in a 3x3 affine transformation matrix. **/
+	/** Position (1, 0) in a 3x3 affine transformation matrix. */
 	p.c = 0;
-	/** Position 1,1 in a 3x3 affine transformation matrix. **/
+	/** Position (1, 1) in a 3x3 affine transformation matrix. */
 	p.d = 1;
-	/** Position 2,0 in a 3x3 affine transformation matrix. **/
+	/** Position (2, 0) in a 3x3 affine transformation matrix. */
 	p.tx = 0;
-	/** Position 2,1 in a 3x3 affine transformation matrix. **/
+	/** Position (2, 1) in a 3x3 affine transformation matrix. */
 	p.ty = 0;
-	/** Property representing the alpha that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values. **/
+	/** Property representing the alpha that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values. */
 	p.alpha = 1;
-	/** Property representing the shadow that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values. **/
+	/** Property representing the shadow that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values. */
 	p.shadow  = null;
-	/** Property representing the compositeOperation that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated compositeOperation values. **/
+	/** Property representing the compositeOperation that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated compositeOperation values. */
 	p.compositeOperation  = null;
 	
 // constructor:
-	/** @private **/
-	p.initialize = function(a,b,c,d,tx,ty) {
+	/** @ignore */
+	p.initialize = function(a, b, c, d, tx, ty) {
 		if (a != null) { this.a = a; }
 		if (b != null) { this.b = b; }
 		if (c != null) { this.c = c; }

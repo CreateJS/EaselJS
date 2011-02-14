@@ -39,7 +39,7 @@
 	}
 	
 // private static properties:
-	/** @private **/
+	/** @private */
 	UID._nextID = 0;
 	
 	/**

@@ -40,13 +40,13 @@ function Container() {
 var p = Container.prototype = new DisplayObject();
 
 // public properties:
-	/** The array of children in the display list. You should usually use the child management methods, rather than accessing this directly, but it is included for advanced users. **/
+	/** The array of children in the display list. You should usually use the child management methods, rather than accessing this directly, but it is included for advanced users. */
 	p.children = null;
 
 // constructor:
-	/** @private **/
+	/** @private */
 	p.DisplayObject_initialize = p.initialize;
-	/** @private **/
+	/** @ignore */
 	p.initialize = function() {
 		this.DisplayObject_initialize();
 		this.children = [];
@@ -58,7 +58,7 @@ var p = Container.prototype = new DisplayObject();
 		return this.visible && this.alpha > 0 && this.children.length && this.scaleX != 0 && this.scaleY != 0;
 	}
 
-	/** @private **/
+	/** @private */
 	p.DisplayObject_draw = p.draw;
 	p.draw = function(ctx, ignoreCache, _mtx) {
 		var snap = Stage._snapToPixelEnabled;
@@ -66,7 +66,7 @@ var p = Container.prototype = new DisplayObject();
 			_mtx = new Matrix2D();
 			_mtx.appendProperties(this.alpha, this.shadow, this.compositeOperation);
 		}
-		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		var l = this.children.length;
 		// this ensures we don't have issues with display list changes that occur during a draw:
 		var list = this.children.slice(0);
@@ -119,7 +119,7 @@ var p = Container.prototype = new DisplayObject();
 		var l = arguments.length;
 		if (l > 2) {
 			index = arguments[i-1];
-			for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i],index+i); }
+			for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i], index+i); }
 			return arguments[l-2];
 		}
 		if (child.parent) { child.parent.removeChild(child); }
@@ -151,7 +151,7 @@ var p = Container.prototype = new DisplayObject();
 		if (l > 1) {
 			var a = [];
 			for (var i=0; i<l; i++) { a[i] = arguments[i]; }
-			a.sort(function(a,b) { return b-a; })
+			a.sort(function(a, b) { return b-a; })
 			var good = true;
 			for (var i=0; i<l; i++) { good = good && this.removeChildAt(a[i]); }
 			return good;
@@ -215,7 +215,7 @@ var p = Container.prototype = new DisplayObject();
 	
 	p.hitTest = function(x, y) {
 		// TODO: optimize to use the fast cache check where possible.
-		return (this.getObjectUnderPoint(x,y) != null);
+		return (this.getObjectUnderPoint(x, y) != null);
 	}
 
 	/**
@@ -261,7 +261,7 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 // private properties:
-	/** @private **/
+	/** @private */
 	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
 
 		var ctx = DisplayObject._hitTestContext;

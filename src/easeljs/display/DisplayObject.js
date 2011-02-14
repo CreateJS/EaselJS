@@ -38,84 +38,84 @@ function DisplayObject() {
 }
 var p = DisplayObject.prototype;
 
-/** Suppresses errors generated when using features like hitTest, onPress/onClick, and getObjectsUnderPoint with cross domain content. **/
+/** Suppresses errors generated when using features like hitTest, onPress/onClick, and getObjectsUnderPoint with cross domain content. */
 DisplayObject.suppressCrossDomainErrors = false;
 
-/** @private **/
+/** @private */
 DisplayObject._hitTestCanvas = document.createElement("canvas");
 DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
-/** @private **/
+/** @private */
 DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
-/** @private **/
+/** @private */
 DisplayObject._workingMatrix = new Matrix2D();
 
 // public properties:
-	/** The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque. **/
+	/** The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque. */
 	p.alpha = 1;
-	/** If a cache is active, this returns the canvas that holds the cached version of this display object. See cache() for more information. READ-ONLY. **/
+	/** If a cache is active, this returns the canvas that holds the cached version of this display object. See cache() for more information. READ-ONLY. */
 	p.cacheCanvas = null;
-	/** Unique ID for this display object. Makes display objects easier for some uses. **/
+	/** Unique ID for this display object. Makes display objects easier for some uses. */
 	p.id = -1;
-	/** Indicates whether to include this object when running Stage.getObjectsUnderPoint(). Setting this to true for Sprites will cause the Sprite to be returned (not its children) regardless of whether it's mouseChildren property is true. **/
+	/** Indicates whether to include this object when running Stage.getObjectsUnderPoint(). Setting this to true for Sprites will cause the Sprite to be returned (not its children) regardless of whether it's mouseChildren property is true. */
 	p.mouseEnabled = true;
-	/** An optional name for this display object. Included in toString(). Useful for debugging. **/
+	/** An optional name for this display object. Included in toString(). Useful for debugging. */
 	p.name = null;
-	/** A reference to the Sprite or Stage object that contains this display object, or null if it has not been added to one. READ-ONLY. **/
+	/** A reference to the Sprite or Stage object that contains this display object, or null if it has not been added to one. READ-ONLY. */
 	p.parent = null;
-	/** The x offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around it's center, you would set regX and regY to 50. **/
+	/** The x offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around it's center, you would set regX and regY to 50. */
 	p.regX = 0;
-	/** The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around it's center, you would set regX and regY to 50. **/
+	/** The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around it's center, you would set regX and regY to 50. */
 	p.regY = 0;
-	/** The rotation in degrees for this display object. **/
+	/** The rotation in degrees for this display object. */
 	p.rotation = 0;
-	/** The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display object to twice it's nominal width. **/
+	/** The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display object to twice it's nominal width. */
 	p.scaleX = 1;
-	/** The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display object to half it's nominal height. **/
+	/** The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display object to half it's nominal height. */
 	p.scaleY = 1;
-	/** The factor to skew this display object horizontally. **/
+	/** The factor to skew this display object horizontally. */
 	p.skewX = 0;
-	/** The factor to skew this display object vertically. **/
+	/** The factor to skew this display object vertically. */
 	p.skewY = 0;
-	/** A shadow object that defines the shadow to render on this display object. Set to null to remove a shadow. If null, this property is inherited from the parent container. **/
+	/** A shadow object that defines the shadow to render on this display object. Set to null to remove a shadow. If null, this property is inherited from the parent container. */
 	p.shadow = null;
-	/** Indicates whether this display object should be rendered to the canvas and included when running Stage.getObjectsUnderPoint(). **/
+	/** Indicates whether this display object should be rendered to the canvas and included when running Stage.getObjectsUnderPoint(). */
 	p.visible = true;
-	/** The x (horizontal) position of the display object, relative to its parent. **/
+	/** The x (horizontal) position of the display object, relative to its parent. */
 	p.x = 0;
-	/** The y (vertical) position of the display object, relative to its parent. **/
+	/** The y (vertical) position of the display object, relative to its parent. */
 	p.y = 0;
-	/** The composite operation indicates how the pixels of this display object will be composited with the elements behind it. If null, this property is inherited from the parent container. For more information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">whatwg spec on compositing</a>. **/
+	/** The composite operation indicates how the pixels of this display object will be composited with the elements behind it. If null, this property is inherited from the parent container. For more information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">whatwg spec on compositing</a>. */
 	p.compositeOperation = null;
-	/** Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage. This only applies if the enclosing stage has snapPixelsEnabled set to true, and the display object's composite transform does not include any scaling, rotation, or skewing. The snapToPixel property is true by default for Bitmap and BitmapSequence instances, and false for all other display objects. **/
+	/** Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage. This only applies if the enclosing stage has snapPixelsEnabled set to true, and the display object's composite transform does not include any scaling, rotation, or skewing. The snapToPixel property is true by default for Bitmap and BitmapSequence instances, and false for all other display objects. */
 	p.snapToPixel = false;
-	/** The onPress callback is called when the user presses down on their mouse over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. You can subscribe to the onMouseMove and onMouseUp callbacks of the event object to receive these events until the user releases the mouse button. If an onPress handler is set on a container, it will receive the event if any of its children are clicked. **/
+	/** The onPress callback is called when the user presses down on their mouse over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. You can subscribe to the onMouseMove and onMouseUp callbacks of the event object to receive these events until the user releases the mouse button. If an onPress handler is set on a container, it will receive the event if any of its children are clicked. */
 	p.onPress = null;
-	/** The onClick callback is called when the user presses down on and then releases the mouse button over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an onClick handler is set on a container, it will receive the event if any of its children are clicked. **/
+	/** The onClick callback is called when the user presses down on and then releases the mouse button over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an onClick handler is set on a container, it will receive the event if any of its children are clicked. */
 	p.onClick = null;
 	
 // private properties:
-	/** @private **/
+	/** @private */
 	p._cacheOffsetX = 0;
-	/** @private **/
+	/** @private */
 	p._cacheOffsetY = 0;
-	/** @private **/
+	/** @private */
 	p._cacheDraw = false;
-	/** @private **/
+	/** @private */
 	p._activeContext = null;
-	/** @private **/
+	/** @private */
 	p._restoreContext = false;
-	/** @private **/
+	/** @private */
 	p._revertShadow = false;
-	/** @private **/
+	/** @private */
 	p._revertX = 0;
-	/** @private **/
+	/** @private */
 	p._revertY = 0;
-	/** @private **/
+	/** @private */
 	p._revertAlpha = 1;
 	
 // constructor:
 	// separated so it can be easily addressed in subclasses:
-	/** @private **/
+	/** @ignore */
 	p.initialize = function() {
 		this.id = UID.get();
 		this.children = [];
@@ -139,16 +139,16 @@ DisplayObject._workingMatrix = new Matrix2D();
 	 * @param ignoreCache Indicates whether the draw operation should ignore any current cache. For example,
 	 * used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
 	 **/
-	p.draw = function(ctx,ignoreCache) {
+	p.draw = function(ctx, ignoreCache) {
 		if (ignoreCache || !this.cacheCanvas) { return false; }
-		ctx.translate(this._cacheOffsetX,this._cacheOffsetY);
-		ctx.drawImage(this.cacheCanvas,0,0);
-		ctx.translate(-this._cacheOffsetX,-this._cacheOffsetY);
+		ctx.translate(this._cacheOffsetX, this._cacheOffsetY);
+		ctx.drawImage(this.cacheCanvas, 0, 0);
+		ctx.translate(-this._cacheOffsetX, -this._cacheOffsetY);
 		return true;
 	}
 	
 	/**
-	* Draws the display object into a new canvas, which is then used for subsequent draws. For complex content that does not change frequently (ex. a Sprite with many children that do not move, or a complex vector Shape), this can provide for much faster rendering because the content does not need to be re-rendered each tick. The cached display object can be moved, rotated, faded, etc freely, however if it's content changes, you must manually update the cache by calling updateCache() or cache() again. You must specify the cache area via the x, y, w, and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates. For example if you defined a Shape that drew a circle at 0,0 with a radius of 25, you could call myShape.cache(-25,-25,50,50) to cache the full shape.
+	* Draws the display object into a new canvas, which is then used for subsequent draws. For complex content that does not change frequently (ex. a Sprite with many children that do not move, or a complex vector Shape), this can provide for much faster rendering because the content does not need to be re-rendered each tick. The cached display object can be moved, rotated, faded, etc freely, however if it's content changes, you must manually update the cache by calling updateCache() or cache() again. You must specify the cache area via the x, y, w, and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates. For example if you defined a Shape that drew a circle at 0, 0 with a radius of 25, you could call myShape.cache(-25, -25, 50, 50) to cache the full shape.
 	* @param x
 	* @param y
 	* @param width
@@ -161,9 +161,9 @@ DisplayObject._workingMatrix = new Matrix2D();
 		ctx = this.cacheCanvas.getContext("2d");
 		this.cacheCanvas.width = width;
 		this.cacheCanvas.height = height;
-		ctx.setTransform(1,0,0,1,-x,-y);
-		ctx.clearRect(0,0,width+1,height+1); // because some browsers don't correctly clear if the width/height remain the same.
-		this.draw(ctx,true);
+		ctx.setTransform(1, 0, 0, 1, -x, -y);
+		ctx.clearRect(0, 0, width+1, height+1); // because some browsers don't correctly clear if the width/height remain the same.
+		this.draw(ctx, true);
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
 	}
@@ -177,10 +177,10 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.updateCache = function(compositeOperation) {
 		if (this.cacheCanvas == null) { throw "cache() must be called before updateCache()"; }
 		var ctx = this.cacheCanvas.getContext("2d");
-		ctx.setTransform(1,0,0,1,-this._cacheOffsetX,-this._cacheOffsetY);
-		if (!compositeOperation) { ctx.clearRect(0,0,this.cacheCanvas.width+1,this.cacheCanvas.height+1); }
+		ctx.setTransform(1, 0, 0, 1, -this._cacheOffsetX, -this._cacheOffsetY);
+		if (!compositeOperation) { ctx.clearRect(0, 0, this.cacheCanvas.width+1, this.cacheCanvas.height+1); }
 		else { ctx.globalCompositeOperation = compositeOperation; }
-		this.draw(ctx,true);
+		this.draw(ctx, true);
 		if (compositeOperation) { ctx.globalCompositeOperation = "source-over"; }
 	}
 	
@@ -215,7 +215,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.localToGlobal = function(x, y) {
 		var mtx = this.getConcatenatedMatrix();
 		if (mtx == null) { return null; }
-		mtx.append(1,0,0,1,x,y);
+		mtx.append(1, 0, 0, 1, x, y);
 		return new Point(mtx.tx, mtx.ty);
 	}
 
@@ -231,7 +231,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		var mtx = this.getConcatenatedMatrix();
 		if (mtx == null) { return null; }
 		mtx.invert();
-		mtx.append(1,0,0,1,x,y);
+		mtx.append(1, 0, 0, 1, x, y);
 		return new Point(mtx.tx, mtx.ty);
 	}
 
@@ -308,7 +308,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 // private methods:
 
 	// separated so it can be used more easily in subclasses:
-	/** @private **/
+	/** @private */
 	p.cloneProps = function(o) {
 		o.alpha = this.alpha;
 		o.name = this.name;
@@ -327,7 +327,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		o.compositeOperation = this.compositeOperation;
 	}
 	
-	/** @private **/
+	/** @private */
 	p.applyShadow = function(ctx, shadow) {
 		ctx.shadowColor = shadow.color;
 		ctx.shadowOffsetX = shadow.offsetX;
@@ -335,10 +335,10 @@ DisplayObject._workingMatrix = new Matrix2D();
 		ctx.shadowBlur = shadow.blur;
 	}
 
-	/** @private **/
+	/** @private */
 	p._testHit = function(ctx) {
 		try {
-			var hit = ctx.getImageData(0,0,1,1).data[3] > 1;
+			var hit = ctx.getImageData(0, 0, 1, 1).data[3] > 1;
 		} catch (e) {
 			if (!DisplayObject.suppressCrossDomainErrors) {
 				throw "An error has occured. This is most likely due to security restrictions on reading canvas pixel data with local or cross-domain images.";

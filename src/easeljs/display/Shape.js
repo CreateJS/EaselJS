@@ -43,13 +43,13 @@ function Shape(graphics) {
 var p = Shape.prototype = new DisplayObject();
 
 // public properties:
-	/** The graphics instance to display.  **/
+	/** The graphics instance to display.  */
 	p.graphics = null;
 	
 // constructor:
-	/** @private **/
+	/** @private */
 	p.DisplayObject_initialize = p.initialize;
-	/** @private **/
+	/** @ignore */
 	p.initialize = function(graphics) {
 		this.DisplayObject_initialize();
 		this.graphics = graphics ? graphics : new Graphics();
@@ -61,8 +61,8 @@ var p = Shape.prototype = new DisplayObject();
 	}
 
 	p.DisplayObject_draw = p.draw;
-	p.draw = function(ctx,ignoreCache) {
-		if (this.DisplayObject_draw(ctx,ignoreCache)) { return true; }
+	p.draw = function(ctx, ignoreCache) {
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this.graphics.draw(ctx);
 		return true;
 	}

@@ -131,7 +131,7 @@ var p = SpaceRock.prototype = new Shape();
 		if(tY + tHit < this.y - this.hit) { return; }
 		
 		//now do the circle distance test
-		return this.hit + tHit > Math.sqrt(Math.pow(Math.abs(this.x - tX),2) + Math.pow(Math.abs(this.y - tY),2));
+		return this.hit + tHit > Math.sqrt(Math.pow(Math.abs(this.x - tX), 2) + Math.pow(Math.abs(this.y - tY), 2));
 	}
 
 

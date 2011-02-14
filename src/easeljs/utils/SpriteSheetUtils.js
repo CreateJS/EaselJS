@@ -38,9 +38,9 @@
 		throw "SpriteSheetUtils cannot be instantiated"; 
 	}
 
-	/** @private **/
+	/** @private */
 	SpriteSheetUtils._workingCanvas = document.createElement("canvas");
-	/** @private **/
+	/** @private */
 	SpriteSheetUtils._workingContext = SpriteSheetUtils._workingCanvas.getContext("2d");
 	
 // public static methods:
@@ -77,9 +77,9 @@
 		var map = [];
 		var frCount = 0;
 		var i = 0;
-		for (var n in flipData) {
+		for (n in flipData) {
 			var fd = flipData[n];
-			var data = frameData[fd[0]];
+			data = frameData[fd[0]];
 			if (data ==  null) { continue; }
 			if (data instanceof Array) {
 				var start = data[0];
@@ -104,7 +104,7 @@
 		
 		// draw the new frames, and update the new frameData:
 		var frame = ttlFrames-1;
-		for (var i=0; i<map.length; i+=4) {
+		for (i=0; i<map.length; i+=4) {
 			n = map[i];
 			start = map[i+1];
 			end = map[i+2];

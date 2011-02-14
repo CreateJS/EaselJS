@@ -30,16 +30,16 @@
 (function(window) {
 
 // used to create the instruction lists used in Graphics:
-/** @private **/
+/** @private */
 function Command(f, params) {
 	this.f = f;
 	this.params = params;
 }
-Command.prototype.exec = function(scope) { this.f.apply(scope,this.params); }
+Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 
 /**
 * Constructs a new Graphics instance.
-* @param instructions Optional. This is a string that will be eval'ed in the scope of this Graphics object. This provides a mechanism for generating a vector shape from a serialized string. Ex. "beginFill('#F00');drawRect(0,0,10,10);"
+* @param instructions Optional. This is a string that will be eval'ed in the scope of this Graphics object. This provides a mechanism for generating a vector shape from a serialized string. Ex. "beginFill('#F00');drawRect(0, 0, 10, 10);"
 * @class The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a specified context.
 * Note that you can use Graphics without any dependency on the Easel framework by calling draw() directly,
 * or it can be used with the Shape object to draw vector graphics within the context of an Easel display list.<br/><br/>
@@ -55,7 +55,7 @@ var p = Graphics.prototype;
 	
 	/**
 	* Returns a CSS compatible color string based on the specified RGB numeric color values in the format "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)". For example,
-	* Graphics.getRGB(50,100,150,0.5) will return "rgba(50,100,150,0.5)". It also supports passing a single hex color value as the first param, and an optional alpha value as the second param. For example,
+	* Graphics.getRGB(50, 100, 150, 0.5) will return "rgba(50,100,150,0.5)". It also supports passing a single hex color value as the first param, and an optional alpha value as the second param. For example,
 	* Graphics.getRGB(0xFF00FF, 0.2) will return "rgba(255,0,255,0.2)".
 	* @param r The red component for the color, between 0 and 0xFF (255).
 	* @param g The green component for the color, between 0 and 0xFF (255).
@@ -79,7 +79,7 @@ var p = Graphics.prototype;
 	
 	/**
 	* Returns a CSS compatible color string based on the specified HSL numeric color values in the format "hsla(360,100,100,1.0)", or if alpha is null then in the format "hsl(360,100,100)". For example,
-	* Graphics.getHSL(150,100,70) will return "hsl(150,100,70)".
+	* Graphics.getHSL(150, 100, 70) will return "hsl(150,100,70)".
 	* @param hue The hue component for the color, between 0 and 360.
 	* @param saturation The saturation component for the color, between 0 and 100.
 	* @param lightness The lightness component for the color, between 0 and 100.
@@ -118,25 +118,25 @@ var p = Graphics.prototype;
 	Graphics.strokeCmd = new Command(Graphics._ctx.stroke, []);
 
 // public properties:
-	/** @private **/
+	/** @private */
 	p._strokeInstructions = null;
-	/** @private **/
+	/** @private */
 	p._strokeStyleInstructions = null;
-	/** @private **/
+	/** @private */
 	p._fillInstructions = null;
-	/** @private **/
+	/** @private */
 	p._instructions = null;
-	/** @private **/
+	/** @private */
 	p._oldInstructions = null;
-	/** @private **/
+	/** @private */
 	p._activeInstructions = null;
-	/** @private **/
+	/** @private */
 	p._active = false;
-	/** @private **/
+	/** @private */
 	p._dirty = false;
 	
 // constructor:
-	/** @private **/
+	/** @ignore */
 	p.initialize = function(instructions) {
 		this.clear();
 		this._ctx = Graphics._ctx;
@@ -191,7 +191,7 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Draws an arc defined by the radius, startAngle and endAngle arguments, centered at the position (x,y). For example arc(100,100,20,0,Math.PI*2) would draw a full circle with a radius of 20 centered at 100,100. For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
+	* Draws an arc defined by the radius, startAngle and endAngle arguments, centered at the position (x, y). For example arc(100, 100, 20, 0, Math.PI*2) would draw a full circle with a radius of 20 centered at (100, 100). For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
 	* @param x
 	* @param y
 	* @param radius
@@ -207,7 +207,7 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Draws a quadratic curve from the current drawing point to (x,y) using the control point (cpx,cpy).  For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
+	* Draws a quadratic curve from the current drawing point to (x, y) using the control point (cpx, cpy).  For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
 	* @param cpx
 	* @param cpy
 	* @param x
@@ -220,7 +220,7 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Draws a bezier curve from the current drawing point to (x,y) using the control points (cp1x,cp1y) and (cp2x,cp2y).  For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
+	* Draws a bezier curve from the current drawing point to (x, y) using the control points (cp1x, cp1y) and (cp2x, cp2y).  For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
 	* @param cp1x
 	* @param cp1y
 	* @param cp2x
@@ -235,7 +235,7 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Draws a rectangle at (x,y) with the specified width and height using the current fill and/or stroke.
+	* Draws a rectangle at (x, y) with the specified width and height using the current fill and/or stroke.
 	*  For detailed information, read the 
 	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
 	* whatwg spec</a>.
@@ -246,7 +246,7 @@ var p = Graphics.prototype;
 	**/
 	p.rect = function(x, y, w, h) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.rect, [x,y,w-1,h]));
+		this._activeInstructions.push(new Command(this._ctx.rect, [x, y, w-1, h]));
 		return this;
 	}
 	
@@ -287,10 +287,10 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Begins a linear gradient fill defined by the line (x0,y0) to (x1,y1). This ends the current subpath. For example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a square to display it:<br/>
-	* myGraphics.beginLinearGradientFill(["#000","#FFF"], [0,1], 0, 20, 0, 120).drawRect(20,20,120,120);
+	* Begins a linear gradient fill defined by the line (x0, y0) to (x1, y1). This ends the current subpath. For example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a square to display it:<br/>
+	* myGraphics.beginLinearGradientFill(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
 	* @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
-	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1,0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
 	* @param x0 The position of the first point defining the line that defines the gradient direction and size.
 	* @param y0 The position of the first point defining the line that defines the gradient direction and size.
 	* @param x1 The position of the second point defining the line that defines the gradient direction and size.
@@ -300,17 +300,17 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		var o = this._ctx.createLinearGradient(x0, y0, x1, y1);
 		for (var i=0, l=colors.length; i<l; i++) {
-			o.addColorStop(ratios[i],colors[i]);
+			o.addColorStop(ratios[i], colors[i]);
 		}
 		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
 		return this;
 	}
 	
 	/**
-	* Begins a radial gradient fill. This ends the current subpath. For example, the following code defines a red to blue radial gradient centered at (100,100), with a radius of 50, and draws a circle to display it:<br/>
-	* myGraphics.beginRadialGradientFill(["#F00","#00F"], [0,1], 100, 100, 0, 100, 100, 50).drawCircle(100, 100, 50);
+	* Begins a radial gradient fill. This ends the current subpath. For example, the following code defines a red to blue radial gradient centered at (100, 100), with a radius of 50, and draws a circle to display it:<br/>
+	* myGraphics.beginRadialGradientFill(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50).drawCircle(100, 100, 50);
 	* @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
-	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1,0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
 	* @param x0 Center position of the inner circle that defines the gradient.
 	* @param y0 Center position of the inner circle that defines the gradient.
 	* @param r0 Radius of the inner circle that defines the gradient.
@@ -322,7 +322,7 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		var o = this._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
 		for (var i=0, l=colors.length; i<l; i++) {
-			o.addColorStop(ratios[i],colors[i]);
+			o.addColorStop(ratios[i], colors[i]);
 		}
 		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
 		return this;
@@ -379,10 +379,10 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Begins a linear gradient stroke defined by the line (x0,y0) to (x1,y1). This ends the current subpath. For example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a square to display it:<br/>
-	* myGraphics.setStrokeStyle(10).beginLinearGradientStroke(["#000","#FFF"], [0,1], 0, 20, 0, 120).drawRect(20,20,120,120);
+	* Begins a linear gradient stroke defined by the line (x0, y0) to (x1, y1). This ends the current subpath. For example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a square to display it:<br/>
+	* myGraphics.setStrokeStyle(10).beginLinearGradientStroke(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
 	* @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
-	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1,0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
 	* @param x0 The position of the first point defining the line that defines the gradient direction and size.
 	* @param y0 The position of the first point defining the line that defines the gradient direction and size.
 	* @param x1 The position of the second point defining the line that defines the gradient direction and size.
@@ -392,7 +392,7 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		var o = this._ctx.createLinearGradient(x0, y0, x1, y1);
 		for (var i=0, l=colors.length; i<l; i++) {
-			o.addColorStop(ratios[i],colors[i]);
+			o.addColorStop(ratios[i], colors[i]);
 		}
 		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
 		return this;
@@ -400,10 +400,10 @@ var p = Graphics.prototype;
 	
 	
 	/**
-	* Begins a radial gradient stroke. This ends the current subpath. For example, the following code defines a red to blue radial gradient centered at (100,100), with a radius of 50, and draws a rectangle to display it:<br/>
-	* myGraphics.setStrokeStyle(10).beginRadialGradientStroke(["#F00","#00F"], [0,1], 100, 100, 0, 100, 100, 50).drawRect(50,90,150,110);
+	* Begins a radial gradient stroke. This ends the current subpath. For example, the following code defines a red to blue radial gradient centered at (100, 100), with a radius of 50, and draws a rectangle to display it:<br/>
+	* myGraphics.setStrokeStyle(10).beginRadialGradientStroke(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50).drawRect(50, 90, 150, 110);
 	* @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
-	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1,0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color to 100%.
+	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color to 100%.
 	* @param x0 Center position of the inner circle that defines the gradient.
 	* @param y0 Center position of the inner circle that defines the gradient.
 	* @param r0 Radius of the inner circle that defines the gradient.
@@ -415,7 +415,7 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		var o = this._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
 		for (var i=0, l=colors.length; i<l; i++) {
-			o.addColorStop(ratios[i],colors[i]);
+			o.addColorStop(ratios[i], colors[i]);
 		}
 		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
 		return this;
@@ -480,8 +480,8 @@ var p = Graphics.prototype;
 	p.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(
-			new Command(this._ctx.moveTo, [x+radiusTL,y]),
-			new Command(this._ctx.lineTo, [x+w-radiusTR,y]),
+			new Command(this._ctx.moveTo, [x+radiusTL, y]),
+			new Command(this._ctx.lineTo, [x+w-radiusTR, y]),
 			new Command(this._ctx.arc, [x+w-radiusTR, y+radiusTR, radiusTR, (-Math.PI/2), 0, false]),
 			new Command(this._ctx.lineTo, [x+w, y+h-radiusBR]),
 			new Command(this._ctx.arc, [x+w-radiusBR, y+h-radiusBR, radiusBR, 0, Math.PI/2, false]),
@@ -494,7 +494,7 @@ var p = Graphics.prototype;
 	} 
 	
 	/**
-	* Draws a circle with the specified radius at (x,y).
+	* Draws a circle with the specified radius at (x, y).
 	* @param x
 	* @param y
 	* @param radius
@@ -533,7 +533,7 @@ var p = Graphics.prototype;
 	
 	/**
 	* Draws a star if pointSize is greater than 0 or a regular polygon if pointSize is 0 with the specified number of points.
-	* For example, the following code will draw a familiar 5 pointed star shape centered at 100,100 and with a radius of 50:
+	* For example, the following code will draw a familiar 5 pointed star shape centered at 100, 100 and with a radius of 50:
 	* myGraphics.beginFill("#FF0").drawPolyStar(100, 100, 50, 5, 0.6, -90); // -90 makes the first point vertical
 	* @param x Position of the center of the shape.
 	* @param y Position of the center of the shape.
@@ -582,81 +582,81 @@ var p = Graphics.prototype;
 	
 	
 // tiny API:
-	/** Shortcut to moveTo. **/
+	/** Shortcut to moveTo. */
 	p.mt = p.moveTo;
-	/** Shortcut to lineTo. **/
+	/** Shortcut to lineTo. */
 	p.lt = p.lineTo;
-	/** Shortcut to arcTo. **/
+	/** Shortcut to arcTo. */
 	p.at = p.arcTo;
-	/** Shortcut to bezierCurveTo. **/
+	/** Shortcut to bezierCurveTo. */
 	p.bt = p.bezierCurveTo;
-	/** Shortcut to quadraticCurveTo / curveTo. **/
+	/** Shortcut to quadraticCurveTo / curveTo. */
 	p.qt = p.quadraticCurveTo;
-	/** Shortcut to arc. **/
+	/** Shortcut to arc. */
 	p.a = p.arc;
-	/** Shortcut to rect. **/
+	/** Shortcut to rect. */
 	p.r = p.rect;
-	/** Shortcut to closePath. **/
+	/** Shortcut to closePath. */
 	p.cp = p.closePath;
-	/** Shortcut to clear. **/
+	/** Shortcut to clear. */
 	p.c = p.clear;
-	/** Shortcut to beginFill. **/
+	/** Shortcut to beginFill. */
 	p.f = p.beginFill;
-	/** Shortcut to beginLinearGradientFill. **/
+	/** Shortcut to beginLinearGradientFill. */
 	p.lf = p.beginLinearGradientFill;
-	/** Shortcut to beginRadialGradientFill. **/
+	/** Shortcut to beginRadialGradientFill. */
 	p.rf = p.beginRadialGradientFill;
-	/** Shortcut to beginBitmapFill. **/
+	/** Shortcut to beginBitmapFill. */
 	p.bf = p.beginBitmapFill;
-	/** Shortcut to endFill. **/
+	/** Shortcut to endFill. */
 	p.ef = p.endFill;
-	/** Shortcut to setStrokeStyle. **/
+	/** Shortcut to setStrokeStyle. */
 	p.ss = p.setStrokeStyle;
-	/** Shortcut to beginStroke. **/
+	/** Shortcut to beginStroke. */
 	p.s = p.beginStroke;
-	/** Shortcut to beginLinearGradientStroke. **/
+	/** Shortcut to beginLinearGradientStroke. */
 	p.ls = p.beginLinearGradientStroke;
-	/** Shortcut to beginRadialGradientStroke. **/
+	/** Shortcut to beginRadialGradientStroke. */
 	p.rs = p.beginRadialGradientStroke;
-	/** Shortcut to beginBitmapStroke. **/
+	/** Shortcut to beginBitmapStroke. */
 	p.bs = p.beginBitmapStroke;
-	/** Shortcut to endStroke. **/
+	/** Shortcut to endStroke. */
 	p.es = p.endStroke;
-	/** Shortcut to drawRect. **/
+	/** Shortcut to drawRect. */
 	p.dr = p.drawRect;
-	/** Shortcut to drawRoundRect. **/
+	/** Shortcut to drawRoundRect. */
 	p.rr = p.drawRoundRect;
-	/** Shortcut to drawRoundRectComplex. **/
+	/** Shortcut to drawRoundRectComplex. */
 	p.rc = p.drawRoundRectComplex;
-	/** Shortcut to drawCircle. **/
+	/** Shortcut to drawCircle. */
 	p.dc = p.drawCircle;
-	/** Shortcut to drawEllipse. **/
+	/** Shortcut to drawEllipse. */
 	p.de = p.drawEllipse;
-	/** Shortcut to drawPolyStar. **/
+	/** Shortcut to drawPolyStar. */
 	p.dp = p.drawPolyStar;
 	
 	
 // private methods:
-	/** @private **/
+	/** @private */
 	p._updateInstructions = function() {
 		this._instructions = this._oldInstructions.slice()
 		this._instructions.push(Graphics.beginCmd);
 		 
-		if (this._fillInstructions) { this._instructions.push.apply(this._instructions,this._fillInstructions); }
+		if (this._fillInstructions) { this._instructions.push.apply(this._instructions, this._fillInstructions); }
 		if (this._strokeInstructions) {
-			this._instructions.push.apply(this._instructions,this._strokeInstructions);
+			this._instructions.push.apply(this._instructions, this._strokeInstructions);
 			if (this._strokeStyleInstructions) {
-				this._instructions.push.apply(this._instructions,this._strokeStyleInstructions);
+				this._instructions.push.apply(this._instructions, this._strokeStyleInstructions);
 			}
 		}
 		
-		this._instructions.push.apply(this._instructions,this._activeInstructions);
+		this._instructions.push.apply(this._instructions, this._activeInstructions);
 		
 		if (this._fillInstructions) { this._instructions.push(Graphics.fillCmd); }
 		if (this._strokeInstructions) { this._instructions.push(Graphics.strokeCmd); }
 	}
 	
-	/** @private **/
+	/** @private */
 	p._newPath = function() {
 		if (this._dirty) { this._updateInstructions(); }
 		this._oldInstructions = this._instructions;
@@ -665,7 +665,7 @@ var p = Graphics.prototype;
 	}
 	
 	// used to create Commands that set properties:
-	/** @private **/
+	/** @private */
 	p._setProp = function(name, value) {
 		this[name] = value;
 	}

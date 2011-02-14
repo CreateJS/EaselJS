@@ -42,29 +42,29 @@
 	}
 	
 // private static properties:
-	/** @private **/
+	/** @private */
 	Ticker._listeners = [];
-	/** @private **/
+	/** @private */
 	Ticker._pauseable = [];
-	/** @private **/
+	/** @private */
 	Ticker._paused = false;
-	/** @private **/
+	/** @private */
 	Ticker._inited = false;
-	/** @private **/
+	/** @private */
 	Ticker._startTime = 0;
-	/** @private **/
+	/** @private */
 	Ticker._pausedTime=0;
-	/** @private : number of ticks that have passed **/
+	/** @private : number of ticks that have passed */
 	Ticker._ticks = 0;
-	/** @private : number of ticks that have passed while Ticker has been paused **/
+	/** @private : number of ticks that have passed while Ticker has been paused */
 	Ticker._pausedTickers = 0;
-	/** @private **/
+	/** @private */
 	Ticker._interval = 50; // READ-ONLY
-	/** @private **/
+	/** @private */
 	Ticker._intervalID = null;
-	/** @private **/
+	/** @private */
 	Ticker._lastTime = 0;
-	/** @private **/
+	/** @private */
 	Ticker._times = [];
 	
 // public static methods:
@@ -97,8 +97,8 @@
 		if (Ticker._listeners == null) { return; }
 		var index = Ticker._listeners.indexOf(o);
 		if (index != -1) {
-			Ticker._listeners.splice(index,1);
-			Ticker._pauseable.splice(index,1);
+			Ticker._listeners.splice(index, 1);
+			Ticker._pauseable.splice(index, 1);
 		}
 	}
 	
@@ -161,7 +161,7 @@
 		
 		// x >> 1 : use bitwise to divide by two (int math)
 		if (ticks == null) { ticks = Ticker.getFPS()>>1; }
-		ticks = Math.min(Ticker._times.length-1,ticks);
+		ticks = Math.min(Ticker._times.length-1, ticks);
 		return 1000/((Ticker._times[0]-Ticker._times[ticks])/ticks);
 	}
 	
@@ -203,7 +203,7 @@
 	}
 	
 // private static methods:
-	/** @private **/
+	/** @private */
 	Ticker._tick = function() {
 		Ticker._ticks++;
 		
@@ -232,7 +232,7 @@
 		if (Ticker._times.length > 100) { Ticker._times.pop(); }
 	}
 	
-	/** @private **/
+	/** @private */
 	Ticker._getTime = function() {
 		return new Date().getTime();
 	}
