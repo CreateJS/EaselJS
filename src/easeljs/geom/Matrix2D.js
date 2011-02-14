@@ -42,7 +42,6 @@
 function Matrix2D(a, b, c, d, tx, ty) {
   this.initialize(a, b, c, d, tx, ty);
 }
-var p = Matrix2D.prototype;
 	
 // static public properties:
 	/**
@@ -57,27 +56,27 @@ var p = Matrix2D.prototype;
 	
 // public properties:
 	/** Position (0, 0) in a 3x3 affine transformation matrix. */
-	p.a = 1;
+	Matrix2D.prototype.a = 1;
 	/** Position (0, 1) in a 3x3 affine transformation matrix. */
-	p.b = 0;
+	Matrix2D.prototype.b = 0;
 	/** Position (1, 0) in a 3x3 affine transformation matrix. */
-	p.c = 0;
+	Matrix2D.prototype.c = 0;
 	/** Position (1, 1) in a 3x3 affine transformation matrix. */
-	p.d = 1;
+	Matrix2D.prototype.d = 1;
 	/** Position (2, 0) in a 3x3 affine transformation matrix. */
-	p.tx = 0;
+	Matrix2D.prototype.tx = 0;
 	/** Position (2, 1) in a 3x3 affine transformation matrix. */
-	p.ty = 0;
+	Matrix2D.prototype.ty = 0;
 	/** Property representing the alpha that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values. */
-	p.alpha = 1;
+	Matrix2D.prototype.alpha = 1;
 	/** Property representing the shadow that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values. */
-	p.shadow  = null;
+	Matrix2D.prototype.shadow  = null;
 	/** Property representing the compositeOperation that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated compositeOperation values. */
-	p.compositeOperation  = null;
+	Matrix2D.prototype.compositeOperation  = null;
 	
 // constructor:
 	/** @ignore */
-	p.initialize = function(a, b, c, d, tx, ty) {
+	Matrix2D.prototype.initialize = function(a, b, c, d, tx, ty) {
 		if (a != null) { this.a = a; }
 		if (b != null) { this.b = b; }
 		if (c != null) { this.c = c; }
@@ -90,7 +89,7 @@ var p = Matrix2D.prototype;
 	/**
 	* Concatenates the specified matrix properties with this matrix. You must provide values for all of the parameters.
 	**/
-	p.prepend = function(a, b, c, d, tx, ty) {
+	Matrix2D.prototype.prepend = function(a, b, c, d, tx, ty) {
 		var tx1 = this.tx;
 		if (a != 1 || b != 0 || c != 0 || d != 1) {
 			var a1 = this.a;
@@ -104,7 +103,7 @@ var p = Matrix2D.prototype;
 		this.ty = tx1*b+this.ty*d+ty;
 	}
 
-	p.append = function(a, b, c, d, tx, ty) {
+	Matrix2D.prototype.append = function(a, b, c, d, tx, ty) {
 		var a1 = this.a;
 		var b1 = this.b;
 		var c1 = this.c;
@@ -121,7 +120,7 @@ var p = Matrix2D.prototype;
 	/**
 	* Prepends the specified matrix with this matrix.
 	**/
-	p.prependMatrix = function(matrix) {
+	Matrix2D.prototype.prependMatrix = function(matrix) {
 		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 		this.prependProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
 	}
@@ -129,7 +128,7 @@ var p = Matrix2D.prototype;
 	/**
 	* Appends the specified matrix with this matrix.
 	**/
-	p.appendMatrix = function(matrix) {
+	Matrix2D.prototype.appendMatrix = function(matrix) {
 		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 		this.appendProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
 	}
@@ -147,7 +146,7 @@ var p = Matrix2D.prototype;
 	 * @param regX Optional.
 	 * @param regY Optional.
 	**/
-	p.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+	Matrix2D.prototype.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
@@ -186,7 +185,7 @@ var p = Matrix2D.prototype;
 	 * @param regX Optional.
 	 * @param regY Optional.
 	**/
-	p.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+	Matrix2D.prototype.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
@@ -217,7 +216,7 @@ var p = Matrix2D.prototype;
 	 * Applies a rotation transformation to the matrix.
 	 * @param angle The angle in degrees.
 	 **/
-	p.rotate = function(angle) {
+	Matrix2D.prototype.rotate = function(angle) {
 		var cos = Math.cos(angle);
 		var sin = Math.sin(angle);
 		
@@ -238,7 +237,7 @@ var p = Matrix2D.prototype;
 	 * @param skewX The amount to skew horizontally in degrees.
 	 * @param skewY The amount to skew vertically in degrees.
 	 */
-	p.skew = function(skewX, skewY) {
+	Matrix2D.prototype.skew = function(skewX, skewY) {
 		skewX = skewX*Matrix2D.DEG_TO_RAD;
 		skewY = skewY*Matrix2D.DEG_TO_RAD;
 		this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
@@ -247,7 +246,7 @@ var p = Matrix2D.prototype;
 	/**
 	* Applies a scale transformation to the matrix.
 	**/
-	p.scale = function(x, y) {
+	Matrix2D.prototype.scale = function(x, y) {
 		this.a *= x;
 		this.d *= y;
 		this.tx *= x;
@@ -257,7 +256,7 @@ var p = Matrix2D.prototype;
 	/**
 	* Translates the matrix on the x and y axes.
 	**/
-	p.translate = function(x, y) {
+	Matrix2D.prototype.translate = function(x, y) {
 		this.tx += x;
 		this.ty += y;
 	}
@@ -265,7 +264,7 @@ var p = Matrix2D.prototype;
 	/**
 	* Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
 	**/
-	p.identity = function() {
+	Matrix2D.prototype.identity = function() {
 		this.alpha = this.a = this.d = 1;
 		this.b = this.c = this.tx = this.ty = 0;
 		this.shadow = this.compositeOperation = null;
@@ -274,7 +273,7 @@ var p = Matrix2D.prototype;
 	/**
 	* Inverts the matrix, causing it to perform the opposite transformation.
 	**/
-	p.invert = function() {
+	Matrix2D.prototype.invert = function() {
 		var a1 = this.a;
 		var b1 = this.b;
 		var c1 = this.c;
@@ -296,7 +295,7 @@ var p = Matrix2D.prototype;
 	 * results.
 	 * @param target The object to apply the transform properties to. If null, then a new object will be returned.
 	 */
-	p.decompose = function(target) {
+	Matrix2D.prototype.decompose = function(target) {
 		// TODO: it would be nice to be able to solve for whether the matrix can be decomposed into only scale/rotation even when scale is negative
 		if (target == null) { target = {}; }
 		target.x = this.tx;
@@ -326,7 +325,7 @@ var p = Matrix2D.prototype;
 	 * @param shadow desired shadow value
 	 * @param compositeOperation desired composite operation value
 	 */
-	p.appendProperties = function(alpha, shadow, compositeOperation) {
+	Matrix2D.prototype.appendProperties = function(alpha, shadow, compositeOperation) {
 		this.alpha *= alpha;
 		this.shadow = shadow || this.shadow;
 		this.compositeOperation = compositeOperation || this.compositeOperation;
@@ -338,7 +337,7 @@ var p = Matrix2D.prototype;
 	 * @param shadow desired shadow value
 	 * @param compositeOperation desired composite operation value
 	 */
-	p.prependProperties = function(alpha, shadow, compositeOperation) {
+	Matrix2D.prototype.prependProperties = function(alpha, shadow, compositeOperation) {
 		this.alpha *= alpha;
 		this.shadow = this.shadow || shadow;
 		this.compositeOperation = this.compositeOperation || compositeOperation;
@@ -347,7 +346,7 @@ var p = Matrix2D.prototype;
 	/**
 	* Returns a clone of this Matrix.
 	**/
-	p.clone = function() {
+	Matrix2D.prototype.clone = function() {
 		var mtx = new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
 		mtx.shadow = this.shadow;
 		mtx.alpha = this.alpha;
@@ -358,7 +357,7 @@ var p = Matrix2D.prototype;
 	/**
 	* Returns a string representation of this object.
 	**/
-	p.toString = function() {
+	Matrix2D.prototype.toString = function() {
 		return "[Matrix2D (a="+this.a+" b="+this.b+" c="+this.c+" d="+this.d+" tx="+this.tx+" ty="+this.ty+")]";
 	}
 

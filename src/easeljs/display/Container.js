@@ -37,30 +37,30 @@
 function Container() {
   this.initialize();
 }
-var p = Container.prototype = new DisplayObject();
+Container.prototype = new DisplayObject();
 
 // public properties:
 	/** The array of children in the display list. You should usually use the child management methods, rather than accessing this directly, but it is included for advanced users. */
-	p.children = null;
+	Container.prototype.children = null;
 
 // constructor:
-	/** @private */
-	p.DisplayObject_initialize = p.initialize;
 	/** @ignore */
-	p.initialize = function() {
+	Container.prototype.DisplayObject_initialize = Container.prototype.initialize;
+	/** @ignore */
+	Container.prototype.initialize = function() {
 		this.DisplayObject_initialize();
 		this.children = [];
 	}
 	
 // public methods:
 
-	p.isVisible = function() {
+	Container.prototype.isVisible = function() {
 		return this.visible && this.alpha > 0 && this.children.length && this.scaleX != 0 && this.scaleY != 0;
 	}
 
 	/** @private */
-	p.DisplayObject_draw = p.draw;
-	p.draw = function(ctx, ignoreCache, _mtx) {
+	Container.prototype.DisplayObject_draw = Container.prototype.draw;
+	Container.prototype.draw = function(ctx, ignoreCache, _mtx) {
 		var snap = Stage._snapToPixelEnabled;
 		if (!_mtx) {
 			_mtx = new Matrix2D();
@@ -98,7 +98,7 @@ var p = Container.prototype = new DisplayObject();
 	* Adds a child to the top of the display list. You can also add multiple children, such as "addChild(child1, child2, ...);". Returns the child that was added, or the last child if multiple children were added.
 	* @param child The display object to add.
 	**/
-	p.addChild = function(child) {
+	Container.prototype.addChild = function(child) {
 		var l = arguments.length;
 		if (l > 1) {
 			for (var i=0; i<l; i++) { this.addChild(arguments[i]); }
@@ -115,7 +115,7 @@ var p = Container.prototype = new DisplayObject();
 	* @param child The display object to add.
 	* @param index The index to add the child at.
 	**/
-	p.addChildAt = function(child, index) {
+	Container.prototype.addChildAt = function(child, index) {
 		var l = arguments.length;
 		if (l > 2) {
 			index = arguments[i-1];
@@ -132,7 +132,7 @@ var p = Container.prototype = new DisplayObject();
 	* Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is already known. You can also remove multiple children, such as "removeChild(child1, child2, ...);". Returns true if the child (or children) was removed, or false if it was not in the display list.
 	* @param child The child to remove.
 	**/
-	p.removeChild = function(child) {
+	Container.prototype.removeChild = function(child) {
 		var l = arguments.length;
 		if (l > 1) {
 			var good = true;
@@ -146,7 +146,7 @@ var p = Container.prototype = new DisplayObject();
 	* Removes the child at the specified index from the display list, and sets its parent to null. You can also remove multiple children, such as "removeChildAt(2, 7, ...);". Returns true if the child (or children) was removed, or false if any index was out of range.
 	* @param The index of the child to remove.
 	**/
-	p.removeChildAt = function(index) {
+	Container.prototype.removeChildAt = function(index) {
 		var l = arguments.length;
 		if (l > 1) {
 			var a = [];
@@ -166,7 +166,7 @@ var p = Container.prototype = new DisplayObject();
 	/**
 	* Removes all children from the display list.
 	**/
-	p.removeAllChildren = function() {
+	Container.prototype.removeAllChildren = function() {
 		while (this.children.length) { this.removeChildAt(0); }
 	}
 	
@@ -174,7 +174,7 @@ var p = Container.prototype = new DisplayObject();
 	* Returns the child at the specified index.
 	* @param index The index of the child to return.
 	**/
-	p.getChildAt = function(index) {
+	Container.prototype.getChildAt = function(index) {
 		return this.children[index];
 	}
 	
@@ -182,7 +182,7 @@ var p = Container.prototype = new DisplayObject();
 	* Performs an array sort operation on the child list.
 	* @sortFunction the function to use to sort the child list. See javascript's Array.sort documentation for details.
 	**/
-	p.sortChildren = function(sortFunction) {
+	Container.prototype.sortChildren = function(sortFunction) {
 		this.children.sort(sortFunction);
 	}
 	
@@ -190,14 +190,14 @@ var p = Container.prototype = new DisplayObject();
 	* Returns the index of the specified child in the display list, or -1 if it is not in the display list.
 	* @param The child to return the index of.
 	**/
-	p.getChildIndex = function(child) {
+	Container.prototype.getChildIndex = function(child) {
 		return this.children.indexOf(child);
 	}
 	
 	/**
 	* Returns the number of children in the display list.
 	**/
-	p.getNumChildren = function() {
+	Container.prototype.getNumChildren = function() {
 		return this.children.length;
 	}
 	
@@ -205,7 +205,7 @@ var p = Container.prototype = new DisplayObject();
 	* Returns true if the specified display object either is this container or is a descendent
 	* (child, grandchild, etc) of this container.
 	**/
-	p.contains = function(child) {
+	Container.prototype.contains = function(child) {
 		while (child) {
 			if (child == this) { return true; }
 			child = child.parent;
@@ -213,7 +213,7 @@ var p = Container.prototype = new DisplayObject();
 		return false;
 	}
 	
-	p.hitTest = function(x, y) {
+	Container.prototype.hitTest = function(x, y) {
 		// TODO: optimize to use the fast cache check where possible.
 		return (this.getObjectUnderPoint(x, y) != null);
 	}
@@ -223,7 +223,7 @@ var p = Container.prototype = new DisplayObject();
 	* @param x The x position in the container to test.
 	* @param y The y position in the container to test.
 	**/
-	p.getObjectsUnderPoint = function(x, y) {
+	Container.prototype.getObjectsUnderPoint = function(x, y) {
 		var arr = [];
 		var pt = this.localToGlobal(x, y);
 		this._getObjectsUnderPoint(pt.x, pt.y, arr);
@@ -235,7 +235,7 @@ var p = Container.prototype = new DisplayObject();
 	* @param x The x position in the container to test.
 	* @param y The y position in the container to test.
 	**/
-	p.getObjectUnderPoint = function(x, y) {
+	Container.prototype.getObjectUnderPoint = function(x, y) {
 		var pt = this.localToGlobal(x, y);
 		return this._getObjectsUnderPoint(pt.x, pt.y);
 	}
@@ -244,7 +244,7 @@ var p = Container.prototype = new DisplayObject();
 	* Returns a clone of this Container. Some properties that are specific to this instance's current context are reverted to their defaults (for example .parent).
 	* @param recursive If true, all of the descendants of this container will be cloned recursively. If false, the properties of the container will be cloned, but the new instance will not have any children.
 	**/
-	p.clone = function(recursive) {
+	Container.prototype.clone = function(recursive) {
 		var o = new Container();
 		this.cloneProps(o);
 		if (recursive) {
@@ -256,13 +256,13 @@ var p = Container.prototype = new DisplayObject();
 		return o;
 	}
 	
-	p.toString = function() {
+	Container.prototype.toString = function() {
 		return "[Container (name="+  this.name +")]";
 	}
 	
 // private properties:
 	/** @private */
-	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
+	Container.prototype._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
 
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;

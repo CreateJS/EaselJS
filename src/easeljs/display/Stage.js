@@ -38,7 +38,7 @@
 function Stage(canvas) {
   this.initialize(canvas);
 }
-var p = Stage.prototype = new Container();
+Stage.prototype = new Container();
 
 // static properties:
 	/** @private */
@@ -46,36 +46,36 @@ var p = Stage.prototype = new Container();
 
 // public properties:
 	/** Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for example). */
-	p.autoClear = true;
+	Stage.prototype.autoClear = true;
 	/** The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the first stage that will be ticked (or they will clear each other's render). */
-	p.canvas = null;
+	Stage.prototype.canvas = null;
 	/** READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas. */
-	p.mouseX = null;
+	Stage.prototype.mouseX = null;
 	/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas. */
-	p.mouseY = null;
+	Stage.prototype.mouseY = null;
 	/** The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance. */
-	p.onMouseMove = null;
+	Stage.prototype.onMouseMove = null;
 	/** The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler is passed a single param containing the corresponding MouseEvent instance. */
-	p.onMouseUp = null;
+	Stage.prototype.onMouseUp = null;
 	/** The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance. */
-	p.onMouseDown = null;
+	Stage.prototype.onMouseDown = null;
 	/** Indicates whether this stage should use the snapToPixel property of display objects when rendering them. */
-	p.snapToPixelEnabled = false;
+	Stage.prototype.snapToPixelEnabled = false;
 	
 // private properties:
 	/** @private */
-	p._tmpCanvas = null;
+	Stage.prototype._tmpCanvas = null;
 	/** @private */
-	p._activeMouseEvent = null;
+	Stage.prototype._activeMouseEvent = null;
 	/** @private */
-	p._activeMouseTarget = null;
+	Stage.prototype._activeMouseTarget = null;
 	/** @private */
 	
 // constructor:
-	/** @private */
-	p.Container_initialize = p.initialize;
 	/** @ignore */
-	p.initialize = function(canvas) {
+	Stage.prototype.Container_initialize = Stage.prototype.initialize;
+	/** @ignore */
+	Stage.prototype.initialize = function(canvas) {
 		this.Container_initialize();
 		this.canvas = canvas;
 		this.mouseChildren = true;
@@ -94,7 +94,7 @@ var p = Stage.prototype = new Container();
 	/**
 	* Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapSequence) and render its entire display list to the canvas.
 	**/
-	p.update = function() {
+	Stage.prototype.update = function() {
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
@@ -104,12 +104,12 @@ var p = Stage.prototype = new Container();
 	/**
 	* Calls the update method. Useful for adding stage as a listener to Ticker directly.
 	**/
-	p.tick = p.update;
+	Stage.prototype.tick = Stage.prototype.update;
 	
 	/**
 	* Clears the target canvas. Useful if autoClear is set to false.
 	**/
-	p.clear = function() {
+	Stage.prototype.clear = function() {
 		if (!this.canvas) { return; }
 		var ctx = this.canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -126,7 +126,7 @@ var p = Stage.prototype = new Container();
 	* @returns a Base64 encoded image.
 	* @type String
 	**/
-	p.toDataURL = function(backgroundColor, mimeType) {
+	Stage.prototype.toDataURL = function(backgroundColor, mimeType) {
 		if(!mimeType) {
 			mimeType = "image/png";
 		}
@@ -172,19 +172,19 @@ var p = Stage.prototype = new Container();
 		return dataURL;
 	}
 	
-	p.clone = function() {
+	Stage.prototype.clone = function() {
 		var o = new Stage(null);
 		this.cloneProps(o);
 		return o;
 	}
 		
-	p.toString = function() {
+	Stage.prototype.toString = function() {
 		return "[Stage (name="+  this.name +")]";
 	}
 	
 // private methods:
 	
-	p._handleMouseMove = function(e) {
+	Stage.prototype._handleMouseMove = function(e) {
 		if (!this.canvas) {
 			this.mouseX = this.mouseY = null;
 			return;
@@ -198,7 +198,7 @@ var p = Stage.prototype = new Container();
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
 	}
 	
-	p._handleMouseUp = function(e) {
+	Stage.prototype._handleMouseUp = function(e) {
 		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp instanceof Function) { this._activeMouseEvent.onMouseUp(evt); }
@@ -209,7 +209,7 @@ var p = Stage.prototype = new Container();
 		this._activeMouseEvent = this.activeMouseTarget = null;
 	}
 	
-	p._handleMouseDown = function(e) {
+	Stage.prototype._handleMouseDown = function(e) {
 		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
 		if (target) {

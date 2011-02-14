@@ -43,31 +43,30 @@
 function MouseEvent(type, stageX, stageY) {
   this.initialize(type, stageX, stageY);
 }
-var p = MouseEvent.prototype;
 	
 // public properties:
 	/** The mouseX position on the stage. */
-	p.stageX = 0;
+	MouseEvent.prototype.stageX = 0;
 	/** The mouseY position on the stage. */
-	p.stageY = 0;
+	MouseEvent.prototype.stageY = 0;
 	/** The type of mouse event. This will be the same as the handler it maps to (onPress, onMouseDown, 
 		onMouseUp, onMouseMove, or onClick). 
 	**/
-	p.type = null;
+	MouseEvent.prototype.type = null;
 	/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseMove 
 		property. This handler will be called every time the mouse is moved until the mouse is released. 
 		This is useful for operations like drag and drop. 
 	**/
-	p.onMouseMove = null;
+	MouseEvent.prototype.onMouseMove = null;
 	/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseUp property. 
 		This handler will be called a single time when the mouse is released anywhere over the page. This is useful for operations 
 		like drag and drop. 
 	**/
-	p.onMouseUp = null;
+	MouseEvent.prototype.onMouseUp = null;
 	
 // constructor:
 	/** @ignore */
-	p.initialize = function(type, stageX, stageY) {
+	MouseEvent.prototype.initialize = function(type, stageX, stageY) {
 		this.type = type;
 		this.stageX = stageX;
 		this.stageY = stageY;
@@ -77,14 +76,14 @@ var p = MouseEvent.prototype;
 	/**
 	* Returns a clone of the MouseEvent instance.
 	**/
-	p.clone = function() {
+	MouseEvent.prototype.clone = function() {
 		return new MouseEvent(this.type, this.stageX, this.stageY);
 	}
 
 	/**
 	* Returns a string representation of this object.
 	**/
-	p.toString = function() {
+	MouseEvent.prototype.toString = function() {
 		return "[MouseEvent (type="+this.type+" stageX="+this.stageX+" stageY="+this.stageY+")]";
 	}
 	

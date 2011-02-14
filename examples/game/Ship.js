@@ -4,7 +4,7 @@
 function Ship() {
   this.initialize();
 }
-var p = Ship.prototype = new Container();
+Ship.prototype = new Container();
 
 // public properties:
 	Ship.TOGGLE = 60;
@@ -12,22 +12,22 @@ var p = Ship.prototype = new Container();
 	Ship.MAX_VELOCITY = 5;
 
 // public properties:
-	p.shipFlame;
-	p.shipBody;
+	Ship.prototype.shipFlame = null;
+	Ship.prototype.shipBody = null;
 	
-	p.timeout;
-	p.thrust;
+	Ship.prototype.timeout = 0;
+	Ship.prototype.thrust = 0;
 	
-	p.vX;
-	p.vY;
+	Ship.prototype.vX = 0;
+	Ship.prototype.vY = 0;
 	
-	p.bounds;
-	p.hit;
+	Ship.prototype.bounds = 0;
+	Ship.prototype.hit = 0;
 	
 // constructor:
-	p.Container_initialize = p.initialize;	//unique to avoid overiding base class
+	Ship.prototype.Container_initialize = Ship.prototype.initialize;	//unique to avoid overiding base class
 	
-	p.initialize = function() {
+	Ship.prototype.initialize = function() {
 		this.Container_initialize();
 		
 		this.shipFlame = new Shape();
@@ -44,7 +44,7 @@ var p = Ship.prototype = new Container();
 	}
 	
 // public methods:
-	p.makeShape = function() {
+	Ship.prototype.makeShape = function() {
 		//draw ship body
 		var g = this.shipBody.graphics;
 		g.clear();
@@ -81,7 +81,7 @@ var p = Ship.prototype = new Container();
 		this.hit = this.bounds;
 	}
 	
-	p.tick = function() {
+	Ship.prototype.tick = function() {
 		//move by velocity
 		this.x += this.vX;
 		this.y += this.vY;
@@ -108,8 +108,8 @@ var p = Ship.prototype = new Container();
 		}
 	}
 	
-	p.accelerate = function() {
-		//increase push ammount for acceleration
+	Ship.prototype.accelerate = function() {
+		//increase push amount for acceleration
 		this.thrust += this.thrust + 0.6;
 		if(this.thrust >= Ship.MAX_THRUST) {
 			this.thrust = Ship.MAX_THRUST;

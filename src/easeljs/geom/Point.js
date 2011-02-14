@@ -46,7 +46,7 @@ function Point(x, y) {
 	Point.prototype.y = 0;
 	
 // constructor:
-	/** @private */
+	/** @ignore */
 	Point.prototype.initialize = function(x, y) {
 		this.x = (x == null ? 0 : x);
 		this.y = (y == null ? 0 : y);

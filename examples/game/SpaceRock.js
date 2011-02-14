@@ -5,7 +5,7 @@ function SpaceRock(size) {
 	this.initialize(size);
 }
 
-var p = SpaceRock.prototype = new Shape();
+SpaceRock.prototype = new Shape();
 
 // static properties:
 	SpaceRock.LRG_ROCK = 40;
@@ -14,22 +14,22 @@ var p = SpaceRock.prototype = new Shape();
 
 // public properties:
 
-	p.bounds;	//visual radial size
-	p.hit;		//average radial disparity
+	SpaceRock.prototype.bounds = 0;	//visual radial size
+	SpaceRock.prototype.hit = 0;		//average radial disparity
 	
-	p.size;		//size value itself
-	p.spin;		//spin ammount
-	p.score;	//score value
+	SpaceRock.prototype.size = 0;		//size value itself
+	SpaceRock.prototype.spin = 0;		//spin ammount
+	SpaceRock.prototype.score = 0;	//score value
 	
-	p.vX;		//velocity X
-	p.vY;		//velocity Y
+	SpaceRock.prototype.vX = 0;		//velocity X
+	SpaceRock.prototype.vY = 0;		//velocity Y
 	
-	p.active;	//is it active
+	SpaceRock.prototype.active = false;	//is it active
 	
 // constructor:
-	p.Shape_initialize = p.initialize;	//unique to avoid overiding base class
+	SpaceRock.prototype.Shape_initialize = SpaceRock.prototype.initialize;	//unique to avoid overiding base class
 	
-	p.initialize = function(size) {
+	SpaceRock.prototype.initialize = function(size) {
 		this.Shape_initialize(); // super call
 		
 		this.activate(size);
@@ -37,7 +37,7 @@ var p = SpaceRock.prototype = new Shape();
 	
 // public methods:
 	//handle drawing a spaceRock
-	p.getShape = function(size) {
+	SpaceRock.prototype.getShape = function(size) {
 		var angle = 0;
 		var radius = size;
 		
@@ -66,7 +66,7 @@ var p = SpaceRock.prototype = new Shape();
 	}
 	
 	//handle reinit for poolings sake
-	p.activate = function(size) {
+	SpaceRock.prototype.activate = function(size) {
 		this.getShape(size);	
 		
 		//pick a random direction to move in and base the rotation off of speed
@@ -81,14 +81,14 @@ var p = SpaceRock.prototype = new Shape();
 	}
 	
 	//handle what a spaceRock does to itself every frame
-	p.tick = function() {
+	SpaceRock.prototype.tick = function() {
 		this.rotation += this.spin;
 		this.x += this.vX;
 		this.y += this.vY;
 	}
 	
 	//position the spaceRock so it floats on screen
-	p.floatOnScreen = function(width, height) {
+	SpaceRock.prototype.floatOnScreen = function(width, height) {
 		//base bias on real estate and pick a side or top/bottom
 		if(Math.random()*(width+height) > width) {
 			//side; ensure velocity pushes it on screen
@@ -119,11 +119,11 @@ var p = SpaceRock.prototype = new Shape();
 		}
 	}
 	
-	p.hitPoint = function(tX, tY) {
+	SpaceRock.prototype.hitPoint = function(tX, tY) {
 		return this.hitRadius(tX, tY, 0);
 	}
 	
-	p.hitRadius = function(tX, tY, tHit) {
+	SpaceRock.prototype.hitRadius = function(tX, tY, tHit) {
 		//early returns speed it up
 		if(tX - tHit > this.x + this.hit) { return; }
 		if(tX + tHit < this.x - this.hit) { return; }
