@@ -1,0 +1,503 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="generator" content="JsDoc Toolkit" />
+		
+		<title>JsDoc Reference - SpriteSheetUtils</title>
+
+		<style type="text/css">
+			/* default.css */
+body
+{
+	font: 12px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
+	width: 800px;
+}
+
+.header
+{
+	clear: both;
+	background-color: #ccc;
+	padding: 8px;
+}
+
+h1
+{
+	font-size: 150%;
+	font-weight: bold;
+	padding: 0;
+	margin: 1em 0 0 .3em;
+}
+
+hr
+{
+	border: none 0;
+	border-top: 1px solid #7F8FB1;
+	height: 1px;
+}
+
+pre.code
+{
+	display: block;
+	padding: 8px;
+	border: 1px dashed #ccc;
+}
+
+#index
+{
+	margin-top: 24px;
+	float: left;
+	width: 160px;
+	position: absolute;
+	left: 8px;
+	background-color: #F3F3F3;
+	padding: 8px;
+}
+
+#content
+{
+	margin-left: 190px;
+	width: 600px;
+}
+
+.classList
+{
+	list-style-type: none;
+	padding: 0;
+	margin: 0 0 0 8px;
+	font-family: arial, sans-serif;
+	font-size: 1em;
+	overflow: auto;
+}
+
+.classList li
+{
+	padding: 0;
+	margin: 0 0 8px 0;
+}
+
+.summaryTable { width: 100%; }
+
+h1.classTitle
+{
+	font-size:170%;
+	line-height:130%;
+}
+
+h2 { font-size: 110%; }
+caption, div.sectionTitle
+{
+	background-color: #7F8FB1;
+	color: #fff;
+	font-size:130%;
+	text-align: left;
+	padding: 2px 6px 2px 6px;
+	border: 1px #7F8FB1 solid;
+}
+
+div.sectionTitle { margin-bottom: 8px; }
+.summaryTable thead { display: none; }
+
+.summaryTable td
+{
+	vertical-align: top;
+	padding: 4px;
+	border-bottom: 1px #7F8FB1 solid;
+	border-right: 1px #7F8FB1 solid;
+}
+
+/*col#summaryAttributes {}*/
+.summaryTable td.attributes
+{
+	border-left: 1px #7F8FB1 solid;
+	width: 140px;
+	text-align: right;
+}
+
+td.attributes, .fixedFont
+{
+	line-height: 15px;
+	color: #002EBE;
+	font-family: "Courier New",Courier,monospace;
+	font-size: 13px;
+}
+
+.summaryTable td.nameDescription
+{
+	text-align: left;
+	font-size: 13px;
+	line-height: 15px;
+}
+
+.summaryTable td.nameDescription, .description
+{
+	line-height: 15px;
+	padding: 4px;
+	padding-left: 4px;
+}
+
+.summaryTable { margin-bottom: 8px; }
+
+ul.inheritsList
+{
+	list-style: square;
+	margin-left: 20px;
+	padding-left: 0;
+}
+
+.detailList {
+	margin-left: 20px; 
+	line-height: 15px;
+}
+.detailList dt { margin-left: 20px; }
+
+.detailList .heading
+{
+	font-weight: bold;
+	padding-bottom: 6px;
+	margin-left: 0;
+}
+
+.light, td.attributes, .light a:link, .light a:visited
+{
+	color: #777;
+	font-style: italic;
+}
+
+.fineprint
+{
+	text-align: right;
+	font-size: 10px;
+}
+		</style>
+	</head>
+
+	<body>
+<!-- ============================== header ================================= -->	
+		<!-- begin static/header.html -->
+		<div id="header">
+</div>
+		<!-- end static/header.html -->
+
+<!-- ============================== classes index ============================ -->
+		<div id="index">
+			<!-- begin publish.classesIndex -->
+			<div align="center"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+<hr />
+<h2>Classes</h2>
+<ul class="classList">
+	
+	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	
+	<li><a href="../symbols/Bitmap.html">Bitmap</a></li>
+	
+	<li><a href="../symbols/BitmapSequence.html">BitmapSequence</a></li>
+	
+	<li><a href="../symbols/Container.html">Container</a></li>
+	
+	<li><a href="../symbols/DisplayObject.html">DisplayObject</a></li>
+	
+	<li><a href="../symbols/Graphics.html">Graphics</a></li>
+	
+	<li><a href="../symbols/Matrix2D.html">Matrix2D</a></li>
+	
+	<li><a href="../symbols/MouseEvent.html">MouseEvent</a></li>
+	
+	<li><a href="../symbols/Point.html">Point</a></li>
+	
+	<li><a href="../symbols/Rectangle.html">Rectangle</a></li>
+	
+	<li><a href="../symbols/Shadow.html">Shadow</a></li>
+	
+	<li><a href="../symbols/Shape.html">Shape</a></li>
+	
+	<li><a href="../symbols/SpriteSheet.html">SpriteSheet</a></li>
+	
+	<li><a href="../symbols/SpriteSheetUtils.html">SpriteSheetUtils</a></li>
+	
+	<li><a href="../symbols/Stage.html">Stage</a></li>
+	
+	<li><a href="../symbols/Text.html">Text</a></li>
+	
+	<li><a href="../symbols/Ticker.html">Ticker</a></li>
+	
+	<li><a href="../symbols/UID.html">UID</a></li>
+	
+</ul>
+<hr />
+			<!-- end publish.classesIndex -->
+		</div>
+		
+		<div id="content">
+<!-- ============================== class title ============================ -->
+			<h1 class="classTitle">
+				
+				Class SpriteSheetUtils
+			</h1>
+
+<!-- ============================== class summary ========================== -->			
+			<p class="description">
+				
+				
+			
+				The SpriteSheetUtils class is a collection of static methods for working with sprite sheets.  A sprite sheet is a series of images (usually animation frames) combined into a single image on a regular grid. For example, an animation consisting of 8 100x100 images could be combined into a 400x200 sprite sheet (4 frames across by 2 high).
+				
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/EaselJS_src_easeljs_utils_SpriteSheetUtils.js.html">SpriteSheetUtils.js</a>.
+				
+			</p>
+
+<!-- ============================== constructor summary ==================== -->			
+			
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class SpriteSheetUtils.">
+				<caption>Class Summary</caption>
+				<thead>
+					<tr>
+						<th scope="col">Constructor Attributes</th>
+						<th scope="col">Constructor Name and Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="attributes">&nbsp;</td>
+						<td class="nameDescription" >
+							<div class="fixedFont">
+								<b><a href="../symbols/SpriteSheetUtils.html#constructor">SpriteSheetUtils</a></b>()
+							</div>
+							<div class="description">The SpriteSheetUtils class uses a static interface and should not be instantiated.</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+
+<!-- ============================== properties summary ===================== -->
+			
+
+<!-- ============================== methods summary ======================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class SpriteSheetUtils.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SpriteSheetUtils.<b><a href="../symbols/SpriteSheetUtils.html#.extractFrame">extractFrame</a></b>(spriteSheet, frame)
+								</div>
+								<div class="description">Returns a single frame of the specified sprite sheet as a new PNG image.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SpriteSheetUtils.<b><a href="../symbols/SpriteSheetUtils.html#.flip">flip</a></b>(spriteSheet, flipData)
+								</div>
+								<div class="description">Builds a new extended sprite sheet based on the specified sprite sheet by adding flipped frames(vertical, horizontal, or both).</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SpriteSheetUtils.<b><a href="../symbols/SpriteSheetUtils.html#.frameDataToString">frameDataToString</a></b>(frameData)
+								</div>
+								<div class="description">Returns a string representing the specified frameData object.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
+<!-- ============================== events summary ======================== -->
+			
+
+<!-- ============================== constructor details ==================== -->		
+			
+			<div class="details"><a name="constructor"> </a>
+				<div class="sectionTitle">
+					Class Detail
+				</div>
+				
+				<div class="fixedFont">
+						<b>SpriteSheetUtils</b>()
+				</div>
+				
+				<div class="description">
+					The SpriteSheetUtils class uses a static interface and should not be instantiated.
+					
+				</div>
+				
+				
+				
+				
+					
+					
+					
+					
+					
+					
+					
+
+			</div>
+			
+
+<!-- ============================== field details ========================== -->		
+			
+
+<!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name=".extractFrame"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">SpriteSheetUtils.</span><b>extractFrame</b>(spriteSheet, frame)
+					
+					</div>
+					<div class="description">
+						Returns a single frame of the specified sprite sheet as a new PNG image.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>spriteSheet</b>
+									
+								</dt>
+								<dd>The SpriteSheet instance to extract a frame from.</dd>
+							
+								<dt>
+									<b>frame</b>
+									
+								</dt>
+								<dd>The frame number or sequence name to extract. If a sequence name is specified, only the first frame of the sequence will be extracted.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".flip"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">SpriteSheetUtils.</span><b>flip</b>(spriteSheet, flipData)
+					
+					</div>
+					<div class="description">
+						Builds a new extended sprite sheet based on the specified sprite sheet by adding flipped frames(vertical, horizontal, or both). Flipping elements on the display list by using setting scaleX/scaleYto -1 is quite expensive in most browsers, so this method allows you to incur the cost of flipping once,in advance, without increasing the load size of your sprite sheets. Returns a new SpriteSheet instancecontaining the generated image and frame data.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>spriteSheet</b>
+									
+								</dt>
+								<dd>The sprite sheet to use as the source.</dd>
+							
+								<dt>
+									<b>flipData</b>
+									
+								</dt>
+								<dd>A generic object that specifies which frames will be flipped, what to name the flipped result, and how to flip the frames (horizontally, vertically, or both). Each property name indicates the name of a new sequence to create, and should reference an array where the first index is the name of the original sequence to flip, the second index indicates whether to flip it horizontally, the third index indicates whether to flip it vertically, and the fourth indicates what the "next" value for the resulting frame data should be. For example, the following would create a new sequence named "walk_left" consisting of the frames from the original "walk_right" sequence flipped horizontally: {walk_left:["walk_right", true, false]}</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".frameDataToString"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">SpriteSheetUtils.</span><b>frameDataToString</b>(frameData)
+					
+					</div>
+					<div class="description">
+						Returns a string representing the specified frameData object.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>frameData</b>
+									
+								</dt>
+								<dd>The frame data to output.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					
+				
+			
+			
+<!-- ============================== event details ========================= -->		
+			
+			
+			<hr />
+		</div>
+
+		
+<!-- ============================== footer ================================= -->
+		<div class="fineprint" style="clear:both">
+			
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sun Feb 13 2011 22:46:01 GMT-0700 (MST)
+		</div>
+	</body>
+</html>
