@@ -1,9 +1,10 @@
-Version 0.3.1 [Not tagged for release]
+Version 0.3.1 [Feb 13, 2011]
 ****************************************************************************************************
 - fixed issues with hitTest and mouse event callbacks on Container instances.
 - added recursive clone option to Container and Shape
 - fix for snapToPixel
 - added cache, updateCache, and HelloWorld demos
+- extensive code cleanup, including improved support for jsdoc
 
 
 Version 0.3 [Feb 8, 2011]
