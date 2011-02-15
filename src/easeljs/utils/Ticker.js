@@ -233,12 +233,14 @@
 	}
 	
 	/**
-	* Returns the number of ticks that have elapsed while Ticker was active.
+	* Returns the number of ticks that have been broadcast by Ticker.
 	* @method getTicks
 	* @static
-	* @param {Boolean} pauseable Indicates whether to return the elapsed ticks for pauseable, 
-	* or unpauseable listeners.
-	* @return Number of ticks that have elapsed while Ticker was active.
+	* @param {Boolean} pauseable Indicates whether to include ticks that would have been broadcast
+	* while Ticker was paused. If false only tick events broadcast while Ticker is not paused will be returned.
+	* If true, tick events that would have been boradcast while Ticker was paused will be included in the return
+	* value. The default value is False.
+	* @return {Number} of ticks that have been broadcast.
 	**/
 	Ticker.getTicks = function(pauseable) {
 		return  Ticker._ticks - (pauseable ?Ticker._pausedTickers : 0);
