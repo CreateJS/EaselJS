@@ -59,7 +59,7 @@ function handleImageLoad(event) {
 		bitmap.name = "bmp_"+i;
 		(function(target) {
 		bitmap.onPress = function(evt) {
-			console.log("press!");
+			if (window.console && console.log) { console.log("press!"); }
 			target.scaleX = target.scaleY = target.scale*1.2;
 			container.addChild(target);
 			// update the stage while we drag this target:
@@ -69,17 +69,17 @@ function handleImageLoad(event) {
 			evt.onMouseMove = function(ev) {
 				target.x = ev.stageX+offset.x;
 				target.y = ev.stageY+offset.y;
-				console.log("move!");
+				if (window.console && console.log) { console.log("move!"); }
 			}
 			evt.onMouseUp = function() {
 				target.scaleX = target.scaleY = target.scale;
 				// update the stage one last time to render the scale change, then stop updating:
 				stage.update();
 				Ticker.removeListener(stage);
-				console.log("up!");
+				if (window.console && console.log) { console.log("up!"); }
 			}
 		}})(bitmap);
-		bitmap.onClick = function() { console.log("click!"); }
+		bitmap.onClick = function() { if (console && console.log) { console.log("click!"); } }
 	}
 	
 	// Update once to render the screen. Thereafter, we only update when something is actually being dragged.
