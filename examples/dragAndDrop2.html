@@ -79,7 +79,7 @@ function handleImageLoad(event) {
 				if (window.console && console.log) { console.log("up!"); }
 			}
 		}})(bitmap);
-		bitmap.onClick = function() { if (console && console.log) { console.log("click!"); } }
+		bitmap.onClick = function() { if (window.console && console.log) { console.log("click!"); } }
 	}
 	
 	// Update once to render the screen. Thereafter, we only update when something is actually being dragged.
