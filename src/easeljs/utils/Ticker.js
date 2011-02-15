@@ -219,14 +219,15 @@
 	}
 	
 	/**
-	* Returns the number of milliseconds that have elapsed since Ticker was loaded. For example, 
-	* you could use this in a time synchronized animation to determine the exact amount of 
+	* Returns the number of milliseconds that have elapsed since the first tick event listener was added to
+	* Ticker. For example, you could use this in a time synchronized animation to determine the exact amount of 
 	* time that has elapsed.
 	* @method getTime
 	* @static
-	* @param {Boolean} pauseable Indicates whether to return the elapsed time for pauseable, or 
-	* unpauseable listeners. If true, time that elapsed while Ticker was paused is not included.
-	* @return {Number} Number of milliseconds that have elapsed since Ticker was loaded.
+	* @param {Boolean} pauseable Indicates whether to include time elapsed
+	* while Ticker was paused. If false only time elapsed while Ticker is not paused will be returned.
+	* If true, the value returned will be total time elapsed since the first tick event listener was added.
+	* @return {Number} Number of milliseconds that have elapsed since Ticker was begun.
 	**/
 	Ticker.getTime = function(pauseable) {
 		return Ticker._getTime() - Ticker._startTime - (pauseable ? Ticker._pausedTime : 0);
@@ -238,8 +239,8 @@
 	* @static
 	* @param {Boolean} pauseable Indicates whether to include ticks that would have been broadcast
 	* while Ticker was paused. If false only tick events broadcast while Ticker is not paused will be returned.
-	* If true, tick events that would have been boradcast while Ticker was paused will be included in the return
-	* value. The default value is False.
+	* If true, tick events that would have been broadcast while Ticker was paused will be included in the return
+	* value. The default value is false.
 	* @return {Number} of ticks that have been broadcast.
 	**/
 	Ticker.getTicks = function(pauseable) {
