@@ -27,12 +27,25 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 **/
 
+
+/**
+ * The Easel Javascript library provides a retained graphics mode for canvas 
+ * including a full, hierarchical display list, a core interaction model, and 
+ * helper classes to make working with Canvas much easier.
+ * @module EaselJS
+ */
+
 (function(window) {
 	
 // constructor:
 	/**
+	* The SpriteSheetUtils class is a collection of static methods for working 
+	* with sprite sheets.  A sprite sheet is a series of images (usually animation frames) 
+	* combined into a single image on a regular grid. For example, an animation consisting 
+	* of 8 100x100 images could be combined into a 400x200 sprite sheet (4 frames across by 2 high).
 	* The SpriteSheetUtils class uses a static interface and should not be instantiated.
-	* @class The SpriteSheetUtils class is a collection of static methods for working with sprite sheets.  A sprite sheet is a series of images (usually animation frames) combined into a single image on a regular grid. For example, an animation consisting of 8 100x100 images could be combined into a 400x200 sprite sheet (4 frames across by 2 high).
+	* @class SpriteSheetUtils
+	* @static
 	**/
 	SpriteSheetUtils = function() {
 		throw "SpriteSheetUtils cannot be instantiated"; 
@@ -45,15 +58,23 @@
 	
 // public static methods:
 	/**
-	 * Builds a new extended sprite sheet based on the specified sprite sheet by adding flipped frames
-	 * (vertical, horizontal, or both). Flipping elements on the display list by using setting scaleX/scaleY
-	 * to -1 is quite expensive in most browsers, so this method allows you to incur the cost of flipping once,
-	 * in advance, without increasing the load size of your sprite sheets. Returns a new SpriteSheet instance
-	 * containing the generated image and frame data.
-	 * @param spriteSheet The sprite sheet to use as the source.
-	 * @param flipData A generic object that specifies which frames will be flipped, what to name the flipped result, and how to flip the frames (horizontally, vertically, or both). Each property name indicates the name of a new sequence to create, and should reference an array where the first index is the name of the original sequence to flip, the second index indicates whether to flip it horizontally, the third index indicates whether to flip it vertically, and the fourth indicates what the "next" value for the resulting frame data should be. For example, the following would create a new sequence named "walk_left" consisting of the frames from the original "walk_right" sequence flipped horizontally: {walk_left:["walk_right", true, false]}
-	 * @static
-	 **/
+	* Builds a new extended sprite sheet based on the specified sprite sheet by adding flipped frames
+	* (vertical, horizontal, or both). Flipping elements on the display list by using setting scaleX/scaleY
+	* to -1 is quite expensive in most browsers, so this method allows you to incur the cost of flipping once,
+	* in advance, without increasing the load size of your sprite sheets. Returns a new SpriteSheet instance
+	* containing the generated image and frame data.
+	* @method flip
+	* @static
+	* @param {Image} spriteSheet The sprite sheet to use as the source.
+	* @param {Object} flipData A generic object that specifies which frames will be flipped, what to name the 
+	* flipped result, and how to flip the frames (horizontally, vertically, or both). Each property name 
+	*indicates the name of a new sequence to create, and should reference an array where the first index is 
+	* the name of the original sequence to flip, the second index indicates whether to flip it horizontally, 
+	* the third index indicates whether to flip it vertically, and the fourth indicates what the "next" value 
+	* for the resulting frame data should be. For example, the following would create a new sequence named 
+	* "walk_left" consisting of the frames from the original "walk_right" sequence flipped horizontally: 
+	* {walk_left:["walk_right", true, false]}
+	**/
 	SpriteSheetUtils.flip = function(spriteSheet, flipData) {
 		var image = spriteSheet.image;
 		var frameData = spriteSheet.frameData;
@@ -134,8 +155,10 @@
 	
 	/**
 	* Returns a string representing the specified frameData object.
-	* @param frameData The frame data to output.
+	* @method frameDataToString
 	* @static
+	* @param {Object} frameData The frame data to output.
+	* @return {String} The a String representing the specified frameData object?
 	**/
 	SpriteSheetUtils.frameDataToString = function(frameData) {
 		var str = "";
@@ -167,10 +190,13 @@
 	}
 
 	/**
-	 * Returns a single frame of the specified sprite sheet as a new PNG image.
-	 * @param spriteSheet The SpriteSheet instance to extract a frame from.
-	 * @param frame The frame number or sequence name to extract. If a sequence name is specified, only the first frame of the sequence will be extracted.
-	 */
+	* Returns a single frame of the specified sprite sheet as a new PNG image.
+	* @method extractFrame
+	* @param {Image} spriteSheet The SpriteSheet instance to extract a frame from.
+	* @param {Number} frame The frame number or sequence name to extract. If a sequence 
+	* name is specified, only the first frame of the sequence will be extracted.
+	* @return {Image} a single frame of the specified sprite sheet as a new PNG image.
+	*/
 	SpriteSheetUtils.extractFrame = function(spriteSheet, frame) {
 		var image = spriteSheet.image;
 		var frameWidth = spriteSheet.frameWidth;
