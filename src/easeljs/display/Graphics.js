@@ -270,8 +270,7 @@ var p = Graphics.prototype;
 		this._instructions = [];
 		this._oldInstructions = [];
 		this._activeInstructions = [];
-		this._strokeStyleInstructions = null;
-		this._strokeInstructions = this._fillInstructions = null;
+		this._strokeStyleInstructions = this._strokeInstructions = this._fillInstructions = null;
 		this._active = this._dirty = false;
 		return this;
 	}
@@ -565,14 +564,13 @@ var p = Graphics.prototype;
 	p.clone = function() {
 		var o = new Graphics();
 		o._instructions = this._instructions.slice();
-		o._activeIntructions = this._activeInstructions.slice();
+		o._activeInstructions = this._activeInstructions.slice();
 		o._oldInstructions = this._oldInstructions.slice();
-		o._fillInstructions = this._fillInstructions.slice();
-		o._strokeInstructions = this._strokeInstructions.slice();
-		o._strokeStyleInstructions = this._strokeStyleInstructions.slice();
+		if (this._fillInstructions) { o._fillInstructions = this._fillInstructions.slice(); }
+		if (this._strokeInstructions) { o._strokeInstructions = this._strokeInstructions.slice(); }
+		if (this._strokeStyleInstructions) { o._strokeStyleInstructions = this._strokeStyleInstructions.slice(); }
 		o._active = this._active;
 		o._dirty = this._dirty;
-		o._assets = this._assets;
 		return o;
 	}
 		
