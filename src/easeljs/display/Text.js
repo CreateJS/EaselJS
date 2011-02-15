@@ -42,7 +42,7 @@
 Text = function(text, font, color) {
   this.initialize(text, font, color);
 }
-Text.prototype = new DisplayObject();
+var p = Text.prototype = new DisplayObject();
 
 /** @private */
 var canvas = document.createElement("canvas");
@@ -50,29 +50,29 @@ Text._workingContext = canvas.getContext("2d");
 
 // public properties:
 	/** The text to display. */
-	Text.prototype.text = "";
+	p.text = "";
 	/** The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold 36px Arial"). */
-	Text.prototype.font = null;
+	p.font = null;
 	/** The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). */
-	Text.prototype.color = null;
+	p.color = null;
 	/** The horizontal text alignment. Any of start, end, left, right, and center. For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">whatwg spec</a>. */
-	Text.prototype.textAlign = null;
+	p.textAlign = null;
 	/** The vertical alignment point on the font. Any of top, hanging, middle, alphabetic, ideographic, or bottom. For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">whatwg spec</a>. */
-	Text.prototype.textBaseline = null;
+	p.textBaseline = null;
 	/** The maximum width to draw the text. If maxWidth is specified (not null), the text will be condensed or shrunk to make it fit in this width. For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">whatwg spec</a>. */
-	Text.prototype.maxWidth = null;
+	p.maxWidth = null;
 	/** If true, the text will be drawn as a stroke (outline). If false, the text will be drawn as a fill. */
-	Text.prototype.outline = false;
+	p.outline = false;
 	/** Indicates the line height (vertical distance between baselines) for multi-line text. If null, the value of getMeasuredLineHeight is used. */
-	Text.prototype.lineHeight = null;
+	p.lineHeight = null;
 	/** Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null, the text will not be wrapped. */
-	Text.prototype.lineWidth = null;
+	p.lineWidth = null;
 	
 // constructor:
 	/** @ignore */
-	Text.prototype.DisplayObject_initialize = Text.prototype.initialize;
+	p.DisplayObject_initialize = p.initialize;
 	/** @ignore */
-	Text.prototype.initialize = function(text, font, color) {
+	p.initialize = function(text, font, color) {
 		this.DisplayObject_initialize();
 		this.text = text;
 		this.font = font;
@@ -80,12 +80,12 @@ Text._workingContext = canvas.getContext("2d");
 	}
 	
 // public methods:
-	Text.prototype.isVisible = function() {
+	p.isVisible = function() {
 		return Boolean(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.text != null && this.text != "");
 	}
 
-	Text.prototype.DisplayObject_draw = Text.prototype.draw;
-	Text.prototype.draw = function(ctx, ignoreCache) {
+	p.DisplayObject_draw = p.draw;
+	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		
 		if (this.outline) { ctx.strokeStyle = this.color; }
@@ -127,7 +127,7 @@ Text._workingContext = canvas.getContext("2d");
 	/**
 	* Returns the measured, untransformed width of the text.
 	**/
-	Text.prototype.getMeasuredWidth = function() {
+	p.getMeasuredWidth = function() {
 		return this._getWorkingContext().measureText(this.text).width;
 	}
 
@@ -135,26 +135,26 @@ Text._workingContext = canvas.getContext("2d");
 	 * Returns an approximate line height of the text, ignoring the lineHeight property. This is based on the measured width of
 	 * a "M" character multiplied by 1.2, which approximates em for most fonts.
 	 */
-	Text.prototype.getMeasuredLineHeight = function() {
+	p.getMeasuredLineHeight = function() {
 		return this._getWorkingContext().measureText("M").width*1.2;
 	}
 	
-	Text.prototype.clone = function() {
+	p.clone = function() {
 		var o = new Text(this.text, this.font, this.color);
 		this.cloneProps(o);
 		return o;
 	}
 		
-	Text.prototype.toString = function() {
+	p.toString = function() {
 		return "[Text (text="+  (this.text.length > 20 ? this.text.substr(0, 17)+"..." : this.text) +")]";
 	}
 	
 // private methods:
 	
 	/** @private */
-	Text.prototype.DisplayObject_cloneProps = Text.prototype.cloneProps;
+	p.DisplayObject_cloneProps = p.cloneProps;
 	/** @private */
-	Text.prototype.cloneProps = function(o) {
+	p.cloneProps = function(o) {
 		this.DisplayObject_cloneProps(o);
 		o.textAlign = this.textAlign;
 		o.textBaseline = this.textBaseline;
@@ -164,7 +164,7 @@ Text._workingContext = canvas.getContext("2d");
 		o.lineWidth = this.lineWidth;
 	}
 
-	Text.prototype._getWorkingContext = function() {
+	p._getWorkingContext = function() {
 		var ctx = Text._workingContext;
 		ctx.font = this.font;
 		ctx.textAlign = this.textAlign ? this.textAlign : "start";
@@ -172,7 +172,7 @@ Text._workingContext = canvas.getContext("2d");
 		return ctx;
 	}
 	
-	Text.prototype._drawTextLine = function(ctx, text, y) {
+	p._drawTextLine = function(ctx, text, y) {
 		if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth); }
 		else { ctx.fillText(text, 0, y, this.maxWidth); }
 	}

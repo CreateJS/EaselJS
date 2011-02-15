@@ -38,35 +38,35 @@
 * DisplayObject instances.
 * By default, mouse events are disabled for performance reasons. In order to enabled them for a specified stage
 * set mouseEventsEnabled to true on your stage instance.
-* @see Stage#mouseEventsEnabled
 **/
 MouseEvent = function(type, stageX, stageY) {
   this.initialize(type, stageX, stageY);
 }
+var p = MouseEvent.prototype;
 	
 // public properties:
 	/** The mouseX position on the stage. */
-	MouseEvent.prototype.stageX = 0;
+	p.stageX = 0;
 	/** The mouseY position on the stage. */
-	MouseEvent.prototype.stageY = 0;
+	p.stageY = 0;
 	/** The type of mouse event. This will be the same as the handler it maps to (onPress, onMouseDown, 
 		onMouseUp, onMouseMove, or onClick). 
 	**/
-	MouseEvent.prototype.type = null;
+	p.type = null;
 	/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseMove 
 		property. This handler will be called every time the mouse is moved until the mouse is released. 
 		This is useful for operations like drag and drop. 
 	**/
-	MouseEvent.prototype.onMouseMove = null;
+	p.onMouseMove = null;
 	/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseUp property. 
 		This handler will be called a single time when the mouse is released anywhere over the page. This is useful for operations 
 		like drag and drop. 
 	**/
-	MouseEvent.prototype.onMouseUp = null;
+	p.onMouseUp = null;
 	
 // constructor:
 	/** @ignore */
-	MouseEvent.prototype.initialize = function(type, stageX, stageY) {
+	p.initialize = function(type, stageX, stageY) {
 		this.type = type;
 		this.stageX = stageX;
 		this.stageY = stageY;
@@ -76,14 +76,14 @@ MouseEvent = function(type, stageX, stageY) {
 	/**
 	* Returns a clone of the MouseEvent instance.
 	**/
-	MouseEvent.prototype.clone = function() {
+	p.clone = function() {
 		return new MouseEvent(this.type, this.stageX, this.stageY);
 	}
 
 	/**
 	* Returns a string representation of this object.
 	**/
-	MouseEvent.prototype.toString = function() {
+	p.toString = function() {
 		return "[MouseEvent (type="+this.type+" stageX="+this.stageX+" stageY="+this.stageY+")]";
 	}
 	

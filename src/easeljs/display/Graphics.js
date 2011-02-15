@@ -49,6 +49,7 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 Graphics = function(instructions) {
 	this.initialize(instructions);
 }
+var p = Graphics.prototype;
 
 // static public methods:
 	
@@ -118,32 +119,32 @@ Graphics = function(instructions) {
 
 // public properties:
 	/** @private */
-	Graphics.prototype._strokeInstructions = null;
+	p._strokeInstructions = null;
 	/** @private */
-	Graphics.prototype._strokeStyleInstructions = null;
+	p._strokeStyleInstructions = null;
 	/** @private */
-	Graphics.prototype._fillInstructions = null;
+	p._fillInstructions = null;
 	/** @private */
-	Graphics.prototype._instructions = null;
+	p._instructions = null;
 	/** @private */
-	Graphics.prototype._oldInstructions = null;
+	p._oldInstructions = null;
 	/** @private */
-	Graphics.prototype._activeInstructions = null;
+	p._activeInstructions = null;
 	/** @private */
-	Graphics.prototype._active = false;
+	p._active = false;
 	/** @private */
-	Graphics.prototype._dirty = false;
+	p._dirty = false;
 	
 // constructor:
 	/** @ignore */
-	Graphics.prototype.initialize = function(instructions) {
+	p.initialize = function(instructions) {
 		this.clear();
 		this._ctx = Graphics._ctx;
 		with (this) { eval(instructions); }
 	}
 	
 // public methods:
-	Graphics.prototype.draw = function(ctx) {
+	p.draw = function(ctx) {
 		if (this._dirty) {
 			this._updateInstructions();
 		}
@@ -159,7 +160,7 @@ Graphics = function(instructions) {
 	* @param x
 	* @param y
 	**/
-	Graphics.prototype.moveTo = function(x, y) {
+	p.moveTo = function(x, y) {
 		this._activeInstructions.push(new Command(this._ctx.moveTo, [x, y]));
 		return this;
 	}
@@ -169,7 +170,7 @@ Graphics = function(instructions) {
 	* @param x
 	* @param y
 	**/
-	Graphics.prototype.lineTo = function(x, y) {
+	p.lineTo = function(x, y) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(new Command(this._ctx.lineTo, [x, y]));
 		return this;
@@ -183,7 +184,7 @@ Graphics = function(instructions) {
 	* @param y2
 	* @param radius
 	**/
-	Graphics.prototype.arcTo = function(x1, y1, x2, y2, radius) {
+	p.arcTo = function(x1, y1, x2, y2, radius) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(new Command(this._ctx.arcTo, [x1, y1, x2, y2, radius]));
 		return this;
@@ -198,7 +199,7 @@ Graphics = function(instructions) {
 	* @param endAngle
 	* @param anticlockwise
 	**/
-	Graphics.prototype.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
+	p.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		this._dirty = this._active = true;
 		if (anticlockwise == null) { anticlockwise = false; }
 		this._activeInstructions.push(new Command(this._ctx.arc, [x, y, radius, startAngle, endAngle, anticlockwise]));
@@ -212,7 +213,7 @@ Graphics = function(instructions) {
 	* @param x
 	* @param y
 	**/
-	Graphics.prototype.quadraticCurveTo = function(cpx, cpy, x, y) {
+	p.quadraticCurveTo = function(cpx, cpy, x, y) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(new Command(this._ctx.quadraticCurveTo, [cpx, cpy, x, y]));
 		return this;
@@ -227,7 +228,7 @@ Graphics = function(instructions) {
 	* @param x
 	* @param y
 	**/
-	Graphics.prototype.bezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
+	p.bezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(new Command(this._ctx.bezierCurveTo, [cp1x, cp1y, cp2x, cp2y, x, y]));
 		return this;
@@ -243,7 +244,7 @@ Graphics = function(instructions) {
 	* @param w Width of the rectangle
 	* @param h Height of the rectangle
 	**/
-	Graphics.prototype.rect = function(x, y, w, h) {
+	p.rect = function(x, y, w, h) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(new Command(this._ctx.rect, [x, y, w-1, h]));
 		return this;
@@ -252,7 +253,7 @@ Graphics = function(instructions) {
 	/**
 	* Closes the current path, effectively drawing a line from the current drawing point to the first drawing point specified since the fill or stroke was last set.
 	**/
-	Graphics.prototype.closePath = function() {
+	p.closePath = function() {
 		if (this._active) {
 			this._dirty = true;
 			this._activeInstructions.push(new Command(this._ctx.closePath, []));
@@ -265,7 +266,7 @@ Graphics = function(instructions) {
 	/**
 	* Clears all drawing instructions, effectively reseting this Graphics instance.
 	**/
-	Graphics.prototype.clear = function() {
+	p.clear = function() {
 		this._instructions = [];
 		this._oldInstructions = [];
 		this._activeInstructions = [];
@@ -279,7 +280,7 @@ Graphics = function(instructions) {
 	* Begins a fill with the specified color. This ends the current subpath.
 	* @param color A CSS compatible color value (ex. "#FF0000" or "rgba(255,0,0,0.5)"). Setting to null will result in no fill.
 	**/
-	Graphics.prototype.beginFill = function(color) {
+	p.beginFill = function(color) {
 		if (this._active) { this._newPath(); }
 		this._fillInstructions = color ? [new Command(this._setProp, ["fillStyle", color])] : null;
 		return this;
@@ -295,7 +296,7 @@ Graphics = function(instructions) {
 	* @param x1 The position of the second point defining the line that defines the gradient direction and size.
 	* @param y1 The position of the second point defining the line that defines the gradient direction and size.
 	**/
-	Graphics.prototype.beginLinearGradientFill = function(colors, ratios, x0, y0, x1, y1) {
+	p.beginLinearGradientFill = function(colors, ratios, x0, y0, x1, y1) {
 		if (this._active) { this._newPath(); }
 		var o = this._ctx.createLinearGradient(x0, y0, x1, y1);
 		for (var i=0, l=colors.length; i<l; i++) {
@@ -317,7 +318,7 @@ Graphics = function(instructions) {
 	* @param y1 Center position of the outer circle that defines the gradient.
 	* @param r1 Radius of the outer circle that defines the gradient.
 	**/
-	Graphics.prototype.beginRadialGradientFill = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
+	p.beginRadialGradientFill = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
 		if (this._active) { this._newPath(); }
 		var o = this._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
 		for (var i=0, l=colors.length; i<l; i++) {
@@ -332,7 +333,7 @@ Graphics = function(instructions) {
 	* @param image The Image, Canvas, or Video object to use as the pattern.
 	* @param repetition Optional. Indicates whether to repeat the image in the fill area. One of repeat, repeat-x, repeat-y, or no-repeat. Defaults to "repeat".
 	**/
-	Graphics.prototype.beginBitmapFill = function(image, repetition) {
+	p.beginBitmapFill = function(image, repetition) {
 		if (this._active) { this._newPath(); }
 		repetition = repetition || "";
 		var o = this._ctx.createPattern(image, repetition);
@@ -343,7 +344,7 @@ Graphics = function(instructions) {
 	/**
 	* Ends the current subpath, and begins a new one with no fill. Functionally identical to beginFill(null).
 	**/
-	Graphics.prototype.endFill = function() {
+	p.endFill = function() {
 		this.beginFill(null);
 		return this;
 	}
@@ -356,7 +357,7 @@ Graphics = function(instructions) {
 	* @param joints Optional. Specifies the type of joints that should be used where two lines meet. One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel) for use with the tiny API.
 	* @param miter Optional. If joints is set to "miter", then you can specify a miter limit ratio which controls at what point a mitered joint will be clipped.
 	**/
-	Graphics.prototype.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
+	p.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
 		if (this._active) { this._newPath(); }
 		this._strokeStyleInstructions = [
 			new Command(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)]),
@@ -371,7 +372,7 @@ Graphics = function(instructions) {
 	* Begins a stroke with the specified color. This ends the current subpath.
 	* @param color A CSS compatible color value (ex. "#FF0000" or "rgba(255,0,0,0.5)"). Setting to null will result in no stroke.
 	**/
-	Graphics.prototype.beginStroke = function(color) {
+	p.beginStroke = function(color) {
 		if (this._active) { this._newPath(); }
 		this._strokeInstructions = color ? [new Command(this._setProp, ["strokeStyle", color])] : null;
 		return this;
@@ -387,7 +388,7 @@ Graphics = function(instructions) {
 	* @param x1 The position of the second point defining the line that defines the gradient direction and size.
 	* @param y1 The position of the second point defining the line that defines the gradient direction and size.
 	**/
-	Graphics.prototype.beginLinearGradientStroke = function(colors, ratios, x0, y0, x1, y1) {
+	p.beginLinearGradientStroke = function(colors, ratios, x0, y0, x1, y1) {
 		if (this._active) { this._newPath(); }
 		var o = this._ctx.createLinearGradient(x0, y0, x1, y1);
 		for (var i=0, l=colors.length; i<l; i++) {
@@ -410,7 +411,7 @@ Graphics = function(instructions) {
 	* @param y1 Center position of the outer circle that defines the gradient.
 	* @param r1 Radius of the outer circle that defines the gradient.
 	**/
-	Graphics.prototype.beginRadialGradientStroke = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
+	p.beginRadialGradientStroke = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
 		if (this._active) { this._newPath(); }
 		var o = this._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
 		for (var i=0, l=colors.length; i<l; i++) {
@@ -425,7 +426,7 @@ Graphics = function(instructions) {
 	* @param image The Image, Canvas, or Video object to use as the pattern.
 	* @param repetition Optional. Indicates whether to repeat the image in the fill area. One of repeat, repeat-x, repeat-y, or no-repeat. Defaults to "repeat".
 	**/
-	Graphics.prototype.beginBitmapStroke = function(image, repetition) {
+	p.beginBitmapStroke = function(image, repetition) {
 		if (this._active) { this._newPath(); }
 		repetition = repetition || "";
 		var o = this._ctx.createPattern(image, repetition);
@@ -437,7 +438,7 @@ Graphics = function(instructions) {
 	/**
 	* Ends the current subpath, and begins a new one with no stroke. Functionally identical to beginStroke(null).
 	**/
-	Graphics.prototype.endStroke = function() {
+	p.endStroke = function() {
 		this.beginStroke(null);
 		return this;
 	}
@@ -445,12 +446,12 @@ Graphics = function(instructions) {
 	/**
 	* Maps the familiar ActionScript curveTo() method to the functionally similar quatraticCurveTo() method.
 	**/
-	Graphics.prototype.curveTo = Graphics.prototype.quadraticCurveTo;
+	p.curveTo = p.quadraticCurveTo;
 	
 	/**
 	* Maps the familiar ActionScript drawRect() method to the functionally similar rect() method.
 	**/
-	Graphics.prototype.drawRect = Graphics.prototype.rect;
+	p.drawRect = p.rect;
 	
 	/**
 	* Draws a rounded rectangle with all corners with the specified radius.
@@ -460,7 +461,7 @@ Graphics = function(instructions) {
 	* @param h
 	* @param radius Corner radius.
 	**/
-	Graphics.prototype.drawRoundRect = function(x, y, w, h, radius) {
+	p.drawRoundRect = function(x, y, w, h, radius) {
 		this.drawRoundRectComplex(x, y, w, h, radius, radius, radius, radius);
 		return this;
 	}
@@ -476,7 +477,7 @@ Graphics = function(instructions) {
 	* @param radiusBR Bottom right corner radius.
 	* @param radiusBL Bottom left corner radius.
 	**/
-	Graphics.prototype.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
+	p.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(
 			new Command(this._ctx.moveTo, [x+radiusTL, y]),
@@ -498,7 +499,7 @@ Graphics = function(instructions) {
 	* @param y
 	* @param radius
 	**/
-	Graphics.prototype.drawCircle = function(x, y, radius) {
+	p.drawCircle = function(x, y, radius) {
 		this.arc(x, y, radius, 0, Math.PI*2);
 		return this;
 	}
@@ -510,7 +511,7 @@ Graphics = function(instructions) {
 	* @param w
 	* @param h
 	**/
-	Graphics.prototype.drawEllipse = function(x, y, w, h) {
+	p.drawEllipse = function(x, y, w, h) {
 		this._dirty = this._active = true;
 		var k = 0.5522848;
 		var ox = (w / 2) * k;
@@ -541,7 +542,7 @@ Graphics = function(instructions) {
 	* @param pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular polygon (no points), a pointSize of 1 will draw nothing because the points are infinitely pointy.
 	* @param angle The angle of the first point / corner. For example a value of 0 will draw the first point directly to the right of the center.
 	**/
-	Graphics.prototype.drawPolyStar = function(x, y, radius, sides, pointSize, angle) {
+	p.drawPolyStar = function(x, y, radius, sides, pointSize, angle) {
 		this._dirty = this._active = true;
 		if (pointSize == null) { pointSize = 0; }
 		pointSize = 1-pointSize;
@@ -561,7 +562,7 @@ Graphics = function(instructions) {
 		return this;
 	}
 	
-	Graphics.prototype.clone = function() {
+	p.clone = function() {
 		var o = new Graphics();
 		o._instructions = this._instructions.slice();
 		o._activeIntructions = this._activeInstructions.slice();
@@ -575,69 +576,69 @@ Graphics = function(instructions) {
 		return o;
 	}
 		
-	Graphics.prototype.toString = function() {
+	p.toString = function() {
 		return "[Graphics]";
 	}
 	
 	
 // tiny API:
 	/** Shortcut to moveTo. */
-	Graphics.prototype.mt = Graphics.prototype.moveTo;
+	p.mt = p.moveTo;
 	/** Shortcut to lineTo. */
-	Graphics.prototype.lt = Graphics.prototype.lineTo;
+	p.lt = p.lineTo;
 	/** Shortcut to arcTo. */
-	Graphics.prototype.at = Graphics.prototype.arcTo;
+	p.at = p.arcTo;
 	/** Shortcut to bezierCurveTo. */
-	Graphics.prototype.bt = Graphics.prototype.bezierCurveTo;
+	p.bt = p.bezierCurveTo;
 	/** Shortcut to quadraticCurveTo / curveTo. */
-	Graphics.prototype.qt = Graphics.prototype.quadraticCurveTo;
+	p.qt = p.quadraticCurveTo;
 	/** Shortcut to arc. */
-	Graphics.prototype.a = Graphics.prototype.arc;
+	p.a = p.arc;
 	/** Shortcut to rect. */
-	Graphics.prototype.r = Graphics.prototype.rect;
+	p.r = p.rect;
 	/** Shortcut to closePath. */
-	Graphics.prototype.cp = Graphics.prototype.closePath;
+	p.cp = p.closePath;
 	/** Shortcut to clear. */
-	Graphics.prototype.c = Graphics.prototype.clear;
+	p.c = p.clear;
 	/** Shortcut to beginFill. */
-	Graphics.prototype.f = Graphics.prototype.beginFill;
+	p.f = p.beginFill;
 	/** Shortcut to beginLinearGradientFill. */
-	Graphics.prototype.lf = Graphics.prototype.beginLinearGradientFill;
+	p.lf = p.beginLinearGradientFill;
 	/** Shortcut to beginRadialGradientFill. */
-	Graphics.prototype.rf = Graphics.prototype.beginRadialGradientFill;
+	p.rf = p.beginRadialGradientFill;
 	/** Shortcut to beginBitmapFill. */
-	Graphics.prototype.bf = Graphics.prototype.beginBitmapFill;
+	p.bf = p.beginBitmapFill;
 	/** Shortcut to endFill. */
-	Graphics.prototype.ef = Graphics.prototype.endFill;
+	p.ef = p.endFill;
 	/** Shortcut to setStrokeStyle. */
-	Graphics.prototype.ss = Graphics.prototype.setStrokeStyle;
+	p.ss = p.setStrokeStyle;
 	/** Shortcut to beginStroke. */
-	Graphics.prototype.s = Graphics.prototype.beginStroke;
+	p.s = p.beginStroke;
 	/** Shortcut to beginLinearGradientStroke. */
-	Graphics.prototype.ls = Graphics.prototype.beginLinearGradientStroke;
+	p.ls = p.beginLinearGradientStroke;
 	/** Shortcut to beginRadialGradientStroke. */
-	Graphics.prototype.rs = Graphics.prototype.beginRadialGradientStroke;
+	p.rs = p.beginRadialGradientStroke;
 	/** Shortcut to beginBitmapStroke. */
-	Graphics.prototype.bs = Graphics.prototype.beginBitmapStroke;
+	p.bs = p.beginBitmapStroke;
 	/** Shortcut to endStroke. */
-	Graphics.prototype.es = Graphics.prototype.endStroke;
+	p.es = p.endStroke;
 	/** Shortcut to drawRect. */
-	Graphics.prototype.dr = Graphics.prototype.drawRect;
+	p.dr = p.drawRect;
 	/** Shortcut to drawRoundRect. */
-	Graphics.prototype.rr = Graphics.prototype.drawRoundRect;
+	p.rr = p.drawRoundRect;
 	/** Shortcut to drawRoundRectComplex. */
-	Graphics.prototype.rc = Graphics.prototype.drawRoundRectComplex;
+	p.rc = p.drawRoundRectComplex;
 	/** Shortcut to drawCircle. */
-	Graphics.prototype.dc = Graphics.prototype.drawCircle;
+	p.dc = p.drawCircle;
 	/** Shortcut to drawEllipse. */
-	Graphics.prototype.de = Graphics.prototype.drawEllipse;
+	p.de = p.drawEllipse;
 	/** Shortcut to drawPolyStar. */
-	Graphics.prototype.dp = Graphics.prototype.drawPolyStar;
+	p.dp = p.drawPolyStar;
 	
 	
 // private methods:
 	/** @private */
-	Graphics.prototype._updateInstructions = function() {
+	p._updateInstructions = function() {
 		this._instructions = this._oldInstructions.slice()
 		this._instructions.push(Graphics.beginCmd);
 		 
@@ -656,7 +657,7 @@ Graphics = function(instructions) {
 	}
 	
 	/** @private */
-	Graphics.prototype._newPath = function() {
+	p._newPath = function() {
 		if (this._dirty) { this._updateInstructions(); }
 		this._oldInstructions = this._instructions;
 		this._activeInstructions = [];
@@ -665,7 +666,7 @@ Graphics = function(instructions) {
 	
 	// used to create Commands that set properties:
 	/** @private */
-	Graphics.prototype._setProp = function(name, value) {
+	p._setProp = function(name, value) {
 		this[name] = value;
 	}
 

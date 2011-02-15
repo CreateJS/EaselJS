@@ -40,20 +40,21 @@
 Rectangle = function(x, y, width, height) {
   this.initialize(x, y, width, height);
 }
+var p = Rectangle.prototype;
 	
 // public properties:
 	/** X position. */
-	Rectangle.prototype.x = 0;
+	p.x = 0;
 	/** Y position. */
-	Rectangle.prototype.y = 0;
+	p.y = 0;
 	/** Width. */
-	Rectangle.prototype.width = 0;
+	p.width = 0;
 	/** Height. */
-	Rectangle.prototype.height = 0;
+	p.height = 0;
 	
 // constructor:
 	/** @ignore */
-	Rectangle.prototype.initialize = function(x, y, width, height) {
+	p.initialize = function(x, y, width, height) {
 		this.x = (x == null ? 0 : x);
 		this.y = (y == null ? 0 : y);
 		this.width = (width == null ? 0 : width);
@@ -64,14 +65,14 @@ Rectangle = function(x, y, width, height) {
 	/**
 	* Returns a clone of this Rectangle.
 	**/
-	Rectangle.prototype.clone = function() {
+	p.clone = function() {
 		return new Rectangle(this.x, this.y, this.width, this.height);
 	}
 
 	/**
 	* Returns a string representation of this object.
 	**/
-	Rectangle.prototype.toString = function() {
+	p.toString = function() {
 		return "[Rectangle (x="+this.x+" y="+this.y+" width="+this.width+" height="+this.height+")]";
 	}
 	

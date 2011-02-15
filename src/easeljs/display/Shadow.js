@@ -40,6 +40,7 @@
 Shadow = function(color, offsetX, offsetY, blur) {
   this.initialize(color, offsetX, offsetY, blur);
 }
+var p = Shadow.prototype;
 	
 // static public properties:
 	/**
@@ -50,17 +51,17 @@ Shadow = function(color, offsetX, offsetY, blur) {
 	
 // public properties:
 	/** The color of the shadow. */
-	Shadow.prototype.color = null;
+	p.color = null;
 	/** The x offset of the shadow. */
-	Shadow.prototype.offsetX = 0;
+	p.offsetX = 0;
 	/** The y offset of the shadow. */
-	Shadow.prototype.offsetY = 0;
+	p.offsetY = 0;
 	/** The blur of the shadow. */
-	Shadow.prototype.blur = 0;
+	p.blur = 0;
 	
 // constructor:
 	/** @ignore */
-	Shadow.prototype.initialize = function(color, offsetX, offsetY, blur) {
+	p.initialize = function(color, offsetX, offsetY, blur) {
 		this.color = color;
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
@@ -71,7 +72,7 @@ Shadow = function(color, offsetX, offsetY, blur) {
 	/**
 	* Returns a string representation of this object.
 	**/
-	Shadow.prototype.toString = function() {
+	p.toString = function() {
 		return "[Shadow]";
 	}
 	
@@ -79,7 +80,7 @@ Shadow = function(color, offsetX, offsetY, blur) {
 	/**
 	* Returns a clone of this object.
 	**/
-	Shadow.prototype.clone = function() {
+	p.clone = function() {
 		return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);
 	}
 	

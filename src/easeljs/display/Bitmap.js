@@ -38,31 +38,31 @@
 Bitmap = function(image) {
   this.initialize(image);
 }
-Bitmap.prototype = new DisplayObject();
+var p = Bitmap.prototype = new DisplayObject();
 
 // public properties:
 	/** The image to render. This can be an Image, a Canvas, or a Video. */
-	Bitmap.prototype.image = null;
-	Bitmap.prototype.snapToPixel = true;
+	p.image = null;
+	p.snapToPixel = true;
 	
 // constructor:
 	/** @private */
-	Bitmap.prototype.DisplayObject_initialize = Bitmap.prototype.initialize;
+	p.DisplayObject_initialize = p.initialize;
 	/** @ignore */
-	Bitmap.prototype.initialize = function(image) {
+	p.initialize = function(image) {
 		this.DisplayObject_initialize();
 		this.image = image;
 	}
 	
 // public methods:
 
-	Bitmap.prototype.isVisible = function() {
+	p.isVisible = function() {
 		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.image && (this.image.complete || this.image.getContext);
 	}
 
 	/** @borrows DisplayObject#draw as this.draw */
-	Bitmap.prototype.DisplayObject_draw = Bitmap.prototype.draw;
-	Bitmap.prototype.draw = function(ctx, ignoreCache) {
+	p.DisplayObject_draw = p.draw;
+	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		ctx.drawImage(this.image, 0, 0);
 		return true;
@@ -71,23 +71,23 @@ Bitmap.prototype = new DisplayObject();
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	**/
-	Bitmap.prototype.cache = function() {}
+	p.cache = function() {}
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	**/
-	Bitmap.prototype.updateCache = function() {}
+	p.updateCache = function() {}
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	**/
-	Bitmap.prototype.uncache = function() {}
+	p.uncache = function() {}
 	
-	Bitmap.prototype.clone = function() {
+	p.clone = function() {
 		var o = new Bitmap(this.image);
 		this.cloneProps(o);
 		return o;
 	}
 	
-	Bitmap.prototype.toString = function() {
+	p.toString = function() {
 		return "[Bitmap (name="+  this.name +")]";
 	}
 

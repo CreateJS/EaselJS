@@ -42,25 +42,25 @@
 SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
   this.initialize(image, frameWidth, frameHeight, frameData);
 }
-	
+var p = SpriteSheet.prototype;
 	
 // public properties:
 	/** The Image, Canvas, or Video instance to use as a sprite sheet. */
-	SpriteSheet.prototype.image = null;
+	p.image = null;
 	/** The width in pixels of each frame on the sprite sheet image. */
-	SpriteSheet.prototype.frameWidth = 0;
+	p.frameWidth = 0;
 	/** The height in pixels of each frame on the sprite sheet image. */
-	SpriteSheet.prototype.frameHeight = 0;
+	p.frameHeight = 0;
 	/** Defines named frames and frame sequences. Frame data is specified as a generic object, where each property name will be used to define a new named frame or sequence. Named frames specify a frame number. Sequences are defined using an array of 2 or 3 values: the start frame, the end frame, and optionally the name of the next sequence to play.<br/><br/>For example, examine the following frame data:<br/>{walk:[0,20], shoot:[21,25,"walk"], crouch:[26,30,false], stand:31}<br/>This will create 3 sequences and a named frame. The first sequence will be named "walk", and will loop frames 0 to 20 inclusive. The second sequence will be named "shoot", and will play frames 21 to 25 then play the walk sequence. The third sequence "crouch" will play frames 26 to 30 then pause on frame 30, due to false being passed as the next sequence. The named frame "stand" will display frame 31. */
-	SpriteSheet.prototype.frameData = null;
+	p.frameData = null;
 	/** The loop property is only used if no frameData is specified, and indicates whether all frames (as specified with totalFrames) should loop. If false, the animation will play to totalFrames, then pause. */
-	SpriteSheet.prototype.loop = true;
+	p.loop = true;
 	/** Specifies the total number of frames in the sprite sheet if no frameData is specified. This is useful for excluding extraneous frames (for example, if you have 7 frames in a 2x4 sprite sheet). The total frames will be automatically calculated by BitmapSequence based on frame and image dimensions if totalFrames is 0. */
-	SpriteSheet.prototype.totalFrames = 0;
+	p.totalFrames = 0;
 	
 // constructor:
 	/** @ignore */
-	SpriteSheet.prototype.initialize = function(image, frameWidth, frameHeight, frameData) {
+	p.initialize = function(image, frameWidth, frameHeight, frameData) {
 		this.image = image;
 		this.frameWidth = frameWidth;
 		this.frameHeight = frameHeight;
@@ -71,14 +71,14 @@ SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
 	/**
 	* Returns a string representation of this object.
 	**/
-	SpriteSheet.prototype.toString = function() {
+	p.toString = function() {
 		return "[SpriteSheet]";
 	}
 	
 	/**
 	* Returns a clone of this object.
 	**/
-	SpriteSheet.prototype.clone = function() {
+	p.clone = function() {
 		var o = new SpriteSheet(this.image, this.frameWidth, this.frameHeight, this.frameData);
 		o.loop = this.loop;
 		o.totalFrames = this.totalFrames;

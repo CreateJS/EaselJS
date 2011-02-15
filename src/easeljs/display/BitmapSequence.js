@@ -38,44 +38,44 @@
 BitmapSequence = function(spriteSheet) {
   this.initialize(spriteSheet);
 }
-BitmapSequence.prototype = new DisplayObject();
+var p = BitmapSequence.prototype = new DisplayObject();
 
 // public properties:
 	/** Specifies a funciton to call whenever any sequence reaches its end. */
-	BitmapSequence.prototype.callback = null;
+	p.callback = null;
 	/** The frame that will be drawn on the next tick. This can also be set, but it will not update the current sequence, so it may result in unexpected behaviour if you are using frameData. */
-	BitmapSequence.prototype.currentFrame = -1;
+	p.currentFrame = -1;
 	/** Returns the currently playing sequence when using frameData. READ-ONLY. */
-	BitmapSequence.prototype.currentSequence = null; // READ-ONLY
+	p.currentSequence = null; // READ-ONLY
 	/** Returns the last frame of the currently playing sequence when using frameData. READ-ONLY. */
-	BitmapSequence.prototype.currentEndFrame = null; // READ-ONLY
+	p.currentEndFrame = null; // READ-ONLY
 	/** Returns the first frame of the currently playing sequence when using frameData. READ-ONLY. */
-	BitmapSequence.prototype.currentStartFrame = null; // READ-ONLY
+	p.currentStartFrame = null; // READ-ONLY
 	/** Returns the name of the next sequence that will be played, or null if it will stop playing after the current sequence. READ-ONLY. */
-	BitmapSequence.prototype.nextSequence = null;
+	p.nextSequence = null;
 	/** Prevents the animation from advancing each tick automatically. For example, you could create a sprite sheet of icons, set paused to true, and display the appropriate icon by setting currentFrame. */
-	BitmapSequence.prototype.paused = false;
+	p.paused = false;
 	/** The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame data. See SpriteSheet for more information. */
-	BitmapSequence.prototype.spriteSheet = null;
-	BitmapSequence.prototype.snapToPixel = true;
+	p.spriteSheet = null;
+	p.snapToPixel = true;
 	
 // constructor:
 	/** @ignore */
-	BitmapSequence.prototype.DisplayObject_initialize = BitmapSequence.prototype.initialize;
+	p.DisplayObject_initialize = p.initialize;
 	/** @ignore */
-	BitmapSequence.prototype.initialize = function(spriteSheet) {
+	p.initialize = function(spriteSheet) {
 		this.DisplayObject_initialize();
 		this.spriteSheet = spriteSheet;
 	}
 	
 // public methods:
-	BitmapSequence.prototype.isVisible = function() {
+	p.isVisible = function() {
 		var image = this.spriteSheet ? this.spriteSheet.image : null;
 		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && image && this.currentFrame >= 0 && (image.complete || image.getContext);
 	}
 
-	BitmapSequence.prototype.DisplayObject_draw = BitmapSequence.prototype.draw;
-	BitmapSequence.prototype.draw = function(ctx, ignoreCache) {
+	p.DisplayObject_draw = p.draw;
+	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		
 		var image = this.spriteSheet.image;
@@ -119,7 +119,7 @@ BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Advances the currentFrame if paused is not true. This is called automatically when the Stage ticks.
 	**/
-	BitmapSequence.prototype.tick = function() {
+	p.tick = function() {
 		if (this.paused) { return; }
 		this.currentFrame++;
 	}
@@ -127,20 +127,20 @@ BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for BitmapSequence instances.
 	**/
-	BitmapSequence.prototype.cache = function() {}
+	p.cache = function() {}
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for BitmapSequence instances.
 	**/
-	BitmapSequence.prototype.updateCache = function() {}
+	p.updateCache = function() {}
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for BitmapSequence instances.
 	**/
-	BitmapSequence.prototype.uncache = function() {}
+	p.uncache = function() {}
 	
 	/**
 	* Sets paused to false and plays the specified sequence name, named frame, or frame number.
 	**/
-	BitmapSequence.prototype.gotoAndPlay = function(frameOrSequence) {
+	p.gotoAndPlay = function(frameOrSequence) {
 		this.paused = false;
 		this._goto(frameOrSequence);
 	}
@@ -148,26 +148,26 @@ BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Sets paused to true and seeks to the specified sequence name, named frame, or frame number.
 	**/
-	BitmapSequence.prototype.gotoAndStop = function(frameOrSequence) {
+	p.gotoAndStop = function(frameOrSequence) {
 		this.paused = true;
 		this._goto(frameOrSequence);
 	}
 	
-	BitmapSequence.prototype.clone = function() {
+	p.clone = function() {
 		var o = new BitmapSequence(this.spriteSheet);
 		this.cloneProps(o);
 		return o;
 	}
 		
-	BitmapSequence.prototype.toString = function() {
+	p.toString = function() {
 		return "[BitmapSequence (name="+  this.name +")]";
 	}
 	
 // private methods:
 	/** @private */
-	BitmapSequence.prototype.DisplayObject_cloneProps = BitmapSequence.prototype.cloneProps;
+	p.DisplayObject_cloneProps = p.cloneProps;
 	/** @private */
-	BitmapSequence.prototype.cloneProps = function(o) {
+	p.cloneProps = function(o) {
 		this.DisplayObject_cloneProps(o);
 		o.callback = this.callback;
 		o.currentFrame = this.currentFrame;
@@ -180,7 +180,7 @@ BitmapSequence.prototype = new DisplayObject();
 	}
 	
 	/** @private */
-	BitmapSequence.prototype._goto = function(frameOrSequence) {
+	p._goto = function(frameOrSequence) {
 		if (isNaN(frameOrSequence)) {
 			if (frameOrSequence == this.currentSequence) {
 				this.currentFrame = this.currentStartFrame;
