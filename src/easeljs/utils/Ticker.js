@@ -61,29 +61,92 @@
 	*/	
 	
 // private static properties:
-	/** @private */
+
+	
+	/** 
+	* @property _listeners
+	* @type Array[Object]
+	* @protected 
+	**/
 	Ticker._listeners = [];
-	/** @private */
+	
+	/** 
+	* @property _pauseable
+	* @type Array[Boolean]
+	* @protected 
+	**/
 	Ticker._pauseable = [];
-	/** @private */
+	
+	/** 
+	* @property _paused
+	* @type Boolean
+	* @protected 
+	**/
 	Ticker._paused = false;
-	/** @private */
+	
+	/** 
+	* @property _inited
+	* @type Boolean
+	* @protected 
+	**/
 	Ticker._inited = false;
-	/** @private */
+	
+	/** 
+	* @property _startTime
+	* @type Number
+	* @protected 
+	**/
 	Ticker._startTime = 0;
-	/** @private */
+	
+	/** 
+	* @property _pausedTime
+	* @type Number
+	* @protected 
+	**/
 	Ticker._pausedTime=0;
-	/** @private : number of ticks that have passed */
+	
+	/** 
+	* Number of ticks that have passed
+	* @property _ticks
+	* @type Number
+	* @protected 
+	**/
 	Ticker._ticks = 0;
-	/** @private : number of ticks that have passed while Ticker has been paused */
+	
+	/**
+	* Number of ticks that have passed while Ticker has been paused
+	* @property _pausedTickers
+	* @type Number
+	* @protected 
+	**/
 	Ticker._pausedTickers = 0;
-	/** @private */
+	
+	/** 
+	* @property _interval
+	* @type Number
+	* @protected 
+	**/
 	Ticker._interval = 50; // READ-ONLY
-	/** @private */
+	
+	/** 
+	* @property _intervalID
+	* @type Number
+	* @protected 
+	**/
 	Ticker._intervalID = null;
-	/** @private */
+	
+	/** 
+	* @property _lastTime
+	* @type Number
+	* @protected 
+	**/
 	Ticker._lastTime = 0;
-	/** @private */
+	
+	/** 
+	* @property _times
+	* @type Array[Number]
+	* @protected 
+	**/
 	Ticker._times = [];
 	
 // public static methods:
@@ -248,7 +311,11 @@
 	}
 	
 // private static methods:
-	/** @private */
+
+	/**
+	* @method _tick
+	* @protected
+	* */
 	Ticker._tick = function() {
 		Ticker._ticks++;
 		
@@ -277,7 +344,7 @@
 		if (Ticker._times.length > 100) { Ticker._times.pop(); }
 	}
 	
-	/** @private */
+	/** @protected */
 	Ticker._getTime = function() {
 		return new Date().getTime();
 	}

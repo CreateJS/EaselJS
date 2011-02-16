@@ -84,7 +84,11 @@ var p = Rectangle.prototype;
 	p.height = 0;
 	
 // constructor:
-	/** @ignore */
+	/** 
+	* Initialization method.
+	* @method initialize
+	* @protected
+	*/
 	p.initialize = function(x, y, width, height) {
 		this.x = (x == null ? 0 : x);
 		this.y = (y == null ? 0 : y);
