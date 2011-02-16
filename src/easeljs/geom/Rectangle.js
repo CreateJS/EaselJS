@@ -37,12 +37,12 @@
 (function(window) {
 
 /**
- * Represents a point on a 2 dimensional x / y coordinate system.
- * @class Point
+ * Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
+ * @class Rectangle
  **/
 
 /**
-* Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
+* Constructs a new Rectangle instance.
 * @constructor
 * @param {Number} x X position. Default is 0.
 * @param {Number} y Y position. Default is 0.
@@ -58,28 +58,28 @@ var p = Rectangle.prototype;
 	/** 
 	* X position. 
 	* @property x
-	* @type {Number}
+	* @type Number
 	**/
 	p.x = 0;
 	
 	/** 
 	* Y position. 
 	* @property y
-	* @type {Number}
+	* @type Number
 	**/
 	p.y = 0;
 	
 	/** 
 	* Width.
 	* @property width
-	* @type {Number}
+	* @type Number
 	**/
 	p.width = 0;
 	
 	/** 
 	* Height.
 	* @property height
-	* @type {Number}
+	* @type Number
 	**/
 	p.height = 0;
 	

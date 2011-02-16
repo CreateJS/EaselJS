@@ -57,14 +57,14 @@ var p = Point.prototype;
 	/** 
 	* X position. 
 	* @property x
-	* @type {Number}
+	* @type Number
 	**/
 	p.x = 0;
 	
 	/** 
 	* Y position. 
 	* @property y
-	* @type {Number}
+	* @type Number
 	**/
 	p.y = 0;
 	
