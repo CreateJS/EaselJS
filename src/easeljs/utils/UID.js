@@ -47,8 +47,11 @@
 		throw "UID cannot be instantiated"; 
 	}
 	
-// private static properties:
-	/** @private */
+	/** 
+	* @property _nextID
+	* @type Number
+	* @protected 
+	**/
 	UID._nextID = 0;
 	
 	/**
