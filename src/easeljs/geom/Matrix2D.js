@@ -145,7 +145,11 @@ var p = Matrix2D.prototype;
 	p.compositeOperation  = null;
 	
 // constructor:
-	/** @private */
+	/** 
+	* Initialization method.
+	* @method initialize
+	* @protected
+	*/
 	p.initialize = function(a, b, c, d, tx, ty) {
 		if (a != null) { this.a = a; }
 		if (b != null) { this.b = b; }

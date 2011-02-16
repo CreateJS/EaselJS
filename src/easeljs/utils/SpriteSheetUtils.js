@@ -51,9 +51,20 @@
 		throw "SpriteSheetUtils cannot be instantiated"; 
 	}
 
-	/** @private */
+	/** 
+	* @property _workingCanvas
+	* @static
+	* @type HTMLCanvasElement
+	* @protected
+	*/
 	SpriteSheetUtils._workingCanvas = document.createElement("canvas");
-	/** @private */
+
+	/** 
+	* @property _workingContext
+	* @static
+	* @type CanvasRenderingContext2D
+	* @protected
+	*/
 	SpriteSheetUtils._workingContext = SpriteSheetUtils._workingCanvas.getContext("2d");
 	
 // public static methods:

@@ -69,7 +69,11 @@ var p = Point.prototype;
 	p.y = 0;
 	
 // constructor:
-	/** @private */
+	/** 
+	* Initialization method.
+	* @method initialize
+	* @protected
+	*/
 	p.initialize = function(x, y) {
 		this.x = (x == null ? 0 : x);
 		this.y = (y == null ? 0 : y);
