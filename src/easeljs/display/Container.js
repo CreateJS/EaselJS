@@ -266,7 +266,7 @@ var p = Container.prototype = new DisplayObject();
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;
 		var mtx = DisplayObject._workingMatrix;
-		var hasHandler = mouseEvents && (this.onPress || this.onClick);
+		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick)) || (mouseEvents&2 && (this.onMouseOver || this.onMouseOut));
 
 		// if we have a cache handy, we can use it to do a quick check:
 		if (this.cacheCanvas) {
@@ -299,7 +299,7 @@ var p = Container.prototype = new DisplayObject();
 					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!mouseEvents || (mouseEvents && (child.onPress || child.onClick || hasHandler))) {
+			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.onPress || child.onClick)) || (mouseEvents&2 && (child.onMouseOver || child.onMouseOut))) {
 				child.getConcatenatedMatrix(mtx);
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				ctx.globalAlpha = mtx.alpha;

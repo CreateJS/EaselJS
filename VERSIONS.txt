@@ -1,3 +1,11 @@
+Version 0.3.2 [not released]
+****************************************************************************************************
+- fixed Graphics.clone()
+- added stage.mouseInBounds
+- added DisplayObject.onMouseOver and onMouseOut callbacks
+- added stage.enableMouseOver(freq)
+
+
 Version 0.3.1 [Feb 13, 2011]
 ****************************************************************************************************
 - fixed issues with hitTest and mouse event callbacks on Container instances.

@@ -49,9 +49,9 @@ var p = Stage.prototype = new Container();
 	p.autoClear = true;
 	/** The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the first stage that will be ticked (or they will clear each other's render). */
 	p.canvas = null;
-	/** READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas. */
+	/** READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas, and mouseInBounds will be set to false. */
 	p.mouseX = null;
-	/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas. */
+	/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas, and mouseInBounds will be set to false. */
 	p.mouseY = null;
 	/** The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance. */
 	p.onMouseMove = null;
@@ -61,6 +61,8 @@ var p = Stage.prototype = new Container();
 	p.onMouseDown = null;
 	/** Indicates whether this stage should use the snapToPixel property of display objects when rendering them. */
 	p.snapToPixelEnabled = false;
+	/** Indicates whether the mouse is currently within the bounds of the canvas. */
+	p.mouseInBounds = false;
 	
 // private properties:
 	/** @private */
@@ -70,6 +72,13 @@ var p = Stage.prototype = new Container();
 	/** @private */
 	p._activeMouseTarget = null;
 	/** @private */
+	p._mouseOverIntervalID = null;
+	/** @private */
+	p._mouseOverX = 0;
+	/** @private */
+	p._mouseOverY = 0;
+	/** @private */
+	p._mouseOverTarget = null;
 	
 // constructor:
 	/** @ignore */
@@ -83,10 +92,11 @@ var p = Stage.prototype = new Container();
 		var o = this;
 		if (window.addEventListener) {
 			window.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
+			window.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
 		} else if (document.addEventListener) {
 			document.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
+			document.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
 		}
-		canvas.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
 		canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
 	}
 	
@@ -170,6 +180,24 @@ var p = Stage.prototype = new Container();
 
 		return dataURL;
 	}
+
+	/**
+	 * Enables or disables (by passing a frequency of 0) mouse over handlers (onMouseOver and onMouseOut) for this stage's display
+	 * list. These events can be expensive to generate, so they are disabled by default, and the frequency of the events
+	 * can be controlled independently of mouse move events via the frequency parameter.
+	 * @param frequency The maximum number of times per second to broadcast mouse over/out events. Set to 0 to disable mouse over events completely. Maximum is 50. A lower frequency is less responsive, but uses less CPU.
+	 */
+	p.enableMouseOver = function(frequency) {
+		if (this._mouseOverIntervalID) {
+			clearInterval(this._mouseOverIntervalID);
+			this._mouseOverIntervalID = null;
+		}
+		if (frequency <= 0) { return; }
+		var o = this;
+		this._mouseOverIntervalID = setInterval(function(){ o._testMouseOver(); }, 1000/Math.min(50,frequency));
+		this._mouseOverX = NaN;
+		this._mouseOverTarget = null;
+	}
 	
 	p.clone = function() {
 		var o = new Stage(null);
@@ -182,35 +210,44 @@ var p = Stage.prototype = new Container();
 	}
 	
 // private methods:
-	
+	/** @private */
 	p._handleMouseMove = function(e) {
 		if (!this.canvas) {
 			this.mouseX = this.mouseY = null;
 			return;
 		}
 		if(!e){ e = window.event; }
-		this.mouseX = e.pageX-this.canvas.offsetLeft;
-		this.mouseY = e.pageY-this.canvas.offsetTop;
+
+		var mouseX = e.pageX-this.canvas.offsetLeft;
+		var mouseY = e.pageY-this.canvas.offsetTop;
+		var inBounds = (mouseX >= 0 && mouseY >= 0 && mouseX < this.canvas.width && mouseY < this.canvas.height);
+		if (!inBounds && !this.mouseInBounds) { return; }
 		
+		if (inBounds) {
+			this.mouseX = mouseX;
+			this.mouseY = mouseY;
+		}
+		this.mouseInBounds = inBounds;
 		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY);
 		if (this.onMouseMove) { this.onMouseMove(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
 	}
-	
+
+	/** @private */
 	p._handleMouseUp = function(e) {
 		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
-		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp instanceof Function) { this._activeMouseEvent.onMouseUp(evt); }
-		if (this._activeMouseTarget && this._activeMouseTarget.onClick &&
-			 this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true) == this._activeMouseTarget) {
+		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
+		if (this._activeMouseTarget && this._activeMouseTarget.onClick && this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true, (this._mouseOverIntervalID ? 3 : 1)) == this._activeMouseTarget) {
 			this._activeMouseTarget.onClick(new MouseEvent("onClick", this.mouseX, this.mouseY));
 		}
 		this._activeMouseEvent = this.activeMouseTarget = null;
 	}
-	
+
+	/** @private */
 	p._handleMouseDown = function(e) {
 		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
-		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
+		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
 			if (target.onPress instanceof Function) {
 				var evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
@@ -218,6 +255,26 @@ var p = Stage.prototype = new Container();
 				if (evt.onMouseMove || evt.onMouseUp) { this._activeMouseEvent = evt; }
 			}
 			this._activeMouseTarget = target;
+		}
+	}
+
+	/** @private */
+	p._testMouseOver = function() {
+		if (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds) { return; }
+		var target = null;
+		if (this.mouseInBounds) {
+			var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, 3);
+			this._mouseOverX = this.mouseX;
+			this._mouseOverY = this.mouseY;
+		}
+		if (this._mouseOverTarget != target) {
+			if (this._mouseOverTarget && this._mouseOverTarget.onMouseOut) {
+				this._mouseOverTarget.onMouseOut(new MouseEvent("onMouseOver", this.mouseX, this.mouseY));
+			}
+			if (target && target.onMouseOver) {
+				target.onMouseOver(new MouseEvent("onMouseOut", this.mouseX, this.mouseY));
+			}
+			this._mouseOverTarget = target;
 		}
 	}
 

@@ -92,6 +92,10 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p.onPress = null;
 	/** The onClick callback is called when the user presses down on and then releases the mouse button over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an onClick handler is set on a container, it will receive the event if any of its children are clicked. */
 	p.onClick = null;
+	/** The onMouseOver callback is called when the user rolls over the display object. You must enable this event using stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.  */
+	p.onMouseOver = null;
+	/** The onMouseOut callback is called when the user rolls off of the display object. You must enable this event using stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.  */
+	p.onMouseOut = null;
 	
 // private properties:
 	/** @private */
