@@ -138,7 +138,7 @@ var p = Matrix2D.prototype;
 	* Property representing the compositeOperation that will be applied to a display object. This is not part of
 	* matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated 
 	* compositeOperation values. You can find a list of valid composite operations at:
-	* https://developer.mozilla.org/en/Canvas_tutorial/Compositing
+	* <a href="https://developer.mozilla.org/en/Canvas_tutorial/Compositing">https://developer.mozilla.org/en/Canvas_tutorial/Compositing</a>
 	* @property compositeOperation
 	* @type String
 	**/
