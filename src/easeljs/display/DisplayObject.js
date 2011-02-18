@@ -127,22 +127,26 @@ DisplayObject._workingMatrix = new Matrix2D();
 	
 // public methods:
 	/**
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced developers.
-	 * Returns true or falsee indicating whether the display object would be visible if drawn to a canvas.
-	 * This does not account for whether it would be visible within the boundaries of the stage.
-	 **/
+	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+	* This does not account for whether it would be visible within the boundaries of the stage.
+	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	* @method isVisible
+	* @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+	**/
 	p.isVisible = function() {
 		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0;
 	}
 	
 	/**
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced developers.
-	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
-	 * Returns true if the draw was handled (useful for overriding functionality).
-	 * @param ctx The canvas 2D context object to draw into.
-	 * @param ignoreCache Indicates whether the draw operation should ignore any current cache. For example,
-	 * used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
-	 **/
+	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Returns true if the draw was handled (useful for overriding functionality).
+	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	* @method draw
+	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	* @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache. 
+	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+	* into itself).
+	**/
 	p.draw = function(ctx, ignoreCache) {
 		if (ignoreCache || !this.cacheCanvas) { return false; }
 		ctx.translate(this._cacheOffsetX, this._cacheOffsetY);
