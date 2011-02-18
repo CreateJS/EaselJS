@@ -251,10 +251,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @method cache
 	**/	
 	
-	p.cache = function() {}
-	p.updateCache = function() {}
-	p.uncache = function() {}
-	
 	/**
 	* Sets paused to false and plays the specified sequence name, named frame, or frame number.
 	* @method gotoAndPlay
