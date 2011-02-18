@@ -217,9 +217,38 @@ var p = Stage.prototype = new Container();
 			return;
 		}
 		if(!e){ e = window.event; }
-
-		var mouseX = e.pageX-this.canvas.offsetLeft;
-		var mouseY = e.pageY-this.canvas.offsetTop;
+		
+		function getOffsetX( obj ) {
+			var distX = 0;
+			if(obj.offsetParent)
+				while( 1 ) {
+					distX += obj.offsetLeft;
+					if(!obj.offsetParent)
+						break;
+					obj = obj.offsetParent;
+				}
+			else if( obj.x )
+				distX += obj.x;
+			return distX;
+		}
+		
+		function getOffsetY( obj ) {
+			var distY = 0;
+			if(obj.offsetParent)
+				while( 1 ) {
+					distY += obj.offsetTop;
+					if(!obj.offsetParent)
+						break;
+					obj = obj.offsetParent;
+				}
+			else if( obj.y )
+				distY += obj.y;
+			return distY;
+		}
+		
+		var mouseX = e.pageX-getOffsetX( this.canvas );
+		var mouseY = e.pageY-getOffsetY( this.canvas );
+		
 		var inBounds = (mouseX >= 0 && mouseY >= 0 && mouseX < this.canvas.width && mouseY < this.canvas.height);
 		if (!inBounds && !this.mouseInBounds) { return; }
 		
