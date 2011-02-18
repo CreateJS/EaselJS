@@ -123,26 +123,26 @@ var p = Bitmap.prototype = new DisplayObject();
 		return true;
 	}
 	
-	/**
-	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	* You should not cache Bitmap instances as it can degrade performance.
-	* @method cache
-	**/
-	p.cache = function() {}
+	//Note, the doc sections below document using the specified APIs (from DisplayObject)  from
+	//Bitmap. This is why they have no method implementations.
 	
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
 	* @method cache
 	**/
-	p.updateCache = function() {}
 	
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
 	* @method cache
 	**/
-	p.uncache = function() {}
+	
+	/**
+	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+	* You should not cache Bitmap instances as it can degrade performance.
+	* @method cache
+	**/
 	
 	/**
 	* Returns a clone of the Point instance.
