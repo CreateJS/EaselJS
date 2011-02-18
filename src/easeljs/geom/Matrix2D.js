@@ -67,9 +67,10 @@ var p = Matrix2D.prototype;
 	Matrix2D.identity = null; // set at bottom of class definition.
 
 	/** 
-	* Multiplier for converting degrees to radians. Used internally by Matrix2D. Read-only
+	* Multiplier for converting degrees to radians. Used internally by Matrix2D. Read-only.
 	* @property DEG_TO_RAD
 	* @static
+	* @final
 	* @type Number
 	**/
 	Matrix2D.DEG_TO_RAD = Math.PI/180;

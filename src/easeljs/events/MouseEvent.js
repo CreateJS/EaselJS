@@ -27,17 +27,30 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 **/
 
+/**
+* The Easel Javascript library provides a retained graphics mode for canvas 
+* including a full, hierarchical display list, a core interaction model, and 
+* helper classes to make working with Canvas much easier.
+* @module EaselJS
+**/
+
 (function(window) {
 
+
 /**
-* Constructs a new MouseEvent instance.
-* @param type The event type.
-* @param stageX The mouseX position relative to the stage.
-* @param stageY The mouseY position relative to the stage.
-* @class This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, and onClick handlers on 
+* This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, and onClick handlers on 
 * DisplayObject instances.
 * By default, mouse events are disabled for performance reasons. In order to enabled them for a specified stage
 * set mouseEventsEnabled to true on your stage instance.
+* @class MouseEvent
+**/
+
+/**
+* Constructs a new MouseEvent instance.
+* @constructor
+* @param {String} type The event type.
+* @param {Number} stageX The mouseX position relative to the stage.
+* @param {Number} stageY The mouseY position relative to the stage.
 **/
 MouseEvent = function(type, stageX, stageY) {
   this.initialize(type, stageX, stageY);
@@ -45,27 +58,53 @@ MouseEvent = function(type, stageX, stageY) {
 var p = MouseEvent.prototype;
 	
 // public properties:
-	/** The mouseX position on the stage. */
+
+	/**
+	* The mouseX position on the stage.
+	* @property stageX
+	* @type Number
+	*/
 	p.stageX = 0;
-	/** The mouseY position on the stage. */
+	
+	/**
+	* The mouseY position on the stage.
+	* @property stageY
+	* @type Number
+	**/
 	p.stageY = 0;
-	/** The type of mouse event. This will be the same as the handler it maps to (onPress, onMouseDown, 
-		onMouseUp, onMouseMove, or onClick). 
+	
+	/**
+	* The type of mouse event. This will be the same as the handler it maps to (onPress, 
+	* onMouseDown, onMouseUp, onMouseMove, or onClick).
+	* @property type
+	* @type String
 	**/
 	p.type = null;
-	/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseMove 
-		property. This handler will be called every time the mouse is moved until the mouse is released. 
-		This is useful for operations like drag and drop. 
+	
+	/**
+	* 	For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseMove 
+	* property. This handler will be called every time the mouse is moved until the mouse is released. 
+	* This is useful for operations such as drag and drop.
+	* @event onMouseMove
+	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
 	**/
 	p.onMouseMove = null;
-	/** For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseUp property. 
-		This handler will be called a single time when the mouse is released anywhere over the page. This is useful for operations 
-		like drag and drop. 
-	**/
+	
+	/**
+	* 	For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseUp 
+	* property. This handler will be called every time the mouse is moved until the mouse is released. 
+	* This is useful for operations such as drag and drop.
+	* @event onMouseUp
+	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
+	*/
 	p.onMouseUp = null;
 	
 // constructor:
-	/** @ignore */
+	/** 
+	* Initialization method.
+	* @method initialize
+	* @protected
+	**/
 	p.initialize = function(type, stageX, stageY) {
 		this.type = type;
 		this.stageX = stageX;
@@ -74,7 +113,9 @@ var p = MouseEvent.prototype;
 	
 // public methods:
 	/**
-	* Returns a clone of the MouseEvent instance.
+	* Returns a string representation of this object.
+	* @method toString
+	* @return {String} a string representation of the instance.
 	**/
 	p.clone = function() {
 		return new MouseEvent(this.type, this.stageX, this.stageY);
