@@ -278,7 +278,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 
 	/** 
 	 * @method cloneProps
-	 * @param {Text}
+	 * @param {Text} o
 	 * @protected 
 	 **/
 	p.cloneProps = function(o) {

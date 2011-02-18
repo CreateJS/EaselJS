@@ -101,7 +101,7 @@ var p = Bitmap.prototype = new DisplayObject();
 	}
 
 	/**
-	* @property
+	* @property DisplayObject_draw
 	* @type Function
 	* @private
 	**/
