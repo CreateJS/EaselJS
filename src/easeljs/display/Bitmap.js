@@ -45,7 +45,7 @@
 /**
 * Constructs a Bitmap object with the specified source image.
 * @constructor
-* @param {Object} image The Image, Canvas, or Video to render to the display list.
+* @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video to render to the display list.
 **/
 Bitmap = function(image) {
   this.initialize(image);
@@ -56,7 +56,7 @@ var p = Bitmap.prototype = new DisplayObject();
 	/**
 	* The image to render. This can be an Image, a Canvas, or a Video.
 	* @property image
-	* @type Object
+	* @type Image | HTMLCanvasElement | HTMLVideoElement
 	**/
 	p.image = null;
 	

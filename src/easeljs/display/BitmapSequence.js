@@ -254,7 +254,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Sets paused to false and plays the specified sequence name, named frame, or frame number.
 	* @method gotoAndPlay
-	* @param {Object} frameOrSequence The frame number or sequence that the playhead should move to
+	* @param {String|Number} frameOrSequence The frame number or sequence that the playhead should move to
 	* and begin playing.
 	**/
 	p.gotoAndPlay = function(frameOrSequence) {
@@ -265,7 +265,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Sets paused to true and seeks to the specified sequence name, named frame, or frame number.
 	* @method gotoAndStop
-	* @param {Object} frameOrSequence The frame number or sequence that the playhead should move to
+	* @param {String|Number} frameOrSequence The frame number or sequence that the playhead should move to
 	* and stop.
 	**/
 	p.gotoAndStop = function(frameOrSequence) {
@@ -321,7 +321,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Moves the playhead to the specified frame number of sequence.
 	* @method _goto
-	* @param {Object} frameOrSequence The frame number of sequence that the playhead should move to.
+	* @param {String|Number} frameOrSequence The frame number of sequence that the playhead should move to.
 	* @protected
 	**/
 	p._goto = function(frameOrSequence) {
