@@ -300,9 +300,9 @@ var p = Container.prototype = new DisplayObject();
 	/**
 	* Specifies whether a display object exists at the specified coordinates.
 	* @method hitTest
-	* @param {Number} x
-	* @param {Number} y
-	* @return {Boolean}
+	* @param {Number} x The x coordinate to check for a hit
+	* @param {Number} y The y coordinate to check for a hit
+	* @return {Boolean} A Boolean indicating whether there is a DisplayObject that overlaps the specified coordinates.
 	**/
 	p.hitTest = function(x, y) {
 		// TODO: optimize to use the fast cache check where possible.
@@ -310,9 +310,15 @@ var p = Container.prototype = new DisplayObject();
 	}
 
 	/**
-	* Returns an array of all display objects under the specified coordinates that are in this container's display list. This routine ignores any display objects with mouseEnabled set to false. The array will be sorted in order of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
-	* @param x The x position in the container to test.
-	* @param y The y position in the container to test.
+	* Returns an array of all display objects under the specified coordinates that are in this container's display list. 
+	* This routine ignores any display objects with mouseEnabled set to false. The array will be sorted in order of visual 
+	* depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an expensive operation 
+	* to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on 
+	* mousemove), and only if the mouse's position has changed.
+	* @method getObjectsUnderPoint
+	* @param {Number} x The x position in the container to test.
+	* @param {Number} y The y position in the container to test.
+	* @return {Array[DisplayObject]} An Array of DisplayObjects under the specified coordinates.
 	**/
 	p.getObjectsUnderPoint = function(x, y) {
 		var arr = [];
@@ -322,9 +328,12 @@ var p = Container.prototype = new DisplayObject();
 	}
 
 	/**
-	* Similar to getObjectsUnderPoint(), but returns only the top-most display object. This runs significantly faster than getObjectsUnderPoint(), but is still an expensive operation. See getObjectsUnderPoint() for more information.
-	* @param x The x position in the container to test.
-	* @param y The y position in the container to test.
+	* Similar to getObjectsUnderPoint(), but returns only the top-most display object. This runs significantly faster than 
+	* getObjectsUnderPoint(), but is still an expensive operation. See getObjectsUnderPoint() for more information.
+	* @getObjectUnderPoint
+	* @param {Number} x The x position in the container to test.
+	* @param {Number} y The y position in the container to test.
+	* @return {DisplayObject} The top-most display object under the specified coordinates.
 	**/
 	p.getObjectUnderPoint = function(x, y) {
 		var pt = this.localToGlobal(x, y);
@@ -332,8 +341,11 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 	/**
-	* Returns a clone of this Container. Some properties that are specific to this instance's current context are reverted to their defaults (for example .parent).
-	* @param recursive If true, all of the descendants of this container will be cloned recursively. If false, the properties of the container will be cloned, but the new instance will not have any children.
+	* Returns a clone of this Container. Some properties that are specific to this instance's current context are reverted to
+	* their defaults (for example .parent).
+	* @param {Boolean} recursive If true, all of the descendants of this container will be cloned recursively. If false, the 
+	* properties of the container will be cloned, but the new instance will not have any children.
+	* @return {Container} A clone of the current Container instance.
 	**/
 	p.clone = function(recursive) {
 		var o = new Container();
@@ -347,12 +359,25 @@ var p = Container.prototype = new DisplayObject();
 		return o;
 	}
 	
+	/**
+	* Returns a string representation of this object.
+	* @method toString
+	* @return {String} a string representation of the instance.
+	**/
 	p.toString = function() {
 		return "[Container (name="+  this.name +")]";
 	}
 	
 // private properties:
-	/** @private */
+	/** 
+	* @method _getObjectsUnderPoint
+	* @param {Number} x
+	* @param {Number} x
+	* @param {Array} arr
+	* @param {Array[MouseEvent]} mouseEvents
+	* @return {Array[DisplayObject]}
+	* @protected
+	**/
 	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;

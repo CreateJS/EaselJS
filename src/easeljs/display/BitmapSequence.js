@@ -302,10 +302,10 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	p.DisplayObject_cloneProps = p.cloneProps;
 	
 	/** 
-	 * @method cloneProps
-	 * @param {Text} o
-	 * @protected
-	 **/
+	* @method cloneProps
+	* @param {Text} o
+	* @protected
+	**/
 	p.cloneProps = function(o) {
 		this.DisplayObject_cloneProps(o);
 		o.callback = this.callback;
