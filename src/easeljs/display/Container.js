@@ -27,12 +27,31 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 **/
 
+/**
+* The Easel Javascript library provides a retained graphics mode for canvas 
+* including a full, hierarchical display list, a core interaction model, and 
+* helper classes to make working with Canvas much easier.
+* @module EaselJS
+**/
+
 (function(window) {
 
 /**
+* Container are nestable display lists that allow you to work with compound display elements. For 
+* example you could group arm, leg, torso and head Bitmaps together into a Person Container, and 
+* transform them as a group, while still being able to move the individual parts relative to each 
+* other. Children of containers have their transform and alpha properties concatenated with their 
+* parent Container. For example, a Shape with x=100 and alpha=0.5, placed in a Container with 
+* x=50 and alpha=0.7 will be rendered to the canvas at x=150 and alpha=0.35. Containers have some 
+* overhead, so you generally shouldn't create a Container to hold a single child.
+* @class Container
+* @extends DisplayObject
+**/
+
+
+/**
 * Constructs a new Container instance.
-* @class Container are nestable display lists that allow you to work with compound display elements. For example you could group arm, leg, torso and head Bitmaps together into a Person Container, and transform them as a group, while still being able to move the individual parts relative to each other. Children of containers have their transform and alpha properties concatenated with their parent Container. For example, a Shape with x=100 and alpha=0.5, placed in a Container with x=50 and alpha=0.7 will be rendered to the canvas at x=150 and alpha=0.35. Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
-* @augments DisplayObject
+* @constructor
 **/
 Container = function() {
   this.initialize();
@@ -40,13 +59,29 @@ Container = function() {
 var p = Container.prototype = new DisplayObject();
 
 // public properties:
-	/** The array of children in the display list. You should usually use the child management methods, rather than accessing this directly, but it is included for advanced users. */
+	/**
+	* The array of children in the display list. You should usually use the child management methods, 
+	* rather than accessing this directly, but it is included for advanced users.
+	* @property children
+	* @type Array[DisplayObject]
+	* @default null
+	**/
 	p.children = null;
 
 // constructor:
-	/** @ignore */
+
+	/**
+	* @property DisplayObject_initialize
+	* @type Function
+	* @private
+	**/
 	p.DisplayObject_initialize = p.initialize;
-	/** @ignore */
+	
+	/** 
+	* Initialization method.
+	* @method initialize
+	* @protected
+	*/
 	p.initialize = function() {
 		this.DisplayObject_initialize();
 		this.children = [];
@@ -54,12 +89,34 @@ var p = Container.prototype = new DisplayObject();
 	
 // public methods:
 
+	/**
+	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+	* This does not account for whether it would be visible within the boundaries of the stage.
+	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	* @method isVisible
+	* @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+	**/
 	p.isVisible = function() {
 		return this.visible && this.alpha > 0 && this.children.length && this.scaleX != 0 && this.scaleY != 0;
 	}
 
-	/** @private */
+	/**
+	* @property DisplayObject_draw
+	* @type Function
+	* @private
+	**/
 	p.DisplayObject_draw = p.draw;
+	
+	/**
+	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Returns true if the draw was handled (useful for overriding functionality).
+	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	* @method draw
+	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	* @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache. 
+	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+	* into itself).
+	**/
 	p.draw = function(ctx, ignoreCache, _mtx) {
 		var snap = Stage._snapToPixelEnabled;
 		if (!_mtx) {
@@ -95,8 +152,11 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 	/**
-	* Adds a child to the top of the display list. You can also add multiple children, such as "addChild(child1, child2, ...);". Returns the child that was added, or the last child if multiple children were added.
-	* @param child The display object to add.
+	* Adds a child to the top of the display list. You can also add multiple children, such as "addChild(child1, child2, ...);".
+	* Returns the child that was added, or the last child if multiple children were added.
+	* @method addChild
+	* @param {DisplayObject} child The display object to add.
+	* @return {DisplayObject} The child that was added, or the last child if multiple children were added.
 	**/
 	p.addChild = function(child) {
 		var l = arguments.length;
@@ -111,9 +171,15 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 	/**
-	* Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and setting its parent to this Container. You can also add multiple children, such as "addChildAt(child1, child2, ..., index);". The index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list, you could use: container.addChildAt(myShape, container.getChildIndex(otherShape)). This would also bump otherShape's index up by one. Returns the last child that was added, or the last child if multiple children were added.
-	* @param child The display object to add.
-	* @param index The index to add the child at.
+	* Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and setting 
+	* its parent to this Container. You can also add multiple children, such as "addChildAt(child1, child2, ..., index);". The 
+	* index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list, you could use: 
+	* container.addChildAt(myShape, container.getChildIndex(otherShape)). This would also bump otherShape's index up by one. 
+	* Returns the last child that was added, or the last child if multiple children were added.
+	* @method addChildAt
+	* @param {DisplayObject} child The display object to add.
+	* @param {Number} index The index to add the child at.
+	* @return {DisplayObject} The child that was added, or the last child if multiple children were added.
 	**/
 	p.addChildAt = function(child, index) {
 		var l = arguments.length;
@@ -129,8 +195,12 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 	/**
-	* Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is already known. You can also remove multiple children, such as "removeChild(child1, child2, ...);". Returns true if the child (or children) was removed, or false if it was not in the display list.
-	* @param child The child to remove.
+	* Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is already known.
+	* You can also remove multiple children, such as "removeChild(child1, child2, ...);". Returns true if the child (or children) 
+	* was removed, or false if it was not in the display list.
+	* @method removeChild
+	* @param {DisplayObject} child The child to remove.
+	* @return {Boolean} true if the child (or children) was removed, or false if it was not in the display list.
 	**/
 	p.removeChild = function(child) {
 		var l = arguments.length;
@@ -143,8 +213,11 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 	/**
-	* Removes the child at the specified index from the display list, and sets its parent to null. You can also remove multiple children, such as "removeChildAt(2, 7, ...);". Returns true if the child (or children) was removed, or false if any index was out of range.
-	* @param index The index of the child to remove.
+	* Removes the child at the specified index from the display list, and sets its parent to null. You can also remove multiple
+	* children, such as "removeChildAt(2, 7, ...);". Returns true if the child (or children) was removed, or false if any index
+	* was out of range.
+	* @param {Number} index The index of the child to remove.
+	* @return true if the child (or children) was removed, or false if any index was out of range.
 	**/
 	p.removeChildAt = function(index) {
 		var l = arguments.length;
@@ -165,6 +238,7 @@ var p = Container.prototype = new DisplayObject();
 	
 	/**
 	* Removes all children from the display list.
+	* @method removeAllChildren
 	**/
 	p.removeAllChildren = function() {
 		while (this.children.length) { this.removeChildAt(0); }
@@ -172,7 +246,9 @@ var p = Container.prototype = new DisplayObject();
 	
 	/**
 	* Returns the child at the specified index.
-	* @param index The index of the child to return.
+	* @method getChildAt
+	* @param {Number} index The index of the child to return.
+	* @return {DisplayObject} The child at the specified index.
 	**/
 	p.getChildAt = function(index) {
 		return this.children[index];
@@ -180,7 +256,8 @@ var p = Container.prototype = new DisplayObject();
 	
 	/**
 	* Performs an array sort operation on the child list.
-	* @sortFunction the function to use to sort the child list. See javascript's Array.sort documentation for details.
+	* @method sortChildren
+	* @param {Function} sortFunction the function to use to sort the child list. See javascript's Array.sort documentation for details.
 	**/
 	p.sortChildren = function(sortFunction) {
 		this.children.sort(sortFunction);
@@ -188,7 +265,9 @@ var p = Container.prototype = new DisplayObject();
 	
 	/**
 	* Returns the index of the specified child in the display list, or -1 if it is not in the display list.
-	* @param child The child to return the index of.
+	* @method getChildIndex
+	* @param {DisplayObject} child The child to return the index of.
+	* @return {Number} The index of the specified child. -1 if the child is not found.
 	**/
 	p.getChildIndex = function(child) {
 		return this.children.indexOf(child);
@@ -196,14 +275,19 @@ var p = Container.prototype = new DisplayObject();
 	
 	/**
 	* Returns the number of children in the display list.
+	* @method getNumChildren
+	* @return {Number} The number of children in the display list.
 	**/
 	p.getNumChildren = function() {
 		return this.children.length;
 	}
 	
 	/**
-	* Returns true if the specified display object either is this container or is a descendent
+	* Returns true if the specified display object either is this container or is a descendent.
 	* (child, grandchild, etc) of this container.
+	* @method contains
+	* @param {DisplayObject} child The DisplayObject to be checked.
+	* @return {Boolean} true if the specified display object either is this container or is a descendent.
 	**/
 	p.contains = function(child) {
 		while (child) {
@@ -213,6 +297,13 @@ var p = Container.prototype = new DisplayObject();
 		return false;
 	}
 	
+	/**
+	* Specifies whether a display object exists at the specified coordinates.
+	* @method hitTest
+	* @param {Number} x
+	* @param {Number} y
+	* @return {Boolean}
+	**/
 	p.hitTest = function(x, y) {
 		// TODO: optimize to use the fast cache check where possible.
 		return (this.getObjectUnderPoint(x, y) != null);
