@@ -298,11 +298,12 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 	/**
-	* Specifies whether a display object exists at the specified coordinates.
+	* Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the specified position).
+	* This ignores the alpha, shadow and compositeOperation of the display object, and all transform properties including regX/Y.
 	* @method hitTest
-	* @param {Number} x The x coordinate to check for a hit
-	* @param {Number} y The y coordinate to check for a hit
-	* @return {Boolean} A Boolean indicating whether there is a DisplayObject that overlaps the specified coordinates.
+	* @param x The x position to check in the display object's local coordinates.
+	* @param y The y position to check in the display object's local coordinates.
+	* @return {Boolean} A Boolean indicating whether there is a visible section of a DisplayObject that overlaps the specified coordinates.
 	**/
 	p.hitTest = function(x, y) {
 		// TODO: optimize to use the fast cache check where possible.
@@ -374,7 +375,8 @@ var p = Container.prototype = new DisplayObject();
 	* @param {Number} x
 	* @param {Number} x
 	* @param {Array} arr
-	* @param {Array[MouseEvent]} mouseEvents
+	* @param {Number} mouseEvents A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress & 
+	* onClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
 	* @return {Array[DisplayObject]}
 	* @protected
 	**/
