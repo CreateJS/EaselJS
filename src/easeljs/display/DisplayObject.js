@@ -237,9 +237,9 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* whatwg spec on compositing</a>.
 	* @property compositeOperation
 	* @type String
-	* @default "source-over"
+	* @default null
 	**/
-	p.compositeOperation = "source-over;
+	p.compositeOperation = null;
 	
 	/**
 	* Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage. 
