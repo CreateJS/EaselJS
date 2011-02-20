@@ -27,7 +27,23 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 **/
 
+/**
+* The Easel Javascript library provides a retained graphics mode for canvas 
+* including a full, hierarchical display list, a core interaction model, and 
+* helper classes to make working with Canvas much easier.
+* @module EaselJS
+**/
+
 (function(window) {
+
+/**
+* The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a specified context.
+* Note that you can use Graphics without any dependency on the Easel framework by calling draw() directly,
+* or it can be used with the Shape object to draw vector graphics within the context of an Easel display list.<br/><br/>
+* Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example, the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then render it to the specified context2D:<br/>
+* myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
+* @class Graphics 
+**/
 
 // used to create the instruction lists used in Graphics:
 /** @private */
@@ -39,12 +55,9 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 
 /**
 * Constructs a new Graphics instance.
-* @param instructions Optional. This is a string that will be eval'ed in the scope of this Graphics object. This provides a mechanism for generating a vector shape from a serialized string. Ex. "beginFill('#F00');drawRect(0, 0, 10, 10);"
-* @class The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a specified context.
-* Note that you can use Graphics without any dependency on the Easel framework by calling draw() directly,
-* or it can be used with the Shape object to draw vector graphics within the context of an Easel display list.<br/><br/>
-* Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example, the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then render it to the specified context2D:<br/>
-* myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
+* @param {String} instructions Optional. This is a string that will be eval'ed in the scope of this Graphics object. 
+* This provides a mechanism for generating a vector shape from a serialized string. Ex. 
+* "beginFill('#F00');drawRect(0, 0, 10, 10);"
 **/
 Graphics = function(instructions) {
 	this.initialize(instructions);
@@ -54,14 +67,19 @@ var p = Graphics.prototype;
 // static public methods:
 	
 	/**
-	* Returns a CSS compatible color string based on the specified RGB numeric color values in the format "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)". For example,
-	* Graphics.getRGB(50, 100, 150, 0.5) will return "rgba(50,100,150,0.5)". It also supports passing a single hex color value as the first param, and an optional alpha value as the second param. For example,
-	* Graphics.getRGB(0xFF00FF, 0.2) will return "rgba(255,0,255,0.2)".
-	* @param r The red component for the color, between 0 and 0xFF (255).
-	* @param g The green component for the color, between 0 and 0xFF (255).
-	* @param b The blue component for the color, between 0 and 0xFF (255).
-	* @param alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
+	* Returns a CSS compatible color string based on the specified RGB numeric color values in the format 
+	* "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)". For example,
+	* Graphics.getRGB(50, 100, 150, 0.5) will return "rgba(50,100,150,0.5)". It also supports passing a single hex color 
+	* value as the first param, and an optional alpha value as the second param. For example, Graphics.getRGB(0xFF00FF, 0.2)
+	* will return "rgba(255,0,255,0.2)".
+	* @method getRGB
 	* @static
+	* @param {Number} r The red component for the color, between 0 and 0xFF (255).
+	* @param {Number} g The green component for the color, between 0 and 0xFF (255).
+	* @param {Number} b The blue component for the color, between 0 and 0xFF (255).
+	* @param {Number} alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
+	* @return A CSS compatible color string based on the specified RGB numeric color values in the format 
+	* "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)".
 	**/
 	Graphics.getRGB = function(r, g, b, alpha) {
 		if (r != null && b == null) {
@@ -78,13 +96,18 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Returns a CSS compatible color string based on the specified HSL numeric color values in the format "hsla(360,100,100,1.0)", or if alpha is null then in the format "hsl(360,100,100)". For example,
-	* Graphics.getHSL(150, 100, 70) will return "hsl(150,100,70)".
-	* @param hue The hue component for the color, between 0 and 360.
-	* @param saturation The saturation component for the color, between 0 and 100.
-	* @param lightness The lightness component for the color, between 0 and 100.
-	* @param alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
+	* Returns a CSS compatible color string based on the specified HSL numeric color values in the format "hsla(360,100,100,1.0)", 
+	* or if alpha is null then in the format "hsl(360,100,100)". For example, Graphics.getHSL(150, 100, 70) will return 
+	* "hsl(150,100,70)".
+	* @method getHSL
 	* @static
+	* @param {Number} hue The hue component for the color, between 0 and 360.
+	* @param {Number} saturation The saturation component for the color, between 0 and 100.
+	* @param {Number} lightness The lightness component for the color, between 0 and 100.
+	* @param {Number} alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
+	* @return a CSS compatible color string based on the specified HSL numeric color values in the format 
+	* "hsla(360,100,100,1.0)", or if alpha is null then in the format "hsl(360,100,100)". For example, 
+	* Graphics.getHSL(150, 100, 70) will return "hsl(150,100,70)".
 	**/
 	Graphics.getHSL = function(hue, saturation, lightness, alpha) {
 		if (alpha == null) {
@@ -99,6 +122,10 @@ var p = Graphics.prototype;
 	* This is primarily for use with the tiny API. The mappings are as follows: 0 to "butt",
 	* 1 to "round", and 2 to "square".
 	* For example, myGraphics.ss(16, 2) would set the line caps to "square".
+	* @property STROKE_CAPS_MAP
+	* @static
+	* @final
+	* @type Array[String]
 	**/
 	Graphics.STROKE_CAPS_MAP = ["butt", "round", "square"];
 	
@@ -107,6 +134,10 @@ var p = Graphics.prototype;
 	* This is primarily for use with the tiny API. The mappings are as follows: 0 to "miter",
 	* 1 to "round", and 2 to "bevel".
 	* For example, myGraphics.ss(16, 0, 2) would set the line joints to "bevel".
+	* @property STROKE_JOINTS_MAP
+	* @static
+	* @final
+	* @type Array[String]
 	**/
 	Graphics.STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
 	

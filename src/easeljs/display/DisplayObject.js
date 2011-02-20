@@ -44,7 +44,9 @@
 **/
 
 
-
+/**
+* @constructor
+**/
 DisplayObject = function() {
   this.initialize();
 }
@@ -54,6 +56,7 @@ var p = DisplayObject.prototype;
 * Suppresses errors generated when using features like hitTest, onPress/onClick, and getObjectsUnderPoint with cross 
 * domain content
 * @property suppressCrossDomainErrors
+* @static
 * @type Boolean
 * @default false
 **/
