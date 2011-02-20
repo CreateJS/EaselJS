@@ -141,8 +141,7 @@ var p = Graphics.prototype;
 	**/
 	Graphics.STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
 	
-	Graphics._canvas = document.createElement("canvas");
-	Graphics._ctx = Graphics._canvas.getContext("2d");
+	Graphics._ctx = document.createElement("canvas").getContext("2d");
 	
 	Graphics.beginCmd = new Command(Graphics._ctx.beginPath, []);
 	Graphics.fillCmd = new Command(Graphics._ctx.fill, []);
