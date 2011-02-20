@@ -435,11 +435,14 @@ DisplayObject._workingMatrix = new Matrix2D();
 	}
 
 	/**
-	 * Redraws the display object to its cache. Calling updateCache without an active cache will throw an error.
-	 * If compositeOperation is null the current cache will be cleared prior to drawing. Otherwise the display object
-	 * will be drawn over the existing cache using the specified compositeOperation.
-	 * @param compositeOperation The compositeOperation to use, or null to clear the cache and redraw it. <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">whatwg spec on compositing</a>.
-	 */
+	* Redraws the display object to its cache. Calling updateCache without an active cache will throw an error.
+	* If compositeOperation is null the current cache will be cleared prior to drawing. Otherwise the display object
+	* will be drawn over the existing cache using the specified compositeOperation.
+	* @method updateCache
+	* @param {String} compositeOperation The compositeOperation to use, or null to clear the cache and redraw it. 
+	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
+	* whatwg spec on compositing</a>.
+	**/
 	p.updateCache = function(compositeOperation) {
 		if (this.cacheCanvas == null) { throw "cache() must be called before updateCache()"; }
 		var ctx = this.cacheCanvas.getContext("2d");
@@ -452,6 +455,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	
 	/**
 	* Clears the current cache. See cache() for more information.
+	* @method uncache
 	**/
 	p.uncache = function() {
 		this.cacheCanvas = null;
@@ -460,6 +464,9 @@ DisplayObject._workingMatrix = new Matrix2D();
 	
 	/**
 	* Returns the stage that this display object will be rendered on, or null if it has not been added to one.
+	* @method getStage
+	* @return {Stage} The Stage instance that the display object is a descendent of. null if the DisplayObject has not 
+	* been added to a Stage.
 	**/
 	p.getStage = function() {
 		var o = this;
@@ -475,8 +482,11 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* to the global (stage) coordinate space. For example, this could be used to position an HTML label
 	* over a specific point on a nested display object. Returns a Point instance with x and y properties
 	* correlating to the transformed coordinates on the stage.
-	* @param x The x position in the source display object to transform.
-	* @param y The y position in the source display object to transform.
+	* @method localToGlobal
+	* @param {Number} x The x position in the source display object to transform.
+	* @param {Number} y The y position in the source display object to transform.
+	* @return {Point} A Point instance with x and y properties correlating to the transformed coordinates 
+	* on the stage.
 	**/
 	p.localToGlobal = function(x, y) {
 		var mtx = this.getConcatenatedMatrix();
@@ -490,8 +500,11 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* coordinate space of the display object. For example, this could be used to determine
 	* the current mouse position within the display object. Returns a Point instance with x and y properties
 	* correlating to the transformed position in the display object's coordinate space.
-	* @param x The x position on the stage to transform.
-	* @param y The y position on the stage to transform.
+	* @method globalToLocal
+	* @param {Number} x The x position on the stage to transform.
+	* @param {Number} y The y position on the stage to transform.
+	* @return {Point} A Point instance with x and y properties correlating to the transformed position in the
+	* display object's coordinate space.
 	**/
 	p.globalToLocal = function(x, y) {
 		var mtx = this.getConcatenatedMatrix();
@@ -506,9 +519,12 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* coordinate space of the target display object. Returns a Point instance with x and y properties
 	* correlating to the transformed position in the target's coordinate space. Effectively the same as calling
 	* var pt = this.localToGlobal(x, y); pt = target.globalToLocal(pt.x, pt.y);
-	* @param x The x position in the source display object to transform.
-	* @param y The y position on the stage to transform.
-	* @param target The target display object to which the coordinates will be transformed.
+	* @method localToLocal
+	* @param {Number} x The x position in the source display object to transform.
+	* @param {Number} y The y position on the stage to transform.
+	* @param {DisplayObject} target The target display object to which the coordinates will be transformed.
+	* @return {Point} Returns a Point instance with x and y properties correlating to the transformed position 
+	* in the target's coordinate space.
 	**/
 	p.localToLocal = function(x, y, target) {
 		var pt = this.localToGlobal(x, y);
@@ -516,18 +532,23 @@ DisplayObject._workingMatrix = new Matrix2D();
 	}
 
 	/**
-	 * Generates a concatenated Matrix2D object representing the combined transform of
-	 * the display object and all of its parent Containers up to the highest level ancestor
-	 * (usually the stage). This can be used to transform positions between coordinate spaces,
-	 * such as with localToGlobal and globalToLocal.
-	 * @param mtx Optional. A Matrix2D object to populate with the calculated values. If null, a new Matrix object is returned.
-	 **/
+	* Generates a concatenated Matrix2D object representing the combined transform of
+	* the display object and all of its parent Containers up to the highest level ancestor
+	* (usually the stage). This can be used to transform positions between coordinate spaces,
+	* such as with localToGlobal and globalToLocal.
+	* @method getConcatenatedMatrix
+	* @param {Matrix2D} mtx Optional. A Matrix2D object to populate with the calculated values. If null, a new 
+	* Matrix object is returned.
+	* @return {Matrix2D} a concatenated Matrix2D object representing the combined transform of
+	* the display object and all of its parent Containers up to the highest level ancestor (usually the stage).
+	**/
 	p.getConcatenatedMatrix = function(mtx) {
 		if (mtx) { mtx.identity(); }
 		else { mtx = new Matrix2D(); }
 		var target = this;
 		while (true) {
-			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.skewX, target.skewY, target.regX, target.regY);
+			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.skewX, 
+									target.skewY, target.regX, target.regY);
 			mtx.prependProperties(target.alpha, target.shadow, target.compositeOperation);
 			if ((p = target.parent) == null) { break; }
 			target = p;
@@ -536,11 +557,15 @@ DisplayObject._workingMatrix = new Matrix2D();
 	}
 
 	/**
-	 * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the specified position).
-	 * This ignores the alpha, shadow and compositeOperation of the display object, and all transform properties including regX/Y.
-	 * @param x The x position to check in the display object's local coordinates.
-	 * @param y The y position to check in the display object's local coordinates.
-	 */
+	* Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at 
+	* the specified position). This ignores the alpha, shadow and compositeOperation of the display object, and all 
+	* transform properties including regX/Y.
+	* @method hitTest
+	* @param {Number} x The x position to check in the display object's local coordinates.
+	* @param {Number} y The y position to check in the display object's local coordinates.
+	* @return {Boolean} A Boolean indicting whether a visible portion of the DisplayObject intersect the specified 
+	* local Point.
+	*/
 	p.hitTest = function(x, y) {
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;
@@ -556,7 +581,10 @@ DisplayObject._workingMatrix = new Matrix2D();
 	}
 	
 	/**
-	* Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are reverted to their defaults (for example .parent).
+	* Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are 
+	* reverted to their defaults (for example .parent).
+	* @method clone
+	 @return {DisplayObject} A clone of the current DisplayObject instance.
 	**/
 	p.clone = function() {
 		var o = new DisplayObject();
@@ -566,6 +594,8 @@ DisplayObject._workingMatrix = new Matrix2D();
 	
 	/**
 	* Returns a string representation of this object.
+	* @method toString
+	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {
 		return "[DisplayObject (name="+  this.name +")]";
@@ -574,7 +604,12 @@ DisplayObject._workingMatrix = new Matrix2D();
 // private methods:
 
 	// separated so it can be used more easily in subclasses:
-	/** @private */
+	/**
+	* @method cloneProps
+	* @protected
+	* @param {DisplayObject} o The DisplayObject instance which will have properties from the current DisplayObject
+	* instance copied into.
+	**/
 	p.cloneProps = function(o) {
 		o.alpha = this.alpha;
 		o.name = this.name;
@@ -593,7 +628,12 @@ DisplayObject._workingMatrix = new Matrix2D();
 		o.compositeOperation = this.compositeOperation;
 	}
 	
-	/** @private */
+	/**
+	* @method applyShadow
+	* @protected
+	* @param {CanvasRenderingContext2D} ctx
+	* @param {Shadow} shadow
+	**/
 	p.applyShadow = function(ctx, shadow) {
 		ctx.shadowColor = shadow.color;
 		ctx.shadowOffsetX = shadow.offsetX;
@@ -601,13 +641,19 @@ DisplayObject._workingMatrix = new Matrix2D();
 		ctx.shadowBlur = shadow.blur;
 	}
 
-	/** @private */
+	/**
+	* @method _testHit
+	* @protected
+	* @param {CanvasRenderingContext2D} ctx
+	* @return {Boolean}
+	**/
 	p._testHit = function(ctx) {
 		try {
 			var hit = ctx.getImageData(0, 0, 1, 1).data[3] > 1;
 		} catch (e) {
 			if (!DisplayObject.suppressCrossDomainErrors) {
-				throw "An error has occured. This is most likely due to security restrictions on reading canvas pixel data with local or cross-domain images.";
+				throw "An error has occured. This is most likely due to security restrictions on reading canvas pixel " +
+				"data with local or cross-domain images.";
 			}
 		}
 		return hit;

@@ -133,7 +133,8 @@ var p = Container.prototype = new DisplayObject();
 			if (!child.isVisible()) { continue; }
 
 			var mtx = _mtx.clone();
-			mtx.appendTransform(child.x, child.y, child.scaleX, child.scaleY, child.rotation, child.skewX, child.skewY, child.regX, child.regY);
+			mtx.appendTransform(child.x, child.y, child.scaleX, child.scaleY, child.rotation, child.skewX, child.skewY, 
+									child.regX, child.regY);
 			mtx.appendProperties(child.alpha, child.shadow, child.compositeOperation);
 
 			if (!(child instanceof Container)) {
@@ -195,9 +196,9 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 	/**
-	* Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is already known.
-	* You can also remove multiple children, such as "removeChild(child1, child2, ...);". Returns true if the child (or children) 
-	* was removed, or false if it was not in the display list.
+	* Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is already 
+	* known. You can also remove multiple children, such as "removeChild(child1, child2, ...);". Returns true if the child 
+	* (or children) was removed, or false if it was not in the display list.
 	* @method removeChild
 	* @param {DisplayObject} child The child to remove.
 	* @return {Boolean} true if the child (or children) was removed, or false if it was not in the display list.
@@ -257,7 +258,8 @@ var p = Container.prototype = new DisplayObject();
 	/**
 	* Performs an array sort operation on the child list.
 	* @method sortChildren
-	* @param {Function} sortFunction the function to use to sort the child list. See javascript's Array.sort documentation for details.
+	* @param {Function} sortFunction the function to use to sort the child list. See javascript's Array.sort documentation 
+	* for details.
 	**/
 	p.sortChildren = function(sortFunction) {
 		this.children.sort(sortFunction);
@@ -298,12 +300,14 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 	/**
-	* Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the specified position).
-	* This ignores the alpha, shadow and compositeOperation of the display object, and all transform properties including regX/Y.
+	* Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the specified 
+	* position). This ignores the alpha, shadow and compositeOperation of the display object, and all transform properties 
+	* including regX/Y.
 	* @method hitTest
 	* @param x The x position to check in the display object's local coordinates.
 	* @param y The y position to check in the display object's local coordinates.
-	* @return {Boolean} A Boolean indicating whether there is a visible section of a DisplayObject that overlaps the specified coordinates.
+	* @return {Boolean} A Boolean indicating whether there is a visible section of a DisplayObject that overlaps the specified 
+	* coordinates.
 	**/
 	p.hitTest = function(x, y) {
 		// TODO: optimize to use the fast cache check where possible.
@@ -384,7 +388,8 @@ var p = Container.prototype = new DisplayObject();
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;
 		var mtx = DisplayObject._workingMatrix;
-		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick)) || (mouseEvents&2 && (this.onMouseOver || this.onMouseOut));
+		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick)) || (mouseEvents&2 && 
+																(this.onMouseOver || this.onMouseOut));
 
 		// if we have a cache handy, we can use it to do a quick check:
 		if (this.cacheCanvas) {
@@ -417,7 +422,8 @@ var p = Container.prototype = new DisplayObject();
 					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.onPress || child.onClick)) || (mouseEvents&2 && (child.onMouseOver || child.onMouseOut))) {
+			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.onPress || child.onClick)) || 
+														(mouseEvents&2 && (child.onMouseOver || child.onMouseOut))) {
 				child.getConcatenatedMatrix(mtx);
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				ctx.globalAlpha = mtx.alpha;
