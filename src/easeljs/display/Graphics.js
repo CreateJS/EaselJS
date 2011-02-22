@@ -141,39 +141,115 @@ var p = Graphics.prototype;
 	**/
 	Graphics.STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
 	
+	/**
+	* @property _ctx
+	* @static
+	* @protected
+	* @type CanvasRenderingContext2D
+	**/
 	Graphics._ctx = document.createElement("canvas").getContext("2d");
 	
+	/**
+	* @property beginCmd
+	* @static
+	* @protected
+	* @type Command
+	**/
 	Graphics.beginCmd = new Command(Graphics._ctx.beginPath, []);
+	
+	/**
+	* @property fillCmd
+	* @static
+	* @protected
+	* @type Command
+	**/
 	Graphics.fillCmd = new Command(Graphics._ctx.fill, []);
+	
+	/**
+	* @property strokeCmd
+	* @static
+	* @protected
+	* @type Command
+	**/
 	Graphics.strokeCmd = new Command(Graphics._ctx.stroke, []);
 
-// public properties:
-	/** @private */
+	/**
+	* @property _strokeInstructions
+	* @protected
+	* @type Array[Command]
+	**/
 	p._strokeInstructions = null;
-	/** @private */
+
+	/**
+	* @property _strokeStyleInstructions
+	* @protected
+	* @type Array[Command]
+	**/
 	p._strokeStyleInstructions = null;
-	/** @private */
+	
+	/**
+	* @property _fillInstructions
+	* @protected
+	* @type Array[Command]
+	**/
 	p._fillInstructions = null;
-	/** @private */
+	
+	/**
+	* @property _instructions
+	* @protected
+	* @type Array[Command]
+	**/
 	p._instructions = null;
-	/** @private */
+	
+	/**
+	* @property _oldInstructions
+	* @protected
+	* @type Array[Command]
+	**/
 	p._oldInstructions = null;
-	/** @private */
+	
+	/**
+	* @property _activeInstructions
+	* @protected
+	* @type Array[Command]
+	**/
 	p._activeInstructions = null;
-	/** @private */
+	
+	/**
+	* @property _active
+	* @protected
+	* @type Boolean
+	* @default false
+	**/
 	p._active = false;
-	/** @private */
+	
+	/**
+	* @property _dirty
+	* @protected
+	* @type Boolean
+	* @default false
+	**/
 	p._dirty = false;
 	
-// constructor:
-	/** @ignore */
+	/** 
+	* Initialization method.
+	* @method initialize
+	* @protected
+	* @param {Array[Command]} instructions
+	*/
 	p.initialize = function(instructions) {
 		this.clear();
 		this._ctx = Graphics._ctx;
 		with (this) { eval(instructions); }
 	}
 	
-// public methods:
+	/**
+	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Returns true if the draw was handled (useful for overriding functionality).
+	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	* @method draw
+	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	**/
 	p.draw = function(ctx) {
 		if (this._dirty) {
 			this._updateInstructions();
