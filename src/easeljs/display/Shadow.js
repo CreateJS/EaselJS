@@ -27,15 +27,28 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 **/
 
+/**
+* The Easel Javascript library provides a retained graphics mode for canvas 
+* including a full, hierarchical display list, a core interaction model, and 
+* helper classes to make working with Canvas much easier.
+* @module EaselJS
+**/
+
 (function(window) {
+
+
+/**
+* Encapsulates the properties required to define a shadow to apply to a DisplayObject via it's .shadow property.
+* @class Shape 
+**/
 
 /**
 * Constructs a new Shadow object.
-* @param color The color of the shadow.
-* @param offsetX The x offset of the shadow.
-* @param offsetY The y offset of the shadow.
-* @param blur The blur of the shadow.
-* @class Encapsulates the properties required to define a shadow to apply to a DisplayObject via it's .shadow property.
+* @constructor
+* @param {String} color The color of the shadow.
+* @param {Number} offsetX The x offset of the shadow.
+* @param {Number} offsetY The y offset of the shadow.
+* @param {Number} blur The size of the blurring effect.
 **/
 Shadow = function(color, offsetX, offsetY, blur) {
   this.initialize(color, offsetX, offsetY, blur);
@@ -45,22 +58,49 @@ var p = Shadow.prototype;
 // static public properties:
 	/**
 	* An identity shadow object (all properties are set to 0). Read-only.
+	* @property identity
+	* @type Shadow
 	* @static
+	* @final
 	**/
 	Shadow.identity = null; // set at bottom of class definition.
 	
 // public properties:
-	/** The color of the shadow. */
+	/** The color of the shadow.
+	* property color
+	* @type String
+	* @default null
+	*/
 	p.color = null;
-	/** The x offset of the shadow. */
+	
+	/** The x offset of the shadow.
+	* property offsetX
+	* @type Number
+	* @default 0
+	*/
 	p.offsetX = 0;
-	/** The y offset of the shadow. */
+	
+	/** The y offset of the shadow.
+	* property offsetY
+	* @type Number
+	* @default 0
+	*/
 	p.offsetY = 0;
-	/** The blur of the shadow. */
+	
+	/** The blur of the shadow.
+	* property blur
+	* @type Number
+	* @default 0
+	*/
 	p.blur = 0;
 	
 // constructor:
-	/** @ignore */
+	/** 
+	* Initialization method.
+	* @method initialize
+	* @protected
+	* @param {Array[Command]} instructions
+	**/
 	p.initialize = function(color, offsetX, offsetY, blur) {
 		this.color = color;
 		this.offsetX = offsetX;
@@ -71,6 +111,8 @@ var p = Shadow.prototype;
 // public methods:
 	/**
 	* Returns a string representation of this object.
+	* @method toString
+	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {
 		return "[Shadow]";
@@ -78,7 +120,9 @@ var p = Shadow.prototype;
 	
 	
 	/**
-	* Returns a clone of this object.
+	* Returns a clone of this Shadow instance.
+	* @method clone
+	 @return {Shadow} A clone of the current Shadow instance.
 	**/
 	p.clone = function() {
 		return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);

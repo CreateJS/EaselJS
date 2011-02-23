@@ -251,8 +251,8 @@ var p = Graphics.prototype;
 	* Initialization method.
 	* @method initialize
 	* @protected
-	* @param {Array[Command]} instructions
-	*/
+	* @param {String} instructions
+	**/
 	p.initialize = function(instructions) {
 		this.clear();
 		this._ctx = Graphics._ctx;
@@ -759,7 +759,7 @@ var p = Graphics.prototype;
 	/**
 	* Returns a clone of this Graphics instance.
 	* @method clone
-	 @return {Graphics} A clone of the current DisplayObject instance.
+	 @return {Graphics} A clone of the current Graphics instance.
 	**/
 	p.clone = function() {
 		var o = new Graphics();
