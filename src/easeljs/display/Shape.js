@@ -37,7 +37,7 @@
 (function(window) {
 
 /**
-A Shape allows you to display vector art in the display list. It composites a Graphics instance which exposes all of the vector
+* A Shape allows you to display vector art in the display list. It composites a Graphics instance which exposes all of the vector
 * drawing methods. The Graphics instance can be shared between multiple Shape instances to display the same vector graphics with different
 * positions or transforms. If the vector art will not change between draws, you may want to use the cache() method to reduce the rendering cost.
 * @class Shape 
@@ -73,7 +73,7 @@ var p = Shape.prototype = new DisplayObject();
 	* @method initialize
 	* param {Graphics} graphics
 	* @protected
-	*/
+	**/
 	p.initialize = function(graphics) {
 		this.DisplayObject_initialize();
 		this.graphics = graphics ? graphics : new Graphics();
