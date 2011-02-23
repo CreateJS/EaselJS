@@ -38,7 +38,7 @@
 
 /**
 * Encapsulates the properties associated with a sprite sheet. A sprite sheet is a series of images (usually animation frames) combined
-*  into a single image on a regular grid. For example, an animation consisting of 8 100x100 images could be combined into a 400x200 
+* into a single image on a regular grid. For example, an animation consisting of 8 100x100 images could be combined into a 400x200 
 * sprite sheet (4 frames across by 2 high).
 * The simplest form of sprite sheet has values for the image, frameWidth, and frameHeight properties, but does not include frameData. 
 * It will then play all of the frames in the animation and loop if the loop property is true. In this simple mode, you can also set 
