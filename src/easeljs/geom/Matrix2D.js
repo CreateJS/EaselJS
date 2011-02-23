@@ -1,4 +1,4 @@
-/**
+/*
 * Matrix2D by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -37,12 +37,8 @@
 (function(window) {
 
 /**
- * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
- * @class Matrix2D
- **/
-
-/**
-* Constructs a new Matrix2D instance.
+* Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
+* @class Matrix2D
 * @constructor
 * @param {Number} a Specifies the a property for the new matrix.
 * @param {Number} b Specifies the b property for the new matrix.

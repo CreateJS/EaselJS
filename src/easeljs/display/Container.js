@@ -1,4 +1,4 @@
-/**
+/*
 * Container by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -37,7 +37,7 @@
 (function(window) {
 
 /**
-* Container are nestable display lists that allow you to work with compound display elements. For 
+* A Container is a nestable display lists that allows you to work with compound display elements. For 
 * example you could group arm, leg, torso and head Bitmaps together into a Person Container, and 
 * transform them as a group, while still being able to move the individual parts relative to each 
 * other. Children of containers have their transform and alpha properties concatenated with their 
@@ -46,11 +46,6 @@
 * overhead, so you generally shouldn't create a Container to hold a single child.
 * @class Container
 * @extends DisplayObject
-**/
-
-
-/**
-* Constructs a new Container instance.
 * @constructor
 **/
 Container = function() {
@@ -335,7 +330,7 @@ var p = Container.prototype = new DisplayObject();
 	/**
 	* Similar to getObjectsUnderPoint(), but returns only the top-most display object. This runs significantly faster than 
 	* getObjectsUnderPoint(), but is still an expensive operation. See getObjectsUnderPoint() for more information.
-	* @getObjectUnderPoint
+	* @method getObjectUnderPoint
 	* @param {Number} x The x position in the container to test.
 	* @param {Number} y The y position in the container to test.
 	* @return {DisplayObject} The top-most display object under the specified coordinates.

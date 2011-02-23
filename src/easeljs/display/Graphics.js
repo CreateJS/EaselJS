@@ -1,4 +1,4 @@
-/**
+/*
 * Graphics by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -36,23 +36,13 @@
 
 (function(window) {
 
-/**
-* The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a specified context.
-* Note that you can use Graphics without any dependency on the Easel framework by calling draw() directly,
-* or it can be used with the Shape object to draw vector graphics within the context of an Easel display list.<br/><br/>
-* Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example, the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then render it to the specified context2D:<br/>
-* myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
-* @class Graphics 
-**/
-
 // used to create the instruction lists used in Graphics:
+
+
 /**
-* Inner class.
+* Inner class used by the Graphics class. Used to create the instruction lists used in Graphics:
 * @class Command
 * @for Graphics
-*/
-
-/**
 * @constructor
 **/
 function Command(f, params) {
@@ -62,13 +52,19 @@ function Command(f, params) {
 
 /**
 * @method exec
-* @protected
 * @param {Object} scope
 **/
 Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 
 /**
-* Constructs a new Graphics instance.
+* The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a specified context.
+* Note that you can use Graphics without any dependency on the Easel framework by calling draw() directly,
+* or it can be used with the Shape object to draw vector graphics within the context of an Easel display list.<br/><br/>
+* Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example, the following 
+* line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then render it to the specified 
+* context2D:<br/>
+* myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
+* @class Graphics
 * @constructor
 * @param {String} instructions Optional. This is a string that will be eval'ed in the scope of this Graphics object. 
 * This provides a mechanism for generating a vector shape from a serialized string. Ex. 
@@ -385,8 +381,8 @@ var p = Graphics.prototype;
 	* Draws a rectangle at (x, y) with the specified width and height using the current fill and/or stroke.
 	*  For detailed information, read the 
 	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-rect">
-	* @method rect
 	* whatwg spec</a>.
+	* @method rect
 	* @param {Number} x
 	* @param {Number} y
 	* @param {Number} w Width of the rectangle

@@ -1,4 +1,4 @@
-/**
+/*
 * Text by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -35,7 +35,7 @@
 **/
 
 (function(window) {
-
+	
 /**
 * Allows you to display one or more lines of dynamic text (not user editable) in the display list.
 * Line wrapping support (using the lineWidth is very basic, wrapping on spaces and tabs only. Note
@@ -43,10 +43,6 @@
 * items in the display list using the localToGlobal() method.
 * @class Text
 * @extends DisplayObject
-**/
-	
-/**
-* Constructs a new Text instance.
 * @constructor
 * @param {String} text Optional. The text to display.
 * @param {String} font Optional. The font style to use. Any valid value for the CSS font attribute is 

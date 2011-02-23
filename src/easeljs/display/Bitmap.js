@@ -1,4 +1,4 @@
-/**
+/*
 * Bitmap by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -36,14 +36,10 @@
 
 (function(window) {
 
-
 /**
- * A Bitmap represents an Image, Canvas, or Video in the display list.
- * @class Bitmap
- **/
-
-/**
-* Constructs a Bitmap object with the specified source image.
+* A Bitmap represents an Image, Canvas, or Video in the display list.
+* @class Bitmap
+* @extends DisplayObject
 * @constructor
 * @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video to render to the display list.
 **/
@@ -71,7 +67,7 @@ var p = Bitmap.prototype = new DisplayObject();
 // constructor:
 
 	/**
-	* @property
+	* @property DisplayObject_initialize
 	* @type Function
     * @private
 	**/
@@ -135,13 +131,13 @@ var p = Bitmap.prototype = new DisplayObject();
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
-	* @method cache
+	* @method updateCache
 	**/
 	
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
-	* @method cache
+	* @method uncache
 	**/
 	
 	/**

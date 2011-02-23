@@ -1,4 +1,4 @@
-/**
+/*
 * Shape by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -40,11 +40,8 @@
 * A Shape allows you to display vector art in the display list. It composites a Graphics instance which exposes all of the vector
 * drawing methods. The Graphics instance can be shared between multiple Shape instances to display the same vector graphics with different
 * positions or transforms. If the vector art will not change between draws, you may want to use the cache() method to reduce the rendering cost.
-* @class Shape 
-**/
-
-/**
-* Constructs a new Shape instance.
+* @class Shape
+* @extends DisplayObject
 * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
 **/
 Shape = function(graphics) {

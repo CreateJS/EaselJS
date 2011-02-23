@@ -1,4 +1,4 @@
-/**
+/*
 * Shadow by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -36,14 +36,9 @@
 
 (function(window) {
 
-
 /**
 * Encapsulates the properties required to define a shadow to apply to a DisplayObject via it's .shadow property.
-* @class Shadow 
-**/
-
-/**
-* Constructs a new Shadow object.
+* @class Shadow
 * @constructor
 * @param {String} color The color of the shadow.
 * @param {Number} offsetX The x offset of the shadow.

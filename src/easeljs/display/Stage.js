@@ -1,4 +1,4 @@
-/**
+/*
 * Stage by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -38,12 +38,9 @@
 
 /**
 * A stage is the root level Container for a display list. Each time its tick method is called, it will render its display
-*  list to its target canvas.
-* @class Stage 
-**/
-
-/**
-* Constructs a Stage object with the specified target canvas.
+* list to its target canvas.
+* @class Stage
+* @extends Container
 * @constructor
 * @param {HTMLCanvasElement} canvas The canvas the stage will render to.
 **/
@@ -55,7 +52,7 @@ var p = Stage.prototype = new Container();
 // static properties:
 	/**
 	* @property _snapToPixelEnabled
-	* protected
+	* @protected
 	* @type Boolean
 	* @default false
 	**/

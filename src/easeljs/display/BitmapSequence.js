@@ -1,4 +1,4 @@
-/**
+/*
 * BitmapSequence by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -44,10 +44,6 @@
 * together. See the SpriteSheet class for more information on setting up frames and animation.
 * @class BitmapSequence
 * @extends DisplayObject
-**/
-
-/**
-* Constructs a BitmapSequence object with the specified sprite sheet.
 * @constructor
 * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image, frame 
 * dimensions, and frame data. See SpriteSheet for more information.
@@ -242,14 +238,14 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
-	* @method cache
+	* @method updateCache
 	**/
 	
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
-	* @method cache
-	**/	
+	* @method uncache
+	**/
 	
 	/**
 	* Sets paused to false and plays the specified sequence name, named frame, or frame number.

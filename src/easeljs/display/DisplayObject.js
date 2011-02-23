@@ -1,4 +1,4 @@
-/**
+/*
 * DisplayObject by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -40,11 +40,7 @@
 * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as 
 * Sprite, Bitmap, and Shape. DisplayObject is the base class for all display classes in the CanvasDisplay library. 
 * It defines the core properties and methods that are shared between all display objects.
-* @class DisplayObject 
-**/
-
-
-/**
+* @class DisplayObject
 * @constructor
 **/
 DisplayObject = function() {
@@ -96,7 +92,8 @@ DisplayObject._workingMatrix = new Matrix2D();
 	**/
 	p.alpha = 1;
 	
-	/** If a cache is active, this returns the canvas that holds the cached version of this display object. See cache()
+	/**
+	* If a cache is active, this returns the canvas that holds the cached version of this display object. See cache()
 	* for more information. READ-ONLY.
 	* @property cacheCanvas
 	* @type HTMLCanvasElement
@@ -106,8 +103,8 @@ DisplayObject._workingMatrix = new Matrix2D();
 	
 	/**
 	* Unique ID for this display object. Makes display objects easier for some uses.
-	* @property Number
-	* @type id
+	* @property id
+	* @type Number
 	* @default -1
 	**/
 	p.id = -1;
@@ -152,7 +149,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
 	* it's center, you would set regX and regY to 50.
-	* @property regX
+	* @property regY
 	* @type Number
 	* @default 0
 	**/
@@ -357,10 +354,10 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p._revertY = 0;
 	
 	/**
-	* @property
+	* @property _revertAlpha
 	* @protected
-	* @type
-	* @default
+	* @type Number
+	* @default 1
 	**/
 	p._revertAlpha = 1;
 	

@@ -1,4 +1,4 @@
-/**
+/*
 * MouseEvent by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -36,17 +36,12 @@
 
 (function(window) {
 
-
 /**
 * This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, and onClick handlers on 
 * DisplayObject instances.
 * By default, mouse events are disabled for performance reasons. In order to enabled them for a specified stage
 * set mouseEventsEnabled to true on your stage instance.
 * @class MouseEvent
-**/
-
-/**
-* Constructs a new MouseEvent instance.
 * @constructor
 * @param {String} type The event type.
 * @param {Number} stageX The mouseX position relative to the stage.

@@ -1,4 +1,4 @@
-/**
+/*
 * SpriteSheet by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -46,11 +46,7 @@
 * frames used).<br/><br/>
 * More complex sprite sheets include a frameData property, which provides named frames and animations which can be played and sequenced 
 * together. See frameData for more information.
-* @class SpriteSheet 
-**/
-
-/**
-* Constructs a new SpriteSheet object.
+* @class SpriteSheet
 * @constructor
 * @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video instance to use as a sprite sheet.
 * @param {Number} frameWidth The width in pixels of each frame on the sprite sheet.

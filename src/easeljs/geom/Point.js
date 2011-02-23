@@ -1,4 +1,4 @@
-/**
+/*
 * Point by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
@@ -25,7 +25,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 
@@ -37,12 +37,8 @@
 (function(window) {
 
 /**
- * Represents a point on a 2 dimensional x / y coordinate system.
- * @class Point
- **/
-
-/**
-* Constructs a new Point instance.
+* Represents a point on a 2 dimensional x / y coordinate system.
+* @class Point
 * @constructor
 * @param {Number} x X position. Default is 0.
 * @param {Number} y Y position. Default is 0.
