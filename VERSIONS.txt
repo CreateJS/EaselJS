@@ -4,6 +4,7 @@ Version 0.3.2 [not released]
 - added stage.mouseInBounds
 - added DisplayObject.onMouseOver and onMouseOut callbacks
 - added stage.enableMouseOver(freq)
+- migrated to use YUIDocs instead of JSDocs
 
 
 Version 0.3.1 [Feb 13, 2011]
