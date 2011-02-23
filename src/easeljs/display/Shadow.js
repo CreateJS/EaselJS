@@ -39,7 +39,7 @@
 
 /**
 * Encapsulates the properties required to define a shadow to apply to a DisplayObject via it's .shadow property.
-* @class Shape 
+* @class Shadow 
 **/
 
 /**
