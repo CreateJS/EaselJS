@@ -55,6 +55,7 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 
 /**
 * Constructs a new Graphics instance.
+* @constructor
 * @param {String} instructions Optional. This is a string that will be eval'ed in the scope of this Graphics object. 
 * This provides a mechanism for generating a vector shape from a serialized string. Ex. 
 * "beginFill('#F00');drawRect(0, 0, 10, 10);"
@@ -263,8 +264,10 @@ var p = Graphics.prototype;
 // public methods that map directly to context 2D calls:
 	/**
 	* Moves the drawing point to the specified position.
-	* @param x
-	* @param y
+	* @method moveTo
+	* @param {Number} x The x coordinate the drawing point should move to.
+	* @param {Number} y The y coordinate the drawing point should move to.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.moveTo = function(x, y) {
 		this._activeInstructions.push(new Command(this._ctx.moveTo, [x, y]));
@@ -272,9 +275,14 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Draws a line from the current drawing point to the specified position, which become the new current drawing point. For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
-	* @param x
-	* @param y
+	* Draws a line from the current drawing point to the specified position, which become the new current drawing point. 
+	* For detailed information, read the 
+	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
+	* whatwg spec</a>.
+	* @method lineTo
+	* @param {Number} x The x coordinate the drawing point should draw to.
+	* @param {Number} y The y coordinate the drawing point should draw to.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.lineTo = function(x, y) {
 		this._dirty = this._active = true;
@@ -283,12 +291,16 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Draws an arc with the specified control points and radius.  For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
-	* @param x1
-	* @param y1
-	* @param x2
-	* @param y2
-	* @param radius
+	* Draws an arc with the specified control points and radius.  For detailed information, read the 
+	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arcto">
+	* whatwg spec</a>.
+	* @method arcTo
+	* @param {Number} x1
+	* @param {Number} y1
+	* @param {Number} x2
+	* @param {Number} y2
+	* @param {Number} radius
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.arcTo = function(x1, y1, x2, y2, radius) {
 		this._dirty = this._active = true;
@@ -297,13 +309,18 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Draws an arc defined by the radius, startAngle and endAngle arguments, centered at the position (x, y). For example arc(100, 100, 20, 0, Math.PI*2) would draw a full circle with a radius of 20 centered at (100, 100). For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
-	* @param x
-	* @param y
-	* @param radius
-	* @param startAngle
-	* @param endAngle
-	* @param anticlockwise
+	* Draws an arc defined by the radius, startAngle and endAngle arguments, centered at the position (x, y). For example 
+	* arc(100, 100, 20, 0, Math.PI*2) would draw a full circle with a radius of 20 centered at (100, 100). For detailed 
+	* information, read the 
+	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arc">whatwg spec</a>.
+	* @method arc
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} radius
+	* @param {Number} startAngle Measured in radians.
+	* @param {Number} endAngle Measured in radians.
+	* @param {Boolean} anticlockwise
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		this._dirty = this._active = true;
@@ -313,11 +330,15 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Draws a quadratic curve from the current drawing point to (x, y) using the control point (cpx, cpy).  For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
-	* @param cpx
-	* @param cpy
-	* @param x
-	* @param y
+	* Draws a quadratic curve from the current drawing point to (x, y) using the control point (cpx, cpy).  For detailed information, 
+	* read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-quadraticcurveto">
+	* whatwg spec</a>.
+	* @method quadraticCurveTo
+	* @param {Number} cpx
+	* @param {Number} cpy
+	* @param {Number} x
+	* @param {Number} y
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.quadraticCurveTo = function(cpx, cpy, x, y) {
 		this._dirty = this._active = true;
@@ -326,13 +347,18 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Draws a bezier curve from the current drawing point to (x, y) using the control points (cp1x, cp1y) and (cp2x, cp2y).  For detailed information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">whatwg spec</a>.
-	* @param cp1x
-	* @param cp1y
-	* @param cp2x
-	* @param cp2y
-	* @param x
-	* @param y
+	* Draws a bezier curve from the current drawing point to (x, y) using the control points (cp1x, cp1y) and (cp2x, cp2y).  
+	* For detailed information, read the 
+	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-beziercurveto">
+	* whatwg spec</a>.
+	* method @bezierCurveTo
+	* @param {Number} cp1x
+	* @param {Number} cp1y
+	* @param {Number} cp2x
+	* @param {Number} cp2y
+	* @param {Number} x
+	* @param {Number} y
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.bezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
 		this._dirty = this._active = true;
@@ -343,12 +369,14 @@ var p = Graphics.prototype;
 	/**
 	* Draws a rectangle at (x, y) with the specified width and height using the current fill and/or stroke.
 	*  For detailed information, read the 
-	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
+	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-rect">
+	* @method rect
 	* whatwg spec</a>.
-	* @param x
-	* @param y
-	* @param w Width of the rectangle
-	* @param h Height of the rectangle
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} w Width of the rectangle
+	* @param {Number} h Height of the rectangle
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.rect = function(x, y, w, h) {
 		this._dirty = this._active = true;
@@ -357,7 +385,10 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Closes the current path, effectively drawing a line from the current drawing point to the first drawing point specified since the fill or stroke was last set.
+	* Closes the current path, effectively drawing a line from the current drawing point to the first drawing point specified
+	* since the fill or stroke was last set.
+	* @method closePath
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.closePath = function() {
 		if (this._active) {
@@ -371,6 +402,8 @@ var p = Graphics.prototype;
 // public methods that roughly map to Flash graphics APIs:
 	/**
 	* Clears all drawing instructions, effectively reseting this Graphics instance.
+	* @method clear
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.clear = function() {
 		this._instructions = [];
@@ -383,7 +416,10 @@ var p = Graphics.prototype;
 	
 	/**
 	* Begins a fill with the specified color. This ends the current subpath.
-	* @param color A CSS compatible color value (ex. "#FF0000" or "rgba(255,0,0,0.5)"). Setting to null will result in no fill.
+	* @method beginFill
+	* @param {String} color A CSS compatible color value (ex. "#FF0000" or "rgba(255,0,0,0.5)"). Setting to null will 
+	* result in no fill.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.beginFill = function(color) {
 		if (this._active) { this._newPath(); }
@@ -392,14 +428,19 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Begins a linear gradient fill defined by the line (x0, y0) to (x1, y1). This ends the current subpath. For example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a square to display it:<br/>
+	* Begins a linear gradient fill defined by the line (x0, y0) to (x1, y1). This ends the current subpath. For example, the
+	* following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a square to display it:<br/>
 	* myGraphics.beginLinearGradientFill(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
-	* @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
-	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
-	* @param x0 The position of the first point defining the line that defines the gradient direction and size.
-	* @param y0 The position of the first point defining the line that defines the gradient direction and size.
-	* @param x1 The position of the second point defining the line that defines the gradient direction and size.
-	* @param y1 The position of the second point defining the line that defines the gradient direction and size.
+	* @method beginLinearGradientFill
+	* @param {Array[String]} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient 
+	* drawing from red to blue.
+	* @param {Array[Number]} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw 
+	* the first color to 10% then interpolating to the second color at 90%.
+	* @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
+	* @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
+	* @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
+	* @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.beginLinearGradientFill = function(colors, ratios, x0, y0, x1, y1) {
 		if (this._active) { this._newPath(); }
@@ -412,16 +453,21 @@ var p = Graphics.prototype;
 	}
 	
 	/**
-	* Begins a radial gradient fill. This ends the current subpath. For example, the following code defines a red to blue radial gradient centered at (100, 100), with a radius of 50, and draws a circle to display it:<br/>
+	* Begins a radial gradient fill. This ends the current subpath. For example, the following code defines a red to blue radial 
+	* gradient centered at (100, 100), with a radius of 50, and draws a circle to display it:<br/>
 	* myGraphics.beginRadialGradientFill(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50).drawCircle(100, 100, 50);
-	* @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
-	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
-	* @param x0 Center position of the inner circle that defines the gradient.
-	* @param y0 Center position of the inner circle that defines the gradient.
-	* @param r0 Radius of the inner circle that defines the gradient.
-	* @param x1 Center position of the outer circle that defines the gradient.
-	* @param y1 Center position of the outer circle that defines the gradient.
-	* @param r1 Radius of the outer circle that defines the gradient.
+	* @method beginRadialGradientFill
+	* @param {Array[String]} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient 
+	* drawing from red to blue.
+	* @param {Array[Number]} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would 
+	* draw the first color to 10% then interpolating to the second color at 90%.
+	* @param {Number} x0 Center position of the inner circle that defines the gradient.
+	* @param {Number} y0 Center position of the inner circle that defines the gradient.
+	* @param {Number} r0 Radius of the inner circle that defines the gradient.
+	* @param {Number} x1 Center position of the outer circle that defines the gradient.
+	* @param {Number} y1 Center position of the outer circle that defines the gradient.
+	* @param {Number} r1 Radius of the outer circle that defines the gradient.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.beginRadialGradientFill = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
 		if (this._active) { this._newPath(); }
@@ -435,8 +481,11 @@ var p = Graphics.prototype;
 	
 	/**
 	* Begins a pattern fill using the specified image. This ends the current subpath.
+	* @method beginBitmapFill
 	* @param image The Image, Canvas, or Video object to use as the pattern.
-	* @param repetition Optional. Indicates whether to repeat the image in the fill area. One of repeat, repeat-x, repeat-y, or no-repeat. Defaults to "repeat".
+	* @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
+	* "repeat-y", or "no-repeat". Defaults to "repeat".
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.beginBitmapFill = function(image, repetition) {
 		if (this._active) { this._newPath(); }
@@ -448,6 +497,7 @@ var p = Graphics.prototype;
 	
 	/**
 	* Ends the current subpath, and begins a new one with no fill. Functionally identical to beginFill(null).
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.endFill = function() {
 		this.beginFill(null);
@@ -461,6 +511,7 @@ var p = Graphics.prototype;
 	* @param caps Optional. Indicates the type of caps to use at the end of lines. One of butt, round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with the tiny API.
 	* @param joints Optional. Specifies the type of joints that should be used where two lines meet. One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel) for use with the tiny API.
 	* @param miter Optional. If joints is set to "miter", then you can specify a miter limit ratio which controls at what point a mitered joint will be clipped.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
 		if (this._active) { this._newPath(); }
@@ -476,6 +527,7 @@ var p = Graphics.prototype;
 	/**
 	* Begins a stroke with the specified color. This ends the current subpath.
 	* @param color A CSS compatible color value (ex. "#FF0000" or "rgba(255,0,0,0.5)"). Setting to null will result in no stroke.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.beginStroke = function(color) {
 		if (this._active) { this._newPath(); }
@@ -492,6 +544,7 @@ var p = Graphics.prototype;
 	* @param y0 The position of the first point defining the line that defines the gradient direction and size.
 	* @param x1 The position of the second point defining the line that defines the gradient direction and size.
 	* @param y1 The position of the second point defining the line that defines the gradient direction and size.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.beginLinearGradientStroke = function(colors, ratios, x0, y0, x1, y1) {
 		if (this._active) { this._newPath(); }
@@ -515,6 +568,7 @@ var p = Graphics.prototype;
 	* @param x1 Center position of the outer circle that defines the gradient.
 	* @param y1 Center position of the outer circle that defines the gradient.
 	* @param r1 Radius of the outer circle that defines the gradient.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)	
 	**/
 	p.beginRadialGradientStroke = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
 		if (this._active) { this._newPath(); }
@@ -528,8 +582,10 @@ var p = Graphics.prototype;
 	
 	/**
 	* Begins a pattern fill using the specified image. This ends the current subpath.
-	* @param image The Image, Canvas, or Video object to use as the pattern.
-	* @param repetition Optional. Indicates whether to repeat the image in the fill area. One of repeat, repeat-x, repeat-y, or no-repeat. Defaults to "repeat".
+	* @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use as the pattern.
+	* @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
+	* "repeat-y", or "no-repeat". Defaults to "repeat".
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)	
 	**/
 	p.beginBitmapStroke = function(image, repetition) {
 		if (this._active) { this._newPath(); }
@@ -542,6 +598,8 @@ var p = Graphics.prototype;
 	
 	/**
 	* Ends the current subpath, and begins a new one with no stroke. Functionally identical to beginStroke(null).
+	* @method endStroke
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.endStroke = function() {
 		this.beginStroke(null);
@@ -550,21 +608,27 @@ var p = Graphics.prototype;
 	
 	/**
 	* Maps the familiar ActionScript curveTo() method to the functionally similar quatraticCurveTo() method.
+	* @property curveTo
+	* @type Function
 	**/
 	p.curveTo = p.quadraticCurveTo;
 	
 	/**
 	* Maps the familiar ActionScript drawRect() method to the functionally similar rect() method.
+	* @property drawRect
+	* @type Function
 	**/
 	p.drawRect = p.rect;
 	
 	/**
 	* Draws a rounded rectangle with all corners with the specified radius.
-	* @param x
-	* @param y
-	* @param w
-	* @param h
-	* @param radius Corner radius.
+	* @method drawRoundRect
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} w
+	* @param {Number} h
+	* @param {Number} radius Corner radius.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.drawRoundRect = function(x, y, w, h, radius) {
 		this.drawRoundRectComplex(x, y, w, h, radius, radius, radius, radius);
@@ -573,14 +637,16 @@ var p = Graphics.prototype;
 	
 	/**
 	* Draws a rounded rectangle with different corner radiuses.
-	* @param x
-	* @param y
-	* @param w
-	* @param h
-	* @param radiusTL Top left corner radius.
-	* @param radiusTR Top right corner radius.
-	* @param radiusBR Bottom right corner radius.
-	* @param radiusBL Bottom left corner radius.
+	* @method drawRoundRectComplex
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} w
+	* @param {Number} h
+	* @param {Number} radiusTL Top left corner radius.
+	* @param {Number} radiusTR Top right corner radius.
+	* @param {Number} radiusBR Bottom right corner radius.
+	* @param {Number} radiusBL Bottom left corner radius.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
 		this._dirty = this._active = true;
@@ -600,9 +666,11 @@ var p = Graphics.prototype;
 	
 	/**
 	* Draws a circle with the specified radius at (x, y).
-	* @param x
-	* @param y
-	* @param radius
+	* @method drawCircle
+	* @param {Number} x x coordinate center point of circle.
+	* @param {Number} y y coordinate center point of circle.
+	* @param {Number} radius Radius of circle.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.drawCircle = function(x, y, radius) {
 		this.arc(x, y, radius, 0, Math.PI*2);
@@ -611,10 +679,12 @@ var p = Graphics.prototype;
 	
 	/**
 	* Draws an ellipse (oval).
-	* @param x
-	* @param y
-	* @param w
-	* @param h
+	* @method drawEllipse
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} w
+	* @param {Number} h
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.drawEllipse = function(x, y, w, h) {
 		this._dirty = this._active = true;
@@ -640,12 +710,16 @@ var p = Graphics.prototype;
 	* Draws a star if pointSize is greater than 0 or a regular polygon if pointSize is 0 with the specified number of points.
 	* For example, the following code will draw a familiar 5 pointed star shape centered at 100, 100 and with a radius of 50:
 	* myGraphics.beginFill("#FF0").drawPolyStar(100, 100, 50, 5, 0.6, -90); // -90 makes the first point vertical
-	* @param x Position of the center of the shape.
-	* @param y Position of the center of the shape.
-	* @param radius The outer radius of the shape.
-	* @param sides The number of points on the star or sides on the polygon.
-	* @param pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular polygon (no points), a pointSize of 1 will draw nothing because the points are infinitely pointy.
-	* @param angle The angle of the first point / corner. For example a value of 0 will draw the first point directly to the right of the center.
+	* @method drawPolyStar
+	* @param {Number} x Position of the center of the shape.
+	* @param {Number} y Position of the center of the shape.
+	* @param {Number} radius The outer radius of the shape.
+	* @param {Number} sides The number of points on the star or sides on the polygon.
+	* @param {Number} pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular polygon (no points), 
+	* a pointSize of 1 will draw nothing because the points are infinitely pointy.
+	* @param {Number} angle The angle of the first point / corner. For example a value of 0 will draw the first point directly to the 
+	* right of the center.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.drawPolyStar = function(x, y, radius, sides, pointSize, angle) {
 		this._dirty = this._active = true;
@@ -667,6 +741,11 @@ var p = Graphics.prototype;
 		return this;
 	}
 	
+	/**
+	* Returns a clone of this Graphics instance.
+	* @method clone
+	 @return {Graphics} A clone of the current DisplayObject instance.
+	**/
 	p.clone = function() {
 		var o = new Graphics();
 		o._instructions = this._instructions.slice();
@@ -680,68 +759,205 @@ var p = Graphics.prototype;
 		return o;
 	}
 		
+	/**
+	* Returns a string representation of this object.
+	* @method toString
+	* @return {String} a string representation of the instance.
+	**/
 	p.toString = function() {
 		return "[Graphics]";
 	}
 	
 	
 // tiny API:
-	/** Shortcut to moveTo. */
+	/** Shortcut to moveTo.
+	* @property mt
+	* @protected
+	* type Function
+	**/
 	p.mt = p.moveTo;
-	/** Shortcut to lineTo. */
+	
+	/** Shortcut to lineTo.
+	* @property lt
+	* @protected
+	* type Function
+	**/
 	p.lt = p.lineTo;
-	/** Shortcut to arcTo. */
+	
+	/** Shortcut to arcTo.
+	* @property at
+	* @protected
+	* type Function
+	**/
 	p.at = p.arcTo;
-	/** Shortcut to bezierCurveTo. */
+	
+	/** Shortcut to bezierCurveTo.
+	* @property bt
+	* @protected
+	* type Function
+	**/
 	p.bt = p.bezierCurveTo;
-	/** Shortcut to quadraticCurveTo / curveTo. */
+	
+	/** Shortcut to quadraticCurveTo / curveTo.
+	* @property qt
+	* @protected
+	* type Function
+	**/
 	p.qt = p.quadraticCurveTo;
-	/** Shortcut to arc. */
+	
+	/** Shortcut to arc.
+	* @property a
+	* @protected
+	* type Function
+	**/
 	p.a = p.arc;
-	/** Shortcut to rect. */
+	
+	/** Shortcut to rect.
+	* @property r
+	* @protected
+	* type Function
+	**/
 	p.r = p.rect;
-	/** Shortcut to closePath. */
+	
+	/** Shortcut to closePath.
+	* @property cp
+	* @protected
+	* type Function
+	**/
 	p.cp = p.closePath;
-	/** Shortcut to clear. */
+	
+	/** Shortcut to clear.
+	* @property c
+	* @protected
+	* type Function
+	**/
 	p.c = p.clear;
-	/** Shortcut to beginFill. */
+	
+	/** Shortcut to beginFill.
+	* @property f
+	* @protected
+	* type Function
+	**/
 	p.f = p.beginFill;
-	/** Shortcut to beginLinearGradientFill. */
+	
+	/** Shortcut to beginLinearGradientFill.
+	* @property lf
+	* @protected
+	* type Function
+	**/
 	p.lf = p.beginLinearGradientFill;
-	/** Shortcut to beginRadialGradientFill. */
+	
+	/** Shortcut to beginRadialGradientFill.
+	* @property rf
+	* @protected
+	* type Function
+	**/
 	p.rf = p.beginRadialGradientFill;
-	/** Shortcut to beginBitmapFill. */
+	
+	/** Shortcut to beginBitmapFill.
+	* @property bf
+	* @protected
+	* type Function
+	**/
 	p.bf = p.beginBitmapFill;
-	/** Shortcut to endFill. */
+	
+	/** Shortcut to endFill.
+	* @property ef
+	* @protected
+	* type Function
+	**/
 	p.ef = p.endFill;
-	/** Shortcut to setStrokeStyle. */
+	
+	/** Shortcut to setStrokeStyle.
+	* @property ss
+	* @protected
+	* type Function
+	**/
 	p.ss = p.setStrokeStyle;
-	/** Shortcut to beginStroke. */
+	
+	/** Shortcut to beginStroke.
+	* @property s
+	* @protected
+	* type Function
+	**/
 	p.s = p.beginStroke;
-	/** Shortcut to beginLinearGradientStroke. */
+	
+	/** Shortcut to beginLinearGradientStroke.
+	* @property ls
+	* @protected
+	* type Function
+	**/
 	p.ls = p.beginLinearGradientStroke;
-	/** Shortcut to beginRadialGradientStroke. */
+	
+	/** Shortcut to beginRadialGradientStroke.
+	* @property rs
+	* @protected
+	* type Function
+	**/
 	p.rs = p.beginRadialGradientStroke;
-	/** Shortcut to beginBitmapStroke. */
+	
+	/** Shortcut to beginBitmapStroke.
+	* @property bs
+	* @protected
+	* type Function
+	**/
 	p.bs = p.beginBitmapStroke;
-	/** Shortcut to endStroke. */
+	
+	/** Shortcut to endStroke.
+	* @property es
+	* @protected
+	* type Function
+	**/
 	p.es = p.endStroke;
-	/** Shortcut to drawRect. */
+	
+	/** Shortcut to drawRect.
+	* @property dr
+	* @protected
+	* type Function
+	**/
 	p.dr = p.drawRect;
-	/** Shortcut to drawRoundRect. */
+	
+	/** Shortcut to drawRoundRect.
+	* @property rr
+	* @protected
+	* type Function
+	**/
 	p.rr = p.drawRoundRect;
-	/** Shortcut to drawRoundRectComplex. */
+	
+	/** Shortcut to drawRoundRectComplex.
+	* @property rc
+	* @protected
+	* type Function
+	**/
 	p.rc = p.drawRoundRectComplex;
-	/** Shortcut to drawCircle. */
+	
+	/** Shortcut to drawCircle.
+	* @property dc
+	* @protected
+	* type Function
+	**/
 	p.dc = p.drawCircle;
-	/** Shortcut to drawEllipse. */
+	
+	/** Shortcut to drawEllipse.
+	* @property de
+	* @protected
+	* type Function
+	**/
 	p.de = p.drawEllipse;
-	/** Shortcut to drawPolyStar. */
+	
+	/** Shortcut to drawPolyStar.
+	* @property dp
+	* @protected
+	* type Function
+	**/
 	p.dp = p.drawPolyStar;
 	
 	
 // private methods:
-	/** @private */
+	/**
+	* @method _updateInstructions
+	* @protected
+	**/
 	p._updateInstructions = function() {
 		this._instructions = this._oldInstructions.slice()
 		this._instructions.push(Graphics.beginCmd);
@@ -760,7 +976,10 @@ var p = Graphics.prototype;
 		if (this._strokeInstructions) { this._instructions.push(Graphics.strokeCmd); }
 	}
 	
-	/** @private */
+	/**
+	* @method _newPath
+	* @protected
+	**/
 	p._newPath = function() {
 		if (this._dirty) { this._updateInstructions(); }
 		this._oldInstructions = this._instructions;
@@ -769,7 +988,13 @@ var p = Graphics.prototype;
 	}
 	
 	// used to create Commands that set properties:
-	/** @private */
+	/**
+	* used to create Commands that set properties
+	* @method _setProp
+	* @param {String} name
+	* @param {String} value
+	* @protected
+	**/
 	p._setProp = function(name, value) {
 		this[name] = value;
 	}
