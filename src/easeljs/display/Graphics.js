@@ -46,11 +46,25 @@
 **/
 
 // used to create the instruction lists used in Graphics:
-/** @private */
+/**
+* Inner class.
+* @class Command
+* @for Graphics
+*/
+
+/**
+* @constructor
+**/
 function Command(f, params) {
 	this.f = f;
 	this.params = params;
 }
+
+/**
+* @method exec
+* @protected
+* @param {Object} scope
+**/
 Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 
 /**
@@ -59,6 +73,7 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 * @param {String} instructions Optional. This is a string that will be eval'ed in the scope of this Graphics object. 
 * This provides a mechanism for generating a vector shape from a serialized string. Ex. 
 * "beginFill('#F00');drawRect(0, 0, 10, 10);"
+* @for Graphics
 **/
 Graphics = function(instructions) {
 	this.initialize(instructions);
