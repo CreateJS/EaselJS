@@ -239,7 +239,7 @@ DisplayObject.prototype.y = 0;
  * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
  * whatwg spec on compositing</a>.
  * @property compositeOperation
- * @type {string}
+ * @type {?string}
  * @default null
  **/
 DisplayObject.prototype.compositeOperation = null;
@@ -390,7 +390,7 @@ DisplayObject.prototype.isVisible = function() {
  * Returns true if the draw was handled (useful for overriding functionality).
  * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
  * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
- * @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+ * @param {boolean=} ignoreCache Indicates whether the draw operation should ignore any current cache.
  * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
  * into itself).
  **/
@@ -590,9 +590,10 @@ DisplayObject.prototype.hitTest = function(x, y) {
 /**
  * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
  * reverted to their defaults (for example .parent).
- @return {DisplayObject} A clone of the current DisplayObject instance.
+ * @param {boolean=} opt_recursive
+ @return {!DisplayObject} A clone of the current DisplayObject instance.
  **/
-DisplayObject.prototype.clone = function() {
+DisplayObject.prototype.clone = function(opt_recursive) {
   var o = new DisplayObject();
   this.cloneProps(o);
   return o;
@@ -1009,8 +1010,8 @@ Container.prototype.toString = function() {
 /**
  * @param {number} x
  * @param {number} y
- * @param {Array} arr
- * @param {number} mouseEvents A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress &
+ * @param {Array=} arr
+ * @param {number=} mouseEvents A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress &
  * onClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
  * @return {Array.<DisplayObject>}
  * @protected
@@ -1124,18 +1125,18 @@ Stage.prototype.canvas = null;
  * READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent 
  * position over the canvas, and mouseInBounds will be set to false.
  * @property mouseX
- * @type {?number}
+ * @type {number}
  * @final
  **/
-Stage.prototype.mouseX = null;
+Stage.prototype.mouseX = NaN;
 
 /** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent 
  * position over the canvas, and mouseInBounds will be set to false.
  * @property mouseY
- * @type {?number}
+ * @type {number}
  * @final
  **/
-Stage.prototype.mouseY = null;
+Stage.prototype.mouseY = NaN;
 
 /** The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param
  * containing the corresponding MouseEventPlus instance.
@@ -1414,7 +1415,7 @@ Stage.prototype.toString = function() {
  **/
 Stage.prototype._handleMouseMove = function(e) {
   if (!this.canvas) {
-    this.mouseX = this.mouseY = null;
+    this.mouseX = this.mouseY = NaN;
     return;
   }
   if (!e) {

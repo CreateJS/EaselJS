@@ -137,7 +137,7 @@ Matrix2D.prototype.shadow = null;
  * compositeOperation values. You can find a list of valid composite operations at:
  * <a href="https://developer.mozilla.org/en/Canvas_tutorial/Compositing">https://developer.mozilla.org/en/Canvas_tutorial/Compositing</a>
  * @property compositeOperation
- * @type {string}
+ * @type {?string}
  **/
 Matrix2D.prototype.compositeOperation = null;
 
@@ -406,7 +406,7 @@ Matrix2D.prototype.decompose = function(target) {
  * Appends the specified visual properties to the current matrix.
  * @param {number} alpha desired alpha value
  * @param {Shadow} shadow desired shadow value
- * @param {string} compositeOperation desired composite operation value
+ * @param {?string} compositeOperation desired composite operation value
  */
 Matrix2D.prototype.appendProperties = function(alpha, shadow, compositeOperation) {
   this.alpha *= alpha;
@@ -418,7 +418,7 @@ Matrix2D.prototype.appendProperties = function(alpha, shadow, compositeOperation
  * Prepends the specified visual properties to the current matrix.
  * @param {number} alpha desired alpha value
  * @param {Shadow} shadow desired shadow value
- * @param {string} compositeOperation desired composite operation value
+ * @param {?string} compositeOperation desired composite operation value
  */
 Matrix2D.prototype.prependProperties = function(alpha, shadow, compositeOperation) {
   this.alpha *= alpha;

@@ -151,7 +151,7 @@ Ticker._times = [];
  * previous tick and the current one.
  * @static
  * @param {Object} o The object to add as a listener.
- * @param {boolean} pauseable If false, the listener will continue to have tick called
+ * @param {boolean=} pauseable If false, the listener will continue to have tick called
  * even when Ticker is paused via Ticker.pause(). Default is true.
  **/
 Ticker.addListener = function(o, pauseable) {

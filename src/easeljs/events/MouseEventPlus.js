@@ -42,12 +42,14 @@ goog.provide('MouseEventPlus');
  * set mouseEventsEnabled to true on your stage instance.
  * @class MouseEventPlus
  * @constructor
- * @param {string} type The event type.
+ * @param {?string} type The event type.
  * @param {number} stageX The mouseX position relative to the stage.
  * @param {number} stageY The mouseY position relative to the stage.
  **/
 MouseEventPlus = function(type, stageX, stageY) {
-  this.initialize(type, stageX, stageY);
+  this.type = type;
+  this.stageX = stageX;
+  this.stageY = stageY;
 };
 
 // public properties:
@@ -69,7 +71,7 @@ MouseEventPlus.prototype.stageY = 0;
  * The type of mouse event. This will be the same as the handler it maps to (onPress,
  * onMouseDown, onMouseUp, onMouseMove, or onClick).
  * @property type
- * @type {string}
+ * @type {?string}
  **/
 MouseEventPlus.prototype.type = null;
 
@@ -91,21 +93,10 @@ MouseEventPlus.prototype.onMouseMove = null;
  */
 MouseEventPlus.prototype.onMouseUp = null;
 
-// constructor:
-/**
- * Initialization method.
- * @protected
- **/
-MouseEventPlus.prototype.initialize = function(type, stageX, stageY) {
-  this.type = type;
-  this.stageX = stageX;
-  this.stageY = stageY;
-};
-
 // public methods:
 /**
- * Returns a string representation of this object.
- * @return {string} a string representation of the instance.
+ * Returns a clone of this object.
+ * @return {!MouseEventPlus} a string representation of the instance.
  **/
 MouseEventPlus.prototype.clone = function() {
   return new MouseEventPlus(this.type, this.stageX, this.stageY);
