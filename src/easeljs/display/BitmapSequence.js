@@ -74,7 +74,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Returns the currently playing sequence when using frameData. READ-ONLY.
 	* @property currentSequence
-	* @type String
+	* @type {string}
 	* @final
 	**/
 	p.currentSequence = null; // READ-ONLY
@@ -99,7 +99,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* Returns the name of the next sequence that will be played, or null if it will stop playing after the 
 	* current sequence. READ-ONLY.
 	* @property nextSequence
-	* @type String
+	* @type {string}
 	* @final
 	**/
 	p.nextSequence = null;
@@ -272,7 +272,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		
 	/**
 	* Returns a string representation of this object.
-	* @return {String} a string representation of the instance.
+	* @return {string} a string representation of the instance.
 	**/
 	p.toString = function() {
 		return "[BitmapSequence (name="+  this.name +")]";

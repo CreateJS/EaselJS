@@ -44,10 +44,10 @@
 * @class Text
 * @extends DisplayObject
 * @constructor
-* @param {String} text Optional. The text to display.
-* @param {String} font Optional. The font style to use. Any valid value for the CSS font attribute is 
+* @param {string} text Optional. The text to display.
+* @param {string} font Optional. The font style to use. Any valid value for the CSS font attribute is 
 * acceptable (ex. "36px bold Arial").
-* @param {String} color Optional. The color to draw the text in. Any valid value for the CSS color attribute
+* @param {string} color Optional. The color to draw the text in. Any valid value for the CSS color attribute
 * is acceptable (ex. "#F00").
 **/
 Text = function(text, font, color) {
@@ -68,21 +68,21 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	/**
 	* The text to display.
 	* @property text
-	* @type String
+	* @type {string}
 	**/
 	p.text = "";
 	
 	/**
 	* The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold 36px Arial"). 
 	* @property font
-	* @type String
+	* @type {string}
 	**/
 	p.font = null;
 	
 	/**
 	* The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00").
 	* @property color
-	* @type String
+	* @type {string}
 	**/
 	p.color = null;
 	
@@ -92,7 +92,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">
 	* whatwg spec</a>.
 	* @property textAlign
-	* @type String
+	* @type {string}
 	**/
 	p.textAlign = null;
 	
@@ -101,7 +101,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">
 	* whatwg spec</a>.
 	* @property textBaseline
-	* @type String
+	* @type {string}
 	*/
 	p.textBaseline = null;
 	
@@ -250,7 +250,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 		
 	/**
 	* Returns a string representation of this object.
-	* @return {String} a string representation of the instance.
+	* @return {string} a string representation of the instance.
 	**/
 	p.toString = function() {
 		return "[Text (text="+  (this.text.length > 20 ? this.text.substr(0, 17)+"..." : this.text) +")]";

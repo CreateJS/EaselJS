@@ -125,7 +125,7 @@ DisplayObject.prototype.mouseEnabled = true;
 /**
  * An optional name for this display object. Included in toString(). Useful for debugging.
  * @property name
- * @type String
+ * @type {string}
  * @default null
  **/
 DisplayObject.prototype.name = null;
@@ -239,7 +239,7 @@ DisplayObject.prototype.y = 0;
  * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
  * whatwg spec on compositing</a>.
  * @property compositeOperation
- * @type String
+ * @type {string}
  * @default null
  **/
 DisplayObject.prototype.compositeOperation = null;
@@ -439,7 +439,7 @@ DisplayObject.prototype.cache = function(x, y, width, height) {
  * Redraws the display object to its cache. Calling updateCache without an active cache will throw an error.
  * If compositeOperation is null the current cache will be cleared prior to drawing. Otherwise the display object
  * will be drawn over the existing cache using the specified compositeOperation.
- * @param {String} compositeOperation The compositeOperation to use, or null to clear the cache and redraw it.
+ * @param {string} compositeOperation The compositeOperation to use, or null to clear the cache and redraw it.
  * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
  * whatwg spec on compositing</a>.
  **/
@@ -603,7 +603,7 @@ DisplayObject.prototype.clone = function() {
 
 /**
  * Returns a string representation of this object.
- * @return {String} a string representation of the instance.
+ * @return {string} a string representation of the instance.
  **/
 DisplayObject.prototype.toString = function() {
   return '[DisplayObject (name=' + this.name + ')]';
@@ -1002,7 +1002,7 @@ Container.prototype.clone = function(recursive) {
 
 /**
  * Returns a string representation of this object.
- * @return {String} a string representation of the instance.
+ * @return {string} a string representation of the instance.
  **/
 Container.prototype.toString = function() {
   return '[Container (name=' + this.name + ')]';
@@ -1316,11 +1316,11 @@ Stage.prototype.clear = function() {
 /**
  * Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be 
  * specified as the src value of an image element.
- * @param {String} backgroundColor The background color to be used for the generated image. The value can be any value HTML color
+ * @param {string} backgroundColor The background color to be used for the generated image. The value can be any value HTML color
  * value, including HEX colors, rgb and rgba. The default value is a transparent background.
- * @param {String} mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
+ * @param {string} mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
  * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
- * @return {String} a Base64 encoded image.
+ * @return {string} a Base64 encoded image.
  **/
 Stage.prototype.toDataURL = function(backgroundColor, mimeType) {
   if (!mimeType) {
@@ -1404,7 +1404,7 @@ Stage.prototype.clone = function() {
 
 /**
  * Returns a string representation of this object.
- * @return {String} a string representation of the instance.
+ * @return {string} a string representation of the instance.
  **/
 Stage.prototype.toString = function() {
   return "[Stage (name=" + this.name + ")]";

@@ -40,7 +40,7 @@
 * Encapsulates the properties required to define a shadow to apply to a DisplayObject via it's .shadow property.
 * @class Shadow
 * @constructor
-* @param {String} color The color of the shadow.
+* @param {string} color The color of the shadow.
 * @param {number} offsetX The x offset of the shadow.
 * @param {number} offsetY The y offset of the shadow.
 * @param {number} blur The size of the blurring effect.
@@ -63,7 +63,7 @@ var p = Shadow.prototype;
 // public properties:
 	/** The color of the shadow.
 	* property color
-	* @type String
+	* @type {string}
 	* @default null
 	*/
 	p.color = null;
@@ -105,7 +105,7 @@ var p = Shadow.prototype;
 // public methods:
 	/**
 	* Returns a string representation of this object.
-	* @return {String} a string representation of the instance.
+	* @return {string} a string representation of the instance.
 	**/
 	p.toString = function() {
 		return "[Shadow]";

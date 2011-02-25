@@ -167,7 +167,7 @@
 	* Returns a string representing the specified frameData object.
 	* @static
 	* @param {Object} frameData The frame data to output.
-	* @return {String} The a String representing the specified frameData object?
+	* @return {string} The a String representing the specified frameData object?
 	**/
 	SpriteSheetUtils.frameDataToString = function(frameData) {
 		var str = "";

@@ -65,7 +65,7 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 * myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
 * @class Graphics
 * @constructor
-* @param {String} instructions Optional. This is a string that will be eval'ed in the scope of this Graphics object. 
+* @param {string} instructions Optional. This is a string that will be eval'ed in the scope of this Graphics object. 
 * This provides a mechanism for generating a vector shape from a serialized string. Ex. 
 * "beginFill('#F00');drawRect(0, 0, 10, 10);"
 * @for Graphics
@@ -243,7 +243,7 @@ var p = Graphics.prototype;
 	/** 
 	* Initialization method.
 	* @protected
-	* @param {String} instructions
+	* @param {string} instructions
 	**/
 	p.initialize = function(instructions) {
 		this.clear();
@@ -414,7 +414,7 @@ var p = Graphics.prototype;
 	
 	/**
 	* Begins a fill with the specified color. This ends the current subpath.
-	* @param {String} color A CSS compatible color value (ex. "#FF0000" or "rgba(255,0,0,0.5)"). Setting to null will 
+	* @param {string} color A CSS compatible color value (ex. "#FF0000" or "rgba(255,0,0,0.5)"). Setting to null will 
 	* result in no fill.
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
@@ -477,7 +477,7 @@ var p = Graphics.prototype;
 	/**
 	* Begins a pattern fill using the specified image. This ends the current subpath.
 	* @param image The Image, Canvas, or Video object to use as the pattern.
-	* @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
+	* @param {string} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
 	* "repeat-y", or "no-repeat". Defaults to "repeat".
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
@@ -577,7 +577,7 @@ var p = Graphics.prototype;
 	/**
 	* Begins a pattern fill using the specified image. This ends the current subpath.
 	* @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use as the pattern.
-	* @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
+	* @param {string} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
 	* "repeat-y", or "no-repeat". Defaults to "repeat".
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)	
 	**/
@@ -748,7 +748,7 @@ var p = Graphics.prototype;
 		
 	/**
 	* Returns a string representation of this object.
-	* @return {String} a string representation of the instance.
+	* @return {string} a string representation of the instance.
 	**/
 	p.toString = function() {
 		return "[Graphics]";
@@ -974,8 +974,8 @@ var p = Graphics.prototype;
 	// used to create Commands that set properties:
 	/**
 	* used to create Commands that set properties
-	* @param {String} name
-	* @param {String} value
+	* @param {string} name
+	* @param {string} value
 	* @protected
 	**/
 	p._setProp = function(name, value) {

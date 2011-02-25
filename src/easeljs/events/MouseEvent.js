@@ -43,7 +43,7 @@
 * set mouseEventsEnabled to true on your stage instance.
 * @class MouseEvent
 * @constructor
-* @param {String} type The event type.
+* @param {string} type The event type.
 * @param {number} stageX The mouseX position relative to the stage.
 * @param {number} stageY The mouseY position relative to the stage.
 **/
@@ -72,7 +72,7 @@ var p = MouseEvent.prototype;
 	* The type of mouse event. This will be the same as the handler it maps to (onPress, 
 	* onMouseDown, onMouseUp, onMouseMove, or onClick).
 	* @property type
-	* @type String
+	* @type {string}
 	**/
 	p.type = null;
 	
@@ -108,7 +108,7 @@ var p = MouseEvent.prototype;
 // public methods:
 	/**
 	* Returns a string representation of this object.
-	* @return {String} a string representation of the instance.
+	* @return {string} a string representation of the instance.
 	**/
 	p.clone = function() {
 		return new MouseEvent(this.type, this.stageX, this.stageY);

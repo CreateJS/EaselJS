@@ -121,7 +121,7 @@ SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
 // public methods:
 	/**
 	* Returns a string representation of this object.
-	* @return {String} a string representation of the instance.
+	* @return {string} a string representation of the instance.
 	**/
 	SpriteSheet.prototype.toString = function() {
 		return "[SpriteSheet]";

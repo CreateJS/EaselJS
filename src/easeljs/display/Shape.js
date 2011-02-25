@@ -121,7 +121,7 @@ var p = Shape.prototype = new DisplayObject();
 		
 	/**
 	* Returns a string representation of this object.
-	* @return {String} a string representation of the instance.
+	* @return {string} a string representation of the instance.
 	**/
 	p.toString = function() {
 		return "[Shape (name="+  this.name +")]";
