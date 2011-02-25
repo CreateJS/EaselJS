@@ -110,7 +110,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-0">
 	* whatwg spec</a>.
 	* @property maxWidth
-	* @type Number
+	* @type {number}
 	*/
 	p.maxWidth = null;
 	
@@ -123,7 +123,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	/** Indicates the line height (vertical distance between baselines) for multi-line text. If null, 
 	* the value of getMeasuredLineHeight is used.
 	* @property lineHeight
-	* @type Number
+	* @type {number}
 	**/
 	p.lineHeight = null;
 	
@@ -131,7 +131,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	* Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null, 
 	* the text will not be wrapped.
 	* @property lineWidth
-	* @type Number
+	* @type {number}
 	**/
 	p.lineWidth = null;
 	

@@ -66,7 +66,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* The frame that will be drawn on the next tick. This can also be set, but it will not update the current
 	* sequence, so it may result in unexpected behavior if you are using frameData.
 	* @property currentFrame
-	* @type Number
+	* @type {number}
 	* @default -1
 	**/
 	p.currentFrame = -1;
@@ -82,7 +82,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Returns the last frame of the currently playing sequence when using frameData. READ-ONLY.
 	* @property currentEndFrame
-	* @type Number
+	* @type {number}
 	* @final
 	**/
 	p.currentEndFrame = null; // READ-ONLY
@@ -90,7 +90,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Returns the first frame of the currently playing sequence when using frameData. READ-ONLY.
 	* @property currentStartFrame
-	* @type Number
+	* @type {number}
 	* @final
 	**/
 	p.currentStartFrame = null; // READ-ONLY

@@ -70,21 +70,21 @@ var p = Shadow.prototype;
 	
 	/** The x offset of the shadow.
 	* property offsetX
-	* @type Number
+	* @type {number}
 	* @default 0
 	*/
 	p.offsetX = 0;
 	
 	/** The y offset of the shadow.
 	* property offsetY
-	* @type Number
+	* @type {number}
 	* @default 0
 	*/
 	p.offsetY = 0;
 	
 	/** The blur of the shadow.
 	* property blur
-	* @type Number
+	* @type {number}
 	* @default 0
 	*/
 	p.blur = 0;

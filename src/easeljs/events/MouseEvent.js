@@ -57,14 +57,14 @@ var p = MouseEvent.prototype;
 	/**
 	* The mouseX position on the stage.
 	* @property stageX
-	* @type Number
+	* @type {number}
 	*/
 	p.stageX = 0;
 	
 	/**
 	* The mouseY position on the stage.
 	* @property stageY
-	* @type Number
+	* @type {number}
 	**/
 	p.stageY = 0;
 	

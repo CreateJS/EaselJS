@@ -79,7 +79,7 @@ goog.inherits(Stage, Container);
 	* READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent 
 	* position over the canvas, and mouseInBounds will be set to false.
 	* @property mouseX
-	* @type Number
+	* @type {number}
 	* @final
 	**/
 	Stage.prototype.mouseX = null;
@@ -87,7 +87,7 @@ goog.inherits(Stage, Container);
 	/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent 
 	* position over the canvas, and mouseInBounds will be set to false.
 	* @property mouseY
-	* @type Number
+	* @type {number}
 	* @final
 	**/
 	Stage.prototype.mouseY = null;
@@ -156,21 +156,21 @@ goog.inherits(Stage, Container);
 	/**
 	* @property _mouseOverIntervalID
 	* @protected
-	* @type Number
+	* @type {number}
 	**/
 	Stage.prototype._mouseOverIntervalID = null;
 
 	/**
 	* @property _mouseOverX
 	* @protected
-	* @type Number
+	* @type {number}
 	**/
 	Stage.prototype._mouseOverX = 0;
 
 	/**
 	* @property _mouseOverY
 	* @protected
-	* @type Number
+	* @type {number}
 	**/
 	Stage.prototype._mouseOverY = 0;
 

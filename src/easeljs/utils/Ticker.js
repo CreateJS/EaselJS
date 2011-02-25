@@ -92,14 +92,14 @@ goog.provide('Ticker');
 	
 	/** 
 	* @property _startTime
-	* @type Number
+	* @type {number}
 	* @protected 
 	**/
 	Ticker._startTime = 0;
 	
 	/** 
 	* @property _pausedTime
-	* @type Number
+	* @type {number}
 	* @protected 
 	**/
 	Ticker._pausedTime=0;
@@ -107,7 +107,7 @@ goog.provide('Ticker');
 	/** 
 	* Number of ticks that have passed
 	* @property _ticks
-	* @type Number
+	* @type {number}
 	* @protected 
 	**/
 	Ticker._ticks = 0;
@@ -115,28 +115,28 @@ goog.provide('Ticker');
 	/**
 	* Number of ticks that have passed while Ticker has been paused
 	* @property _pausedTickers
-	* @type Number
+	* @type {number}
 	* @protected 
 	**/
 	Ticker._pausedTickers = 0;
 	
 	/** 
 	* @property _interval
-	* @type Number
+	* @type {number}
 	* @protected 
 	**/
 	Ticker._interval = 50; // READ-ONLY
 	
 	/** 
 	* @property _intervalID
-	* @type Number
+	* @type {number}
 	* @protected 
 	**/
 	Ticker._intervalID = null;
 	
 	/** 
 	* @property _lastTime
-	* @type Number
+	* @type {number}
 	* @protected 
 	**/
 	Ticker._lastTime = 0;

@@ -54,28 +54,28 @@ var p = Rectangle.prototype;
 	/** 
 	* X position. 
 	* @property x
-	* @type Number
+	* @type {number}
 	**/
 	p.x = 0;
 	
 	/** 
 	* Y position. 
 	* @property y
-	* @type Number
+	* @type {number}
 	**/
 	p.y = 0;
 	
 	/** 
 	* Width.
 	* @property width
-	* @type Number
+	* @type {number}
 	**/
 	p.width = 0;
 	
 	/** 
 	* Height.
 	* @property height
-	* @type Number
+	* @type {number}
 	**/
 	p.height = 0;
 	

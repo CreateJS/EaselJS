@@ -66,7 +66,7 @@ Matrix2D = function(a, b, c, d, tx, ty) {
 	* @property DEG_TO_RAD
 	* @static
 	* @final
-	* @type Number
+	* @type {number}
 	**/
 	Matrix2D.DEG_TO_RAD = Math.PI/180;
 
@@ -75,42 +75,42 @@ Matrix2D = function(a, b, c, d, tx, ty) {
 	/**
 	* Position (0, 0) in a 3x3 affine transformation matrix.
 	* @property a
-	* @type Number
+	* @type {number}
 	**/
 	Matrix2D.prototype.a = 1;
 	
 	/**
 	* Position (0, 1) in a 3x3 affine transformation matrix.
 	* @property b
-	* @type Number
+	* @type {number}
 	**/
 	Matrix2D.prototype.b = 0;
 	
 	/**
 	* Position (1, 0) in a 3x3 affine transformation matrix.
 	* @property c
-	* @type Number
+	* @type {number}
 	**/
 	Matrix2D.prototype.c = 0;
 	
 	/**
 	* Position (1, 1) in a 3x3 affine transformation matrix.
 	* @property d
-	* @type Number
+	* @type {number}
 	**/
 	Matrix2D.prototype.d = 1;
 	
 	/**
 	* Position (2, 0) in a 3x3 affine transformation matrix.
 	* @property atx
-	* @type Number
+	* @type {number}
 	**/
 	Matrix2D.prototype.tx = 0;
 	
 	/**
 	* Position (2, 1) in a 3x3 affine transformation matrix.
 	* @property ty
-	* @type Number
+	* @type {number}
 	**/
 	Matrix2D.prototype.ty = 0;
 	
@@ -118,7 +118,7 @@ Matrix2D = function(a, b, c, d, tx, ty) {
 	* Property representing the alpha that will be applied to a display object. This is not part of matrix 
 	* operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values.
 	* @property alpha
-	* @type Number
+	* @type {number}
 	**/
 	Matrix2D.prototype.alpha = 1;
 	

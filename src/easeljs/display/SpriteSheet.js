@@ -67,13 +67,13 @@ SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
 	
 	/** The width in pixels of each frame on the sprite sheet image.
 	* @property frameWidth
-	* @type Number
+	* @type {number}
 	**/
 	SpriteSheet.prototype.frameWidth = 0;
 	
 	/** The height in pixels of each frame on the sprite sheet image.
 	* @property frameHeight
-	* @type Number
+	* @type {number}
 	**/
 	SpriteSheet.prototype.frameHeight = 0;
 	
@@ -101,7 +101,7 @@ SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
 	* frames (for example, if you have 7 frames in a 2x4 sprite sheet). The total frames will be automatically calculated by 
 	* BitmapSequence based on frame and image dimensions if totalFrames is 0.
 	* @property totalFrames
-	* @type Number
+	* @type {number}
 	**/
 	SpriteSheet.prototype.totalFrames = 0;
 	
