@@ -367,7 +367,6 @@ DisplayObject.prototype._revertAlpha = 1;
 // separated so it can be easily addressed in subclasses:
 /**
  * Initialization method.
- * @method initialize
  * @protected
  */
 DisplayObject.prototype.initialize = function() {
@@ -380,7 +379,6 @@ DisplayObject.prototype.initialize = function() {
  * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
  * This does not account for whether it would be visible within the boundaries of the stage.
  * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
- * @method isVisible
  * @return {boolean} Boolean indicating whether the display object would be visible if drawn to a canvas.
  **/
 DisplayObject.prototype.isVisible = function() {
@@ -391,7 +389,6 @@ DisplayObject.prototype.isVisible = function() {
  * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
  * Returns true if the draw was handled (useful for overriding functionality).
  * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
- * @method draw
  * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
  * @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
  * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
@@ -416,7 +413,6 @@ DisplayObject.prototype.draw = function(ctx, ignoreCache) {
  * and h parameters. This defines the rectangle that will be rendered and cached using this display object's
  * coordinates. For example if you defined a Shape that drew a circle at 0, 0 with a radius of 25, you could call
  * myShape.cache(-25, -25, 50, 50) to cache the full shape.
- * @method cache
  * @param {number} x The x coordinate origin for the cache region.
  * @param {number} y The y coordinate origin for the cache region.
  * @param {number} width The width of the cache region.
@@ -443,7 +439,6 @@ DisplayObject.prototype.cache = function(x, y, width, height) {
  * Redraws the display object to its cache. Calling updateCache without an active cache will throw an error.
  * If compositeOperation is null the current cache will be cleared prior to drawing. Otherwise the display object
  * will be drawn over the existing cache using the specified compositeOperation.
- * @method updateCache
  * @param {String} compositeOperation The compositeOperation to use, or null to clear the cache and redraw it.
  * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
  * whatwg spec on compositing</a>.
@@ -467,7 +462,6 @@ DisplayObject.prototype.updateCache = function(compositeOperation) {
 
 /**
  * Clears the current cache. See cache() for more information.
- * @method uncache
  **/
 DisplayObject.prototype.uncache = function() {
   this.cacheCanvas = null;
@@ -476,7 +470,6 @@ DisplayObject.prototype.uncache = function() {
 
 /**
  * Returns the stage that this display object will be rendered on, or null if it has not been added to one.
- * @method getStage
  * @return {Stage} The Stage instance that the display object is a descendent of. null if the DisplayObject has not
  * been added to a Stage.
  **/
@@ -496,7 +489,6 @@ DisplayObject.prototype.getStage = function() {
  * to the global (stage) coordinate space. For example, this could be used to position an HTML label
  * over a specific point on a nested display object. Returns a Point instance with x and y properties
  * correlating to the transformed coordinates on the stage.
- * @method localToGlobal
  * @param {number} x The x position in the source display object to transform.
  * @param {number} y The y position in the source display object to transform.
  * @return {Point} A Point instance with x and y properties correlating to the transformed coordinates
@@ -516,7 +508,6 @@ DisplayObject.prototype.localToGlobal = function(x, y) {
  * coordinate space of the display object. For example, this could be used to determine
  * the current mouse position within the display object. Returns a Point instance with x and y properties
  * correlating to the transformed position in the display object's coordinate space.
- * @method globalToLocal
  * @param {number} x The x position on the stage to transform.
  * @param {number} y The y position on the stage to transform.
  * @return {Point} A Point instance with x and y properties correlating to the transformed position in the
@@ -537,7 +528,6 @@ DisplayObject.prototype.globalToLocal = function(x, y) {
  * coordinate space of the target display object. Returns a Point instance with x and y properties
  * correlating to the transformed position in the target's coordinate space. Effectively the same as calling
  * var pt = this.localToGlobal(x, y); pt = target.globalToLocal(pt.x, pt.y);
- * @method localToLocal
  * @param {number} x The x position in the source display object to transform.
  * @param {number} y The y position on the stage to transform.
  * @param {DisplayObject} target The target display object to which the coordinates will be transformed.
@@ -554,7 +544,6 @@ DisplayObject.prototype.localToLocal = function(x, y, target) {
  * the display object and all of its parent Containers up to the highest level ancestor
  * (usually the stage). This can be used to transform positions between coordinate spaces,
  * such as with localToGlobal and globalToLocal.
- * @method getConcatenatedMatrix
  * @param {Matrix2D} mtx Optional. A Matrix2D object to populate with the calculated values. If null, a new
  * Matrix object is returned.
  * @return {Matrix2D} a concatenated Matrix2D object representing the combined transform of
@@ -582,7 +571,6 @@ DisplayObject.prototype.getConcatenatedMatrix = function(mtx) {
  * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at
  * the specified position). This ignores the alpha, shadow and compositeOperation of the display object, and all
  * transform properties including regX/Y.
- * @method hitTest
  * @param {number} x The x position to check in the display object's local coordinates.
  * @param {number} y The y position to check in the display object's local coordinates.
  * @return {boolean} A Boolean indicting whether a visible portion of the DisplayObject intersect the specified
@@ -605,7 +593,6 @@ DisplayObject.prototype.hitTest = function(x, y) {
 /**
  * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
  * reverted to their defaults (for example .parent).
- * @method clone
  @return {DisplayObject} A clone of the current DisplayObject instance.
  **/
 DisplayObject.prototype.clone = function() {
@@ -616,7 +603,6 @@ DisplayObject.prototype.clone = function() {
 
 /**
  * Returns a string representation of this object.
- * @method toString
  * @return {String} a string representation of the instance.
  **/
 DisplayObject.prototype.toString = function() {
@@ -626,7 +612,6 @@ DisplayObject.prototype.toString = function() {
 // private methods:
 // separated so it can be used more easily in subclasses:
 /**
- * @method cloneProps
  * @protected
  * @param {DisplayObject} o The DisplayObject instance which will have properties from the current DisplayObject
  * instance copied into.
@@ -650,7 +635,6 @@ DisplayObject.prototype.cloneProps = function(o) {
 };
 
 /**
- * @method applyShadow
  * @protected
  * @param {CanvasRenderingContext2D} ctx
  * @param {Shadow} shadow
@@ -663,7 +647,6 @@ DisplayObject.prototype.applyShadow = function(ctx, shadow) {
 };
 
 /**
- * @method _testHit
  * @protected
  * @param {CanvasRenderingContext2D} ctx
  * @return {boolean}
@@ -716,7 +699,6 @@ Container.prototype.DisplayObject_initialize = Container.prototype.initialize;
 
 /**
  * Initialization method.
- * @method initialize
  * @protected
  */
 Container.prototype.initialize = function() {
@@ -729,7 +711,6 @@ Container.prototype.initialize = function() {
  * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
  * This does not account for whether it would be visible within the boundaries of the stage.
  * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
- * @method isVisible
  * @return {boolean} Boolean indicating whether the display object would be visible if drawn to a canvas.
  **/
 Container.prototype.isVisible = function() {
@@ -747,7 +728,6 @@ Container.prototype.DisplayObject_draw = Container.prototype.draw;
  * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
  * Returns true if the draw was handled (useful for overriding functionality).
  * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
- * @method draw
  * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
  * @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
  * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
@@ -798,7 +778,6 @@ Container.prototype.draw = function(ctx, ignoreCache, _mtx) {
 /**
  * Adds a child to the top of the display list. You can also add multiple children, such as "addChild(child1, child2, ...);".
  * Returns the child that was added, or the last child if multiple children were added.
- * @method addChild
  * @param {DisplayObject} child The display object to add.
  * @return {DisplayObject} The child that was added, or the last child if multiple children were added.
  **/
@@ -824,7 +803,6 @@ Container.prototype.addChild = function(child) {
  * index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list, you could use:
  * container.addChildAt(myShape, container.getChildIndex(otherShape)). This would also bump otherShape's index up by one.
  * Returns the last child that was added, or the last child if multiple children were added.
- * @method addChildAt
  * @param {DisplayObject} child The display object to add.
  * @param {number} index The index to add the child at.
  * @return {DisplayObject} The child that was added, or the last child if multiple children were added.
@@ -850,7 +828,6 @@ Container.prototype.addChildAt = function(child, index) {
  * Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is already
  * known. You can also remove multiple children, such as "removeChild(child1, child2, ...);". Returns true if the child
  * (or children) was removed, or false if it was not in the display list.
- * @method removeChild
  * @param {DisplayObject} child The child to remove.
  * @return {boolean} true if the child (or children) was removed, or false if it was not in the display list.
  **/
@@ -903,7 +880,6 @@ Container.prototype.removeChildAt = function(index) {
 
 /**
  * Removes all children from the display list.
- * @method removeAllChildren
  **/
 Container.prototype.removeAllChildren = function() {
   while (this.children.length) {
@@ -913,7 +889,6 @@ Container.prototype.removeAllChildren = function() {
 
 /**
  * Returns the child at the specified index.
- * @method getChildAt
  * @param {number} index The index of the child to return.
  * @return {DisplayObject} The child at the specified index.
  **/
@@ -923,7 +898,6 @@ Container.prototype.getChildAt = function(index) {
 
 /**
  * Performs an array sort operation on the child list.
- * @method sortChildren
  * @param {Function} sortFunction the function to use to sort the child list. See javascript's Array.sort documentation
  * for details.
  **/
@@ -933,7 +907,6 @@ Container.prototype.sortChildren = function(sortFunction) {
 
 /**
  * Returns the index of the specified child in the display list, or -1 if it is not in the display list.
- * @method getChildIndex
  * @param {DisplayObject} child The child to return the index of.
  * @return {number} The index of the specified child. -1 if the child is not found.
  **/
@@ -943,7 +916,6 @@ Container.prototype.getChildIndex = function(child) {
 
 /**
  * Returns the number of children in the display list.
- * @method getNumChildren
  * @return {number} The number of children in the display list.
  **/
 Container.prototype.getNumChildren = function() {
@@ -953,7 +925,6 @@ Container.prototype.getNumChildren = function() {
 /**
  * Returns true if the specified display object either is this container or is a descendent.
  * (child, grandchild, etc) of this container.
- * @method contains
  * @param {DisplayObject} child The DisplayObject to be checked.
  * @return {boolean} true if the specified display object either is this container or is a descendent.
  **/
@@ -971,7 +942,6 @@ Container.prototype.contains = function(child) {
  * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the specified
  * position). This ignores the alpha, shadow and compositeOperation of the display object, and all transform properties
  * including regX/Y.
- * @method hitTest
  * @param x The x position to check in the display object's local coordinates.
  * @param y The y position to check in the display object's local coordinates.
  * @return {boolean} A Boolean indicating whether there is a visible section of a DisplayObject that overlaps the specified
@@ -988,7 +958,6 @@ Container.prototype.hitTest = function(x, y) {
  * depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an expensive operation
  * to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on
  * mousemove), and only if the mouse's position has changed.
- * @method getObjectsUnderPoint
  * @param {number} x The x position in the container to test.
  * @param {number} y The y position in the container to test.
  * @return {Array[DisplayObject]} An Array of DisplayObjects under the specified coordinates.
@@ -1003,7 +972,6 @@ Container.prototype.getObjectsUnderPoint = function(x, y) {
 /**
  * Similar to getObjectsUnderPoint(), but returns only the top-most display object. This runs significantly faster than
  * getObjectsUnderPoint(), but is still an expensive operation. See getObjectsUnderPoint() for more information.
- * @method getObjectUnderPoint
  * @param {number} x The x position in the container to test.
  * @param {number} y The y position in the container to test.
  * @return {DisplayObject} The top-most display object under the specified coordinates.
@@ -1034,7 +1002,6 @@ Container.prototype.clone = function(recursive) {
 
 /**
  * Returns a string representation of this object.
- * @method toString
  * @return {String} a string representation of the instance.
  **/
 Container.prototype.toString = function() {
@@ -1043,7 +1010,6 @@ Container.prototype.toString = function() {
 
 // private properties:
 /**
- * @method _getObjectsUnderPoint
  * @param {number} x
  * @param {number} x
  * @param {Array} arr
@@ -1272,7 +1238,6 @@ Stage.prototype.Container_initialize = Stage.prototype.initialize;
 
 /** 
  * Initialization method.
- * @method initialize
  * param {HTMLCanvasElement} canvas
  * @protected
  **/
@@ -1316,7 +1281,6 @@ Stage.prototype.initialize = function(canvas) {
 /**
  * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapSequence) 
  * and render its entire display list to the canvas.
- * @method update
  **/
 Stage.prototype.update = function() {
   if (!this.canvas) {
@@ -1339,7 +1303,6 @@ Stage.prototype.tick = Stage.prototype.update;
 
 /**
  * Clears the target canvas. Useful if autoClear is set to false.
- * @method clear
  **/
 Stage.prototype.clear = function() {
   if (!this.canvas) {
@@ -1353,7 +1316,6 @@ Stage.prototype.clear = function() {
 /**
  * Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be 
  * specified as the src value of an image element.
- * @method toDataURL
  * @param {String} backgroundColor The background color to be used for the generated image. The value can be any value HTML color
  * value, including HEX colors, rgb and rgba. The default value is a transparent background.
  * @param {String} mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
@@ -1410,7 +1372,6 @@ Stage.prototype.toDataURL = function(backgroundColor, mimeType) {
  * Enables or disables (by passing a frequency of 0) mouse over handlers (onMouseOver and onMouseOut) for this stage's display
  * list. These events can be expensive to generate, so they are disabled by default, and the frequency of the events
  * can be controlled independently of mouse move events via the frequency parameter.
- * @method enableMouseOver
  * @param {number} frequency The maximum number of times per second to broadcast mouse over/out events. Set to 0 to disable mouse
  * over events completely. Maximum is 50. A lower frequency is less responsive, but uses less CPU.
  **/
@@ -1443,7 +1404,6 @@ Stage.prototype.clone = function() {
 
 /**
  * Returns a string representation of this object.
- * @method toString
  * @return {String} a string representation of the instance.
  **/
 Stage.prototype.toString = function() {
@@ -1452,7 +1412,6 @@ Stage.prototype.toString = function() {
 
 // private methods:
 /**
- * @method _handleMouseMove
  * @protected
  * @param {MouseEvent} e
  **/
@@ -1487,7 +1446,6 @@ Stage.prototype._handleMouseMove = function(e) {
 };
 
 /**
- * @method _handleMouseUp
  * @protected
  * @param {MouseEvent} e
  **/
@@ -1506,7 +1464,6 @@ Stage.prototype._handleMouseUp = function(e) {
 };
 
 /**
- * @method _handleMouseDown
  * @protected
  * @param {MouseEvent} e
  **/
@@ -1528,7 +1485,6 @@ Stage.prototype._handleMouseDown = function(e) {
 };
 
 /**
- * @method _testMouseOver
  * @protected
  **/
 Stage.prototype._testMouseOver = function() {

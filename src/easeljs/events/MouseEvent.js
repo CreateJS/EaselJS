@@ -97,7 +97,6 @@ var p = MouseEvent.prototype;
 // constructor:
 	/** 
 	* Initialization method.
-	* @method initialize
 	* @protected
 	**/
 	p.initialize = function(type, stageX, stageY) {
@@ -109,7 +108,6 @@ var p = MouseEvent.prototype;
 // public methods:
 	/**
 	* Returns a string representation of this object.
-	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
 	p.clone = function() {

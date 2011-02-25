@@ -145,7 +145,6 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	
 	/** 
 	* Initialization method.
-	* @method initialize
 	* @protected
 	*/
 	p.initialize = function(text, font, color) {
@@ -159,7 +158,6 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	* This does not account for whether it would be visible within the boundaries of the stage.
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method isVisible
 	* @return {boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	**/
 	p.isVisible = function() {
@@ -178,7 +176,6 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	* Draws the Text into the specified context ignoring it's visible, alpha, shadow, and transform.
 	* Returns true if the draw was handled (useful for overriding functionality).
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method draw
 	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
 	* @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache. 
 	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
@@ -225,7 +222,6 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	
 	/**
 	* Returns the measured, untransformed width of the text.
-	* @method getMeasuredWidth
 	* @return {number} The measured, untransformed width of the text.
 	**/
 	p.getMeasuredWidth = function() {
@@ -235,7 +231,6 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	/**
 	* Returns an approximate line height of the text, ignoring the lineHeight property. This is based 
 	* on the measured width of a "M" character multiplied by 1.2, which approximates em for most fonts.
-	* @method getMeasuredLineHeight
 	* @return {number} an approximate line height of the text, ignoring the lineHeight property. This is 
 	* based on the measured width of a "M" character multiplied by 1.2, which approximates em for most fonts.
 	**/
@@ -245,7 +240,6 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	
 	/**
 	* Returns a clone of the Point instance.
-	* @method clone
 	* @return {Point} a clone of the Point instance.
 	**/
 	p.clone = function() {
@@ -256,7 +250,6 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 		
 	/**
 	* Returns a string representation of this object.
-	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {
@@ -273,7 +266,6 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	p.DisplayObject_cloneProps = p.cloneProps;
 
 	/** 
-	 * @method cloneProps
 	 * @param {Text} o
 	 * @protected 
 	 **/
@@ -288,7 +280,6 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	}
 
 	/** 
-	 * @method _getWorkingContext
 	 * @protected 
 	 **/
 	p._getWorkingContext = function() {
@@ -300,7 +291,6 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	}
 	
 	/** 
-	 * @method _drawTextLine
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @param {Text} text
 	 * @param {number} y

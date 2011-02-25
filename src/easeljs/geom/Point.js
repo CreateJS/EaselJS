@@ -67,7 +67,6 @@ var p = Point.prototype;
 // constructor:
 	/** 
 	* Initialization method.
-	* @method initialize
 	* @protected
 	*/
 	p.initialize = function(x, y) {
@@ -78,7 +77,6 @@ var p = Point.prototype;
 // public methods:
 	/**
 	* Returns a clone of the Point instance.
-	* @method clone
 	* @return {Point} a clone of the Point instance.
 	**/
 	p.clone = function() {
@@ -87,7 +85,6 @@ var p = Point.prototype;
 
 	/**
 	* Returns a string representation of this object.
-	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {

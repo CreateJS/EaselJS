@@ -108,7 +108,6 @@ SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
 // constructor:
 	/** 
 	* Initialization method.
-	* @method initialize
 	* param {Graphics} graphics
 	* @protected
 	**/
@@ -122,7 +121,6 @@ SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
 // public methods:
 	/**
 	* Returns a string representation of this object.
-	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
 	SpriteSheet.prototype.toString = function() {
@@ -131,7 +129,6 @@ SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
 	
 	/**
 	* Returns a clone of the SpriteSheet instance.
-	* @method clone
 	* @return {SpriteSheet} a clone of the SpriteSheet instance.
 	**/
 	SpriteSheet.prototype.clone = function() {

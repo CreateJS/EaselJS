@@ -55,7 +55,6 @@ UID._nextID = 0;
 
 /**
  * Returns the next unique id.
- * @method get
  * @return {number} The next unique id
  * @static
  **/

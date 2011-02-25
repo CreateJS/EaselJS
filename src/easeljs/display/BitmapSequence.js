@@ -139,7 +139,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	
 	/** 
 	* Initialization method.
-	* @method initialize
 	* @protected
 	*/
 	p.initialize = function(spriteSheet) {
@@ -151,7 +150,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	* This does not account for whether it would be visible within the boundaries of the stage.
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method isVisible
 	* @return {boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	**/
 	p.isVisible = function() {
@@ -170,7 +168,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
 	* Returns true if the draw was handled (useful for overriding functionality).
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method draw
 	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
 	* @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache. 
 	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
@@ -219,7 +216,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	
 	/**
 	* Advances the currentFrame if paused is not true. This is called automatically when the Stage ticks.
-	* @method tick
 	**/
 	p.tick = function() {
 		if (this.paused) { return; }
@@ -232,24 +228,20 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
-	* @method cache
 	**/
 	
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
-	* @method updateCache
 	**/
 	
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
-	* @method uncache
 	**/
 	
 	/**
 	* Sets paused to false and plays the specified sequence name, named frame, or frame number.
-	* @method gotoAndPlay
 	* @param {String|Number} frameOrSequence The frame number or sequence that the playhead should move to
 	* and begin playing.
 	**/
@@ -260,7 +252,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	
 	/**
 	* Sets paused to true and seeks to the specified sequence name, named frame, or frame number.
-	* @method gotoAndStop
 	* @param {String|Number} frameOrSequence The frame number or sequence that the playhead should move to
 	* and stop.
 	**/
@@ -271,7 +262,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	
 	/**
 	* Returns a clone of the Point instance.
-	* @method clone
 	* @return {Point} a clone of the Point instance.
 	**/
 	p.clone = function() {
@@ -282,7 +272,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		
 	/**
 	* Returns a string representation of this object.
-	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {
@@ -298,7 +287,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	p.DisplayObject_cloneProps = p.cloneProps;
 	
 	/** 
-	* @method cloneProps
 	* @param {Text} o
 	* @protected
 	**/
@@ -316,7 +304,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	
 	/**
 	* Moves the playhead to the specified frame number of sequence.
-	* @method _goto
 	* @param {String|Number} frameOrSequence The frame number of sequence that the playhead should move to.
 	* @protected
 	**/

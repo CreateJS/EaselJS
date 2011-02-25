@@ -82,7 +82,6 @@ var p = Rectangle.prototype;
 // constructor:
 	/** 
 	* Initialization method.
-	* @method initialize
 	* @protected
 	*/
 	p.initialize = function(x, y, width, height) {
@@ -95,7 +94,6 @@ var p = Rectangle.prototype;
 // public methods:
 	/**
 	* Returns a clone of the Rectangle instance.
-	* @method clone
 	* @return {Rectangle} a clone of the Rectangle instance.
 	**/
 	p.clone = function() {
@@ -104,7 +102,6 @@ var p = Rectangle.prototype;
 
 	/**
 	* Returns a string representation of this object.
-	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {

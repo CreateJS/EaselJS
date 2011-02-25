@@ -74,7 +74,6 @@
 	* to -1 is quite expensive in most browsers, so this method allows you to incur the cost of flipping once,
 	* in advance, without increasing the load size of your sprite sheets. Returns a new SpriteSheet instance
 	* containing the generated image and frame data.
-	* @method flip
 	* @static
 	* @param {Image} spriteSheet The sprite sheet to use as the source.
 	* @param {Object} flipData A generic object that specifies which frames will be flipped, what to name the 
@@ -166,7 +165,6 @@
 	
 	/**
 	* Returns a string representing the specified frameData object.
-	* @method frameDataToString
 	* @static
 	* @param {Object} frameData The frame data to output.
 	* @return {String} The a String representing the specified frameData object?
@@ -202,7 +200,6 @@
 
 	/**
 	* Returns a single frame of the specified sprite sheet as a new PNG image.
-	* @method extractFrame
 	* @static
 	* @param {Image} spriteSheet The SpriteSheet instance to extract a frame from.
 	* @param {number} frame The frame number or sequence name to extract. If a sequence 

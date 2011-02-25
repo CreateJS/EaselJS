@@ -92,7 +92,6 @@ var p = Shadow.prototype;
 // constructor:
 	/** 
 	* Initialization method.
-	* @method initialize
 	* @protected
 	* @param {Array[Command]} instructions
 	**/
@@ -106,7 +105,6 @@ var p = Shadow.prototype;
 // public methods:
 	/**
 	* Returns a string representation of this object.
-	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {
@@ -116,8 +114,7 @@ var p = Shadow.prototype;
 	
 	/**
 	* Returns a clone of this Shadow instance.
-	* @method clone
-	 @return {Shadow} A clone of the current Shadow instance.
+	@return {Shadow} A clone of the current Shadow instance.
 	**/
 	p.clone = function() {
 		return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);

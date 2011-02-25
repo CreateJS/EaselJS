@@ -75,7 +75,6 @@ goog.inherits(Bitmap, DisplayObject);
 
 	/**
 	* Initialization method.
-	* @method initialize
 	* @protected
 	*/
 	Bitmap.prototype.initialize = function(image) {
@@ -89,7 +88,6 @@ goog.inherits(Bitmap, DisplayObject);
 	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	* This does not account for whether it would be visible within the boundaries of the stage.
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method isVisible
 	* @return {boolean} Boolean indicating whether the display object would be visible if drawn to a canvas.
 	**/
 	Bitmap.prototype.isVisible = function() {
@@ -107,7 +105,6 @@ goog.inherits(Bitmap, DisplayObject);
 	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
 	* Returns true if the draw was handled (useful for overriding functionality).
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method draw
 	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
 	* @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
@@ -125,24 +122,20 @@ goog.inherits(Bitmap, DisplayObject);
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
-	* @method cache
 	**/
 
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
-	* @method updateCache
 	**/
 
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	* You should not cache Bitmap instances as it can degrade performance.
-	* @method uncache
 	**/
 
 	/**
 	* Returns a clone of the Point instance.
-	* @method clone
 	* @return {Point} a clone of the Point instance.
 	**/
 	Bitmap.prototype.clone = function() {
@@ -153,7 +146,6 @@ goog.inherits(Bitmap, DisplayObject);
 
 	/**
 	* Returns a string representation of this object.
-	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
 	Bitmap.prototype.toString = function() {

@@ -155,7 +155,6 @@ goog.provide('Ticker');
 	* .setInterval(ms) method.
 	* The exposed tick method is passed a single parameter, which include the elapsed time between the 
 	* previous tick and the current one.
-	* @method addListener
 	* @static
 	* @param {Object} o The object to add as a listener.
 	* @param {boolean} pauseable If false, the listener will continue to have tick called 
@@ -173,7 +172,6 @@ goog.provide('Ticker');
 	
 	/**
 	* Removes the specified listener.
-	* @method removeListener
 	* @static
 	* @param {Object} o The object to remove from listening from the tick event.
 	**/
@@ -188,7 +186,6 @@ goog.provide('Ticker');
 	
 	/**
 	* Removes all listeners.
-	* @method removeAllListeners
 	* @static
 	**/
 	Ticker.removeAllListeners = function() {
@@ -199,7 +196,6 @@ goog.provide('Ticker');
 	/**
 	* Sets the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
 	* Note actual time between ticks may be more than requested depending on CPU load.
-	* @method setInterval
 	* @static
 	* @param {number} interval Time in milliseconds between ticks. Default value is 50.
 	**/
@@ -212,7 +208,6 @@ goog.provide('Ticker');
 	
 	/**
 	* Returns the current target time between ticks, as set with setInterval.
-	* @method getInterval
 	* @static
 	* @return {number} The current target interval in milliseconds between tick events.
 	**/
@@ -223,7 +218,6 @@ goog.provide('Ticker');
 	/**
 	* Returns the target frame rate in frames per second (FPS). For example, with an 
 	* interval of 40, getFPS() will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
-	* @method getFPS
 	* @static
 	* @return {number} The current target number of frames / ticks broadcast per second.
 	**/
@@ -234,7 +228,6 @@ goog.provide('Ticker');
 	/**
 	* Sets the target frame rate in frames per second (FPS). For example, with an interval of 40, getFPS() will 
 	* return 25 (1000ms per second divided by 40 ms per tick = 25fps).
-	* @method setFPS
 	* @static
 	* @param {number} value Target number of ticks broadcast per second.
 	**/	
@@ -244,7 +237,6 @@ goog.provide('Ticker');
 	
 	/**
 	* Returns the actual frames / ticks per second.
-	* @method getMeasuredFPS
 	* @static
 	* @param {number} ticks Optional. The number of previous ticks over which to measure the actual 
 	* frames / ticks per second.
@@ -262,7 +254,6 @@ goog.provide('Ticker');
 	
 	/**
 	* While Ticker is paused, pausable listeners are not ticked. See addListener for more information.
-	* @method setPaused
 	* @static
 	* @param {boolean} value Indicates whether to pause (true) or unpause (false) Ticker.
 	**/
@@ -272,7 +263,6 @@ goog.provide('Ticker');
 	
 	/**
 	* Returns a boolean indicating whether Ticker is currently paused, as set with setPaused.
-	* @method getPaused
 	* @static
 	* @return {boolean} Whether the Ticker is currently paused.
 	**/
@@ -284,7 +274,6 @@ goog.provide('Ticker');
 	* Returns the number of milliseconds that have elapsed since the first tick event listener was added to
 	* Ticker. For example, you could use this in a time synchronized animation to determine the exact amount of 
 	* time that has elapsed.
-	* @method getTime
 	* @static
 	* @param {boolean} pauseable Indicates whether to include time elapsed
 	* while Ticker was paused. If false only time elapsed while Ticker is not paused will be returned.
@@ -297,7 +286,6 @@ goog.provide('Ticker');
 	
 	/**
 	* Returns the number of ticks that have been broadcast by Ticker.
-	* @method getTicks
 	* @static
 	* @param {boolean} pauseable Indicates whether to include ticks that would have been broadcast
 	* while Ticker was paused. If false only tick events broadcast while Ticker is not paused will be returned.
@@ -312,7 +300,6 @@ goog.provide('Ticker');
 // private static methods:
 
 	/**
-	* @method _tick
 	* @protected
 	* */
 	Ticker._tick = function() {
