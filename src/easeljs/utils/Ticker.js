@@ -56,7 +56,7 @@ goog.provide('Ticker');
 	* Event broadcast  once each tick / interval. The interval is specified via the 
 	* .setInterval(ms) or setFPS methods.
 	* @event tick
-	* @param {Number} timeElapsed The time elapsed in milliseconds since the last tick event.
+	* @param {number} timeElapsed The time elapsed in milliseconds since the last tick event.
 	*/	
 	
 // private static properties:
@@ -201,7 +201,7 @@ goog.provide('Ticker');
 	* Note actual time between ticks may be more than requested depending on CPU load.
 	* @method setInterval
 	* @static
-	* @param {Number} interval Time in milliseconds between ticks. Default value is 50.
+	* @param {number} interval Time in milliseconds between ticks. Default value is 50.
 	**/
 	Ticker.setInterval = function(interval) {
 		if (Ticker._intervalID != null) { clearInterval(Ticker._intervalID); }
@@ -236,7 +236,7 @@ goog.provide('Ticker');
 	* return 25 (1000ms per second divided by 40 ms per tick = 25fps).
 	* @method setFPS
 	* @static
-	* @param {Number} value Target number of ticks broadcast per second.
+	* @param {number} value Target number of ticks broadcast per second.
 	**/	
 	Ticker.setFPS = function(value) {
 		Ticker.setInterval(1000/value);
@@ -246,7 +246,7 @@ goog.provide('Ticker');
 	* Returns the actual frames / ticks per second.
 	* @method getMeasuredFPS
 	* @static
-	* @param {Number} ticks Optional. The number of previous ticks over which to measure the actual 
+	* @param {number} ticks Optional. The number of previous ticks over which to measure the actual 
 	* frames / ticks per second.
 	* @return {number} The actual frames / ticks per second. Depending on performance, this may differ
 	* from the target frames per second.

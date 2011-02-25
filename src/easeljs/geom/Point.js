@@ -40,8 +40,8 @@ goog.provide('Point');
 * Represents a point on a 2 dimensional x / y coordinate system.
 * @class Point
 * @constructor
-* @param {Number} x X position. Default is 0.
-* @param {Number} y Y position. Default is 0.
+* @param {number} x X position. Default is 0.
+* @param {number} y Y position. Default is 0.
 **/
 Point = function(x, y) {
   this.initialize(x, y);

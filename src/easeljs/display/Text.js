@@ -303,7 +303,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	 * @method _drawTextLine
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @param {Text} text
-	 * @param {Number} y
+	 * @param {number} y
 	 * @protected 
 	 **/
 	p._drawTextLine = function(ctx, text, y) {

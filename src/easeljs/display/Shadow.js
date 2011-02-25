@@ -41,9 +41,9 @@
 * @class Shadow
 * @constructor
 * @param {String} color The color of the shadow.
-* @param {Number} offsetX The x offset of the shadow.
-* @param {Number} offsetY The y offset of the shadow.
-* @param {Number} blur The size of the blurring effect.
+* @param {number} offsetX The x offset of the shadow.
+* @param {number} offsetY The y offset of the shadow.
+* @param {number} blur The size of the blurring effect.
 **/
 Shadow = function(color, offsetX, offsetY, blur) {
   this.initialize(color, offsetX, offsetY, blur);

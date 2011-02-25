@@ -49,8 +49,8 @@ goog.provide('SpriteSheet');
 * @class SpriteSheet
 * @constructor
 * @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video instance to use as a sprite sheet.
-* @param {Number} frameWidth The width in pixels of each frame on the sprite sheet.
-* @param {Number} frameHeight The height in pixels of each frame on the sprite sheet.
+* @param {number} frameWidth The width in pixels of each frame on the sprite sheet.
+* @param {number} frameHeight The height in pixels of each frame on the sprite sheet.
 * @param {Object} frameData Defines named frames and frame sequences. See the frameData property for more information.
 **/
 SpriteSheet = function(image, frameWidth, frameHeight, frameData) {

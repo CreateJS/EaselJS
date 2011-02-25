@@ -44,8 +44,8 @@
 * @class MouseEvent
 * @constructor
 * @param {String} type The event type.
-* @param {Number} stageX The mouseX position relative to the stage.
-* @param {Number} stageY The mouseY position relative to the stage.
+* @param {number} stageX The mouseX position relative to the stage.
+* @param {number} stageY The mouseY position relative to the stage.
 **/
 MouseEvent = function(type, stageX, stageY) {
   this.initialize(type, stageX, stageY);

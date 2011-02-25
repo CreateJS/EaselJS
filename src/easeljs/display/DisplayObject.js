@@ -417,10 +417,10 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* coordinates. For example if you defined a Shape that drew a circle at 0, 0 with a radius of 25, you could call
 	* myShape.cache(-25, -25, 50, 50) to cache the full shape.
 	* @method cache
-	* @param {Number} x The x coordinate origin for the cache region.
-	* @param {Number} y The y coordinate origin for the cache region.
-	* @param {Number} width The width of the cache region.
-	* @param {Number} height The height of the cache region.
+	* @param {number} x The x coordinate origin for the cache region.
+	* @param {number} y The y coordinate origin for the cache region.
+	* @param {number} width The width of the cache region.
+	* @param {number} height The height of the cache region.
 	**/
 	DisplayObject.prototype.cache = function(x, y, width, height) {
 		// draw to canvas.
@@ -486,8 +486,8 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* over a specific point on a nested display object. Returns a Point instance with x and y properties
 	* correlating to the transformed coordinates on the stage.
 	* @method localToGlobal
-	* @param {Number} x The x position in the source display object to transform.
-	* @param {Number} y The y position in the source display object to transform.
+	* @param {number} x The x position in the source display object to transform.
+	* @param {number} y The y position in the source display object to transform.
 	* @return {Point} A Point instance with x and y properties correlating to the transformed coordinates
 	* on the stage.
 	**/
@@ -504,8 +504,8 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* the current mouse position within the display object. Returns a Point instance with x and y properties
 	* correlating to the transformed position in the display object's coordinate space.
 	* @method globalToLocal
-	* @param {Number} x The x position on the stage to transform.
-	* @param {Number} y The y position on the stage to transform.
+	* @param {number} x The x position on the stage to transform.
+	* @param {number} y The y position on the stage to transform.
 	* @return {Point} A Point instance with x and y properties correlating to the transformed position in the
 	* display object's coordinate space.
 	**/
@@ -523,8 +523,8 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* correlating to the transformed position in the target's coordinate space. Effectively the same as calling
 	* var pt = this.localToGlobal(x, y); pt = target.globalToLocal(pt.x, pt.y);
 	* @method localToLocal
-	* @param {Number} x The x position in the source display object to transform.
-	* @param {Number} y The y position on the stage to transform.
+	* @param {number} x The x position in the source display object to transform.
+	* @param {number} y The y position on the stage to transform.
 	* @param {DisplayObject} target The target display object to which the coordinates will be transformed.
 	* @return {Point} Returns a Point instance with x and y properties correlating to the transformed position
 	* in the target's coordinate space.
@@ -564,8 +564,8 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* the specified position). This ignores the alpha, shadow and compositeOperation of the display object, and all
 	* transform properties including regX/Y.
 	* @method hitTest
-	* @param {Number} x The x position to check in the display object's local coordinates.
-	* @param {Number} y The y position to check in the display object's local coordinates.
+	* @param {number} x The x position to check in the display object's local coordinates.
+	* @param {number} y The y position to check in the display object's local coordinates.
 	* @return {Boolean} A Boolean indicting whether a visible portion of the DisplayObject intersect the specified
 	* local Point.
 	*/

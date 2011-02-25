@@ -86,10 +86,10 @@ var p = Graphics.prototype;
 	* will return "rgba(255,0,255,0.2)".
 	* @method getRGB
 	* @static
-	* @param {Number} r The red component for the color, between 0 and 0xFF (255).
-	* @param {Number} g The green component for the color, between 0 and 0xFF (255).
-	* @param {Number} b The blue component for the color, between 0 and 0xFF (255).
-	* @param {Number} alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
+	* @param {number} r The red component for the color, between 0 and 0xFF (255).
+	* @param {number} g The green component for the color, between 0 and 0xFF (255).
+	* @param {number} b The blue component for the color, between 0 and 0xFF (255).
+	* @param {number} alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
 	* @return A CSS compatible color string based on the specified RGB numeric color values in the format 
 	* "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)".
 	**/
@@ -113,10 +113,10 @@ var p = Graphics.prototype;
 	* "hsl(150,100,70)".
 	* @method getHSL
 	* @static
-	* @param {Number} hue The hue component for the color, between 0 and 360.
-	* @param {Number} saturation The saturation component for the color, between 0 and 100.
-	* @param {Number} lightness The lightness component for the color, between 0 and 100.
-	* @param {Number} alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
+	* @param {number} hue The hue component for the color, between 0 and 360.
+	* @param {number} saturation The saturation component for the color, between 0 and 100.
+	* @param {number} lightness The lightness component for the color, between 0 and 100.
+	* @param {number} alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
 	* @return a CSS compatible color string based on the specified HSL numeric color values in the format 
 	* "hsla(360,100,100,1.0)", or if alpha is null then in the format "hsl(360,100,100)". For example, 
 	* Graphics.getHSL(150, 100, 70) will return "hsl(150,100,70)".
@@ -276,8 +276,8 @@ var p = Graphics.prototype;
 	/**
 	* Moves the drawing point to the specified position.
 	* @method moveTo
-	* @param {Number} x The x coordinate the drawing point should move to.
-	* @param {Number} y The y coordinate the drawing point should move to.
+	* @param {number} x The x coordinate the drawing point should move to.
+	* @param {number} y The y coordinate the drawing point should move to.
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.moveTo = function(x, y) {
@@ -291,8 +291,8 @@ var p = Graphics.prototype;
 	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
 	* whatwg spec</a>.
 	* @method lineTo
-	* @param {Number} x The x coordinate the drawing point should draw to.
-	* @param {Number} y The y coordinate the drawing point should draw to.
+	* @param {number} x The x coordinate the drawing point should draw to.
+	* @param {number} y The y coordinate the drawing point should draw to.
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.lineTo = function(x, y) {
@@ -306,11 +306,11 @@ var p = Graphics.prototype;
 	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arcto">
 	* whatwg spec</a>.
 	* @method arcTo
-	* @param {Number} x1
-	* @param {Number} y1
-	* @param {Number} x2
-	* @param {Number} y2
-	* @param {Number} radius
+	* @param {number} x1
+	* @param {number} y1
+	* @param {number} x2
+	* @param {number} y2
+	* @param {number} radius
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.arcTo = function(x1, y1, x2, y2, radius) {
@@ -325,11 +325,11 @@ var p = Graphics.prototype;
 	* information, read the 
 	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arc">whatwg spec</a>.
 	* @method arc
-	* @param {Number} x
-	* @param {Number} y
-	* @param {Number} radius
-	* @param {Number} startAngle Measured in radians.
-	* @param {Number} endAngle Measured in radians.
+	* @param {number} x
+	* @param {number} y
+	* @param {number} radius
+	* @param {number} startAngle Measured in radians.
+	* @param {number} endAngle Measured in radians.
 	* @param {Boolean} anticlockwise
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
@@ -345,10 +345,10 @@ var p = Graphics.prototype;
 	* read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-quadraticcurveto">
 	* whatwg spec</a>.
 	* @method quadraticCurveTo
-	* @param {Number} cpx
-	* @param {Number} cpy
-	* @param {Number} x
-	* @param {Number} y
+	* @param {number} cpx
+	* @param {number} cpy
+	* @param {number} x
+	* @param {number} y
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.quadraticCurveTo = function(cpx, cpy, x, y) {
@@ -363,12 +363,12 @@ var p = Graphics.prototype;
 	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-beziercurveto">
 	* whatwg spec</a>.
 	* method @bezierCurveTo
-	* @param {Number} cp1x
-	* @param {Number} cp1y
-	* @param {Number} cp2x
-	* @param {Number} cp2y
-	* @param {Number} x
-	* @param {Number} y
+	* @param {number} cp1x
+	* @param {number} cp1y
+	* @param {number} cp2x
+	* @param {number} cp2y
+	* @param {number} x
+	* @param {number} y
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.bezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
@@ -383,10 +383,10 @@ var p = Graphics.prototype;
 	* <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-rect">
 	* whatwg spec</a>.
 	* @method rect
-	* @param {Number} x
-	* @param {Number} y
-	* @param {Number} w Width of the rectangle
-	* @param {Number} h Height of the rectangle
+	* @param {number} x
+	* @param {number} y
+	* @param {number} w Width of the rectangle
+	* @param {number} h Height of the rectangle
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.rect = function(x, y, w, h) {
@@ -447,10 +447,10 @@ var p = Graphics.prototype;
 	* drawing from red to blue.
 	* @param {Array[Number]} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw 
 	* the first color to 10% then interpolating to the second color at 90%.
-	* @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
-	* @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
-	* @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
-	* @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
+	* @param {number} x0 The position of the first point defining the line that defines the gradient direction and size.
+	* @param {number} y0 The position of the first point defining the line that defines the gradient direction and size.
+	* @param {number} x1 The position of the second point defining the line that defines the gradient direction and size.
+	* @param {number} y1 The position of the second point defining the line that defines the gradient direction and size.
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.beginLinearGradientFill = function(colors, ratios, x0, y0, x1, y1) {
@@ -472,12 +472,12 @@ var p = Graphics.prototype;
 	* drawing from red to blue.
 	* @param {Array[Number]} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would 
 	* draw the first color to 10% then interpolating to the second color at 90%.
-	* @param {Number} x0 Center position of the inner circle that defines the gradient.
-	* @param {Number} y0 Center position of the inner circle that defines the gradient.
-	* @param {Number} r0 Radius of the inner circle that defines the gradient.
-	* @param {Number} x1 Center position of the outer circle that defines the gradient.
-	* @param {Number} y1 Center position of the outer circle that defines the gradient.
-	* @param {Number} r1 Radius of the outer circle that defines the gradient.
+	* @param {number} x0 Center position of the inner circle that defines the gradient.
+	* @param {number} y0 Center position of the inner circle that defines the gradient.
+	* @param {number} r0 Radius of the inner circle that defines the gradient.
+	* @param {number} x1 Center position of the outer circle that defines the gradient.
+	* @param {number} y1 Center position of the outer circle that defines the gradient.
+	* @param {number} r1 Radius of the outer circle that defines the gradient.
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.beginRadialGradientFill = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
@@ -634,11 +634,11 @@ var p = Graphics.prototype;
 	/**
 	* Draws a rounded rectangle with all corners with the specified radius.
 	* @method drawRoundRect
-	* @param {Number} x
-	* @param {Number} y
-	* @param {Number} w
-	* @param {Number} h
-	* @param {Number} radius Corner radius.
+	* @param {number} x
+	* @param {number} y
+	* @param {number} w
+	* @param {number} h
+	* @param {number} radius Corner radius.
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.drawRoundRect = function(x, y, w, h, radius) {
@@ -649,14 +649,14 @@ var p = Graphics.prototype;
 	/**
 	* Draws a rounded rectangle with different corner radiuses.
 	* @method drawRoundRectComplex
-	* @param {Number} x
-	* @param {Number} y
-	* @param {Number} w
-	* @param {Number} h
-	* @param {Number} radiusTL Top left corner radius.
-	* @param {Number} radiusTR Top right corner radius.
-	* @param {Number} radiusBR Bottom right corner radius.
-	* @param {Number} radiusBL Bottom left corner radius.
+	* @param {number} x
+	* @param {number} y
+	* @param {number} w
+	* @param {number} h
+	* @param {number} radiusTL Top left corner radius.
+	* @param {number} radiusTR Top right corner radius.
+	* @param {number} radiusBR Bottom right corner radius.
+	* @param {number} radiusBL Bottom left corner radius.
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
@@ -678,9 +678,9 @@ var p = Graphics.prototype;
 	/**
 	* Draws a circle with the specified radius at (x, y).
 	* @method drawCircle
-	* @param {Number} x x coordinate center point of circle.
-	* @param {Number} y y coordinate center point of circle.
-	* @param {Number} radius Radius of circle.
+	* @param {number} x x coordinate center point of circle.
+	* @param {number} y y coordinate center point of circle.
+	* @param {number} radius Radius of circle.
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.drawCircle = function(x, y, radius) {
@@ -691,10 +691,10 @@ var p = Graphics.prototype;
 	/**
 	* Draws an ellipse (oval).
 	* @method drawEllipse
-	* @param {Number} x
-	* @param {Number} y
-	* @param {Number} w
-	* @param {Number} h
+	* @param {number} x
+	* @param {number} y
+	* @param {number} w
+	* @param {number} h
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.drawEllipse = function(x, y, w, h) {
@@ -722,13 +722,13 @@ var p = Graphics.prototype;
 	* For example, the following code will draw a familiar 5 pointed star shape centered at 100, 100 and with a radius of 50:
 	* myGraphics.beginFill("#FF0").drawPolyStar(100, 100, 50, 5, 0.6, -90); // -90 makes the first point vertical
 	* @method drawPolyStar
-	* @param {Number} x Position of the center of the shape.
-	* @param {Number} y Position of the center of the shape.
-	* @param {Number} radius The outer radius of the shape.
-	* @param {Number} sides The number of points on the star or sides on the polygon.
-	* @param {Number} pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular polygon (no points), 
+	* @param {number} x Position of the center of the shape.
+	* @param {number} y Position of the center of the shape.
+	* @param {number} radius The outer radius of the shape.
+	* @param {number} sides The number of points on the star or sides on the polygon.
+	* @param {number} pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular polygon (no points), 
 	* a pointSize of 1 will draw nothing because the points are infinitely pointy.
-	* @param {Number} angle The angle of the first point / corner. For example a value of 0 will draw the first point directly to the 
+	* @param {number} angle The angle of the first point / corner. For example a value of 0 will draw the first point directly to the 
 	* right of the center.
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/

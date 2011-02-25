@@ -40,10 +40,10 @@
 * Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
 * @class Rectangle
 * @constructor
-* @param {Number} x X position. Default is 0.
-* @param {Number} y Y position. Default is 0.
-* @param {Number} width Width. Default is 0.
-* @param {Number} height Height. Default is 0.
+* @param {number} x X position. Default is 0.
+* @param {number} y Y position. Default is 0.
+* @param {number} width Width. Default is 0.
+* @param {number} height Height. Default is 0.
 **/
 Rectangle = function(x, y, width, height) {
   this.initialize(x, y, width, height);

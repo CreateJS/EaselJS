@@ -174,7 +174,7 @@ goog.inherits(Container, DisplayObject);
 	* Returns the last child that was added, or the last child if multiple children were added.
 	* @method addChildAt
 	* @param {DisplayObject} child The display object to add.
-	* @param {Number} index The index to add the child at.
+	* @param {number} index The index to add the child at.
 	* @return {DisplayObject} The child that was added, or the last child if multiple children were added.
 	**/
 	Container.prototype.addChildAt = function(child, index) {
@@ -212,7 +212,7 @@ goog.inherits(Container, DisplayObject);
 	* Removes the child at the specified index from the display list, and sets its parent to null. You can also remove multiple
 	* children, such as "removeChildAt(2, 7, ...);". Returns true if the child (or children) was removed, or false if any index
 	* was out of range.
-	* @param {Number} index The index of the child to remove.
+	* @param {number} index The index of the child to remove.
 	* @return true if the child (or children) was removed, or false if any index was out of range.
 	**/
 	Container.prototype.removeChildAt = function(index) {
@@ -243,7 +243,7 @@ goog.inherits(Container, DisplayObject);
 	/**
 	* Returns the child at the specified index.
 	* @method getChildAt
-	* @param {Number} index The index of the child to return.
+	* @param {number} index The index of the child to return.
 	* @return {DisplayObject} The child at the specified index.
 	**/
 	Container.prototype.getChildAt = function(index) {
@@ -316,8 +316,8 @@ goog.inherits(Container, DisplayObject);
 	* to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on
 	* mousemove), and only if the mouse's position has changed.
 	* @method getObjectsUnderPoint
-	* @param {Number} x The x position in the container to test.
-	* @param {Number} y The y position in the container to test.
+	* @param {number} x The x position in the container to test.
+	* @param {number} y The y position in the container to test.
 	* @return {Array[DisplayObject]} An Array of DisplayObjects under the specified coordinates.
 	**/
 	Container.prototype.getObjectsUnderPoint = function(x, y) {
@@ -331,8 +331,8 @@ goog.inherits(Container, DisplayObject);
 	* Similar to getObjectsUnderPoint(), but returns only the top-most display object. This runs significantly faster than
 	* getObjectsUnderPoint(), but is still an expensive operation. See getObjectsUnderPoint() for more information.
 	* @method getObjectUnderPoint
-	* @param {Number} x The x position in the container to test.
-	* @param {Number} y The y position in the container to test.
+	* @param {number} x The x position in the container to test.
+	* @param {number} y The y position in the container to test.
 	* @return {DisplayObject} The top-most display object under the specified coordinates.
 	**/
 	Container.prototype.getObjectUnderPoint = function(x, y) {
@@ -371,10 +371,10 @@ goog.inherits(Container, DisplayObject);
 // private properties:
 	/**
 	* @method _getObjectsUnderPoint
-	* @param {Number} x
-	* @param {Number} x
+	* @param {number} x
+	* @param {number} x
 	* @param {Array} arr
-	* @param {Number} mouseEvents A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress &
+	* @param {number} mouseEvents A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress &
 	* onClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
 	* @return {Array[DisplayObject]}
 	* @protected
