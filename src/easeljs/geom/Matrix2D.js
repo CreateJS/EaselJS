@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(window) {
+goog.provide('Matrix2D');
 
 /**
 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
@@ -50,7 +50,6 @@
 Matrix2D = function(a, b, c, d, tx, ty) {
   this.initialize(a, b, c, d, tx, ty);
 }
-var p = Matrix2D.prototype;
 
 // static public properties:
 
@@ -78,42 +77,42 @@ var p = Matrix2D.prototype;
 	* @property a
 	* @type Number
 	**/
-	p.a = 1;
+	Matrix2D.prototype.a = 1;
 	
 	/**
 	* Position (0, 1) in a 3x3 affine transformation matrix.
 	* @property b
 	* @type Number
 	**/
-	p.b = 0;
+	Matrix2D.prototype.b = 0;
 	
 	/**
 	* Position (1, 0) in a 3x3 affine transformation matrix.
 	* @property c
 	* @type Number
 	**/
-	p.c = 0;
+	Matrix2D.prototype.c = 0;
 	
 	/**
 	* Position (1, 1) in a 3x3 affine transformation matrix.
 	* @property d
 	* @type Number
 	**/
-	p.d = 1;
+	Matrix2D.prototype.d = 1;
 	
 	/**
 	* Position (2, 0) in a 3x3 affine transformation matrix.
 	* @property atx
 	* @type Number
 	**/
-	p.tx = 0;
+	Matrix2D.prototype.tx = 0;
 	
 	/**
 	* Position (2, 1) in a 3x3 affine transformation matrix.
 	* @property ty
 	* @type Number
 	**/
-	p.ty = 0;
+	Matrix2D.prototype.ty = 0;
 	
 	/**
 	* Property representing the alpha that will be applied to a display object. This is not part of matrix 
@@ -121,7 +120,7 @@ var p = Matrix2D.prototype;
 	* @property alpha
 	* @type Number
 	**/
-	p.alpha = 1;
+	Matrix2D.prototype.alpha = 1;
 	
 	/**
 	* Property representing the shadow that will be applied to a display object. This is not part of matrix
@@ -129,7 +128,7 @@ var p = Matrix2D.prototype;
 	* @property shadow
 	* @type Shadow
 	**/
-	p.shadow  = null;
+	Matrix2D.prototype.shadow  = null;
 	
 	/**
 	* Property representing the compositeOperation that will be applied to a display object. This is not part of
@@ -139,7 +138,7 @@ var p = Matrix2D.prototype;
 	* @property compositeOperation
 	* @type String
 	**/
-	p.compositeOperation  = null;
+	Matrix2D.prototype.compositeOperation  = null;
 	
 // constructor:
 	/** 
@@ -147,7 +146,7 @@ var p = Matrix2D.prototype;
 	* @method initialize
 	* @protected
 	*/
-	p.initialize = function(a, b, c, d, tx, ty) {
+	Matrix2D.prototype.initialize = function(a, b, c, d, tx, ty) {
 		if (a != null) { this.a = a; }
 		if (b != null) { this.b = b; }
 		if (c != null) { this.c = c; }
@@ -167,7 +166,7 @@ var p = Matrix2D.prototype;
 	* @param {Number} tx
 	* @param {Number} ty
 	**/
-	p.prepend = function(a, b, c, d, tx, ty) {
+	Matrix2D.prototype.prepend = function(a, b, c, d, tx, ty) {
 		var tx1 = this.tx;
 		if (a != 1 || b != 0 || c != 0 || d != 1) {
 			var a1 = this.a;
@@ -191,7 +190,7 @@ var p = Matrix2D.prototype;
 	* @param {Number} tx
 	* @param {Number} ty
 	**/
-	p.append = function(a, b, c, d, tx, ty) {
+	Matrix2D.prototype.append = function(a, b, c, d, tx, ty) {
 		var a1 = this.a;
 		var b1 = this.b;
 		var c1 = this.c;
@@ -210,7 +209,7 @@ var p = Matrix2D.prototype;
 	* @method prependMatrix
 	* @param {Matrix2D} matrix
 	**/
-	p.prependMatrix = function(matrix) {
+	Matrix2D.prototype.prependMatrix = function(matrix) {
 		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 		this.prependProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
 	}
@@ -220,7 +219,7 @@ var p = Matrix2D.prototype;
 	* @method appendMatrix
 	* @param {Matrix2D} matrix
 	**/
-	p.appendMatrix = function(matrix) {
+	Matrix2D.prototype.appendMatrix = function(matrix) {
 		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 		this.appendProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
 	}
@@ -240,7 +239,7 @@ var p = Matrix2D.prototype;
 	* @param {Number} regX Optional.
 	* @param {Number} regY Optional.
 	**/
-	p.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+	Matrix2D.prototype.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
@@ -281,7 +280,7 @@ var p = Matrix2D.prototype;
 	* @param {Number} regX Optional.
 	* @param {Number} regY Optional.
 	**/
-	p.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+	Matrix2D.prototype.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
@@ -313,7 +312,7 @@ var p = Matrix2D.prototype;
 	* @method rotate
 	* @param {Number} angle The angle in degrees.
 	**/
-	p.rotate = function(angle) {
+	Matrix2D.prototype.rotate = function(angle) {
 		var cos = Math.cos(angle);
 		var sin = Math.sin(angle);
 		
@@ -335,7 +334,7 @@ var p = Matrix2D.prototype;
 	* @param {Number} skewX The amount to skew horizontally in degrees.
 	* @param {Number} skewY The amount to skew vertically in degrees.
 	*/
-	p.skew = function(skewX, skewY) {
+	Matrix2D.prototype.skew = function(skewX, skewY) {
 		skewX = skewX*Matrix2D.DEG_TO_RAD;
 		skewY = skewY*Matrix2D.DEG_TO_RAD;
 		this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
@@ -347,7 +346,7 @@ var p = Matrix2D.prototype;
 	* @param {Number} x
 	* @param {Number} y
 	**/
-	p.scale = function(x, y) {
+	Matrix2D.prototype.scale = function(x, y) {
 		this.a *= x;
 		this.d *= y;
 		this.tx *= x;
@@ -360,7 +359,7 @@ var p = Matrix2D.prototype;
 	* @param {Number} x
 	* @param {Number} y
 	**/
-	p.translate = function(x, y) {
+	Matrix2D.prototype.translate = function(x, y) {
 		this.tx += x;
 		this.ty += y;
 	}
@@ -369,7 +368,7 @@ var p = Matrix2D.prototype;
 	* Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
 	* @method identity
 	**/
-	p.identity = function() {
+	Matrix2D.prototype.identity = function() {
 		this.alpha = this.a = this.d = 1;
 		this.b = this.c = this.tx = this.ty = 0;
 		this.shadow = this.compositeOperation = null;
@@ -379,7 +378,7 @@ var p = Matrix2D.prototype;
 	* Inverts the matrix, causing it to perform the opposite transformation.
 	* @method invert
 	**/
-	p.invert = function() {
+	Matrix2D.prototype.invert = function() {
 		var a1 = this.a;
 		var b1 = this.b;
 		var c1 = this.c;
@@ -402,7 +401,7 @@ var p = Matrix2D.prototype;
 	* @method decompose
 	* @param {Object} target The object to apply the transform properties to. If null, then a new object will be returned.
 	*/
-	p.decompose = function(target) {
+	Matrix2D.prototype.decompose = function(target) {
 		// TODO: it would be nice to be able to solve for whether the matrix can be decomposed into only scale/rotation 
 		// even when scale is negative
 		if (target == null) { target = {}; }
@@ -434,7 +433,7 @@ var p = Matrix2D.prototype;
 	* @param {Shadow} shadow desired shadow value
 	* @param {String} compositeOperation desired composite operation value
 	*/
-	p.appendProperties = function(alpha, shadow, compositeOperation) {
+	Matrix2D.prototype.appendProperties = function(alpha, shadow, compositeOperation) {
 		this.alpha *= alpha;
 		this.shadow = shadow || this.shadow;
 		this.compositeOperation = compositeOperation || this.compositeOperation;
@@ -447,7 +446,7 @@ var p = Matrix2D.prototype;
 	* @param {Shadow} shadow desired shadow value
 	* @param {String} compositeOperation desired composite operation value
 	*/
-	p.prependProperties = function(alpha, shadow, compositeOperation) {
+	Matrix2D.prototype.prependProperties = function(alpha, shadow, compositeOperation) {
 		this.alpha *= alpha;
 		this.shadow = this.shadow || shadow;
 		this.compositeOperation = this.compositeOperation || compositeOperation;
@@ -458,7 +457,7 @@ var p = Matrix2D.prototype;
 	* @method clone
 	* @return {Matrix2D} a clone of the Matrix2D instance.
 	**/
-	p.clone = function() {
+	Matrix2D.prototype.clone = function() {
 		var mtx = new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
 		mtx.shadow = this.shadow;
 		mtx.alpha = this.alpha;
@@ -471,12 +470,10 @@ var p = Matrix2D.prototype;
 	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
-	p.toString = function() {
+	Matrix2D.prototype.toString = function() {
 		return "[Matrix2D (a="+this.a+" b="+this.b+" c="+this.c+" d="+this.d+" tx="+this.tx+" ty="+this.ty+")]";
 	}
 
 	// this has to be populated after the class is defined:
 	Matrix2D.identity = new Matrix2D(1, 0, 0, 1, 0, 0);
 	
-window.Matrix2D = Matrix2D;
-}(window));

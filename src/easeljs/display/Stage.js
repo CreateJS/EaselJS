@@ -34,20 +34,20 @@
 * @module EaselJS
 **/
 
-(function(window) {
+goog.provide('Stage');
 
 /**
 * A stage is the root level Container for a display list. Each time its tick method is called, it will render its display
 * list to its target canvas.
 * @class Stage
-* @extends Container
+* @extends {Container}
 * @constructor
 * @param {HTMLCanvasElement} canvas The canvas the stage will render to.
 **/
 Stage = function(canvas) {
   this.initialize(canvas);
 }
-var p = Stage.prototype = new Container();
+goog.inherits(Stage, Container);
 
 // static properties:
 	/**
@@ -66,14 +66,14 @@ var p = Stage.prototype = new Container();
 	* @type Boolean
 	* @default true
 	**/
-	p.autoClear = true;
+	Stage.prototype.autoClear = true;
 	
 	/** The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the
 	* first stage that will be ticked (or they will clear each other's render).
 	* @property canvas
 	* @type HTMLCanvasElement
 	**/
-	p.canvas = null;
+	Stage.prototype.canvas = null;
 	
 	/**
 	* READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent 
@@ -82,7 +82,7 @@ var p = Stage.prototype = new Container();
 	* @type Number
 	* @final
 	**/
-	p.mouseX = null;
+	Stage.prototype.mouseX = null;
 	
 	/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent 
 	* position over the canvas, and mouseInBounds will be set to false.
@@ -90,14 +90,14 @@ var p = Stage.prototype = new Container();
 	* @type Number
 	* @final
 	**/
-	p.mouseY = null;
+	Stage.prototype.mouseY = null;
 	
 	/** The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param
 	* containing the corresponding MouseEvent instance.
 	* @event onMouseMove
 	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
 	**/
-	p.onMouseMove = null;
+	Stage.prototype.onMouseMove = null;
 	
 	/**
 	* The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler 
@@ -105,7 +105,7 @@ var p = Stage.prototype = new Container();
 	* @event onMouseUp
 	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
 	**/
-	p.onMouseUp = null;
+	Stage.prototype.onMouseUp = null;
 	
 	/**
 	* The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single 
@@ -113,7 +113,7 @@ var p = Stage.prototype = new Container();
 	* @event onMouseDown
 	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
 	**/
-	p.onMouseDown = null;
+	Stage.prototype.onMouseDown = null;
 
 	/**
 	* Indicates whether this stage should use the snapToPixel property of display objects when rendering them.
@@ -121,14 +121,14 @@ var p = Stage.prototype = new Container();
 	* @type Boolean
 	* @default false
 	**/
-	p.snapToPixelEnabled = false;
+	Stage.prototype.snapToPixelEnabled = false;
 	
 	/** Indicates whether the mouse is currently within the bounds of the canvas.
 	* @property mouseInBounds
 	* @type Boolean
 	* @default false
 	**/
-	p.mouseInBounds = false;
+	Stage.prototype.mouseInBounds = false;
 	
 // private properties:
 
@@ -137,49 +137,49 @@ var p = Stage.prototype = new Container();
 	* @protected
 	* @type HTMLCanvasElement
 	**/
-	p._tmpCanvas = null;
+	Stage.prototype._tmpCanvas = null;
 
 	/**
 	* @property _activeMouseEvent
 	* @protected
 	* @type MouseEvent
 	**/
-	p._activeMouseEvent = null;
+	Stage.prototype._activeMouseEvent = null;
 
 	/**
 	* @property _activeMouseTarget
 	* @protected
 	* @type DisplayObject
 	**/
-	p._activeMouseTarget = null;
+	Stage.prototype._activeMouseTarget = null;
 
 	/**
 	* @property _mouseOverIntervalID
 	* @protected
 	* @type Number
 	**/
-	p._mouseOverIntervalID = null;
+	Stage.prototype._mouseOverIntervalID = null;
 
 	/**
 	* @property _mouseOverX
 	* @protected
 	* @type Number
 	**/
-	p._mouseOverX = 0;
+	Stage.prototype._mouseOverX = 0;
 
 	/**
 	* @property _mouseOverY
 	* @protected
 	* @type Number
 	**/
-	p._mouseOverY = 0;
+	Stage.prototype._mouseOverY = 0;
 
 	/**
 	* @property _mouseOverTarget
 	* @protected
 	* @type DisplayObject
 	**/
-	p._mouseOverTarget = null;
+	Stage.prototype._mouseOverTarget = null;
 	
 // constructor:
 	/**
@@ -187,7 +187,7 @@ var p = Stage.prototype = new Container();
 	* @type Function
 	* @private
 	**/
-	p.Container_initialize = p.initialize;
+	Stage.prototype.Container_initialize = Stage.prototype.initialize;
 	
 	/** 
 	* Initialization method.
@@ -195,7 +195,7 @@ var p = Stage.prototype = new Container();
 	* param {HTMLCanvasElement} canvas
 	* @protected
 	**/
-	p.initialize = function(canvas) {
+	Stage.prototype.initialize = function(canvas) {
 		this.Container_initialize();
 		this.canvas = canvas;
 		this.mouseChildren = true;
@@ -223,7 +223,7 @@ var p = Stage.prototype = new Container();
 	* and render its entire display list to the canvas.
 	* @method update
 	**/
-	p.update = function() {
+	Stage.prototype.update = function() {
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
@@ -236,13 +236,13 @@ var p = Stage.prototype = new Container();
 	* @private
 	* @type Function
 	**/
-	p.tick = p.update;
+	Stage.prototype.tick = Stage.prototype.update;
 	
 	/**
 	* Clears the target canvas. Useful if autoClear is set to false.
 	* @method clear
 	**/
-	p.clear = function() {
+	Stage.prototype.clear = function() {
 		if (!this.canvas) { return; }
 		var ctx = this.canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -259,7 +259,7 @@ var p = Stage.prototype = new Container();
 	* is passed in, or if the browser does not support the specified MIME type, the default value will be used.
 	* @return {String} a Base64 encoded image.
 	**/
-	p.toDataURL = function(backgroundColor, mimeType) {
+	Stage.prototype.toDataURL = function(backgroundColor, mimeType) {
 		if(!mimeType) {
 			mimeType = "image/png";
 		}
@@ -313,7 +313,7 @@ var p = Stage.prototype = new Container();
 	* @param {Number} frequency The maximum number of times per second to broadcast mouse over/out events. Set to 0 to disable mouse
 	* over events completely. Maximum is 50. A lower frequency is less responsive, but uses less CPU.
 	**/
-	p.enableMouseOver = function(frequency) {
+	Stage.prototype.enableMouseOver = function(frequency) {
 		if (this._mouseOverIntervalID) {
 			clearInterval(this._mouseOverIntervalID);
 			this._mouseOverIntervalID = null;
@@ -329,7 +329,7 @@ var p = Stage.prototype = new Container();
 	* Returns a clone of this Stage.
 	* @return {Stage} A clone of the current Container instance.
 	**/
-	p.clone = function() {
+	Stage.prototype.clone = function() {
 		var o = new Stage(null);
 		this.cloneProps(o);
 		return o;
@@ -340,7 +340,7 @@ var p = Stage.prototype = new Container();
 	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
-	p.toString = function() {
+	Stage.prototype.toString = function() {
 		return "[Stage (name="+  this.name +")]";
 	}
 	
@@ -350,7 +350,7 @@ var p = Stage.prototype = new Container();
 	* @protected
 	* @param {MouseEvent} e
 	**/
-	p._handleMouseMove = function(e) {
+	Stage.prototype._handleMouseMove = function(e) {
 		if (!this.canvas) {
 			this.mouseX = this.mouseY = null;
 			return;
@@ -377,7 +377,7 @@ var p = Stage.prototype = new Container();
 	* @protected
 	* @param {MouseEvent} e
 	**/
-	p._handleMouseUp = function(e) {
+	Stage.prototype._handleMouseUp = function(e) {
 		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
@@ -392,7 +392,7 @@ var p = Stage.prototype = new Container();
 	* @protected
 	* @param {MouseEvent} e
 	**/
-	p._handleMouseDown = function(e) {
+	Stage.prototype._handleMouseDown = function(e) {
 		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
@@ -409,7 +409,7 @@ var p = Stage.prototype = new Container();
 	* @method _testMouseOver
 	* @protected
 	**/
-	p._testMouseOver = function() {
+	Stage.prototype._testMouseOver = function() {
 		if (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds) { return; }
 		var target = null;
 		if (this.mouseInBounds) {
@@ -427,6 +427,3 @@ var p = Stage.prototype = new Container();
 			this._mouseOverTarget = target;
 		}
 	}
-
-window.Stage = Stage;
-}(window));

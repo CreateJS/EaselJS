@@ -34,8 +34,8 @@
 * @module EaselJS
 **/
 
+goog.provide('UID');
 
-(function(window) {
 	
 	/**
 	* Global utility for generating sequential unique ID numbers.
@@ -63,6 +63,3 @@
 	UID.get = function() {
 		return UID._nextID++;
 	}
-
-window.UID = UID;
-}(window));

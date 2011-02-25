@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(window) {
+goog.provide('SpriteSheet');
 
 /**
 * Encapsulates the properties associated with a sprite sheet. A sprite sheet is a series of images (usually animation frames) combined
@@ -56,7 +56,6 @@
 SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
   this.initialize(image, frameWidth, frameHeight, frameData);
 }
-var p = SpriteSheet.prototype;
 	
 // public properties:
 	/**
@@ -64,19 +63,19 @@ var p = SpriteSheet.prototype;
 	* @property image
 	* @type Image | HTMLCanvasElement | HTMLVideoElement
 	**/
-	p.image = null;
+	SpriteSheet.prototype.image = null;
 	
 	/** The width in pixels of each frame on the sprite sheet image.
 	* @property frameWidth
 	* @type Number
 	**/
-	p.frameWidth = 0;
+	SpriteSheet.prototype.frameWidth = 0;
 	
 	/** The height in pixels of each frame on the sprite sheet image.
 	* @property frameHeight
 	* @type Number
 	**/
-	p.frameHeight = 0;
+	SpriteSheet.prototype.frameHeight = 0;
 	
 	/** Defines named frames and frame sequences. Frame data is specified as a generic object, where each property name will 
 	* be used to define a new named frame or sequence. Named frames specify a frame number. Sequences are defined using an 
@@ -89,14 +88,14 @@ var p = SpriteSheet.prototype;
 	* @property frameData
 	* @type Object
 	**/
-	p.frameData = null;
+	SpriteSheet.prototype.frameData = null;
 	
 	/** The loop property is only used if no frameData is specified, and indicates whether all frames (as specified with totalFrames) 
 	* should loop. If false, the animation will play to totalFrames, then pause.
 	* @property loop
 	* @type Boolean
 	**/
-	p.loop = true;
+	SpriteSheet.prototype.loop = true;
 	
 	/** Specifies the total number of frames in the sprite sheet if no frameData is specified. This is useful for excluding extraneous 
 	* frames (for example, if you have 7 frames in a 2x4 sprite sheet). The total frames will be automatically calculated by 
@@ -104,7 +103,7 @@ var p = SpriteSheet.prototype;
 	* @property totalFrames
 	* @type Number
 	**/
-	p.totalFrames = 0;
+	SpriteSheet.prototype.totalFrames = 0;
 	
 // constructor:
 	/** 
@@ -113,7 +112,7 @@ var p = SpriteSheet.prototype;
 	* param {Graphics} graphics
 	* @protected
 	**/
-	p.initialize = function(image, frameWidth, frameHeight, frameData) {
+	SpriteSheet.prototype.initialize = function(image, frameWidth, frameHeight, frameData) {
 		this.image = image;
 		this.frameWidth = frameWidth;
 		this.frameHeight = frameHeight;
@@ -126,7 +125,7 @@ var p = SpriteSheet.prototype;
 	* @method toString
 	* @return {String} a string representation of the instance.
 	**/
-	p.toString = function() {
+	SpriteSheet.prototype.toString = function() {
 		return "[SpriteSheet]";
 	}
 	
@@ -135,12 +134,10 @@ var p = SpriteSheet.prototype;
 	* @method clone
 	* @return {SpriteSheet} a clone of the SpriteSheet instance.
 	**/
-	p.clone = function() {
+	SpriteSheet.prototype.clone = function() {
 		var o = new SpriteSheet(this.image, this.frameWidth, this.frameHeight, this.frameData);
 		o.loop = this.loop;
 		o.totalFrames = this.totalFrames;
 		return o;
 	}
 	
-window.SpriteSheet = SpriteSheet;
-}(window));

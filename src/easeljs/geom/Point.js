@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(window) {
+goog.provide('Point');
 
 /**
 * Represents a point on a 2 dimensional x / y coordinate system.
@@ -94,5 +94,3 @@ var p = Point.prototype;
 		return "[Point (x="+this.x+" y="+this.y+")]";
 	}
 	
-window.Point = Point;
-}(window));

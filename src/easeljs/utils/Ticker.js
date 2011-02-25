@@ -34,8 +34,7 @@
 * @module EaselJS
 **/
 
-
-(function(window) {
+goog.provide('Ticker');
 
 
 // constructor:
@@ -350,5 +349,3 @@
 	}
 	Ticker._startTime = Ticker._getTime();
 
-window.Ticker = Ticker;
-}(window));
