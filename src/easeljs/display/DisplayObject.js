@@ -90,7 +90,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque.
 	* @property alpha
-	* @type Number
+	* @type {number}
 	* @default 1
 	**/
 	DisplayObject.prototype.alpha = 1;
@@ -107,7 +107,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* Unique ID for this display object. Makes display objects easier for some uses.
 	* @property id
-	* @type Number
+	* @type {number}
 	* @default -1
 	**/
 	DisplayObject.prototype.id = -1;
@@ -144,7 +144,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* The x offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
 	* it's center, you would set regX and regY to 50.
 	* @property regX
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype.regX = 0;
@@ -153,7 +153,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
 	* it's center, you would set regX and regY to 50.
 	* @property regY
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype.regY = 0;
@@ -161,7 +161,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* The rotation in degrees for this display object.
 	* @property rotation
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype.rotation = 0;
@@ -170,7 +170,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display
 	* object to twice it's nominal width.
 	* @property scaleX
-	* @type Number
+	* @type {number}
 	* @default 1
 	**/
 	DisplayObject.prototype.scaleX = 1;
@@ -179,7 +179,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display
 	* object to half it's nominal height.
 	* @property scaleY
-	* @type Number
+	* @type {number}
 	* @default 1
 	**/
 	DisplayObject.prototype.scaleY = 1;
@@ -187,7 +187,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* The factor to skew this display object horizontally.
 	* @property skewX
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype.skewX = 0;
@@ -195,7 +195,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* The factor to skew this display object vertically.
 	* @property skewY
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype.skewY = 0;
@@ -221,14 +221,14 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* The x (horizontal) position of the display object, relative to its parent.
 	* @property x
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype.x = 0;
 
 	/** The y (vertical) position of the display object, relative to its parent.
 	* @property y
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype.y = 0;
@@ -295,7 +295,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* @property _cacheOffsetX
 	* @protected
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype._cacheOffsetX = 0;
@@ -303,7 +303,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* @property _cacheOffsetY
 	* @protected
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype._cacheOffsetY = 0;
@@ -343,7 +343,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* @property _revertX
 	* @protected
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype._revertX = 0;
@@ -351,7 +351,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* @property _revertY
 	* @protected
-	* @type Number
+	* @type {number}
 	* @default 0
 	**/
 	DisplayObject.prototype._revertY = 0;
@@ -359,7 +359,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* @property _revertAlpha
 	* @protected
-	* @type Number
+	* @type {number}
 	* @default 1
 	**/
 	DisplayObject.prototype._revertAlpha = 1;

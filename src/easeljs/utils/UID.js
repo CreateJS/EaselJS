@@ -48,7 +48,7 @@ UID = function() {
 
 /** 
  * @property _nextID
- * @type Number
+ * @type {number}
  * @protected 
  **/
 UID._nextID = 0;
