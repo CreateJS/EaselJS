@@ -56,7 +56,7 @@ DisplayObject = function() {
 * domain content
 * @property suppressCrossDomainErrors
 * @static
-* @type Boolean
+* @type {boolean}
 * @default false
 **/
 DisplayObject.suppressCrossDomainErrors = false;
@@ -117,7 +117,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* Sprites will cause the Sprite to be returned (not its children) regardless of whether it's mouseChildren property
 	* is true.
 	* @property mouseEnabled
-	* @type Boolean
+	* @type {boolean}
 	* @default true
 	**/
 	DisplayObject.prototype.mouseEnabled = true;
@@ -213,7 +213,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* Indicates whether this display object should be rendered to the canvas and included when running
 	* Stage.getObjectsUnderPoint().
 	* @property visible
-	* @type Boolean
+	* @type {boolean}
 	* @default true
 	**/
 	DisplayObject.prototype.visible = true;
@@ -250,7 +250,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* transform does not include any scaling, rotation, or skewing. The snapToPixel property is true by default for
 	* Bitmap and BitmapSequence instances, and false for all other display objects.
 	* @property snapToPixel
-	* @type Boolean
+	* @type {boolean}
 	* @default false
 	**/
 	DisplayObject.prototype.snapToPixel = false;
@@ -311,7 +311,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* @property _cacheDraw
 	* @protected
-	* @type Boolean
+	* @type {boolean}
 	* @default false
 	**/
 	DisplayObject.prototype._cacheDraw = false;
@@ -327,7 +327,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* @property _restoreContext
 	* @protected
-	* @type Boolean
+	* @type {boolean}
 	* @default false
 	**/
 	DisplayObject.prototype._restoreContext = false;
@@ -335,7 +335,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	/**
 	* @property _revertShadow
 	* @protected
-	* @type Boolean
+	* @type {boolean}
 	* @default false
 	**/
 	DisplayObject.prototype._revertShadow = false;
@@ -383,7 +383,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* This does not account for whether it would be visible within the boundaries of the stage.
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @method isVisible
-	* @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas.
+	* @return {boolean} Boolean indicating whether the display object would be visible if drawn to a canvas.
 	**/
 	DisplayObject.prototype.isVisible = function() {
 		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0;
@@ -395,7 +395,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @method draw
 	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+	* @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	* into itself).
 	**/
@@ -566,7 +566,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* @method hitTest
 	* @param {number} x The x position to check in the display object's local coordinates.
 	* @param {number} y The y position to check in the display object's local coordinates.
-	* @return {Boolean} A Boolean indicting whether a visible portion of the DisplayObject intersect the specified
+	* @return {boolean} A Boolean indicting whether a visible portion of the DisplayObject intersect the specified
 	* local Point.
 	*/
 	DisplayObject.prototype.hitTest = function(x, y) {
@@ -648,7 +648,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* @method _testHit
 	* @protected
 	* @param {CanvasRenderingContext2D} ctx
-	* @return {Boolean}
+	* @return {boolean}
 	**/
 	DisplayObject.prototype._testHit = function(ctx) {
 		try {

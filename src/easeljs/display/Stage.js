@@ -53,7 +53,7 @@ goog.inherits(Stage, Container);
 	/**
 	* @property _snapToPixelEnabled
 	* @protected
-	* @type Boolean
+	* @type {boolean}
 	* @default false
 	**/
 	Stage._snapToPixelEnabled = false; // snapToPixelEnabled is temporarily copied here during a draw to provide global access.
@@ -63,7 +63,7 @@ goog.inherits(Stage, Container);
 	* Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually
 	* control clearing (for generative art, or when pointing multiple stages at the same canvas for example).
 	* @property autoClear
-	* @type Boolean
+	* @type {boolean}
 	* @default true
 	**/
 	Stage.prototype.autoClear = true;
@@ -118,14 +118,14 @@ goog.inherits(Stage, Container);
 	/**
 	* Indicates whether this stage should use the snapToPixel property of display objects when rendering them.
 	* @property snapToPixelEnabled
-	* @type Boolean
+	* @type {boolean}
 	* @default false
 	**/
 	Stage.prototype.snapToPixelEnabled = false;
 	
 	/** Indicates whether the mouse is currently within the bounds of the canvas.
 	* @property mouseInBounds
-	* @type Boolean
+	* @type {boolean}
 	* @default false
 	**/
 	Stage.prototype.mouseInBounds = false;

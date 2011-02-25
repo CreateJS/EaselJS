@@ -59,7 +59,7 @@ goog.inherits(Bitmap, DisplayObject);
 	/**
 	* Whether or not the Bitmap should be draw to the canvas at whole pixel coordinates.
 	* @property snapToPixel
-	* @type Boolean
+	* @type {boolean}
 	* @default true
 	**/
 	Bitmap.prototype.snapToPixel = true;
@@ -90,7 +90,7 @@ goog.inherits(Bitmap, DisplayObject);
 	* This does not account for whether it would be visible within the boundaries of the stage.
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @method isVisible
-	* @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas.
+	* @return {boolean} Boolean indicating whether the display object would be visible if drawn to a canvas.
 	**/
 	Bitmap.prototype.isVisible = function() {
 		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.image && (this.image.complete || this.image.getContext);
@@ -109,7 +109,7 @@ goog.inherits(Bitmap, DisplayObject);
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @method draw
 	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+	* @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	* into itself).
 	**/

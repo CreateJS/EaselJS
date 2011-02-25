@@ -89,7 +89,7 @@ goog.inherits(Container, DisplayObject);
 	* This does not account for whether it would be visible within the boundaries of the stage.
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @method isVisible
-	* @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas.
+	* @return {boolean} Boolean indicating whether the display object would be visible if drawn to a canvas.
 	**/
 	Container.prototype.isVisible = function() {
 		return this.visible && this.alpha > 0 && this.children.length && this.scaleX != 0 && this.scaleY != 0;
@@ -108,7 +108,7 @@ goog.inherits(Container, DisplayObject);
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @method draw
 	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+	* @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	* into itself).
 	**/
@@ -196,7 +196,7 @@ goog.inherits(Container, DisplayObject);
 	* (or children) was removed, or false if it was not in the display list.
 	* @method removeChild
 	* @param {DisplayObject} child The child to remove.
-	* @return {Boolean} true if the child (or children) was removed, or false if it was not in the display list.
+	* @return {boolean} true if the child (or children) was removed, or false if it was not in the display list.
 	**/
 	Container.prototype.removeChild = function(child) {
 		var l = arguments.length;
@@ -284,7 +284,7 @@ goog.inherits(Container, DisplayObject);
 	* (child, grandchild, etc) of this container.
 	* @method contains
 	* @param {DisplayObject} child The DisplayObject to be checked.
-	* @return {Boolean} true if the specified display object either is this container or is a descendent.
+	* @return {boolean} true if the specified display object either is this container or is a descendent.
 	**/
 	Container.prototype.contains = function(child) {
 		while (child) {
@@ -301,7 +301,7 @@ goog.inherits(Container, DisplayObject);
 	* @method hitTest
 	* @param x The x position to check in the display object's local coordinates.
 	* @param y The y position to check in the display object's local coordinates.
-	* @return {Boolean} A Boolean indicating whether there is a visible section of a DisplayObject that overlaps the specified
+	* @return {boolean} A Boolean indicating whether there is a visible section of a DisplayObject that overlaps the specified
 	* coordinates.
 	**/
 	Container.prototype.hitTest = function(x, y) {
@@ -343,7 +343,7 @@ goog.inherits(Container, DisplayObject);
 	/**
 	* Returns a clone of this Container. Some properties that are specific to this instance's current context are reverted to
 	* their defaults (for example .parent).
-	* @param {Boolean} recursive If true, all of the descendants of this container will be cloned recursively. If false, the
+	* @param {boolean} recursive If true, all of the descendants of this container will be cloned recursively. If false, the
 	* properties of the container will be cloned, but the new instance will not have any children.
 	* @return {Container} A clone of the current Container instance.
 	**/

@@ -230,7 +230,7 @@ var p = Graphics.prototype;
 	/**
 	* @property _active
 	* @protected
-	* @type Boolean
+	* @type {boolean}
 	* @default false
 	**/
 	p._active = false;
@@ -238,7 +238,7 @@ var p = Graphics.prototype;
 	/**
 	* @property _dirty
 	* @protected
-	* @type Boolean
+	* @type {boolean}
 	* @default false
 	**/
 	p._dirty = false;
@@ -330,7 +330,7 @@ var p = Graphics.prototype;
 	* @param {number} radius
 	* @param {number} startAngle Measured in radians.
 	* @param {number} endAngle Measured in radians.
-	* @param {Boolean} anticlockwise
+	* @param {boolean} anticlockwise
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {

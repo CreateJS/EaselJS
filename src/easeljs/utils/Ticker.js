@@ -78,14 +78,14 @@ goog.provide('Ticker');
 	
 	/** 
 	* @property _paused
-	* @type Boolean
+	* @type {boolean}
 	* @protected 
 	**/
 	Ticker._paused = false;
 	
 	/** 
 	* @property _inited
-	* @type Boolean
+	* @type {boolean}
 	* @protected 
 	**/
 	Ticker._inited = false;
@@ -158,7 +158,7 @@ goog.provide('Ticker');
 	* @method addListener
 	* @static
 	* @param {Object} o The object to add as a listener.
-	* @param {Boolean} pauseable If false, the listener will continue to have tick called 
+	* @param {boolean} pauseable If false, the listener will continue to have tick called 
 	* even when Ticker is paused via Ticker.pause(). Default is true.
 	**/
 	Ticker.addListener = function(o, pauseable) {
@@ -264,7 +264,7 @@ goog.provide('Ticker');
 	* While Ticker is paused, pausable listeners are not ticked. See addListener for more information.
 	* @method setPaused
 	* @static
-	* @param {Boolean} value Indicates whether to pause (true) or unpause (false) Ticker.
+	* @param {boolean} value Indicates whether to pause (true) or unpause (false) Ticker.
 	**/
 	Ticker.setPaused = function(value) {
 		Ticker._paused = value;
@@ -274,7 +274,7 @@ goog.provide('Ticker');
 	* Returns a boolean indicating whether Ticker is currently paused, as set with setPaused.
 	* @method getPaused
 	* @static
-	* @return {Boolean} Whether the Ticker is currently paused.
+	* @return {boolean} Whether the Ticker is currently paused.
 	**/
 	Ticker.getPaused = function() {
 		return Ticker._paused;
@@ -286,7 +286,7 @@ goog.provide('Ticker');
 	* time that has elapsed.
 	* @method getTime
 	* @static
-	* @param {Boolean} pauseable Indicates whether to include time elapsed
+	* @param {boolean} pauseable Indicates whether to include time elapsed
 	* while Ticker was paused. If false only time elapsed while Ticker is not paused will be returned.
 	* If true, the value returned will be total time elapsed since the first tick event listener was added.
 	* @return {number} Number of milliseconds that have elapsed since Ticker was begun.
@@ -299,7 +299,7 @@ goog.provide('Ticker');
 	* Returns the number of ticks that have been broadcast by Ticker.
 	* @method getTicks
 	* @static
-	* @param {Boolean} pauseable Indicates whether to include ticks that would have been broadcast
+	* @param {boolean} pauseable Indicates whether to include ticks that would have been broadcast
 	* while Ticker was paused. If false only tick events broadcast while Ticker is not paused will be returned.
 	* If true, tick events that would have been broadcast while Ticker was paused will be included in the return
 	* value. The default value is false.

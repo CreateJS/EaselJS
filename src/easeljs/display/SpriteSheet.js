@@ -93,7 +93,7 @@ SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
 	/** The loop property is only used if no frameData is specified, and indicates whether all frames (as specified with totalFrames) 
 	* should loop. If false, the animation will play to totalFrames, then pause.
 	* @property loop
-	* @type Boolean
+	* @type {boolean}
 	**/
 	SpriteSheet.prototype.loop = true;
 	
