@@ -544,7 +544,7 @@ DisplayObject.prototype.localToLocal = function(x, y, target) {
  * the display object and all of its parent Containers up to the highest level ancestor
  * (usually the stage). This can be used to transform positions between coordinate spaces,
  * such as with localToGlobal and globalToLocal.
- * @param {Matrix2D} mtx Optional. A Matrix2D object to populate with the calculated values. If null, a new
+ * @param {Matrix2D=} mtx Optional. A Matrix2D object to populate with the calculated values. If null, a new
  * Matrix object is returned.
  * @return {Matrix2D} a concatenated Matrix2D object representing the combined transform of
  * the display object and all of its parent Containers up to the highest level ancestor (usually the stage).
