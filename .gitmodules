@@ -1,0 +1,9 @@
+[submodule "src/easeljs"]
+	path = src/easeljs
+	url = git://github.com/kevmoo/easelJS_src.git
+[submodule "closure"]
+	path = closure
+	url = git://github.com/jarib/google-closure-library.git
+[submodule "_tools"]
+	path = _tools
+	url = git://github.com/thinkpixellab/google-closure-tools.git
