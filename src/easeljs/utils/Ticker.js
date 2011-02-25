@@ -214,7 +214,7 @@ goog.provide('Ticker');
 	* Returns the current target time between ticks, as set with setInterval.
 	* @method getInterval
 	* @static
-	* @return {Number} The current target interval in milliseconds between tick events.
+	* @return {number} The current target interval in milliseconds between tick events.
 	**/
 	Ticker.getInterval = function() {
 		return Ticker._interval;
@@ -225,7 +225,7 @@ goog.provide('Ticker');
 	* interval of 40, getFPS() will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
 	* @method getFPS
 	* @static
-	* @return {Number} The current target number of frames / ticks broadcast per second.
+	* @return {number} The current target number of frames / ticks broadcast per second.
 	**/
 	Ticker.getFPS = function() {
 		return 1000/Ticker._interval;
@@ -248,7 +248,7 @@ goog.provide('Ticker');
 	* @static
 	* @param {Number} ticks Optional. The number of previous ticks over which to measure the actual 
 	* frames / ticks per second.
-	* @return {Number} The actual frames / ticks per second. Depending on performance, this may differ
+	* @return {number} The actual frames / ticks per second. Depending on performance, this may differ
 	* from the target frames per second.
 	**/
 	Ticker.getMeasuredFPS = function(ticks) {
@@ -289,7 +289,7 @@ goog.provide('Ticker');
 	* @param {Boolean} pauseable Indicates whether to include time elapsed
 	* while Ticker was paused. If false only time elapsed while Ticker is not paused will be returned.
 	* If true, the value returned will be total time elapsed since the first tick event listener was added.
-	* @return {Number} Number of milliseconds that have elapsed since Ticker was begun.
+	* @return {number} Number of milliseconds that have elapsed since Ticker was begun.
 	**/
 	Ticker.getTime = function(pauseable) {
 		return Ticker._getTime() - Ticker._startTime - (pauseable ? Ticker._pausedTime : 0);
@@ -303,7 +303,7 @@ goog.provide('Ticker');
 	* while Ticker was paused. If false only tick events broadcast while Ticker is not paused will be returned.
 	* If true, tick events that would have been broadcast while Ticker was paused will be included in the return
 	* value. The default value is false.
-	* @return {Number} of ticks that have been broadcast.
+	* @return {number} of ticks that have been broadcast.
 	**/
 	Ticker.getTicks = function(pauseable) {
 		return  Ticker._ticks - (pauseable ?Ticker._pausedTickers : 0);

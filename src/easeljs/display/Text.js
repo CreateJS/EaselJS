@@ -226,7 +226,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	/**
 	* Returns the measured, untransformed width of the text.
 	* @method getMeasuredWidth
-	* @return {Number} The measured, untransformed width of the text.
+	* @return {number} The measured, untransformed width of the text.
 	**/
 	p.getMeasuredWidth = function() {
 		return this._getWorkingContext().measureText(this.text).width;
@@ -236,7 +236,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	* Returns an approximate line height of the text, ignoring the lineHeight property. This is based 
 	* on the measured width of a "M" character multiplied by 1.2, which approximates em for most fonts.
 	* @method getMeasuredLineHeight
-	* @return {Number} an approximate line height of the text, ignoring the lineHeight property. This is 
+	* @return {number} an approximate line height of the text, ignoring the lineHeight property. This is 
 	* based on the measured width of a "M" character multiplied by 1.2, which approximates em for most fonts.
 	**/
 	p.getMeasuredLineHeight = function() {

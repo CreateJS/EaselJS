@@ -264,7 +264,7 @@ goog.inherits(Container, DisplayObject);
 	* Returns the index of the specified child in the display list, or -1 if it is not in the display list.
 	* @method getChildIndex
 	* @param {DisplayObject} child The child to return the index of.
-	* @return {Number} The index of the specified child. -1 if the child is not found.
+	* @return {number} The index of the specified child. -1 if the child is not found.
 	**/
 	Container.prototype.getChildIndex = function(child) {
 		return this.children.indexOf(child);
@@ -273,7 +273,7 @@ goog.inherits(Container, DisplayObject);
 	/**
 	* Returns the number of children in the display list.
 	* @method getNumChildren
-	* @return {Number} The number of children in the display list.
+	* @return {number} The number of children in the display list.
 	**/
 	Container.prototype.getNumChildren = function() {
 		return this.children.length;
