@@ -30,6 +30,7 @@
 goog.require('Matrix2D');
 goog.require('Point');
 goog.require('UID');
+goog.require('MouseEventPlus');
 
 goog.provide('DisplayObject');
 goog.provide('Container');
@@ -256,36 +257,36 @@ DisplayObject.prototype.snapToPixel = false;
 
 /**
  * The onPress callback is called when the user presses down on their mouse over this display object. The handler
- * is passed a single param containing the corresponding MouseEvent instance. You can subscribe to the onMouseMove
+ * is passed a single param containing the corresponding MouseEventPlus instance. You can subscribe to the onMouseMove
  * and onMouseUp callbacks of the event object to receive these events until the user releases the mouse button.
  * If an onPress handler is set on a container, it will receive the event if any of its children are clicked.
  * @event onPress
- * @param {MouseEvent} event MouseEvent with information about the event.
+ * @param {MouseEventPlus} event MouseEventPlus with information about the event.
  **/
 DisplayObject.prototype.onPress = null;
 
 /**
  * The onClick callback is called when the user presses down on and then releases the mouse button over this
- * display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an
+ * display object. The handler is passed a single param containing the corresponding MouseEventPlus instance. If an
  * onClick handler is set on a container, it will receive the event if any of its children are clicked.
  * @event onClick
- * @param {MouseEvent} event MouseEvent with information about the event.
+ * @param {MouseEventPlus} event MouseEventPlus with information about the event.
  **/
 DisplayObject.prototype.onClick = null;
 
 /**
  * The onMouseOver callback is called when the user rolls over the display object. You must enable this event using
- * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
+ * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEventPlus instance.
  * @event onMouseOver
- * @param {MouseEvent} event MouseEvent with information about the event.
+ * @param {MouseEventPlus} event MouseEventPlus with information about the event.
  **/
 DisplayObject.prototype.onMouseOver = null;
 
 /**
  * The onMouseOut callback is called when the user rolls off of the display object. You must enable this event using
- * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
+ * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEventPlus instance.
  * @event onMouseOut
- * @param {MouseEvent} event MouseEvent with information about the event.
+ * @param {MouseEventPlus} event MouseEventPlus with information about the event.
  **/
 DisplayObject.prototype.onMouseOut = null;
 
@@ -1137,25 +1138,25 @@ Stage.prototype.mouseX = null;
 Stage.prototype.mouseY = null;
 
 /** The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param
- * containing the corresponding MouseEvent instance.
+ * containing the corresponding MouseEventPlus instance.
  * @event onMouseMove
- * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
+ * @param {MouseEventPlus} event A MouseEventPlus instance with information about the current mouse event.
  **/
 Stage.prototype.onMouseMove = null;
 
 /**
  * The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler 
- * is passed a single param containing the corresponding MouseEvent instance.
+ * is passed a single param containing the corresponding MouseEventPlus instance.
  * @event onMouseUp
- * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
+ * @param {MouseEventPlus} event A MouseEventPlus instance with information about the current mouse event.
  **/
 Stage.prototype.onMouseUp = null;
 
 /**
  * The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single 
- * param containing the corresponding MouseEvent instance.
+ * param containing the corresponding MouseEventPlus instance.
  * @event onMouseDown
- * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
+ * @param {MouseEventPlus} event A MouseEventPlus instance with information about the current mouse event.
  **/
 Stage.prototype.onMouseDown = null;
 
@@ -1183,11 +1184,11 @@ Stage.prototype.mouseInBounds = false;
 Stage.prototype._tmpCanvas = null;
 
 /**
- * @property _activeMouseEvent
+ * @property _activeMouseEventPlus
  * @protected
- * @type MouseEvent
+ * @type MouseEventPlus
  **/
-Stage.prototype._activeMouseEvent = null;
+Stage.prototype._activeMouseEventPlus = null;
 
 /**
  * @property _activeMouseTarget
@@ -1409,7 +1410,7 @@ Stage.prototype.toString = function() {
 // private methods:
 /**
  * @protected
- * @param {MouseEvent} e
+ * @param {MouseEventPlus} e
  **/
 Stage.prototype._handleMouseMove = function(e) {
   if (!this.canvas) {
@@ -1432,48 +1433,48 @@ Stage.prototype._handleMouseMove = function(e) {
     this.mouseY = mouseY;
   }
   this.mouseInBounds = inBounds;
-  var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY);
+  var evt = new MouseEventPlus("onMouseMove", this.mouseX, this.mouseY);
   if (this.onMouseMove) {
     this.onMouseMove(evt);
   }
-  if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) {
-    this._activeMouseEvent.onMouseMove(evt);
+  if (this._activeMouseEventPlus && this._activeMouseEventPlus.onMouseMove) {
+    this._activeMouseEventPlus.onMouseMove(evt);
   }
 };
 
 /**
  * @protected
- * @param {MouseEvent} e
+ * @param {MouseEventPlus} e
  **/
 Stage.prototype._handleMouseUp = function(e) {
-  var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
+  var evt = new MouseEventPlus("onMouseUp", this.mouseX, this.mouseY);
   if (this.onMouseUp) {
     this.onMouseUp(evt);
   }
-  if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) {
-    this._activeMouseEvent.onMouseUp(evt);
+  if (this._activeMouseEventPlus && this._activeMouseEventPlus.onMouseUp) {
+    this._activeMouseEventPlus.onMouseUp(evt);
   }
   if (this._activeMouseTarget && this._activeMouseTarget.onClick && this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true, (this._mouseOverIntervalID ? 3 : 1)) == this._activeMouseTarget) {
-    this._activeMouseTarget.onClick(new MouseEvent("onClick", this.mouseX, this.mouseY));
+    this._activeMouseTarget.onClick(new MouseEventPlus("onClick", this.mouseX, this.mouseY));
   }
-  this._activeMouseEvent = this.activeMouseTarget = null;
+  this._activeMouseEventPlus = this.activeMouseTarget = null;
 };
 
 /**
  * @protected
- * @param {MouseEvent} e
+ * @param {MouseEventPlus} e
  **/
 Stage.prototype._handleMouseDown = function(e) {
   if (this.onMouseDown) {
-    this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY));
+    this.onMouseDown(new MouseEventPlus("onMouseDown", this.mouseX, this.mouseY));
   }
   var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
   if (target) {
     if (target.onPress instanceof Function) {
-      var evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
+      var evt = new MouseEventPlus("onPress", this.mouseX, this.mouseY);
       target.onPress(evt);
       if (evt.onMouseMove || evt.onMouseUp) {
-        this._activeMouseEvent = evt;
+        this._activeMouseEventPlus = evt;
       }
     }
     this._activeMouseTarget = target;
@@ -1495,10 +1496,10 @@ Stage.prototype._testMouseOver = function() {
   }
   if (this._mouseOverTarget != target) {
     if (this._mouseOverTarget && this._mouseOverTarget.onMouseOut) {
-      this._mouseOverTarget.onMouseOut(new MouseEvent("onMouseOver", this.mouseX, this.mouseY));
+      this._mouseOverTarget.onMouseOut(new MouseEventPlus("onMouseOver", this.mouseX, this.mouseY));
     }
     if (target && target.onMouseOver) {
-      target.onMouseOver(new MouseEvent("onMouseOut", this.mouseX, this.mouseY));
+      target.onMouseOver(new MouseEventPlus("onMouseOut", this.mouseX, this.mouseY));
     }
     this._mouseOverTarget = target;
   }
