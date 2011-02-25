@@ -555,13 +555,10 @@ DisplayObject.prototype.getConcatenatedMatrix = function(mtx) {
     mtx = new Matrix2D();
   }
   var target = this;
-  while (true) {
+  while (target != null) {
     mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.skewX, target.skewY, target.regX, target.regY);
     mtx.prependProperties(target.alpha, target.shadow, target.compositeOperation);
-    if ((p = target.parent) == null) {
-      break;
-    }
-    target = p;
+    target = target.parent;
   }
   return mtx;
 };
@@ -1010,7 +1007,7 @@ Container.prototype.toString = function() {
 // private properties:
 /**
  * @param {number} x
- * @param {number} x
+ * @param {number} y
  * @param {Array} arr
  * @param {number} mouseEvents A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress &
  * onClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
