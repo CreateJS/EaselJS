@@ -40,7 +40,7 @@ goog.provide('Bitmap');
 * @class Bitmap
 * @extends {DisplayObject}
 * @constructor
-* @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video to render to the display list.
+* @param {Image|HTMLCanvasElement|HTMLVideoElement} image The Image, Canvas, or Video to render to the display list.
 **/
 Bitmap = function(image) {
   this.initialize(image);
@@ -51,7 +51,7 @@ goog.inherits(Bitmap, DisplayObject);
 	/**
 	* The image to render. This can be an Image, a Canvas, or a Video.
 	* @property image
-	* @type Image | HTMLCanvasElement | HTMLVideoElement
+	* @type {Image|HTMLCanvasElement|HTMLVideoElement}
 	**/
 	Bitmap.prototype.image = null;
 
@@ -135,7 +135,7 @@ goog.inherits(Bitmap, DisplayObject);
 
 	/**
 	* Returns a clone of the Point instance.
-	* @return {Point} a clone of the Point instance.
+	* @return {!Bitmap} a clone of the Point instance.
 	**/
 	Bitmap.prototype.clone = function() {
 		var o = new Bitmap(this.image);
