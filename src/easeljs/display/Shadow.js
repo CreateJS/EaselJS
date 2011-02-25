@@ -86,7 +86,7 @@ Shadow.prototype.blur = 0;
  * @return {string} a string representation of the instance.
  **/
 Shadow.prototype.toString = function() {
-  return "[Shadow]";
+  return '[Shadow]';
 };
 
 /**

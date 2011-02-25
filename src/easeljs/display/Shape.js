@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,8 +28,8 @@
 */
 
 /**
-* The Easel Javascript library provides a retained graphics mode for canvas 
-* including a full, hierarchical display list, a core interaction model, and 
+* The Easel Javascript library provides a retained graphics mode for canvas
+* including a full, hierarchical display list, a core interaction model, and
 * helper classes to make working with Canvas much easier.
 **/
 
@@ -55,7 +55,7 @@ var p = Shape.prototype = new DisplayObject();
 	* @type Graphics
 	**/
 	p.graphics = null;
-	
+
 // constructor:
 	/**
 	* @property DisplayObject_initialize
@@ -64,7 +64,7 @@ var p = Shape.prototype = new DisplayObject();
 	**/
 	p.DisplayObject_initialize = p.initialize;
 
-	/** 
+	/**
 	* Initialization method.
 	* param {Graphics} graphics
 	* @protected
@@ -78,7 +78,7 @@ var p = Shape.prototype = new DisplayObject();
 	* Returns true or false indicating whether the Shape would be visible if drawn to a canvas.
 	* This does not account for whether it would be visible within the boundaries of the stage.
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @return {boolean} Boolean indicating whether the Shape would be visible if drawn to a canvas
+	* @return {boolean} Boolean indicating whether the Shape would be visible if drawn to a canvas.
 	**/
 	p.isVisible = function() {
 		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.graphics;
@@ -90,13 +90,13 @@ var p = Shape.prototype = new DisplayObject();
 	* @type Function
 	**/
 	p.DisplayObject_draw = p.draw;
-	
+
 	/**
 	* Draws the Shape into the specified context ignoring it's visible, alpha, shadow, and transform.
 	* Returns true if the draw was handled (useful for overriding functionality).
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache. 
+	* @param {boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	* into itself).
 	**/
@@ -105,11 +105,11 @@ var p = Shape.prototype = new DisplayObject();
 		this.graphics.draw(ctx);
 		return true;
 	}
-	
+
 	/**
-	* Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to 
+	* Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to
 	* their defaults (for example .parent).
-	* @param {boolean} recursive If true, this Shape's Graphics instance will also be cloned. If false, the Graphics instance 
+	* @param {boolean} recursive If true, this Shape's Graphics instance will also be cloned. If false, the Graphics instance
 	* will be shared with the new Shape.
 	**/
 	p.clone = function(recursive) {
@@ -117,13 +117,13 @@ var p = Shape.prototype = new DisplayObject();
 		this.cloneProps(o);
 		return o;
 	}
-		
+
 	/**
 	* Returns a string representation of this object.
 	* @return {string} a string representation of the instance.
 	**/
 	p.toString = function() {
-		return "[Shape (name="+  this.name +")]";
+		return '[Shape (name='+ this.name + ')]';
 	}
 
 window.Shape = Shape;

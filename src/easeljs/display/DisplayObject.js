@@ -28,13 +28,13 @@
 */
 
 goog.require('Matrix2D');
-goog.require('Point');
-goog.require('UID');
 goog.require('MouseEventPlus');
+goog.require('Point');
 goog.require('Shadow');
+goog.require('UID');
 
-goog.provide('DisplayObject');
 goog.provide('Container');
+goog.provide('DisplayObject');
 goog.provide('Stage');
 
 /**
@@ -653,7 +653,7 @@ DisplayObject.prototype.applyShadow = function(ctx, shadow) {
 DisplayObject.prototype._testHit = function(ctx) {
   try {
     var hit = ctx.getImageData(0, 0, 1, 1).data[3] > 1;
-  } catch(e) {
+  } catch (e) {
     if (!DisplayObject.suppressCrossDomainErrors) {
       throw 'An error has occured. This is most likely due to security restrictions on reading canvas pixel ' + 'data with local or cross-domain images.';
     }
@@ -1106,7 +1106,7 @@ goog.inherits(Stage, Container);
  **/
 Stage._snapToPixelEnabled = false; // snapToPixelEnabled is temporarily copied here during a draw to provide global access.
 // public properties:
-/** 
+/**
  * Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually
  * control clearing (for generative art, or when pointing multiple stages at the same canvas for example).
  * @property autoClear
@@ -1123,7 +1123,7 @@ Stage.prototype.autoClear = true;
 Stage.prototype.canvas = null;
 
 /**
- * READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent 
+ * READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
  * position over the canvas, and mouseInBounds will be set to false.
  * @property mouseX
  * @type {number}
@@ -1131,7 +1131,7 @@ Stage.prototype.canvas = null;
  **/
 Stage.prototype.mouseX = NaN;
 
-/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent 
+/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
  * position over the canvas, and mouseInBounds will be set to false.
  * @property mouseY
  * @type {number}
@@ -1147,7 +1147,7 @@ Stage.prototype.mouseY = NaN;
 Stage.prototype.onMouseMove = null;
 
 /**
- * The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler 
+ * The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler
  * is passed a single param containing the corresponding MouseEventPlus instance.
  * @event onMouseUp
  * @param {MouseEventPlus} event A MouseEventPlus instance with information about the current mouse event.
@@ -1155,7 +1155,7 @@ Stage.prototype.onMouseMove = null;
 Stage.prototype.onMouseUp = null;
 
 /**
- * The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single 
+ * The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single
  * param containing the corresponding MouseEventPlus instance.
  * @event onMouseDown
  * @param {MouseEventPlus} event A MouseEventPlus instance with information about the current mouse event.
@@ -1235,7 +1235,7 @@ Stage.prototype._mouseOverTarget = null;
  **/
 Stage.prototype.Container_initialize = Stage.prototype.initialize;
 
-/** 
+/**
  * Initialization method.
  * param {HTMLCanvasElement} canvas
  * @protected
@@ -1247,25 +1247,25 @@ Stage.prototype.initialize = function(canvas) {
 
   var o = this;
   if (window.addEventListener) {
-    window.addEventListener("mouseup", function(e) {
+    window.addEventListener('mouseup', function(e) {
       o._handleMouseUp(e);
     },
     false);
-    window.addEventListener("mousemove", function(e) {
+    window.addEventListener('mousemove', function(e) {
       o._handleMouseMove(e);
     },
     false);
   } else if (document.addEventListener) {
-    document.addEventListener("mouseup", function(e) {
+    document.addEventListener('mouseup', function(e) {
       o._handleMouseUp(e);
     },
     false);
-    document.addEventListener("mousemove", function(e) {
+    document.addEventListener('mousemove', function(e) {
       o._handleMouseMove(e);
     },
     false);
   }
-  canvas.addEventListener("mousedown", function(e) {
+  canvas.addEventListener('mousedown', function(e) {
     o._handleMouseDown(e);
   },
   false);
@@ -1278,7 +1278,7 @@ Stage.prototype.initialize = function(canvas) {
  **/
 
 /**
- * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapSequence) 
+ * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapSequence)
  * and render its entire display list to the canvas.
  **/
 Stage.prototype.update = function() {
@@ -1289,7 +1289,7 @@ Stage.prototype.update = function() {
     this.clear();
   }
   Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-  this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
+  this.draw(this.canvas.getContext('2d'), false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
 };
 
 /**
@@ -1307,13 +1307,13 @@ Stage.prototype.clear = function() {
   if (!this.canvas) {
     return;
   }
-  var ctx = this.canvas.getContext("2d");
+  var ctx = this.canvas.getContext('2d');
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
 
 /**
- * Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be 
+ * Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be
  * specified as the src value of an image element.
  * @param {string} backgroundColor The background color to be used for the generated image. The value can be any value HTML color
  * value, including HEX colors, rgb and rgba. The default value is a transparent background.
@@ -1323,7 +1323,7 @@ Stage.prototype.clear = function() {
  **/
 Stage.prototype.toDataURL = function(backgroundColor, mimeType) {
   if (!mimeType) {
-    mimeType = "image/png";
+    mimeType = 'image/png';
   }
 
   var ctx = this.canvas.getContext('2d');
@@ -1341,7 +1341,7 @@ Stage.prototype.toDataURL = function(backgroundColor, mimeType) {
     var compositeOperation = ctx.globalCompositeOperation;
 
     //set to draw behind current content
-    ctx.globalCompositeOperation = "destination-over";
+    ctx.globalCompositeOperation = 'destination-over';
 
     //set background color
     ctx.fillStyle = backgroundColor;
@@ -1406,7 +1406,7 @@ Stage.prototype.clone = function() {
  * @return {string} a string representation of the instance.
  **/
 Stage.prototype.toString = function() {
-  return "[Stage (name=" + this.name + ")]";
+  return '[Stage (name=' + this.name + ')]';
 };
 
 // private methods:
@@ -1435,7 +1435,7 @@ Stage.prototype._handleMouseMove = function(e) {
     this.mouseY = mouseY;
   }
   this.mouseInBounds = inBounds;
-  var evt = new MouseEventPlus("onMouseMove", this.mouseX, this.mouseY);
+  var evt = new MouseEventPlus('onMouseMove', this.mouseX, this.mouseY);
   if (this.onMouseMove) {
     this.onMouseMove(evt);
   }
@@ -1449,7 +1449,7 @@ Stage.prototype._handleMouseMove = function(e) {
  * @param {MouseEventPlus} e
  **/
 Stage.prototype._handleMouseUp = function(e) {
-  var evt = new MouseEventPlus("onMouseUp", this.mouseX, this.mouseY);
+  var evt = new MouseEventPlus('onMouseUp', this.mouseX, this.mouseY);
   if (this.onMouseUp) {
     this.onMouseUp(evt);
   }
@@ -1457,7 +1457,7 @@ Stage.prototype._handleMouseUp = function(e) {
     this._activeMouseEventPlus.onMouseUp(evt);
   }
   if (this._activeMouseTarget && this._activeMouseTarget.onClick && this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true, (this._mouseOverIntervalID ? 3 : 1)) == this._activeMouseTarget) {
-    this._activeMouseTarget.onClick(new MouseEventPlus("onClick", this.mouseX, this.mouseY));
+    this._activeMouseTarget.onClick(new MouseEventPlus('onClick', this.mouseX, this.mouseY));
   }
   this._activeMouseEventPlus = this.activeMouseTarget = null;
 };
@@ -1468,12 +1468,12 @@ Stage.prototype._handleMouseUp = function(e) {
  **/
 Stage.prototype._handleMouseDown = function(e) {
   if (this.onMouseDown) {
-    this.onMouseDown(new MouseEventPlus("onMouseDown", this.mouseX, this.mouseY));
+    this.onMouseDown(new MouseEventPlus('onMouseDown', this.mouseX, this.mouseY));
   }
   var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
   if (target) {
     if (target.onPress instanceof Function) {
-      var evt = new MouseEventPlus("onPress", this.mouseX, this.mouseY);
+      var evt = new MouseEventPlus('onPress', this.mouseX, this.mouseY);
       target.onPress(evt);
       if (evt.onMouseMove || evt.onMouseUp) {
         this._activeMouseEventPlus = evt;
@@ -1498,10 +1498,10 @@ Stage.prototype._testMouseOver = function() {
   }
   if (this._mouseOverTarget != target) {
     if (this._mouseOverTarget && this._mouseOverTarget.onMouseOut) {
-      this._mouseOverTarget.onMouseOut(new MouseEventPlus("onMouseOver", this.mouseX, this.mouseY));
+      this._mouseOverTarget.onMouseOut(new MouseEventPlus('onMouseOver', this.mouseX, this.mouseY));
     }
     if (target && target.onMouseOver) {
-      target.onMouseOver(new MouseEventPlus("onMouseOut", this.mouseX, this.mouseY));
+      target.onMouseOver(new MouseEventPlus('onMouseOut', this.mouseX, this.mouseY));
     }
     this._mouseOverTarget = target;
   }
