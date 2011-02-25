@@ -31,6 +31,7 @@ goog.require('Matrix2D');
 goog.require('Point');
 goog.require('UID');
 goog.require('MouseEventPlus');
+goog.require('Shadow');
 
 goog.provide('DisplayObject');
 goog.provide('Container');
