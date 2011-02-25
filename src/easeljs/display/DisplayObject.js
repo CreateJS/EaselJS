@@ -684,7 +684,7 @@ goog.inherits(Container, DisplayObject);
  * The array of children in the display list. You should usually use the child management methods,
  * rather than accessing this directly, but it is included for advanced users.
  * @property children
- * @type Array[DisplayObject]
+ * @type {Array.<DisplayObject>}
  * @default null
  **/
 Container.prototype.children = null;
@@ -1015,7 +1015,7 @@ Container.prototype.toString = function() {
  * @param {Array} arr
  * @param {number} mouseEvents A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress &
  * onClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
- * @return {Array[DisplayObject]}
+ * @return {Array.<DisplayObject>}
  * @protected
  **/
 Container.prototype._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {

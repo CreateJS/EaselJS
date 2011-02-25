@@ -64,14 +64,14 @@ goog.provide('Ticker');
 	
 	/** 
 	* @property _listeners
-	* @type Array[Object]
+	* @type {Array.<Object>}
 	* @protected 
 	**/
 	Ticker._listeners = [];
 	
 	/** 
 	* @property _pauseable
-	* @type Array[Boolean]
+	* @type {Array.<Boolean>}
 	* @protected 
 	**/
 	Ticker._pauseable = [];
@@ -143,7 +143,7 @@ goog.provide('Ticker');
 	
 	/** 
 	* @property _times
-	* @type Array[Number]
+	* @type {Array.<number>}
 	* @protected 
 	**/
 	Ticker._times = [];

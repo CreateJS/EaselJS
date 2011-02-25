@@ -93,7 +93,7 @@ var p = Shadow.prototype;
 	/** 
 	* Initialization method.
 	* @protected
-	* @param {Array[Command]} instructions
+	* @param {Array.<Command>} instructions
 	**/
 	p.initialize = function(color, offsetX, offsetY, blur) {
 		this.color = color;
