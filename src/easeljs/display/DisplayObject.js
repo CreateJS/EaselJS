@@ -39,7 +39,6 @@ goog.provide('Stage');
  * The Easel Javascript library provides a retained graphics mode for canvas
  * including a full, hierarchical display list, a core interaction model, and
  * helper classes to make working with Canvas much easier.
- * @module EaselJS
  **/
 
 /**
@@ -1203,7 +1202,7 @@ Stage.prototype._activeMouseTarget = null;
 /**
  * @property _mouseOverIntervalID
  * @protected
- * @type {number}
+ * @type {?number}
  **/
 Stage.prototype._mouseOverIntervalID = null;
 
