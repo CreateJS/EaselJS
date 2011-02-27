@@ -126,7 +126,8 @@ var p = Container.prototype = new DisplayObject();
 			var child = list[i];
 			if (child.tick) { child.tick(); }
 			if (!child.isVisible()) { continue; }
-
+			
+			var shadow = false;
 			var mtx = _mtx.clone();
 			mtx.appendTransform(child.x, child.y, child.scaleX, child.scaleY, child.rotation, child.skewX, child.skewY, 
 									child.regX, child.regY);
@@ -140,9 +141,10 @@ var p = Container.prototype = new DisplayObject();
 				}
 				ctx.globalAlpha = mtx.alpha;
 				ctx.globalCompositeOperation = mtx.compositeOperation || "source-over";
-				if (mtx.shadow) { this.applyShadow(ctx, mtx.shadow); }
+				if (shadow = mtx.shadow) { this.applyShadow(ctx, shadow); }
 			}
 			child.draw(ctx, false, mtx);
+			if (shadow) { this.applyShadow(ctx); }
 		}
 		return true;
 	}

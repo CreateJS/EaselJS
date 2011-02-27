@@ -635,6 +635,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* @param {Shadow} shadow
 	**/
 	p.applyShadow = function(ctx, shadow) {
+		shadow = shadow || Shadow.identity;
 		ctx.shadowColor = shadow.color;
 		ctx.shadowOffsetX = shadow.offsetX;
 		ctx.shadowOffsetY = shadow.offsetY;
