@@ -4,6 +4,7 @@ Version 0.3.2 [not released]
 - added stage.mouseInBounds
 - added DisplayObject.onMouseOver and onMouseOut callbacks
 - added stage.enableMouseOver(freq)
+- fixed an issue with shadows not being reset properly
 - migrated to use YUIDocs instead of JSDocs
 
 

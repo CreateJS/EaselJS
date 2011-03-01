@@ -356,20 +356,29 @@ var p = Stage.prototype = new Container();
 			return;
 		}
 		if(!e){ e = window.event; }
+		this._calculateMousePosition(e.pageX, e.pageY);
+		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY);
+		if (this.onMouseMove) { this.onMouseMove(evt); }
+		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
+	}
 
-		var mouseX = e.pageX-this.canvas.offsetLeft;
-		var mouseY = e.pageY-this.canvas.offsetTop;
+	/**
+	* @method _calculateMousePosition
+	* @protected
+	* @param {Number} pageX
+	* @param {Number} pageY
+	**/
+	p._calculateMousePosition = function(pageX, pageY) {
+		var mouseX = pageX-this.canvas.offsetLeft;
+		var mouseY = pageY-this.canvas.offsetTop;
 		var inBounds = (mouseX >= 0 && mouseY >= 0 && mouseX < this.canvas.width && mouseY < this.canvas.height);
 		if (!inBounds && !this.mouseInBounds) { return; }
-		
+
 		if (inBounds) {
 			this.mouseX = mouseX;
 			this.mouseY = mouseY;
 		}
 		this.mouseInBounds = inBounds;
-		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY);
-		if (this.onMouseMove) { this.onMouseMove(evt); }
-		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
 	}
 
 	/**
