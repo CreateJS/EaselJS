@@ -356,29 +356,35 @@ var p = Stage.prototype = new Container();
 			return;
 		}
 		if(!e){ e = window.event; }
-		this._calculateMousePosition(e.pageX, e.pageY);
+		
+		var inBounds = this.mouseInBounds;
+		this._updateMousePosition(e.pageX, e.pageY);
+		if (!inBounds && !this.mouseInBounds) { return; }
+
 		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY);
 		if (this.onMouseMove) { this.onMouseMove(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
 	}
 
 	/**
-	* @method _calculateMousePosition
+	* @method _updateMousePosition
 	* @protected
 	* @param {Number} pageX
 	* @param {Number} pageY
 	**/
-	p._calculateMousePosition = function(pageX, pageY) {
-		var mouseX = pageX-this.canvas.offsetLeft;
-		var mouseY = pageY-this.canvas.offsetTop;
-		var inBounds = (mouseX >= 0 && mouseY >= 0 && mouseX < this.canvas.width && mouseY < this.canvas.height);
-		if (!inBounds && !this.mouseInBounds) { return; }
+	p._updateMousePosition = function(pageX, pageY) {
+		var o = this.canvas;
+		do {
+			pageX -= o.offsetLeft;
+			pageY -= o.offsetTop;
+		} while (o = o.offsetParent);
+		
+		this.mouseInBounds = (pageX >= 0 && pageY >= 0 && pageX < this.canvas.width && pageY < this.canvas.height);
 
-		if (inBounds) {
-			this.mouseX = mouseX;
-			this.mouseY = mouseY;
+		if (this.mouseInBounds) {
+			this.mouseX = pageX;
+			this.mouseY = pageY;
 		}
-		this.mouseInBounds = inBounds;
 	}
 
 	/**
