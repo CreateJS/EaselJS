@@ -21,8 +21,12 @@ parser_in="../src"
 # json string, and copies of the parsed files.
 parser_out=tmp/parser
 
+working_dir=output
+doc_dir=easeljs_docs
+zip_name=easeljs_docs.zip
+
 # The directory to put the html file outputted by the generator
-generator_out=output/docs
+generator_out=$working_dir/$doc_dir/
 
 # The location of the template files.  Any subdirectories here will be copied
 # verbatim to the destination directory.
@@ -45,3 +49,7 @@ projectname="EaselJS"
 $yuidoc_exe $parser_in -p $parser_out -o $generator_out -t $template -v $version -Y $yuiversion -m $projectname -u "http://www.easeljs.com"
 
 rm -r tmp
+
+cd $working_dir
+zip -r $zip_name $doc_dir -x "*.DS_Store"
+cd ..
