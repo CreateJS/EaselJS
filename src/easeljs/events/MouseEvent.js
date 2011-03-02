@@ -108,9 +108,9 @@ var p = MouseEvent.prototype;
 	
 // public methods:
 	/**
-	* Returns a string representation of this object.
-	* @method toString
-	* @return {String} a string representation of the instance.
+	* Returns a clone of the MouseEvent instance.
+	* @method clone
+	* @return {MouseEvent} a clone of the MouseEvent instance.
 	**/
 	p.clone = function() {
 		return new MouseEvent(this.type, this.stageX, this.stageY);
@@ -118,6 +118,8 @@ var p = MouseEvent.prototype;
 
 	/**
 	* Returns a string representation of this object.
+	* @method toString
+	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {
 		return "[MouseEvent (type="+this.type+" stageX="+this.stageX+" stageY="+this.stageY+")]";

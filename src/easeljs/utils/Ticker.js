@@ -315,7 +315,7 @@
 	/**
 	* @method _tick
 	* @protected
-	* */
+	**/
 	Ticker._tick = function() {
 		Ticker._ticks++;
 		
@@ -344,10 +344,15 @@
 		if (Ticker._times.length > 100) { Ticker._times.pop(); }
 	}
 	
-	/** @protected */
+	/**
+	* @method _getTime
+	* @protected
+	**/
 	Ticker._getTime = function() {
 		return new Date().getTime();
 	}
+	
+	//docced above
 	Ticker._startTime = Ticker._getTime();
 
 window.Ticker = Ticker;

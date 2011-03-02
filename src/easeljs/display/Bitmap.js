@@ -141,9 +141,9 @@ var p = Bitmap.prototype = new DisplayObject();
 	**/
 	
 	/**
-	* Returns a clone of the Point instance.
+	* Returns a clone of the Bitmap instance.
 	* @method clone
-	* @return {Point} a clone of the Point instance.
+	* @return {Bitmap} a clone of the Bitmap instance.
 	**/
 	p.clone = function() {
 		var o = new Bitmap(this.image);
