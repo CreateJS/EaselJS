@@ -1,12 +1,12 @@
-Version 0.3.2 [not released]
+Version 0.3.2 [Mar 2, 2011]
 ****************************************************************************************************
-- fixed Graphics.clone()
 - added stage.mouseInBounds
 - added DisplayObject.onMouseOver and onMouseOut callbacks
 - added stage.enableMouseOver(freq)
+- improved support for calculating mouseX/Y in divs with relative positioning
+- fixed Graphics.clone()
 - fixed an issue with shadows not being reset properly
 - migrated to use YUIDocs instead of JSDocs
-- improved support for calculating mouseX/Y in divs with relative positioning
 - fixed an issue that prevented BitmapSequence instances with frameData from working with gotoAndPlay(frameNumber)
 
 
