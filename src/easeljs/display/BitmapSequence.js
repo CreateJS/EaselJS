@@ -49,9 +49,11 @@
 * dimensions, and frame data. See SpriteSheet for more information.
 **/
 BitmapSequence = function(spriteSheet) {
-  this.initialize(spriteSheet);
+  DisplayObject.call(this);
+	this.spriteSheet = spriteSheet;
 }
-var p = BitmapSequence.prototype = new DisplayObject();
+goog.inherits(BitmapSequence, DisplayObject);
+var p = BitmapSequence.prototype;
 
 // public properties:
 	
@@ -128,24 +130,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @default true
 	**/
 	p.snapToPixel = true;
-	
-// constructor:
-	/**
-	* @property DisplayObject_initialize
-	* @type Function
-	* @private
-	**/
-	p.DisplayObject_initialize = p.initialize;
-	
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	*/
-	p.initialize = function(spriteSheet) {
-		this.DisplayObject_initialize();
-		this.spriteSheet = spriteSheet;
-	}
 	
 	/**
 	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.

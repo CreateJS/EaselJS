@@ -44,7 +44,8 @@
 * @param {Number} y Y position. Default is 0.
 **/
 Point = function(x, y) {
-  this.initialize(x, y);
+	this.x = (x == null ? 0 : x);
+	this.y = (y == null ? 0 : y);
 }
 var p = Point.prototype;
 	
@@ -63,17 +64,6 @@ var p = Point.prototype;
 	* @type Number
 	**/
 	p.y = 0;
-	
-// constructor:
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	*/
-	p.initialize = function(x, y) {
-		this.x = (x == null ? 0 : x);
-		this.y = (y == null ? 0 : y);
-	}
 	
 // public methods:
 	/**

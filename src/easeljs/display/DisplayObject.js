@@ -44,7 +44,8 @@
 * @constructor
 **/
 DisplayObject = function() {
-  this.initialize();
+	this.id = UID.get();
+	this.children = [];
 }
 var p = DisplayObject.prototype;
 
@@ -388,16 +389,6 @@ DisplayObject._workingMatrix = new Matrix2D();
 // constructor:
 	// separated so it can be easily addressed in subclasses:
 
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	*/
-	p.initialize = function() {
-		this.id = UID.get();
-		this.children = [];
-	}
-	
 // public methods:
 	/**
 	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.

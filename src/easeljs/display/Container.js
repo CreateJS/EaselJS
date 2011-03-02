@@ -49,9 +49,11 @@
 * @constructor
 **/
 Container = function() {
-  this.initialize();
+  DisplayObject.call(this);
+	this.children = [];
 }
-var p = Container.prototype = new DisplayObject();
+goog.inherits(Container, DisplayObject);
+p = Container.prototype;
 
 // public properties:
 	/**
@@ -62,25 +64,6 @@ var p = Container.prototype = new DisplayObject();
 	* @default null
 	**/
 	p.children = null;
-
-// constructor:
-
-	/**
-	* @property DisplayObject_initialize
-	* @type Function
-	* @private
-	**/
-	p.DisplayObject_initialize = p.initialize;
-	
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	*/
-	p.initialize = function() {
-		this.DisplayObject_initialize();
-		this.children = [];
-	}
 	
 // public methods:
 
@@ -95,13 +78,6 @@ var p = Container.prototype = new DisplayObject();
 		return this.visible && this.alpha > 0 && this.children.length && this.scaleX != 0 && this.scaleY != 0;
 	}
 
-	/**
-	* @property DisplayObject_draw
-	* @type Function
-	* @private
-	**/
-	p.DisplayObject_draw = p.draw;
-	
 	/**
 	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
 	* Returns true if the draw was handled (useful for overriding functionality).
@@ -118,7 +94,7 @@ var p = Container.prototype = new DisplayObject();
 			_mtx = new Matrix2D();
 			_mtx.appendProperties(this.alpha, this.shadow, this.compositeOperation);
 		}
-		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+		if (DisplayObject.prototype.draw.call(this, ctx, ignoreCache)) { return true; }
 		var l = this.children.length;
 		// this ensures we don't have issues with display list changes that occur during a draw:
 		var list = this.children.slice(0);

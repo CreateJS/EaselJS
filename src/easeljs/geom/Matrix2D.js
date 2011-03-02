@@ -48,7 +48,12 @@
 * @param {Number} ty Specifies the ty property for the new matrix.
 **/
 Matrix2D = function(a, b, c, d, tx, ty) {
-  this.initialize(a, b, c, d, tx, ty);
+	if (a != null) { this.a = a; }
+	if (b != null) { this.b = b; }
+	if (c != null) { this.c = c; }
+	if (d != null) { this.d = d; }
+	if (tx != null) { this.tx = tx; }
+	if (ty != null) { this.ty = ty; }
 }
 var p = Matrix2D.prototype;
 
@@ -140,21 +145,6 @@ var p = Matrix2D.prototype;
 	* @type String
 	**/
 	p.compositeOperation  = null;
-	
-// constructor:
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	*/
-	p.initialize = function(a, b, c, d, tx, ty) {
-		if (a != null) { this.a = a; }
-		if (b != null) { this.b = b; }
-		if (c != null) { this.c = c; }
-		if (d != null) { this.d = d; }
-		if (tx != null) { this.tx = tx; }
-		if (ty != null) { this.ty = ty; }
-	}
 	
 // public methods:
 	/**

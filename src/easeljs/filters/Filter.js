@@ -42,17 +42,8 @@
 * @constructor
 **/
 Filter = function() {
-  this.initialize();
 }
 var p = Filter.prototype;
-	
-// constructor:
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	**/
-	p.initialize = function() {}
 	
 // public methods:
 	/**

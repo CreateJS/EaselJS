@@ -42,9 +42,11 @@
 * @constructor
 **/
 ColorMatrixFilter = function(matrix) {
-  this.initialize(matrix);
+  Filter.call(this);
+	this.matrix = matrix;
 }
-var p = ColorMatrixFilter.prototype = new Filter();
+goog.inherits(ColorMatrixFilter, Filter);
+var p = ColorMatrixFilter.prototype;
 
 // public properties:
 	p.matrix = null;
@@ -58,7 +60,6 @@ var p = ColorMatrixFilter.prototype = new Filter();
 	* @param matrix A 4x5 matrix describing the color operation to perform.
 	**/
 	p.initialize = function(matrix) {
-		this.matrix = matrix;
 	}
 	
 // public methods:

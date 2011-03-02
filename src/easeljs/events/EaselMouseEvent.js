@@ -48,7 +48,9 @@
 * @param {Number} stageY The mouseY position relative to the stage.
 **/
 EaselMouseEvent = function(type, stageX, stageY) {
-  this.initialize(type, stageX, stageY);
+	this.type = type;
+	this.stageX = stageX;
+	this.stageY = stageY;
 }
 var p = EaselMouseEvent.prototype;
 	
@@ -103,18 +105,6 @@ var p = EaselMouseEvent.prototype;
 	* @param {EaselMouseEvent} event A EaselMouseEvent instance with information about the current mouse event.
 	*/
 	p.onMouseUp = null;
-	
-// constructor:
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	**/
-	p.initialize = function(type, stageX, stageY) {
-		this.type = type;
-		this.stageX = stageX;
-		this.stageY = stageY;
-	}
 	
 // public methods:
 	/**

@@ -84,7 +84,9 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 * @for Graphics
 **/
 Graphics = function(instructions) {
-	this.initialize(instructions);
+	this.clear();
+	this._ctx = Graphics._ctx;
+	with (this) { eval(instructions); }
 }
 var p = Graphics.prototype;
 
@@ -263,18 +265,6 @@ var p = Graphics.prototype;
 	p._boundsQueue = null; // defers expensive bounds operations until getBounds is called.
 	p._x = 0; // current "pen" location
 	p._y = 0; // TODO: implement in all methods.
-	
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	* @param {String} instructions
-	**/
-	p.initialize = function(instructions) {
-		this.clear();
-		this._ctx = Graphics._ctx;
-		with (this) { eval(instructions); }
-	}
 	
 	/**
 	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.

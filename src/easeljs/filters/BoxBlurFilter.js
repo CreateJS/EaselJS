@@ -35,20 +35,16 @@
 * @augments Filter
 **/
 BoxBlurFilter = function( blurX, blurY, quality ) {
-  this.initialize( blurX, blurY, quality );
+  Filter.call(this);
+	if ( isNaN(blurX) || blurX < 0 ) blurX = 0;
+	this.blurX = blurX | 0;
+	if ( isNaN(blurY) || blurY < 0 ) blurY = 0;
+	this.blurY = blurY | 0;
+	if ( isNaN(quality) || quality < 1  ) quality = 1;
+	this.quality = quality | 0;
 }
-var p = BoxBlurFilter.prototype = new Filter();
-
-// constructor:
-	/** @ignore */
-	p.initialize = function( blurX, blurY, quality ) {
-		if ( isNaN(blurX) || blurX < 0 ) blurX = 0;
-		this.blurX = blurX | 0;
-		if ( isNaN(blurY) || blurY < 0 ) blurY = 0;
-		this.blurY = blurY | 0;
-		if ( isNaN(quality) || quality < 1  ) quality = 1;
-		this.quality = quality | 0;
-	}
+goog.inherits(BoxBlurFilter, Filter);
+var p = BoxBlurFilter.prototype;
 
 // public properties:
 

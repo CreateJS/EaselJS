@@ -45,9 +45,11 @@
 * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
 **/
 Shape = function(graphics) {
-  this.initialize(graphics);
+  DisplayObject.call(this, graphics);
+	this.graphics = graphics ? graphics : new Graphics();
 }
-var p = Shape.prototype = new DisplayObject();
+goog.inherits(Shape, DisplayObject);
+p = Shape.prototype;
 
 // public properties:
 	/**
@@ -57,25 +59,6 @@ var p = Shape.prototype = new DisplayObject();
 	**/
 	p.graphics = null;
 	
-// constructor:
-	/**
-	* @property DisplayObject_initialize
-	* @private
-	* @type Function
-	**/
-	p.DisplayObject_initialize = p.initialize;
-
-	/** 
-	* Initialization method.
-	* @method initialize
-	* param {Graphics} graphics
-	* @protected
-	**/
-	p.initialize = function(graphics) {
-		this.DisplayObject_initialize();
-		this.graphics = graphics ? graphics : new Graphics();
-	}
-
 	/**
 	* Returns true or false indicating whether the Shape would be visible if drawn to a canvas.
 	* This does not account for whether it would be visible within the boundaries of the stage.

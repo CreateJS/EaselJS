@@ -44,9 +44,11 @@
 * @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video to render to the display list.
 **/
 Bitmap = function(image) {
-  this.initialize(image);
+  DisplayObject.call(this);
+	this.image = image;
 }
-var p = Bitmap.prototype = new DisplayObject();
+goog.inherits(Bitmap, DisplayObject);
+var p = Bitmap.prototype;
 
 	// public properties:
 	/**
@@ -63,25 +65,6 @@ var p = Bitmap.prototype = new DisplayObject();
 	* @default true
 	**/
 	p.snapToPixel = true;
-	
-	// constructor:
-
-	/**
-	* @property DisplayObject_initialize
-	* @type Function
-    * @private
-	**/
-	p.DisplayObject_initialize = p.initialize;
-
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	*/
-	p.initialize = function(image) {
-		this.DisplayObject_initialize();
-		this.image = image;
-	}
 	
 // public methods:
 
