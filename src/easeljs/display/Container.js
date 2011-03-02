@@ -374,7 +374,7 @@ var p = Container.prototype = new DisplayObject();
 	/** 
 	* @method _getObjectsUnderPoint
 	* @param {Number} x
-	* @param {Number} x
+	* @param {Number} y
 	* @param {Array} arr
 	* @param {Number} mouseEvents A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress & 
 	* onClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
