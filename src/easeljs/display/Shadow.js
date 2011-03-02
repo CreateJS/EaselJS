@@ -46,7 +46,10 @@
 * @param {Number} blur The size of the blurring effect.
 **/
 Shadow = function(color, offsetX, offsetY, blur) {
-  this.initialize(color, offsetX, offsetY, blur);
+	this.color = color;
+	this.offsetX = offsetX;
+	this.offsetY = offsetY;
+	this.blur = blur;
 }
 var p = Shadow.prototype;
 	
@@ -88,23 +91,6 @@ var p = Shadow.prototype;
 	* @default 0
 	*/
 	p.blur = 0;
-	
-// constructor:
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	* @param {String} color The color of the shadow.
-	* @param {Number} offsetX The x offset of the shadow.
-	* @param {Number} offsetY The y offset of the shadow.
-	* @param {Number} blur The size of the blurring effect.
-	**/
-	p.initialize = function(color, offsetX, offsetY, blur) {
-		this.color = color;
-		this.offsetX = offsetX;
-		this.offsetY = offsetY;
-		this.blur = blur;
-	}
 	
 // public methods:
 	/**

@@ -54,7 +54,10 @@
 * @param {Object} frameData Defines named frames and frame sequences. See the frameData property for more information.
 **/
 SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
-  this.initialize(image, frameWidth, frameHeight, frameData);
+	this.image = image;
+	this.frameWidth = frameWidth;
+	this.frameHeight = frameHeight;
+	this.frameData = frameData;
 }
 var p = SpriteSheet.prototype;
 	
@@ -105,20 +108,6 @@ var p = SpriteSheet.prototype;
 	* @type Number
 	**/
 	p.totalFrames = 0;
-	
-// constructor:
-	/** 
-	* Initialization method.
-	* @method initialize
-	* param {Graphics} graphics
-	* @protected
-	**/
-	p.initialize = function(image, frameWidth, frameHeight, frameData) {
-		this.image = image;
-		this.frameWidth = frameWidth;
-		this.frameHeight = frameHeight;
-		this.frameData = frameData;
-	}
 	
 // public methods:
 	/**

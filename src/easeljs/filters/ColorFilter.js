@@ -42,9 +42,18 @@
 * @constructor
 **/
 ColorFilter = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
-  this.initialize(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset);
+  Filter.call(this);
+	this.redMultiplier = redMultiplier != null ? redMultiplier : 1;
+	this.greenMultiplier = greenMultiplier != null ? greenMultiplier : 1;
+	this.blueMultiplier = blueMultiplier != null ? blueMultiplier : 1;
+	this.alphaMultiplier = alphaMultiplier != null ? alphaMultiplier : 1;
+	this.redOffset = redOffset || 0;
+	this.greenOffset = greenOffset || 0;
+	this.blueOffset = blueOffset || 0;
+	this.alphaOffset = alphaOffset || 0;
 }
-var p = ColorFilter.prototype = new Filter();
+goog.inherits(ColorFilter, Filter);
+var p = ColorFilter.prototype;
 
 // public properties:
 	// TODO: doc.
@@ -56,24 +65,6 @@ var p = ColorFilter.prototype = new Filter();
 	p.greenOffset = 0;
 	p.blueOffset = 0;
 	p.alphaOffset = 0;
-	
-// constructor:
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	* @param 
-	**/
-	p.initialize = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
-		this.redMultiplier = redMultiplier != null ? redMultiplier : 1;
-		this.greenMultiplier = greenMultiplier != null ? greenMultiplier : 1;
-		this.blueMultiplier = blueMultiplier != null ? blueMultiplier : 1;
-		this.alphaMultiplier = alphaMultiplier != null ? alphaMultiplier : 1;
-		this.redOffset = redOffset || 0;
-		this.greenOffset = greenOffset || 0;
-		this.blueOffset = blueOffset || 0;
-		this.alphaOffset = alphaOffset || 0;
-	}
 	
 // public methods:
 	/**

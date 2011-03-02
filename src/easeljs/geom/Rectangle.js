@@ -46,7 +46,10 @@
 * @param {Number} height Height. Default is 0.
 **/
 Rectangle = function(x, y, width, height) {
-  this.initialize(x, y, width, height);
+	this.x = (x == null ? 0 : x);
+	this.y = (y == null ? 0 : y);
+	this.width = (width == null ? 0 : width);
+	this.height = (height == null ? 0 : height);
 }
 var p = Rectangle.prototype;
 	
@@ -78,19 +81,6 @@ var p = Rectangle.prototype;
 	* @type Number
 	**/
 	p.height = 0;
-	
-// constructor:
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	*/
-	p.initialize = function(x, y, width, height) {
-		this.x = (x == null ? 0 : x);
-		this.y = (y == null ? 0 : y);
-		this.width = (width == null ? 0 : width);
-		this.height = (height == null ? 0 : height);
-	}
 	
 // public methods:
 	/**

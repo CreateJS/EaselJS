@@ -51,11 +51,13 @@
 * is acceptable (ex. "#F00").
 **/
 DisplayText = function(text, font, color) {
-  this.initialize(text, font, color);
+  DisplayObject.call(this);
+	this.text = text;
+	this.font = font;
+	this.color = color ? color : "#000";
 }
-
-var p = DisplayText.prototype = new DisplayObject();
-
+goog.inherits(DisplayText, DisplayObject);
+var p = DisplayText.prototype;
 
 /**
 * @property _workingContext
@@ -134,26 +136,6 @@ DisplayText._workingContext = document.createElement("canvas").getContext("2d");
 	* @type Number
 	**/
 	p.lineWidth = null;
-	
-// constructor:
-	/**
-	* @property DisplayObject_initialize
-	* @private
-	* @type Function
-	**/
-	p.DisplayObject_initialize = p.initialize;
-	
-	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	*/
-	p.initialize = function(text, font, color) {
-		this.DisplayObject_initialize();
-		this.text = text;
-		this.font = font;
-		this.color = color ? color : "#000";
-	}
 	
 	/**
 	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.

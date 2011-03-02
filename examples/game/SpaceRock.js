@@ -2,10 +2,11 @@
 
 //
 function SpaceRock(size) {
-	this.initialize(size);
+  Shape.call(this);
+	
+	this.activate(size);
 }
-
-SpaceRock.prototype = new Shape();
+goog.inherits(SpaceRock, Shape);
 
 // static properties:
 	SpaceRock.LRG_ROCK = 40;
@@ -28,12 +29,6 @@ SpaceRock.prototype = new Shape();
 	
 // constructor:
 	SpaceRock.prototype.Shape_initialize = SpaceRock.prototype.initialize;	//unique to avoid overiding base class
-	
-	SpaceRock.prototype.initialize = function(size) {
-		this.Shape_initialize(); // super call
-		
-		this.activate(size);
-	}
 	
 // public methods:
 	//handle drawing a spaceRock

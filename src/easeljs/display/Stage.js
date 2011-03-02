@@ -45,9 +45,24 @@
 * @param {HTMLCanvasElement} canvas The canvas the stage will render to.
 **/
 Stage = function(canvas) {
-  this.initialize(canvas);
+  Container.call(this, canvas);
+	this.canvas = canvas;
+	this.mouseChildren = true;
+
+	var o = this;
+	if (window.addEventListener) {
+		window.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
+		window.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
+		window.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
+	} else if (document.addEventListener) {
+		document.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
+		document.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
+		document.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
+	}
+	canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
 }
-var p = Stage.prototype = new Container();
+goog.inherits(Stage, Container);
+var p = Stage.prototype;
 
 // static properties:
 	/**
@@ -180,38 +195,6 @@ var p = Stage.prototype = new Container();
 	* @type DisplayObject
 	**/
 	p._mouseOverTarget = null;
-	
-// constructor:
-	/**
-	* @property DisplayObject_initialize
-	* @type Function
-	* @private
-	**/
-	p.Container_initialize = p.initialize;
-	
-	/** 
-	* Initialization method.
-	* @method initialize
-	* param {HTMLCanvasElement} canvas
-	* @protected
-	**/
-	p.initialize = function(canvas) {
-		this.Container_initialize();
-		this.canvas = canvas;
-		this.mouseChildren = true;
-		
-		var o = this;
-		if (window.addEventListener) {
-			window.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
-			window.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
-			window.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
-		} else if (document.addEventListener) {
-			document.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
-			document.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
-			document.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
-		}
-		canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
-	}
 	
 // public methods:
 

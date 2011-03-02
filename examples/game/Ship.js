@@ -2,9 +2,21 @@
 
 //
 function Ship() {
-  this.initialize();
+  Container.call(this);
+	
+	this.shipFlame = new Shape();
+	this.shipBody = new Shape();
+	
+	this.addChild(this.shipFlame);
+	this.addChild(this.shipBody);
+	
+	this.makeShape();
+	this.timeout = 0;
+	this.thrust = 0;
+	this.vX = 0;
+	this.vY = 0;
 }
-Ship.prototype = new Container();
+goog.inherits(Ship, Container);
 
 // public properties:
 	Ship.TOGGLE = 60;
@@ -23,25 +35,6 @@ Ship.prototype = new Container();
 	
 	Ship.prototype.bounds = 0;
 	Ship.prototype.hit = 0;
-	
-// constructor:
-	Ship.prototype.Container_initialize = Ship.prototype.initialize;	//unique to avoid overiding base class
-	
-	Ship.prototype.initialize = function() {
-		this.Container_initialize();
-		
-		this.shipFlame = new Shape();
-		this.shipBody = new Shape();
-		
-		this.addChild(this.shipFlame);
-		this.addChild(this.shipBody);
-		
-		this.makeShape();
-		this.timeout = 0;
-		this.thrust = 0;
-		this.vX = 0;
-		this.vY = 0;
-	}
 	
 // public methods:
 	Ship.prototype.makeShape = function() {
