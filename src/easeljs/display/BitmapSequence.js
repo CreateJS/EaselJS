@@ -186,6 +186,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		var rows = image.height/frameHeight|0;
 		
 		if (this.currentEndFrame != null) {
+			// use sequencing.
 			if (this.currentFrame > this.currentEndFrame) {
 				if (this.nextSequence) {
 					this._goto(this.nextSequence);
@@ -195,10 +196,8 @@ var p = BitmapSequence.prototype = new DisplayObject();
 				}
 				if (this.callback) { this.callback(this); }
 			}
-		} else if (this.spriteSheet.frameData) {
-			// sequence data is set, but we haven't actually played a sequence yet:
-			this.paused = true;
 		} else {
+			// use simple mode.
 			var ttlFrames = this.spriteSheet.totalFrames || cols*rows;
 			if (this.currentFrame >= ttlFrames) {
 				if (this.spriteSheet.loop) { this.currentFrame = 0; }
@@ -222,6 +221,10 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @method tick
 	**/
 	p.tick = function() {
+		if (this.currentFrame == -1 && this.spriteSheet.frameData) {
+			// sequence data is set, but we haven't actually played a sequence yet:
+			this.paused = true;
+		}
 		if (this.paused) { return; }
 		this.currentFrame++;
 	}
