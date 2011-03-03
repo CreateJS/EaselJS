@@ -34,6 +34,8 @@
 * @module EaselJS
 **/
 
+goog.provide('EaselMouseEvent');
+
 (function(window) {
 
 /**

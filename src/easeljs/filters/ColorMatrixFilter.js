@@ -34,6 +34,10 @@
 * @module EaselJS
 **/
 
+goog.provide('ColorMatrixFilter');
+
+goog.require('Filter');
+
 (function(window) {
 
 /**

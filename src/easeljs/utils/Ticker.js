@@ -34,6 +34,7 @@
 * @module EaselJS
 **/
 
+goog.provide('Ticker');
 
 (function(window) {
 

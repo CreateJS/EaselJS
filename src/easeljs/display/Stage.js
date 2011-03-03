@@ -34,6 +34,10 @@
 * @module EaselJS
 **/
 
+goog.provide('Stage');
+
+goog.require('Container');
+
 (function(window) {
 
 /**

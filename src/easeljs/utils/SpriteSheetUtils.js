@@ -27,6 +27,9 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
+goog.provide('SpriteSheetUtils');
+
+goog.require('SpriteSheet');
 
 /**
 * The Easel Javascript library provides a retained graphics mode for canvas 

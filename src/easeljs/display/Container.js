@@ -34,6 +34,10 @@
 * @module EaselJS
 **/
 
+goog.provide('Container');
+
+goog.require('DisplayObject');
+
 (function(window) {
 
 /**

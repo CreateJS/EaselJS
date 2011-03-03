@@ -34,6 +34,10 @@
 * @module EaselJS
 **/
 
+goog.provide('ColorFilter');
+
+goog.require('Filter');
+
 (function(window) {
 
 /**

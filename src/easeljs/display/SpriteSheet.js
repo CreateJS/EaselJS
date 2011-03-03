@@ -34,6 +34,8 @@
 * @module EaselJS
 **/
 
+goog.provide('SpriteSheet');
+
 (function(window) {
 
 /**

@@ -34,6 +34,8 @@
 * @module EaselJS
 **/
 
+goog.provide('Matrix2D');
+
 (function(window) {
 
 /**
