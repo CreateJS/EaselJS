@@ -1,5 +1,5 @@
 /*
-* MouseEvent by Grant Skinner. Dec 5, 2010
+* EaselMouseEvent by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
 *
@@ -41,16 +41,16 @@
 * DisplayObject instances.
 * By default, mouse events are disabled for performance reasons. In order to enabled them for a specified stage
 * set mouseEventsEnabled to true on your stage instance.
-* @class MouseEvent
+* @class EaselMouseEvent
 * @constructor
 * @param {String} type The event type.
 * @param {Number} stageX The mouseX position relative to the stage.
 * @param {Number} stageY The mouseY position relative to the stage.
 **/
-MouseEvent = function(type, stageX, stageY) {
+EaselMouseEvent = function(type, stageX, stageY) {
   this.initialize(type, stageX, stageY);
 }
-var p = MouseEvent.prototype;
+var p = EaselMouseEvent.prototype;
 	
 // public properties:
 
@@ -91,7 +91,7 @@ var p = MouseEvent.prototype;
 	* property. This handler will be called every time the mouse is moved until the mouse is released. 
 	* This is useful for operations such as drag and drop.
 	* @event onMouseMove
-	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
+	* @param {EaselMouseEvent} event A EaselMouseEvent instance with information about the current mouse event.
 	**/
 	p.onMouseMove = null;
 	
@@ -100,7 +100,7 @@ var p = MouseEvent.prototype;
 	* property. This handler will be called every time the mouse is moved until the mouse is released. 
 	* This is useful for operations such as drag and drop.
 	* @event onMouseUp
-	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
+	* @param {EaselMouseEvent} event A EaselMouseEvent instance with information about the current mouse event.
 	*/
 	p.onMouseUp = null;
 	
@@ -118,12 +118,12 @@ var p = MouseEvent.prototype;
 	
 // public methods:
 	/**
-	* Returns a clone of the MouseEvent instance.
+	* Returns a clone of the EaselMouseEvent instance.
 	* @method clone
-	* @return {MouseEvent} a clone of the MouseEvent instance.
+	* @return {EaselMouseEvent} a clone of the EaselMouseEvent instance.
 	**/
 	p.clone = function() {
-		var out = new MouseEvent(this.type, this.stageX, this.stageY);
+		var out = new EaselMouseEvent(this.type, this.stageX, this.stageY);
 		out.nativeEvent = this.nativeEvent;
 		return out;
 	}
@@ -134,8 +134,8 @@ var p = MouseEvent.prototype;
 	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {
-		return "[MouseEvent (type="+this.type+" stageX="+this.stageX+" stageY="+this.stageY+")]";
+		return "[EaselMouseEvent (type="+this.type+" stageX="+this.stageX+" stageY="+this.stageY+")]";
 	}
 	
-window.MouseEvent = MouseEvent;
+window.EaselMouseEvent = EaselMouseEvent;
 }(window));

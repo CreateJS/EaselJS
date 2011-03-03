@@ -9,7 +9,7 @@
 <!-- Import EaselJS Framework -->
 <script src="../src/easeljs/utils/UID.js"></script>
 <script src="../src/easeljs/geom/Matrix2D.js"></script>
-<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/events/EaselMouseEvent.js"></script>
 <script src="../src/easeljs/display/SpriteSheet.js"></script>
 <script src="../src/easeljs/display/Shadow.js"></script>
 <script src="../src/easeljs/display/DisplayObject.js"></script>
@@ -18,7 +18,7 @@
 <script src="../src/easeljs/display/Bitmap.js"></script>
 <script src="../src/easeljs/display/BitmapSequence.js"></script>
 <script src="../src/easeljs/display/Shape.js"></script>
-<script src="../src/easeljs/display/Text.js"></script>
+<script src="../src/easeljs/display/DisplayText.js"></script>
 <script src="../src/easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
 
@@ -54,7 +54,7 @@ function handleImageLoad() {
 	bmpSeq.regY = bmpSeq.frameHeight/2|0;
 	
 	// add a text object to output the current FPS:
-	fpsLabel = new Text("-- fps","bold 14px Arial","#FFF");
+	fpsLabel = new DisplayText("-- fps","bold 14px Arial","#FFF");
 	stage.addChild(fpsLabel);
 	fpsLabel.x = 10;
 	fpsLabel.y = 20;
@@ -137,7 +137,7 @@ function addSparkles(count, x, y, speed) {
 	
 <body onload="init();">
 	<div class="description">
-	Example showing how to use simple animated <strong>BitmapSequence</strong> elements. Move your mouse and click on the canvas. It also demonstrates displaying the current measured framerate with <strong>Ticker.getMeasuredFramerate()</strong> and <strong>Text</strong>. Click repeatedly to generate lots of sparkles and slow down the framerate.<br/>
+	Example showing how to use simple animated <strong>BitmapSequence</strong> elements. Move your mouse and click on the canvas. It also demonstrates displaying the current measured framerate with <strong>Ticker.getMeasuredFramerate()</strong> and <strong>DisplayText</strong>. Click repeatedly to generate lots of sparkles and slow down the framerate.<br/>
 	</div>
 	<div class="canvasHolder">
 		<canvas id="testCanvas" width="980" height="680" style="background:#000000"></canvas>

@@ -9,13 +9,13 @@
 <!-- Import EaselJS Framework -->
 <script src="../src/easeljs/utils/UID.js"></script>
 <script src="../src/easeljs/geom/Matrix2D.js"></script>
-<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/events/EaselMouseEvent.js"></script>
 <script src="../src/easeljs/display/SpriteSheet.js"></script>
 <script src="../src/easeljs/display/Shadow.js"></script>
 <script src="../src/easeljs/display/DisplayObject.js"></script>
 <script src="../src/easeljs/display/Container.js"></script>
 <script src="../src/easeljs/display/Stage.js"></script>
-<script src="../src/easeljs/display/Text.js"></script>
+<script src="../src/easeljs/display/DisplayText.js"></script>
 <script src="../src/easeljs/display/Graphics.js"></script>
 <script src="../src/easeljs/display/Shape.js"></script>
 <script src="../src/easeljs/utils/Ticker.js"></script>
@@ -53,7 +53,7 @@ function init() {
 	}
 	
 	// add a text object to output the current FPS:
-	fpsLabel = new Text("-- fps","bold 18px Arial","#FFF");
+	fpsLabel = new DisplayText("-- fps","bold 18px Arial","#FFF");
 	stage.addChild(fpsLabel);
 	fpsLabel.x = 10;
 	fpsLabel.y = 20;

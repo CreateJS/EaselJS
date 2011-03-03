@@ -9,7 +9,7 @@
 <!-- Import EaselJS Framework -->
 <script src="../src/easeljs/utils/UID.js"></script>
 <script src="../src/easeljs/geom/Matrix2D.js"></script>
-<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/events/EaselMouseEvent.js"></script>
 <script src="../src/easeljs/display/SpriteSheet.js"></script>
 <script src="../src/easeljs/display/Shadow.js"></script>
 <script src="../src/easeljs/display/DisplayObject.js"></script>
@@ -19,7 +19,7 @@
 <script src="../src/easeljs/display/BitmapSequence.js"></script>
 <script src="../src/easeljs/display/Graphics.js"></script>
 <script src="../src/easeljs/display/Shape.js"></script>
-<script src="../src/easeljs/display/Text.js"></script>
+<script src="../src/easeljs/display/DisplayText.js"></script>
 <script src="../src/easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
 
@@ -76,7 +76,7 @@ function init() {
 	}
 	
 	// add the graph title:
-	label = new Text("Bar Graph Example", "bold 30px Arial", "#FFF");
+	label = new DisplayText("Bar Graph Example", "bold 30px Arial", "#FFF");
 	label.textAlign = "center";
 	label.x = canvas.width/2;
 	label.y = 50;
@@ -120,7 +120,7 @@ function init() {
 		right.x = barWidth-0.5;
 		
 		// create the label at the bottom of the bar:
-		var label = new Text("Label "+i, "16px Arial", "#FFF");
+		var label = new DisplayText("Label "+i, "16px Arial", "#FFF");
 		label.textAlign = "center";
 		label.x = barWidth/2;
 		label.maxWidth = barWidth;
@@ -133,7 +133,7 @@ function init() {
 			.drawRoundRectComplex(0,1,barWidth,38,0,0,10,10);
 		
 		// create the value label that will be populated and positioned by drawBar:
-		var value = new Text("foo","bold 14px Arial","#000");
+		var value = new DisplayText("foo","bold 14px Arial","#000");
 		value.textAlign = "center";
 		value.x = barWidth/2;
 		value.alpha = 0.45;
@@ -205,7 +205,7 @@ function drawBar(bar, value) {
 	
 <body onload="init();">
 	<div class="description">
-		Reload for new random data. Example of using the <strong>Graphics</strong>, <strong>Shape</strong>, <strong>Text</strong> and <strong>Container</strong> classes to draw a simple vector bar graph.
+		Reload for new random data. Example of using the <strong>Graphics</strong>, <strong>Shape</strong>, <strong>DisplayText</strong> and <strong>Container</strong> classes to draw a simple vector bar graph.
     </div>
     <div class="canvasHolder">
 		<canvas id="testCanvas" width="980" height="580"></canvas>

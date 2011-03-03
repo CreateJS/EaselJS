@@ -11,13 +11,13 @@
 <script src="../../src/easeljs/display/SpriteSheet.js"></script>
 <script src="../../src/easeljs/display/Shadow.js"></script>
 <script src="../../src/easeljs/geom/Matrix2D.js"></script>
-<script src="../../src/easeljs/events/MouseEvent.js"></script>
+<script src="../../src/easeljs/events/EaselMouseEvent.js"></script>
 <script src="../../src/easeljs/display/DisplayObject.js"></script>
 <script src="../../src/easeljs/display/Container.js"></script>
 <script src="../../src/easeljs/display/Stage.js"></script>
 <script src="../../src/easeljs/display/Graphics.js"></script>
 <script src="../../src/easeljs/display/Shape.js"></script>
-<script src="../../src/easeljs/display/Text.js"></script>
+<script src="../../src/easeljs/display/DisplayText.js"></script>
 <script src="../../src/easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
 
@@ -73,12 +73,12 @@ function init() {
 	canvas = document.getElementById("testCanvas");
 	stage = new Stage(canvas);
 	
-	scoreField = new Text("0", "bold 12px Arial", "#FFFFFF");
+	scoreField = new DisplayText("0", "bold 12px Arial", "#FFFFFF");
 	scoreField.textAlign = "right";
 	scoreField.x = canvas.width - 10;
 	scoreField.y = 22;
 	
-	messageField = new Text("Welcome:  Click to play", "bold 24px Arial", "#FFFFFF");
+	messageField = new DisplayText("Welcome:  Click to play", "bold 24px Arial", "#FFFFFF");
 	messageField.textAlign = "center";
 	messageField.x = canvas.width / 2;
 	messageField.y = canvas.height / 2;
@@ -391,7 +391,7 @@ function addScore(value) {
 	
 <body onload="init();">
 	<div class="description">
-	Demo showing a simple game using vector <strong>Shapes</strong>, <strong>Text</strong> and a <strong>Container</strong>. It also demonstrates extending <strong>Shape</Strong> to create custom display objects. Arrow keys to steer, space to shoot.<br/>
+	Demo showing a simple game using vector <strong>Shapes</strong>, <strong>DisplayText</strong> and a <strong>Container</strong>. It also demonstrates extending <strong>Shape</Strong> to create custom display objects. Arrow keys to steer, space to shoot.<br/>
 	</div>
 	<div class="canvasHolder" style="background-color:#000000; height:600px; position:relative; float:left;">
 		<canvas style="position:absolute; float:left" id="testCanvas" width="980px" height="600px"></canvas>
