@@ -16,8 +16,8 @@ function init() {
 	// create a stage object to work with the canvas. This is the top level node in the display list:
 	var stage = new Stage(canvas);
 	
-	// Create a new Text object:
-	var text = new Text("Hello World!", "36px Arial", "#FFF");
+	// Create a new DisplayText object:
+	var text = new DisplayText("Hello World!", "36px Arial", "#FFF");
 	
 	// add the text as a child of the stage. This means it will be drawn any time the stage is updated
 	// and that it's transformations will be relative to the stage coordinates:
@@ -35,7 +35,7 @@ function init() {
 	
 <body onload="init();">
 	<div class="description">
-		Hello World example using <strong>Text</strong> and <strong>Stage</strong>.
+		Hello World example using <strong>DisplayText</strong> and <strong>Stage</strong>.
 	</div>
 	<div class="canvasHolder">
 		<canvas id="testCanvas" width="980" height="580"></canvas>

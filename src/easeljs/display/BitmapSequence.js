@@ -302,7 +302,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	
 	/** 
 	* @method cloneProps
-	* @param {Text} o
+	* @param {DisplayText} o
 	* @protected
 	**/
 	p.cloneProps = function(o) {
