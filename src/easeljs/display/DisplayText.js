@@ -1,5 +1,5 @@
 /*
-* Text by Grant Skinner. Dec 5, 2010
+* DisplayText by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
 *
@@ -39,9 +39,9 @@
 /**
 * Allows you to display one or more lines of dynamic text (not user editable) in the display list.
 * Line wrapping support (using the lineWidth is very basic, wrapping on spaces and tabs only. Note
-* that as an alternative to Text, you can position HTML text above or below the canvas relative to 
+* that as an alternative to DisplayText, you can position HTML text above or below the canvas relative to 
 * items in the display list using the localToGlobal() method.
-* @class Text
+* @class DisplayText
 * @extends DisplayObject
 * @constructor
 * @param {String} text Optional. The text to display.
@@ -50,11 +50,11 @@
 * @param {String} color Optional. The color to draw the text in. Any valid value for the CSS color attribute
 * is acceptable (ex. "#F00").
 **/
-Text = function(text, font, color) {
+DisplayText = function(text, font, color) {
   this.initialize(text, font, color);
 }
 
-var p = Text.prototype = new DisplayObject();
+var p = DisplayText.prototype = new DisplayObject();
 
 
 /**
@@ -62,7 +62,7 @@ var p = Text.prototype = new DisplayObject();
 * @type CanvasRenderingContext2D
 * @private 
 **/
-Text._workingContext = document.createElement("canvas").getContext("2d");
+DisplayText._workingContext = document.createElement("canvas").getContext("2d");
 
 // public properties:
 	/**
@@ -175,7 +175,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	p.DisplayObject_draw = p.draw;
 	
 	/**
-	* Draws the Text into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Draws the DisplayText into the specified context ignoring it's visible, alpha, shadow, and transform.
 	* Returns true if the draw was handled (useful for overriding functionality).
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @method draw
@@ -249,7 +249,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	* @return {Point} a clone of the Point instance.
 	**/
 	p.clone = function() {
-		var o = new Text(this.text, this.font, this.color);
+		var o = new DisplayText(this.text, this.font, this.color);
 		this.cloneProps(o);
 		return o;
 	}
@@ -260,7 +260,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {
-		return "[Text (text="+  (this.text.length > 20 ? this.text.substr(0, 17)+"..." : this.text) +")]";
+		return "[DisplayText (text="+  (this.text.length > 20 ? this.text.substr(0, 17)+"..." : this.text) +")]";
 	}
 	
 // private methods:
@@ -274,7 +274,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 
 	/** 
 	 * @method cloneProps
-	 * @param {Text} o
+	 * @param {DisplayText} o
 	 * @protected 
 	 **/
 	p.cloneProps = function(o) {
@@ -292,7 +292,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	 * @protected 
 	 **/
 	p._getWorkingContext = function() {
-		var ctx = Text._workingContext;
+		var ctx = DisplayText._workingContext;
 		ctx.font = this.font;
 		ctx.textAlign = this.textAlign ? this.textAlign : "start";
 		ctx.textBaseline = this.textBaseline ? this.textBaseline : "alphabetic";
@@ -302,7 +302,7 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 	/** 
 	 * @method _drawTextLine
 	 * @param {CanvasRenderingContext2D} ctx
-	 * @param {Text} text
+	 * @param {DisplayText} text
 	 * @param {Number} y
 	 * @protected 
 	 **/
@@ -311,5 +311,5 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 		else { ctx.fillText(text, 0, y, this.maxWidth); }
 	}
 
-window.Text = Text;
+window.DisplayText = DisplayText;
 }(window));
