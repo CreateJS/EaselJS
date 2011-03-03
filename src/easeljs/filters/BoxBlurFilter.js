@@ -27,6 +27,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 **/
 
+goog.provide('BoxBlurFilter');
+
+goog.require('Filter');
+
 (function(window) {
 
 /**

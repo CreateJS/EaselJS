@@ -7,8 +7,12 @@
 <link href="styles.css" rel="stylesheet" type="text/css" />
 
 
-<script src="../lib/easel.js"></script>
+<script src="../src/easeljs/base.js"></script>
+<script src="../src/easeljs/deps.js"></script>
 <script>
+goog.require('Stage');
+goog.require('DisplayText');
+
 function init() {
 	// get a reference to the canvas we'll be working with:
 	var canvas = document.getElementById("testCanvas");

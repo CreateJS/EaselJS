@@ -34,6 +34,11 @@
 * @module EaselJS
 **/
 
+goog.provide('Shape');
+
+goog.require('DisplayObject');
+goog.require('Graphics');
+
 (function(window) {
 
 /**

@@ -8,24 +8,16 @@
 
 <!-- Import EaselJS Framework -->
 <script src="../../src/easeljs/base.js"></script>
-<script src="../../src/easeljs/utils/UID.js"></script>
-<script src="../../src/easeljs/display/SpriteSheet.js"></script>
-<script src="../../src/easeljs/display/Shadow.js"></script>
-<script src="../../src/easeljs/geom/Matrix2D.js"></script>
-<script src="../../src/easeljs/events/EaselMouseEvent.js"></script>
-<script src="../../src/easeljs/display/DisplayObject.js"></script>
-<script src="../../src/easeljs/display/Container.js"></script>
-<script src="../../src/easeljs/display/Stage.js"></script>
-<script src="../../src/easeljs/display/Graphics.js"></script>
-<script src="../../src/easeljs/display/Shape.js"></script>
-<script src="../../src/easeljs/display/DisplayText.js"></script>
-<script src="../../src/easeljs/utils/Ticker.js"></script>
+<script src="deps.js"></script>
 <!-- End EaselJS Imports -->
 
 <!-- Game script below -->
-<script src="SpaceRock.js"></script>
-<script src="Ship.js"></script>
 <script>
+goog.require('DisplayText');
+goog.require('Ticker');
+goog.require('Ship');
+goog.require('SpaceRock');
+goog.require('Stage');
 
 var DIFFICULTY = 2;			//how fast the game gets mor difficult
 var ROCK_TIME = 110;		//aprox tick count untill a new asteroid gets introduced

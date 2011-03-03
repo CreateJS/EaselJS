@@ -1,3 +1,8 @@
+goog.provide('Ship');
+
+goog.require('Container');
+goog.require('Shape');
+
 (function(window) {
 
 //

@@ -1,3 +1,8 @@
+goog.provide('SpaceRock');
+
+goog.require('Shape');
+goog.require('Container');
+
 (function(window) {
 
 //

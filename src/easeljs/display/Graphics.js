@@ -34,6 +34,8 @@
 * @module EaselJS
 **/
 
+goog.provide('Graphics');
+
 (function(window) {
 
 // used to create the instruction lists used in Graphics:

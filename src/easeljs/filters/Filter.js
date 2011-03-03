@@ -34,6 +34,8 @@
 * @module EaselJS
 **/
 
+goog.provide('Filter');
+
 (function(window) {
 
 /**

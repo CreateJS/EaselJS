@@ -34,6 +34,12 @@
 * @module EaselJS
 **/
 
+goog.provide('DisplayObject');
+
+goog.require('Matrix2D');
+goog.require('UID');
+goog.require('EaselMouseEvent');
+
 (function(window) {
 
 /**

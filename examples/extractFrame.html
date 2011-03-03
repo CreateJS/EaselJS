@@ -8,11 +8,12 @@
 
 <!-- Import EaselJS Framework -->
 <script src="../src/easeljs/base.js"></script>
-<script src="../src/easeljs/display/SpriteSheet.js"></script>
-<script src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
+<script src="../src/easeljs/deps.js"></script>
 <!-- End EaselJS Imports -->
 
 <script>
+goog.require('SpriteSheetUtils');
+
 var imgSeq = new Image();		//bmp of the sprite sheet
 var results;					//frame data to be displayed
 

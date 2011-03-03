@@ -34,6 +34,10 @@
 * @module EaselJS
 **/
 
+goog.provide('DisplayText');
+
+goog.require('DisplayObject');
+
 (function(window) {
 	
 /**

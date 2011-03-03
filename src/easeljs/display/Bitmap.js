@@ -34,6 +34,10 @@
 * @module EaselJS
 **/
 
+goog.provide('Bitmap');
+
+goog.require('DisplayObject');
+
 (function(window) {
 
 /**
