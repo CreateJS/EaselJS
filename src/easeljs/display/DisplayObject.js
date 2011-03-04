@@ -532,6 +532,32 @@ DisplayObject._workingMatrix = new Matrix2D();
 	}
 
 	/**
+	* Shortcut method to quickly set the transform properties on the display object. All parameters are optional.
+	* Omitted parameters will have the default value set (ex. 0 for x/y, 1 for scaleX/Y).
+	* @method setTransform
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} scaleX
+	* @param {Number} scaleY
+	* @param {Number} rotation
+	* @param {Number} skewX
+	* @param {Number} skewY
+	* @param {Number} regX
+	* @param {Number} regY
+	*/
+	p.setTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+		this.x = x || 0;
+		this.y = y || 0;
+		this.scaleX = scaleX == null ? 1 : scaleX;
+		this.scaleY = scaleY == null ? 1 : scaleY;
+		this.rotation = rotation || 0;
+		this.skewX = skewX || 0;
+		this.skewY = skewY || 0;
+		this.regX = regX || 0;
+		this.regY = regY || 0;
+	}
+
+	/**
 	* Generates a concatenated Matrix2D object representing the combined transform of
 	* the display object and all of its parent Containers up to the highest level ancestor
 	* (usually the stage). This can be used to transform positions between coordinate spaces,
