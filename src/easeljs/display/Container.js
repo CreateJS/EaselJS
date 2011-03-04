@@ -377,7 +377,7 @@ var p = Container.prototype = new DisplayObject();
 	* @param {Number} y
 	* @param {Array} arr
 	* @param {Number} mouseEvents A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress & 
-	* onClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
+	* onClick & onDoubleClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
 	* @return {Array[DisplayObject]}
 	* @protected
 	**/
@@ -385,7 +385,7 @@ var p = Container.prototype = new DisplayObject();
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;
 		var mtx = DisplayObject._workingMatrix;
-		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick)) || (mouseEvents&2 && 
+		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick || this.onDoubleClick)) || (mouseEvents&2 && 
 																(this.onMouseOver || this.onMouseOut));
 
 		// if we have a cache handy, we can use it to do a quick check:
@@ -419,7 +419,7 @@ var p = Container.prototype = new DisplayObject();
 					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.onPress || child.onClick)) || 
+			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.onPress || child.onClick || child.onDoubleClick)) || 
 														(mouseEvents&2 && (child.onMouseOver || child.onMouseOut))) {
 				child.getConcatenatedMatrix(mtx);
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);

@@ -270,6 +270,15 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* @param {MouseEvent} event MouseEvent with information about the event.
 	**/
 	p.onClick = null;
+
+	/**
+	* The onDoubleClick callback is called when the user double clicks over this display object. The handler is
+	* passed a single param containing the corresponding MouseEvent instance. If an onDoubleClick handler is set
+	* on a container, it will receive the event if any of its children are clicked.
+	* @event onDoubleClick
+	* @param {MouseEvent} event MouseEvent with information about the event.
+	**/
+	p.onDoubleClick = null;
 	
 	/**
 	* The onMouseOver callback is called when the user rolls over the display object. You must enable this event using 

@@ -204,9 +204,11 @@ var p = Stage.prototype = new Container();
 		if (window.addEventListener) {
 			window.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
 			window.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
+			window.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
 		} else if (document.addEventListener) {
 			document.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
 			document.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
+			document.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
 		}
 		canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
 	}
@@ -440,6 +442,21 @@ var p = Stage.prototype = new Container();
 				target.onMouseOver(new MouseEvent("onMouseOut", this.mouseX, this.mouseY));
 			}
 			this._mouseOverTarget = target;
+		}
+	}
+
+	/**
+	* @method _handleDoubleClick
+	* @protected
+	* @param {MouseEvent} e
+	**/
+	p._handleDoubleClick = function(e) {
+		if (this.onDoubleClick) { this.onDoubleClick(new MouseEvent("onDoubleClick", this.mouseX, this.mouseY)); }
+		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
+		if (target) {
+			if (target.onDoubleClick instanceof Function) {
+				target.onDoubleClick(new MouseEvent("onPress", this.mouseX, this.mouseY));
+			}
 		}
 	}
 
