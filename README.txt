@@ -2,9 +2,13 @@ EASEL JS LIBRARY:
 
 Easel is a library to make working with the Canvas element easier. It provides a display list to allow you to work with display elements on a canvas as nested objects. It also provides a simple framework for providing shape based mouse interactions on elements in the display list. This is useful for games, generative art, and other highly graphical experiences.
 
-It was built by gskinner.com, and is released for free under the MIT license, which means you can use it for almost any purpose (including commercial projects). We appreciate credit where possible, but it is not a requirement.
-
 The latest version of Easel can be found at http://easeljs.com/
+
+There is a Google Group for discussions and support at http://groups.google.com/group/easeljs
+
+There is a GitHub repository, which includes issue tracking and a wiki at https://github.com/gskinner/EaselJS
+
+It was built by gskinner.com, and is released for free under the MIT license, which means you can use it for almost any purpose (including commercial projects). We appreciate credit where possible, but it is not a requirement.
 
 Easel is currently in alpha. We will be making significant improvements to the library, samples, and documentation over the coming weeks. Please be aware that this may necessitate changes to the existing API.
 
