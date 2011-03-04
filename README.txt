@@ -1,22 +1,22 @@
-EASEL JS LIBRARY:
+EASELJS LIBRARY:
 
-Easel is a library to make working with the Canvas element easier. It provides a display list to allow you to work with display elements on a canvas as nested objects. It also provides a simple framework for providing shape based mouse interactions on elements in the display list. This is useful for games, generative art, and other highly graphical experiences.
+EaselJS is a library to make working with the Canvas element easier. It provides a display list to allow you to work with display elements on a canvas as nested objects. It also provides a simple framework for providing shape based mouse interactions on elements in the display list. This is useful for games, generative art, and other highly graphical experiences.
 
-The latest version of Easel can be found at http://easeljs.com/
+The home page for EaselJS can be found at http://easeljs.com/
 
 There is a Google Group for discussions and support at http://groups.google.com/group/easeljs
 
-There is a GitHub repository, which includes issue tracking and a wiki at https://github.com/gskinner/EaselJS
+There is a GitHub repository, which includes downloads, issue tracking, & a wiki at https://github.com/gskinner/EaselJS
 
 It was built by gskinner.com, and is released for free under the MIT license, which means you can use it for almost any purpose (including commercial projects). We appreciate credit where possible, but it is not a requirement.
 
-Easel is currently in alpha. We will be making significant improvements to the library, samples, and documentation over the coming weeks. Please be aware that this may necessitate changes to the existing API.
+EaselJS is currently in alpha. We will be making significant improvements to the library, samples, and documentation over the coming weeks. Please be aware that this may necessitate changes to the existing API.
 
 
 The API is inspired by Flash's display list, and should be easy to pick up for both JS and AS3 developers. The key classes are:
 
 DisplayObject
-Abstract base class for all display elements in Easel. Exposes all of the display properties (ex. x, y, rotation, scaleX, scaleY, alpha, shadow, etc) that are common to all display objects.
+Abstract base class for all display elements in EaselJS. Exposes all of the display properties (ex. x, y, rotation, scaleX, scaleY, skewX, skewY, alpha, shadow, etc) that are common to all display objects.
 
 Stage
 The root level display container for display elements. Each time tick() is called on Stage, it will update and render the display list to its associated canvas.
@@ -56,9 +56,6 @@ Contains utility methods for extending existing sprite sheets with flipped frame
 
 SpriteSheet
 Encapsulates all the data associated with a sprite sheet to be used with BitmapSequence.
-
-CoordTransform
-Contains methods for transforming positions between different coordinate spaces.
 
 Matrix2D
 Represents a 3x3 affine transformation matrix. Used internally for calculating concatenated transformations.
