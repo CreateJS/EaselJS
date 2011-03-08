@@ -94,7 +94,10 @@ var p = Shadow.prototype;
 	* Initialization method.
 	* @method initialize
 	* @protected
-	* @param {Array[Command]} instructions
+	* @param {String} color The color of the shadow.
+	* @param {Number} offsetX The x offset of the shadow.
+	* @param {Number} offsetY The y offset of the shadow.
+	* @param {Number} blur The size of the blurring effect.
 	**/
 	p.initialize = function(color, offsetX, offsetY, blur) {
 		this.color = color;

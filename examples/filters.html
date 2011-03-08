@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Displaying icons using BitmapSequence and SpriteSheet</title>
+
+<link href="styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
+<script src="../src/easeljs/display/Graphics.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/display/Shape.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<script src="../src/easeljs/filters/Filter.js"></script>
+<script src="../src/easeljs/filters/ColorFilter.js"></script>
+<script src="../src/easeljs/filters/BoxBlurFilter.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+
+function init() {
+	//find canvas and load images, wait for last image to load
+	var canvas = document.getElementById("testCanvas");
+	
+	// create a new stage and point it at our canvas:
+	stage = new Stage(canvas);
+
+	var blurFilter = new BoxBlurFilter(16, 8, 2);
+	var margins = blurFilter.getMargins();
+	
+	var shape = new Shape();
+	shape.graphics.beginStroke("#FFFFFF").beginFill("#888").drawRect(0,0,100,100);
+	shape.x = shape.y = 50;
+	shape.filters = [new ColorFilter(0,1,1,1,0,0,0,0),blurFilter];
+	shape.cache(-margins.left,-margins.top,100+margins.right+margins.left,100+margins.bottom+margins.top);
+	stage.addChild(shape);
+	
+	
+	
+	// we want to do some work before we update the canvas,
+	// otherwise we could use Ticker.addListener(stage);
+	stage.update();
+}
+
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+	Demonstrates using filters.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580"></canvas>
+	</div>
+</body>
+</html>

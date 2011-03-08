@@ -295,6 +295,15 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* @param {MouseEvent} event MouseEvent with information about the event.
 	**/
 	p.onMouseOut = null;
+
+	/**
+	* An array of Filter objects to apply to this display object. Filters are only applied / updated when cache() or
+	* updateCache() is called on the display object, and only apply to the area that is cached.
+	* @property filters
+	* @type Array[Filter]
+	* @default null
+	**/
+	p.filters = null;
 	
 // private properties:
 
@@ -369,6 +378,12 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* @default 1
 	**/
 	p._revertAlpha = 1;
+
+	// TODO: Doc.
+	p._minX = NaN;
+	p._minY = NaN;
+	p._maxX = NaN;
+	p._maxY = NaN;
 	
 // constructor:
 	// separated so it can be easily addressed in subclasses:
@@ -436,11 +451,11 @@ DisplayObject._workingMatrix = new Matrix2D();
 		this.cacheCanvas.width = width;
 		this.cacheCanvas.height = height;
 		ctx.setTransform(1, 0, 0, 1, -x, -y);
-		ctx.clearRect(0, 0, width+1, height+1); // because some browsers don't correctly clear if the width/height 
-												//remain the same.
+		ctx.clearRect(0, 0, width+1, height+1); // because some browsers don't clear if the width/height remain the same.
 		this.draw(ctx, true);
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
+		this._applyFilters();
 	}
 
 	/**
@@ -460,6 +475,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		else { ctx.globalCompositeOperation = compositeOperation; }
 		this.draw(ctx, true);
 		if (compositeOperation) { ctx.globalCompositeOperation = "source-over"; }
+		this._applyFilters();
 	}
 	
 	/**
@@ -613,6 +629,11 @@ DisplayObject._workingMatrix = new Matrix2D();
 		canvas.width = 1;
 		return hit;
 	}
+
+	// TODO: Doc.
+	p.getBounds = function() {
+		return isNaN(this._minX) ? null : new Rectangle(this._minX, this._minY, this._maxX-this._minX, this._maxY-this._minY);
+	}
 	
 	/**
 	* Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are 
@@ -692,6 +713,31 @@ DisplayObject._workingMatrix = new Matrix2D();
 			}
 		}
 		return hit;
+	}
+
+	// TODO: Doc.
+	p._extendBounds = function(x, y) {
+		if (isNaN(this._minX)) {
+			this._minX = this._maxX = x;
+			this._minY = this._maxY = y;
+		} else {
+			if (x < this._minX) { this._minX = x; }
+			else if (x > this._maxX) { this._maxX = x; }
+			if (y < this._minY) { this._minY = y; }
+			else if (y > this._maxY) { this._maxY = y; }
+		}
+	}
+
+	// TODO: Doc.
+	p._applyFilters = function() {
+		if (!this.filters || this.filters.length == 0 || !this.cacheCanvas) { return; }
+		var l = this.filters.length;
+		var ctx = this.cacheCanvas.getContext("2d");
+		var w = this.cacheCanvas.width;
+		var h = this.cacheCanvas.height;
+		for (var i=0; i<l; i++) {
+			this.filters[i].applyFilter(ctx, 0, 0, w, h);
+		}
 	}
 
 window.DisplayObject = DisplayObject;

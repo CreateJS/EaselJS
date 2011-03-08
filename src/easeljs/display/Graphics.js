@@ -242,6 +242,15 @@ var p = Graphics.prototype;
 	* @default false
 	**/
 	p._dirty = false;
+
+	// TODO: Doc & update clone.
+	p._minX = NaN;
+	p._minY = NaN;
+	p._maxX = NaN;
+	p._maxY = NaN;
+	p._boundsQueue = null; // defers expensive bounds operations until getBounds is called.
+	p._x = 0; // current "pen" location
+	p._y = 0; // TODO: implement in all methods.
 	
 	/** 
 	* Initialization method.
@@ -270,6 +279,12 @@ var p = Graphics.prototype;
 		for (var i=0, l=instr.length; i<l; i++) {
 			instr[i].exec(ctx);
 		}
+	}
+
+	// TODO: Doc.
+	p.getBounds = function() {
+		if (this._boundsQueue.length) { this._updateBounds(); }
+		return isNaN(this._minX) ? null : new Rectangle(this._minX, this._minY, this._maxX-this._minX, this._maxY-this._minY);
 	}
 	
 // public methods that map directly to context 2D calls:
@@ -374,6 +389,7 @@ var p = Graphics.prototype;
 	p.bezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(new Command(this._ctx.bezierCurveTo, [cp1x, cp1y, cp2x, cp2y, x, y]));
+		this._boundsQueue.push(new Command(this._bezierCurveToBounds, [_x, _y, cp1x, cp1y, cp2x, cp2y, x, y]));
 		return this;
 	}
 	
@@ -422,6 +438,8 @@ var p = Graphics.prototype;
 		this._activeInstructions = [];
 		this._strokeStyleInstructions = this._strokeInstructions = this._fillInstructions = null;
 		this._active = this._dirty = false;
+		this._boundsQueue = [];
+		this._minX = this._minY = this._maxX = this._maxY = NaN;
 		return this;
 	}
 	
@@ -1008,6 +1026,32 @@ var p = Graphics.prototype;
 	**/
 	p._setProp = function(name, value) {
 		this[name] = value;
+	}
+
+	// TODO: Doc.
+	p._extendBounds = function(x, y) {
+		// this could be borrowed from DisplayObject, but it's small and it would be best to keep this independent.
+		if (isNaN(this._minX)) {
+			this._minX = this._maxX = x;
+			this._minY = this._maxY = y;
+		} else {
+			if (x < this._minX) { this._minX = x; }
+			else if (x > this._maxX) { this._maxX = x; }
+			if (y < this._minY) { this._minY = y; }
+			else if (y > this._maxY) { this._maxY = y; }
+		}
+	}
+
+	// TODO: Doc.
+	p._updateBounds = function() {
+		var ctx = this._ctx;
+		while (boundsQueue.length) {
+			boundsQueue.pop().exec(this);
+		}
+	}
+
+	p._bezierCurveBounds = function(x1, x2, cp1x, cp1y, cp2x, cp2y, x2, y2) {
+		// TODO: need to track and pass in the old X/Y.
 	}
 
 window.Graphics = Graphics;
