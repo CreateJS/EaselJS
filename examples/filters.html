@@ -20,6 +20,7 @@
 <script src="../src/easeljs/filters/Filter.js"></script>
 <script src="../src/easeljs/filters/ColorFilter.js"></script>
 <script src="../src/easeljs/filters/BoxBlurFilter.js"></script>
+<script src="../src/easeljs/filters/ColorMatrixFilter.js"></script>
 <!-- End EaselJS Imports -->
 
 <script>
@@ -35,12 +36,24 @@ function init() {
 	var margins = blurFilter.getMargins();
 	
 	var shape = new Shape();
-	shape.graphics.beginStroke("#FFFFFF").beginFill("#888").drawRect(0,0,100,100);
+	shape.graphics.setStrokeStyle(4).beginStroke("#FFFFFF").beginFill("#666").drawRect(0,0,100,100);
 	shape.x = shape.y = 50;
 	shape.filters = [new ColorFilter(0,1,1,1,0,0,0,0),blurFilter];
 	shape.cache(-margins.left,-margins.top,100+margins.right+margins.left,100+margins.bottom+margins.top);
 	stage.addChild(shape);
-	
+
+	var a = 0.33;
+	var mtx = [a,a,a,0,0,
+			   a,a,a,0,0,
+			   a,a,a,0,0,
+			   0,0,0,1,0];
+	shape = new Shape();
+	shape.graphics.beginStroke("#FF0").beginFill("#0F0").drawRect(0,0,100,100);
+	shape.x = 200;
+	shape.y = 50;
+	shape.filters = [new ColorMatrixFilter(mtx)];
+	shape.cache(-2,-2,104,104);
+	stage.addChild(shape);
 	
 	
 	// we want to do some work before we update the canvas,
