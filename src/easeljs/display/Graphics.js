@@ -695,6 +695,19 @@ var p = Graphics.prototype;
 	
 	/**
 	* Draws a circle with the specified radius at (x, y).
+	*
+	* <pre><code>var g = new Graphics();
+	*	g.setStrokeStyle(1);
+	*	g.beginStroke(Graphics.getRGB(0,0,0));
+	*	g.beginFill(Graphics.getRGB(255,0,0));
+	*	g.drawCircle(0,0,3);
+	*
+	*	var s = new Shape(g);
+	*		s.x = 100;
+	*		s.y = 100;
+	*
+	*	stage.addChild(s);
+	*	stage.update();</code></pre>
 	* @method drawCircle
 	* @param {Number} x x coordinate center point of circle.
 	* @param {Number} y y coordinate center point of circle.
