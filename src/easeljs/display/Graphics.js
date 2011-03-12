@@ -48,7 +48,6 @@
 function Command(f, params) {
 	this.f = f;
 	this.params = params;
-	Command.newCount++;
 }
 
 /**
@@ -56,9 +55,9 @@ function Command(f, params) {
 * @param {Object} scope
 **/
 Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
-Command.prototype.recoverable = false;
+Command.prototype.reuse = false;
+
 Command._pool = [];
-Command.newCount = 0;
 Command.get = function(f, params) {
 	if (Command._pool.length) {
 		var cmd = Command._pool.pop();
@@ -67,21 +66,15 @@ Command.get = function(f, params) {
 	} else {
 		cmd = new Command(f,params);
 	}
-	cmd.recoverable = true;
+	cmd.reuse = true;
 	return cmd;
 }
-
 Command.put = function(cmd) {
-	if (cmd.f && cmd.recoverable) {
+	if (cmd.f && cmd.reuse) {
 		cmd.f = null;
 		Command._pool.push(cmd);
 	}
 }
-
-Command.trace = function() {
-	console.log(Command._pool.length, Command.newCount);
-}
-window.Command = Command; // TODO: remove.
 
 /**
 * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a specified context.
@@ -298,6 +291,7 @@ var p = Graphics.prototype;
 	* @param {String} instructions
 	**/
 	p.initialize = function(instructions) {
+		this._boundsQueue = [];
 		this.clear();
 		this._ctx = Graphics._ctx;
 		with (this) { eval(instructions); }
@@ -472,6 +466,8 @@ var p = Graphics.prototype;
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.clear = function() {
+		// TODO: evaluate setting .length = 0 instead of recreating instruction arrays.
+		// reset instructions:
 		if (this._dirty) { this._updateInstructions(); }
 		if (this._instructions) {
 			var l = this._instructions.length;
@@ -484,8 +480,11 @@ var p = Graphics.prototype;
 		this._activeInstructions = [];
 		this._strokeStyleInstructions = this._strokeInstructions = this._fillInstructions = null;
 		this._active = this._dirty = false;
-		this._boundsQueue = [];
+
+		// reset bounds;
+		this._boundsQueue.length = 0;
 		this._minX = this._minY = this._maxX = this._maxY = NaN;
+		
 		return this;
 	}
 	
