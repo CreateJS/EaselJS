@@ -30,7 +30,7 @@ a:visited { color: #003399;}
 #doc3 .default { margin-top:6px; }
 #doc3 .detail .deprecated { margin-top:4px; padding:4px; background-color: #EFECCA }
 #doc3 .detail .deprecated strong { color:#441054; }
-#doc3 code, pre {font-size:85%}
+#doc3 code, pre {font-size:100%}
 
 #doc3 #hd h1 {
     border: 1px solid #98AAB1;
@@ -106,7 +106,7 @@ a:visited { color: #003399;}
 #doc3 .section.details .description td { border:1px solid #ccc; margin:2px;padding:2px;}
 
 #doc3 .inheritance { padding:10px; background-color:#ECF0F6; border:1px solid #98AAB1; }
-#doc3 .inheritance h4 { font-size: 100%;}
+#doc3 .inheritance h4 { font-size: 90%;}
 
 /* index page autocomplete */
 /*

@@ -364,6 +364,8 @@ var p = Stage.prototype = new Container();
 		if (!inBounds && !this.mouseInBounds) { return; }
 
 		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY);
+		evt.nativeEvent = e;
+		
 		if (this.onMouseMove) { this.onMouseMove(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
 	}
@@ -396,10 +398,16 @@ var p = Stage.prototype = new Container();
 	**/
 	p._handleMouseUp = function(e) {
 		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
+		evt.nativeEvent = e;
 		if (this.onMouseUp) { this.onMouseUp(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
-		if (this._activeMouseTarget && this._activeMouseTarget.onClick && this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true, (this._mouseOverIntervalID ? 3 : 1)) == this._activeMouseTarget) {
-			this._activeMouseTarget.onClick(new MouseEvent("onClick", this.mouseX, this.mouseY));
+		if (this._activeMouseTarget && 
+			this._activeMouseTarget.onClick && 
+			this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true, (this._mouseOverIntervalID ? 3 : 1)) == this._activeMouseTarget) {
+			
+			evt = new MouseEvent("onClick", this.mouseX, this.mouseY);
+			evt.nativeEvent = e;
+			this._activeMouseTarget.onClick(evt);
 		}
 		this._activeMouseEvent = this.activeMouseTarget = null;
 	}
@@ -410,11 +418,18 @@ var p = Stage.prototype = new Container();
 	* @param {MouseEvent} e
 	**/
 	p._handleMouseDown = function(e) {
-		if (this.onMouseDown) { this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY)); }
+		var evt;
+		if (this.onMouseDown) { 
+			evt = new MouseEvent("onMouseDown", this.mouseX, this.mouseY);
+			evt.nativeEvent = e;
+			this.onMouseDown(evt); 
+		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
 			if (target.onPress instanceof Function) {
-				var evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
+				evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
+				evt.nativeEvent = e;
+				
 				target.onPress(evt);
 				if (evt.onMouseMove || evt.onMouseUp) { this._activeMouseEvent = evt; }
 			}
@@ -434,6 +449,7 @@ var p = Stage.prototype = new Container();
 			this._mouseOverX = this.mouseX;
 			this._mouseOverY = this.mouseY;
 		}
+		
 		if (this._mouseOverTarget != target) {
 			if (this._mouseOverTarget && this._mouseOverTarget.onMouseOut) {
 				this._mouseOverTarget.onMouseOut(new MouseEvent("onMouseOver", this.mouseX, this.mouseY));
@@ -451,11 +467,18 @@ var p = Stage.prototype = new Container();
 	* @param {MouseEvent} e
 	**/
 	p._handleDoubleClick = function(e) {
-		if (this.onDoubleClick) { this.onDoubleClick(new MouseEvent("onDoubleClick", this.mouseX, this.mouseY)); }
+		var evt;
+		if (this.onDoubleClick) {
+			evt = new MouseEvent("onDoubleClick", this.mouseX, this.mouseY);
+			evt.nativeEvent = e;
+			this.onDoubleClick(evt);
+		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
 			if (target.onDoubleClick instanceof Function) {
-				target.onDoubleClick(new MouseEvent("onPress", this.mouseX, this.mouseY));
+				evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
+				evt.nativeEvent = e;
+				target.onDoubleClick(evt);
 			}
 		}
 	}
