@@ -48,6 +48,7 @@
 function Command(f, params) {
 	this.f = f;
 	this.params = params;
+	Command.newCount++;
 }
 
 /**
@@ -55,6 +56,32 @@ function Command(f, params) {
 * @param {Object} scope
 **/
 Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
+Command.prototype.recoverable = false;
+Command._pool = [];
+Command.newCount = 0;
+Command.get = function(f, params) {
+	if (Command._pool.length) {
+		var cmd = Command._pool.pop();
+		cmd.f = f;
+		cmd.params = params;
+	} else {
+		cmd = new Command(f,params);
+	}
+	cmd.recoverable = true;
+	return cmd;
+}
+
+Command.put = function(cmd) {
+	if (cmd.f && cmd.recoverable) {
+		cmd.f = null;
+		Command._pool.push(cmd);
+	}
+}
+
+Command.trace = function() {
+	console.log(Command._pool.length, Command.newCount);
+}
+window.Command = Command; // TODO: remove.
 
 /**
 * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a specified context.
@@ -160,7 +187,7 @@ var p = Graphics.prototype;
 	* @type CanvasRenderingContext2D
 	**/
 	Graphics._ctx = document.createElement("canvas").getContext("2d");
-	
+
 	/**
 	* @property beginCmd
 	* @static
@@ -168,7 +195,7 @@ var p = Graphics.prototype;
 	* @type Command
 	**/
 	Graphics.beginCmd = new Command(Graphics._ctx.beginPath, []);
-	
+
 	/**
 	* @property fillCmd
 	* @static
@@ -176,7 +203,7 @@ var p = Graphics.prototype;
 	* @type Command
 	**/
 	Graphics.fillCmd = new Command(Graphics._ctx.fill, []);
-	
+
 	/**
 	* @property strokeCmd
 	* @static
@@ -251,7 +278,7 @@ var p = Graphics.prototype;
 	p._boundsQueue = null; // defers expensive bounds operations until getBounds is called.
 	p._x = 0; // current "pen" location
 	p._y = 0; // TODO: implement in all methods.
-	
+
 	/** 
 	* Initialization method.
 	* @method initialize
@@ -296,7 +323,7 @@ var p = Graphics.prototype;
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.moveTo = function(x, y) {
-		this._activeInstructions.push(new Command(this._ctx.moveTo, [x, y]));
+		this._activeInstructions.push(Command.get(this._ctx.moveTo, [x, y]));
 		return this;
 	}
 	
@@ -312,7 +339,7 @@ var p = Graphics.prototype;
 	**/
 	p.lineTo = function(x, y) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.lineTo, [x, y]));
+		this._activeInstructions.push(Command.get(this._ctx.lineTo, [x, y]));
 		return this;
 	}
 	
@@ -330,7 +357,7 @@ var p = Graphics.prototype;
 	**/
 	p.arcTo = function(x1, y1, x2, y2, radius) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.arcTo, [x1, y1, x2, y2, radius]));
+		this._activeInstructions.push(Command.get(this._ctx.arcTo, [x1, y1, x2, y2, radius]));
 		return this;
 	}
 	
@@ -351,7 +378,7 @@ var p = Graphics.prototype;
 	p.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		this._dirty = this._active = true;
 		if (anticlockwise == null) { anticlockwise = false; }
-		this._activeInstructions.push(new Command(this._ctx.arc, [x, y, radius, startAngle, endAngle, anticlockwise]));
+		this._activeInstructions.push(Command.get(this._ctx.arc, [x, y, radius, startAngle, endAngle, anticlockwise]));
 		return this;
 	}
 	
@@ -368,7 +395,7 @@ var p = Graphics.prototype;
 	**/
 	p.quadraticCurveTo = function(cpx, cpy, x, y) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.quadraticCurveTo, [cpx, cpy, x, y]));
+		this._activeInstructions.push(Command.get(this._ctx.quadraticCurveTo, [cpx, cpy, x, y]));
 		return this;
 	}
 	
@@ -388,8 +415,8 @@ var p = Graphics.prototype;
 	**/
 	p.bezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.bezierCurveTo, [cp1x, cp1y, cp2x, cp2y, x, y]));
-		this._boundsQueue.push(new Command(this._bezierCurveToBounds, [_x, _y, cp1x, cp1y, cp2x, cp2y, x, y]));
+		this._activeInstructions.push(Command.get(this._ctx.bezierCurveTo, [cp1x, cp1y, cp2x, cp2y, x, y]));
+		this._boundsQueue.push(Command.get(this._bezierCurveToBounds, [_x, _y, cp1x, cp1y, cp2x, cp2y, x, y]));
 		return this;
 	}
 	
@@ -407,7 +434,7 @@ var p = Graphics.prototype;
 	**/
 	p.rect = function(x, y, w, h) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.rect, [x, y, w-1, h]));
+		this._activeInstructions.push(Command.get(this._ctx.rect, [x, y, w-1, h]));
 		return this;
 	}
 	
@@ -420,7 +447,7 @@ var p = Graphics.prototype;
 	p.closePath = function() {
 		if (this._active) {
 			this._dirty = true;
-			this._activeInstructions.push(new Command(this._ctx.closePath, []));
+			this._activeInstructions.push(Command.get(this._ctx.closePath, []));
 		}
 		return this;
 	}
@@ -433,6 +460,13 @@ var p = Graphics.prototype;
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.clear = function() {
+		if (this._dirty) { this._updateInstructions(); }
+		if (this._instructions) {
+			var l = this._instructions.length;
+			for (var i=0; i<l; i++) {
+				Command.put(this._instructions[i]);
+			}
+		}
 		this._instructions = [];
 		this._oldInstructions = [];
 		this._activeInstructions = [];
@@ -452,7 +486,7 @@ var p = Graphics.prototype;
 	**/
 	p.beginFill = function(color) {
 		if (this._active) { this._newPath(); }
-		this._fillInstructions = color ? [new Command(this._setProp, ["fillStyle", color])] : null;
+		this._fillInstructions = color ? [Command.get(this._setProp, ["fillStyle", color])] : null;
 		return this;
 	}
 	
@@ -477,7 +511,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
+		this._fillInstructions = [Command.get(this._setProp, ["fillStyle", o])];
 		return this;
 	}
 	
@@ -504,7 +538,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
+		this._fillInstructions = [Command.get(this._setProp, ["fillStyle", o])];
 		return this;
 	}
 	
@@ -520,7 +554,7 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		repetition = repetition || "";
 		var o = this._ctx.createPattern(image, repetition);
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
+		this._fillInstructions = [Command.get(this._setProp, ["fillStyle", o])];
 		return this;
 	}
 	
@@ -545,10 +579,10 @@ var p = Graphics.prototype;
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
 		if (this._active) { this._newPath(); }
 		this._strokeStyleInstructions = [
-			new Command(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)]),
-			new Command(this._setProp, ["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))]),
-			new Command(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))]),
-			new Command(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)])
+			Command.get(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)]),
+			Command.get(this._setProp, ["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))]),
+			Command.get(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))]),
+			Command.get(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)])
 			];
 		return this;
 	}
@@ -560,7 +594,7 @@ var p = Graphics.prototype;
 	**/
 	p.beginStroke = function(color) {
 		if (this._active) { this._newPath(); }
-		this._strokeInstructions = color ? [new Command(this._setProp, ["strokeStyle", color])] : null;
+		this._strokeInstructions = color ? [Command.get(this._setProp, ["strokeStyle", color])] : null;
 		return this;
 	}
 	
@@ -581,7 +615,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
+		this._strokeInstructions = [Command.get(this._setProp, ["strokeStyle", o])];
 		return this;
 	}
 	
@@ -605,7 +639,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
+		this._strokeInstructions = [Command.get(this._setProp, ["strokeStyle", o])];
 		return this;
 	}
 	
@@ -620,7 +654,7 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		repetition = repetition || "";
 		var o = this._ctx.createPattern(image, repetition);
-		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
+		this._strokeInstructions = [Command.get(this._setProp, ["strokeStyle", o])];
 		return this;
 	}
 	
@@ -680,15 +714,15 @@ var p = Graphics.prototype;
 	p.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(
-			new Command(this._ctx.moveTo, [x+radiusTL, y]),
-			new Command(this._ctx.lineTo, [x+w-radiusTR, y]),
-			new Command(this._ctx.arc, [x+w-radiusTR, y+radiusTR, radiusTR, (-Math.PI/2), 0, false]),
-			new Command(this._ctx.lineTo, [x+w, y+h-radiusBR]),
-			new Command(this._ctx.arc, [x+w-radiusBR, y+h-radiusBR, radiusBR, 0, Math.PI/2, false]),
-			new Command(this._ctx.lineTo, [x+radiusBL, y+h]),
-			new Command(this._ctx.arc, [x+radiusBL, y+h-radiusBL, radiusBL, Math.PI/2, Math.PI, false]),
-			new Command(this._ctx.lineTo, [x, y+radiusTL]),
-			new Command(this._ctx.arc, [x+radiusTL, y+radiusTL, radiusTL, Math.PI, Math.PI*3/2, false])
+			Command.get(this._ctx.moveTo, [x+radiusTL, y]),
+			Command.get(this._ctx.lineTo, [x+w-radiusTR, y]),
+			Command.get(this._ctx.arc, [x+w-radiusTR, y+radiusTR, radiusTR, (-Math.PI/2), 0, false]),
+			Command.get(this._ctx.lineTo, [x+w, y+h-radiusBR]),
+			Command.get(this._ctx.arc, [x+w-radiusBR, y+h-radiusBR, radiusBR, 0, Math.PI/2, false]),
+			Command.get(this._ctx.lineTo, [x+radiusBL, y+h]),
+			Command.get(this._ctx.arc, [x+radiusBL, y+h-radiusBL, radiusBL, Math.PI/2, Math.PI, false]),
+			Command.get(this._ctx.lineTo, [x, y+radiusTL]),
+			Command.get(this._ctx.arc, [x+radiusTL, y+radiusTL, radiusTL, Math.PI, Math.PI*3/2, false])
 		);
 		return this;
 	} 
@@ -726,11 +760,11 @@ var p = Graphics.prototype;
 		var ym = y + h / 2;
 			
 		this._activeInstructions.push(
-			new Command(this._ctx.moveTo, [x, ym]),
-			new Command(this._ctx.bezierCurveTo, [x, ym-oy, xm-ox, y, xm, y]),
-			new Command(this._ctx.bezierCurveTo, [xm+ox, y, xe, ym-oy, xe, ym]),
-			new Command(this._ctx.bezierCurveTo, [xe, ym+oy, xm+ox, ye, xm, ye]),
-			new Command(this._ctx.bezierCurveTo, [xm-ox, ye, x, ym+oy, x, ym])
+			Command.get(this._ctx.moveTo, [x, ym]),
+			Command.get(this._ctx.bezierCurveTo, [x, ym-oy, xm-ox, y, xm, y]),
+			Command.get(this._ctx.bezierCurveTo, [xm+ox, y, xe, ym-oy, xe, ym]),
+			Command.get(this._ctx.bezierCurveTo, [xe, ym+oy, xm+ox, ye, xm, ye]),
+			Command.get(this._ctx.bezierCurveTo, [xm-ox, ye, x, ym+oy, x, ym])
 		);
 		return this;
 	}
@@ -758,14 +792,14 @@ var p = Graphics.prototype;
 		else { angle /= 180/Math.PI; }
 		var a = Math.PI/sides;
 		
-		this._activeInstructions.push(new Command(this._ctx.moveTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
+		this._activeInstructions.push(Command.get(this._ctx.moveTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
 		for (var i=0; i<sides; i++) {
 			angle += a;
 			if (pointSize != 1) {
-				this._activeInstructions.push(new Command(this._ctx.lineTo, [x+Math.cos(angle)*radius*pointSize, y+Math.sin(angle)*radius*pointSize]));
+				this._activeInstructions.push(Command.get(this._ctx.lineTo, [x+Math.cos(angle)*radius*pointSize, y+Math.sin(angle)*radius*pointSize]));
 			}
 			angle += a;
-			this._activeInstructions.push(new Command(this._ctx.lineTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
+			this._activeInstructions.push(Command.get(this._ctx.lineTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
 		}
 		return this;
 	}
@@ -988,7 +1022,7 @@ var p = Graphics.prototype;
 	* @protected
 	**/
 	p._updateInstructions = function() {
-		this._instructions = this._oldInstructions.slice()
+		this._instructions = this._oldInstructions.slice();
 		this._instructions.push(Graphics.beginCmd);
 		 
 		if (this._fillInstructions) { this._instructions.push.apply(this._instructions, this._fillInstructions); }
@@ -998,7 +1032,7 @@ var p = Graphics.prototype;
 				this._instructions.push.apply(this._instructions, this._strokeStyleInstructions);
 			}
 		}
-		
+
 		this._instructions.push.apply(this._instructions, this._activeInstructions);
 		
 		if (this._fillInstructions) { this._instructions.push(Graphics.fillCmd); }
