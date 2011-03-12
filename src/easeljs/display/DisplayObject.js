@@ -422,9 +422,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	**/
 	p.draw = function(ctx, ignoreCache) {
 		if (ignoreCache || !this.cacheCanvas) { return false; }
-		ctx.translate(this._cacheOffsetX, this._cacheOffsetY);
-		ctx.drawImage(this.cacheCanvas, 0, 0);
-		ctx.translate(-this._cacheOffsetX, -this._cacheOffsetY);
+		ctx.drawImage(this.cacheCanvas, this._cacheOffsetX, this._cacheOffsetY);
 		return true;
 	}
 	
