@@ -123,20 +123,6 @@ goog.provide('Ticker');
 	Ticker._pausedTickers = 0;
 	
 	/** 
-	* @property _interval
-	* @type Number
-	* @protected 
-	**/
-	Ticker._interval = 50; // READ-ONLY
-	
-	/** 
-	* @property _intervalID
-	* @type Number
-	* @protected 
-	**/
-	Ticker._intervalID = null;
-	
-	/** 
 	* @property _lastTime
 	* @type Number
 	* @protected 
@@ -166,7 +152,7 @@ goog.provide('Ticker');
 	Ticker.addListener = function(o, pauseable) {
 		if (!Ticker._inited) {
 			Ticker._inited = true;
-			Ticker.setInterval(Ticker._interval);
+  		Ticker.requestAnimFrame(Ticker._tick);
 		}
 		this.removeListener(o);
 		Ticker._pauseable[Ticker._listeners.length] = (pauseable == null) ? true : pauseable;
@@ -199,52 +185,6 @@ goog.provide('Ticker');
 	}
 	
 	/**
-	* Sets the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
-	* Note actual time between ticks may be more than requested depending on CPU load.
-	* @method setInterval
-	* @static
-	* @param {Number} interval Time in milliseconds between ticks. Default value is 50.
-	**/
-	Ticker.setInterval = function(interval) {
-		if (Ticker._intervalID != null) { clearInterval(Ticker._intervalID); }
-		Ticker._lastTime = Ticker._getTime();
-		Ticker._interval = interval;
-		Ticker._intervalID = setInterval(Ticker._tick, interval);
-	}
-	
-	/**
-	* Returns the current target time between ticks, as set with setInterval.
-	* @method getInterval
-	* @static
-	* @return {Number} The current target interval in milliseconds between tick events.
-	**/
-	Ticker.getInterval = function() {
-		return Ticker._interval;
-	}
-	
-	/**
-	* Returns the target frame rate in frames per second (FPS). For example, with an 
-	* interval of 40, getFPS() will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
-	* @method getFPS
-	* @static
-	* @return {Number} The current target number of frames / ticks broadcast per second.
-	**/
-	Ticker.getFPS = function() {
-		return 1000/Ticker._interval;
-	}
-	
-	/**
-	* Sets the target frame rate in frames per second (FPS). For example, with an interval of 40, getFPS() will 
-	* return 25 (1000ms per second divided by 40 ms per tick = 25fps).
-	* @method setFPS
-	* @static
-	* @param {Number} value Target number of ticks broadcast per second.
-	**/	
-	Ticker.setFPS = function(value) {
-		Ticker.setInterval(1000/value);
-	}
-	
-	/**
 	* Returns the actual frames / ticks per second.
 	* @method getMeasuredFPS
 	* @static
@@ -257,7 +197,7 @@ goog.provide('Ticker');
 		if (Ticker._times.length < 2) { return -1; }
 		
 		// x >> 1 : use bitwise to divide by two (int math)
-		if (ticks == null) { ticks = Ticker.getFPS()>>1; }
+		ticks = ticks || 5;
 		ticks = Math.min(Ticker._times.length-1, ticks);
 		return 1000/((Ticker._times[0]-Ticker._times[ticks])/ticks);
 	}
@@ -343,6 +283,7 @@ goog.provide('Ticker');
 		
 		Ticker._times.unshift(time);
 		if (Ticker._times.length > 100) { Ticker._times.pop(); }
+		Ticker.requestAnimFrame(Ticker._tick);
 	}
 	
 	/**
@@ -355,6 +296,18 @@ goog.provide('Ticker');
 	
 	//docced above
 	Ticker._startTime = Ticker._getTime();
+
+  Ticker.requestAnimFrame = function(callback){
+    var func = window['requestAnimationFrame']       ||
+               window['webkitRequestAnimationFrame'] ||
+               window['mozRequestAnimationFrame']    ||
+               window['oRequestAnimationFrame']      ||
+               window['msRequestAnimationFrame']     ||
+               function(/* function */ callback, /* DOMElement */ element){
+                 window.setTimeout(callback, 1000 / 60);
+               };
+    func(callback);
+  };
 
 window.Ticker = Ticker;
 }(window));
