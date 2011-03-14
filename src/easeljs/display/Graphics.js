@@ -153,79 +153,48 @@ var p = Graphics.prototype;
 	**/
 	Graphics._ctx = document.createElement("canvas").getContext("2d");
 
-	// TODO: remove.
-	/**
-	* @property beginCmd
-	* @static
-	* @protected
-	* @type Command
-	**/
-	//Graphics.beginCmd = new Command(Graphics._ctx.beginPath, []);
-
-	/**
-	* @property fillCmd
-	* @static
-	* @protected
-	* @type Command
-	**/
-	//Graphics.fillCmd = new Command(Graphics._ctx.fill, []);
-
-	/**
-	* @property strokeCmd
-	* @static
-	* @protected
-	* @type Command
-	**/
-	//Graphics.strokeCmd = new Command(Graphics._ctx.stroke, []);
-
 	// TODO: doc.
 	/**
 	* @property _strokeInstruction
 	* @protected
 	* @type Array[Command]
 	**/
-	p._strokeFunction = null;
-	p._strokeParams = null;
+	p._strokeInstructions = null;
 
 	/**
 	* @property _strokeStyleInstructions
 	* @protected
 	* @type Array[Command]
 	**/
-	p._strokeStyleFunctions = null;
-	p._strokeStyleParams = null;
+	p._strokeStyleInstructions = null;
 
 	/**
 	* @property _fillInstruction
 	* @protected
 	* @type Array[Command]
 	**/
-	p._fillFunction = null;
-	p._fillParams = null;
+	p._fillInstructions = null;
 
 	/**
 	* @property _instructions
 	* @protected
 	* @type Array[Command]
 	**/
-	p._currentFunctions = null;
-	p._currentParams = null;
+	p._instructions = null;
 
 	/**
 	* @property _oldInstructions
 	* @protected
 	* @type Array[Command]
 	**/
-	p._oldFunctions = null;
-	p._oldParams = null;
+	p._oldInstructions = null;
 
 	/**
 	* @property _activeInstructions
 	* @protected
 	* @type Array[Command]
 	**/
-	p._activeFunctions = null;
-	p._activeParams = null;
+	p._activeInstructions = null;
 
 	/**
 	* @property _active
@@ -260,14 +229,9 @@ var p = Graphics.prototype;
 	**/
 	p.initialize = function(instructions) {
 		this._boundsQueue = [];
-		this._activeFunctions = [];
-		this._activeParams = [];
-		this._currentFunctions = [];
-		this._currentParams = [];
-		this._oldFunctions = [];
-		this._oldParams = [];
-		this._strokeStyleFunctions = [];
-		this._strokeStyleParams = [];
+		this._activeInstructions = [];
+		this._instructions = [];
+		this._oldInstructions = [];
 		this._ctx = Graphics._ctx;
 		with (this) { eval(instructions); }
 	}
@@ -283,10 +247,9 @@ var p = Graphics.prototype;
 		if (this._dirty) {
 			this._updateInstructions();
 		}
-		var functions = this._currentFunctions;
-		var params = this._currentParams;
-		for (var i=0, l=functions.length; i<l; i++) {
-			functions[i].apply(ctx,params[i]);
+		var instr = this._instructions;
+		for (var i=0, l=instr.length; i<l; i+=2) {
+			instr[i].apply(ctx, instr[i+1]);
 		}
 	}
 
@@ -305,8 +268,7 @@ var p = Graphics.prototype;
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.moveTo = function(x, y) {
-		this._activeFunctions.push(this._ctx.moveTo);
-		this._activeParams.push([x, y]);
+		this._activeInstructions.push(this._ctx.moveTo, [x, y]);
 		return this;
 	}
 
@@ -322,8 +284,7 @@ var p = Graphics.prototype;
 	**/
 	p.lineTo = function(x, y) {
 		this._dirty = this._active = true;
-		this._activeFunctions.push(this._ctx.lineTo);
-		this._activeParams.push([x, y]);
+		this._activeInstructions.push(this._ctx.lineTo, [x, y]);
 		return this;
 	}
 
@@ -362,8 +323,7 @@ var p = Graphics.prototype;
 	p.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		this._dirty = this._active = true;
 		if (anticlockwise == null) { anticlockwise = false; }
-		this._activeFunctions.push(this._ctx.arc);
-		this._activeParams.push([x, y, radius, startAngle, endAngle, anticlockwise]);
+		this._activeInstructions.push(this._ctx.arc, [x, y, radius, startAngle, endAngle, anticlockwise]);
 		return this;
 	}
 
@@ -447,12 +407,8 @@ var p = Graphics.prototype;
 	p.clear = function() {
 		// reset instructions:
 		if (this._dirty) { this._updateInstructions(); }
-		this._currentFunctions.length = this._currentParams.length = 0;;
-		this._oldFunctions.length = this._oldParams.length = 0;
-		this._activeFunctions.length = this._activeParams.length = 0;
-		this._strokeStyleFunctions.length = this._strokeStyleParams.length = 0;
-		this._strokeFunction = this._strokeParams = null;
-		this._fillFunction = this._fillParams = null;
+		this._instructions.length = this._oldInstructions.length = this._activeInstructions.length = 0;
+		this._strokeInstructions = this._fillInstructions = this._strokeStyleInstructions = null;
 		this._active = this._dirty = false;
 
 		// reset bounds;
@@ -471,12 +427,7 @@ var p = Graphics.prototype;
 	**/
 	p.beginFill = function(color) {
 		if (this._active) { this._newPath(); }
-		if (color) {
-			this._fillFunction = this._setProp;
-			this._fillParams = ["fillStyle",color];
-		} else {
-			this._fillFunction = this._fillParams = null;
-		}
+		this._fillInstructions = color ? [this._setProp, ["fillStyle", color]] : null;
 		return this;
 	}
 
@@ -568,14 +519,12 @@ var p = Graphics.prototype;
 	**/
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
 		if (this._active) { this._newPath(); }
-		this._strokeStyleFunctions.length = this._strokeStyleParams.length = 0;
-		this._strokeStyleFunctions.push(this._setProp, this._setProp, this._setProp, this._setProp);
-		this._strokeStyleParams.push(
-			["lineWidth", (thickness == null ? "1" : thickness)],
-			["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))],
-			["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))],
-			["miterLimit", (miterLimit == null ? "10" : miterLimit)]
-			);
+		this._strokeStyleInstructions = [
+			this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)],
+			this._setProp, ["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))],
+			this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))],
+			this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)]
+			];
 		return this;
 	}
 
@@ -585,12 +534,8 @@ var p = Graphics.prototype;
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.beginStroke = function(color) {
-		if (this._active) { this._newPath(); }if (color) {
-			this._strokeFunction = this._setProp;
-			this._strokeParams = ["strokeStyle",color];
-		} else {
-			this._strokeFunction = this._strokeParams = null;
-		}
+		if (this._active) { this._newPath(); }
+		this._strokeInstructions = color ? [this._setProp, ["strokeStyle",color]] : null;
 		return this;
 	}
 
@@ -1032,34 +977,26 @@ var p = Graphics.prototype;
 	* @protected
 	**/
 	p._updateInstructions = function() {
-		this._currentFunctions = this._oldFunctions.slice();
-		this._currentParams = this._oldParams.slice();
-		this._currentFunctions.push(Graphics._ctx.beginPath);
-		this._currentParams.push([]);
+		this._instructions = this._oldInstructions.slice();
+		this._instructions.push(Graphics._ctx.beginPath, []);
 
-		if (this._fillFunction) {
-			this._currentFunctions.push(this._fillFunction);
-			this._currentParams.push(this._fillParams);
+		if (this._fillInstructions) {
+			this._instructions.push.apply(this._instructions, this._fillInstructions);
 		}
-		if (this._strokeFunction) {
-			this._currentFunctions.push(this._strokeFunction);
-			this._currentParams.push(this._strokeParams);
-			if (this._strokeStyleFunctions.length) {
-				this._currentFunctions.push.apply(this._currentFunctions, this._strokeStyleFunctions);
-				this._currentParams.push.apply(this._currentParams, this._strokeStyleParams);
+		if (this._strokeInstructions) {
+			this._instructions.push.apply(this._instructions, this._strokeInstructions);
+			if (this._strokeStyleInstructions) {
+				this._instructions.push.apply(this._instructions, this._strokeStyleInstructions);
 			}
 		}
 
-		this._currentFunctions.push.apply(this._currentFunctions, this._activeFunctions);
-		this._currentParams.push.apply(this._currentParams, this._activeParams);
+		this._instructions.push.apply(this._instructions, this._activeInstructions);
 
-		if (this._fillFunction) {
-			this._currentFunctions.push(Graphics._ctx.fill);
-			this._currentParams.push([]);
+		if (this._fillInstructions) {
+			this._instructions.push(Graphics._ctx.fill, []);
 		}
-		if (this._strokeFunction) {
-			this._currentFunctions.push(Graphics._ctx.stroke);
-			this._currentParams.push([]);
+		if (this._strokeInstructions) {
+			this._instructions.push(Graphics._ctx.stroke, []);
 		}
 	}
 
@@ -1069,10 +1006,8 @@ var p = Graphics.prototype;
 	**/
 	p._newPath = function() {
 		if (this._dirty) { this._updateInstructions(); }
-		this._oldFunctions = this._currentFunctions;
-		this._oldParams = this._currentParams;
-		this._activeFunctions.length = 0;
-		this._activeParams.length = 0;
+		this._oldInstructions = this._instructions;
+		this._activeInstructions.length = 0;
 		this._active = this._dirty = false;
 	}
 
