@@ -56,6 +56,7 @@ function Command(f, params) {
 * @param {Object} scope
 **/
 Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
+Command.prototype.clone = function() { return Command.get(this.f,  this.params); }
 Command.prototype.reuse = false;
 
 Command._pool = [];
@@ -608,7 +609,7 @@ var p = Graphics.prototype;
 	**/
 	p.beginStroke = function(color) {
 		if (this._active) { this._newPath(); }
-		//else if (this._strokeInstruction) { Command.put(this._strokeInstruction); }
+		else if (this._strokeInstruction && !this._strokeInstruction.inUse) { Command.put(this._strokeInstruction); }
 		this._strokeInstruction = color ? Command.get(this._setProp, ["strokeStyle", color]) : null;
 		return this;
 	}
@@ -1057,6 +1058,7 @@ var p = Graphics.prototype;
 		if (this._fillInstruction) { this._instructions.push(this._fillInstruction); }
 		if (this._strokeInstruction) {
 			this._instructions.push(this._strokeInstruction);
+			this._strokeInstruction.inUse = true;
 			if (this._strokeStyleInstructions) {
 				this._instructions.push.apply(this._instructions, this._strokeStyleInstructions);
 			}
