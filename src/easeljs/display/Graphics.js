@@ -36,50 +36,6 @@
 
 (function(window) {
 
-// used to create the instruction lists used in Graphics:
-
-
-/**
-* Inner class used by the Graphics class. Used to create the instruction lists used in Graphics:
-* @class Command
-* @for Graphics
-* @constructor
-**/
-function Command(f, params) {
-	this.f = f;
-	this.params = params;
-	Command.newCount++;
-}
-
-/**
-* @method exec
-* @param {Object} scope
-**/
-Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
-Command.prototype.clone = function() { return Command.get(this.f,  this.params); }
-Command.prototype.reuse = false;
-
-Command._pool = [];
-Command.newCount = 0;
-Command.get = function(f, params) {
-	if (Command._pool.length) {
-		var cmd = Command._pool.pop();
-		cmd.f = f;
-		cmd.params = params;
-	} else {
-		cmd = new Command(f,params);
-	}
-	cmd.reuse = true;
-	return cmd;
-}
-Command.put = function(cmd) {
-	if (cmd.f && cmd.reuse) {
-		cmd.f = null;
-		Command._pool.push(cmd);
-	}
-}
-window.Command = Command;
-
 /**
 * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a specified context.
 * Note that you can use Graphics without any dependency on the Easel framework by calling draw() directly,
@@ -197,13 +153,14 @@ var p = Graphics.prototype;
 	**/
 	Graphics._ctx = document.createElement("canvas").getContext("2d");
 
+	// TODO: remove.
 	/**
 	* @property beginCmd
 	* @static
 	* @protected
 	* @type Command
 	**/
-	Graphics.beginCmd = new Command(Graphics._ctx.beginPath, []);
+	//Graphics.beginCmd = new Command(Graphics._ctx.beginPath, []);
 
 	/**
 	* @property fillCmd
@@ -211,7 +168,7 @@ var p = Graphics.prototype;
 	* @protected
 	* @type Command
 	**/
-	Graphics.fillCmd = new Command(Graphics._ctx.fill, []);
+	//Graphics.fillCmd = new Command(Graphics._ctx.fill, []);
 
 	/**
 	* @property strokeCmd
@@ -219,49 +176,56 @@ var p = Graphics.prototype;
 	* @protected
 	* @type Command
 	**/
-	Graphics.strokeCmd = new Command(Graphics._ctx.stroke, []);
+	//Graphics.strokeCmd = new Command(Graphics._ctx.stroke, []);
 
+	// TODO: doc.
 	/**
 	* @property _strokeInstruction
 	* @protected
 	* @type Array[Command]
 	**/
-	p._strokeInstruction = null;
+	p._strokeFunction = null;
+	p._strokeParams = null;
 
 	/**
 	* @property _strokeStyleInstructions
 	* @protected
 	* @type Array[Command]
 	**/
-	p._strokeStyleInstructions = null;
+	p._strokeStyleFunctions = null;
+	p._strokeStyleParams = null;
 
 	/**
 	* @property _fillInstruction
 	* @protected
 	* @type Array[Command]
 	**/
-	p._fillInstruction = null;
+	p._fillFunction = null;
+	p._fillParams = null;
 
 	/**
 	* @property _instructions
 	* @protected
 	* @type Array[Command]
 	**/
-	p._instructions = null;
+	p._currentFunctions = null;
+	p._currentParams = null;
 
 	/**
 	* @property _oldInstructions
 	* @protected
 	* @type Array[Command]
 	**/
-	p._oldInstructions = null;
+	p._oldFunctions = null;
+	p._oldParams = null;
 
 	/**
 	* @property _activeInstructions
 	* @protected
 	* @type Array[Command]
 	**/
-	p._activeInstructions = null;
+	p._activeFunctions = null;
+	p._activeParams = null;
 
 	/**
 	* @property _active
@@ -296,7 +260,14 @@ var p = Graphics.prototype;
 	**/
 	p.initialize = function(instructions) {
 		this._boundsQueue = [];
-		this.clear();
+		this._activeFunctions = [];
+		this._activeParams = [];
+		this._currentFunctions = [];
+		this._currentParams = [];
+		this._oldFunctions = [];
+		this._oldParams = [];
+		this._strokeStyleFunctions = [];
+		this._strokeStyleParams = [];
 		this._ctx = Graphics._ctx;
 		with (this) { eval(instructions); }
 	}
@@ -312,9 +283,10 @@ var p = Graphics.prototype;
 		if (this._dirty) {
 			this._updateInstructions();
 		}
-		var instr = this._instructions;
-		for (var i=0, l=instr.length; i<l; i++) {
-			instr[i].exec(ctx);
+		var functions = this._currentFunctions;
+		var params = this._currentParams;
+		for (var i=0, l=functions.length; i<l; i++) {
+			functions[i].apply(ctx,params[i]);
 		}
 	}
 
@@ -333,7 +305,8 @@ var p = Graphics.prototype;
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.moveTo = function(x, y) {
-		this._activeInstructions.push(Command.get(this._ctx.moveTo, [x, y]));
+		this._activeFunctions.push(this._ctx.moveTo);
+		this._activeParams.push([x, y]);
 		return this;
 	}
 
@@ -349,7 +322,8 @@ var p = Graphics.prototype;
 	**/
 	p.lineTo = function(x, y) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(Command.get(this._ctx.lineTo, [x, y]));
+		this._activeFunctions.push(this._ctx.lineTo);
+		this._activeParams.push([x, y]);
 		return this;
 	}
 
@@ -388,7 +362,8 @@ var p = Graphics.prototype;
 	p.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		this._dirty = this._active = true;
 		if (anticlockwise == null) { anticlockwise = false; }
-		this._activeInstructions.push(Command.get(this._ctx.arc, [x, y, radius, startAngle, endAngle, anticlockwise]));
+		this._activeFunctions.push(this._ctx.arc);
+		this._activeParams.push([x, y, radius, startAngle, endAngle, anticlockwise]);
 		return this;
 	}
 
@@ -470,19 +445,14 @@ var p = Graphics.prototype;
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.clear = function() {
-		// TODO: evaluate setting .length = 0 instead of recreating instruction arrays.
 		// reset instructions:
 		if (this._dirty) { this._updateInstructions(); }
-		if (this._instructions) {
-			var l = this._instructions.length;
-			for (var i=0; i<l; i++) {
-				Command.put(this._instructions[i]);
-			}
-		}
-		this._instructions = [];
-		this._oldInstructions = [];
-		this._activeInstructions = [];
-		this._strokeStyleInstructions = this._strokeInstruction = this._fillInstruction = null;
+		this._currentFunctions.length = this._currentParams.length = 0;;
+		this._oldFunctions.length = this._oldParams.length = 0;
+		this._activeFunctions.length = this._activeParams.length = 0;
+		this._strokeStyleFunctions.length = this._strokeStyleParams.length = 0;
+		this._strokeFunction = this._strokeParams = null;
+		this._fillFunction = this._fillParams = null;
 		this._active = this._dirty = false;
 
 		// reset bounds;
@@ -501,7 +471,12 @@ var p = Graphics.prototype;
 	**/
 	p.beginFill = function(color) {
 		if (this._active) { this._newPath(); }
-		this._fillInstruction = color ? Command.get(this._setProp, ["fillStyle", color]) : null;
+		if (color) {
+			this._fillFunction = this._setProp;
+			this._fillParams = ["fillStyle",color];
+		} else {
+			this._fillFunction = this._fillParams = null;
+		}
 		return this;
 	}
 
@@ -588,17 +563,19 @@ var p = Graphics.prototype;
 	* @param thickness The width of the stroke.
 	* @param caps Optional. Indicates the type of caps to use at the end of lines. One of butt, round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with the tiny API.
 	* @param joints Optional. Specifies the type of joints that should be used where two lines meet. One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel) for use with the tiny API.
-	* @param miter Optional. If joints is set to "miter", then you can specify a miter limit ratio which controls at what point a mitered joint will be clipped.
+	* @param miterLimit Optional. If joints is set to "miter", then you can specify a miter limit ratio which controls at what point a mitered joint will be clipped.
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
 		if (this._active) { this._newPath(); }
-		this._strokeStyleInstructions = [
-			Command.get(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)]),
-			Command.get(this._setProp, ["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))]),
-			Command.get(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))]),
-			Command.get(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)])
-			];
+		this._strokeStyleFunctions.length = this._strokeStyleParams.length = 0;
+		this._strokeStyleFunctions.push(this._setProp, this._setProp, this._setProp, this._setProp);
+		this._strokeStyleParams.push(
+			["lineWidth", (thickness == null ? "1" : thickness)],
+			["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))],
+			["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))],
+			["miterLimit", (miterLimit == null ? "10" : miterLimit)]
+			);
 		return this;
 	}
 
@@ -608,9 +585,12 @@ var p = Graphics.prototype;
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.beginStroke = function(color) {
-		if (this._active) { this._newPath(); }
-		else if (this._strokeInstruction && !this._strokeInstruction.inUse) { Command.put(this._strokeInstruction); }
-		this._strokeInstruction = color ? Command.get(this._setProp, ["strokeStyle", color]) : null;
+		if (this._active) { this._newPath(); }if (color) {
+			this._strokeFunction = this._setProp;
+			this._strokeParams = ["strokeStyle",color];
+		} else {
+			this._strokeFunction = this._strokeParams = null;
+		}
 		return this;
 	}
 
@@ -1052,22 +1032,35 @@ var p = Graphics.prototype;
 	* @protected
 	**/
 	p._updateInstructions = function() {
-		this._instructions = this._oldInstructions.slice();
-		this._instructions.push(Graphics.beginCmd);
+		this._currentFunctions = this._oldFunctions.slice();
+		this._currentParams = this._oldParams.slice();
+		this._currentFunctions.push(Graphics._ctx.beginPath);
+		this._currentParams.push([]);
 
-		if (this._fillInstruction) { this._instructions.push(this._fillInstruction); }
-		if (this._strokeInstruction) {
-			this._instructions.push(this._strokeInstruction);
-			this._strokeInstruction.inUse = true;
-			if (this._strokeStyleInstructions) {
-				this._instructions.push.apply(this._instructions, this._strokeStyleInstructions);
+		if (this._fillFunction) {
+			this._currentFunctions.push(this._fillFunction);
+			this._currentParams.push(this._fillParams);
+		}
+		if (this._strokeFunction) {
+			this._currentFunctions.push(this._strokeFunction);
+			this._currentParams.push(this._strokeParams);
+			if (this._strokeStyleFunctions.length) {
+				this._currentFunctions.push.apply(this._currentFunctions, this._strokeStyleFunctions);
+				this._currentParams.push.apply(this._currentParams, this._strokeStyleParams);
 			}
 		}
 
-		this._instructions.push.apply(this._instructions, this._activeInstructions);
+		this._currentFunctions.push.apply(this._currentFunctions, this._activeFunctions);
+		this._currentParams.push.apply(this._currentParams, this._activeParams);
 
-		if (this._fillInstruction) { this._instructions.push(Graphics.fillCmd); }
-		if (this._strokeInstruction) { this._instructions.push(Graphics.strokeCmd); }
+		if (this._fillFunction) {
+			this._currentFunctions.push(Graphics._ctx.fill);
+			this._currentParams.push([]);
+		}
+		if (this._strokeFunction) {
+			this._currentFunctions.push(Graphics._ctx.stroke);
+			this._currentParams.push([]);
+		}
 	}
 
 	/**
@@ -1076,8 +1069,10 @@ var p = Graphics.prototype;
 	**/
 	p._newPath = function() {
 		if (this._dirty) { this._updateInstructions(); }
-		this._oldInstructions = this._instructions;
-		this._activeInstructions = [];
+		this._oldFunctions = this._currentFunctions;
+		this._oldParams = this._currentParams;
+		this._activeFunctions.length = 0;
+		this._activeParams.length = 0;
 		this._active = this._dirty = false;
 	}
 
