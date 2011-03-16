@@ -1045,7 +1045,7 @@ var p = Graphics.prototype;
 		}
 	}
 
-	p._bezierCurveBounds = function(x1, x2, cp1x, cp1y, cp2x, cp2y, x2, y2) {
+	p._bezierCurveBounds = function(x1, x2, cp1x, cp1y, cp2x, cp2y, px2, py2) {
 		// TODO: need to track and pass in the old X/Y.
 	}
 
