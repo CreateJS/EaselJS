@@ -1094,7 +1094,6 @@ var p = Graphics.prototype;
 		}
 	}
 
-<<<<<<< HEAD
 		/**
 	* @method _bezierCurveToBounds
 	* @protected
@@ -1103,10 +1102,6 @@ var p = Graphics.prototype;
 		this._extendBounds(x1, y1);
 		this._extendBounds(x2, y2);
 		// TODO: implement.
-=======
-	p._bezierCurveBounds = function(x1, x2, cp1x, cp1y, cp2x, cp2y, px2, py2) {
-		// TODO: need to track and pass in the old X/Y.
->>>>>>> ce2c42f016596d34f6619a4551c8685d9802ff51
 	}
 
 window.Graphics = Graphics;
