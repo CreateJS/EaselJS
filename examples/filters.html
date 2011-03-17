@@ -2,13 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>EaselJS Example: Displaying icons using BitmapSequence and SpriteSheet</title>
+<title>EaselJS Example: Filters test file.</title>
 
 <link href="styles.css" rel="stylesheet" type="text/css" />
 
 <!-- Import EaselJS Framework -->
 <script src="../src/easeljs/utils/UID.js"></script>
 <script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/geom/Rectangle.js"></script>
 <script src="../src/easeljs/events/MouseEvent.js"></script>
 <script src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 <script src="../src/easeljs/display/Graphics.js"></script>
@@ -25,6 +26,10 @@
 
 <script>
 
+	/**
+	 * TODO: This file will be converted to a proper demo before v0.4 release.
+	 */
+
 function init() {
 	//find canvas and load images, wait for last image to load
 	var canvas = document.getElementById("testCanvas");
@@ -33,13 +38,13 @@ function init() {
 	stage = new Stage(canvas);
 
 	var blurFilter = new BoxBlurFilter(16, 8, 2);
-	var margins = blurFilter.getMargins();
+	var margins = blurFilter.getBounds();
 	
 	var shape = new Shape();
 	shape.graphics.setStrokeStyle(4).beginStroke("#FFFFFF").beginFill("#666").drawRect(0,0,100,100);
 	shape.x = shape.y = 50;
 	shape.filters = [new ColorFilter(0,1,1,1,0,0,0,0),blurFilter];
-	shape.cache(-margins.left,-margins.top,100+margins.right+margins.left,100+margins.bottom+margins.top);
+	shape.cache(margins.x,margins.y,100+margins.width,100+margins.height);
 	stage.addChild(shape);
 
 	var a = 0.33;
