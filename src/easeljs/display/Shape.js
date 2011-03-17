@@ -132,5 +132,20 @@ var p = Shape.prototype = new DisplayObject();
 		return "[Shape (name="+  this.name +")]";
 	}
 
+
+	/**
+	* @method _calculateBounds
+	* @protected
+	* @return {Rectangle}
+	**/
+	p._calculateBounds = function() {
+		if (this.graphics) {
+			// TODO: finish implementing getBounds.
+			return this.graphics.getBounds();
+		} else {
+			return new Rectangle(0,0,0,0);
+		}
+	}
+
 window.Shape = Shape;
 }(window));

@@ -295,6 +295,10 @@ var p = Graphics.prototype;
 
 	// TODO: Doc.
 	p.getBounds = function() {
+		// TODO: finish implementation.
+			// TODO: implement _x, _y tracking everywhere (ex. see "lineTo" and "moveTo") (required for lineTo/curveTo, etc bounds).
+		// For cheap calculations, bounds are updated immediately  (ex. see "lineTo" & "rect").
+		// More expensive calculations are deferred until getBounds is called (ex. see "bezierCurveTo").
 		if (this._boundsQueue.length) { this._updateBounds(); }
 		return isNaN(this._minX) ? null : new Rectangle(this._minX, this._minY, this._maxX-this._minX, this._maxY-this._minY);
 	}
@@ -309,6 +313,8 @@ var p = Graphics.prototype;
 	**/
 	p.moveTo = function(x, y) {
 		this._activeInstructions.push(new Command(this._ctx.moveTo, [x, y]));
+		this._x = x;
+		this._y = y;
 		return this;
 	}
 	
@@ -325,6 +331,10 @@ var p = Graphics.prototype;
 	p.lineTo = function(x, y) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(new Command(this._ctx.lineTo, [x, y]));
+		this._extendBounds(this._x, this._y);
+		this._extendBounds(x, y);
+		this._x = x;
+		this._y = y;
 		return this;
 	}
 	
@@ -420,6 +430,8 @@ var p = Graphics.prototype;
 	p.rect = function(x, y, w, h) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(new Command(this._ctx.rect, [x, y, w-1, h]));
+		this._extendBounds(x, y);
+		this._extendBounds(x+w, y+h);
 		return this;
 	}
 	
@@ -1053,9 +1065,13 @@ var p = Graphics.prototype;
 		this[name] = value;
 	}
 
-	// TODO: Doc.
+	/**
+	* @method _extendBounds
+	* @param {Number} x
+	* @param {Number} y
+	* @protected
+	**/
 	p._extendBounds = function(x, y) {
-		// this could be borrowed from DisplayObject, but it's small and it would be best to keep this independent.
 		if (isNaN(this._minX)) {
 			this._minX = this._maxX = x;
 			this._minY = this._maxY = y;
@@ -1067,7 +1083,10 @@ var p = Graphics.prototype;
 		}
 	}
 
-	// TODO: Doc.
+	/**
+	* @method _updateBounds
+	* @protected
+	**/
 	p._updateBounds = function() {
 		var ctx = this._ctx;
 		while (boundsQueue.length) {
@@ -1075,8 +1094,14 @@ var p = Graphics.prototype;
 		}
 	}
 
-	p._bezierCurveBounds = function(x1, x2, cp1x, cp1y, cp2x, cp2y, x2, y2) {
-		// TODO: need to track and pass in the old X/Y.
+		/**
+	* @method _bezierCurveToBounds
+	* @protected
+	**/
+	p._bezierCurveToBounds = function(x1, x2, cp1x, cp1y, cp2x, cp2y, x2, y2) {
+		this._extendBounds(x1, y1);
+		this._extendBounds(x2, y2);
+		// TODO: implement.
 	}
 
 window.Graphics = Graphics;
