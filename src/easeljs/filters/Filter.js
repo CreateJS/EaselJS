@@ -49,13 +49,14 @@ var p = Filter.prototype;
 	
 // public methods:
 	/**
-	* Returns a generic object with values indicating the margins required to draw the filter.
-	* The object will have properties: top, left, right, bottom.
-	* @method getMargins
-	* @return {Object} a generic object with top, left, right, and bottom properties.
+	* Returns a rectangle with values indicating the margins required to draw the filter.
+	* For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
+	* (but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0).
+	* @method getBounds
+	* @return {Rectangle} a rectangle object indicating the margins required to draw the filter.
 	**/
-	p.getMargins = function() {
-		return {left:0,top:0,right:0,bottom:0}
+	p.getBounds = function() {
+		return new Rectangle(0,0,0,0);
 	}
 	
 	/**

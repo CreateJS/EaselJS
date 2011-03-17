@@ -57,26 +57,6 @@ function Command(f, params) {
 * @param {Object} scope
 **/
 Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
-Command.prototype.reuse = false;
-
-Command._pool = [];
-Command.get = function(f, params) {
-	if (Command._pool.length) {
-		var cmd = Command._pool.pop();
-		cmd.f = f;
-		cmd.params = params;
-	} else {
-		cmd = new Command(f,params);
-	}
-	cmd.reuse = true;
-	return cmd;
-}
-Command.put = function(cmd) {
-	if (cmd.f && cmd.reuse) {
-		cmd.f = null;
-		Command._pool.push(cmd);
-	}
-}
 
 /**
 * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a specified context.
@@ -106,7 +86,6 @@ Command.put = function(cmd) {
 * @for Graphics
 **/
 Graphics = function(instructions) {
-	this._boundsQueue = [];
 	this.clear();
 	this._ctx = Graphics._ctx;
 	with (this) { eval(instructions); }
@@ -197,7 +176,7 @@ var p = Graphics.prototype;
 	* @type CanvasRenderingContext2D
 	**/
 	Graphics._ctx = document.createElement("canvas").getContext("2d");
-
+	
 	/**
 	* @property beginCmd
 	* @static
@@ -205,7 +184,7 @@ var p = Graphics.prototype;
 	* @type Command
 	**/
 	Graphics.beginCmd = new Command(Graphics._ctx.beginPath, []);
-
+	
 	/**
 	* @property fillCmd
 	* @static
@@ -213,7 +192,7 @@ var p = Graphics.prototype;
 	* @type Command
 	**/
 	Graphics.fillCmd = new Command(Graphics._ctx.fill, []);
-
+	
 	/**
 	* @property strokeCmd
 	* @static
@@ -308,6 +287,10 @@ var p = Graphics.prototype;
 
 	// TODO: Doc.
 	p.getBounds = function() {
+		// TODO: finish implementation.
+			// TODO: implement _x, _y tracking everywhere (ex. see "lineTo" and "moveTo") (required for lineTo/curveTo, etc bounds).
+		// For cheap calculations, bounds are updated immediately  (ex. see "lineTo" & "rect").
+		// More expensive calculations are deferred until getBounds is called (ex. see "bezierCurveTo").
 		if (this._boundsQueue.length) { this._updateBounds(); }
 		return isNaN(this._minX) ? null : new Rectangle(this._minX, this._minY, this._maxX-this._minX, this._maxY-this._minY);
 	}
@@ -321,7 +304,9 @@ var p = Graphics.prototype;
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.moveTo = function(x, y) {
-		this._activeInstructions.push(Command.get(this._ctx.moveTo, [x, y]));
+		this._activeInstructions.push(new Command(this._ctx.moveTo, [x, y]));
+		this._x = x;
+		this._y = y;
 		return this;
 	}
 	
@@ -337,7 +322,11 @@ var p = Graphics.prototype;
 	**/
 	p.lineTo = function(x, y) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(Command.get(this._ctx.lineTo, [x, y]));
+		this._activeInstructions.push(new Command(this._ctx.lineTo, [x, y]));
+		this._extendBounds(this._x, this._y);
+		this._extendBounds(x, y);
+		this._x = x;
+		this._y = y;
 		return this;
 	}
 	
@@ -355,7 +344,7 @@ var p = Graphics.prototype;
 	**/
 	p.arcTo = function(x1, y1, x2, y2, radius) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(Command.get(this._ctx.arcTo, [x1, y1, x2, y2, radius]));
+		this._activeInstructions.push(new Command(this._ctx.arcTo, [x1, y1, x2, y2, radius]));
 		return this;
 	}
 	
@@ -376,7 +365,7 @@ var p = Graphics.prototype;
 	p.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		this._dirty = this._active = true;
 		if (anticlockwise == null) { anticlockwise = false; }
-		this._activeInstructions.push(Command.get(this._ctx.arc, [x, y, radius, startAngle, endAngle, anticlockwise]));
+		this._activeInstructions.push(new Command(this._ctx.arc, [x, y, radius, startAngle, endAngle, anticlockwise]));
 		return this;
 	}
 	
@@ -393,7 +382,7 @@ var p = Graphics.prototype;
 	**/
 	p.quadraticCurveTo = function(cpx, cpy, x, y) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(Command.get(this._ctx.quadraticCurveTo, [cpx, cpy, x, y]));
+		this._activeInstructions.push(new Command(this._ctx.quadraticCurveTo, [cpx, cpy, x, y]));
 		return this;
 	}
 	
@@ -413,8 +402,8 @@ var p = Graphics.prototype;
 	**/
 	p.bezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(Command.get(this._ctx.bezierCurveTo, [cp1x, cp1y, cp2x, cp2y, x, y]));
-		this._boundsQueue.push(Command.get(this._bezierCurveToBounds, [_x, _y, cp1x, cp1y, cp2x, cp2y, x, y]));
+		this._activeInstructions.push(new Command(this._ctx.bezierCurveTo, [cp1x, cp1y, cp2x, cp2y, x, y]));
+		this._boundsQueue.push(new Command(this._bezierCurveToBounds, [_x, _y, cp1x, cp1y, cp2x, cp2y, x, y]));
 		return this;
 	}
 	
@@ -432,7 +421,9 @@ var p = Graphics.prototype;
 	**/
 	p.rect = function(x, y, w, h) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(Command.get(this._ctx.rect, [x, y, w-1, h]));
+		this._activeInstructions.push(new Command(this._ctx.rect, [x, y, w-1, h]));
+		this._extendBounds(x, y);
+		this._extendBounds(x+w, y+h);
 		return this;
 	}
 	
@@ -445,7 +436,7 @@ var p = Graphics.prototype;
 	p.closePath = function() {
 		if (this._active) {
 			this._dirty = true;
-			this._activeInstructions.push(Command.get(this._ctx.closePath, []));
+			this._activeInstructions.push(new Command(this._ctx.closePath, []));
 		}
 		return this;
 	}
@@ -458,25 +449,13 @@ var p = Graphics.prototype;
 	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	**/
 	p.clear = function() {
-		// TODO: evaluate setting .length = 0 instead of recreating instruction arrays.
-		// reset instructions:
-		if (this._dirty) { this._updateInstructions(); }
-		if (this._instructions) {
-			var l = this._instructions.length;
-			for (var i=0; i<l; i++) {
-				Command.put(this._instructions[i]);
-			}
-		}
 		this._instructions = [];
 		this._oldInstructions = [];
 		this._activeInstructions = [];
 		this._strokeStyleInstructions = this._strokeInstructions = this._fillInstructions = null;
 		this._active = this._dirty = false;
-
-		// reset bounds;
-		this._boundsQueue.length = 0;
+		this._boundsQueue = [];
 		this._minX = this._minY = this._maxX = this._maxY = NaN;
-		
 		return this;
 	}
 	
@@ -489,7 +468,7 @@ var p = Graphics.prototype;
 	**/
 	p.beginFill = function(color) {
 		if (this._active) { this._newPath(); }
-		this._fillInstructions = color ? [Command.get(this._setProp, ["fillStyle", color])] : null;
+		this._fillInstructions = color ? [new Command(this._setProp, ["fillStyle", color])] : null;
 		return this;
 	}
 	
@@ -514,7 +493,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._fillInstructions = [Command.get(this._setProp, ["fillStyle", o])];
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
 		return this;
 	}
 	
@@ -541,7 +520,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._fillInstructions = [Command.get(this._setProp, ["fillStyle", o])];
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
 		return this;
 	}
 	
@@ -557,7 +536,7 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		repetition = repetition || "";
 		var o = this._ctx.createPattern(image, repetition);
-		this._fillInstructions = [Command.get(this._setProp, ["fillStyle", o])];
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
 		return this;
 	}
 	
@@ -582,10 +561,10 @@ var p = Graphics.prototype;
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
 		if (this._active) { this._newPath(); }
 		this._strokeStyleInstructions = [
-			Command.get(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)]),
-			Command.get(this._setProp, ["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))]),
-			Command.get(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))]),
-			Command.get(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)])
+			new Command(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)]),
+			new Command(this._setProp, ["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))]),
+			new Command(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))]),
+			new Command(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)])
 			];
 		return this;
 	}
@@ -597,7 +576,7 @@ var p = Graphics.prototype;
 	**/
 	p.beginStroke = function(color) {
 		if (this._active) { this._newPath(); }
-		this._strokeInstructions = color ? [Command.get(this._setProp, ["strokeStyle", color])] : null;
+		this._strokeInstructions = color ? [new Command(this._setProp, ["strokeStyle", color])] : null;
 		return this;
 	}
 	
@@ -618,7 +597,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._strokeInstructions = [Command.get(this._setProp, ["strokeStyle", o])];
+		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
 		return this;
 	}
 	
@@ -642,7 +621,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._strokeInstructions = [Command.get(this._setProp, ["strokeStyle", o])];
+		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
 		return this;
 	}
 	
@@ -657,7 +636,7 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		repetition = repetition || "";
 		var o = this._ctx.createPattern(image, repetition);
-		this._strokeInstructions = [Command.get(this._setProp, ["strokeStyle", o])];
+		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
 		return this;
 	}
 	
@@ -717,15 +696,15 @@ var p = Graphics.prototype;
 	p.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(
-			Command.get(this._ctx.moveTo, [x+radiusTL, y]),
-			Command.get(this._ctx.lineTo, [x+w-radiusTR, y]),
-			Command.get(this._ctx.arc, [x+w-radiusTR, y+radiusTR, radiusTR, (-Math.PI/2), 0, false]),
-			Command.get(this._ctx.lineTo, [x+w, y+h-radiusBR]),
-			Command.get(this._ctx.arc, [x+w-radiusBR, y+h-radiusBR, radiusBR, 0, Math.PI/2, false]),
-			Command.get(this._ctx.lineTo, [x+radiusBL, y+h]),
-			Command.get(this._ctx.arc, [x+radiusBL, y+h-radiusBL, radiusBL, Math.PI/2, Math.PI, false]),
-			Command.get(this._ctx.lineTo, [x, y+radiusTL]),
-			Command.get(this._ctx.arc, [x+radiusTL, y+radiusTL, radiusTL, Math.PI, Math.PI*3/2, false])
+			new Command(this._ctx.moveTo, [x+radiusTL, y]),
+			new Command(this._ctx.lineTo, [x+w-radiusTR, y]),
+			new Command(this._ctx.arc, [x+w-radiusTR, y+radiusTR, radiusTR, (-Math.PI/2), 0, false]),
+			new Command(this._ctx.lineTo, [x+w, y+h-radiusBR]),
+			new Command(this._ctx.arc, [x+w-radiusBR, y+h-radiusBR, radiusBR, 0, Math.PI/2, false]),
+			new Command(this._ctx.lineTo, [x+radiusBL, y+h]),
+			new Command(this._ctx.arc, [x+radiusBL, y+h-radiusBL, radiusBL, Math.PI/2, Math.PI, false]),
+			new Command(this._ctx.lineTo, [x, y+radiusTL]),
+			new Command(this._ctx.arc, [x+radiusTL, y+radiusTL, radiusTL, Math.PI, Math.PI*3/2, false])
 		);
 		return this;
 	} 
@@ -776,11 +755,11 @@ var p = Graphics.prototype;
 		var ym = y + h / 2;
 			
 		this._activeInstructions.push(
-			Command.get(this._ctx.moveTo, [x, ym]),
-			Command.get(this._ctx.bezierCurveTo, [x, ym-oy, xm-ox, y, xm, y]),
-			Command.get(this._ctx.bezierCurveTo, [xm+ox, y, xe, ym-oy, xe, ym]),
-			Command.get(this._ctx.bezierCurveTo, [xe, ym+oy, xm+ox, ye, xm, ye]),
-			Command.get(this._ctx.bezierCurveTo, [xm-ox, ye, x, ym+oy, x, ym])
+			new Command(this._ctx.moveTo, [x, ym]),
+			new Command(this._ctx.bezierCurveTo, [x, ym-oy, xm-ox, y, xm, y]),
+			new Command(this._ctx.bezierCurveTo, [xm+ox, y, xe, ym-oy, xe, ym]),
+			new Command(this._ctx.bezierCurveTo, [xe, ym+oy, xm+ox, ye, xm, ye]),
+			new Command(this._ctx.bezierCurveTo, [xm-ox, ye, x, ym+oy, x, ym])
 		);
 		return this;
 	}
@@ -808,14 +787,14 @@ var p = Graphics.prototype;
 		else { angle /= 180/Math.PI; }
 		var a = Math.PI/sides;
 		
-		this._activeInstructions.push(Command.get(this._ctx.moveTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
+		this._activeInstructions.push(new Command(this._ctx.moveTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
 		for (var i=0; i<sides; i++) {
 			angle += a;
 			if (pointSize != 1) {
-				this._activeInstructions.push(Command.get(this._ctx.lineTo, [x+Math.cos(angle)*radius*pointSize, y+Math.sin(angle)*radius*pointSize]));
+				this._activeInstructions.push(new Command(this._ctx.lineTo, [x+Math.cos(angle)*radius*pointSize, y+Math.sin(angle)*radius*pointSize]));
 			}
 			angle += a;
-			this._activeInstructions.push(Command.get(this._ctx.lineTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
+			this._activeInstructions.push(new Command(this._ctx.lineTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
 		}
 		return this;
 	}
@@ -1038,7 +1017,7 @@ var p = Graphics.prototype;
 	* @protected
 	**/
 	p._updateInstructions = function() {
-		this._instructions = this._oldInstructions.slice();
+		this._instructions = this._oldInstructions.slice()
 		this._instructions.push(Graphics.beginCmd);
 		 
 		if (this._fillInstructions) { this._instructions.push.apply(this._instructions, this._fillInstructions); }
@@ -1048,7 +1027,7 @@ var p = Graphics.prototype;
 				this._instructions.push.apply(this._instructions, this._strokeStyleInstructions);
 			}
 		}
-
+		
 		this._instructions.push.apply(this._instructions, this._activeInstructions);
 		
 		if (this._fillInstructions) { this._instructions.push(Graphics.fillCmd); }
@@ -1078,9 +1057,13 @@ var p = Graphics.prototype;
 		this[name] = value;
 	}
 
-	// TODO: Doc.
+	/**
+	* @method _extendBounds
+	* @param {Number} x
+	* @param {Number} y
+	* @protected
+	**/
 	p._extendBounds = function(x, y) {
-		// this could be borrowed from DisplayObject, but it's small and it would be best to keep this independent.
 		if (isNaN(this._minX)) {
 			this._minX = this._maxX = x;
 			this._minY = this._maxY = y;
@@ -1092,7 +1075,10 @@ var p = Graphics.prototype;
 		}
 	}
 
-	// TODO: Doc.
+	/**
+	* @method _updateBounds
+	* @protected
+	**/
 	p._updateBounds = function() {
 		var ctx = this._ctx;
 		while (boundsQueue.length) {
@@ -1100,8 +1086,14 @@ var p = Graphics.prototype;
 		}
 	}
 
-	p._bezierCurveBounds = function(x1, x2, cp1x, cp1y, cp2x, cp2y, y1, y2) {
-		// TODO: need to track and pass in the old X/Y.
+		/**
+	* @method _bezierCurveToBounds
+	* @protected
+	**/
+	p._bezierCurveToBounds = function(x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2) {
+		this._extendBounds(x1, y1);
+		this._extendBounds(x2, y2);
+		// TODO: implement.
 	}
 
 window.Graphics = Graphics;

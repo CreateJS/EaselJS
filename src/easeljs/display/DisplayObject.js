@@ -479,7 +479,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	**/
 	p.uncache = function() {
 		this.cacheCanvas = null;
-		this.cacheOffsetX = this.cacheOffsetY = 0;
+		this._cacheOffsetX = this._cacheOffsetY = 0;
 	}
 	
 	/**
@@ -627,7 +627,11 @@ DisplayObject._workingMatrix = new Matrix2D();
 
 	// TODO: Doc.
 	p.getBounds = function() {
-		return isNaN(this._minX) ? null : new Rectangle(this._minX, this._minY, this._maxX-this._minX, this._maxY-this._minY);
+		if (this._cacheCanvas) {
+			return new Rectangle(-this._cacheOffsetX, -this._cacheOffsetY, this.cacheCanvas.width, this.cacheCanvas.height);
+		} else {
+			return this._calculateBounds();
+		}
 	}
 	
 	/**
@@ -710,20 +714,10 @@ DisplayObject._workingMatrix = new Matrix2D();
 		return hit;
 	}
 
-	// TODO: Doc.
-	p._extendBounds = function(x, y) {
-		if (isNaN(this._minX)) {
-			this._minX = this._maxX = x;
-			this._minY = this._maxY = y;
-		} else {
-			if (x < this._minX) { this._minX = x; }
-			else if (x > this._maxX) { this._maxX = x; }
-			if (y < this._minY) { this._minY = y; }
-			else if (y > this._maxY) { this._maxY = y; }
-		}
-	}
-
-	// TODO: Doc.
+	/**
+	* @method _applyFilters
+	* @protected
+	**/
 	p._applyFilters = function() {
 		if (!this.filters || this.filters.length == 0 || !this.cacheCanvas) { return; }
 		var l = this.filters.length;
@@ -733,6 +727,15 @@ DisplayObject._workingMatrix = new Matrix2D();
 		for (var i=0; i<l; i++) {
 			this.filters[i].applyFilter(ctx, 0, 0, w, h);
 		}
+	}
+
+	/**
+	* @method _calculateBounds
+	* @protected
+	* @return {Rectangle}
+	**/
+	p._calculateBounds = function() {
+		return new Rectangle(0,0,0,0);
 	}
 
 window.DisplayObject = DisplayObject;
