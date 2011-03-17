@@ -30,6 +30,7 @@
 goog.provide('BoxBlurFilter');
 
 goog.require('Filter');
+goog.require('Rectangle');
 
 (function(window) {
 
