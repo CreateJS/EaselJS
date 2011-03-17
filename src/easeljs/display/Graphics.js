@@ -1098,7 +1098,7 @@ var p = Graphics.prototype;
 	* @method _bezierCurveToBounds
 	* @protected
 	**/
-	p._bezierCurveToBounds = function(x1, x2, cp1x, cp1y, cp2x, cp2y, x2, y2) {
+	p._bezierCurveToBounds = function(x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2) {
 		this._extendBounds(x1, y1);
 		this._extendBounds(x2, y2);
 		// TODO: implement.
