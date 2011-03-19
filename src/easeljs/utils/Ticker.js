@@ -37,7 +37,6 @@
 
 (function(window) {
 
-
 // constructor:
 	/**
 	* The Ticker class uses a static interface (ex. Ticker.getPaused()) and should not be instantiated.
@@ -165,6 +164,8 @@
 	Ticker.addListener = function(o, pauseable) {
 		if (!Ticker._inited) {
 			Ticker._inited = true;
+			Ticker._startTime = Ticker._getTime();
+			Ticker._times.push(0);
 			Ticker.setInterval(Ticker._interval);
 		}
 		this.removeListener(o);
@@ -206,7 +207,7 @@
 	**/
 	Ticker.setInterval = function(interval) {
 		if (Ticker._intervalID != null) { clearInterval(Ticker._intervalID); }
-		Ticker._lastTime = Ticker._getTime();
+		Ticker._lastTime = Ticker.getTime(false);
 		Ticker._interval = interval;
 		Ticker._intervalID = setInterval(Ticker._tick, interval);
 	}
@@ -322,6 +323,7 @@
 		var time = Ticker.getTime(false);
 		var elapsedTime = time-Ticker._lastTime;
 		var paused = Ticker._paused;
+		console.log("huh",Ticker._lastTime, time);
 		
 		if (paused) {
 			Ticker._pausedTickers++;
@@ -330,8 +332,7 @@
 		Ticker._lastTime = time;
 		
 		var pauseable = Ticker._pauseable;
-		var listeners = Ticker._listeners;
-		
+		var listeners = Ticker._listeners.slice();
 		var l = listeners ? listeners.length : 0;
 		for (var i=0; i<l; i++) {
 			var p = pauseable[i];
@@ -351,9 +352,6 @@
 	Ticker._getTime = function() {
 		return new Date().getTime();
 	}
-	
-	//docced above
-	Ticker._startTime = Ticker._getTime();
 
 window.Ticker = Ticker;
 }(window));
