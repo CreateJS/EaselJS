@@ -1,3 +1,13 @@
+Version 0.4 [NOT RELEASED]
+****************************************************************************************************
+- fixes to Ticker
+- added DisplayObject.getBounds() (incomplete)
+- added filter support via DisplayObject.filters and Filter objects
+- added DisplayObject.setTransform()
+- added DisplayObject.onDoubleClick handler (thanks to rbarazi)
+- added MouseEvent.nativeEvent property
+
+
 Version 0.3.2 [Mar 2, 2011]
 ****************************************************************************************************
 - added stage.mouseInBounds
