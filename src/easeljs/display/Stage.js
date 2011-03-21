@@ -201,7 +201,6 @@ var p = Stage.prototype = new Container();
 		this.mouseChildren = true;
 		
 		var o = this;
-		
 		if(!this.hasTouchSupport())
 		{
 			if (window.addEventListener) {
@@ -215,8 +214,7 @@ var p = Stage.prototype = new Container();
 			}
 			canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
 		}
-		else
-		{
+		else {
 			canvas.addEventListener("touchstart", function(e) { o._handleTouchStart(e); }, false);
 			document.addEventListener("touchend", function(e) { o._handleTouchEnd(e); }, false);
 		}
