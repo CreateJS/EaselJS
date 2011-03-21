@@ -453,8 +453,7 @@ var p = Stage.prototype = new Container();
 		for(var i = 0; i < len; i++){
 			touch = touches[i];
 			
-			//check to see if the touch point we are tracking
-			//ended
+			//find the primary touchPoint by id
 			if(touch.identifier == this._primaryTouchId) {
 				return touch;
 			}
