@@ -6,6 +6,7 @@ Version 0.4 [NOT RELEASED]
 - added DisplayObject.setTransform()
 - added DisplayObject.onDoubleClick handler (thanks to rbarazi)
 - added MouseEvent.nativeEvent property
+- performance optimization for DisplayObject drawing (6910e6849856bd0740f8)
 
 
 Version 0.3.2 [Mar 2, 2011]
