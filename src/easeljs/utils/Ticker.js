@@ -323,7 +323,6 @@
 		var time = Ticker.getTime(false);
 		var elapsedTime = time-Ticker._lastTime;
 		var paused = Ticker._paused;
-		console.log("huh",Ticker._lastTime, time);
 		
 		if (paused) {
 			Ticker._pausedTickers++;

@@ -443,14 +443,13 @@ DisplayObject._workingMatrix = new Matrix2D();
 	**/
 	p.cache = function(x, y, width, height) {
 		// draw to canvas.
-		var ctx;
 		if (this.cacheCanvas == null) { this.cacheCanvas = document.createElement("canvas"); }
-		ctx = this.cacheCanvas.getContext("2d");
+		var ctx = this.cacheCanvas.getContext("2d");
 		this.cacheCanvas.width = width;
 		this.cacheCanvas.height = height;
-		ctx.setTransform(1, 0, 0, 1, -x, -y);
-		ctx.clearRect(0, 0, width+1, height+1); // because some browsers don't clear if the width/height remain the same.
-		this.draw(ctx, true);
+		ctx.setTransform(1, 0, 0, 1, 0, 0); // because some browsers don't properly clear if the width/height remain the same.
+		ctx.clearRect(0, 0, width+1, height+1); // because some browsers don't properly clear if the width/height remain the same.
+		this.draw(ctx, true, new Matrix2D(1,0,0,1,-x,-y));
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
 		this._applyFilters();

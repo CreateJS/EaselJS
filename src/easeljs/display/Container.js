@@ -133,7 +133,7 @@ var p = Container.prototype = new DisplayObject();
 									child.regX, child.regY);
 			mtx.appendProperties(child.alpha, child.shadow, child.compositeOperation);
 
-			if (!(child instanceof Container)) {
+			if (!(child instanceof Container && child.cacheCanvas == null)) {
 				if (snap && child.snapToPixel && mtx.a == 1 && mtx.b == 0 && mtx.c == 0 && mtx.d == 1) {
 					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0);
 				} else {
