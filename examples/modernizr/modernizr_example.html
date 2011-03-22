@@ -5,7 +5,7 @@
 <title>EaselJS Example: Modernizr</title>
 
 <link href="../styles/styles.css" rel="stylesheet" type="text/css" />
-
+<link href="styles.css" rel="stylesheet" type="text/css" />
 
 <!--
 	Modernizr Library
@@ -40,12 +40,13 @@ var update = true;
 function init() {
 	
 	//Make sure the browser supports the canvas element
-	if(!Modernizr.canvas)
+	if(!!Modernizr.canvas)
 	{
-		var canvasDiv = document.getElementById("canvasHolder");
+		var canvasDiv = document.getElementById("canvasContainer");
 		
 		//if canvas is not supported, show a message to the user
-		canvasDiv.innerHTML("This example requires a browser that supports the HTML5 Canvas element.");
+		canvasDiv.innerHTML = "<div class=\"nosupport\">" +
+					"This example requires a browser that supports the HTML5 Canvas element.</div>";
 		
 		//return since the example wont work
 		return;
@@ -136,7 +137,7 @@ function tick() {
 	<p>This example uses the <a href="../dragAndDrop.html">drag and drop example</a> to show how to use the <a href="http://www.modernizr.com/">Modernizr library</a> to detect browser support for features. In this case, Modernizr is being used to detect for Browser and touch support.</p>
 	<p>Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.</p>
 	</div>
-	<div class="canvasHolder">
+	<div class="canvasHolder" id="canvasContainer">
 		<canvas id="testCanvas" width="980" height="580"></canvas>
 	</div>
 </body>

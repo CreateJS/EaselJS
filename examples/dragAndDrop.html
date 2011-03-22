@@ -4,16 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>EaselJS Example: Rollovers and Drag & Drop</title>
 
-<link href="styles.css" rel="stylesheet" type="text/css" />
-
-
-<!--
-	Modernizr Library
-	http://www.modernizr.com/
-	
-	Used in this example to detect touch support.
--->
-<script src="modernizr-1.7.js"></script>
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
 
 <!-- Import EaselJS Framework -->
 <script src="../src/easeljs/utils/UID.js"></script>
@@ -42,7 +33,7 @@ function init() {
 	canvas = document.getElementById("testCanvas");
 	
 	//check to see if we are running in a browser with touch support
-	var useTouch = Modernizr.touch;
+	var useTouch = hasTouchSupport();
 	stage = new Stage(canvas, useTouch);
 
 	// enabled mouse over / out events
@@ -52,6 +43,17 @@ function init() {
 	var image = new Image();
 	image.src = "img/daisy.png";
 	image.onload = handleImageLoad;
+}
+
+function hasTouchSupport()
+{
+	//note: this is a very simple test that will work on Android and iOS. For production
+	//you should use a library like modernizr for more robust feature detection:
+	//http://www.modernizr.com/
+	//Modernizr.touch
+	//
+	//There is an example of how to use Modernizr in the examples/modernizr folder.
+	return ('ontouchstart' in window);
 }
 
 function handleImageLoad(event) {
