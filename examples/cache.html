@@ -104,8 +104,8 @@ function toggleCache(value) {
 	<div class="description">
 	This example demonstrates the effect of <strong>DisplayObject.cache()</strong> and <strong>snapToPixel</strong> on performance. Caching speeds things up because the complex vector shapes do not have to be rerendered each tick. The results for snapToPixel vary between browsers, but in general it will have no effect on the uncached shapes, but a significant effect when cached.
 	<br/><br/>
-	<input type="checkbox" onClick="toggleCache(this.value);"/> cache enabled
-	<input type="checkbox" onClick="stage.snapToPixelEnabled = !!this.value;"/> snapToPixel enabled
+	<input type="checkbox" onClick="toggleCache(this.checked);"/> cache enabled
+	<input type="checkbox" onClick="stage.snapToPixelEnabled = !!this.checked;"/> snapToPixel enabled
 	</div>
 	<div class="canvasHolder">
 		<canvas id="testCanvas" width="980" height="680" style="background-color:#000"></canvas>
