@@ -40,12 +40,12 @@ var update = true;
 function init() {
 	
 	//Make sure the browser supports the canvas element
-	if(!!Modernizr.canvas)
+	if(!Modernizr.canvas)
 	{
 		var canvasDiv = document.getElementById("canvasContainer");
 		
 		//if canvas is not supported, show a message to the user
-		canvasDiv.innerHTML = "<div class=\"nosupport\">" +
+		canvasDiv.innerHTML = "<div id=\"nosupport\">" +
 					"This example requires a browser that supports the HTML5 Canvas element.</div>";
 		
 		//return since the example wont work
