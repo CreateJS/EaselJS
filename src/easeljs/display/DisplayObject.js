@@ -447,7 +447,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		var ctx = this.cacheCanvas.getContext("2d");
 		this.cacheCanvas.width = width;
 		this.cacheCanvas.height = height;
-		ctx.setTransform(1, 0, 0, 1, 0, 0); // because some browsers don't properly clear if the width/height remain the same.
+		ctx.setTransform(1, 0, 0, 1, -x, -y); // because some browsers don't properly clear if the width/height remain the same.
 		ctx.clearRect(0, 0, width+1, height+1); // because some browsers don't properly clear if the width/height remain the same.
 		this.draw(ctx, true, new Matrix2D(1,0,0,1,-x,-y));
 		this._cacheOffsetX = x;
