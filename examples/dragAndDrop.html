@@ -6,6 +6,15 @@
 
 <link href="styles.css" rel="stylesheet" type="text/css" />
 
+
+<!--
+	Modernizr Library
+	http://www.modernizr.com/
+	
+	Used in this example to detect touch support.
+-->
+<script src="modernizr-1.7.js"></script>
+
 <!-- Import EaselJS Framework -->
 <script src="../src/easeljs/utils/UID.js"></script>
 <script src="../src/easeljs/events/MouseEvent.js"></script>
@@ -31,7 +40,10 @@ var update = true;
 function init() {
 	// create stage and point it to the canvas:
 	canvas = document.getElementById("testCanvas");
-	stage = new Stage(canvas);
+	
+	//check to see if we are running in a browser with touch support
+	var useTouch = Modernizr.touch;
+	stage = new Stage(canvas, useTouch);
 
 	// enabled mouse over / out events
 	stage.enableMouseOver(10);

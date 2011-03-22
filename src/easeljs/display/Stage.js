@@ -43,9 +43,11 @@
 * @extends Container
 * @constructor
 * @param {HTMLCanvasElement} canvas The canvas the stage will render to.
+* @param {Boolean} useTouch Whether the interaction model should leverage touch support. If touch support is enabled, Stage will listen for TouchEvents, and not
+* MouseEvents for its interaction model. Default value is false..
 **/
-Stage = function(canvas) {
-  this.initialize(canvas);
+Stage = function(canvas, useTouch) {
+  this.initialize(canvas, useTouch);
 }
 var p = Stage.prototype = new Container();
 
@@ -195,13 +197,13 @@ var p = Stage.prototype = new Container();
 	* param {HTMLCanvasElement} canvas
 	* @protected
 	**/
-	p.initialize = function(canvas) {
+	p.initialize = function(canvas, useTouch) {
 		this.Container_initialize();
 		this.canvas = canvas;
 		this.mouseChildren = true;
 		
 		var o = this;
-		if(!this.hasTouchSupport())
+		if(!useTouch)
 		{
 			if (window.addEventListener) {
 				window.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
@@ -219,13 +221,7 @@ var p = Stage.prototype = new Container();
 			document.addEventListener("touchend", function(e) { o._handleTouchEnd(e); }, false);
 		}
 	}
-	
-	//todo: probably move this to a statc function / utility
-	p.hasTouchSupport = function() {
-		//need to test this on android / firefox
-		return ('ontouchstart' in window);
-	}	
-	
+		
 // public methods:
 
 	/**
