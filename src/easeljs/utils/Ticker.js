@@ -197,6 +197,8 @@
 		Ticker._listeners = [];
 		Ticker._pauseable = [];
 	}
+
+  Ticker._requestFrame = function() {};
 	
 	/**
 	* Sets the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
@@ -209,7 +211,14 @@
 		if (Ticker._intervalID != null) { clearInterval(Ticker._intervalID); }
 		Ticker._lastTime = Ticker.getTime(false);
 		Ticker._interval = interval;
-		Ticker._intervalID = setInterval(Ticker._tick, interval);
+
+    if (typeof window.mozRequestAnimationFrame === "function") {
+      (Ticker._requestFrame = function() { window.mozRequestAnimationFrame(Ticker._tick); })();
+    } else if (typeof window.webkitRequestAnimationFrame === "function") {
+      (Ticker._requestFrame = function() { window.webkitRequestAnimationFrame(Ticker._tick); })();
+    } else {
+		  Ticker._intervalID = setInterval(Ticker._tick, interval);
+    } 
 	}
 	
 	/**
@@ -342,6 +351,8 @@
 		
 		Ticker._times.unshift(time);
 		if (Ticker._times.length > 100) { Ticker._times.pop(); }
+
+    Ticker._requestFrame(); // Will do nothing if RequestAnimationFrame is not supported
 	}
 	
 	/**
