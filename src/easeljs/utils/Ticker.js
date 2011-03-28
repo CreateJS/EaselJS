@@ -120,12 +120,15 @@
 	**/
 	Ticker._pausedTickers = 0;
 	
+
+  var DEFAULT_INTERVAL = 20; // 50 FPS
+
 	/** 
 	* @property _interval
 	* @type Number
 	* @protected 
 	**/
-	Ticker._interval = 50; // READ-ONLY
+	Ticker._interval = DEFAULT_INTERVAL; // READ-ONLY
 	
 	/** 
 	* @property _intervalID
@@ -166,7 +169,7 @@
 			Ticker._inited = true;
 			Ticker._startTime = Ticker._getTime();
 			Ticker._times.push(0);
-			Ticker.setInterval(Ticker._interval);
+			Ticker.setInterval(); 
 		}
 		this.removeListener(o);
 		Ticker._pauseable[Ticker._listeners.length] = (pauseable == null) ? true : pauseable;
@@ -198,25 +201,27 @@
 		Ticker._pauseable = [];
 	}
 
-  Ticker._requestFrame = function() {};
+  var nextFrame = function() {};
 	
 	/**
-	* Sets the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
+	* Sets the target time (in milliseconds) between ticks. Default is 20 (50 FPS).
 	* Note actual time between ticks may be more than requested depending on CPU load.
 	* @method setInterval
 	* @static
-	* @param {Number} interval Time in milliseconds between ticks. Default value is 50.
+	* @param {Number} interval Time in milliseconds between ticks. Default value is 20.
 	**/
 	Ticker.setInterval = function(interval) {
 		if (Ticker._intervalID != null) { clearInterval(Ticker._intervalID); }
 		Ticker._lastTime = Ticker.getTime(false);
-		Ticker._interval = interval;
+		Ticker._interval = interval || DEFAULT_INTERVAL;
 
-    if (typeof window.mozRequestAnimationFrame === "function") {
-      (Ticker._requestFrame = function() { window.mozRequestAnimationFrame(Ticker._tick); })();
-    } else if (typeof window.webkitRequestAnimationFrame === "function") {
-      (Ticker._requestFrame = function() { window.webkitRequestAnimationFrame(Ticker._tick); })();
+    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+
+    if (typeof requestAnimationFrame === "function" && (interval === DEFAULT_INTERVAL || !interval)) { 
+      // Only use requestAnimationFrame API if the interval is 50 FPS or is not implicitly set by the user
+      (nextFrame = function() { requestAnimationFrame(Ticker._tick); })();
     } else {
+      nextFrame = function() {}; // Reset to empty function when using window.setInterval
 		  Ticker._intervalID = setInterval(Ticker._tick, interval);
     } 
 	}
@@ -352,7 +357,7 @@
 		Ticker._times.unshift(time);
 		if (Ticker._times.length > 100) { Ticker._times.pop(); }
 
-    Ticker._requestFrame(); // Will do nothing if RequestAnimationFrame is not supported
+    nextFrame(); // Will do nothing if requestAnimationFrame API is not supported
 	}
 	
 	/**
