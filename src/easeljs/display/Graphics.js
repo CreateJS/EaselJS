@@ -411,7 +411,9 @@ var p = Graphics.prototype;
 	p.bezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
 		this._dirty = this._active = true;
 		this._activeInstructions.push(new Command(this._ctx.bezierCurveTo, [cp1x, cp1y, cp2x, cp2y, x, y]));
-		this._boundsQueue.push(new Command(this._bezierCurveToBounds, [_x, _y, cp1x, cp1y, cp2x, cp2y, x, y]));
+		this._x = x;
+		thix._y = y;
+		this._boundsQueue.push(new Command(this._bezierCurveToBounds, [this._x, this._y, cp1x, cp1y, cp2x, cp2y, x, y]));
 		return this;
 	}
 	
