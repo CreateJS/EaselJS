@@ -38,38 +38,38 @@
 
     // constructor:
     /**
-		* The AnnimationManager class uses a static interface (ex. AnnimationManager.getList()) and should not be instantiated.
+		* The animationManager class uses a static interface (ex. animationManager.getList()) and should not be instantiated.
 		* Provides a centralized way to animate DisplayObjects
-		* @class AnnimationManager
+		* @class AnimationManager
 		* @static
 		**/
-    AnnimationManager = function() {
-        throw "AnnimationManager cannot be instantiated.";
+    AnimationManager = function() {
+        throw "animationManager cannot be instantiated.";
     }
     // public static methods:
     /**
-		* Adds an annimation
+		* Adds an animation
 		* @method add
 		* @static
-		* @param {Annimation} annimation The annimation we have to add
+		* @param {animation} animation The animation we have to add
 		**/
-    AnnimationManager.add = function(annimation) {
-        AnnimationManager._annimations.push(annimation);
+    AnimationManager.add = function(animation) {
+        AnimationManager._animations.push(animation);
     }
     // private static properties:
     /** 
-	* @property _annimations
+	* @property _animations
 	* @type Array[Object]
 	* @protected 
 	**/
-    AnnimationManager._annimations = [];
+    AnimationManager._animations = [];
 
     /** 
 	* @property _easing
 	* @type Object[String,function]
 	* @protected 
 	**/
-    AnnimationManager._easing = {
+    AnimationManager._easing = {
         //t: current time, b: begInnIng value, c: change In value, d: duration
         linear: function(t, b, c, d) {
             return (t / d) * (c - b) + b;
@@ -79,31 +79,29 @@
 
     // private static methods:
     /**
-	* Event listener for tick : the moment of annimation
+	* Event listener for tick : the moment of animation
 	* @method tick
 	* @static
 	* @protected
 	**/
-    AnnimationManager.tick = function() {
+    AnimationManager.tick = function() {
         var t = (new Date()).getTime();
-        var futureArray = [];
-        for (var a in AnnimationManager._annimations) {
-            var aa = AnnimationManager._annimations[a];
+        for (var a in AnimationManager._animations) {
+            var aa = AnimationManager._animations[a];
             var tt = t - aa.initialtime;
             if (tt < aa.timing) {
                 aa.applyStep(t - aa.initialtime);
-                futureArray.push(aa);
             } else {
                 aa.applyEnd();
+				AnimationManager._animations.splice(a,1);
             }
         }
-        AnnimationManager._annimations = futureArray;
     };
 
 
 
     ///////////////////////////////////////////
     // very important : add listener for have a tick event listener
-    Ticker.addListener(AnnimationManager, false);
-    window.AnnimationManager = AnnimationManager;
+    Ticker.addListener(AnimationManager, false);
+    window.AnimationManager = AnimationManager;
 } (window));

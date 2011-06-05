@@ -37,15 +37,15 @@
  (function(window) {
 
     /**
-	* Simple way for animate some things
-	* @class Animation
+	* Abstract class for managing events
+	* @class EventProducer
 	* @constructor
 	**/
-    Animation = function(target, goals, timing, easing) {
-        this.initialize(target, goals, timing, easing);
+    EventProducer = function() {
+        this.initialize();
     }
-    var p = Animation.prototype = new EventProducer();
-    p.initialize_event = p.initialize;
+    var p = EventProducer.prototype;
+
 
 
     // constructor:
@@ -53,54 +53,36 @@
 	* Initialization method.
 	* @method initialize
 	* @protected
-	* @param target the target element of the annimation
-	* @param goals an object with the future values of the element properties
-	* @param timing the time for the annimation in millisecond
-	* @param easing name of the easing function
 	**/
-    p.initialize = function(target, goals, timing, easing) {
-        this.initialize_event();
-        this.target = target;
-        this.goals = goals;
-        this.timing = timing;
-        this.easing = easing || 'linear';
-        this.origin = {};
-        this.initialtime = 0;
-        for (var pp in goals) {
-            this.origin[pp] = this.target[pp];
-        }
+    p.initialize = function() {
+        this.events = {};
     }
     // public methods:
     /**
-		* Start the animation
-		* @method start
-		* @return {Animation} return the animation
-		**/
-    p.start = function() {
-        this.initialtime = (new Date()).getTime();
-        AnimationManager.add(this);
-        return this;
-    }
-    /**
-	* Apply the animation step
-	* @param t the current time for the annimation
-	* @method applyStep
+	* Add an event listener
+	* @param eventName the name of the event listened
+	* @callback the function trigged
+	* @method addEventListener
 	**/
-    p.applyStep = function(t) {
-        for (var pp in this.goals) {
-            this.target[pp] = AnimationManager._easing[this.easing](t, this.origin[pp], this.goals[pp], this.timing);
+    p.addEventListener = function(eventName, callback) {
+        if (this.events[eventName] == undefined) {
+            this.events[eventName] = [callback];
+        } else {
+            this.events[eventName].push(callback);
         }
     }
     /**
-	* Apply the end animation
-	* @method applyEnd
+	* Fire an Event
+	* @param eventName the name of the event fired
+	* @method fireEvent
 	**/
-    p.applyEnd = function() {
-        for (var pp in this.goals) {
-            this.target[pp] = this.goals[pp];
+    p.fireEvent = function(eventName) {
+        if (this.events[eventName] !== undefined) {
+            for (ee in this.events[eventName]) {
+                this.events[eventName][ee]();
+            }
         }
-		this.fireEvent('complete');
     }
 
-    window.Animation = Animation;
+    window.EventProducer = EventProducer;
 } (window));

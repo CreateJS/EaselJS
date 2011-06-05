@@ -8,6 +8,7 @@
 
 
 <script src="../lib/easel.js"></script>
+<script src="../src/easeljs/events/EventProducer.js"></script>
 <script src="../src/easeljs/animation/AnimationManager.js"></script>
 <script src="../src/easeljs/animation/Animation.js"></script>
 <script>
@@ -19,7 +20,7 @@ function init() {
 	var stage = new Stage(canvas);
 	
 	// Create a new Text object:
-	var text = new Text("Hello World!", "36px Arial", "#FFF");
+	text = new Text("Hello World!", "36px Arial", "#FFF");
 	
 	// add the text as a child of the stage. This means it will be drawn any time the stage is updated
 	// and that it's transformations will be relative to the stage coordinates:
@@ -29,11 +30,30 @@ function init() {
 	text.x = 100;
 	text.y = 100;
 	
+	var img = new Image();
+    img.src = "img/icons.png";
+	var frameData = {trash:0, male:1, wait:2, library:3, female:4, hanger:5, stairs:6, noparking:7};
+    var spriteSheet = new SpriteSheet(img, 80, 80, frameData);
+	var icon1 = new BitmapSequence(spriteSheet);
+	icon1.y = 10;
+	icon1.x = 10;
+	icon1.alpha = .2;
+	icon1.gotoAndStop(2);
+	stage.addChild(icon1);
+	
+	
+	
 	// call update on the stage to make it render the current display list to the canvas:
 	stage.update();
 	
 	
-	var a = new Animation(text, {x:200, y:150}, 2000).start();
+	var a = new Animation(text, {x:200, y:150}, 2000);
+	a.addEventListener('complete', function(){
+//		console.log(text);
+		var aaa = new Animation(text, {y:400, alpha:0}, 4000).start();
+	});
+	a.start();
+	var aa = new Animation(icon1, {alpha:1}, 1500).start();
 	Ticker.addListener(stage);
 	
 	
