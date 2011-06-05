@@ -88,7 +88,6 @@
     p.applyStep = function(t) {
         for (var pp in this.goals) {
             this.target[pp] = AnnimationManager._easing[this.easing](t, this.origin[pp], this.goals[pp], this.timing);
-            console.log(pp + ' : ' + this.target[pp]);
         }
     }
     /**
