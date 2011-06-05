@@ -71,14 +71,10 @@
 	**/
     AnnimationManager._easing = {
         //t: current time, b: begInnIng value, c: change In value, d: duration
-        /*
-        linear: function(p, n, firstNum, diff) {
-            return firstNum + diff * p;
-        },
-      */
         linear: function(t, b, c, d) {
             return (t / d) * (c - b) + b;
         }
+        // TODO : write some goods easing method
     }
 
     // private static methods:
@@ -107,6 +103,7 @@
 
 
     ///////////////////////////////////////////
+    // very important : add listener for have a tick event listener
     Ticker.addListener(AnnimationManager, false);
     window.AnnimationManager = AnnimationManager;
 } (window));
