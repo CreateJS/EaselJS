@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(window) {
+(function(easeljs) {
 
 /**
 * A Container is a nestable display lists that allows you to work with compound display elements. For 
@@ -48,10 +48,10 @@
 * @extends DisplayObject
 * @constructor
 **/
-Container = function() {
+var Container = easeljs.Container = function() {
   this.initialize();
 }
-var p = Container.prototype = new DisplayObject();
+var p = Container.prototype = new easeljs.DisplayObject();
 
 // public properties:
 	/**
@@ -113,7 +113,7 @@ var p = Container.prototype = new DisplayObject();
 	* into itself).
 	**/
 	p.draw = function(ctx, ignoreCache, _mtx) {
-		var snap = Stage._snapToPixelEnabled;
+		var snap = easeljs.Stage._snapToPixelEnabled;
 		if (!_mtx) {
 			_mtx = new Matrix2D();
 			_mtx.appendProperties(this.alpha, this.shadow, this.compositeOperation);
@@ -382,9 +382,9 @@ var p = Container.prototype = new DisplayObject();
 	* @protected
 	**/
 	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
-		var ctx = DisplayObject._hitTestContext;
-		var canvas = DisplayObject._hitTestCanvas;
-		var mtx = DisplayObject._workingMatrix;
+		var ctx = easeljs.DisplayObject._hitTestContext;
+		var canvas = easeljs.DisplayObject._hitTestCanvas;
+		var mtx = easeljs.DisplayObject._workingMatrix;
 		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick || this.onDoubleClick)) || (mouseEvents&2 && 
 																(this.onMouseOver || this.onMouseOut));
 
@@ -447,5 +447,4 @@ var p = Container.prototype = new DisplayObject();
 		// calculate max/min x/y
 	}
 
-window.Container = Container;
-}(window));
+}(easeljs = window.easeljs || {}));

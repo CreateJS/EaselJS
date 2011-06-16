@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(window) {
+(function(easeljs) {
 
 /**
 * A Shape allows you to display vector art in the display list. It composites a Graphics instance which exposes all of the vector
@@ -44,10 +44,10 @@
 * @extends DisplayObject
 * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
 **/
-Shape = function(graphics) {
+var Shape = easeljs.Shape = function(graphics) {
   this.initialize(graphics);
 }
-var p = Shape.prototype = new DisplayObject();
+var p = Shape.prototype = new easeljs.DisplayObject();
 
 // public properties:
 	/**
@@ -73,7 +73,7 @@ var p = Shape.prototype = new DisplayObject();
 	**/
 	p.initialize = function(graphics) {
 		this.DisplayObject_initialize();
-		this.graphics = graphics ? graphics : new Graphics();
+		this.graphics = graphics ? graphics : new easeljs.Graphics();
 	}
 
 	/**
@@ -147,5 +147,4 @@ var p = Shape.prototype = new DisplayObject();
 		}
 	}
 
-window.Shape = Shape;
-}(window));
+}(easeljs = window.easeljs || {}));

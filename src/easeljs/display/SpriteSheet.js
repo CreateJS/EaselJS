@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(window) {
+(function(easeljs) {
 
 /**
 * Encapsulates the properties associated with a sprite sheet. A sprite sheet is a series of images (usually animation frames) combined
@@ -53,7 +53,7 @@
 * @param {Number} frameHeight The height in pixels of each frame on the sprite sheet.
 * @param {Object} frameData Defines named frames and frame sequences. See the frameData property for more information.
 **/
-SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
+var SpriteSheet = easeljs.SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
   this.initialize(image, frameWidth, frameHeight, frameData);
 }
 var p = SpriteSheet.prototype;
@@ -141,6 +141,5 @@ var p = SpriteSheet.prototype;
 		o.totalFrames = this.totalFrames;
 		return o;
 	}
-	
-window.SpriteSheet = SpriteSheet;
-}(window));
+
+}(easeljs = window.easeljs || {}));

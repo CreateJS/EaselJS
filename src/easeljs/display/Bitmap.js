@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(window) {
+(function(easeljs) {
 
 /**
 * A Bitmap represents an Image, Canvas, or Video in the display list.
@@ -43,10 +43,10 @@
 * @constructor
 * @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video to render to the display list.
 **/
-Bitmap = function(image) {
+var Bitmap = easeljs.Bitmap = function(image) {
   this.initialize(image);
 }
-var p = Bitmap.prototype = new DisplayObject();
+var p = Bitmap.prototype = new easeljs.DisplayObject();
 
 	// public properties:
 	/**
@@ -174,5 +174,4 @@ var p = Bitmap.prototype = new DisplayObject();
 		}
 	}
 
-window.Bitmap = Bitmap;
-}(window));
+}(easeljs = window.easeljs || {}));

@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(window) {
+(function(easeljs) {
 
 /**
 * Encapsulates the properties required to define a shadow to apply to a DisplayObject via it's .shadow property.
@@ -45,7 +45,7 @@
 * @param {Number} offsetY The y offset of the shadow.
 * @param {Number} blur The size of the blurring effect.
 **/
-Shadow = function(color, offsetX, offsetY, blur) {
+var Shadow = easeljs.Shadow = function(color, offsetX, offsetY, blur) {
   this.initialize(color, offsetX, offsetY, blur);
 }
 var p = Shadow.prototype;
@@ -128,6 +128,6 @@ var p = Shadow.prototype;
 	
 	// this has to be populated after the class is defined:
 	Shadow.identity = new Shadow(null, 0, 0, 0);
-	
-window.Shadow = Shadow;
-}(window));
+
+
+}(easeljs = window.easeljs || {}));

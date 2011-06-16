@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(window) {
+(function(easeljs) {
 	
 /**
 * Allows you to display one or more lines of dynamic text (not user editable) in the display list.
@@ -50,11 +50,11 @@
 * @param {String} color Optional. The color to draw the text in. Any valid value for the CSS color attribute
 * is acceptable (ex. "#F00").
 **/
-Text = function(text, font, color) {
+var Text = easeljs.Text = function(text, font, color) {
   this.initialize(text, font, color);
 }
 
-var p = Text.prototype = new DisplayObject();
+var p = Text.prototype = new easeljs.DisplayObject();
 
 
 /**
@@ -322,5 +322,4 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 		// measure each line for width
 	}
 
-window.Text = Text;
-}(window));
+}(easeljs = window.easeljs || {}));
