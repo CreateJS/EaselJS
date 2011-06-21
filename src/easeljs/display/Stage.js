@@ -60,6 +60,14 @@ var p = Stage.prototype = new Container();
 	**/
 	Stage._snapToPixelEnabled = false; // snapToPixelEnabled is temporarily copied here during a draw to provide global access.
 
+	/**
+	* @property _updateTicksDescendants
+	* @protected
+	* @type Boolean
+	* @default true
+	**/
+	Stage._updateTicksDescendants = true; // updateTicksDescendants is temporarily copied here during a draw to provide global access.
+
 // public properties:
 	/** 
 	* Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually
@@ -124,6 +132,14 @@ var p = Stage.prototype = new Container();
 	* @default false
 	**/
 	p.snapToPixelEnabled = false;
+
+	/**
+	* Indicates whether this stage should automatically tick non-BitmapSequence descendants exposing a tick method when the update method is called.
+	* @property updateTicksDescendants
+	* @type Boolean
+	* @default true
+	**/
+	p.updateTicksDescendants = true;
 	
 	/** Indicates whether the mouse is currently within the bounds of the canvas.
 	* @property mouseInBounds
@@ -230,14 +246,15 @@ var p = Stage.prototype = new Container();
 	**/
 
 	/**
-	* Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapSequence) 
-	* and render its entire display list to the canvas.
+	* Each time the update method is called, the stage will tick any BitmapSequences and any other descendants 
+	* exposing a tick method (if updateTicksDescendants is set to true) and render its entire display list to the canvas.
 	* @method update
 	**/
 	p.update = function() {
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
+		Stage._updateTicksDescendants = this.updateTicksDescendants;
 		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
 	}
 	
