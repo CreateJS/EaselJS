@@ -114,6 +114,7 @@ var p = Container.prototype = new DisplayObject();
 	**/
 	p.draw = function(ctx, ignoreCache, _mtx) {
 		var snap = Stage._snapToPixelEnabled;
+		var tick = Stage._updateTicksDescendants;
 		if (!_mtx) {
 			_mtx = new Matrix2D();
 			_mtx.appendProperties(this.alpha, this.shadow, this.compositeOperation);
@@ -124,7 +125,7 @@ var p = Container.prototype = new DisplayObject();
 		var list = this.children.slice(0);
 		for (var i=0; i<l; i++) {
 			var child = list[i];
-			if (child.tick) { child.tick(); }
+			if ((tick || child instanceof BitmapSequence) && child.tick) { child.tick(); }
 			if (!child.isVisible()) { continue; }
 			
 			var shadow = false;
