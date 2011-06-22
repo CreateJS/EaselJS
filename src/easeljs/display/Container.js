@@ -125,7 +125,7 @@ var p = Container.prototype = new DisplayObject();
 		var list = this.children.slice(0);
 		for (var i=0; i<l; i++) {
 			var child = list[i];
-			if ((tick || child instanceof BitmapSequence) && child.tick) { child.tick(); }
+			if ((tick || (window.BitmapSequence && child instanceof BitmapSequence)) && child.tick) { child.tick(); }
 			if (!child.isVisible()) { continue; }
 			
 			var shadow = false;
