@@ -78,13 +78,10 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 * <pre><code>myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
 * @class Graphics
 * @constructor
-* @param {String} instructions Optional. This is a string that will be eval'ed in the scope of this Graphics object.</code></pre>
-* This provides a mechanism for generating a vector shape from a serialized string. Ex. 
-* "beginFill('#F00');drawRect(0, 0, 10, 10);"
 * @for Graphics
 **/
-Graphics = function(instructions) {
-	this.initialize(instructions);
+Graphics = function() {
+	this.initialize();
 }
 var p = Graphics.prototype;
 
@@ -270,10 +267,9 @@ var p = Graphics.prototype;
 	* @protected
 	* @param {String} instructions
 	**/
-	p.initialize = function(instructions) {
+	p.initialize = function() {
 		this.clear();
 		this._ctx = Graphics._ctx;
-		with (this) { eval(instructions); }
 	}
 	
 	/**

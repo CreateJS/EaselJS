@@ -114,11 +114,8 @@ var p = Container.prototype = new DisplayObject();
 	**/
 	p.draw = function(ctx, ignoreCache, _mtx) {
 		var snap = Stage._snapToPixelEnabled;
-		if (!_mtx) {
-			_mtx = new Matrix2D();
-			_mtx.appendProperties(this.alpha, this.shadow, this.compositeOperation);
-		}
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+		_mtx = _mtx || this._matrix.reinitialize(1,0,0,1,0,0,this.alpha, this.shadow, this.compositeOperation);
 		var l = this.children.length;
 		// this ensures we don't have issues with display list changes that occur during a draw:
 		var list = this.children.slice(0);
@@ -128,7 +125,7 @@ var p = Container.prototype = new DisplayObject();
 			if (!child.isVisible()) { continue; }
 			
 			var shadow = false;
-			var mtx = _mtx.clone();
+			var mtx = child._matrix.reinitialize(_mtx.a,_mtx.b,_mtx.c,_mtx.d,_mtx.tx,_mtx.ty,_mtx.alpha,_mtx.shadow,_mtx.compositeOperation);
 			mtx.appendTransform(child.x, child.y, child.scaleX, child.scaleY, child.rotation, child.skewX, child.skewY, 
 									child.regX, child.regY);
 			mtx.appendProperties(child.alpha, child.shadow, child.compositeOperation);
@@ -384,7 +381,7 @@ var p = Container.prototype = new DisplayObject();
 	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;
-		var mtx = DisplayObject._workingMatrix;
+		var mtx = this._matrix;
 		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick || this.onDoubleClick)) || (mouseEvents&2 && 
 																(this.onMouseOver || this.onMouseOut));
 

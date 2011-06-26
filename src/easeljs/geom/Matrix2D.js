@@ -427,6 +427,20 @@ var p = Matrix2D.prototype;
 		return target;
 	}
 
+	// TODO: Document.
+	p.reinitialize = function(a,b,c,d,tx,ty,alpha,shadow,compositeOperation) {
+		this.a = a;
+		this.b = b;
+		this.c = c;
+		this.d = d;
+		this.tx = tx;
+		this.ty = ty;
+		this.alpha = alpha;
+		this.shadow = shadow;
+		this.compositeOperation = compositeOperation;
+		return this;
+	}
+
 	/**
 	* Appends the specified visual properties to the current matrix.
 	* @method appendProperties

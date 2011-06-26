@@ -75,14 +75,6 @@ DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
 **/
 DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 
-/**
-* @property _workingMatrix
-* @type Matrix2D
-* @static
-* @protected
-**/
-DisplayObject._workingMatrix = new Matrix2D();
-
 
 	/** 
 	* The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque.
@@ -384,6 +376,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	p._minY = NaN;
 	p._maxX = NaN;
 	p._maxY = NaN;
+	p._matrix = null;
 	
 // constructor:
 	// separated so it can be easily addressed in subclasses:
@@ -395,7 +388,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	*/
 	p.initialize = function() {
 		this.id = UID.get();
-		this.children = [];
+		this._matrix = new Matrix2D();
 	}
 	
 // public methods:
@@ -449,7 +442,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		this.cacheCanvas.height = height;
 		ctx.setTransform(1, 0, 0, 1, -x, -y);
 		ctx.clearRect(0, 0, width+1, height+1); // because some browsers don't properly clear if the width/height remain the same.
-		this.draw(ctx, true, new Matrix2D(1,0,0,1,-x,-y));
+		this.draw(ctx, true);
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
 		this._applyFilters();
@@ -511,7 +504,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* on the stage.
 	**/
 	p.localToGlobal = function(x, y) {
-		var mtx = this.getConcatenatedMatrix();
+		var mtx = this.getConcatenatedMatrix(this._matrix);
 		if (mtx == null) { return null; }
 		mtx.append(1, 0, 0, 1, x, y);
 		return new Point(mtx.tx, mtx.ty);
@@ -529,7 +522,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* display object's coordinate space.
 	**/
 	p.globalToLocal = function(x, y) {
-		var mtx = this.getConcatenatedMatrix();
+		var mtx = this.getConcatenatedMatrix(this._matrix);
 		if (mtx == null) { return null; }
 		mtx.invert();
 		mtx.append(1, 0, 0, 1, x, y);
