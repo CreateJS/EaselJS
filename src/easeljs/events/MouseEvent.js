@@ -104,16 +104,21 @@ var p = MouseEvent.prototype;
 	*/
 	p.onMouseUp = null;
 	
+	//TODO: doc.
+	p.target = null;
+	
 // constructor:
 	/** 
 	* Initialization method.
 	* @method initialize
 	* @protected
 	**/
-	p.initialize = function(type, stageX, stageY) {
+	p.initialize = function(type, stageX, stageY, target, nativeEvent) {
 		this.type = type;
 		this.stageX = stageX;
 		this.stageY = stageY;
+		this.target = target;
+		this.nativeEvent = nativeEvent;
 	}
 	
 // public methods:
@@ -123,9 +128,7 @@ var p = MouseEvent.prototype;
 	* @return {MouseEvent} a clone of the MouseEvent instance.
 	**/
 	p.clone = function() {
-		var out = new MouseEvent(this.type, this.stageX, this.stageY);
-		out.nativeEvent = this.nativeEvent;
-		return out;
+		return new MouseEvent(this.type, this.stageX, this.stageY, this.target, this.nativeEvent);
 	}
 
 	/**

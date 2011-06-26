@@ -475,8 +475,7 @@ var p = Stage.prototype = new Container();
 		this._updateMousePosition(e.pageX, e.pageY);
 		if (!inBounds && !this.mouseInBounds) { return; }
 
-		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY);
-		evt.nativeEvent = e;
+		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY, this, e);
 		
 		if (this.onMouseMove) { this.onMouseMove(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
@@ -510,19 +509,15 @@ var p = Stage.prototype = new Container();
 	* @param {MouseEvent} e
 	**/
 	p._handleMouseUp = function(e) {
-		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
-		evt.nativeEvent = e;
+		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY, this, e);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
-		if (this._activeMouseTarget && 
-			this._activeMouseTarget.onClick && 
-			this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true, (this._mouseOverIntervalID ? 3 : 1)) == this._activeMouseTarget) {
-			
-			evt = new MouseEvent("onClick", this.mouseX, this.mouseY);
-			evt.nativeEvent = e;
-			this._activeMouseTarget.onClick(evt);
+		if (this._activeMouseTarget && this._activeMouseTarget.onClick &&
+				this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true, (this._mouseOverIntervalID ? 3 : 1)) == this._activeMouseTarget) {
+
+			this._activeMouseTarget.onClick(new MouseEvent("onClick", this.mouseX, this.mouseY, this._activeMouseTarget, e));
 		}
-		this._activeMouseEvent = this.activeMouseTarget = null;
+		this._activeMouseEvent = this._activeMouseTarget = null;
 	}
 
 	/**
@@ -531,18 +526,13 @@ var p = Stage.prototype = new Container();
 	* @param {MouseEvent} e
 	**/
 	p._handleMouseDown = function(e) {
-		var evt;
-		if (this.onMouseDown) { 
-			evt = new MouseEvent("onMouseDown", this.mouseX, this.mouseY);
-			evt.nativeEvent = e;
-			this.onMouseDown(evt); 
+		if (this.onMouseDown) {
+			this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY, this, e));
 		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
 			if (target.onPress instanceof Function) {
-				evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
-				evt.nativeEvent = e;
-				
+				var evt = new MouseEvent("onPress", this.mouseX, this.mouseY, target, e);
 				target.onPress(evt);
 				if (evt.onMouseMove || evt.onMouseUp) { this._activeMouseEvent = evt; }
 			}
@@ -565,10 +555,10 @@ var p = Stage.prototype = new Container();
 		
 		if (this._mouseOverTarget != target) {
 			if (this._mouseOverTarget && this._mouseOverTarget.onMouseOut) {
-				this._mouseOverTarget.onMouseOut(new MouseEvent("onMouseOver", this.mouseX, this.mouseY));
+				this._mouseOverTarget.onMouseOut(new MouseEvent("onMouseOut", this.mouseX, this.mouseY, this._mouseOverTarget));
 			}
 			if (target && target.onMouseOver) {
-				target.onMouseOver(new MouseEvent("onMouseOut", this.mouseX, this.mouseY));
+				target.onMouseOver(new MouseEvent("onMouseOver", this.mouseX, this.mouseY, target));
 			}
 			this._mouseOverTarget = target;
 		}
@@ -580,18 +570,13 @@ var p = Stage.prototype = new Container();
 	* @param {MouseEvent} e
 	**/
 	p._handleDoubleClick = function(e) {
-		var evt;
 		if (this.onDoubleClick) {
-			evt = new MouseEvent("onDoubleClick", this.mouseX, this.mouseY);
-			evt.nativeEvent = e;
-			this.onDoubleClick(evt);
+			this.onDoubleClick(new MouseEvent("onDoubleClick", this.mouseX, this.mouseY, this, e));
 		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
 			if (target.onDoubleClick instanceof Function) {
-				evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
-				evt.nativeEvent = e;
-				target.onDoubleClick(evt);
+				target.onDoubleClick(new MouseEvent("onPress", this.mouseX, this.mouseY, target, e));
 			}
 		}
 	}
