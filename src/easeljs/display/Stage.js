@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(easeljs) {
+(function(window) {
 
 /**
 * A stage is the root level Container for a display list. Each time its tick method is called, it will render its display
@@ -46,10 +46,10 @@
 * @param {Boolean} useTouch Whether the interaction model should leverage touch support. If touch support is enabled, Stage will listen for TouchEvents, and not
 * MouseEvents for its interaction model. Default value is false..
 **/
-var Stage = easeljs.Stage = function(canvas, useTouch) {
+Stage = function(canvas, useTouch) {
   this.initialize(canvas, useTouch);
 }
-var p = Stage.prototype = new easeljs.Container();
+var p = Stage.prototype = new Container();
 
 // static properties:
 	/**
@@ -238,7 +238,7 @@ var p = Stage.prototype = new easeljs.Container();
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(easeljs.DisplayObject._workingMatrix));
+		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(DisplayObject._workingMatrix));
 	}
 	
 	/**
@@ -475,7 +475,8 @@ var p = Stage.prototype = new easeljs.Container();
 		this._updateMousePosition(e.pageX, e.pageY);
 		if (!inBounds && !this.mouseInBounds) { return; }
 
-		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY, this, e);
+		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY);
+		evt.nativeEvent = e;
 		
 		if (this.onMouseMove) { this.onMouseMove(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
@@ -509,13 +510,17 @@ var p = Stage.prototype = new easeljs.Container();
 	* @param {MouseEvent} e
 	**/
 	p._handleMouseUp = function(e) {
-		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY, this, e);
+		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY);
+		evt.nativeEvent = e;
 		if (this.onMouseUp) { this.onMouseUp(evt); }
 		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
 		if (this._activeMouseTarget && 
 			this._activeMouseTarget.onClick && 
 			this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true, (this._mouseOverIntervalID ? 3 : 1)) == this._activeMouseTarget) {
-			this._activeMouseTarget.onClick(new MouseEvent("onClick", this.mouseX, this.mouseY, this._activeMouseTarget, e));
+			
+			evt = new MouseEvent("onClick", this.mouseX, this.mouseY);
+			evt.nativeEvent = e;
+			this._activeMouseTarget.onClick(evt);
 		}
 		this._activeMouseEvent = this.activeMouseTarget = null;
 	}
@@ -528,13 +533,16 @@ var p = Stage.prototype = new easeljs.Container();
 	p._handleMouseDown = function(e) {
 		var evt;
 		if (this.onMouseDown) { 
-			evt = new MouseEvent("onMouseDown", this.mouseX, this.mouseY, this, e);
+			evt = new MouseEvent("onMouseDown", this.mouseX, this.mouseY);
+			evt.nativeEvent = e;
 			this.onMouseDown(evt); 
 		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
 			if (target.onPress instanceof Function) {
-				evt = new MouseEvent("onPress", this.mouseX, this.mouseY, target, e);
+				evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
+				evt.nativeEvent = e;
+				
 				target.onPress(evt);
 				if (evt.onMouseMove || evt.onMouseUp) { this._activeMouseEvent = evt; }
 			}
@@ -557,10 +565,10 @@ var p = Stage.prototype = new easeljs.Container();
 		
 		if (this._mouseOverTarget != target) {
 			if (this._mouseOverTarget && this._mouseOverTarget.onMouseOut) {
-				this._mouseOverTarget.onMouseOut(new MouseEvent("onMouseOut", this.mouseX, this.mouseY, this._mouseOverTarget));
+				this._mouseOverTarget.onMouseOut(new MouseEvent("onMouseOver", this.mouseX, this.mouseY));
 			}
 			if (target && target.onMouseOver) {
-				target.onMouseOver(new MouseEvent("onMouseOver", this.mouseX, this.mouseY, target));
+				target.onMouseOver(new MouseEvent("onMouseOut", this.mouseX, this.mouseY));
 			}
 			this._mouseOverTarget = target;
 		}
@@ -574,18 +582,19 @@ var p = Stage.prototype = new easeljs.Container();
 	p._handleDoubleClick = function(e) {
 		var evt;
 		if (this.onDoubleClick) {
-			evt = new MouseEvent("onDoubleClick", this.mouseX, this.mouseY, this, e);
+			evt = new MouseEvent("onDoubleClick", this.mouseX, this.mouseY);
 			evt.nativeEvent = e;
 			this.onDoubleClick(evt);
 		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
 			if (target.onDoubleClick instanceof Function) {
-				evt = new MouseEvent("onPress", this.mouseX, this.mouseY, target, e);
+				evt = new MouseEvent("onPress", this.mouseX, this.mouseY);
 				evt.nativeEvent = e;
 				target.onDoubleClick(evt);
 			}
 		}
 	}
 
-}(easeljs = window.easeljs || {}));
+window.Stage = Stage;
+}(window));

@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(easeljs) {
+(function(window) {
 
 /**
 * Displays frames or sequences of frames from a sprite sheet image. A sprite sheet is a series of images 
@@ -48,10 +48,10 @@
 * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image, frame 
 * dimensions, and frame data. See SpriteSheet for more information.
 **/
-var BitmapSequence = easeljs.BitmapSequence = function(spriteSheet) {
+BitmapSequence = function(spriteSheet) {
   this.initialize(spriteSheet);
 }
-var p = BitmapSequence.prototype = new easeljs.DisplayObject();
+var p = BitmapSequence.prototype = new DisplayObject();
 
 // public properties:
 	
@@ -363,4 +363,5 @@ var p = BitmapSequence.prototype = new easeljs.DisplayObject();
 		}
 	}
 
-}(easeljs = window.easeljs || {}));
+window.BitmapSequence = BitmapSequence;
+}(window));

@@ -103,22 +103,17 @@ var p = MouseEvent.prototype;
 	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
 	*/
 	p.onMouseUp = null;
-
-	//TODO: doc.
-	p.target = null;
-
+	
 // constructor:
 	/** 
 	* Initialization method.
 	* @method initialize
 	* @protected
 	**/
-	p.initialize = function(type, stageX, stageY, target, nativeEvent) {
+	p.initialize = function(type, stageX, stageY) {
 		this.type = type;
 		this.stageX = stageX;
 		this.stageY = stageY;
-		this.target = target;
-		this.nativeEvent = nativeEvent;
 	}
 	
 // public methods:

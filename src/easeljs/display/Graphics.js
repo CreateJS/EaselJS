@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(easeljs) {
+(function(window) {
 
 // used to create the instruction lists used in Graphics:
 
@@ -83,7 +83,7 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 * "beginFill('#F00');drawRect(0, 0, 10, 10);"
 * @for Graphics
 **/
-var Graphics = easeljs.Graphics = function(instructions) {
+Graphics = function(instructions) {
 	this.initialize(instructions);
 }
 var p = Graphics.prototype;
@@ -1106,4 +1106,5 @@ var p = Graphics.prototype;
 		// TODO: implement.
 	}
 
-}(easeljs = window.easeljs || {}));
+window.Graphics = Graphics;
+}(window));

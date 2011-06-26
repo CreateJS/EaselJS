@@ -34,7 +34,7 @@
 * @module EaselJS
 **/
 
-(function(easeljs) {
+(function(window) {
 
 /**
 * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as 
@@ -43,7 +43,7 @@
 * @class DisplayObject
 * @constructor
 **/
-var DisplayObject = easeljs.DisplayObject = function() {
+DisplayObject = function() {
   this.initialize();
 }
 var p = DisplayObject.prototype;
@@ -395,6 +395,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	*/
 	p.initialize = function() {
 		this.id = UID.get();
+		this.children = [];
 	}
 	
 // public methods:
@@ -446,7 +447,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 		var ctx = this.cacheCanvas.getContext("2d");
 		this.cacheCanvas.width = width;
 		this.cacheCanvas.height = height;
-		ctx.setTransform(1, 0, 0, 1, -x, -y);
+		ctx.setTransform(1, 0, 0, 1, -x, -y); // because some browsers don't properly clear if the width/height remain the same.
 		ctx.clearRect(0, 0, width+1, height+1); // because some browsers don't properly clear if the width/height remain the same.
 		this.draw(ctx, true, new Matrix2D(1,0,0,1,-x,-y));
 		this._cacheOffsetX = x;
@@ -690,7 +691,7 @@ DisplayObject._workingMatrix = new Matrix2D();
 	* @param {Shadow} shadow
 	**/
 	p.applyShadow = function(ctx, shadow) {
-		shadow = shadow || easeljs.Shadow.identity;
+		shadow = shadow || Shadow.identity;
 		ctx.shadowColor = shadow.color;
 		ctx.shadowOffsetX = shadow.offsetX;
 		ctx.shadowOffsetY = shadow.offsetY;
@@ -739,4 +740,5 @@ DisplayObject._workingMatrix = new Matrix2D();
 		return new Rectangle(0,0,0,0);
 	}
 
-}(easeljs = window.easeljs || {}));
+window.DisplayObject = DisplayObject;
+}(window));
