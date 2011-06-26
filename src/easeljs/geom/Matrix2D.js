@@ -149,11 +149,11 @@ var p = Matrix2D.prototype;
 	*/
 	p.initialize = function(a, b, c, d, tx, ty) {
 		if (a != null) { this.a = a; }
-		if (b != null) { this.b = b; }
-		if (c != null) { this.c = c; }
+		this.b = b || 0;
+		this.c = c || 0;
 		if (d != null) { this.d = d; }
-		if (tx != null) { this.tx = tx; }
-		if (ty != null) { this.ty = ty; }
+		this.tx = tx || 0;
+		this.ty = ty || 0;
 	}
 	
 // public methods:
@@ -427,15 +427,22 @@ var p = Matrix2D.prototype;
 		return target;
 	}
 
-	// TODO: Document.
+	/**
+	* Reinitializes all matrix properties to those specified.
+	* @method appendProperties
+	* @param {Number} a
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @param {Number} tx
+	* @param {Number} ty
+	* @param {Number} alpha desired alpha value
+	* @param {Shadow} shadow desired shadow value
+	* @param {String} compositeOperation desired composite operation value
+	*/
 	p.reinitialize = function(a,b,c,d,tx,ty,alpha,shadow,compositeOperation) {
-		this.a = a;
-		this.b = b;
-		this.c = c;
-		this.d = d;
-		this.tx = tx;
-		this.ty = ty;
-		this.alpha = alpha;
+		this.initialize(a,b,c,d,tx,ty);
+		this.alpha = alpha || 1;
 		this.shadow = shadow;
 		this.compositeOperation = compositeOperation;
 		return this;
