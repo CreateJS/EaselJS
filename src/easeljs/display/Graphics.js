@@ -427,7 +427,7 @@ var p = Graphics.prototype;
 	**/
 	p.rect = function(x, y, w, h) {
 		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.rect, [x, y, w-1, h]));
+		this._activeInstructions.push(new Command(this._ctx.rect, [x, y, w, h]));
 		this._extendBounds(x, y);
 		this._extendBounds(x+w, y+h);
 		return this;

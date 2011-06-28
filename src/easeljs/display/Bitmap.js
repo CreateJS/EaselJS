@@ -41,10 +41,10 @@
 * @class Bitmap
 * @extends DisplayObject
 * @constructor
-* @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video to render to the display list.
+* @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use. If it is a URI, a new Image object will be constructed and assigned to the .image property.
 **/
-Bitmap = function(image) {
-  this.initialize(image);
+Bitmap = function(imageOrUri) {
+  this.initialize(imageOrUri);
 }
 var p = Bitmap.prototype = new DisplayObject();
 
@@ -78,9 +78,14 @@ var p = Bitmap.prototype = new DisplayObject();
 	* @method initialize
 	* @protected
 	*/
-	p.initialize = function(image) {
+	p.initialize = function(imageOrUri) {
 		this.DisplayObject_initialize();
-		this.image = image;
+		if (typeof imageOrUri == "string") {
+			this.image = new Image();
+			this.image.src = imageOrUri;
+		} else {
+			this.image = imageOrUri;
+		}
 	}
 	
 // public methods:
