@@ -16,6 +16,7 @@
 <script src="../src/easeljs/display/Stage.js"></script>
 <script src="../src/easeljs/display/Bitmap.js"></script>
 <script src="../src/easeljs/utils/Ticker.js"></script>
+<script src="../src/easeljs/ui/Touch.js"></script>
 <!-- End EaselJS Imports -->
 
 <script>
@@ -33,8 +34,10 @@ function init() {
 	canvas = document.getElementById("testCanvas");
 	
 	//check to see if we are running in a browser with touch support
-	var useTouch = hasTouchSupport();
-	stage = new Stage(canvas, useTouch);
+	stage = new Stage(canvas);
+
+	// enable touch interactions if supported on the current device:
+	if (Touch.isSupported()) { Touch.enable(stage); }
 
 	// enabled mouse over / out events
 	stage.enableMouseOver(10);
@@ -43,17 +46,6 @@ function init() {
 	var image = new Image();
 	image.src = "img/daisy.png";
 	image.onload = handleImageLoad;
-}
-
-function hasTouchSupport()
-{
-	//note: this is a very simple test that will work on Android and iOS. For production
-	//you should use a library like modernizr for more robust feature detection:
-	//http://www.modernizr.com/
-	//Modernizr.touch
-	//
-	//There is an example of how to use Modernizr in the examples/modernizr folder.
-	return ('ontouchstart' in window);
 }
 
 function handleImageLoad(event) {
@@ -72,7 +64,6 @@ function handleImageLoad(event) {
 		bitmap.regX = bitmap.image.width/2|0;
 		bitmap.regY = bitmap.image.height/2|0;
 		bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random()*0.4+0.6;
-		bitmap.mouseEnabled = true;
 		bitmap.name = "bmp_"+i;
 
 		// wrapper function to provide scope for the event handlers:
