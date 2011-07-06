@@ -47,7 +47,7 @@
 * @param {Number} tx Specifies the tx property for the new matrix.
 * @param {Number} ty Specifies the ty property for the new matrix.
 **/
-Matrix2D = function(a, b, c, d, tx, ty) {
+var Matrix2D = function(a, b, c, d, tx, ty) {
   this.initialize(a, b, c, d, tx, ty);
 }
 var p = Matrix2D.prototype;

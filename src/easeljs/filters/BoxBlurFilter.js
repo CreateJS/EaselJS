@@ -33,8 +33,12 @@
 * BoxBlurFilter applies a box blur to DisplayObjects
 * @class BoxBlurFilter
 * @augments Filter
+* @constructor
+* @param {Number} blurX
+* @param {Number} blurY
+* @param {Number} quality
 **/
-BoxBlurFilter = function( blurX, blurY, quality ) {
+var BoxBlurFilter = function( blurX, blurY, quality ) {
   this.initialize( blurX, blurY, quality );
 }
 var p = BoxBlurFilter.prototype = new Filter();
@@ -70,7 +74,7 @@ var p = BoxBlurFilter.prototype = new Filter();
 	* @return {Rectangle} a rectangle object indicating the margins required to draw the filter.
 	**/
 	p.getBounds = function() {
-		// TODO: this doesn't account for quality.
+		// TODO: this doesn't properly account for blur quality.
 		return new Rectangle(-this.blurX,-this.blurY,2*this.blurX,2*this.blurY);
 	}
 
@@ -115,10 +119,9 @@ var p = BoxBlurFilter.prototype = new Filter();
 
 		var pixels = imageData.data;
 
-		var rsum,gsum,bsum,asum,x,y,i,p,p1,p2,yp,yi,yw,idx;
+		var rsum,gsum,bsum,asum,x,y,i,p,p1,p2,yp,yi,yw;
 		var wm = width - 1;
 		var hm = height - 1;
-		var wh = width * height;
 		var rad1x = radiusX + 1;
 		var divx = radiusX + rad1x;
 		var rad1y = radiusY + 1;

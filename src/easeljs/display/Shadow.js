@@ -45,7 +45,7 @@
 * @param {Number} offsetY The y offset of the shadow.
 * @param {Number} blur The size of the blurring effect.
 **/
-Shadow = function(color, offsetX, offsetY, blur) {
+var Shadow = function(color, offsetX, offsetY, blur) {
   this.initialize(color, offsetX, offsetY, blur);
 }
 var p = Shadow.prototype;

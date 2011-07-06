@@ -44,7 +44,7 @@
 * @constructor
 * @param {HTMLCanvasElement} canvas The canvas the stage will render to.
 **/
-Stage = function(canvas) {
+var Stage = function(canvas) {
   this.initialize(canvas);
 }
 var p = Stage.prototype = new Container();
@@ -131,13 +131,6 @@ var p = Stage.prototype = new Container();
 	p.mouseInBounds = false;
 	
 // private properties:
-
-	/**
-	* @property _tmpCanvas
-	* @protected
-	* @type HTMLCanvasElement
-	**/
-	p._tmpCanvas = null;
 
 	/**
 	* @property _activeMouseEvent
@@ -440,7 +433,7 @@ var p = Stage.prototype = new Container();
 		if (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds) { return; }
 		var target = null;
 		if (this.mouseInBounds) {
-			var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, 3);
+			target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, 3);
 			this._mouseOverX = this.mouseX;
 			this._mouseOverY = this.mouseY;
 		}

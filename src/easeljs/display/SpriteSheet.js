@@ -53,7 +53,7 @@
 * @param {Number} frameHeight The height in pixels of each frame on the sprite sheet.
 * @param {Object} frameData Defines named frames and frame sequences. See the frameData property for more information.
 **/
-SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
+var SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
   this.initialize(image, frameWidth, frameHeight, frameData);
 }
 var p = SpriteSheet.prototype;

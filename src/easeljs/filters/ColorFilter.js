@@ -40,21 +40,37 @@
 * Applies color transforms.
 * @class ColorFilter
 * @constructor
+* @augments Filter
+* @param {Number} redMultiplier
+* @param {Number} greenMultiplier
+* @param {Number} blueMultiplier
+* @param {Number} alphaMultiplier
+* @param {Number} redOffset
+* @param {Number} greenOffset
+* @param {Number} blueOffset
+* @param {Number} alphaOffset
 **/
-ColorFilter = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
+var ColorFilter = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
   this.initialize(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset);
 }
 var p = ColorFilter.prototype = new Filter();
 
 // public properties:
-	// TODO: doc.
+	/** Red channel multiplier. */
 	p.redMultiplier = 1;
+	/** Green channel multiplier. */
 	p.greenMultiplier = 1;
+	/** Blue channel multiplier. */
 	p.blueMultiplier = 1;
+	/** Alpha channel multiplier. */
 	p.alphaMultiplier = 1;
+	/** Red channel offset (added to value). */
 	p.redOffset = 0;
+	/** Green channel offset (added to value). */
 	p.greenOffset = 0;
+	/** Blue channel offset (added to value). */
 	p.blueOffset = 0;
+	/** Alpha channel offset (added to value). */
 	p.alphaOffset = 0;
 	
 // constructor:
@@ -62,9 +78,8 @@ var p = ColorFilter.prototype = new Filter();
 	* Initialization method.
 	* @method initialize
 	* @protected
-	* @param 
 	**/
-	p.initialize = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
+	p.initialize = function(redMultiplier, , blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
 		this.redMultiplier = redMultiplier != null ? redMultiplier : 1;
 		this.greenMultiplier = greenMultiplier != null ? greenMultiplier : 1;
 		this.blueMultiplier = blueMultiplier != null ? blueMultiplier : 1;

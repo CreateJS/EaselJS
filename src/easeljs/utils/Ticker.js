@@ -38,18 +38,18 @@
 (function(window) {
 
 // constructor:
-	/**
-	* The Ticker class uses a static interface (ex. Ticker.getPaused()) and should not be instantiated.
-	* Provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe 
-	* to the tick event to be notified when a set time interval has elapsed.
-	* Note that the interval that the tick event is called is a target interval, and may be broadcast 
-	* at a slower interval during times of high CPU load.
-	* @class Ticker
-	* @static
-	**/
-	Ticker = function() {
-		throw "Ticker cannot be instantiated.";
-	}
+/**
+* The Ticker class uses a static interface (ex. Ticker.getPaused()) and should not be instantiated.
+* Provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe
+* to the tick event to be notified when a set time interval has elapsed.
+* Note that the interval that the tick event is called is a target interval, and may be broadcast
+* at a slower interval during times of high CPU load.
+* @class Ticker
+* @static
+**/
+var Ticker = function() {
+	throw "Ticker cannot be instantiated.";
+}
 	
 	
 	/**

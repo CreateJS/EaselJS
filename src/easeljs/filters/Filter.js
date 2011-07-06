@@ -41,7 +41,7 @@
 * @class Filter
 * @constructor
 **/
-Filter = function() {
+var Filter = function() {
   this.initialize();
 }
 var p = Filter.prototype;

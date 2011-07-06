@@ -44,7 +44,7 @@
 * @extends DisplayObject
 * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
 **/
-Shape = function(graphics) {
+var Shape = function(graphics) {
   this.initialize(graphics);
 }
 var p = Shape.prototype = new DisplayObject();

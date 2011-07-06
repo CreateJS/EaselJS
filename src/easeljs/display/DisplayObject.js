@@ -43,37 +43,37 @@
 * @class DisplayObject
 * @constructor
 **/
-DisplayObject = function() {
+var DisplayObject = function() {
   this.initialize();
 }
 var p = DisplayObject.prototype;
+	
+	/**
+	* Suppresses errors generated when using features like hitTest, onPress/onClick, and getObjectsUnderPoint with cross
+	* domain content
+	* @property suppressCrossDomainErrors
+	* @static
+	* @type Boolean
+	* @default false
+	**/
+	DisplayObject.suppressCrossDomainErrors = false;
 
-/**
-* Suppresses errors generated when using features like hitTest, onPress/onClick, and getObjectsUnderPoint with cross 
-* domain content
-* @property suppressCrossDomainErrors
-* @static
-* @type Boolean
-* @default false
-**/
-DisplayObject.suppressCrossDomainErrors = false;
+	/**
+	* @property _hitTestCanvas
+	* @type HTMLCanvasElement
+	* @static
+	* @protected
+	**/
+	DisplayObject._hitTestCanvas = document.createElement("canvas");
+	DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
 
-/**
-* @property _hitTestCanvas
-* @type HTMLCanvasElement
-* @static
-* @protected
-**/
-DisplayObject._hitTestCanvas = document.createElement("canvas");
-DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
-
-/**
-* @property _hitTestContext
-* @type CanvasRenderingContext2D
-* @static
-* @protected
-**/
-DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
+	/**
+	* @property _hitTestContext
+	* @type CanvasRenderingContext2D
+	* @static
+	* @protected
+	**/
+	DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 
 
 	/** 
@@ -314,68 +314,13 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 	* @default 0
 	**/
 	p._cacheOffsetY = 0;
-	
+
 	/**
-	* @property _cacheDraw
+	* @property _matrix
 	* @protected
-	* @type Boolean
-	* @default false
-	**/
-	p._cacheDraw = false;
-	
-	/**
-	* @property _activeContext
-	* @protected
-	* @type CanvasRenderingContext2D
-	* @default null
-	**/
-	p._activeContext = null;
-	
-	/**
-	* @property _restoreContext
-	* @protected
-	* @type Boolean
-	* @default false
-	**/
-	p._restoreContext = false;
-	
-	/**
-	* @property _revertShadow
-	* @protected
-	* @type Boolean
-	* @default false
-	**/
-	p._revertShadow = false;
-	
-	/**
-	* @property _revertX
-	* @protected
-	* @type Number
-	* @default 0
-	**/
-	p._revertX = 0;
-	
-	/**
-	* @property _revertY
-	* @protected
-	* @type Number
-	* @default 0
-	**/
-	p._revertY = 0;
-	
-	/**
-	* @property _revertAlpha
-	* @protected
-	* @type Number
+	* @type Matrix2D
 	* @default 1
 	**/
-	p._revertAlpha = 1;
-
-	// TODO: Doc.
-	p._minX = NaN;
-	p._minY = NaN;
-	p._maxX = NaN;
-	p._maxY = NaN;
 	p._matrix = null;
 	
 // constructor:

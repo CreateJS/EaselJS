@@ -358,11 +358,11 @@ function handleKeyDown(e) {
 	if(!e){ var e = window.event; }
 	switch(e.keyCode) {
 		case KEYCODE_SPACE:	shootHeld = true; break;
-		case KEYCODE_A:;
+		case KEYCODE_A:
 		case KEYCODE_LEFT:	lfHeld = true; break;
-		case KEYCODE_D:;
+		case KEYCODE_D:
 		case KEYCODE_RIGHT: rtHeld = true; break;
-		case KEYCODE_W:;
+		case KEYCODE_W:
 		case KEYCODE_UP:	fwdHeld = true; break;
 	}
 }
@@ -372,11 +372,11 @@ function handleKeyUp(e) {
 	if(!e){ var e = window.event; }
 	switch(e.keyCode) {
 		case KEYCODE_SPACE:	shootHeld = false; break;
-		case KEYCODE_A:;
+		case KEYCODE_A:
 		case KEYCODE_LEFT:	lfHeld = false; break;
-		case KEYCODE_D:;
+		case KEYCODE_D:
 		case KEYCODE_RIGHT: rtHeld = false; break;
-		case KEYCODE_W:;
+		case KEYCODE_W:
 		case KEYCODE_UP:	fwdHeld = false; break;
 	}
 }

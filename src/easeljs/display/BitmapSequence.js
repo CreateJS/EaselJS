@@ -48,7 +48,7 @@
 * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image, frame 
 * dimensions, and frame data. See SpriteSheet for more information.
 **/
-BitmapSequence = function(spriteSheet) {
+var BitmapSequence = function(spriteSheet) {
   this.initialize(spriteSheet);
 }
 var p = BitmapSequence.prototype = new DisplayObject();

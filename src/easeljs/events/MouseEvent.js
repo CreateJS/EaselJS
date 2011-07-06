@@ -47,7 +47,7 @@
 * @param {Number} stageX The mouseX position relative to the stage.
 * @param {Number} stageY The mouseY position relative to the stage.
 **/
-MouseEvent = function(type, stageX, stageY) {
+var MouseEvent = function(type, stageX, stageY) {
   this.initialize(type, stageX, stageY);
 }
 var p = MouseEvent.prototype;

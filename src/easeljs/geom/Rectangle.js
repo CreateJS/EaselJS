@@ -45,7 +45,7 @@
 * @param {Number} width Width. Default is 0.
 * @param {Number} height Height. Default is 0.
 **/
-Rectangle = function(x, y, width, height) {
+var Rectangle = function(x, y, width, height) {
   this.initialize(x, y, width, height);
 }
 var p = Rectangle.prototype;

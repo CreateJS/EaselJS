@@ -50,19 +50,18 @@
 * @param {String} color Optional. The color to draw the text in. Any valid value for the CSS color attribute
 * is acceptable (ex. "#F00").
 **/
-Text = function(text, font, color) {
+var Text = function(text, font, color) {
   this.initialize(text, font, color);
 }
-
 var p = Text.prototype = new DisplayObject();
 
 
-/**
-* @property _workingContext
-* @type CanvasRenderingContext2D
-* @private 
-**/
-Text._workingContext = document.createElement("canvas").getContext("2d");
+	/**
+	* @property _workingContext
+	* @type CanvasRenderingContext2D
+	* @private
+	**/
+	Text._workingContext = document.createElement("canvas").getContext("2d");
 
 // public properties:
 	/**

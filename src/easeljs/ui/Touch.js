@@ -36,15 +36,15 @@
 
 
 (function(window) {
-	
-	/**
-	* Global utility for working with touch enabled devices in EaselJS.
-	* @class Touch
-	* @static
-	**/
-	Touch = function() {
-		throw "Touch cannot be instantiated";
-	}
+
+/**
+* Global utility for working with touch enabled devices in EaselJS.
+* @class Touch
+* @static
+**/
+var Touch = function() {
+	throw "Touch cannot be instantiated";
+}
 
 	/**
 	* Enables touch interaction for the specified EaselJS stage. This
@@ -57,17 +57,17 @@
 	Touch.isSupported = function() {
 		return ('ontouchstart' in window);
 	}
-	
+
 	/**
 	* Enables touch interaction for the specified EaselJS stage. This
 	* currently only supports iOS, and simply maps single touch events
 	* to the existing EaselJS mouse events.
 	* @method enable
-	* @return {Stage} The stage to enable touch on.
+	* @param {Stage} stage The stage to enable touch on.
 	* @static
 	**/
 	Touch.enable = function(stage) {
-		if (stage == null || !Touch.isSupported()) { return false; }
+		if (stage == null || !Touch.isSupported()) { return; }
 		var o = stage;
 
 		// inject required properties on stage:
@@ -88,6 +88,7 @@
 	/**
 	* @method _handleTouchStart
 	* @protected
+	* @param {Stage} stage
 	* @param {TouchEvent} e
 	**/
 	Touch._handleTouchStart = function(stage,e) {
@@ -97,7 +98,7 @@
 			//we are already tracking an id
 			return;
 		}
-		
+
 		stage._handleTouchMoveListener = stage._handleTouchMoveListener || function(e){
 			Touch._handleTouchMove(stage,e);
 		}
@@ -115,6 +116,7 @@
 	/**
 	* @method _handleTouchMove
 	* @protected
+	* @param {Stage} stage
 	* @param {TouchEvent} e
 	**/
 	Touch._handleTouchMove = function(stage,e) {
@@ -127,6 +129,7 @@
 	/**
 	* @method _handleTouchEnd
 	* @protected
+	* @param {Stage} stage
 	* @param {TouchEvent} e
 	**/
 	Touch._handleTouchEnd = function(stage,e) {
@@ -144,6 +147,7 @@
 	/**
 	* @method _findPrimaryTouch
 	* @protected
+	* @param {Stage} stage
 	* @param {Array[Touch]} touches
 	**/
 	Touch._findPrimaryTouch = function(stage,touches) {

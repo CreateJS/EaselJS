@@ -80,7 +80,7 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 * @constructor
 * @for Graphics
 **/
-Graphics = function() {
+var Graphics = function() {
 	this.initialize();
 }
 var p = Graphics.prototype;

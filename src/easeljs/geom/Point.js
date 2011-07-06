@@ -43,7 +43,7 @@
 * @param {Number} x X position. Default is 0.
 * @param {Number} y Y position. Default is 0.
 **/
-Point = function(x, y) {
+var Point = function(x, y) {
   this.initialize(x, y);
 }
 var p = Point.prototype;
