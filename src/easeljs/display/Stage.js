@@ -340,7 +340,7 @@ var p = Stage.prototype = new Container();
 		evtTarget.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
 		evtTarget.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
 		evtTarget.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
-		canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
+		this.canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
 	}
 
 	/**

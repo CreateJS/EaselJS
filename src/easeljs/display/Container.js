@@ -352,7 +352,9 @@ var p = Container.prototype = new DisplayObject();
 		if (recursive) {
 			var arr = o.children = [];
 			for (var i=0, l=this.children.length; i<l; i++) {
-				arr.push(this.children[i].clone(recursive));
+				var clone = this.children[i].clone(recursive);
+				clone.parent = o;
+				arr.push(clone);
 			}
 		}
 		return o;
