@@ -1,13 +1,17 @@
-Version 0.4 [NOT RELEASED]
+Version 0.3.3 [NOT RELEASED]
 ****************************************************************************************************
+- support for double click events (thanks to rbarazi)
+- added MouseEvent.nativeEvent and MouseEvent.target properties
 - fixes to Ticker
-- added DisplayObject.getBounds() (incomplete)
+- fixed a problem with caching Container instances
 - added filter support via DisplayObject.filters and Filter objects
 - added DisplayObject.setTransform()
 - added DisplayObject.onDoubleClick handler (thanks to rbarazi)
-- added MouseEvent.nativeEvent property
 - performance optimization for DisplayObject drawing (6910e6849856bd0740f8)
-- Added support for touch input (single point)
+- added support for touch input (single point) via the Touch class
+- minor optimizations
+- added support for passing an image URI to the Bitmap constructor
+- doc updates
 
 
 Version 0.3.2 [Mar 2, 2011]
