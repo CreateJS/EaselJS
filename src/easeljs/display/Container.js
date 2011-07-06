@@ -432,17 +432,6 @@ var p = Container.prototype = new DisplayObject();
 		}
 		return null;
 	}
-	
-	/**
-	* @method _calculateBounds
-	* @protected
-	* @return {Rectangle}
-	**/
-	p._calculateBounds = function() {
-		// TODO: implement.
-		// calculate bounds of each child, and apply transformations (don't forget regX/Y) to the bounds
-		// calculate max/min x/y
-	}
 
 window.Container = Container;
 }(window));

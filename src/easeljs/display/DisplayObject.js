@@ -619,15 +619,6 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 		canvas.width = 1;
 		return hit;
 	}
-
-	// TODO: Doc.
-	p.getBounds = function() {
-		if (this._cacheCanvas) {
-			return new Rectangle(-this._cacheOffsetX, -this._cacheOffsetY, this.cacheCanvas.width, this.cacheCanvas.height);
-		} else {
-			return this._calculateBounds();
-		}
-	}
 	
 	/**
 	* Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are 
@@ -722,15 +713,6 @@ DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 		for (var i=0; i<l; i++) {
 			this.filters[i].applyFilter(ctx, 0, 0, w, h);
 		}
-	}
-
-	/**
-	* @method _calculateBounds
-	* @protected
-	* @return {Rectangle}
-	**/
-	p._calculateBounds = function() {
-		return new Rectangle(0,0,0,0);
 	}
 
 window.DisplayObject = DisplayObject;

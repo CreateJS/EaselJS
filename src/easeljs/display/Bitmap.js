@@ -166,18 +166,6 @@ var p = Bitmap.prototype = new DisplayObject();
 	}
 
 // private methods:
-	/**
-	* @method _calculateBounds
-	* @protected
-	* @return {Rectangle}
-	**/
-	p._calculateBounds = function() {
-		if (this.image && (this.image.complete || this.image.getContext)) {
-			return new Rectangle(0,0,this.image.width,this.image.height);
-		} else {
-			return new Rectangle(0,0,0,0);
-		}
-	}
 
 window.Bitmap = Bitmap;
 }(window));

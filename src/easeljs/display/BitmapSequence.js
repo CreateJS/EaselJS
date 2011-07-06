@@ -349,19 +349,6 @@ var p = BitmapSequence.prototype = new DisplayObject();
 			this.currentFrame = frameOrSequence;
 		}
 	}
-	
-	/**
-	* @method _calculateBounds
-	* @protected
-	* @return {Rectangle}
-	**/
-	p._calculateBounds = function() {
-		if (this.spriteSheet) {
-			return new Rectangle(0,0,this.spriteSheet.frameWidth,this.spriteSheet.frameHeight);
-		} else {
-			return new Rectangle(0,0,0,0);
-		}
-	}
 
 window.BitmapSequence = BitmapSequence;
 }(window));

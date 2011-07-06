@@ -311,16 +311,5 @@ Text._workingContext = document.createElement("canvas").getContext("2d");
 		else { ctx.fillText(text, 0, y, this.maxWidth); }
 	}
 
-	/**
-	* @method _calculateBounds
-	* @protected
-	* @return {Rectangle}
-	**/
-	p._calculateBounds = function() {
-		// TODO: implement.
-		// use getMeasuredLineHeight / lineHeight * lines for height
-		// measure each line for width
-	}
-
 window.Text = Text;
 }(window));
