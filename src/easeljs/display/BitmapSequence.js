@@ -260,6 +260,14 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	}
 
 	/**
+	* Advances the playhead. This occurs automatically each tick by default.
+	* @method advance
+	*/
+	p.advance = function() {
+		this._tick();
+	}
+
+	/**
 	* Returns a clone of the Point instance.
 	* @method clone
 	* @return {Point} a clone of the Point instance.
