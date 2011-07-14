@@ -4,7 +4,7 @@
 *
 *
 * Copyright (c) 2010 Grant Skinner
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +13,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,8 +28,8 @@
 */
 
 /**
-* The Easel Javascript library provides a retained graphics mode for canvas 
-* including a full, hierarchical display list, a core interaction model, and 
+* The Easel Javascript library provides a retained graphics mode for canvas
+* including a full, hierarchical display list, a core interaction model, and
 * helper classes to make working with Canvas much easier.
 * @module EaselJS
 **/
@@ -72,14 +72,14 @@ var p = ColorFilter.prototype = new Filter();
 	p.blueOffset = 0;
 	/** Alpha channel offset (added to value). */
 	p.alphaOffset = 0;
-	
+
 // constructor:
-	/** 
+	/**
 	* Initialization method.
 	* @method initialize
 	* @protected
 	**/
-	p.initialize = function(redMultiplier, , blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
+	p.initialize = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
 		this.redMultiplier = redMultiplier != null ? redMultiplier : 1;
 		this.greenMultiplier = greenMultiplier != null ? greenMultiplier : 1;
 		this.blueMultiplier = blueMultiplier != null ? blueMultiplier : 1;
@@ -89,7 +89,7 @@ var p = ColorFilter.prototype = new Filter();
 		this.blueOffset = blueOffset || 0;
 		this.alphaOffset = alphaOffset || 0;
 	}
-	
+
 // public methods:
 	/**
 	* Applies the filter to the specified context.
@@ -134,8 +134,8 @@ var p = ColorFilter.prototype = new Filter();
 	p.toString = function() {
 		return "[ColorFilter]";
 	}
-	
-	
+
+
 	/**
 	* Returns a clone of this ColorFilter instance.
 	* @method clone
@@ -144,6 +144,6 @@ var p = ColorFilter.prototype = new Filter();
 	p.clone = function() {
 		return new ColorFilter(this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier, this.redOffset, this.greenOffset, this.blueOffset, this.alphaOffset);
 	}
-	
+
 window.ColorFilter = ColorFilter;
 }(window));
