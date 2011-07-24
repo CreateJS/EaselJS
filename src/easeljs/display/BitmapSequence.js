@@ -131,30 +131,30 @@ var p = BitmapSequence.prototype = new DisplayObject();
 
 	/** Indicates how often the animation frame should move forwards. For example, a value of 1 will cause the playhead to
 	 * move forwards every time tick is called whereas a value of 3 would cause it to advance every third time.
-	 * @property updateFrequency
+	 * @property advanceFrequency
 	 * @type Number
 	 * @default 1
 	 */
-	p.updateFrequency = 1;
+	p.advanceFrequency = 1;
 
-	/** When used in conjunction with an updateFrequency greater than 1, this lets you offset which tick the playhead will
-	 * advance on. For example, you could create two BitmapSequences, both with updateFrequency set to 2, but one
-	 * having updateOffset set to 1. Both instances would advance every second tick, but they would advance on alternating
+	/** When used in conjunction with an advanceFrequency greater than 1, this lets you offset which tick the playhead will
+	 * advance on. For example, you could create two BitmapSequences, both with advanceFrequency set to 2, but one
+	 * having advanceOffset set to 1. Both instances would advance every second tick, but they would advance on alternating
 	 * ticks (effectively, one instance would advance on odd ticks, the other on even ticks).
-	 * @property updateOffset
+	 * @property advanceOffset
 	 * @type Number
 	 * @default 0
 	 */
-	p.updateOffset = 0;
+	p.advanceOffset = 0;
 
 // private properties:
 		/**
-	* @property _updateCount
+	* @property _advanceCount
 	* @protected
 	* @type Number
 	* @default 0
 	**/
-	p._updateCount = 0;
+	p._advanceCount = 0;
 
 // constructor:
 	/**
@@ -325,7 +325,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 			// sequence data is set, but we haven't actually played a sequence yet:
 			this.paused = true;
 		}
-		if (this.paused || ((++this._updateCount)+this.updateOffset)%this.updateFrequency != 0) { return; }
+		if (this.paused || ((++this._advanceCount)+this.advanceOffset)%this.advanceFrequency != 0) { return; }
 		this.currentFrame++;
 	}
 
