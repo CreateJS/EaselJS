@@ -193,7 +193,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	**/
 	p.DisplayObject_draw = p.draw;
 
-	/**
+/**
 	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
 	* Returns true if the draw was handled (useful for overriding functionality).
 	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
@@ -206,6 +206,19 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 
+		var rect = this.getCurrentFrameRect();
+		if (rect != null) {
+			ctx.drawImage(this.spriteSheet.image, rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width, rect.height);
+		}
+		return true;
+	}
+
+	/**
+	* Normalizes the currentFrame property and returns a Rectangle defining the bounds of current frame.
+	* @method getCurrentFrameRect
+	* @returns Rectangle
+	**/
+	p.getCurrentFrameRect = function() {
 		var image = this.spriteSheet.image;
 		var frameWidth = this.spriteSheet.frameWidth;
 		var frameHeight = this.spriteSheet.frameHeight;
@@ -235,13 +248,14 @@ var p = BitmapSequence.prototype = new DisplayObject();
 				if (this.callback) { this.callback(this); }
 			}
 		}
+
 		if (this.currentFrame >= 0) {
 			var col = this.currentFrame%cols;
 			var row = this.currentFrame/cols|0;
-			ctx.drawImage(image, frameWidth*col, frameHeight*row, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight);
+			return new Rectangle(frameWidth*col, frameHeight*row, frameWidth, frameHeight);
 		}
-		return true;
 	}
+
 
 	//Note, the doc sections below document using the specified APIs (from DisplayObject)  from
 	//Bitmap. This is why they have no method implementations.
@@ -325,8 +339,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 			// sequence data is set, but we haven't actually played a sequence yet:
 			this.paused = true;
 		}
-		if (this.paused || ((++this._advanceCount)+this.advanceOffset)%this.advanceFrequency != 0) { return; }
-		this.currentFrame++;
+		if (!this.paused && ((++this._advanceCount)+this.advanceOffset)%this.advanceFrequency == 0) { this.currentFrame++; }
 	}
 
 	/**
