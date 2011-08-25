@@ -310,8 +310,7 @@ var p = Stage.prototype = new Container();
 			this._mouseOverIntervalID = null;
 		}
 		if (frequency <= 0) { return; }
-		var o = this;
-		this._mouseOverIntervalID = setInterval(function(){ o._testMouseOver(); }, 1000/Math.min(50,frequency));
+		this._mouseOverIntervalID = setInterval(this._testMouseOver, 1000/Math.min(50,frequency));
 		this._mouseOverX = NaN;
 		this._mouseOverTarget = null;
 	}
