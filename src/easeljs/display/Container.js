@@ -178,7 +178,7 @@ var p = Container.prototype = new DisplayObject();
 	p.addChildAt = function(child, index) {
 		var l = arguments.length;
 		if (l > 2) {
-			index = arguments[i-1];
+			index = arguments[l-1];
 			for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i], index+i); }
 			return arguments[l-2];
 		}
