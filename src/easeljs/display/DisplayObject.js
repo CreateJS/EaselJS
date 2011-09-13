@@ -40,7 +40,7 @@ if (typeof module !== 'undefined' && module.exports) {
     var UID      = require('../utils/UID').UID;
     var Matrix2D = require('../geom/Matrix2D').Matrix2D;
     var window   = this;
-    var document = {
+    document = {
         createElement: function() {
             return new Canvas();
         }
