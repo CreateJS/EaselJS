@@ -45,6 +45,7 @@ if (typeof module !== 'undefined' && module.exports) {
         },
         addEventListener: function() {}
     };
+    window.addEventListener = function() {}
     Canvas.prototype.addEventListener = function() {};
 }
 

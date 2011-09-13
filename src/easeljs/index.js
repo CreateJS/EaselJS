@@ -2,7 +2,7 @@
 exports.Bitmap              = require('./display/Bitmap').Bitmap;
 exports.BitmapSequence      = require('./display/BitmapSequence').BitmapSequence;
 exports.Container           = require('./display/Container').Container;
-exports.DisplayObject       = require('./display/DisplayObject');
+exports.DisplayObject       = require('./display/DisplayObject').DisplayObject;
 exports.DOMElement          = require('./display/DOMElement').DOMElement;
 exports.Graphics            = require('./display/Graphics').Graphics;
 exports.Shadow              = require('./display/Shadow').Shadow;

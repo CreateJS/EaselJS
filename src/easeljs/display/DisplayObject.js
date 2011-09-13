@@ -39,7 +39,7 @@ if (typeof module !== 'undefined' && module.exports) {
     var Canvas   = require('canvas');
     var UID      = require('../utils/UID').UID;
     var Matrix2D = require('../geom/Matrix2D').Matrix2D;
-    var window   = this;
+    var window   = module.exports;
     document = {
         createElement: function() {
             return new Canvas();
@@ -449,6 +449,9 @@ var p = DisplayObject.prototype;
 	* been added to a Stage.
 	**/
 	p.getStage = function() {
+        if (typeof module !== 'undefined' && module.exports) {
+            var Stage = require('./Stage').Stage;
+        }
 		var o = this;
 		while (o.parent) {
 			o = o.parent;
