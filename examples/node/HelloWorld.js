@@ -1,5 +1,5 @@
 var fs        = require('fs');
-var Easel     = require('EaselJS');
+var Easel     = require('easeljs');
 var Canvas    = require('canvas');
 var Stage     = Easel.Stage;
 var Text      = Easel.Text;
