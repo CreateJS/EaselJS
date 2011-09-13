@@ -35,6 +35,17 @@
 * @module EaselJS
 **/
 
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var Canvas   = require('canvas');
+    var window   = module.exports;
+    var document = {
+        createElement: function() {
+            return new Canvas();
+        }
+    };
+}
+
 (function(window) {
 
 // constructor:

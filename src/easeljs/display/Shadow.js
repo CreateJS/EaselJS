@@ -34,6 +34,11 @@
 * @module EaselJS
 **/
 
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var window = module.exports;
+}
+
 (function(window) {
 
 /**

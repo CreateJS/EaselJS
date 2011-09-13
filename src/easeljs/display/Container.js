@@ -34,6 +34,13 @@
 * @module EaselJS
 **/
 
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var DisplayObject = require('./DisplayObject').DisplayObject;
+    var Stage         = {}; // Not Ideal - Required due to the call in the draw method for Stage._snapToPixelEnabled
+    var window = module.exports;
+}
+
 (function(window) {
 
 /**

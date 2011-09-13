@@ -34,6 +34,22 @@
 * @module EaselJS
 **/
 
+/**
+ * Node.js-ification
+ * ctx.createPattern is not implemented in the 0.7.2 version of node-canvas (More Info: https://github.com/LearnBoost/node-canvas/issues/107)
+ * This makes beginBitmapFill and beginBitmapStroke fail silently.
+ * Also, drawPolyStar did not work in tests (see example: node/graphicsTest.js)
+ */
+if (typeof module !== 'undefined' && module.exports) {
+    var Canvas   = require('canvas');
+    var window   = module.exports;
+    var document = {
+        createElement: function() {
+            return new Canvas();
+        }
+    };
+}
+
 (function(window) {
 
 // used to create the instruction lists used in Graphics:
