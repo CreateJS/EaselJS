@@ -450,7 +450,7 @@ var p = DisplayObject.prototype;
 	**/
 	p.getStage = function() {
         if (typeof module !== 'undefined' && module.exports) {
-            var Stage = require('./Stage').Stage;
+            Stage = require('./Stage').Stage;
         }
 		var o = this;
 		while (o.parent) {

@@ -120,7 +120,7 @@ var p = Container.prototype = new DisplayObject();
 	**/
 	p.draw = function(ctx, ignoreCache, _mtx) {
         if (typeof module !== 'undefined' && module.exports) {
-            var Stage         = require('./Stage').Stage;
+            Stage = require('./Stage').Stage;
         }
         
 		var snap = Stage._snapToPixelEnabled;

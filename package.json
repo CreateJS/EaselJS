@@ -9,6 +9,6 @@
         "node" : ">=0.5.2"
     },
     "dependencies": {
-        "canvas": "0.7.2"
+        "canvas": ">=0.7.2"
     }
 }
