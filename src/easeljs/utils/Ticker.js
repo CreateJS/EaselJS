@@ -51,6 +51,7 @@ var Ticker = function() {
 	throw "Ticker cannot be instantiated.";
 }
 	
+	Ticker.useInterval = true;
 	
 	/**
 	* Event broadcast  once each tick / interval. The interval is specified via the 
@@ -67,14 +68,14 @@ var Ticker = function() {
 	* @type Array[Object]
 	* @protected 
 	**/
-	Ticker._listeners = [];
+	Ticker._listeners = null;
 	
 	/** 
 	* @property _pauseable
 	* @type Array[Boolean]
 	* @protected 
 	**/
-	Ticker._pauseable = [];
+	Ticker._pauseable = null;
 	
 	/** 
 	* @property _paused
@@ -128,13 +129,6 @@ var Ticker = function() {
 	Ticker._interval = 50; // READ-ONLY
 	
 	/** 
-	* @property _intervalID
-	* @type Number
-	* @protected 
-	**/
-	Ticker._intervalID = null;
-	
-	/** 
 	* @property _lastTime
 	* @type Number
 	* @protected 
@@ -146,7 +140,22 @@ var Ticker = function() {
 	* @type Array[Number]
 	* @protected 
 	**/
-	Ticker._times = [];
+	Ticker._times = null;
+	
+	/** 
+	* @property _tickTimes
+	* @type Array[Number]
+	* @protected 
+	**/
+	Ticker._tickTimes = null;
+	
+	/** 
+	* @property _rafActive
+	* @type Boolean
+	* @protected 
+	**/
+	Ticker._rafActive = false;
+	
 	
 // public static methods:
 	/**
@@ -162,15 +171,26 @@ var Ticker = function() {
 	* even when Ticker is paused via Ticker.pause(). Default is true.
 	**/
 	Ticker.addListener = function(o, pauseable) {
-		if (!Ticker._inited) {
-			Ticker._inited = true;
-			Ticker._startTime = Ticker._getTime();
-			Ticker._times.push(0);
-			Ticker.setInterval(Ticker._interval);
-		}
-		this.removeListener(o);
+		if (!Ticker._inited) { Ticker.init(); }
+		Ticker.removeListener(o);
 		Ticker._pauseable[Ticker._listeners.length] = (pauseable == null) ? true : pauseable;
 		Ticker._listeners.push(o);
+	}
+	
+	/**
+	* Initializes or resets the timer, clearing all associated listeners and fps measuring data, starting the tick.
+	* This is called automatically when the first listener is added.
+	* @method init
+	* @static
+	**/
+	Ticker.init = function() {
+		Ticker._inited = true;
+		Ticker._times = [];
+		Ticker._tickTimes = [];
+		Ticker._pauseable = [];
+		Ticker._listeners = [];
+		Ticker._times.push(Ticker._startTime = Ticker._getTime());
+		Ticker.setInterval(Ticker._interval);
 	}
 	
 	/**
@@ -206,10 +226,18 @@ var Ticker = function() {
 	* @param {Number} interval Time in milliseconds between ticks. Default value is 50.
 	**/
 	Ticker.setInterval = function(interval) {
-		if (Ticker._intervalID != null) { clearInterval(Ticker._intervalID); }
-		Ticker._lastTime = Ticker.getTime(false);
+		Ticker._lastTime = Ticker._getTime();
 		Ticker._interval = interval;
-		Ticker._intervalID = setInterval(Ticker._tick, interval);
+		if (!Ticker.useInterval) {
+			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
+					  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+			if (f) {
+				f(Ticker._handleAF);
+				Ticker._rafFunction = f;
+				return;
+			}
+		}
+		setTimeout(Ticker._handleTimeout, interval);
 	}
 	
 	/**
@@ -220,17 +248,6 @@ var Ticker = function() {
 	**/
 	Ticker.getInterval = function() {
 		return Ticker._interval;
-	}
-	
-	/**
-	* Returns the target frame rate in frames per second (FPS). For example, with an 
-	* interval of 40, getFPS() will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
-	* @method getFPS
-	* @static
-	* @return {Number} The current target number of frames / ticks broadcast per second.
-	**/
-	Ticker.getFPS = function() {
-		return 1000/Ticker._interval;
 	}
 	
 	/**
@@ -245,6 +262,17 @@ var Ticker = function() {
 	}
 	
 	/**
+	* Returns the target frame rate in frames per second (FPS). For example, with an 
+	* interval of 40, getFPS() will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
+	* @method getFPS
+	* @static
+	* @return {Number} The current target number of frames / ticks broadcast per second.
+	**/
+	Ticker.getFPS = function() {
+		return 1000/Ticker._interval;
+	}
+	
+	/**
 	* Returns the actual frames / ticks per second.
 	* @method getMeasuredFPS
 	* @static
@@ -256,7 +284,7 @@ var Ticker = function() {
 	Ticker.getMeasuredFPS = function(ticks) {
 		if (Ticker._times.length < 2) { return -1; }
 		
-		// x >> 1 : use bitwise to divide by two (int math)
+		// by default, calculate fps for the past 1/2 second:
 		if (ticks == null) { ticks = Ticker.getFPS()>>1; }
 		ticks = Math.min(Ticker._times.length-1, ticks);
 		return 1000/((Ticker._times[0]-Ticker._times[ticks])/ticks);
@@ -312,7 +340,29 @@ var Ticker = function() {
 	}
 	
 // private static methods:
-
+	/**
+	* @method _handleAF
+	* @protected
+	**/
+	Ticker._handleAF = function(timeStamp) {
+		console.log(Ticker._rafFunction);
+		if (timeStamp - Ticker._lastTime >= Ticker._interval-1) {
+			Ticker._tick();
+		}
+		var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
+					  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+		f(Ticker._handleAF, Ticker.animationTarget);
+	}
+	
+	/**
+	* @method _handleTimeout
+	* @protected
+	**/
+	Ticker._handleTimeout = function() {
+		Ticker._tick();
+		setTimeout(Ticker._handleTimeout, Ticker._interval);
+	}
+	
 	/**
 	* @method _tick
 	* @protected
@@ -320,7 +370,7 @@ var Ticker = function() {
 	Ticker._tick = function() {
 		Ticker._ticks++;
 		
-		var time = Ticker.getTime(false);
+		var time = Ticker._getTime();
 		var elapsedTime = time-Ticker._lastTime;
 		var paused = Ticker._paused;
 		
@@ -340,8 +390,11 @@ var Ticker = function() {
 			listener.tick(elapsedTime);
 		}
 		
+		Ticker._tickTimes.unshift(Ticker._getTime()-time);
+		while (Ticker._tickTimes.length > 100) { Ticker._tickTimes.pop(); }
+		
 		Ticker._times.unshift(time);
-		if (Ticker._times.length > 100) { Ticker._times.pop(); }
+		while (Ticker._times.length > 100) { Ticker._times.pop(); }
 	}
 	
 	/**
