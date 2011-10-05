@@ -48,13 +48,13 @@
 * together. See frameData for more information.
 * @class SpriteSheet
 * @constructor
-* @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video instance to use as a sprite sheet.
+* @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The Image, Canvas, or Video instance or URI to an image to use as a sprite sheet.
 * @param {Number} frameWidth The width in pixels of each frame on the sprite sheet.
 * @param {Number} frameHeight The height in pixels of each frame on the sprite sheet.
 * @param {Object} frameData Defines named frames and frame sequences. See the frameData property for more information.
 **/
-var SpriteSheet = function(image, frameWidth, frameHeight, frameData) {
-  this.initialize(image, frameWidth, frameHeight, frameData);
+var SpriteSheet = function(imageOrUri, frameWidth, frameHeight, frameData) {
+  this.initialize(imageOrUri, frameWidth, frameHeight, frameData);
 }
 var p = SpriteSheet.prototype;
 
@@ -110,11 +110,15 @@ var p = SpriteSheet.prototype;
 	/**
 	* Initialization method.
 	* @method initialize
-	* param {Graphics} graphics
 	* @protected
 	**/
-	p.initialize = function(image, frameWidth, frameHeight, frameData) {
-		this.image = image;
+	p.initialize = function(imageOrUri, frameWidth, frameHeight, frameData) {
+		if (typeof imageOrUri == "string") {
+			this.image = new Image();
+			this.image.src = imageOrUri;
+		} else {
+			this.image = imageOrUri;
+		}
 		this.frameWidth = frameWidth;
 		this.frameHeight = frameHeight;
 		this.frameData = frameData;
