@@ -223,31 +223,8 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		var frameWidth = this.spriteSheet.frameWidth;
 		var frameHeight = this.spriteSheet.frameHeight;
 		var cols = image.width/frameWidth|0;
-		var rows = image.height/frameHeight|0;
-
-		if (this.currentEndFrame != null) {
-			// use sequencing.
-			if (this.currentFrame > this.currentEndFrame) {
-				if (this.nextSequence) {
-					this._goto(this.nextSequence);
-				} else {
-					this.paused = true;
-					this.currentFrame = this.currentEndFrame;
-				}
-				if (this.callback) { this.callback(this); }
-			}
-		} else {
-			// use simple mode.
-			var ttlFrames = this.spriteSheet.totalFrames || cols*rows;
-			if (this.currentFrame >= ttlFrames) {
-				if (this.spriteSheet.loop) { this.currentFrame = 0; }
-				else {
-					this.currentFrame = ttlFrames-1;
-					this.paused = true;
-				}
-				if (this.callback) { this.callback(this); }
-			}
-		}
+		
+		this._normalizeCurrentFrame(); // revisit whether this should trigger events.
 
 		if (this.currentFrame >= 0) {
 			var col = this.currentFrame%cols;
@@ -339,7 +316,48 @@ var p = BitmapSequence.prototype = new DisplayObject();
 			// sequence data is set, but we haven't actually played a sequence yet:
 			this.paused = true;
 		}
-		if (!this.paused && ((++this._advanceCount)+this.advanceOffset)%this.advanceFrequency == 0) { this.currentFrame++; }
+		if (!this.paused && ((++this._advanceCount)+this.advanceOffset)%this.advanceFrequency == 0) {
+			this.currentFrame++;
+			this._normalizeCurrentFrame();
+		}
+	}
+	
+	
+	/**
+	* Normalizes the current frame, advancing sequences and dispatching callbacks as appropriate.
+	* @protected
+	* @method _normalizeCurrentFrame
+	**/
+	p._normalizeCurrentFrame = function() { 
+		var image = this.spriteSheet.image;
+		var frameWidth = this.spriteSheet.frameWidth;
+		var frameHeight = this.spriteSheet.frameHeight;
+		var cols = image.width/frameWidth|0;
+		var rows = image.height/frameHeight|0;
+
+		if (this.currentEndFrame != null) {
+			// use sequencing.
+			if (this.currentFrame > this.currentEndFrame) {
+				if (this.nextSequence) {
+					this._goto(this.nextSequence);
+				} else {
+					this.paused = true;
+					this.currentFrame = this.currentEndFrame;
+				}
+				if (this.callback) { this.callback(this); }
+			}
+		} else {
+			// use simple mode.
+			var ttlFrames = this.spriteSheet.totalFrames || cols*rows;
+			if (this.currentFrame >= ttlFrames) {
+				if (this.spriteSheet.loop) { this.currentFrame = 0; }
+				else {
+					this.currentFrame = ttlFrames-1;
+					this.paused = true;
+				}
+				if (this.callback) { this.callback(this); }
+			}
+		}
 	}
 
 	/**
@@ -364,6 +382,8 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		o.nextSequence = this.nextSequence;
 		o.paused = this.paused;
 		o.frameData = this.frameData;
+		o.advanceFrequency = this.advanceFrequency;
+		o.advanceOffset = this.advanceOffset;
 	}
 
 	/**
