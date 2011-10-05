@@ -68,7 +68,7 @@ function init() {
 	Simple example of using a <strong>DOMElement</strong>. Note how the DOMElement can display outside the canvas boundaries, whereas the blue <strong>Shape</strong> border cannot.<br/>
 	</div>
 	<div class="canvasHolder">
-		<div id="foo" style="position: absolute; background-color: #FF0000; width:320px; height:260px; padding: 5px; visibility: hidden;">
+		<div id="foo" style="z-index: 1; position: absolute; background-color: #FF0000; width:320px; height:260px; padding: 5px; visibility: hidden;">
 			<b>Hello! I'm an HTML div.</b><br/><br/>
 			I am not rendered to the canvas, but I can be included in the display list for positioning and transformations.<br/><br/>
 			This means I can contain any HTML content (rich text, forms, video, etc), but I'm not a full part of the EaselJS display list.<br/><br/>
