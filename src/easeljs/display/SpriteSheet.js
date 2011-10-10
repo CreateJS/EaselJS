@@ -35,7 +35,7 @@
 **/
 
 (function(window) {
-
+// TODO: update documentation.
 /**
 * Encapsulates the properties associated with a sprite sheet. A sprite sheet is a series of images (usually animation frames) combined
 * into a single image on a regular grid. For example, an animation consisting of 8 100x100 images could be combined into a 400x200
@@ -58,53 +58,15 @@ var SpriteSheet = function(imageOrUri, frameWidth, frameHeight, frameData) {
 }
 var p = SpriteSheet.prototype;
 
-// public properties:
-	/**
-	* The Image, Canvas, or Video instance to use as a sprite sheet.
-	* @property image
-	* @type Image | HTMLCanvasElement | HTMLVideoElement
-	**/
-	p.image = null;
-
-	/** The width in pixels of each frame on the sprite sheet image.
-	* @property frameWidth
-	* @type Number
-	**/
-	p.frameWidth = 0;
-
-	/** The height in pixels of each frame on the sprite sheet image.
-	* @property frameHeight
-	* @type Number
-	**/
-	p.frameHeight = 0;
-
-	/** Defines named frames and frame sequences. Frame data is specified as a generic object, where each property name will
-	* be used to define a new named frame or sequence. Named frames specify a frame number. Sequences are defined using an
-	* array of 2 or 3 values: the start frame, the end frame, and optionally the name of the next sequence to play.<br/><br/>
-	* For example, examine the following frame data:<br/>{walk:[0,20], shoot:[21,25,"walk"], crouch:[26,30,false], stand:31}<br/>
-	* This will create 3 sequences and a named frame. The first sequence will be named "walk", and will loop frames 0 to 20 inclusive.
-	* The second sequence will be named "shoot", and will play frames 21 to 25 then play the walk sequence. The third sequence "crouch"
-	* will play frames 26 to 30 then pause on frame 30, due to false being passed as the next sequence. The named frame "stand" will
-	* display frame 31.
-	* @property frameData
-	* @type Object
-	**/
-	p.frameData = null;
-
-	/** The loop property is only used if no frameData is specified, and indicates whether all frames (as specified with totalFrames)
-	* should loop. If false, the animation will play to totalFrames, then pause.
-	* @property loop
-	* @type Boolean
-	**/
-	p.loop = true;
-
-	/** Specifies the total number of frames in the sprite sheet if no frameData is specified. This is useful for excluding extraneous
-	* frames (for example, if you have 7 frames in a 2x4 sprite sheet). The total frames will be automatically calculated by
-	* BitmapSequence based on frame and image dimensions if totalFrames is 0.
-	* @property totalFrames
-	* @type Number
-	**/
-	p.totalFrames = 0;
+// private properties:
+	p._animations = null;
+	p._frames = null;
+	p._images = null;
+	p._data = null;
+	p._frameHeight = 0;
+	p._frameWidth = 0;
+	p._numFrames = 0;
+	p._loadCount = 0;
 
 // constructor:
 	/**
@@ -112,19 +74,129 @@ var p = SpriteSheet.prototype;
 	* @method initialize
 	* @protected
 	**/
-	p.initialize = function(imageOrUri, frameWidth, frameHeight, frameData) {
-		if (typeof imageOrUri == "string") {
-			this.image = new Image();
-			this.image.src = imageOrUri;
-		} else {
-			this.image = imageOrUri;
+	p.initialize = function(data) {
+		var i,l,o,a;
+		if (data == null) { return; }
+		
+		// parse images:
+		if (data.images && (l=data.images.length) > 0) {
+			a = this._images = [];
+			for (i=0; i<l; i++) {
+				var img = data.images[i];
+				if (!(img instanceof Image)) {
+					var src = img;
+					img = new Image();
+					img.src = src;
+				}
+				a.push(img);
+				if (!img.complete) {
+					this._loadCount++;
+					img.onload = this._handleImageLoad();
+				}
+			}
 		}
-		this.frameWidth = frameWidth;
-		this.frameHeight = frameHeight;
-		this.frameData = frameData;
+		
+		// parse frames:
+		if (data.frames == null) { // nothing
+		} else if (data.frames instanceof Array) {
+			this._frames = [];
+			a = data.frames;
+			for (i=0,l=a.length;i<l;i++) {
+				var arr = a[i];
+				this._frames.push({image:this._images[arr[4]?arr[4]:0], rect:new Rectangle(arr[0],arr[1],arr[2],arr[3]) });
+			}
+		} else {
+			o = data.frames;
+			this._frameWidth = o.frameWidth;
+			this._frameHeight = o.frameHeight;
+			this._numFrames = o.numFrames;
+			if (this._loadCount == 0) { this._calculateFrames(); }
+		}
+		
+		// parse animations:
+		if ((o=data.animations) != null) {
+			this._animations = [];
+			this._data = {};
+			var name;
+			for (name in o) {
+				var anim = {name:name};
+				var obj = o[name];
+				if (!iNaN(obj)) { // single frame
+					a = anim.frames = [obj];
+				} if (obj instanceof Array) { // simple
+					anim.frequency = obj[3];
+					anim.next = obj[2];
+					a = anim.frames = [];
+					for (i=obj[0];i<=obj[1];i++) {
+						a.push(i);
+					}
+				} else { // complex
+					anim.frequency = obj.frequency;
+					anim.next = obj.next;
+					a = anim.frames = obj.frames.slice(0);
+				}
+				anim.next = a.length < 2 ? null : (!anim.next || anim.next == true) ? name : anim.next;
+				if (!anim.frequency) { anim.frequency = 1; }
+				this._animations.push(name);
+				this._data[name] = anim;
+			}
+		}
+		
 	}
 
 // public methods:
+	/**
+	* Returns the total number of frames in the specified animation, or in the whole sprite
+	* sheet if the animation param is omitted.
+	* @param {String} animation The name of the animation to get a frame count for.
+	* @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
+	*/
+	p.getNumFrames = function(animation) {
+		if (animation == null) {
+			return (this._frames ? this._frames.length : this._numFrames;
+		} else {
+			var data = this._data[animation];
+			if (data == null) { return 0; }
+			else { return data.frames.length; }
+		}
+	}
+	
+	/**
+	* Returns an array of all available animation names as strings.
+	* @method getAnimations
+	* @return {Array} an array of animation names available on this sprite sheet.
+	**/
+	p.getAnimations = function() {
+		return this._animations.slice(0);
+	}
+	
+	/**
+	* Returns an object defining the specified animation. The returned object has a
+	* frames property containing an array of the frame id's in the animation, a frequency
+	* property indicating the advance frequency for this animation, a name property, 
+	* and a next property, which specifies the default next animation. If the animation
+	* loops, the name and next property will be the same.
+	* @method getAnimations
+	* @return {Object} a generic object with frames, frequency, name, and next properties.
+	**/
+	p.getAnimation = function(name) {
+		return this._data[name];
+	}
+	
+	/**
+	* Returns an object defining the source rect of the specified frame. The returned object
+	* has an image property holding a reference to the image object in which the frame frame is found,
+	* and a rect property containing a Rectangle instance which defines the boundaries for the
+	* frame within that image.
+	* @method getFrameRect
+	* @param {Number} frameIndex The index of the frame.
+	* @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist, or the image is not fully loaded.
+	**/
+	p.getFrameRect = function(frameIndex) {
+		if (this._frames && (frame=this._frames[frameIndex]) && frame.image.complete) { return frame; }
+		return null;
+	}
+	
 	/**
 	* Returns a string representation of this object.
 	* @method toString
@@ -144,6 +216,32 @@ var p = SpriteSheet.prototype;
 		o.loop = this.loop;
 		o.totalFrames = this.totalFrames;
 		return o;
+	}
+	
+// private methods:
+	p._handleImageLoad = function() {
+		if (--this._loadCount == 0) {
+			this._calculateFrames();
+		}
+	}
+	
+	p._calculateFrames = function() {
+		if (this._frames) { return; }
+		this._frames = [];
+		var ttlFrames = 0;
+		var fw = this._frameWidth;
+		var fh = this._frameHeight;
+		for (var i=0; i<images.length; i++) {
+			var img = images[i];
+			var cols = (img.width+1)/fw|0;
+			var rows = (img.height+1)/fh|0;
+			var ttl = this._numFrames>0 ? Math.min(this._numFrames-ttlFrames,cols*rows) : cols*rows;
+			for (var j=0;j<ttl;j++) {
+				this._frames.push({image:img, rect:new Rectangle(j%cols*fw,(j/cols|0)*fh,fw,fh) });
+			}
+			ttlFrames += ttl;
+		}
+		this._numFrames = ttlFrames;
 	}
 
 window.SpriteSheet = SpriteSheet;
