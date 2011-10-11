@@ -35,7 +35,7 @@
 **/
 
 (function(window) {
-
+// TODO: update docs.
 /**
 * Displays frames or sequences of frames from a sprite sheet image. A sprite sheet is a series of images
 * (usually animation frames) combined into a single image on a regular grid. For example, an animation
@@ -60,6 +60,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @property callback
 	* @type Function
 	**/
+	// TODO: rename.
 	p.callback = null;
 
 	/**
@@ -80,38 +81,13 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	p.currentSequence = null; // READ-ONLY
 
 	/**
-	* Returns the last frame of the currently playing sequence when using frameData. READ-ONLY.
-	* @property currentEndFrame
-	* @type Number
-	* @final
-	**/
-	p.currentEndFrame = null; // READ-ONLY
-
-	/**
-	* Returns the first frame of the currently playing sequence when using frameData. READ-ONLY.
-	* @property currentStartFrame
-	* @type Number
-	* @final
-	**/
-	p.currentStartFrame = null; // READ-ONLY
-
-	/**
-	* Returns the name of the next sequence that will be played, or null if it will stop playing after the
-	* current sequence. READ-ONLY.
-	* @property nextSequence
-	* @type String
-	* @final
-	**/
-	p.nextSequence = null;
-
-	/**
 	* Prevents the animation from advancing each tick automatically. For example, you could create a sprite
 	* sheet of icons, set paused to true, and display the appropriate icon by setting currentFrame.
 	* @property paused
 	* @type Boolean
 	* @default false
 	**/
-	p.paused = false;
+	p.paused = true;
 
 	/**
 	* The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame
@@ -128,24 +104,17 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @default true
 	**/
 	p.snapToPixel = true;
-
-	/** Indicates how often the animation frame should move forwards. For example, a value of 1 will cause the playhead to
-	 * move forwards every time tick is called whereas a value of 3 would cause it to advance every third time.
-	 * @property advanceFrequency
-	 * @type Number
-	 * @default 1
-	 */
-	p.advanceFrequency = 1;
-
-	/** When used in conjunction with an advanceFrequency greater than 1, this lets you offset which tick the playhead will
-	 * advance on. For example, you could create two BitmapSequences, both with advanceFrequency set to 2, but one
-	 * having advanceOffset set to 1. Both instances would advance every second tick, but they would advance on alternating
+	
+	/** 
+	 * When used in conjunction with animations having an frequency greater than 1, this lets you offset which tick the playhead will
+	 * advance on. For example, you could create two BitmapSequences, both playing an animation with a frequency of 2, but one
+	 * having offset set to 1. Both instances would advance every second tick, but they would advance on alternating
 	 * ticks (effectively, one instance would advance on odd ticks, the other on even ticks).
-	 * @property advanceOffset
+	 * @property offset
 	 * @type Number
 	 * @default 0
 	 */
-	p.advanceOffset = 0;
+	p.offset = 0;
 
 // private properties:
 		/**
@@ -155,6 +124,10 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @default 0
 	**/
 	p._advanceCount = 0;
+	
+	// TODO: doc.
+	p._animation = null;
+	p._curAnimFrame = 0;
 
 // constructor:
 	/**
@@ -182,8 +155,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	**/
 	p.isVisible = function() {
-		var image = this.spriteSheet ? this.spriteSheet.image : null;
-		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && image && this.currentFrame >= 0 && (image.complete || image.getContext);
+		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.spriteSheet.complete && this.currentFrame >= 0;
 	}
 
 	/**
@@ -205,34 +177,14 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	**/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-
-		var rect = this.getCurrentFrameRect();
-		if (rect != null) {
-			ctx.drawImage(this.spriteSheet.image, rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width, rect.height);
-		}
+		this._normalizeCurrentFrame();
+		var o = spriteSheet.getFrameRect(this.currentFrame);
+		if (o == null) { return; }
+		var rect = o.rect;
+		// TODO: implement pixel snapping.
+		ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width, rect.height);
 		return true;
 	}
-
-	/**
-	* Normalizes the currentFrame property and returns a Rectangle defining the bounds of current frame.
-	* @method getCurrentFrameRect
-	* @returns Rectangle
-	**/
-	p.getCurrentFrameRect = function() {
-		var image = this.spriteSheet.image;
-		var frameWidth = this.spriteSheet.frameWidth;
-		var frameHeight = this.spriteSheet.frameHeight;
-		var cols = image.width/frameWidth|0;
-		
-		this._normalizeCurrentFrame(); // revisit whether this should trigger events.
-
-		if (this.currentFrame >= 0) {
-			var col = this.currentFrame%cols;
-			var row = this.currentFrame/cols|0;
-			return new Rectangle(frameWidth*col, frameHeight*row, frameWidth, frameHeight);
-		}
-	}
-
 
 	//Note, the doc sections below document using the specified APIs (from DisplayObject)  from
 	//Bitmap. This is why they have no method implementations.
@@ -282,7 +234,9 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @method advance
 	*/
 	p.advance = function() {
-		this.currentFrame++;
+		if (this._animation) { this._curAnimFrame++; }
+		else { this.currentFrame++; }
+		this._normalizeFrame();
 	}
 
 	/**
@@ -312,13 +266,9 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @method _tick
 	**/
 	p._tick = function() {
-		if (this.currentFrame == -1 && this.spriteSheet.frameData) {
-			// sequence data is set, but we haven't actually played a sequence yet:
-			this.paused = true;
-		}
-		if (!this.paused && ((++this._advanceCount)+this.advanceOffset)%this.advanceFrequency == 0) {
-			this.currentFrame++;
-			this._normalizeCurrentFrame();
+		var f = this._animation ? this._animation.frequency : 1;
+		if (!this.paused && ((++this._advanceCount)+this.advanceOffset)%f == 0) {
+			this.advance();
 		}
 	}
 	
@@ -328,33 +278,23 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @protected
 	* @method _normalizeCurrentFrame
 	**/
-	p._normalizeCurrentFrame = function() { 
-		var image = this.spriteSheet.image;
-		var frameWidth = this.spriteSheet.frameWidth;
-		var frameHeight = this.spriteSheet.frameHeight;
-		var cols = image.width/frameWidth|0;
-		var rows = image.height/frameHeight|0;
-
-		if (this.currentEndFrame != null) {
-			// use sequencing.
-			if (this.currentFrame > this.currentEndFrame) {
-				if (this.nextSequence) {
-					this._goto(this.nextSequence);
+	p._normalizeFrame = function() { 
+		var a = this._animation;
+		if (a) {
+			if (this._curAnimFrame >= a.frames.length) {
+				if (a.next) {
+					this._goto(a.next);
+					return;
 				} else {
 					this.paused = true;
-					this.currentFrame = this.currentEndFrame;
+					this._curAnimFrame = a.frames.length;
 				}
+				this.currentFrame = a.frames[this._curAnimFrame];
 				if (this.callback) { this.callback(this); }
 			}
 		} else {
-			// use simple mode.
-			var ttlFrames = this.spriteSheet.totalFrames || cols*rows;
-			if (this.currentFrame >= ttlFrames) {
-				if (this.spriteSheet.loop) { this.currentFrame = 0; }
-				else {
-					this.currentFrame = ttlFrames-1;
-					this.paused = true;
-				}
+			if (this.currentFrame >= this.spriteSheet.getNumFrames()) {
+				this.currentFrame = 0;
 				if (this.callback) { this.callback(this); }
 			}
 		}
@@ -376,14 +316,11 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		this.DisplayObject_cloneProps(o);
 		o.callback = this.callback;
 		o.currentFrame = this.currentFrame;
-		o.currentStartFrame = this.currentStartFrame;
-		o.currentEndFrame = this.currentEndFrame;
 		o.currentSequence = this.currentSequence;
-		o.nextSequence = this.nextSequence;
 		o.paused = this.paused;
-		o.frameData = this.frameData;
-		o.advanceFrequency = this.advanceFrequency;
-		o.advanceOffset = this.advanceOffset;
+		o.offset = this.offset;
+		o._animation = this._animation;
+		o._curAnimFrame = this._curAnimFrame;
 	}
 
 	/**
@@ -394,27 +331,15 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	**/
 	p._goto = function(frameOrSequence) {
 		if (isNaN(frameOrSequence)) {
-			if (frameOrSequence == this.currentSequence) {
-				this.currentFrame = this.currentStartFrame;
-				return;
-			}
-			var data = this.spriteSheet.frameData[frameOrSequence];
-			if (data instanceof Array) {
-				this.currentFrame = this.currentStartFrame = data[0];
+			var data = this.spriteSheet.getAnimation(frameOrSequence);
+			if (data) {
+				this._curAnimFrame = 0;
+				this._animation = data;
 				this.currentSequence = frameOrSequence;
-				this.currentEndFrame = data[1];
-				if (this.currentEndFrame == null) { this.currentEndFrame = this.currentStartFrame; }
-				if (this.currentEndFrame == null) { this.currentEndFrame = this.currentFrame; }
-				this.nextSequence = data[2];
-				if (this.nextSequence == null) { this.nextSequence = this.currentSequence; }
-				else if (this.nextSequence == false) { this.nextSequence = null; }
-			} else {
-				this.currentSequence = this.nextSequence = null;
-				this.currentEndFrame = this.currentFrame = this.currentStartFrame = data;
+				this._normalizeFrame();
 			}
 		} else {
-			this.currentSequence = this.nextSequence = this.currentEndFrame = null;
-			this.currentStartFrame = 0;
+			this.currentSequence = this._animation = null;
 			this.currentFrame = frameOrSequence;
 		}
 	}

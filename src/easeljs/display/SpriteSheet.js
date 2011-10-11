@@ -36,6 +36,7 @@
 
 (function(window) {
 // TODO: update documentation.
+// TODO: how to deal with registration points? Should be part of the frame data.
 /**
 * Encapsulates the properties associated with a sprite sheet. A sprite sheet is a series of images (usually animation frames) combined
 * into a single image on a regular grid. For example, an animation consisting of 8 100x100 images could be combined into a 400x200
@@ -58,6 +59,9 @@ var SpriteSheet = function(imageOrUri, frameWidth, frameHeight, frameData) {
 }
 var p = SpriteSheet.prototype;
 
+// public properties:
+	p.complete = true;
+	
 // private properties:
 	p._animations = null;
 	p._frames = null;
@@ -89,8 +93,9 @@ var p = SpriteSheet.prototype;
 					img.src = src;
 				}
 				a.push(img);
-				if (!img.complete) {
+				if (!img.getContext && !img.complete) {
 					this._loadCount++;
+					this.complete = false;
 					img.onload = this._handleImageLoad();
 				}
 			}
@@ -153,7 +158,7 @@ var p = SpriteSheet.prototype;
 	*/
 	p.getNumFrames = function(animation) {
 		if (animation == null) {
-			return (this._frames ? this._frames.length : this._numFrames;
+			return this._frames ? this._frames.length : this._numFrames;
 		} else {
 			var data = this._data[animation];
 			if (data == null) { return 0; }
@@ -193,7 +198,7 @@ var p = SpriteSheet.prototype;
 	* @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist, or the image is not fully loaded.
 	**/
 	p.getFrameRect = function(frameIndex) {
-		if (this._frames && (frame=this._frames[frameIndex]) && frame.image.complete) { return frame; }
+		if (this.complete && this._frames && (frame=this._frames[frameIndex])) { return frame; }
 		return null;
 	}
 	
@@ -212,9 +217,17 @@ var p = SpriteSheet.prototype;
 	* @return {SpriteSheet} a clone of the SpriteSheet instance.
 	**/
 	p.clone = function() {
-		var o = new SpriteSheet(this.image, this.frameWidth, this.frameHeight, this.frameData);
-		o.loop = this.loop;
-		o.totalFrames = this.totalFrames;
+		// GDS: there isn't really any reason to clone SpriteSheet instances, because they can be reused.
+		var o = new SpriteSheet();
+		o.complete = this.complete;
+		o._animations = this._animations;
+		o._frames = this._frames;
+		o._images = this._images;
+		o._data = this._data;
+		o._frameHeight = this._frameHeight;
+		o._frameWidth = this._frameWidth;
+		o._numFrames = this._numFrames;
+		o._loadCount = this._loadCount;
 		return o;
 	}
 	
@@ -222,11 +235,12 @@ var p = SpriteSheet.prototype;
 	p._handleImageLoad = function() {
 		if (--this._loadCount == 0) {
 			this._calculateFrames();
+			this.complete = true;
 		}
 	}
 	
 	p._calculateFrames = function() {
-		if (this._frames) { return; }
+		if (this._frames || this._frameWidth == 0) { return; }
 		this._frames = [];
 		var ttlFrames = 0;
 		var fw = this._frameWidth;
