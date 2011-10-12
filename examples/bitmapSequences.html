@@ -32,12 +32,7 @@ var bmpSeqList;
 function init() {
 	//find canvas and load images, wait for last image to load
 	canvas = document.getElementById("testCanvas");
-	imgSeq.onload = handleImageLoad;
-	imgSeq.onerror = handleImageError;
-	imgSeq.src = "img/testSeq.png";
-}
-
-function handleImageLoad(e) {
+	
 	// create a new stage and point it at our canvas:
 	stage = new Stage(canvas);
 
@@ -45,19 +40,17 @@ function handleImageLoad(e) {
 	var w = canvas.width;
 	var h = canvas.height;
 
-	// create spritesheet and assign the initial frameData
-	// frameData defines the sequences that can be played
-	// in this format: {nameOfSequence:[startFrame, endFrame, optionalNameOfNextSequence]}
-	var spriteSheet  = new SpriteSheet(
-			imgSeq, //image to use
-			64, //width of each sprite
-			68, //height of each sprite
-			{	//This object specifies 3 named frames and frame sequences
-				walkUpRt:[0,19,"walkRt"],
-				walkDnRt:[20,39,"walkDnLf"],
-				walkRt:[41,59,"walkDnRt"]
-			});
-
+	// create spritesheet and assign the associated data.
+	var spriteSheet  = new SpriteSheet({
+		images: ["img/testSeq.png"],
+		frames: {frameWidth:64, frameHeight:68},
+		animations: {
+			walkUpRt:[0,19,"walkRt"],
+			walkDnRt:[20,39,"walkUpRt"],
+			walkRt:[41,59,"walkDnRt"]
+		}
+	});
+	/*
 	// to save file size, the loaded sprite sheet only includes right facing animations
 	// we could flip the display objects with scaleX=-1, but this is expensive in most browsers
 	// instead, we generate a new sprite sheet which includes the flipped animations according to
@@ -70,14 +63,14 @@ function handleImageLoad(e) {
 				walkDnLf:["walkDnRt",true,false,"walkLf"],
 				walkLf:["walkRt",true,false,"walkUpLf"]
 			});
-
+	*/
 	// create a BitmapSequence instance to display and play back the sprite sheet:
 	var bmpSeq = new BitmapSequence(spriteSheet);
 
 	// set the registration point (the point it will be positioned and rotated around)
 	// to the center of the frame dimensions:
-	bmpSeq.regX = bmpSeq.spriteSheet.frameWidth/2|0;
-	bmpSeq.regY = bmpSeq.spriteSheet.frameHeight/2|0;
+	bmpSeq.regX = 64>>1;
+	bmpSeq.regY = 68>>1;
 
 	// start playing the first sequence:
 	bmpSeq.gotoAndPlay("walkRt");		//animate
@@ -87,10 +80,10 @@ function handleImageLoad(e) {
 	bmpSeq.shadow = new Shadow("#454", 0, 5, 4);
 
 	// the callback is called each time a sequence completes:
-	bmpSeq.callback = angleChange;
+	bmpSeq.onAnimationEnd = angleChange;
 
 	// create a bunch of rats based on the first one, and place them on stage, and in our collection.
-	var l = 30;
+	var l = 2;
 	bmpSeqList = [];
 	for (var i=0; i<l; i++) {
 		bmpSeq.name = "rat"+i;
@@ -102,7 +95,7 @@ function handleImageLoad(e) {
 		bmpSeq.y = Math.random()*(h-220)+0|0;
 
 		// have each rat start on a random frame in the "walkRt" animation:
-		bmpSeq.currentFrame = 41+Math.random()*18|0;
+		//bmpSeq.currentFrame = 41+Math.random()*18|0;
 		stage.addChild(bmpSeq);
 		bmpSeqList.push(bmpSeq);
 

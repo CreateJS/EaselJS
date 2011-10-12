@@ -35,17 +35,16 @@
 **/
 
 (function(window) {
-// TODO: update docs.
 /**
-* Displays frames or sequences of frames from a sprite sheet image. A sprite sheet is a series of images
-* (usually animation frames) combined into a single image on a regular grid. For example, an animation
+* Displays frames or sequences of frames (ie. animations) from a sprite sheet image. A sprite sheet is a series of images
+* (usually animation frames) combined into a single image. For example, an animation
 * consisting of 8 100x100 images could be combined into a 400x200 sprite sheet (4 frames across by 2 high).
-* You can display individual frames, play sequential frames as an animation, and even sequence animations
-* together. See the SpriteSheet class for more information on setting up frames and animation.
+* You can display individual frames, play frames as an animation, and even sequence animations
+* together. See the SpriteSheet class for more information on setting up frames and animations.
 * @class BitmapSequence
 * @extends DisplayObject
 * @constructor
-* @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image, frame
+* @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
 * dimensions, and frame data. See SpriteSheet for more information.
 **/
 var BitmapSequence = function(spriteSheet) {
@@ -56,16 +55,17 @@ var p = BitmapSequence.prototype = new DisplayObject();
 // public properties:
 
 	/**
-	* Specifies a function to call whenever any sequence reaches its end.
-	* @property callback
+	* Specifies a function to call whenever any animation reaches its end. It will be called with two
+	* params: the first will be a reference to this instance, the second will be the name of the animation
+	* that just ended.
+	* @property onAnimationEnd
 	* @type Function
 	**/
-	// TODO: rename.
-	p.callback = null;
+	p.onAnimationEnd = null;
 
 	/**
-	* The frame that will be drawn on the next tick. This can also be set, but it will not update the current
-	* sequence, so it may result in unexpected behavior if you are using frameData.
+	* The frame that will be drawn when draw is called. Note that with some SpriteSheet data, this
+	* will advance non-sequentially. READ-ONLY.
 	* @property currentFrame
 	* @type Number
 	* @default -1
@@ -73,12 +73,12 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	p.currentFrame = -1;
 
 	/**
-	* Returns the currently playing sequence when using frameData. READ-ONLY.
-	* @property currentSequence
+	* Returns the currently playing animation. READ-ONLY.
+	* @property currentAnimation
 	* @type String
 	* @final
 	**/
-	p.currentSequence = null; // READ-ONLY
+	p.currentAnimation = null; // READ-ONLY
 
 	/**
 	* Prevents the animation from advancing each tick automatically. For example, you could create a sprite
@@ -117,7 +117,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	p.offset = 0;
 
 // private properties:
-		/**
+	/**
 	* @property _advanceCount
 	* @protected
 	* @type Number
@@ -125,8 +125,20 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	**/
 	p._advanceCount = 0;
 	
-	// TODO: doc.
+	/**
+	* @property _animation
+	* @protected
+	* @type Object
+	* @default 0
+	**/
 	p._animation = null;
+	
+	/**
+	* @property _curAnimFrame
+	* @protected
+	* @type Number
+	* @default 0
+	**/
 	p._curAnimFrame = 0;
 
 // constructor:
@@ -177,11 +189,11 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	**/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		this._normalizeCurrentFrame();
-		var o = spriteSheet.getFrameRect(this.currentFrame);
+		this._normalizeFrame();
+		var o = this.spriteSheet.getFrameRect(this.currentFrame);
 		if (o == null) { return; }
 		var rect = o.rect;
-		// TODO: implement pixel snapping.
+		// TODO: add support for registration.
 		ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width, rect.height);
 		return true;
 	}
@@ -208,25 +220,25 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	**/
 
 	/**
-	* Sets paused to false and plays the specified sequence name, named frame, or frame number.
+	* Sets paused to false and plays the specified animation name, named frame, or frame number.
 	* @method gotoAndPlay
-	* @param {String|Number} frameOrSequence The frame number or sequence that the playhead should move to
+	* @param {String|Number} frameOrAnimation The frame number or animation name that the playhead should move to
 	* and begin playing.
 	**/
-	p.gotoAndPlay = function(frameOrSequence) {
+	p.gotoAndPlay = function(frameOrAnimation) {
 		this.paused = false;
-		this._goto(frameOrSequence);
+		this._goto(frameOrAnimation);
 	}
 
 	/**
-	* Sets paused to true and seeks to the specified sequence name, named frame, or frame number.
+	* Sets paused to true and seeks to the specified animation name, named frame, or frame number.
 	* @method gotoAndStop
-	* @param {String|Number} frameOrSequence The frame number or sequence that the playhead should move to
+	* @param {String|Number} frameOrAnimation The frame number or animation name that the playhead should move to
 	* and stop.
 	**/
-	p.gotoAndStop = function(frameOrSequence) {
+	p.gotoAndStop = function(frameOrAnimation) {
 		this.paused = true;
-		this._goto(frameOrSequence);
+		this._goto(frameOrAnimation);
 	}
 
 	/**
@@ -267,14 +279,14 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	**/
 	p._tick = function() {
 		var f = this._animation ? this._animation.frequency : 1;
-		if (!this.paused && ((++this._advanceCount)+this.advanceOffset)%f == 0) {
+		if (!this.paused && ((++this._advanceCount)+this.offset)%f == 0) {
 			this.advance();
 		}
 	}
 	
 	
 	/**
-	* Normalizes the current frame, advancing sequences and dispatching callbacks as appropriate.
+	* Normalizes the current frame, advancing animations and dispatching callbacks as appropriate.
 	* @protected
 	* @method _normalizeCurrentFrame
 	**/
@@ -284,18 +296,19 @@ var p = BitmapSequence.prototype = new DisplayObject();
 			if (this._curAnimFrame >= a.frames.length) {
 				if (a.next) {
 					this._goto(a.next);
-					return;
 				} else {
 					this.paused = true;
-					this._curAnimFrame = a.frames.length;
+					this._curAnimFrame = a.frames.length-1;
+					this.currentFrame = a.frames[this._curAnimFrame];
 				}
+				if (this.onAnimationEnd) { this.onAnimationEnd(this,a.name); }
+			} else {
 				this.currentFrame = a.frames[this._curAnimFrame];
-				if (this.callback) { this.callback(this); }
 			}
 		} else {
 			if (this.currentFrame >= this.spriteSheet.getNumFrames()) {
 				this.currentFrame = 0;
-				if (this.callback) { this.callback(this); }
+				if (this.onAnimationEnd) { this.onAnimationEnd(this,null); }
 			}
 		}
 	}
@@ -314,9 +327,9 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	**/
 	p.cloneProps = function(o) {
 		this.DisplayObject_cloneProps(o);
-		o.callback = this.callback;
+		o.onAnimationEnd = this.onAnimationEnd;
 		o.currentFrame = this.currentFrame;
-		o.currentSequence = this.currentSequence;
+		o.currentAnimation = this.currentAnimation;
 		o.paused = this.paused;
 		o.offset = this.offset;
 		o._animation = this._animation;
@@ -324,23 +337,23 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	}
 
 	/**
-	* Moves the playhead to the specified frame number of sequence.
+	* Moves the playhead to the specified frame number or animation.
 	* @method _goto
-	* @param {String|Number} frameOrSequence The frame number of sequence that the playhead should move to.
+	* @param {String|Number} frameOrAnimation The frame number or animation that the playhead should move to.
 	* @protected
 	**/
-	p._goto = function(frameOrSequence) {
-		if (isNaN(frameOrSequence)) {
-			var data = this.spriteSheet.getAnimation(frameOrSequence);
+	p._goto = function(frameOrAnimation) {
+		if (isNaN(frameOrAnimation)) {
+			var data = this.spriteSheet.getAnimation(frameOrAnimation);
 			if (data) {
 				this._curAnimFrame = 0;
 				this._animation = data;
-				this.currentSequence = frameOrSequence;
+				this.currentAnimation = frameOrAnimation;
 				this._normalizeFrame();
 			}
 		} else {
-			this.currentSequence = this._animation = null;
-			this.currentFrame = frameOrSequence;
+			this.currentAnimation = this._animation = null;
+			this.currentFrame = frameOrAnimation;
 		}
 	}
 

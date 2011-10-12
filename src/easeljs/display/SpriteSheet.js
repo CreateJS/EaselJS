@@ -126,7 +126,7 @@ var p = SpriteSheet.prototype;
 			for (name in o) {
 				var anim = {name:name};
 				var obj = o[name];
-				if (!iNaN(obj)) { // single frame
+				if (!isNaN(obj)) { // single frame
 					a = anim.frames = [obj];
 				} if (obj instanceof Array) { // simple
 					anim.frequency = obj[3];
@@ -245,8 +245,8 @@ var p = SpriteSheet.prototype;
 		var ttlFrames = 0;
 		var fw = this._frameWidth;
 		var fh = this._frameHeight;
-		for (var i=0; i<images.length; i++) {
-			var img = images[i];
+		for (var i=0,imgs = this._images; i<imgs.length; i++) {
+			var img = imgs[i];
 			var cols = (img.width+1)/fw|0;
 			var rows = (img.height+1)/fh|0;
 			var ttl = this._numFrames>0 ? Math.min(this._numFrames-ttlFrames,cols*rows) : cols*rows;
