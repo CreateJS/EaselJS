@@ -33,6 +33,13 @@
 * helper classes to make working with Canvas much easier.
 * @module EaselJS
 **/
+
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var DisplayObject = require('./DisplayObject').DisplayObject;
+    var window = module.exports;
+}
+
 (function(window) {
 
 /**

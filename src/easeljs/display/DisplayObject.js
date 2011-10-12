@@ -34,6 +34,19 @@
 * @module EaselJS
 **/
 
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var Canvas   = require('canvas');
+    var UID      = require('../utils/UID').UID;
+    var Matrix2D = require('../geom/Matrix2D').Matrix2D;
+    var window   = module.exports;
+    document = {
+        createElement: function() {
+            return new Canvas();
+        }
+    };
+}
+
 (function(window) {
 
 /**
@@ -436,6 +449,9 @@ var p = DisplayObject.prototype;
 	* been added to a Stage.
 	**/
 	p.getStage = function() {
+        if (typeof module !== 'undefined' && module.exports) {
+            Stage = require('./Stage').Stage;
+        }
 		var o = this;
 		while (o.parent) {
 			o = o.parent;

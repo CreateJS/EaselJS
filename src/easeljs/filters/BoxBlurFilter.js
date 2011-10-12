@@ -27,6 +27,13 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 **/
 
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var Rectangle = require('../geom/Rectangle').Rectangle;
+    var Filter    = require('./Filter').Filter;
+    var window = module.exports;
+}
+
 (function(window) {
 
 /**
