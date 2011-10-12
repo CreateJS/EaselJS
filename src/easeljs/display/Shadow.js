@@ -127,7 +127,7 @@ var p = Shadow.prototype;
 	}
 	
 	// this has to be populated after the class is defined:
-	Shadow.identity = new Shadow(null, 0, 0, 0);
+	Shadow.identity = new Shadow("transparent", 0, 0, 0);
 	
 window.Shadow = Shadow;
 }(window));
