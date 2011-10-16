@@ -18,7 +18,7 @@
 <script src="../src/easeljs/display/Container.js"></script>
 <script src="../src/easeljs/display/Stage.js"></script>
 <script src="../src/easeljs/display/Bitmap.js"></script>
-<script src="../src/easeljs/display/BitmapSequence.js"></script>
+<script src="../src/easeljs/display/BitmapAnimation.js"></script>
 <script src="../src/easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
 
@@ -50,22 +50,25 @@ function init() {
 			walkRt:[41,59,"walkDnRt"]
 		}
 	});
-	/*
+	
 	// to save file size, the loaded sprite sheet only includes right facing animations
 	// we could flip the display objects with scaleX=-1, but this is expensive in most browsers
 	// instead, we generate a new sprite sheet which includes the flipped animations according to
 	// the flipData, which is in the format:
 	// {nameOfFlippedSequence:["derivativeSequence", flipHorizontally, flipVertically, optionNameOfNextSequence]}
-	spriteSheet = SpriteSheetUtils.flip(
-			spriteSheet,
-			{
-				walkUpLf:["walkUpRt",true,false,"walkUpRt"],
-				walkDnLf:["walkDnRt",true,false,"walkLf"],
-				walkLf:["walkRt",true,false,"walkUpLf"]
-			});
+	SpriteSheetUtils.addFlippedFrames(spriteSheet,true,false,false);
+	
+	// we could rewire the next sequences to make them work like so:
+	// but instead we will use code in the angleChange function.
+	/*
+	spriteSheet.getAnimation("walkDnRt").next = "walkDnRt_h";
+	spriteSheet.getAnimation("walkDnRt_h").next = "walkRt_h";
+	spriteSheet.getAnimation("walkRt_h").next = "walkUpRt_h";
+	spriteSheet.getAnimation("walkUpRt_h").next = "walkUpRt";
 	*/
+	
 	// create a BitmapSequence instance to display and play back the sprite sheet:
-	var bmpSeq = new BitmapSequence(spriteSheet);
+	var bmpSeq = new BitmapAnimation(spriteSheet);
 
 	// set the registration point (the point it will be positioned and rotated around)
 	// to the center of the frame dimensions:
@@ -83,7 +86,7 @@ function init() {
 	bmpSeq.onAnimationEnd = angleChange;
 
 	// create a bunch of rats based on the first one, and place them on stage, and in our collection.
-	var l = 2;
+	var l = 40;
 	bmpSeqList = [];
 	for (var i=0; i<l; i++) {
 		bmpSeq.name = "rat"+i;
@@ -95,7 +98,7 @@ function init() {
 		bmpSeq.y = Math.random()*(h-220)+0|0;
 
 		// have each rat start on a random frame in the "walkRt" animation:
-		//bmpSeq.currentFrame = 41+Math.random()*18|0;
+		bmpSeq.currentAnimationFrame = Math.random()*spriteSheet.getNumFrames("walkRt")|0;
 		stage.addChild(bmpSeq);
 		bmpSeqList.push(bmpSeq);
 
@@ -127,14 +130,15 @@ function tick() {
 	stage.update();
 }
 
-function angleChange(bmpSeq) {
+function angleChange(bmpSeq,animation) {
 	//after each sequence ends update the rat's heading and adjust velocities to match
 	bmpSeq.direction -= 60;
 	var angle = bmpSeq.direction * (Math.PI/180);
 	bmpSeq.vX = Math.sin(angle) * bmpSeq.speed;
 	bmpSeq.vY = Math.cos(angle) * bmpSeq.speed;
+	var nextMap = {walkRt:"walkDnRt",walkDnRt:"walkDnRt_h",walkDnRt_h:"walkRt_h",walkRt_h:"walkUpRt_h",walkUpRt_h:"walkUpRt",walkUpRt:"walkRt"}
+	bmpSeq.gotoAndPlay(nextMap[animation]);
 }
-
 </script>
 </head>
 

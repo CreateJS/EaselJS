@@ -140,7 +140,7 @@ var p = SpriteSheet.prototype;
 					anim.next = obj.next;
 					a = anim.frames = obj.frames.slice(0);
 				}
-				anim.next = a.length < 2 ? null : (!anim.next || anim.next == true) ? name : anim.next;
+				anim.next = a.length < 2 ? null : (!anim.next || anim.next == true) ? name : anim.next; // TODO: how to specify no next?
 				if (!anim.frequency) { anim.frequency = 1; }
 				this._animations.push(name);
 				this._data[name] = anim;

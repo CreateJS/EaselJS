@@ -1,5 +1,5 @@
 /*
-* BitmapSequence by Grant Skinner. Dec 5, 2010
+* BitmapAnimation by Grant Skinner. Dec 5, 2010
 * Visit http://easeljs.com/ for documentation, updates and examples.
 *
 *
@@ -41,16 +41,16 @@
 * consisting of 8 100x100 images could be combined into a 400x200 sprite sheet (4 frames across by 2 high).
 * You can display individual frames, play frames as an animation, and even sequence animations
 * together. See the SpriteSheet class for more information on setting up frames and animations.
-* @class BitmapSequence
+* @class BitmapAnimation
 * @extends DisplayObject
 * @constructor
 * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
 * dimensions, and frame data. See SpriteSheet for more information.
 **/
-var BitmapSequence = function(spriteSheet) {
+var BitmapAnimation = function(spriteSheet) {
   this.initialize(spriteSheet);
 }
-var p = BitmapSequence.prototype = new DisplayObject();
+var p = BitmapAnimation.prototype = new DisplayObject();
 
 // public properties:
 
@@ -107,7 +107,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	
 	/** 
 	 * When used in conjunction with animations having an frequency greater than 1, this lets you offset which tick the playhead will
-	 * advance on. For example, you could create two BitmapSequences, both playing an animation with a frequency of 2, but one
+	 * advance on. For example, you could create two BitmapAnimations, both playing an animation with a frequency of 2, but one
 	 * having offset set to 1. Both instances would advance every second tick, but they would advance on alternating
 	 * ticks (effectively, one instance would advance on odd ticks, the other on even ticks).
 	 * @property offset
@@ -115,6 +115,16 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	 * @default 0
 	 */
 	p.offset = 0;
+	
+	
+	/**
+	* Specifies the current frame index within the current playing animation. When playing normally, this will
+	* increase successively from 0 to n-1, where n is the number of frames in the current animation.
+	* @property currentAnimationFrame
+	* @type Number
+	* @default 0
+	**/
+	p.currentAnimationFrame = 0; // TODO: make this public?
 
 // private properties:
 	/**
@@ -129,17 +139,9 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @property _animation
 	* @protected
 	* @type Object
-	* @default 0
+	* @default null
 	**/
 	p._animation = null;
-	
-	/**
-	* @property _curAnimFrame
-	* @protected
-	* @type Number
-	* @default 0
-	**/
-	p._curAnimFrame = 0;
 
 // constructor:
 	/**
@@ -246,7 +248,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @method advance
 	*/
 	p.advance = function() {
-		if (this._animation) { this._curAnimFrame++; }
+		if (this._animation) { this.currentAnimationFrame++; }
 		else { this.currentFrame++; }
 		this._normalizeFrame();
 	}
@@ -257,7 +259,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @return {Point} a clone of the Point instance.
 	**/
 	p.clone = function() {
-		var o = new BitmapSequence(this.spriteSheet);
+		var o = new BitmapAnimation(this.spriteSheet);
 		this.cloneProps(o);
 		return o;
 	}
@@ -268,7 +270,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	* @return {String} a string representation of the instance.
 	**/
 	p.toString = function() {
-		return "[BitmapSequence (name="+  this.name +")]";
+		return "[BitmapAnimation (name="+  this.name +")]";
 	}
 
 // private methods:
@@ -293,17 +295,17 @@ var p = BitmapSequence.prototype = new DisplayObject();
 	p._normalizeFrame = function() { 
 		var a = this._animation;
 		if (a) {
-			if (this._curAnimFrame >= a.frames.length) {
+			if (this.currentAnimationFrame >= a.frames.length) {
 				if (a.next) {
 					this._goto(a.next);
 				} else {
 					this.paused = true;
-					this._curAnimFrame = a.frames.length-1;
-					this.currentFrame = a.frames[this._curAnimFrame];
+					this.currentAnimationFrame = a.frames.length-1;
+					this.currentFrame = a.frames[this.currentAnimationFrame];
 				}
 				if (this.onAnimationEnd) { this.onAnimationEnd(this,a.name); }
 			} else {
-				this.currentFrame = a.frames[this._curAnimFrame];
+				this.currentFrame = a.frames[this.currentAnimationFrame];
 			}
 		} else {
 			if (this.currentFrame >= this.spriteSheet.getNumFrames()) {
@@ -333,7 +335,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		o.paused = this.paused;
 		o.offset = this.offset;
 		o._animation = this._animation;
-		o._curAnimFrame = this._curAnimFrame;
+		o.currentAnimationFrame = this.currentAnimationFrame;
 	}
 
 	/**
@@ -346,7 +348,7 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		if (isNaN(frameOrAnimation)) {
 			var data = this.spriteSheet.getAnimation(frameOrAnimation);
 			if (data) {
-				this._curAnimFrame = 0;
+				this.currentAnimationFrame = 0;
 				this._animation = data;
 				this.currentAnimation = frameOrAnimation;
 				this._normalizeFrame();
@@ -357,5 +359,5 @@ var p = BitmapSequence.prototype = new DisplayObject();
 		}
 	}
 
-window.BitmapSequence = BitmapSequence;
+window.BitmapAnimation = BitmapAnimation;
 }(window));
