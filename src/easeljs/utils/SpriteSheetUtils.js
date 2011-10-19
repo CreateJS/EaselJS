@@ -39,7 +39,7 @@
 if (typeof module !== 'undefined' && module.exports) {
     var Canvas   = require('canvas');
     var window   = module.exports;
-    var document = {
+    document = {
         createElement: function() {
             return new Canvas();
         }
