@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Text</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/geom/Rectangle.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
+<script src="../src/easeljs/display/SpriteSheet.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/display/BitmapSequence.js"></script>
+<script src="../src/easeljs/display/Bitmap.js"></script>
+<script src="../src/easeljs/display/Graphics.js"></script>
+<script src="../src/easeljs/display/Shape.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<!-- End EaselJS Imports -->
+<script>
+
+var canvas;
+var daisy;
+var icons;
+
+function init() {
+	// get a reference to the canvas we'll be working with:
+	canvas = document.getElementById("testCanvas");
+
+	// create a stage object to work with the canvas. This is the top level node in the display list:
+    stage = new Stage(canvas);
+
+    cropRectangle();
+    
+    daisy = new Image();
+    daisy.onload = cropImage;
+    daisy.src = "img/daisy.png";
+
+    icons = new Image();
+    icons.onload = cropSequence;
+    icons.src = "img/icons.png";
+}
+
+function cropRectangle() {
+    // create a new Shape Object and draw it as a white rectanlge
+    var shape  = new Shape();
+    shape.graphics.beginFill('#FFFFFF');
+    shape.graphics.drawRect(0, 0, 300, 100);
+
+    // add the shape as a child of the stage.  This means it will be drawn any tim the stage is updated
+    // and that its transformations will be relative to the stage coordinates
+    stage.addChild(shape);
+
+    shape.x = 50;
+    shape.y = 50;
+
+    // set the clipping path of the bitmap and draw a rectangle to crop it to the specified dimensions
+    shape.clip = new Graphics();
+    shape.clip.drawPolyStar(40, 50, 70, 5, 2);
+	stage.update();
+}
+
+function cropImage() {
+    // create a new Bitmap Object
+    var bitmap  = new Bitmap(daisy);
+
+    // add the bitmap as a child of the stage.  This means it will be drawn any tim the stage is updated
+    // and that its transformations will be relative to the stage coordinates
+    stage.addChild(bitmap);
+
+    bitmap.x = 50;
+    bitmap.y = 150;
+
+    // set the clipping path of the bitmap and draw a circle to crop it to the specified dimensions
+    bitmap.clip = new Graphics();
+    bitmap.clip.drawRect(25, 20, 30, 20);
+
+	// call update on the stage to make it render the current display list to the canvas:
+	stage.update();
+}
+
+function cropSequence() {
+	// create a simple SpriteSheet with a frame size of 80x80 and no frameData:
+	var spriteSheet  = new SpriteSheet(icons, 80, 80);
+
+	// create a BitmapSequence to display frames from the sprite sheet:
+	var iconSeq = new BitmapSequence(spriteSheet);
+
+    // add the bitmap sequence as a child of the stage.  This means it will be drawn any tim the stage is updated
+    // and that its transformations will be relative to the stage coordinates
+    stage.addChild(iconSeq);
+
+    iconSeq.x = 50;
+    iconSeq.y = 250;
+
+    // set the clipping path of the bitmap and draw a circle to crop it to the specified dimensions
+    iconSeq.clip = new Graphics();
+    iconSeq.clip.drawCircle(40, 40, 40);
+ 	iconSeq.gotoAndPlay(0);
+
+	Ticker.setInterval(200);
+	Ticker.addListener(stage);
+}
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+		Example of clipping paths on a <strong>Bitmap</strong>, <strong>Shape</strong>, and <strong>BitmapSequence</strong>.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580"></canvas>
+	</div>
+</body>
+</html>
