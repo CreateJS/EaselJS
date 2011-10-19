@@ -50,12 +50,9 @@
 * @class SpriteSheet
 * @constructor
 * @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The Image, Canvas, or Video instance or URI to an image to use as a sprite sheet.
-* @param {Number} frameWidth The width in pixels of each frame on the sprite sheet.
-* @param {Number} frameHeight The height in pixels of each frame on the sprite sheet.
-* @param {Object} frameData Defines named frames and frame sequences. See the frameData property for more information.
 **/
-var SpriteSheet = function(imageOrUri, frameWidth, frameHeight, frameData) {
-  this.initialize(imageOrUri, frameWidth, frameHeight, frameData);
+var SpriteSheet = function(data) {
+  this.initialize(data);
 }
 var p = SpriteSheet.prototype;
 
@@ -67,10 +64,13 @@ var p = SpriteSheet.prototype;
 	p._frames = null;
 	p._images = null;
 	p._data = null;
+	p._loadCount = 0;
+	// only used for simple frame defs:
 	p._frameHeight = 0;
 	p._frameWidth = 0;
 	p._numFrames = 0;
-	p._loadCount = 0;
+	p._regX = 0;
+	p._regY = 0;
 
 // constructor:
 	/**
@@ -108,12 +108,14 @@ var p = SpriteSheet.prototype;
 			a = data.frames;
 			for (i=0,l=a.length;i<l;i++) {
 				var arr = a[i];
-				this._frames.push({image:this._images[arr[4]?arr[4]:0], rect:new Rectangle(arr[0],arr[1],arr[2],arr[3]) });
+				this._frames.push({image:this._images[arr[4]?arr[4]:0], rect:new Rectangle(arr[0],arr[1],arr[2],arr[3]), regX:arr[4]||0, regY:arr[5]||0 });
 			}
 		} else {
 			o = data.frames;
 			this._frameWidth = o.frameWidth;
 			this._frameHeight = o.frameHeight;
+			this._regX = o.regX||0;
+			this._regY = o.regY||0;
 			this._numFrames = o.numFrames;
 			if (this._loadCount == 0) { this._calculateFrames(); }
 		}
@@ -251,7 +253,7 @@ var p = SpriteSheet.prototype;
 			var rows = (img.height+1)/fh|0;
 			var ttl = this._numFrames>0 ? Math.min(this._numFrames-ttlFrames,cols*rows) : cols*rows;
 			for (var j=0;j<ttl;j++) {
-				this._frames.push({image:img, rect:new Rectangle(j%cols*fw,(j/cols|0)*fh,fw,fh) });
+				this._frames.push({image:img, rect:new Rectangle(j%cols*fw,(j/cols|0)*fh,fw,fh), regX:this._regX, regY:this._regY });
 			}
 			ttlFrames += ttl;
 		}

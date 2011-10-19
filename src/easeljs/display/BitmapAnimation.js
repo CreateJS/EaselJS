@@ -35,6 +35,8 @@
 **/
 
 (function(window) {
+	
+	// TODO: test regX/Y (and everything else)
 /**
 * Displays frames or sequences of frames (ie. animations) from a sprite sheet image. A sprite sheet is a series of images
 * (usually animation frames) combined into a single image. For example, an animation
@@ -124,7 +126,7 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	* @type Number
 	* @default 0
 	**/
-	p.currentAnimationFrame = 0; // TODO: make this public?
+	p.currentAnimationFrame = 0;
 
 // private properties:
 	/**
@@ -195,8 +197,7 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 		var o = this.spriteSheet.getFrameRect(this.currentFrame);
 		if (o == null) { return; }
 		var rect = o.rect;
-		// TODO: add support for registration.
-		ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width, rect.height);
+		ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, -o.regX, -o.regY, rect.width, rect.height);
 		return true;
 	}
 
