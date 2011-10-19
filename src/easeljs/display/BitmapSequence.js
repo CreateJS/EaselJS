@@ -214,7 +214,9 @@ var p = BitmapSequence.prototype = new DisplayObject();
 
 		var rect = this.getCurrentFrameRect();
 		if (rect != null) {
+			this.beginClip(ctx);
 			ctx.drawImage(this.spriteSheet.image, rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width, rect.height);
+			this.endClip(ctx);
 		}
 		return true;
 	}

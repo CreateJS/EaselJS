@@ -113,7 +113,9 @@ var p = Shape.prototype = new DisplayObject();
 	**/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+		this.beginClip(ctx);
 		this.graphics.draw(ctx);
+		this.endClip(ctx);
 		return true;
 	}
 	

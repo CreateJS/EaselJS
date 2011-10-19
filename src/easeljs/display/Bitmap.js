@@ -128,7 +128,9 @@ var p = Bitmap.prototype = new DisplayObject();
 	**/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+		this.beginClip(ctx);
 		ctx.drawImage(this.image, 0, 0);
+		this.endClip(ctx);
 		return true;
 	}
 	
