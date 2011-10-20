@@ -71,6 +71,30 @@ var p = Bitmap.prototype = new DisplayObject();
 	* @default true
 	**/
 	p.snapToPixel = true;
+
+    /**
+     * X Coordinate from which to draw the image inside the bitmap container
+     * @property imageX
+     * @type number
+     * @default 0
+     */
+    p.imageX = 0;
+
+    /**
+     * Y Coordinate from which to draw the image inside the bitmap container
+     * @property imageY
+     * @type number
+     * @default 0
+     */
+    p.imageY = 0;
+
+    /**
+     * Scale of the image when drawn in the bitmap container
+     * @property imageScale
+     * @type number
+     * @default 1
+     */
+    p.imageScale = 1;
 	
 	// constructor:
 
@@ -129,7 +153,7 @@ var p = Bitmap.prototype = new DisplayObject();
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this.beginClip(ctx);
-		ctx.drawImage(this.image, 0, 0);
+		ctx.drawImage(this.image, this.imageX, this.imageY, this.image.width * this.imageScale, this.image.height * this.imageScale);
 		this.endClip(ctx);
 		return true;
 	}
