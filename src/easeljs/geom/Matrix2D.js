@@ -282,12 +282,6 @@ var p = Matrix2D.prototype;
 	* @param {Number} regY Optional.
 	**/
 	p.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-		if (rotation%360 == 0 && scaleX == 1 && scaleY == 1 && skewX == 0 && skewY == 0) {
-			this.tx += x-regX;
-			this.ty += y-regY;
-			return;
-		}
-
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
