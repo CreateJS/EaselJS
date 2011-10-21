@@ -50,8 +50,16 @@
 var Ticker = function() {
 	throw "Ticker cannot be instantiated.";
 }
-	
-	Ticker.useInterval = true;
+
+// public static properties:
+	/**
+	* Indicates whether Ticker should use requestAnimationFrame if it is supported in the browser. If false, Ticker
+	 * will use setTimeout.
+	* @property useRAF
+	 * @static
+	* @type Boolean
+	**/
+	Ticker.useRAF = null;
 	
 	/**
 	* Event broadcast  once each tick / interval. The interval is specified via the 
@@ -162,8 +170,8 @@ var Ticker = function() {
 	* Adds a listener for the tick event. The listener object must expose a .tick() method, 
 	* which will be called once each tick / interval. The interval is specified via the 
 	* .setInterval(ms) method.
-	* The exposed tick method is passed a single parameter, which include the elapsed time between the 
-	* previous tick and the current one.
+	* The exposed tick method is passed two parameters: the elapsed time between the 
+	* previous tick and the current one, and a boolean indicating whether Ticker is paused.
 	* @method addListener
 	* @static
 	* @param {Object} o The object to add as a listener.
@@ -228,7 +236,7 @@ var Ticker = function() {
 	Ticker.setInterval = function(interval) {
 		Ticker._lastTime = Ticker._getTime();
 		Ticker._interval = interval;
-		if (!Ticker.useInterval) {
+		if (Ticker.useRAF) {
 			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
 					  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
 			if (f) {
@@ -237,7 +245,7 @@ var Ticker = function() {
 				return;
 			}
 		}
-		setTimeout(Ticker._handleTimeout, interval);
+		if (this._inited) { setTimeout(Ticker._handleTimeout, interval); }
 	}
 	
 	/**
@@ -387,7 +395,7 @@ var Ticker = function() {
 			var p = pauseable[i];
 			var listener = listeners[i];
 			if (listener == null || (paused && p) || listener.tick == null) { continue; }
-			listener.tick(elapsedTime);
+			listener.tick(elapsedTime,paused);
 		}
 		
 		Ticker._tickTimes.unshift(Ticker._getTime()-time);
