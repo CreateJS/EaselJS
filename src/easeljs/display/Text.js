@@ -221,6 +221,42 @@ var p = Text.prototype = new DisplayObject();
 		}
 		return true;
 	}
+
+
+    /**
+     * Using draw method to figure out actual height of printed text (without actually drawing to context)
+	 * @return {Number} The measured, untransformed height of the text.
+     */
+	p.getHeight = function() {
+		var lines = String(this.text).split(/(?:\r\n|\r|\n)/);
+		var lineHeight = (this.lineHeight == null) ? this.getMeasuredLineHeight() : this.lineHeight;
+		var height = 0;
+		var ctx = this._getWorkingContext();
+		for (var i=0, l=lines.length; i<l; i++) {
+			var w = ctx.measureText(lines[i]).width;
+			if (this.lineWidth == null || w < this.lineWidth) {
+				height += lineHeight;
+				continue;
+			}
+
+			// split up the line
+			var words = lines[i].split(/(\s)/);
+			var str = words[0];
+			for (var j=1, jl=words.length; j<jl; j+=2) {
+				// Line needs to wrap:
+				if (ctx.measureText(str + words[j] + words[j+1]).width > this.lineWidth) {
+					height += lineHeight;
+					str = words[j+1];
+				} else {
+					str += words[j] + words[j+1];
+				}
+			}
+			height += lineHeight;
+		}
+		height += lineHeight;
+
+		return height;
+	}
 	
 	/**
 	* Returns the measured, untransformed width of the text.
