@@ -38,6 +38,7 @@
 if (typeof module !== 'undefined' && module.exports) {
     var Canvas   = require('canvas');
     var Graphics = require('./Graphics').Graphics;
+    var Shadow   = require('./Shadow').Shadow;
     var UID      = require('../utils/UID').UID;
     var Matrix2D = require('../geom/Matrix2D').Matrix2D;
     var window   = module.exports;
