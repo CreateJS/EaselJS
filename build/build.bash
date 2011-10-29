@@ -18,7 +18,7 @@ if [ -e $FINAL ];then
 	rm $FINAL
 fi
 
-java -jar $1 \
+java -jar $1 $2 \
     --js_output_file $OUTPUT \
     --js ../src/easeljs/utils/UID.js \
     --js ../src/easeljs/utils/Ticker.js \
