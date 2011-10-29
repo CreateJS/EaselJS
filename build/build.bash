@@ -32,6 +32,7 @@ java -jar $1 \
     --js ../src/easeljs/display/DisplayObject.js \
     --js ../src/easeljs/display/Container.js \
     --js ../src/easeljs/display/Stage.js \
+    --js ../src/easeljs/display/DOMElement.js \
     --js ../src/easeljs/display/Bitmap.js \
     --js ../src/easeljs/display/BitmapSequence.js \
     --js ../src/easeljs/display/Shape.js \
