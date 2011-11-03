@@ -187,6 +187,10 @@ var p = Bitmap.prototype = new DisplayObject();
 	p.clone = function() {
 		var o = new Bitmap(this.image);
 		this.cloneProps(o);
+		o.imageScale = this.imageScale;
+		o.imageX     = this.imageX;
+		o.imageY     = this.imageY;
+		o.image      = this.image;
 		return o;
 	}
 	
