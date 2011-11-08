@@ -548,6 +548,10 @@ var p = DisplayObject.prototype;
 		return mtx;
 	}
 
+	p.drawHitMask = function(ctx) {
+		this.draw(ctx);
+	}
+
 	/**
 	* Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at
 	* the specified position). This ignores the alpha, shadow and compositeOperation of the display object, and all
@@ -563,7 +567,7 @@ var p = DisplayObject.prototype;
 		var canvas = DisplayObject._hitTestCanvas;
 
 		ctx.setTransform(1,  0, 0, 1, -x, -y);
-		this.draw(ctx);
+		this.drawHitMask(ctx);
 
 		var hit = this._testHit(ctx);
 

@@ -434,7 +434,7 @@ var p = Container.prototype = new DisplayObject();
 				child.getConcatenatedMatrix(mtx);
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				ctx.globalAlpha = mtx.alpha;
-				child.draw(ctx);
+				child.drawHitMask(ctx);
 				if (!this._testHit(ctx)) { continue; }
 				canvas.width = 0;
 				canvas.width = 1;
