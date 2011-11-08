@@ -708,6 +708,16 @@ var p = Graphics.prototype;
 		this.arc(x, y, radius, 0, Math.PI*2);
 		return this;
 	}
+
+	/**
+	* Draws an image.
+	* @method drawImage
+        **/
+	p.drawImage = function() {
+		this._dirty = this._active = true;
+		this._activeInstructions.push(new Command(this._ctx.drawImage, Array.prototype.slice.call(arguments)));
+		return this;
+	};
 	
 	/**
 	* Draws an ellipse (oval).
@@ -969,6 +979,13 @@ var p = Graphics.prototype;
 	* type Function
 	**/
 	p.dc = p.drawCircle;
+	
+	/** Shortcut to drawImage.
+	* @property di
+	* @protected
+	* type Function
+	**/
+	p.di = p.drawImage;
 	
 	/** Shortcut to drawEllipse.
 	* @property de
