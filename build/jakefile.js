@@ -115,6 +115,79 @@ task("build", [],
 task("build-docs", [],
 	function()
 	{
+		if(system.args < 4)
+		{
+			print("USAGE : jake build-docs path-to-yuidoc.py build_version");
+			OS.exit(1);
+		}
+		
+		var compiler_path = system.args[2];
+		
+		if(!compiler_path)
+		{
+			//usage
+			print("USAGE : jake build-docs path-to-yuidoc.py build_version");
+			OS.exit(1);
+		}
+		
+		if(!FILE.exists(compiler_path))
+		{
+			print("ERROR : could not locate yuidoc.py : " + compiler_path );
+			OS.exit(1);
+		}		
+		
+		var version = system.args[3];
+		
+		if(!version)
+		{
+			print("USAGE : jake build-docs path-to-yuidoc.py build_version");
+			OS.exit(1);	
+		}
+		
+		var parser_in="../src";
+
+		var	parser_out="tmp/parser";
+
+		var working_dir="output";
+		var doc_dir="easeljs_docs";
+		var zip_name="easeljs_docs.zip";
+		
+		var generator_out=FILE.join(working_dir, doc_dir);
+		var template = "template";
+		
+		var yuiversion = 2;
+		var projectname = "EaselJS";
+		
+		var cmd = [
+			compiler_path,
+			parser_in,
+			"-p", parser_out,
+			"-o", generator_out,
+			"-t", template,
+			"-v", version,
+			"-Y", yuiversion,
+			"-m", projectname,
+			"-u", "http://www.easeljs.com"
+		];
+		
+		OS.system(cmd);
+		
+		//FILE.remove("tmp");
+		
+		//print("cd " + working_dir + " && zip -r " + zip_name + " " + doc_dir + " -x *.DS_Store && cd ..");
+		OS.system("cd " + OS.enquote(working_dir) + " && zip -r" + zip_name + " " + doc_dir + " -x *.DS_Store");
+		
+		/*
+		OS.system(["cd", working_dir]);
+		OS.system([
+				"zip",
+				"-r",
+				zip_name,
+				doc_dir,
+				"-x", "*.DS_Store"
+			]);
+		OS.system(["cd", ".."]);		
+		*/
 		print("build-docs");
 	}
 );
