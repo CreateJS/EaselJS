@@ -4,6 +4,8 @@ var OS = require("os");
 
 var task = require("jake").task;
 
+var GOOGLE_CLOSURE_PATH = "tools/google-closure/compiler.jar";
+var YUI_DOC_PATH = "tools/yuidoc/bin/yuidoc.py";
 
 var SOURCE_FILES = [
 	"../src/easeljs/utils/UID.js",
@@ -41,21 +43,7 @@ task("default", ["build", "build-docs"],
 task("build", [],
 	function()
 	{
-		var compiler_path = system.args[2];
 		var output_dir = "output";
-
-		if(!compiler_path)
-		{
-			//usage
-			print("USAGE : jake build PATH_TO_COMPILER.JAR");
-			OS.exit(1);
-		}
-		
-		if(!FILE.exists(compiler_path))
-		{
-			print("ERROR : could not locate compiler.jar : " + compiler_path );
-			OS.exit(1);
-		}
 		
 		if(!FILE.exists(output_dir))
 		{
@@ -65,7 +53,6 @@ task("build", [],
 		
 		//catch errors and fail, cleanup and fail gracefully
 		//test with paths that contain spaces
-		
 		
 		try
 		{
@@ -81,7 +68,7 @@ task("build", [],
 			var final_file = FILE.join(output_dir, "easel.js");
 		
 			var cmd = [
-				"java", "-jar", compiler_path
+				"java", "-jar", GOOGLE_CLOSURE_PATH
 			].concat(
 					file_args
 				).concat(
@@ -115,32 +102,17 @@ task("build", [],
 task("build-docs", [],
 	function()
 	{
-		if(system.args < 4)
+		if(system.args < 3)
 		{
-			print("USAGE : jake build-docs path-to-yuidoc.py build_version");
-			OS.exit(1);
-		}
-		
-		var compiler_path = system.args[2];
-		
-		if(!compiler_path)
-		{
-			//usage
-			print("USAGE : jake build-docs path-to-yuidoc.py build_version");
-			OS.exit(1);
-		}
-		
-		if(!FILE.exists(compiler_path))
-		{
-			print("ERROR : could not locate yuidoc.py : " + compiler_path );
+			print("USAGE : jake build-docs build_version");
 			OS.exit(1);
 		}		
 		
-		var version = system.args[3];
+		var version = system.args[2];
 		
 		if(!version)
 		{
-			print("USAGE : jake build-docs path-to-yuidoc.py build_version");
+			print("USAGE : jake build-docs build_version");
 			OS.exit(1);	
 		}
 		
@@ -159,7 +131,7 @@ task("build-docs", [],
 		var projectname = "EaselJS";
 		
 		var cmd = [
-			compiler_path,
+			YUI_DOC_PATH,
 			parser_in,
 			"-p", parser_out,
 			"-o", generator_out,
