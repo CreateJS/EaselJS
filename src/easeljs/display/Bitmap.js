@@ -48,7 +48,7 @@ var Bitmap = function(imageOrUri) {
 }
 var p = Bitmap.prototype = new DisplayObject();
 
-	// public properties:
+// public properties:
 	/**
 	* The image to render. This can be an Image, a Canvas, or a Video.
 	* @property image

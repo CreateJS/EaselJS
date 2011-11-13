@@ -197,6 +197,7 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 		var o = this.spriteSheet.getFrameRect(this.currentFrame);
 		if (o == null) { return; }
 		var rect = o.rect;
+		// TODO: implement snapToPixel on regX/Y?
 		ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, -o.regX, -o.regY, rect.width, rect.height);
 		return true;
 	}

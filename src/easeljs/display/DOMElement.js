@@ -51,7 +51,7 @@
 * @class DOMElement
 * @extends DisplayObject
 * @constructor
-* @param {HTMLElement} htmlElement The DOM object to manage.
+* @param {HTMLElement} htmlElement A reference or id for the DOM element to manage.
 **/
 var DOMElement = function(htmlElement) {
   this.initialize(htmlElement);
@@ -84,13 +84,14 @@ var p = DOMElement.prototype = new DisplayObject();
 	* @protected
 	*/
 	p.initialize = function(htmlElement) {
+		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
 		this.DisplayObject_initialize();
 		this.mouseEnabled = false;
 		this.htmlElement = htmlElement;
 		if (htmlElement) {
 			this._style = htmlElement.style;
 			this._style.position = "absolute";
-			this._style.transformOrigin = this._style.webkitTransformOrigin = this._style.MozTransformOrigin = "0px 0px";
+			this._style.transformOrigin = this._style.webkitTransformOrigin = this._style.MozTransformOrigin = "0% 0%";
 		}
 	}
 
