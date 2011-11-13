@@ -54,7 +54,7 @@ var Ticker = function() {
 // public static properties:
 	/**
 	* Indicates whether Ticker should use requestAnimationFrame if it is supported in the browser. If false, Ticker
-	 * will use setTimeout.
+	 * will use setTimeout. If you change this value, you must call setInterval or setFPS to reinitialize the Ticker.
 	* @property useRAF
 	 * @static
 	* @type Boolean
@@ -164,6 +164,13 @@ var Ticker = function() {
 	**/
 	Ticker._rafActive = false;
 	
+	/** 
+	* @property _timeoutID
+	* @type Number
+	* @protected 
+	**/
+	Ticker._timeoutID = null;
+	
 	
 // public static methods:
 	/**
@@ -236,16 +243,18 @@ var Ticker = function() {
 	Ticker.setInterval = function(interval) {
 		Ticker._lastTime = Ticker._getTime();
 		Ticker._interval = interval;
+		if (Ticker.timeoutID != null) { clearTimeout(Ticker.timeoutID); }
 		if (Ticker.useRAF) {
+			if (Ticker._rafActive) { return; }
+			Ticker._rafActive = true;
 			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
 					  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
 			if (f) {
 				f(Ticker._handleAF);
-				Ticker._rafFunction = f;
 				return;
 			}
 		}
-		if (this._inited) { setTimeout(Ticker._handleTimeout, interval); }
+		if (Ticker._inited) { Ticker.timeoutID = setTimeout(Ticker._handleTimeout, interval); }
 	}
 	
 	/**
@@ -353,13 +362,16 @@ var Ticker = function() {
 	* @protected
 	**/
 	Ticker._handleAF = function(timeStamp) {
-		console.log(Ticker._rafFunction);
 		if (timeStamp - Ticker._lastTime >= Ticker._interval-1) {
 			Ticker._tick();
 		}
-		var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
-					  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
-		f(Ticker._handleAF, Ticker.animationTarget);
+		if (Ticker.useRAF) {
+			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
+						  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+			f(Ticker._handleAF, Ticker.animationTarget);
+		} else {
+			Ticker._rafActive = false;
+		}
 	}
 	
 	/**
@@ -368,7 +380,7 @@ var Ticker = function() {
 	**/
 	Ticker._handleTimeout = function() {
 		Ticker._tick();
-		setTimeout(Ticker._handleTimeout, Ticker._interval);
+		if (!Ticker.useRAF) { setTimeout(Ticker._handleTimeout, Ticker._interval); }
 	}
 	
 	/**
