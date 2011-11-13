@@ -303,7 +303,7 @@ var p = Matrix2D.prototype;
 
 		if (regX || regY) {
 			// prepend the registration offset:
-			this.tx -= regX*this.a+regY*this.c;
+			this.tx -= regX*this.a+regY*this.c; 
 			this.ty -= regX*this.b+regY*this.d;
 		}
 	}

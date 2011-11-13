@@ -392,8 +392,9 @@ var p = DisplayObject.prototype;
 		var ctx = this.cacheCanvas.getContext("2d");
 		this.cacheCanvas.width = width;
 		this.cacheCanvas.height = height;
-		ctx.setTransform(1, 0, 0, 1, -x, -y);
 		ctx.clearRect(0, 0, width+1, height+1); // because some browsers don't properly clear if the width/height remain the same.
+		ctx.setTransform(1, 0, 0, 1, -x, -y);
+		this.draw(ctx, true, this._matrix.reinitialize(1,0,0,1,-x,-y)); // containers require the matrix to work from
 		this.draw(ctx, true);
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
