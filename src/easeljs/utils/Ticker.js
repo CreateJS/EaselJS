@@ -380,7 +380,7 @@ var Ticker = function() {
 	**/
 	Ticker._handleTimeout = function() {
 		Ticker._tick();
-		if (!Ticker.useRAF) { setTimeout(Ticker._handleTimeout, Ticker._interval); }
+		if (!Ticker.useRAF) { Ticker.timeoutID = setTimeout(Ticker._handleTimeout, Ticker._interval); }
 	}
 	
 	/**
