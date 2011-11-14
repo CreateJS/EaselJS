@@ -1,2 +1,4 @@
 .DS_Store
+build/tools/yuidoc/.git/*
+
 /.idea/
