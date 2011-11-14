@@ -1,4 +1,6 @@
 .DS_Store
+
+#ignore .git folder for yuidoc project, otherwise it will be treated as a submodule
 build/tools/yuidoc/.git/*
 
 /.idea/
