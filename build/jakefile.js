@@ -146,8 +146,7 @@ task("build-docs", [],
 		
 		//FILE.remove("tmp");
 		
-		//print("cd " + working_dir + " && zip -r " + zip_name + " " + doc_dir + " -x *.DS_Store && cd ..");
-		OS.system("cd " + OS.enquote(working_dir) + " && zip -r" + zip_name + " " + doc_dir + " -x *.DS_Store");
+		OS.system("cd " + OS.enquote(working_dir) + ";zip -r " + zip_name + " " + doc_dir + " -x *.DS_Store");
 		
 		/*
 		OS.system(["cd", working_dir]);
