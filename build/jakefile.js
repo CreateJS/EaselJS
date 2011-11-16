@@ -144,21 +144,30 @@ task("build-docs", [],
 		
 		OS.system(cmd);
 		
-		//FILE.remove("tmp");
-		
 		OS.system("cd " + OS.enquote(working_dir) + ";zip -r " + zip_name + " " + doc_dir + " -x *.DS_Store");
 		
-		/*
-		OS.system(["cd", working_dir]);
-		OS.system([
-				"zip",
-				"-r",
-				zip_name,
-				doc_dir,
-				"-x", "*.DS_Store"
-			]);
-		OS.system(["cd", ".."]);		
-		*/
+		
+		//Need to make this a recursive function that goes through and cleans the directory
+		//tree
+		var files = FILE.list("/Users/mesh/src/EaselJS/build/tmp/parser/");
+		var len = files.length;
+		for(var i = 0; i < len; i++)
+		{
+			FILE.remove(FILE.join("/Users/mesh/src/EaselJS/build/tmp/parser/", files[i]));
+		}
+		
+		FILE.rmdir("/Users/mesh/src/EaselJS/build/tmp/parser/");
+		
+		
+		var files = FILE.list("/Users/mesh/src/EaselJS/build/tmp/");
+		var len = files.length;
+		for(var i = 0; i < len; i++)
+		{
+			FILE.remove(FILE.join("/Users/mesh/src/EaselJS/build/tmp/", files[i]));
+		}		
+		
+		FILE.rmdir("/Users/mesh/src/EaselJS/build/tmp/");
+		
 		print("build-docs");
 	}
 );
