@@ -4,9 +4,16 @@ var FILE = require("fs");
 var PATH = require("path");
 var CHILD_PROCESS = require("child_process");
 var OS = require("os");
-var WRENCH = require("wrench");
-var argv = require("optimist").argv;
 
+//file system utils
+var WRENCH = require("wrench");
+
+//for parsing command line args
+var OPTIMIST = require("optimist");
+
+
+
+//included in EaselJS repository
 var GOOGLE_CLOSURE_PATH = "tools/google-closure/compiler.jar";
 var YUI_DOC_PATH = "tools/yuidoc/bin/yuidoc.py";
 
@@ -36,16 +43,123 @@ var SOURCE_FILES = [
 	"../src/easeljs/ui/Touch.js"
 ];
 
-function print(msg)
+//directory where generated files are placed
+var OUTPUT_DIR = "output";
+
+//tmp directory used when running scripts
+var TMP_DIR = "tmp";
+
+//directory that includes YUI Doc templates
+var TEMPLATE_DIR = "template";
+
+//project name
+var PROJECT_NAME = "EaselJS";
+
+//yui version being used
+var YUI_VERSION = 2;
+
+//name of file for zipped docs
+var DOC_ZIP_NAME="easeljs_docs.zip";
+
+//name of minified EaselJS file.
+var EASEL_LIB_NAME = "easel.js";
+
+var version;
+var verbose;
+
+var TASK = {
+	ALL:"ALL",
+	BUILDDOCS:"BUILDDOCS",
+	BUILDSOURCE:"BUILDSOURCE",
+	CLEAN:"CLEAN"
+};
+
+//main entry point for script. Takes optimist argv object which
+//contains command line arguments.
+//This function is called at the bottom of the script
+function main(argv)
 {
-	console.log(msg);
+	if(argv.h)
+	{
+		displayUsage();
+		process.exit(0);
+	}
+
+	var task = argv.tasks.toUpperCase();
+
+	if(!taskIsRecognized(task))
+	{
+		print("Unrecognized task : " + task);
+		displayUsage();
+		process.exit(1);
+	}
+
+	verbose = argv.v != undefined;
+	version = argv.version;
+
+	var shouldBuildSource = (task == TASK.BUILDSOURCE);
+	var shouldBuildDocs = (task == TASK.BUILDDOCS);
+
+	if(task==TASK.CLEAN)
+	{
+		cleanTask(
+			function(success)
+			{
+				print("Clean Task Completed");
+			}
+		);
+	}
+
+	if(task == TASK.ALL)
+	{	
+		shouldBuildSource = true;
+		shouldBuildDocs = true;
+	}
+
+	if(shouldBuildDocs && (version == undefined))
+	{
+		displayUsage();
+		process.exit(0);
+	}
+
+	if(shouldBuildSource)
+	{
+		buildSourceTask(function(success)
+		{		
+			print("Build Source Task Complete");
+			if(shouldBuildDocs)
+			{
+				buildDocsTask(version,
+					function(success)
+					{
+						print("Build Docs Task Complete");
+					}
+				);
+			}
+
+		});
+	}
+
+	if(shouldBuildDocs && task != "ALL")
+	{
+		buildDocsTask(version,
+			function(success)
+			{
+				print("Build Docs Task Complete");
+			}
+		);
+	}	
 }
+
+
+/********** TASKS *************/
+
 
 function cleanTask(completeHandler)
 {
-	if(PATH.existsSync("tmp"))
+	if(PATH.existsSync(TMP_DIR))
 	{	
-		WRENCH.rmdirSyncRecursive("tmp");
+		WRENCH.rmdirSyncRecursive(TMP_DIR);
 	}
 	
 	if(PATH.existsSync("output"))
@@ -55,19 +169,12 @@ function cleanTask(completeHandler)
 }
 
 function buildSourceTask(completeHandler)
-{
-	var output_dir = "output";
-	
-	if(!PATH.existsSync(output_dir))
+{	
+	if(!PATH.existsSync(OUTPUT_DIR))
 	{
-		//do we need to make sure this is relative to the build directory?
-		FILE.mkdirSync(output_dir);
+		FILE.mkdirSync(OUTPUT_DIR);
 	}
-	
-	//catch errors and fail, cleanup and fail gracefully
-	//test with paths that contain spaces
-	
-	//try
+
 	var file_args = [];
 	var len = SOURCE_FILES.length;
 	for(var i = 0; i < len; i++)
@@ -76,8 +183,8 @@ function buildSourceTask(completeHandler)
 		file_args.push(SOURCE_FILES[i]);
 	}
 	
-	var tmp_file = PATH.join(output_dir,"tmp.js");
-	var final_file = PATH.join(output_dir, "easel.js");
+	var tmp_file = PATH.join(OUTPUT_DIR,"tmp.js");
+	var final_file = PATH.join(OUTPUT_DIR, EASEL_LIB_NAME);
 
 	var cmd = [
 		"java", "-jar", GOOGLE_CLOSURE_PATH
@@ -119,43 +226,28 @@ function buildSourceTask(completeHandler)
 			FILE.unlinkSync(tmp_file);
 			
 			completeHandler(true);
-			
-			print("Build Task Complete");
 		}
 	);
-}
-
-
-function exitWithFailure()
-{
-	process.exit(1);
 }
 
 function buildDocsTask(version, completeHandler)
 {	
 	var parser_in="../src";
+	var	parser_out= PATH.join(TMP_DIR , "parser");
 
-	var	parser_out="tmp/parser";
-
-	var working_dir="output";
 	var doc_dir="easeljs_docs";
-	var zip_name="easeljs_docs.zip";
 	
-	var generator_out=PATH.join(working_dir, doc_dir);
-	var template = "template";
-	
-	var yuiversion = 2;
-	var projectname = "EaselJS";
+	var generator_out=PATH.join(OUTPUT_DIR, doc_dir);
 	
 	var cmd = [
 		YUI_DOC_PATH,
 		parser_in,
 		"-p", parser_out,
 		"-o", generator_out,
-		"-t", template,
+		"-t", TEMPLATE_DIR,
 		"-v", version,
-		"-Y", yuiversion,
-		"-m", projectname,
+		"-Y", YUI_VERSION,
+		"-m", PROJECT_NAME,
 		"-u", "http://www.easeljs.com"
 	];
 	
@@ -183,7 +275,7 @@ function buildDocsTask(version, completeHandler)
 		    }
 		
 			CHILD_PROCESS.exec(
-				"cd " + PATH.normalize(working_dir) + ";zip -r " + zip_name + " " + doc_dir + " -x *.DS_Store",
+				"cd " + OUTPUT_DIR + ";zip -r " + DOC_ZIP_NAME + " " + doc_dir + " -x *.DS_Store",
 				function(error, stdout, stderr)
 				{
 					if(verbose)
@@ -205,7 +297,7 @@ function buildDocsTask(version, completeHandler)
 						exitWithFailure();
 				    }
 				
-					WRENCH.rmdirSyncRecursive("tmp");
+					WRENCH.rmdirSyncRecursive(TMP_DIR);
 				
 					completeHandler(true);				
 				});		
@@ -214,6 +306,12 @@ function buildDocsTask(version, completeHandler)
 		});	
 }
 
+/*************** some util methods ******************/
+
+function exitWithFailure()
+{
+	process.exit(1);
+}
 
 function displayUsage()
 {
@@ -225,89 +323,13 @@ function taskIsRecognized(task)
 	return TASK.hasOwnProperty(task);
 }
 
-if(argv.h)
+function print(msg)
 {
-	displayUsage();
-	process.exit(0);
+	console.log(msg);
 }
 
-
-var TASK = {
-	ALL:"ALL",
-	BUILDDOCS:"BUILDDOCS",
-	BUILDSOURCE:"BUILDSOURCE",
-	CLEAN:"CLEAN",
-};
-
-var verbose = argv.v != undefined;
-
-var task = argv.tasks.toUpperCase();
-
-if(!taskIsRecognized(task))
-{
-	print("Unrecognized task : " + task);
-	displayUsage();
-	process.exit(1);
-}
-
-
-var version = argv.version;
-
-var shouldBuildSource = (task == TASK.BUILDSOURCE);
-var shouldBuildDocs = (task == TASK.BUILDDOCS);
-
-if(task==TASK.CLEAN)
-{
-	cleanTask(
-		function(success)
-		{
-			print("Clean Task Completed");
-		}
-	);
-}
-
-if(task == TASK.ALL)
-{	
-	shouldBuildSource = true;
-	shouldBuildDocs = true;
-}
-
-if(shouldBuildDocs && (version == undefined))
-{
-	displayUsage();
-	process.exit(0);
-}
-
-if(shouldBuildSource)
-{
-	buildSourceTask(function(success)
-	{		
-		print("Build Source Complete");
-		if(shouldBuildDocs)
-		{
-			buildDocsTask(version,
-				function(success)
-				{
-					print("Build Docs Complete");
-				}
-			);
-		}
-		
-	});
-}
-
-if(shouldBuildDocs && task != "ALL")
-{
-	buildDocsTask(version,
-		function(success)
-		{
-			print("Build Docs Complete");
-		}
-	);
-}
-
-
-
+//call the main script entry point
+main(OPTIMIST.argv);
 
 
 
