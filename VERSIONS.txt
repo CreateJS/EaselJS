@@ -1,10 +1,24 @@
-Version 0.3.3 [NOT RELEASED]
+Version 0.4 [NOT RELEASED]
 ****************************************************************************************************
+- completely rewrote BitmapSequence & SpriteSheet, including data format
+	- BitmapSequence is now named BitmapAnimation
+	- SpriteSheet now handles calculating frame rects
+	- support for multi-image sprite sheets
+	- support for variable frame sizes
+	- support for frame reuse (non-linear frame order)
+	- support for frame registration points
+	- SpriteSheet supports URIs as sources (and will handle preloading)
+- fixes to Shadow
+- fixed support for video sources in Bitmap
+- added support for null canvas for Stage
+- added DOMElement
+- separated tick and draw operations to fix race conditions
+- added Matrix2D.isIdentity()
 - support for double click events (thanks to rbarazi)
 - added MouseEvent.nativeEvent and MouseEvent.target properties
-- fixes to Ticker
+- fixes to Ticker, added second "paused" param when it calls tick
 - fixed a problem with caching Container instances
-- fixed an issue with .parent not being assigned on children of cloned containers
+- fixed an issue with .parent not being assigned on children of cloned Containers
 - added filter support via DisplayObject.filters and Filter objects
 - added sample filters: ColorFilter, ColorMatrixFilter, and BoxBlurFilter
 - added DisplayObject.setTransform()

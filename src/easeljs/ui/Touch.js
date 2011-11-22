@@ -47,25 +47,25 @@ var Touch = function() {
 }
 
 	/**
-	* Enables touch interaction for the specified EaselJS stage. This
-	* currently only supports iOS, and simply maps single touch events
-	* to the existing EaselJS mouse events.
-	* @method isSupported
-	* @return {Boolean} A boolean indicating whether touch is supported in the current environment.
-	* @static
-	**/
+	 * Enables touch interaction for the specified EaselJS stage. This
+	 * currently only supports iOS, and simply maps single touch events
+	 * to the existing EaselJS mouse events.
+	 * @method isSupported
+	 * @return {Boolean} A boolean indicating whether touch is supported in the current environment.
+	 * @static
+	 **/
 	Touch.isSupported = function() {
 		return ('ontouchstart' in window);
 	}
 
 	/**
-	* Enables touch interaction for the specified EaselJS stage. This
-	* currently only supports iOS, and simply maps single touch events
-	* to the existing EaselJS mouse events.
-	* @method enable
-	* @param {Stage} stage The stage to enable touch on.
-	* @static
-	**/
+	 * Enables touch interaction for the specified EaselJS stage. This
+	 * currently only supports iOS, and simply maps single touch events
+	 * to the existing EaselJS mouse events.
+	 * @method enable
+	 * @param {Stage} stage The stage to enable touch on.
+	 * @static
+	 **/
 	Touch.enable = function(stage) {
 		if (stage == null || !Touch.isSupported()) { return; }
 		var o = stage;
@@ -86,11 +86,11 @@ var Touch = function() {
 	}
 
 	/**
-	* @method _handleTouchStart
-	* @protected
-	* @param {Stage} stage
-	* @param {TouchEvent} e
-	**/
+	 * @method _handleTouchStart
+	 * @protected
+	 * @param {Stage} stage
+	 * @param {TouchEvent} e
+	 **/
 	Touch._handleTouchStart = function(stage,e) {
 		e.preventDefault();
 
@@ -114,11 +114,11 @@ var Touch = function() {
 	}
 
 	/**
-	* @method _handleTouchMove
-	* @protected
-	* @param {Stage} stage
-	* @param {TouchEvent} e
-	**/
+	 * @method _handleTouchMove
+	 * @protected
+	 * @param {Stage} stage
+	 * @param {TouchEvent} e
+	 **/
 	Touch._handleTouchMove = function(stage,e) {
 		var touch = Touch._findPrimaryTouch(stage,e.changedTouches);
 		if(touch) {
@@ -127,11 +127,11 @@ var Touch = function() {
 	}
 
 	/**
-	* @method _handleTouchEnd
-	* @protected
-	* @param {Stage} stage
-	* @param {TouchEvent} e
-	**/
+	 * @method _handleTouchEnd
+	 * @protected
+	 * @param {Stage} stage
+	 * @param {TouchEvent} e
+	 **/
 	Touch._handleTouchEnd = function(stage,e) {
 		var touch = Touch._findPrimaryTouch(stage,e.changedTouches);
 
@@ -145,11 +145,11 @@ var Touch = function() {
 	}
 
 	/**
-	* @method _findPrimaryTouch
-	* @protected
-	* @param {Stage} stage
-	* @param {Array[Touch]} touches
-	**/
+	 * @method _findPrimaryTouch
+	 * @protected
+	 * @param {Stage} stage
+	 * @param {Array[Touch]} touches
+	 **/
 	Touch._findPrimaryTouch = function(stage,touches) {
 		var l = touches.length;
 		for(var i = 0; i < l; i++){

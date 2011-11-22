@@ -34,8 +34,11 @@
 * @module EaselJS
 **/
 (function(window) {
+// TODO: fix problems with rotation.
+// TODO: exclude from getObjectsUnderPoint
 
 /**
+ * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b><br/><br/>
 * A DOMElement allows you to associate a HTMLElement with the display list. It will be transformed
 * within the DOM as though it is child of the Container it is added to. However, it is not rendered
 * to canvas, and as such will retain whatever z-index it has relative to the canvas (ie. it will be
@@ -59,29 +62,32 @@ var DOMElement = function(htmlElement) {
 var p = DOMElement.prototype = new DisplayObject();
 
 // public properties:
-	// TODO: check the type on this.
 	/**
-	* The DOM object to manage.
-	* @property htmlElement
-	* @type Object
-	**/
+	 * The DOM object to manage.
+	 * @property htmlElement
+	 * @type HTMLElement
+	 **/
 	p.htmlElement = null;
 
 // private properties:
+	/**
+	 * @property _style
+	 * @protected
+	 **/
 	p._style = null;
 
 // constructor:
 	/**
-	* @property DisplayObject_initialize
-	* @type Function
+	 * @property DisplayObject_initialize
+	 * @type Function
    * @private
-	**/
+	 **/
 	p.DisplayObject_initialize = p.initialize;
 
 	/**
-	* Initialization method.
-	* @method initialize
-	* @protected
+	 * Initialization method.
+	 * @method initialize
+	 * @protected
 	*/
 	p.initialize = function(htmlElement) {
 		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
@@ -98,26 +104,26 @@ var p = DOMElement.prototype = new DisplayObject();
 // public methods:
 	// TODO: fix this. Right now it's used internally to determine if it should be drawn, but DOMElement always needs to be drawn.
 	/**
-	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-	* This does not account for whether it would be visible within the boundaries of the stage.
-	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method isVisible
-	* @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-	**/
+	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+	 * This does not account for whether it would be visible within the boundaries of the stage.
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method isVisible
+	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+	 **/
 	p.isVisible = function() {
 		return this.htmlElement != null;
 	}
 
 	/**
-	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
-	* Returns true if the draw was handled (useful for overriding functionality).
-	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method draw
-	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
-	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	* into itself).
-	**/
+	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	 * Returns true if the draw was handled (useful for overriding functionality).
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method draw
+	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+	 * into itself).
+	 **/
 	p.draw = function(ctx, ignoreCache) {
 		// TODO: possibly save out previous matrix values, to compare against new ones (so layout doesn't need to fire if no change)
 		if (this.htmlElement == null) { return; }
@@ -174,10 +180,10 @@ var p = DOMElement.prototype = new DisplayObject();
 	p.localToLocal = function() {}
 
 	/**
-	* This presently clones the DOMElement instance, but not the associated HTMLElement.
-	* @method clone
-	* @return {DOMElement} a clone of the DOMElement instance.
-	**/
+	 * This presently clones the DOMElement instance, but not the associated HTMLElement.
+	 * @method clone
+	 * @return {DOMElement} a clone of the DOMElement instance.
+	 **/
 	p.clone = function() {
 		var o = new DOMElement();
 		this.cloneProps(o);
@@ -185,10 +191,10 @@ var p = DOMElement.prototype = new DisplayObject();
 	}
 
 	/**
-	* Returns a string representation of this object.
-	* @method toString
-	* @return {String} a string representation of the instance.
-	**/
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
 	p.toString = function() {
 		return "[DOMElement (name="+  this.name +")]";
 	}

@@ -51,24 +51,24 @@ var p = Point.prototype;
 // public properties:
 
 	/** 
-	* X position. 
-	* @property x
-	* @type Number
-	**/
+	 * X position. 
+	 * @property x
+	 * @type Number
+	 **/
 	p.x = 0;
 	
 	/** 
-	* Y position. 
-	* @property y
-	* @type Number
-	**/
+	 * Y position. 
+	 * @property y
+	 * @type Number
+	 **/
 	p.y = 0;
 	
 // constructor:
 	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
+	 * Initialization method.
+	 * @method initialize
+	 * @protected
 	*/
 	p.initialize = function(x, y) {
 		this.x = (x == null ? 0 : x);
@@ -77,19 +77,19 @@ var p = Point.prototype;
 	
 // public methods:
 	/**
-	* Returns a clone of the Point instance.
-	* @method clone
-	* @return {Point} a clone of the Point instance.
-	**/
+	 * Returns a clone of the Point instance.
+	 * @method clone
+	 * @return {Point} a clone of the Point instance.
+	 **/
 	p.clone = function() {
 		return new Point(this.x, this.y);
 	}
 
 	/**
-	* Returns a string representation of this object.
-	* @method toString
-	* @return {String} a string representation of the instance.
-	**/
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
 	p.toString = function() {
 		return "[Point (x="+this.x+" y="+this.y+")]";
 	}

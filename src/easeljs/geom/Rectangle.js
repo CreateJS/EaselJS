@@ -52,38 +52,38 @@ var p = Rectangle.prototype;
 	
 // public properties:
 	/** 
-	* X position. 
-	* @property x
-	* @type Number
-	**/
+	 * X position. 
+	 * @property x
+	 * @type Number
+	 **/
 	p.x = 0;
 	
 	/** 
-	* Y position. 
-	* @property y
-	* @type Number
-	**/
+	 * Y position. 
+	 * @property y
+	 * @type Number
+	 **/
 	p.y = 0;
 	
 	/** 
-	* Width.
-	* @property width
-	* @type Number
-	**/
+	 * Width.
+	 * @property width
+	 * @type Number
+	 **/
 	p.width = 0;
 	
 	/** 
-	* Height.
-	* @property height
-	* @type Number
-	**/
+	 * Height.
+	 * @property height
+	 * @type Number
+	 **/
 	p.height = 0;
 	
 // constructor:
 	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
+	 * Initialization method.
+	 * @method initialize
+	 * @protected
 	*/
 	p.initialize = function(x, y, width, height) {
 		this.x = (x == null ? 0 : x);
@@ -94,19 +94,19 @@ var p = Rectangle.prototype;
 	
 // public methods:
 	/**
-	* Returns a clone of the Rectangle instance.
-	* @method clone
-	* @return {Rectangle} a clone of the Rectangle instance.
-	**/
+	 * Returns a clone of the Rectangle instance.
+	 * @method clone
+	 * @return {Rectangle} a clone of the Rectangle instance.
+	 **/
 	p.clone = function() {
 		return new Rectangle(this.x, this.y, this.width, this.height);
 	}
 
 	/**
-	* Returns a string representation of this object.
-	* @method toString
-	* @return {String} a string representation of the instance.
-	**/
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
 	p.toString = function() {
 		return "[Rectangle (x="+this.x+" y="+this.y+" width="+this.width+" height="+this.height+")]";
 	}

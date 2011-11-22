@@ -28,56 +28,165 @@
 */
 
 /**
-* The Easel Javascript library provides a retained graphics mode for canvas
-* including a full, hierarchical display list, a core interaction model, and
-* helper classes to make working with Canvas much easier.
-* @module EaselJS
-**/
+ * The Easel Javascript library provides a retained graphics mode for canvas
+ * including a full, hierarchical display list, a core interaction model, and
+ * helper classes to make working with Canvas much easier.
+ * @module EaselJS
+ **/
 
 (function(window) {
-// TODO: update documentation.
-// TODO: how to deal with registration points? Should be part of the frame data.
 /**
-* Encapsulates the properties associated with a sprite sheet. A sprite sheet is a series of images (usually animation frames) combined
-* into a single image on a regular grid. For example, an animation consisting of 8 100x100 images could be combined into a 400x200
-* sprite sheet (4 frames across by 2 high).
-* The simplest form of sprite sheet has values for the image, frameWidth, and frameHeight properties, but does not include frameData.
-* It will then play all of the frames in the animation and loop if the loop property is true. In this simple mode, you can also set
-* the totalFrames property if you have extraneous frames in your sprite sheet (for example, a 2x4 frame sprite sheet, with only 7
-* frames used).<br/><br/>
-* More complex sprite sheets include a frameData property, which provides named frames and animations which can be played and sequenced
-* together. See frameData for more information.
-* @class SpriteSheet
-* @constructor
-* @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The Image, Canvas, or Video instance or URI to an image to use as a sprite sheet.
-**/
+ * Encapsulates the properties and methods associated with a sprite sheet. A sprite sheet is a series of images (usually animation frames) combined
+ * into a larger image (or images). For example, an animation consisting of 8 100x100 images could be combined into a 400x200
+ * sprite sheet (4 frames across by 2 high).<br/><br/>
+ * The data passed to the SpriteSheet constructor defines three critical pieces of information:<OL>
+ *    <LI> The image or images to use.</LI>
+ *    <LI> The positions of individual image frames. This data can be represented in one of two ways:
+ *    As a regular grid of sequential, equal-sized frames, or as individually defined, variable sized frames arranged in an irregular (non-sequential) fashion.</LI>
+ *    <LI> Likewise, animations can be represented in two ways: As a series of sequential frames, defined by a start and end frame [0,3], or as a list of frames [0,1,2,3].
+ * </OL>
+ * The easiest way to understand the data format is to see an example:
+ * <pre><code>data = {
+
+// DEFINING IMAGES:
+	// list of images or image URIs to use. SpriteSheet can handle preloading.
+	// the order dictates their index value for frame definition.
+	images: [image1, "path/to/image2.png"],
+
+// DEFINING FRAMES:
+
+	// the simple way to define frames, only requires frame size because frames are consecutive:
+	// define frame width/height, and optionally the number of frames and registration point x/y.
+	frames: {frameWidth:64, frameHeight:64, numFrames:20, regX: 32, regY:64},
+
+	// OR, the complex way that defines individual rects for frames.
+	// The 5th value is the image index (defaults to 0).
+	frames: [
+		// x, y, width, height, imageIndex, regX, regY
+		[0,0,64,64,0,32,64],
+		[64,0,96,64,0]
+	],
+
+// DEFINING ANIMATIONS:
+
+	// simple animation definitions. Define a consecutive range of frames.
+	// also optionally define a "next" animation, and advanceFrequency.
+	// setting next to true makes the animation loop, setting it to false makes it pause when it reaches the end.
+	animations: {
+		// start, end, next, frequency
+		run: [0,8,true],
+		jump: [9,12,"run",2],
+		stand: [13]
+	}
+
+	// the complex approach which specifies every frame in the animation by index.
+	animations: {
+		run: {
+			frames: [1,2,3,3,2,1]
+		},
+		jump: {
+			frames: [1,4,5,6,1],
+			next: "run",
+			frequency: 2
+		},
+		stand: { frames: [7] }
+	}
+
+	// the above two approaches can be combined, you can also use a super simple single frame definition:
+	animations: {
+		run: [0,8,true,2],
+		jump: {
+			frames: [8,9,10,9,8],
+			next: "run",
+			frequency: 2
+		},
+		stand:7
+	}
+}</code></pre>
+ * @class SpriteSheet
+ * @constructor
+ * @param data
+ **/
 var SpriteSheet = function(data) {
   this.initialize(data);
 }
 var p = SpriteSheet.prototype;
 
 // public properties:
+	/**
+	 * Read-only property indicating whether all images are finished loading.
+	 * @property complete
+	 * @type Boolean
+	 **/
 	p.complete = true;
 	
 // private properties:
+	/**
+	 * @property _animations
+	 * @protected
+	 **/
 	p._animations = null;
+	
+	/**
+	 * @property _frames
+	 * @protected
+	 **/
 	p._frames = null;
+	
+	/**
+	 * @property _images
+	 * @protected
+	 **/
 	p._images = null;
+	
+	/**
+	 * @property _data
+	 * @protected
+	 **/
 	p._data = null;
+	
+	/**
+	 * @property _loadCount
+	 * @protected
+	 **/
 	p._loadCount = 0;
+	
 	// only used for simple frame defs:
+	/**
+	 * @property _frameHeight
+	 * @protected
+	 **/
 	p._frameHeight = 0;
+	
+	/**
+	 * @property _frameWidth
+	 * @protected
+	 **/
 	p._frameWidth = 0;
+	
+	/**
+	 * @property _numFrames
+	 * @protected
+	 **/
 	p._numFrames = 0;
+	
+	/**
+	 * @property _regX
+	 * @protected
+	 **/
 	p._regX = 0;
+	
+	/**
+	 * @property _regY
+	 * @protected
+	 **/
 	p._regY = 0;
 
 // constructor:
 	/**
-	* Initialization method.
-	* @method initialize
-	* @protected
-	**/
+	 * @method initialize
+	 * @protected
+	 **/
 	p.initialize = function(data) {
 		var i,l,o,a;
 		if (data == null) { return; }
@@ -142,7 +251,7 @@ var p = SpriteSheet.prototype;
 					anim.next = obj.next;
 					a = anim.frames = obj.frames.slice(0);
 				}
-				anim.next = a.length < 2 ? null : (!anim.next || anim.next == true) ? name : anim.next; // TODO: how to specify no next?
+				anim.next = (a.length < 2 || anim.next == false) ? null : (anim.next == true) ? name : anim.next;
 				if (!anim.frequency) { anim.frequency = 1; }
 				this._animations.push(name);
 				this._data[name] = anim;
@@ -153,10 +262,10 @@ var p = SpriteSheet.prototype;
 
 // public methods:
 	/**
-	* Returns the total number of frames in the specified animation, or in the whole sprite
-	* sheet if the animation param is omitted.
-	* @param {String} animation The name of the animation to get a frame count for.
-	* @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
+	 * Returns the total number of frames in the specified animation, or in the whole sprite
+	 * sheet if the animation param is omitted.
+	 * @param {String} animation The name of the animation to get a frame count for.
+	 * @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
 	*/
 	p.getNumFrames = function(animation) {
 		if (animation == null) {
@@ -169,57 +278,57 @@ var p = SpriteSheet.prototype;
 	}
 	
 	/**
-	* Returns an array of all available animation names as strings.
-	* @method getAnimations
-	* @return {Array} an array of animation names available on this sprite sheet.
-	**/
+	 * Returns an array of all available animation names as strings.
+	 * @method getAnimations
+	 * @return {Array} an array of animation names available on this sprite sheet.
+	 **/
 	p.getAnimations = function() {
 		return this._animations.slice(0);
 	}
 	
 	/**
-	* Returns an object defining the specified animation. The returned object has a
-	* frames property containing an array of the frame id's in the animation, a frequency
-	* property indicating the advance frequency for this animation, a name property, 
-	* and a next property, which specifies the default next animation. If the animation
-	* loops, the name and next property will be the same.
-	* @method getAnimations
-	* @return {Object} a generic object with frames, frequency, name, and next properties.
-	**/
+	 * Returns an object defining the specified animation. The returned object has a
+	 * frames property containing an array of the frame id's in the animation, a frequency
+	 * property indicating the advance frequency for this animation, a name property, 
+	 * and a next property, which specifies the default next animation. If the animation
+	 * loops, the name and next property will be the same.
+	 * @method getAnimations
+	 * @return {Object} a generic object with frames, frequency, name, and next properties.
+	 **/
 	p.getAnimation = function(name) {
 		return this._data[name];
 	}
 	
 	/**
-	* Returns an object defining the source rect of the specified frame. The returned object
-	* has an image property holding a reference to the image object in which the frame frame is found,
-	* and a rect property containing a Rectangle instance which defines the boundaries for the
-	* frame within that image.
-	* @method getFrameRect
-	* @param {Number} frameIndex The index of the frame.
-	* @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist, or the image is not fully loaded.
-	**/
+	 * Returns an object defining the source rect of the specified frame. The returned object
+	 * has an image property holding a reference to the image object in which the frame frame is found,
+	 * and a rect property containing a Rectangle instance which defines the boundaries for the
+	 * frame within that image.
+	 * @method getFrameRect
+	 * @param {Number} frameIndex The index of the frame.
+	 * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist, or the image is not fully loaded.
+	 **/
 	p.getFrameRect = function(frameIndex) {
 		if (this.complete && this._frames && (frame=this._frames[frameIndex])) { return frame; }
 		return null;
 	}
 	
 	/**
-	* Returns a string representation of this object.
-	* @method toString
-	* @return {String} a string representation of the instance.
-	**/
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
 	p.toString = function() {
 		return "[SpriteSheet]";
 	}
 
 	/**
-	* Returns a clone of the SpriteSheet instance.
-	* @method clone
-	* @return {SpriteSheet} a clone of the SpriteSheet instance.
-	**/
+	 * Returns a clone of the SpriteSheet instance.
+	 * @method clone
+	 * @return {SpriteSheet} a clone of the SpriteSheet instance.
+	 **/
 	p.clone = function() {
-		// GDS: there isn't really any reason to clone SpriteSheet instances, because they can be reused.
+		// TODO: there isn't really any reason to clone SpriteSheet instances, because they can be reused.
 		var o = new SpriteSheet();
 		o.complete = this.complete;
 		o._animations = this._animations;
@@ -234,6 +343,10 @@ var p = SpriteSheet.prototype;
 	}
 	
 // private methods:
+	/**
+	 * @method _handleImageLoad
+	 * @protected
+	 **/
 	p._handleImageLoad = function() {
 		if (--this._loadCount == 0) {
 			this._calculateFrames();
@@ -241,6 +354,10 @@ var p = SpriteSheet.prototype;
 		}
 	}
 	
+	/**
+	 * @method _calculateFrames
+	 * @protected
+	 **/
 	p._calculateFrames = function() {
 		if (this._frames || this._frameWidth == 0) { return; }
 		this._frames = [];

@@ -36,7 +36,6 @@
 
 (function(window) {
 	
-	// TODO: test regX/Y (and everything else)
 /**
 * Displays frames or sequences of frames (ie. animations) from a sprite sheet image. A sprite sheet is a series of images
 * (usually animation frames) combined into a single image. For example, an animation
@@ -57,54 +56,54 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 // public properties:
 
 	/**
-	* Specifies a function to call whenever any animation reaches its end. It will be called with two
-	* params: the first will be a reference to this instance, the second will be the name of the animation
-	* that just ended.
-	* @property onAnimationEnd
-	* @type Function
-	**/
+	 * Specifies a function to call whenever any animation reaches its end. It will be called with two
+	 * params: the first will be a reference to this instance, the second will be the name of the animation
+	 * that just ended.
+	 * @property onAnimationEnd
+	 * @type Function
+	 **/
 	p.onAnimationEnd = null;
 
 	/**
-	* The frame that will be drawn when draw is called. Note that with some SpriteSheet data, this
-	* will advance non-sequentially. READ-ONLY.
-	* @property currentFrame
-	* @type Number
-	* @default -1
-	**/
+	 * The frame that will be drawn when draw is called. Note that with some SpriteSheet data, this
+	 * will advance non-sequentially. READ-ONLY.
+	 * @property currentFrame
+	 * @type Number
+	 * @default -1
+	 **/
 	p.currentFrame = -1;
 
 	/**
-	* Returns the currently playing animation. READ-ONLY.
-	* @property currentAnimation
-	* @type String
-	* @final
-	**/
+	 * Returns the currently playing animation. READ-ONLY.
+	 * @property currentAnimation
+	 * @type String
+	 * @final
+	 **/
 	p.currentAnimation = null; // READ-ONLY
 
 	/**
-	* Prevents the animation from advancing each tick automatically. For example, you could create a sprite
-	* sheet of icons, set paused to true, and display the appropriate icon by setting currentFrame.
-	* @property paused
-	* @type Boolean
-	* @default false
-	**/
+	 * Prevents the animation from advancing each tick automatically. For example, you could create a sprite
+	 * sheet of icons, set paused to true, and display the appropriate icon by setting currentFrame.
+	 * @property paused
+	 * @type Boolean
+	 * @default false
+	 **/
 	p.paused = true;
 
 	/**
-	* The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame
-	* data. See SpriteSheet for more information.
-	* @property spriteSheet
-	* @type SpriteSheet
-	**/
+	 * The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame
+	 * data. See SpriteSheet for more information.
+	 * @property spriteSheet
+	 * @type SpriteSheet
+	 **/
 	p.spriteSheet = null;
 
 	/**
-	* Whether or not the Bitmap should be draw to the canvas at whole pixel coordinates.
-	* @property snapToPixel
-	* @type Boolean
-	* @default true
-	**/
+	 * Whether or not the Bitmap should be draw to the canvas at whole pixel coordinates.
+	 * @property snapToPixel
+	 * @type Boolean
+	 * @default true
+	 **/
 	p.snapToPixel = true;
 	
 	/** 
@@ -120,43 +119,43 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	
 	
 	/**
-	* Specifies the current frame index within the current playing animation. When playing normally, this will
-	* increase successively from 0 to n-1, where n is the number of frames in the current animation.
-	* @property currentAnimationFrame
-	* @type Number
-	* @default 0
-	**/
+	 * Specifies the current frame index within the current playing animation. When playing normally, this will
+	 * increase successively from 0 to n-1, where n is the number of frames in the current animation.
+	 * @property currentAnimationFrame
+	 * @type Number
+	 * @default 0
+	 **/
 	p.currentAnimationFrame = 0;
 
 // private properties:
 	/**
-	* @property _advanceCount
-	* @protected
-	* @type Number
-	* @default 0
-	**/
+	 * @property _advanceCount
+	 * @protected
+	 * @type Number
+	 * @default 0
+	 **/
 	p._advanceCount = 0;
 	
 	/**
-	* @property _animation
-	* @protected
-	* @type Object
-	* @default null
-	**/
+	 * @property _animation
+	 * @protected
+	 * @type Object
+	 * @default null
+	 **/
 	p._animation = null;
 
 // constructor:
 	/**
-	* @property DisplayObject_initialize
-	* @type Function
-	* @private
-	**/
+	 * @property DisplayObject_initialize
+	 * @type Function
+	 * @private
+	 **/
 	p.DisplayObject_initialize = p.initialize;
 
 	/**
-	* Initialization method.
-	* @method initialize
-	* @protected
+	 * Initialization method.
+	 * @method initialize
+	 * @protected
 	*/
 	p.initialize = function(spriteSheet) {
 		this.DisplayObject_initialize();
@@ -164,33 +163,33 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	}
 
 	/**
-	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-	* This does not account for whether it would be visible within the boundaries of the stage.
-	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method isVisible
-	* @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-	**/
+	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+	 * This does not account for whether it would be visible within the boundaries of the stage.
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method isVisible
+	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+	 **/
 	p.isVisible = function() {
 		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.spriteSheet.complete && this.currentFrame >= 0;
 	}
 
 	/**
-	* @property DisplayObject_draw
-	* @type Function
-	* @private
-	**/
+	 * @property DisplayObject_draw
+	 * @type Function
+	 * @private
+	 **/
 	p.DisplayObject_draw = p.draw;
 
 /**
-	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
-	* Returns true if the draw was handled (useful for overriding functionality).
-	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method draw
-	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
-	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	* into itself).
-	**/
+	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	 * Returns true if the draw was handled (useful for overriding functionality).
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method draw
+	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+	 * into itself).
+	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this._normalizeFrame();
@@ -206,48 +205,48 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	//Bitmap. This is why they have no method implementations.
 
 	/**
-	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	* You should not cache Bitmap instances as it can degrade performance.
-	* @method cache
-	**/
+	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+	 * You should not cache Bitmap instances as it can degrade performance.
+	 * @method cache
+	 **/
 
 	/**
-	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	* You should not cache Bitmap instances as it can degrade performance.
-	* @method updateCache
-	**/
+	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+	 * You should not cache Bitmap instances as it can degrade performance.
+	 * @method updateCache
+	 **/
 
 	/**
-	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	* You should not cache Bitmap instances as it can degrade performance.
-	* @method uncache
-	**/
+	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+	 * You should not cache Bitmap instances as it can degrade performance.
+	 * @method uncache
+	 **/
 
 	/**
-	* Sets paused to false and plays the specified animation name, named frame, or frame number.
-	* @method gotoAndPlay
-	* @param {String|Number} frameOrAnimation The frame number or animation name that the playhead should move to
-	* and begin playing.
-	**/
+	 * Sets paused to false and plays the specified animation name, named frame, or frame number.
+	 * @method gotoAndPlay
+	 * @param {String|Number} frameOrAnimation The frame number or animation name that the playhead should move to
+	 * and begin playing.
+	 **/
 	p.gotoAndPlay = function(frameOrAnimation) {
 		this.paused = false;
 		this._goto(frameOrAnimation);
 	}
 
 	/**
-	* Sets paused to true and seeks to the specified animation name, named frame, or frame number.
-	* @method gotoAndStop
-	* @param {String|Number} frameOrAnimation The frame number or animation name that the playhead should move to
-	* and stop.
-	**/
+	 * Sets paused to true and seeks to the specified animation name, named frame, or frame number.
+	 * @method gotoAndStop
+	 * @param {String|Number} frameOrAnimation The frame number or animation name that the playhead should move to
+	 * and stop.
+	 **/
 	p.gotoAndStop = function(frameOrAnimation) {
 		this.paused = true;
 		this._goto(frameOrAnimation);
 	}
 
 	/**
-	* Advances the playhead. This occurs automatically each tick by default.
-	* @method advance
+	 * Advances the playhead. This occurs automatically each tick by default.
+	 * @method advance
 	*/
 	p.advance = function() {
 		if (this._animation) { this.currentAnimationFrame++; }
@@ -256,10 +255,10 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	}
 
 	/**
-	* Returns a clone of the Point instance.
-	* @method clone
-	* @return {Point} a clone of the Point instance.
-	**/
+	 * Returns a clone of the Point instance.
+	 * @method clone
+	 * @return {Point} a clone of the Point instance.
+	 **/
 	p.clone = function() {
 		var o = new BitmapAnimation(this.spriteSheet);
 		this.cloneProps(o);
@@ -267,20 +266,20 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	}
 
 	/**
-	* Returns a string representation of this object.
-	* @method toString
-	* @return {String} a string representation of the instance.
-	**/
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
 	p.toString = function() {
 		return "[BitmapAnimation (name="+  this.name +")]";
 	}
 
 // private methods:
 	/**
-	* Advances the currentFrame if paused is not true. This is called automatically when the Stage ticks.
-	* @protected
-	* @method _tick
-	**/
+	 * Advances the currentFrame if paused is not true. This is called automatically when the Stage ticks.
+	 * @protected
+	 * @method _tick
+	 **/
 	p._tick = function() {
 		var f = this._animation ? this._animation.frequency : 1;
 		if (!this.paused && ((++this._advanceCount)+this.offset)%f == 0) {
@@ -290,10 +289,10 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	
 	
 	/**
-	* Normalizes the current frame, advancing animations and dispatching callbacks as appropriate.
-	* @protected
-	* @method _normalizeCurrentFrame
-	**/
+	 * Normalizes the current frame, advancing animations and dispatching callbacks as appropriate.
+	 * @protected
+	 * @method _normalizeCurrentFrame
+	 **/
 	p._normalizeFrame = function() { 
 		var a = this._animation;
 		if (a) {
@@ -318,17 +317,17 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	}
 
 	/**
-	* @property DisplayObject_cloneProps
-	* @private
-	* @type Function
-	**/
+	 * @property DisplayObject_cloneProps
+	 * @private
+	 * @type Function
+	 **/
 	p.DisplayObject_cloneProps = p.cloneProps;
 
 	/**
-	* @method cloneProps
-	* @param {Text} o
-	* @protected
-	**/
+	 * @method cloneProps
+	 * @param {Text} o
+	 * @protected
+	 **/
 	p.cloneProps = function(o) {
 		this.DisplayObject_cloneProps(o);
 		o.onAnimationEnd = this.onAnimationEnd;
@@ -341,11 +340,11 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	}
 
 	/**
-	* Moves the playhead to the specified frame number or animation.
-	* @method _goto
-	* @param {String|Number} frameOrAnimation The frame number or animation that the playhead should move to.
-	* @protected
-	**/
+	 * Moves the playhead to the specified frame number or animation.
+	 * @method _goto
+	 * @param {String|Number} frameOrAnimation The frame number or animation that the playhead should move to.
+	 * @protected
+	 **/
 	p._goto = function(frameOrAnimation) {
 		if (isNaN(frameOrAnimation)) {
 			var data = this.spriteSheet.getAnimation(frameOrAnimation);

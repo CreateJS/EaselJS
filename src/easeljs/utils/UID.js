@@ -48,18 +48,18 @@ var UID = function() {
 }
 
 	/**
-	* @property _nextID
-	* @type Number
-	* @protected
-	**/
+	 * @property _nextID
+	 * @type Number
+	 * @protected
+	 **/
 	UID._nextID = 0;
 
 	/**
-	* Returns the next unique id.
-	* @method get
-	* @return {Number} The next unique id
-	* @static
-	**/
+	 * Returns the next unique id.
+	 * @method get
+	 * @return {Number} The next unique id
+	 * @static
+	 **/
 	UID.get = function() {
 		return UID._nextID++;
 	}
