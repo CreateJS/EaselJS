@@ -14,7 +14,7 @@ In order to run the script, you must have "node.js":http://nodejs.org/ installed
 * "wrench module":https://github.com/ryanmcgrath/wrench-js
 * "optimist module":https://github.com/substack/node-optimist
 
-The easiest way to install the required modules is to first install NPM (node package manager) and then run:
+The easiest way to install the required modules is to first install "NPM":http://npmjs.org/ (node package manager) and then run:
 
 <code>npm install wrench</code>
 <code>npm install optimist</code>
