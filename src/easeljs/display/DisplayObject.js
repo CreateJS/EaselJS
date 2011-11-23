@@ -304,6 +304,15 @@ var p = DisplayObject.prototype;
 	 **/
 	p.filters = null;
 
+	/**
+	* Returns an ID number that uniquely identifies the current cache for this display object.
+	* This can be used to determine if the cache has changed since a previous check.
+	* @property cacheID
+	* @type Number
+	* @default 0
+	*/
+	p.cacheID = 0;
+
 // private properties:
 
 	/**
@@ -323,10 +332,26 @@ var p = DisplayObject.prototype;
 	p._cacheOffsetY = 0;
 
 	/**
+	* @property _cacheDataURLID
+	* @protected
+	* @type Number
+	* @default 0
+	*/
+	p._cacheDataURLID = 0;
+	
+	/**
+	* @property _cacheDataURL
+	* @protected
+	* @type String
+	* @default null
+	*/
+	p._cacheDataURL = null;
+
+	/**
 	 * @property _matrix
 	 * @protected
 	 * @type Matrix2D
-	 * @default 1
+	 * @default null
 	 **/
 	p._matrix = null;
 
@@ -398,6 +423,7 @@ var p = DisplayObject.prototype;
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
 		this._applyFilters();
+		this.cacheID++;
 	}
 
 	/**
@@ -418,6 +444,7 @@ var p = DisplayObject.prototype;
 		this.draw(ctx, true);
 		if (compositeOperation) { ctx.globalCompositeOperation = "source-over"; }
 		this._applyFilters();
+		this.cacheID++;
 	}
 
 	/**
@@ -425,8 +452,19 @@ var p = DisplayObject.prototype;
 	 * @method uncache
 	 **/
 	p.uncache = function() {
-		this.cacheCanvas = null;
+		this._cacheDataURL = this.cacheCanvas = null;
 		this._cacheOffsetX = this._cacheOffsetY = 0;
+	}
+	
+	/**
+	* Returns a data URL for the cache, or null if this display object is not cached.
+	* Uses cacheID to ensure a new data URL is not generated if the cache has not changed.
+	* @method getCacheDataURL.
+	**/
+	p.getCacheDataURL = function() {
+		if (!this.cacheCanvas) { return null; }
+		if (this.cacheID != this._cacheDataURLID) { this._cacheDataURL = this.cacheCanvas.toDataURL(); }
+		return this._cacheDataURL;
 	}
 
 	/**
@@ -618,6 +656,10 @@ var p = DisplayObject.prototype;
 		o.y = this.y;
 		o.mouseEnabled = this.mouseEnabled;
 		o.compositeOperation = this.compositeOperation;
+		if (this.cacheCanvas) {
+			o.cacheCanvas = this.cacheCanvas.cloneNode(true);
+			o.cacheCanvas.getContext("2d").putImageData(this.cacheCanvas.getContext("2d").getImageData(0,0,this.cacheCanvas.width,this.cacheCanvas.height),0,0);
+		}
 	}
 
 	/**
