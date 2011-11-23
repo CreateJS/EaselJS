@@ -24,7 +24,9 @@ OPTIMIST.describe("v", "Enable verbose output")
 	.string("version")
 	.describe("tasks", "Task to run")
 	.default("tasks", "all")
-	.usage("Build Task Manager for EaselJS\nUsage\n$0 [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION]");
+	.describe("s","Include specified file in compilation. Option can be specified multiple times for multiple files.")
+	.alias("s", "source")
+	.usage("Build Task Manager for EaselJS\nUsage\n$0 [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE]");
 
 //included in EaselJS repository
 var GOOGLE_CLOSURE_PATH = "tools/google-closure/compiler.jar";
@@ -91,6 +93,8 @@ var TASK = {
 	CLEAN:"CLEAN"
 };
 
+var extraSourceFiles;
+
 //main entry point for script. Takes optimist argv object which
 //contains command line arguments.
 //This function is called at the bottom of the script
@@ -121,6 +125,8 @@ function main(argv)
 
 	verbose = argv.v != undefined;
 	version = argv.version;
+
+	extraSourceFiles = argv.s;
 
 	var shouldBuildSource = (task == TASK.BUILDSOURCE);
 	var shouldBuildDocs = (task == TASK.BUILDDOCS);
@@ -207,6 +213,17 @@ function buildSourceTask(completeHandler)
 		file_args.push("--js");
 		file_args.push(SOURCE_FILES[i]);
 	}
+	
+	if(extraSourceFiles)
+	{
+		len = extraSourceFiles.length;
+		for(var i = 0; i < len; i++)
+		{
+			file_args.push("--js");
+			file_args.push(extraSourceFiles[i]);
+		}
+	}
+	
 	
 	var tmp_file = PATH.join(OUTPUT_DIR,"tmp.js");
 	var final_file = PATH.join(OUTPUT_DIR, EASEL_LIB_NAME);
