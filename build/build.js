@@ -30,6 +30,10 @@ OPTIMIST.describe("v", "Enable verbose output")
 var GOOGLE_CLOSURE_PATH = "tools/google-closure/compiler.jar";
 var YUI_DOC_PATH = "tools/yuidoc/bin/yuidoc.py";
 
+//all source files in EaselJS. The order matters (for Google Closure)
+//which is why we have to list them here.
+//TODO: add support for recursively checking to see if we are ommiting
+//any files
 var SOURCE_FILES = [
 	"../src/easeljs/utils/UID.js",
 	"../src/easeljs/utils/Ticker.js",
@@ -104,7 +108,7 @@ function main(argv)
 		process.exit(0);
 	}
 
-	//default doesn't seem to be working for OPTIMIZE right now
+	//default doesn't seem to be working for OPTIMIST right now
 	//if task is not specified, we default to ALL
 	var task = (!argv.tasks)?"ALL":argv.tasks.toUpperCase();
 
