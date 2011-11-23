@@ -26,7 +26,9 @@ OPTIMIST.describe("v", "Enable verbose output")
 	.default("tasks", "all")
 	.describe("s","Include specified file in compilation. Option can be specified multiple times for multiple files.")
 	.alias("s", "source")
-	.usage("Build Task Manager for EaselJS\nUsage\n$0 [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE]");
+	.describe("o", "Name of minified JavaScript file.")
+	.alias("o", "output")
+	.usage("Build Task Manager for EaselJS\nUsage\n$0 [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]");
 
 //included in EaselJS repository
 var GOOGLE_CLOSURE_PATH = "tools/google-closure/compiler.jar";
@@ -81,7 +83,7 @@ var YUI_VERSION = 2;
 var DOC_ZIP_NAME="easeljs_docs.zip";
 
 //name of minified EaselJS file.
-var EASEL_LIB_NAME = "easel.js";
+var output_file_name = "easel.js";
 
 var version;
 var verbose;
@@ -127,6 +129,11 @@ function main(argv)
 	version = argv.version;
 
 	extraSourceFiles = argv.s;
+	
+	if(argv.o)
+	{
+		output_file_name = argv.o;
+	}
 
 	var shouldBuildSource = (task == TASK.BUILDSOURCE);
 	var shouldBuildDocs = (task == TASK.BUILDDOCS);
@@ -226,7 +233,7 @@ function buildSourceTask(completeHandler)
 	
 	
 	var tmp_file = PATH.join(OUTPUT_DIR,"tmp.js");
-	var final_file = PATH.join(OUTPUT_DIR, EASEL_LIB_NAME);
+	var final_file = PATH.join(OUTPUT_DIR, output_file_name);
 
 	var cmd = [
 		"java", "-jar", GOOGLE_CLOSURE_PATH
