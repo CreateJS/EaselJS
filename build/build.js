@@ -11,7 +11,20 @@ var WRENCH = require("wrench");
 //for parsing command line args
 var OPTIMIST = require("optimist");
 
-
+OPTIMIST.describe("v", "Enable verbose output")
+	.alias("v", "verbose")
+	.boolean("v")
+	.describe("l", "List all available tasks")
+	.alias("l", "list")
+	.boolean("l")
+	.describe("h", "Display usage")
+	.alias("h", "help")
+	.boolean("h")
+	.describe("version", "Document build version number")
+	.string("version")
+	.describe("tasks", "Task to run")
+	.default("tasks", "all")
+	.usage("Build Task Manager for EaselJS\nUsage\n$0 [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION]");
 
 //included in EaselJS repository
 var GOOGLE_CLOSURE_PATH = "tools/google-closure/compiler.jar";
@@ -85,7 +98,15 @@ function main(argv)
 		process.exit(0);
 	}
 
-	var task = argv.tasks.toUpperCase();
+	if(argv.l)
+	{
+		displayTasks();
+		process.exit(0);
+	}
+
+	//default doesn't seem to be working for OPTIMIZE right now
+	//if task is not specified, we default to ALL
+	var task = (!argv.tasks)?"ALL":argv.tasks.toUpperCase();
 
 	if(!taskIsRecognized(task))
 	{
@@ -315,7 +336,19 @@ function exitWithFailure()
 
 function displayUsage()
 {
-	print("USAGE : build.js -v -h --tasks=TASKNAME [--version=DOCVERSION]");
+	print(OPTIMIST.help());
+}
+
+function displayTasks()
+{
+	var out = "Available tasks: ";
+	
+	for(var _t in TASK)
+	{
+		out += TASK[_t] +", "
+	}
+	
+	print(out.slice(0, -2));
 }
 
 function taskIsRecognized(task)
