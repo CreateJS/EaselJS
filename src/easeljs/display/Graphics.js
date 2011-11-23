@@ -508,7 +508,7 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		var o = this._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
 		for (var i=0, l=colors.length; i<l; i++) {
-			o.addColorStop(ratios[i], colors[i]);
+			o.addColorStop(parseInt(ratios[i], 10), colors[i]);
 		}
 		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
 		return this;
