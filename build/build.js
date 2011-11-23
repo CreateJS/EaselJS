@@ -28,6 +28,7 @@ OPTIMIST.describe("v", "Enable verbose output")
 	.alias("s", "source")
 	.describe("o", "Name of minified JavaScript file.")
 	.alias("o", "output")
+	.default("o", "easel.js")
 	.usage("Build Task Manager for EaselJS\nUsage\n$0 [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]");
 
 //included in EaselJS repository

@@ -22,15 +22,19 @@ The easiest way to install the required modules is to first install "NPM":http:/
 
 h2. Building the Source
 
-<pre><code>Usage
-node ./build.js [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION]
+<pre><code>Build Task Manager for EaselJS
+Usage
+node ./build.js [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]
 
 Options:
-  -v, --verbose  Enable verbose output          [boolean]
-  -l, --list     List all available tasks       [boolean]
-  -h, --help     Display usage                  [boolean]
-  --version      Document build version number  [string]
-  --tasks        Task to run                    [default: "all"]</code></pre>
+  -v, --verbose  Enable verbose output                                                                              [boolean]
+  -l, --list     List all available tasks                                                                           [boolean]
+  -h, --help     Display usage                                                                                      [boolean]
+  --version      Document build version number                                                                      [string]
+  --tasks        Task to run                                                                                        [default: "all"]
+  -s, --source   Include specified file in compilation. Option can be specified multiple times for multiple files.
+  -o, --output   Name of minified JavaScript file.                                                                  [default: "easel.js"]
+</code></pre>
 
 h3. Examples
 
@@ -45,6 +49,10 @@ h4. Build Source
 h4. Build Docs
 
 <code>./build.js --tasks=BUILDDOCS</code>
+
+h4. Build Source and include external .js files and rename generated file
+
+./build.js --tasks=BUILDSOURCE -s test.js -s test2.js -o mylib.js
 
 h4. Clean Build Directories
 
