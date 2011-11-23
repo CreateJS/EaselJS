@@ -187,9 +187,9 @@ function cleanTask(completeHandler)
 		WRENCH.rmdirSyncRecursive(TMP_DIR);
 	}
 	
-	if(PATH.existsSync("output"))
+	if(PATH.existsSync(OUTPUT_DIR))
 	{
-		WRENCH.rmdirSyncRecursive("output");
+		WRENCH.rmdirSyncRecursive(OUTPUT_DIR);
 	}
 }
 
