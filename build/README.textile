@@ -52,7 +52,7 @@ h4. Build Docs
 
 h4. Build Source and include external .js files and rename generated file
 
-./build.js --tasks=BUILDSOURCE -s test.js -s test2.js -o mylib.js
+<code>./build.js --tasks=BUILDSOURCE -s test.js -s test2.js -o mylib.js</code>
 
 h4. Clean Build Directories
 
