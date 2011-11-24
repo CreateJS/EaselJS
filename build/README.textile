@@ -3,7 +3,18 @@ For building EaselJS, we use a custom build script written in node.js. It uses t
 * "Google Closure compiler":http://code.google.com/closure/compiler/docs/gettingstarted_app.html
 * "YUI Doc":http://developer.yahoo.com/yui/yuidoc/
 
-These libraries are included in the EaselJS repository, which makes it easier to run the build, and ensures that we don't have version mismatches between the source and the libraries.
+Google Closure requires that Java is installed on the system.
+
+YUI Doc requires that Python is installed on your system, along with the following modules:
+
+* setuptools
+* Pygments
+* SimpleJSON
+* Cheetah
+
+View the "YUI Doc":http://developer.yahoo.com/yui/yuidoc/ page for more information.
+
+YUI Doc and Google Closure are included in the EaselJS repository, which makes it easier to run the build, and ensures that we don't have version mismatches between the source and the libraries.
 
 
 h2. Configuration
