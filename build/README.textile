@@ -48,7 +48,7 @@ h4. Build Source
 
 h4. Build Docs
 
-<code>./build.js --tasks=BUILDDOCS</code>
+<code>./build.js --tasks=BUILDDOCS --version=5</code>
 
 h4. Build Source and include external .js files and rename generated file
 
