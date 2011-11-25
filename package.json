@@ -1,0 +1,14 @@
+{
+    "name": "easeljs",
+    "main": "./src/easeljs",
+    "version": "0.4.0",
+    "description": "EaselJS is a library to make working with the Canvas element easier. It provides a display list to allow you to work with display elements on a canvas as nested objects. It also provides a simple framework for providing shape based mouse interactions on elements in the display list.",
+    "keywords": ["canvas"],
+    "repository": "git://github.com/enobrev/EaselJS.git",
+    "engines" : {
+        "node" : ">=0.5.2"
+    },
+    "dependencies": {
+        "canvas": ">=0.7.2"
+    }
+}

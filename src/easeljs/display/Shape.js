@@ -34,6 +34,13 @@
 * @module EaselJS
 **/
 
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var DisplayObject = require('./DisplayObject').DisplayObject;
+    var Graphics      = require('./Graphics').Graphics;
+    var window = module.exports;
+}
+
 (function(window) {
 
 /**
@@ -106,7 +113,9 @@ var p = Shape.prototype = new DisplayObject();
 	**/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+		this.beginClip(ctx);
 		this.graphics.draw(ctx);
+		this.endClip(ctx);
 		return true;
 	}
 	

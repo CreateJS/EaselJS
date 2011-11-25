@@ -34,6 +34,14 @@
 * @module EaselJS
 **/
 
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var DisplayObject = require('./DisplayObject').DisplayObject;
+    var Canvas = require('canvas');
+    var Image  = Canvas.Image;
+    var window = module.exports;
+}
+
 (function(window) {
 
 /**
@@ -63,6 +71,30 @@ var p = Bitmap.prototype = new DisplayObject();
 	* @default true
 	**/
 	p.snapToPixel = true;
+
+    /**
+     * X Coordinate from which to draw the image inside the bitmap container
+     * @property imageX
+     * @type number
+     * @default 0
+     */
+    p.imageX = 0;
+
+    /**
+     * Y Coordinate from which to draw the image inside the bitmap container
+     * @property imageY
+     * @type number
+     * @default 0
+     */
+    p.imageY = 0;
+
+    /**
+     * Scale of the image when drawn in the bitmap container
+     * @property imageScale
+     * @type number
+     * @default 1
+     */
+    p.imageScale = 1;
 	
 	// constructor:
 
@@ -120,7 +152,9 @@ var p = Bitmap.prototype = new DisplayObject();
 	**/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		ctx.drawImage(this.image, 0, 0);
+		this.beginClip(ctx);
+		ctx.drawImage(this.image, this.imageX, this.imageY, this.image.width * this.imageScale, this.image.height * this.imageScale);
+		this.endClip(ctx);
 		return true;
 	}
 	
@@ -153,6 +187,10 @@ var p = Bitmap.prototype = new DisplayObject();
 	p.clone = function() {
 		var o = new Bitmap(this.image);
 		this.cloneProps(o);
+		o.imageScale = this.imageScale;
+		o.imageX     = this.imageX;
+		o.imageY     = this.imageY;
+		o.image      = this.image;
 		return o;
 	}
 	

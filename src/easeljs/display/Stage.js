@@ -34,6 +34,21 @@
 * @module EaselJS
 **/
 
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var Container = require('./Container').Container;
+    var Canvas    = require('canvas');
+    var window    = module.exports;
+    document  = {
+        createElement: function() {
+            return new Canvas();
+        },
+        addEventListener: function() {}
+    };
+    window.addEventListener = function() {}
+    Canvas.prototype.addEventListener = function() {};
+}
+
 (function(window) {
 
 /**
@@ -310,8 +325,7 @@ var p = Stage.prototype = new Container();
 			this._mouseOverIntervalID = null;
 		}
 		if (frequency <= 0) { return; }
-		var o = this;
-		this._mouseOverIntervalID = setInterval(function(){ o._testMouseOver(); }, 1000/Math.min(50,frequency));
+		this._mouseOverIntervalID = setInterval(this._testMouseOver, 1000/Math.min(50,frequency));
 		this._mouseOverX = NaN;
 		this._mouseOverTarget = null;
 	}
