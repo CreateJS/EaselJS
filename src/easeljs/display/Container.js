@@ -149,18 +149,19 @@ var p = Container.prototype = new DisplayObject();
 	* Adds a child to the top of the display list. You can also add multiple children, such as "addChild(child1, child2, ...);".
 	* Returns the child that was added, or the last child if multiple children were added.
 	* @method addChild
-	* @param {DisplayObject} child The display object to add.
+	* @param {DisplayObject} children The display object(s) to add.
 	* @return {DisplayObject} The child that was added, or the last child if multiple children were added.
 	**/
-	p.addChild = function(child) {
+	p.addChild = function(children) {
 		var l = arguments.length;
-		if (l > 1) {
-			for (var i=0; i<l; i++) { this.addChild(arguments[i]); }
-			return arguments[l-1];
+		var child;
+		for (var i=0; i<l; i++) {
+			child = arguments[i];
+
+			if (child.parent) { child.parent.removeChild(child); }
+			child.parent = this;
+			this.children.push(child);
 		}
-		if (child.parent) { child.parent.removeChild(child); }
-		child.parent = this;
-		this.children.push(child);
 		return child;
 	}
 
@@ -171,20 +172,21 @@ var p = Container.prototype = new DisplayObject();
 	* container.addChildAt(myShape, container.getChildIndex(otherShape)). This would also bump otherShape's index up by one.
 	* Returns the last child that was added, or the last child if multiple children were added.
 	* @method addChildAt
-	* @param {DisplayObject} child The display object to add.
+	* @param {DisplayObject} children The display object(s) to add.
 	* @param {Number} index The index to add the child at.
 	* @return {DisplayObject} The child that was added, or the last child if multiple children were added.
 	**/
-	p.addChildAt = function(child, index) {
-		var l = arguments.length;
-		if (l > 2) {
-			index = arguments[i-1];
-			for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i], index+i); }
-			return arguments[l-2];
+	p.addChildAt = function(children, index) {
+		var l = arguments.length - 1;
+		var index_first = arguments[l];
+		var child, i;
+		for (i=0; i<l; i++) {
+			child = arguments[i];
+
+			if (child.parent) { child.parent.removeChild(child); }
+			child.parent = this;
+			this.children.splice(index_first+i, 0, child);
 		}
-		if (child.parent) { child.parent.removeChild(child); }
-		child.parent = this;
-		this.children.splice(index, 0, child);
 		return child;
 	}
 
@@ -193,41 +195,45 @@ var p = Container.prototype = new DisplayObject();
 	* known. You can also remove multiple children, such as "removeChild(child1, child2, ...);". Returns true if the child
 	* (or children) was removed, or false if it was not in the display list.
 	* @method removeChild
-	* @param {DisplayObject} child The child to remove.
+	* @param {DisplayObject} children The children to remove.
 	* @return {Boolean} true if the child (or children) was removed, or false if it was not in the display list.
 	**/
-	p.removeChild = function(child) {
+	p.removeChild = function(children) {
 		var l = arguments.length;
-		if (l > 1) {
-			var good = true;
-			for (var i=0; i<l; i++) { good = good && this.removeChild(arguments[i]); }
-			return good;
+		var good = true;
+		for (var i=0; i<l; i++) {
+			var child = arguments[i];
+			var index = this.children.indexOf(child);
+			if (index < 0) { good = false; continue; }
+
+			if (child != null) { child.parent = null; }
+			this.children.splice(index, 1);
 		}
-		return this.removeChildAt(this.children.indexOf(child));
+		return good;
 	}
 
 	/**
 	* Removes the child at the specified index from the display list, and sets its parent to null. You can also remove multiple
 	* children, such as "removeChildAt(2, 7, ...);". Returns true if the child (or children) was removed, or false if any index
 	* was out of range.
-	* @param {Number} index The index of the child to remove.
+	* @param {Number} indexes The indexes of the children to remove.
 	* @return true if the child (or children) was removed, or false if any index was out of range.
 	**/
-	p.removeChildAt = function(index) {
+	p.removeChildAt = function(indexes) {
 		var l = arguments.length;
-		if (l > 1) {
-			var a = [];
-			for (var i=0; i<l; i++) { a[i] = arguments[i]; }
-			a.sort(function(a, b) { return b-a; })
-			var good = true;
-			for (var i=0; i<l; i++) { good = good && this.removeChildAt(a[i]); }
-			return good;
+		var a = Array.prototype.slice.call( arguments, 0 );
+		a.sort(function(a, b) { return b-a; });
+
+		var good = true;
+		for (var i=0; i<l; i++) {
+			var a_i = a[i];
+			if (a_i < 0 || a_i > this.children.length-1) { good = false; continue; }
+
+			var child = this.children[a_i];
+			if (child != null) { child.parent = null; }
+			this.children.splice(a_i, 1);
 		}
-		if (index < 0 || index > this.children.length-1) { return false; }
-		var child = this.children[index];
-		if (child != null) { child.parent = null; }
-		this.children.splice(index, 1);
-		return true;
+		return good;
 	}
 
 	/**
