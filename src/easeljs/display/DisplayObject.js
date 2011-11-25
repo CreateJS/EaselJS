@@ -304,6 +304,15 @@ var p = DisplayObject.prototype;
 	**/
 	p.filters = null;
 
+	/**
+	 * A graphic from which to generate a clipping path to apply to this display path.  The clipping path is applied
+	 * as the display object is drawn to the stage
+	 * @property clip
+	 * @type Graphic
+	 * @default null
+	 */
+	p.clip = null;
+
 // private properties:
 
 	/**
@@ -367,8 +376,38 @@ var p = DisplayObject.prototype;
 	**/
 	p.draw = function(ctx, ignoreCache) {
 		if (ignoreCache || !this.cacheCanvas) { return false; }
+		this.beginClip(ctx);
 		ctx.drawImage(this.cacheCanvas, this._cacheOffsetX, this._cacheOffsetY);
+		this.endClip(ctx);
 		return true;
+	}
+
+	/**
+	 * Begins the process of drawing the clipping path to the stage. This method should be called before
+	 * an object is about to be drawn to the stage, immediately followed by endClip
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method beginClip
+	 * @param ctx
+	 */
+	p.beginClip = function(ctx) {
+		if (this.clip instanceof Graphics) {
+			ctx.save();//push current state into canvas
+			this.clip.draw(ctx);
+			ctx.clip();
+		}
+	}
+
+	/**
+	 * Ends the process of clipping the current display object after it is drawn. This method should be called after
+	 * an object has been drawn to the stage, provided beginClip was called before.
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method endClip
+	 * @param ctx
+	 */
+	p.endClip = function(ctx) {
+		if (this.clip instanceof Graphics) {
+			ctx.restore();
+		}
 	}
 
 	/**
