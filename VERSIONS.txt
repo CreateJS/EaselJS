@@ -1,4 +1,4 @@
-Version 0.4 [NOT RELEASED]
+Version 0.4 [Nov 29, 2011]
 ****************************************************************************************************
 - completely rewrote BitmapSequence & SpriteSheet, including data format
 	- BitmapSequence is now named BitmapAnimation
@@ -23,6 +23,7 @@ Version 0.4 [NOT RELEASED]
 - added sample filters: ColorFilter, ColorMatrixFilter, and BoxBlurFilter
 - added DisplayObject.setTransform()
 - added DisplayObject.onDoubleClick handler (thanks to rbarazi)
+- added DisplayObject.cacheID and DisplayObject.getCacheDataURL()
 - performance optimization for DisplayObject drawing (6910e6849856bd0740f8)
 - added support for touch input (single point) via the Touch class
 - added support for passing an image URI to the Bitmap constructor

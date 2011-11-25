@@ -60,7 +60,7 @@
 	frames: {frameWidth:64, frameHeight:64, numFrames:20, regX: 32, regY:64},
 
 	// OR, the complex way that defines individual rects for frames.
-	// The 5th value is the image index (defaults to 0).
+	// The 5th value is the image index that correlates to an entry in images above (defaults to 0).
 	frames: [
 		// x, y, width, height, imageIndex, regX, regY
 		[0,0,64,64,0,32,64],
@@ -217,7 +217,7 @@ var p = SpriteSheet.prototype;
 			a = data.frames;
 			for (i=0,l=a.length;i<l;i++) {
 				var arr = a[i];
-				this._frames.push({image:this._images[arr[4]?arr[4]:0], rect:new Rectangle(arr[0],arr[1],arr[2],arr[3]), regX:arr[4]||0, regY:arr[5]||0 });
+				this._frames.push({image:this._images[arr[4]?arr[4]:0], rect:new Rectangle(arr[0],arr[1],arr[2],arr[3]), regX:arr[5]||0, regY:arr[6]||0 });
 			}
 		} else {
 			o = data.frames;
@@ -300,15 +300,15 @@ var p = SpriteSheet.prototype;
 	}
 	
 	/**
-	 * Returns an object defining the source rect of the specified frame. The returned object
+	 * Returns an object specifying the image and source rect of the specified frame. The returned object
 	 * has an image property holding a reference to the image object in which the frame frame is found,
 	 * and a rect property containing a Rectangle instance which defines the boundaries for the
 	 * frame within that image.
-	 * @method getFrameRect
+	 * @method getFrame
 	 * @param {Number} frameIndex The index of the frame.
 	 * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist, or the image is not fully loaded.
 	 **/
-	p.getFrameRect = function(frameIndex) {
+	p.getFrame = function(frameIndex) {
 		if (this.complete && this._frames && (frame=this._frames[frameIndex])) { return frame; }
 		return null;
 	}
