@@ -34,6 +34,12 @@
 * @module EaselJS
 **/
 
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var DisplayObject = require('./DisplayObject').DisplayObject;
+    var window = module.exports;
+}
+
 (function(window) {
 
 /**
@@ -113,6 +119,10 @@ var p = Container.prototype = new DisplayObject();
 	* into itself).
 	**/
 	p.draw = function(ctx, ignoreCache, _mtx) {
+        if (typeof module !== 'undefined' && module.exports) {
+            Stage = require('./Stage').Stage;
+        }
+        
 		var snap = Stage._snapToPixelEnabled;
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		_mtx = _mtx || this._matrix.reinitialize(1,0,0,1,0,0,this.alpha, this.shadow, this.compositeOperation);

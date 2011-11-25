@@ -34,6 +34,13 @@
 * @module EaselJS
 **/
 
+// Node.js-ification
+if (typeof module !== 'undefined' && module.exports) {
+    var DisplayObject = require('./DisplayObject').DisplayObject;
+    var Graphics      = require('./Graphics').Graphics;
+    var window = module.exports;
+}
+
 (function(window) {
 
 /**

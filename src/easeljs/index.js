@@ -1,0 +1,24 @@
+
+exports.Bitmap              = require('./display/Bitmap').Bitmap;
+exports.BitmapSequence      = require('./display/BitmapSequence').BitmapSequence;
+exports.Container           = require('./display/Container').Container;
+exports.DisplayObject       = require('./display/DisplayObject').DisplayObject;
+exports.DOMElement          = require('./display/DOMElement').DOMElement;
+exports.Graphics            = require('./display/Graphics').Graphics;
+exports.Shadow              = require('./display/Shadow').Shadow;
+exports.Shape               = require('./display/Shape').Shape;
+exports.SpriteSheet         = require('./display/SpriteSheet').SpriteSheet;
+exports.Stage               = require('./display/Stage').Stage;
+exports.Text                = require('./display/Text').Text;
+exports.MouseEvent          = require('./events/MouseEvent').MouseEvent;
+exports.Filter              = require('./filters/Filter').Filter;
+exports.BoxBlurFilter       = require('./filters/BoxBlurFilter').BoxBlurFilter;
+exports.ColorFilter         = require('./filters/ColorFilter').ColorFilter;
+exports.ColorMatrixFilter   = require('./filters/ColorMatrixFilter').ColorMatrixFilter;
+exports.Matrix2D            = require('./geom/Matrix2D').Matrix2D;
+exports.Point               = require('./geom/Point').Point;
+exports.Rectangle           = require('./geom/Rectangle').Rectangle;
+exports.Touch               = require('./ui/Touch').Touch;
+exports.SpriteSheetUtils    = require('./utils/SpriteSheetUtils').SpriteSheetUtils;
+exports.Ticker              = require('./utils/Ticker').Ticker;
+exports.UID                 = require('./utils/UID').UID;
