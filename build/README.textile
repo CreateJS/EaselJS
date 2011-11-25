@@ -1,0 +1,82 @@
+For building EaselJS, we use a custom build script written in node.js. It uses the following libraries:
+
+* "Google Closure compiler":http://code.google.com/closure/compiler/docs/gettingstarted_app.html
+* "YUI Doc":http://developer.yahoo.com/yui/yuidoc/
+
+Google Closure requires that Java is installed on the system.
+
+YUI Doc requires that Python is installed on your system, along with the following modules:
+
+* setuptools
+* Pygments
+* SimpleJSON
+* Cheetah
+
+View the "YUI Doc":http://developer.yahoo.com/yui/yuidoc/ page for more information.
+
+YUI Doc and Google Closure are included in the EaselJS repository, which makes it easier to run the build, and ensures that we don't have version mismatches between the source and the libraries.
+
+
+h2. Configuration
+
+In order to run the script, you must have "node.js":http://nodejs.org/ installed, along with the "wrench":https://github.com/ryanmcgrath/wrench-js and "optimist":https://github.com/substack/node-optimist modules.
+
+* "node.js":http://nodejs.org/
+* "wrench module":https://github.com/ryanmcgrath/wrench-js
+* "optimist module":https://github.com/substack/node-optimist
+
+The easiest way to install the required modules is to first install "NPM":http://npmjs.org/ (node package manager) and then run:
+
+<code>npm install wrench</code>
+<code>npm install optimist</code>
+
+
+h2. Building the Source
+
+<pre><code>Build Task Manager for EaselJS
+Usage
+node ./build.js [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]
+
+Options:
+  -v, --verbose  Enable verbose output                                                                              [boolean]
+  -l, --list     List all available tasks                                                                           [boolean]
+  -h, --help     Display usage                                                                                      [boolean]
+  --version      Document build version number                                                                      [string]
+  --tasks        Task to run                                                                                        [default: "all"]
+  -s, --source   Include specified file in compilation. Option can be specified multiple times for multiple files.
+  -o, --output   Name of minified JavaScript file.                                                                  [default: "easel.js"]
+</code></pre>
+
+h3. Examples
+
+h4. Build Source and Docs
+
+<code>./build.js --tasks=ALL --version=5</code>
+
+h4. Build Source
+
+<code>./build.js --tasks=BUILDSOURCE</code>
+
+h4. Build Docs
+
+<code>./build.js --tasks=BUILDDOCS --version=5</code>
+
+h4. Build Source and include external .js files and rename generated file
+
+<code>./build.js --tasks=BUILDSOURCE -s test.js -s test2.js -o mylib.js</code>
+
+h4. Clean Build Directories
+
+<code>./build.js --tasks=CLEAN</code>
+
+
+h2. Tagging the Release
+
+When a release is ready to tag, use the following git command:
+
+<pre><code>git tag -a release_v0.3.0
+git push --tags</code></pre>
+
+There is a good reference on tagging at
+
+"http://book.git-scm.com/3_git_tag.html":http://book.git-scm.com/3_git_tag.html

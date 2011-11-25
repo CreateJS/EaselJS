@@ -92,8 +92,8 @@ var p = BoxBlurFilter.prototype = new Filter();
 	 **/
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
 		targetCtx = targetCtx || ctx;
-		if (targetX = null) { targetX = x; }
-		if (targetY = null) { targetY = y; }
+		if (targetX == null) { targetX = x; }
+		if (targetY == null) { targetY = y; }
 		try {
 			var imageData = ctx.getImageData(x, y, width, height);
 		} catch(e) {
