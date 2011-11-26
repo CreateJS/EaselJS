@@ -249,7 +249,7 @@ var p = SpriteSheet.prototype;
 				var obj = o[name];
 				if (!isNaN(obj)) { // single frame
 					a = anim.frames = [obj];
-				} if (obj instanceof Array) { // simple
+				} else if (obj instanceof Array) { // simple
 					anim.frequency = obj[3];
 					anim.next = obj[2];
 					a = anim.frames = [];

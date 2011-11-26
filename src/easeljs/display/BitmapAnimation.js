@@ -193,7 +193,7 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this._normalizeFrame();
-		var o = this.spriteSheet.getFrameRect(this.currentFrame);
+		var o = this.spriteSheet.getFrame(this.currentFrame);
 		if (o == null) { return; }
 		var rect = o.rect;
 		// TODO: implement snapToPixel on regX/Y?
