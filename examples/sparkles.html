@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>EaselJS Example: Using BitmapSequence Objects</title>
+<title>EaselJS Example: Using BitmapAnimation Objects</title>
 
 <link href="styles/styles.css" rel="stylesheet" type="text/css" />
 
@@ -28,7 +28,7 @@ var canvas;
 var stage;
 
 var imgSeq = new Image();		// The image for the sparkle animation
-var bmpSeq;						// The animated sparkle template to clone
+var bmpAnim;						// The animated sparkle template to clone
 var fpsLabel;
 
 function init() {
@@ -41,16 +41,16 @@ function init() {
 	canvas.onmousemove = moveCanvas;
 	canvas.onclick = clickCanvas;
 
-	// this instance will be cloned as needed to create new sparkles.
-	// note that we are using a simple SpriteSheet with no frameData.
-	// by default, it will loop through all of the frames in the image.
+	// define simple sprite sheet data specifying the image(s) to use, the size of the frames,
+	// and the registration point of the frame
+	// it will auto-calculate the number of frames from the image dimensions and loop them
 	var data = {
 		images: ["img/sparkle_21x23.png"],
-		frames: {frameWidth:21,frameHeight:23}
+		frames: {width:21,height:23,regX:10,regY:11}
 	}
-	bmpSeq = new BitmapAnimation(new SpriteSheet(data));
-	bmpSeq.regX = bmpSeq.frameWidth/2|0;
-	bmpSeq.regY = bmpSeq.frameHeight/2|0;
+	
+	// set up an animation instance, which we will clone
+	bmpAnim = new BitmapAnimation(new SpriteSheet(data));
 
 	// add a text object to output the current FPS:
 	fpsLabel = new Text("-- fps","bold 14px Arial","#FFF");
@@ -106,7 +106,7 @@ function addSparkles(count, x, y, speed) {
 	//create the specified number of sparkles
 	for (var i=0; i<count; i++) {
 		// clone the original sparkle, so we don't need to set shared properties:
-		var sparkle = bmpSeq.clone();
+		var sparkle = bmpAnim.clone();
 
 		// set display properties:
 		sparkle.x = x;
@@ -124,7 +124,7 @@ function addSparkles(count, x, y, speed) {
 		sparkle.vA = -Math.random()*0.05-0.01; // alpha
 
 		// start the animation on a random frame:
-		sparkle.gotoAndPlay(Math.random()*12|0);
+		sparkle.gotoAndPlay(Math.random()*sparkle.spriteSheet.getNumFrames()|0);
 
 		// add to the display list:
 		stage.addChild(sparkle);
@@ -136,7 +136,7 @@ function addSparkles(count, x, y, speed) {
 
 <body onload="init();">
 	<div class="description">
-	Example showing how to use simple animated <strong>BitmapSequence</strong> elements. Move your mouse and click on the canvas. It also demonstrates displaying the current measured framerate with <strong>Ticker.getMeasuredFramerate()</strong> and <strong>Text</strong>. Click repeatedly to generate lots of sparkles and slow down the framerate.<br/>
+	Example showing how to use simple animated <strong>BitmapAnimation</strong> elements. Move your mouse and click on the canvas. It also demonstrates displaying the current measured framerate with <strong>Ticker.getMeasuredFramerate()</strong> and <strong>Text</strong>. Click repeatedly to generate lots of sparkles and slow down the framerate.<br/>
 	</div>
 	<div class="canvasHolder">
 		<canvas id="testCanvas" width="980" height="680" style="background:#000000"></canvas>
