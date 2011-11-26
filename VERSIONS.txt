@@ -1,7 +1,7 @@
 Version 0.4 [Nov 29, 2011]
 ****************************************************************************************************
-- completely rewrote BitmapSequence & SpriteSheet, including data format
-	- BitmapSequence is now named BitmapAnimation
+- completely rewrote BitmapSequence (now BitmapAnimation) & SpriteSheet including data format
+	- BitmapSequence was renamed BitmapAnimation
 	- SpriteSheet now handles calculating frame rects
 	- support for multi-image sprite sheets
 	- support for variable frame sizes
@@ -11,11 +11,10 @@ Version 0.4 [Nov 29, 2011]
 - rewrote SpriteSheetUtils to support SpriteSheet changes
 	- renamed .flip() to .addFlippedFrames() and changed functionality significantly
 	- removed .frameDataToString()
-- fixes to Shadow
 - fixed support for video sources in Bitmap
 - added support for null canvas for Stage
-- added DOMElement
-- separated tick and draw operations to fix race conditions
+- added DOMElement, an experimental display object for including DOM elements in the display list
+- separated tick and draw into separate phases to fix possible race conditions
 - added Matrix2D.isIdentity()
 - support for double click events (thanks to rbarazi)
 - added MouseEvent.nativeEvent and MouseEvent.target properties
@@ -23,13 +22,14 @@ Version 0.4 [Nov 29, 2011]
 - fixed a problem with caching Container instances
 - fixed an issue with .parent not being assigned on children of cloned Containers
 - added filter support via DisplayObject.filters and Filter objects
-- added sample filters: ColorFilter, ColorMatrixFilter, and BoxBlurFilter
+	- added sample filters: ColorFilter, ColorMatrixFilter, and BoxBlurFilter
 - added DisplayObject.setTransform()
 - added DisplayObject.onDoubleClick handler (thanks to rbarazi)
 - added DisplayObject.cacheID and DisplayObject.getCacheDataURL()
 - performance optimization for DisplayObject drawing (6910e6849856bd0740f8)
 - added support for touch input (single point) via the Touch class
 - added support for passing an image URI to the Bitmap constructor
+- fixes to Shadow
 - optimizations
 - doc updates
 
