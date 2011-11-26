@@ -53,7 +53,7 @@ var SOURCE_FILES = [
 	"../src/easeljs/display/Container.js",
 	"../src/easeljs/display/Stage.js",
 	"../src/easeljs/display/Bitmap.js",
-	"../src/easeljs/display/BitmapSequence.js",
+	"../src/easeljs/display/BitmapAnimation.js",
 	"../src/easeljs/display/Shape.js",
 	"../src/easeljs/display/Text.js",
 	"../src/easeljs/utils/SpriteSheetUtils.js",
@@ -290,7 +290,7 @@ function buildDocsTask(version, completeHandler)
 	var generator_out=PATH.join(OUTPUT_DIR, doc_dir);
 	
 	var cmd = [
-		YUI_DOC_PATH,
+		"python", YUI_DOC_PATH,
 		parser_in,
 		"-p", parser_out,
 		"-o", generator_out,
