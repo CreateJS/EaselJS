@@ -60,15 +60,15 @@ function handleImageLoad() {
 	
 	
 	/*** NEXT: the more robust approach ***/
-	// define frameData describing the available icons:
-	// we can use the form {frameName:frameNumber} instead of {frameName:[startFrame,endFrame]} because each "sequence" is only a single frame:
+	// define sprite sheet data describing the available icons:
+	// we can use the form {frameName:frameNumber} in animations because each "sequence" is only a single frame:
 	var data = {
 		images:[iconSheet],
 		frames:{width:80, height:80},
 		animations: {trash:0, male:1, wait:2, library:3, female:4, hanger:5, stairs:6, noparking:7}
 	}
 	
-	// create a SpriteSheet using the frameData:
+	// create a SpriteSheet using the data:
  	spriteSheet = new SpriteSheet(data);
  	
  	// we'll clone icon2, to preserve the x/y, and swap out the SpriteSheet:
@@ -76,7 +76,7 @@ function handleImageLoad() {
  	icon3.spriteSheet = spriteSheet;
  	icon3.x += 120;
  	
- 	// we can reference frames by name because of frameData:
+ 	// we can reference frames by name now:
  	icon3.gotoAndStop("male");
  	stage.addChild(icon3);
  	
@@ -97,9 +97,7 @@ function handleImageLoad() {
  	stage.addChild(icon6);
 	
 	
-	// we want to do some work before we update the canvas,
-	// otherwise we could use Ticker.addListener(stage);
-	Ticker.setInterval(200);
+	Ticker.setFPS(3); // low, so we can see the icons
 	Ticker.addListener(stage);
 }
 

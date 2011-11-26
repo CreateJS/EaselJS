@@ -106,7 +106,7 @@ var SpriteSheetUtils = function() {
 		if (isNaN(frame)) {
 			frame = spriteSheet.getAnimation(frame).frames[0];
 		}
-		var data = spriteSheet.getFrameRect(frame);
+		var data = spriteSheet.getFrame(frame);
 		if (!data) { return null; }
 		var r = data.rect;
 		var canvas = SpriteSheetUtils._workingCanvas;
@@ -117,7 +117,9 @@ var SpriteSheetUtils = function() {
 		img.src = canvas.toDataURL("image/png");
 		return img;
 	}
+
 	
+// private static methods:
 	SpriteSheetUtils._flip = function(spriteSheet, count, h, v) {
 		var imgs = spriteSheet._images;
 		var canvas = SpriteSheetUtils._workingCanvas;
