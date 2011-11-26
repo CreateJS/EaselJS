@@ -84,7 +84,6 @@ var SpriteSheetUtils = function() {
 	 * horizontally: &#123;walk_left: ["walk_right", true, false]&#125;
 	 **/
 	SpriteSheetUtils.addFlippedFrames = function(spriteSheet, horizontal, vertical, both) {
-		// TODO: should probably flip regX/Y? Not entirely sure if there's a predictable way to do so.
 		if (!horizontal && !vertical && !both) { return; }
 		
 		var count = 0;
@@ -143,9 +142,16 @@ var SpriteSheetUtils = function() {
 			src = frames[i];
 			var rect = src.rect.clone();
 			img = imgs[src.image.__tmp+il*count];
+			
 			var frame = {image:img,rect:rect,regX:src.regX,regY:src.regY};
-			if (h) { rect.x = img.width-rect.x-rect.width; }
-			if (v) { rect.y = img.height-rect.y-rect.height; }
+			if (h) {
+				rect.x = img.width-rect.x-rect.width; // update rect
+				frame.regX = rect.width-src.regX; // update registration point
+			}
+			if (v) {
+				rect.y = img.height-rect.y-rect.height;  // update rect
+				frame.regY = rect.height-src.regY; // update registration point
+			}
 			frames.push(frame);
 		}
 		

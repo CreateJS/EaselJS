@@ -43,7 +43,7 @@ function init() {
 	// create spritesheet and assign the associated data.
 	var spriteSheet  = new SpriteSheet({
 		images: ["img/testSeq.png"],
-		frames: {width:64, height:68},
+		frames: {width:64, height:68, regX:32, regY:34},
 		animations: {
 			walkUpRt:[0,19,"walkRt"],
 			walkDnRt:[20,39,"walkUpRt"],
@@ -54,8 +54,9 @@ function init() {
 	// to save file size, the loaded sprite sheet only includes right facing animations
 	// we could flip the display objects with scaleX=-1, but this is expensive in most browsers
 	// instead, we append flipped versions of the frames to our sprite sheet
-	// this adds just horizontally flipped frames:
-	SpriteSheetUtils.addFlippedFrames(spriteSheet,true,false,false);
+	// this adds only horizontally flipped frames:
+	SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
+	console.log(spriteSheet.getFrame(82).regX)
 	
 	// we could rewire the "next" sequences to make them work like so:
 	// but instead we will use code in the angleChange function.
@@ -68,11 +69,6 @@ function init() {
 	
 	// create a BitmapAnimation instance to display and play back the sprite sheet:
 	var bmpAnim = new BitmapAnimation(spriteSheet);
-
-	// set the registration point (the point it will be positioned and rotated around)
-	// to the center of the frame dimensions:
-	bmpAnim.regX = 64>>1;
-	bmpAnim.regY = 68>>1;
 
 	// start playing the first sequence:
 	bmpAnim.gotoAndPlay("walkRt");		//animate

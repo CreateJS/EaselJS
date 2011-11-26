@@ -8,6 +8,9 @@ Version 0.4 [Nov 29, 2011]
 	- support for frame reuse (non-linear frame order)
 	- support for frame registration points
 	- SpriteSheet supports URIs as sources (and will handle preloading)
+- rewrote SpriteSheetUtils to support SpriteSheet changes
+	- renamed .flip() to .addFlippedFrames() and changed functionality significantly
+	- removed .frameDataToString()
 - fixes to Shadow
 - fixed support for video sources in Bitmap
 - added support for null canvas for Stage
