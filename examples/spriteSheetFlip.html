@@ -7,6 +7,7 @@
 <link href="styles/styles.css" rel="stylesheet" type="text/css" />
 
 <!-- Import EaselJS Framework -->
+<script src="../src/easeljs/geom/Rectangle.js"></script>
 <script src="../src/easeljs/display/SpriteSheet.js"></script>
 <script src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 <!-- End EaselJS Imports -->
@@ -25,16 +26,23 @@ function handleImageLoad() {
 	// create a new sprite sheet from the loaded image, and define the animation sequences in it.
 	// for example, {walkUpRight:[0,19]} defines an animation sequence called "walkUpRight" that
 	// will play back frames 0 to 19 inclusive.
-	var spriteSheet = new SpriteSheet(imgSeq, 64, 68, {walkUpRight:[0,19], walkDownRight:[20,40], walkRight:[41,59]});
+	var spriteSheet  = new SpriteSheet({
+		images: ["img/testSeq.png"],
+		frames: {width:64, height:68},
+		animations: {
+			walkUpRt:[0,19,"walkRt"],
+			walkDnRt:[20,39,"walkUpRt"],
+			walkRt:[41,59,"walkDnRt"]
+		}
+	});
 	
-	// generate a new sprite sheet based on the old one, but adding new flipped animation sequences.
-	// the second param defines what new sequences to create, and how to flip them. It uses the format:
-	// {nameOfFlippedSequence:["derivativeSequence", flipHorizontally, flipVertically, optionNameOfNextSequence]}
-	spriteSheet = SpriteSheetUtils.flip(spriteSheet, {walkUpLeft:["walkUpRight",true,false], walkDownLeft:["walkDownRight",true,false], walkLeft:["walkRight",true,false], upsideDown:["walkRight",false,true]});
+	// append flipped frames to the sprite sheet. The 2nd, 3rd, and 4th params indicate whether
+	// to add horizontal, vertical, and both horizontally & vertically flipped frames.
+	SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
 	
-	// add the newly created sprite sheet to the bottom of this document:
-	document.body.appendChild(spriteSheet.image);
-	results = SpriteSheetUtils.frameDataToString(spriteSheet.frameData);
+	// add the newly created sprite sheet to the bottom of this document. We're accessing a private property "_images"
+	// for demonstration purposes only.
+	document.body.appendChild(spriteSheet._images[1]);
 }
 
 </script>
@@ -43,11 +51,11 @@ function handleImageLoad() {
 <body onload="init();" bgcolor="#FFFFFF">
 	<!-- allow for alert of frame data-->
 	<div class="description">
-	Tests using the <strong>SpriteSheetUtils.flip()</strong> method to extend a loaded sprite sheet with horizontally flipped frames. The top row of frames is from the original sprite sheet, the bottom is the generated frames. <a href="javascript:alert(results)">Click here</a> to view the resulting frameData.
+	Tests using the <strong>SpriteSheetUtils.flip()</strong> method to extend a loaded sprite sheet with horizontally flipped frames. The top row of frames is from the original sprite sheet, the bottom is the generated frames.
 	</div>
 	<br/><br/>
 	Original sprite sheet:<br/>
 	<img src="img/testSeq.png"><br/><br/><br/>
-	Generated sprite sheet:<br/>
+	Appended sprite sheet:<br/>
 </body>
 </html>

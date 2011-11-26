@@ -27,7 +27,7 @@ var canvas;
 var stage;
 
 var imgSeq = new Image();
-var bmpSeqList;
+var bmpAnimList;
 
 function init() {
 	//find canvas and load images, wait for last image to load
@@ -43,7 +43,7 @@ function init() {
 	// create spritesheet and assign the associated data.
 	var spriteSheet  = new SpriteSheet({
 		images: ["img/testSeq.png"],
-		frames: {frameWidth:64, frameHeight:68},
+		frames: {width:64, height:68},
 		animations: {
 			walkUpRt:[0,19,"walkRt"],
 			walkDnRt:[20,39,"walkUpRt"],
@@ -53,12 +53,11 @@ function init() {
 	
 	// to save file size, the loaded sprite sheet only includes right facing animations
 	// we could flip the display objects with scaleX=-1, but this is expensive in most browsers
-	// instead, we generate a new sprite sheet which includes the flipped animations according to
-	// the flipData, which is in the format:
-	// {nameOfFlippedSequence:["derivativeSequence", flipHorizontally, flipVertically, optionNameOfNextSequence]}
+	// instead, we append flipped versions of the frames to our sprite sheet
+	// this adds just horizontally flipped frames:
 	SpriteSheetUtils.addFlippedFrames(spriteSheet,true,false,false);
 	
-	// we could rewire the next sequences to make them work like so:
+	// we could rewire the "next" sequences to make them work like so:
 	// but instead we will use code in the angleChange function.
 	/*
 	spriteSheet.getAnimation("walkDnRt").next = "walkDnRt_h";
@@ -67,44 +66,44 @@ function init() {
 	spriteSheet.getAnimation("walkUpRt_h").next = "walkUpRt";
 	*/
 	
-	// create a BitmapSequence instance to display and play back the sprite sheet:
-	var bmpSeq = new BitmapAnimation(spriteSheet);
+	// create a BitmapAnimation instance to display and play back the sprite sheet:
+	var bmpAnim = new BitmapAnimation(spriteSheet);
 
 	// set the registration point (the point it will be positioned and rotated around)
 	// to the center of the frame dimensions:
-	bmpSeq.regX = 64>>1;
-	bmpSeq.regY = 68>>1;
+	bmpAnim.regX = 64>>1;
+	bmpAnim.regY = 68>>1;
 
 	// start playing the first sequence:
-	bmpSeq.gotoAndPlay("walkRt");		//animate
+	bmpAnim.gotoAndPlay("walkRt");		//animate
 
 	// set up a shadow. Note that shadows are ridiculously expensive. You could display hundreds
 	// of animated rats if you disabled the shadow.
-	bmpSeq.shadow = new Shadow("#454", 0, 5, 4);
+	bmpAnim.shadow = new Shadow("#454", 0, 5, 4);
 
 	// the callback is called each time a sequence completes:
-	bmpSeq.onAnimationEnd = angleChange;
+	bmpAnim.onAnimationEnd = angleChange;
 
 	// create a bunch of rats based on the first one, and place them on stage, and in our collection.
-	var l = 40;
-	bmpSeqList = [];
+	var l = 1;
+	bmpAnimList = [];
 	for (var i=0; i<l; i++) {
-		bmpSeq.name = "rat"+i;
-		bmpSeq.speed = Math.random()*6+2;
-		bmpSeq.direction = 90;
-		bmpSeq.vX = bmpSeq.speed;
-		bmpSeq.vY = 0;
-		bmpSeq.x = Math.random()*(w-220)+60|0;
-		bmpSeq.y = Math.random()*(h-220)+0|0;
+		bmpAnim.name = "rat"+i;
+		bmpAnim.speed = Math.random()*6+2;
+		bmpAnim.direction = 90;
+		bmpAnim.vX = bmpAnim.speed;
+		bmpAnim.vY = 0;
+		bmpAnim.x = Math.random()*(w-220)+60|0;
+		bmpAnim.y = Math.random()*(h-220)+0|0;
 
 		// have each rat start on a random frame in the "walkRt" animation:
-		bmpSeq.currentAnimationFrame = Math.random()*spriteSheet.getNumFrames("walkRt")|0;
-		stage.addChild(bmpSeq);
-		bmpSeqList.push(bmpSeq);
+		bmpAnim.currentAnimationFrame = Math.random()*spriteSheet.getNumFrames("walkRt")|0;
+		stage.addChild(bmpAnim);
+		bmpAnimList.push(bmpAnim);
 
 		// rather than creating a brand new instance each time, and setting every property, we
 		// can just clone the current one and overwrite the properties we want to change:
-		if (i < l-1) { bmpSeq = bmpSeq.clone(); }
+		if (i < l-1) { bmpAnim = bmpAnim.clone(); }
 	}
 
 	// we want to do some work before we update the canvas,
@@ -119,33 +118,33 @@ function handleImageError(e) {
 
 function tick() {
 	// move all the rats according to their vX/vY properties:
-	var l = bmpSeqList.length;
+	var l = bmpAnimList.length;
 	for (var i=0; i<l; i++) {
-		var bmpSeq = bmpSeqList[i];
-		bmpSeq.x += bmpSeq.vX;
-		bmpSeq.y += bmpSeq.vY;
+		var bmpAnim = bmpAnimList[i];
+		bmpAnim.x += bmpAnim.vX;
+		bmpAnim.y += bmpAnim.vY;
 	}
 
 	// update the stage:
 	stage.update();
 }
 
-function angleChange(bmpSeq,animation) {
+function angleChange(bmpAnim,animation) {
 	//after each sequence ends update the rat's heading and adjust velocities to match
-	bmpSeq.direction -= 60;
-	var angle = bmpSeq.direction * (Math.PI/180);
-	bmpSeq.vX = Math.sin(angle) * bmpSeq.speed;
-	bmpSeq.vY = Math.cos(angle) * bmpSeq.speed;
-	var nextMap = {walkRt:"walkDnRt",walkDnRt:"walkDnRt_h",walkDnRt_h:"walkRt_h",walkRt_h:"walkUpRt_h",walkUpRt_h:"walkUpRt",walkUpRt:"walkRt"}
-	bmpSeq.gotoAndPlay(nextMap[animation]);
+	bmpAnim.direction -= 60;
+	var angle = bmpAnim.direction * (Math.PI/180);
+	bmpAnim.vX = Math.sin(angle) * bmpAnim.speed;
+	bmpAnim.vY = Math.cos(angle) * bmpAnim.speed;
+	var nextMap = {walkRt:"walkDnRt",walkDnRt:"walkDnRt_h",walkDnRt_h:"walkRt_h",walkRt_h:"walkUpRt_h",walkUpRt_h:"walkUpRt",walkUpRt:"walkRt"};
+	bmpAnim.gotoAndPlay(nextMap[animation]);
 }
 </script>
 </head>
 
 <body onload="init();">
 	<div class="description">
-	Dev sample showing how to use <strong>SpriteSheet</strong>, <strong>BitmapSequence</strong>,
-	<strong>Shadow</strong>, and <strong>SpriteSheetUtils.flip()</strong>. Note that shadows are
+	Dev sample showing how to use <strong>SpriteSheet</strong>, <strong>BitmapAnimation</strong>,
+	<strong>Shadow</strong>, and <strong>SpriteSheetUtils.addFlippedFrames()</strong>. Note that shadows are
 	extremely expensive to render in most browsers.
 	</div>
 	<div class="canvasHolder">

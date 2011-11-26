@@ -143,7 +143,7 @@ var SpriteSheetUtils = function() {
 			src = frames[i];
 			var rect = src.rect.clone();
 			img = imgs[src.image.__tmp+il*count];
-			var frame = {image:img,rect:rect};
+			var frame = {image:img,rect:rect,regX:src.regX,regY:src.regY};
 			if (h) { rect.x = img.width-rect.x-rect.width; }
 			if (v) { rect.y = img.height-rect.y-rect.height; }
 			frames.push(frame);
