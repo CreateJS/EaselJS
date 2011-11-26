@@ -51,6 +51,8 @@ function handleImageLoad() {
 	var margins = blurFilter.getBounds();
 	bmp = bmp.clone();
 	bmp.filters = [blurFilter];
+	// filters are only displayed when the display object is cached
+	// later, you can call updateCache() to update changes to your filters
 	bmp.cache(margins.x,margins.y,img.width+margins.width,img.height+margins.height);
 	bmp.x += bmp.x+img.width;
 	stage.addChild(bmp);
@@ -76,8 +78,7 @@ function handleImageLoad() {
 	bmp.x = (canvas.width-2*img.width)/3;
 	stage.addChild(bmp);
 	
-	// we want to do some work before we update the canvas,
-	// otherwise we could use Ticker.addListener(stage);
+	// draw to the canvas:
 	stage.update();
 }
 
