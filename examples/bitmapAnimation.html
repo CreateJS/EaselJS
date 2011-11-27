@@ -26,7 +26,7 @@
 var canvas;
 var stage;
 
-var imgSeq = new Image();
+var img = new Image();
 var bmpAnimList;
 
 function init() {
@@ -35,14 +35,20 @@ function init() {
 	
 	// create a new stage and point it at our canvas:
 	stage = new Stage(canvas);
+	
+	img = new Image();
+	img.src = "img/testSeq.png";
+	img.onload = handleImageLoad;
+}
 
+function handleImageLoad(event) {
 	// grab canvas width and height for later calculations:
 	var w = canvas.width;
 	var h = canvas.height;
-
+	
 	// create spritesheet and assign the associated data.
 	var spriteSheet  = new SpriteSheet({
-		images: ["img/testSeq.png"],
+		images: [img],
 		frames: {width:64, height:68, regX:32, regY:34},
 		animations: {
 			walkUpRt:[0,19,"walkRt"],
@@ -56,7 +62,6 @@ function init() {
 	// instead, we append flipped versions of the frames to our sprite sheet
 	// this adds only horizontally flipped frames:
 	SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
-	console.log(spriteSheet.getFrame(82).regX)
 	
 	// we could rewire the "next" sequences to make them work like so:
 	// but instead we will use code in the angleChange function.
@@ -81,7 +86,7 @@ function init() {
 	bmpAnim.onAnimationEnd = angleChange;
 
 	// create a bunch of rats based on the first one, and place them on stage, and in our collection.
-	var l = 1;
+	var l = 50;
 	bmpAnimList = [];
 	for (var i=0; i<l; i++) {
 		bmpAnim.name = "rat"+i;
