@@ -23,11 +23,11 @@ var SOURCE_FILES = [
 	"../src/easeljs/display/Text.js",
 	"../src/easeljs/utils/SpriteSheetUtils.js",
 	"../src/easeljs/display/DOMElement.js",
-	"../src/easeljs/filters/Filter.js",
-	"../src/easeljs/filters/BoxBlurFilter.js",
-	"../src/easeljs/filters/ColorFilter.js",
-	"../src/easeljs/filters/ColorMatrixFilter.js",
-	"../src/easeljs/ui/Touch.js"
+	//"../src/easeljs/filters/Filter.js",
+	//"../src/easeljs/filters/BoxBlurFilter.js",
+	//"../src/easeljs/filters/ColorFilter.js",
+	//"../src/easeljs/filters/ColorMatrixFilter.js",
+	//"../src/easeljs/ui/Touch.js"
 ];
 
 // default name for lib output:

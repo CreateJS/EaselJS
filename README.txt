@@ -27,7 +27,7 @@ A nestable display container, which lets you aggregate display objects and manip
 Bitmap
 Draws an image, video or canvas to the canvas according to its display properties.
 
-BitmapSequence
+BitmapAnimation
 Displays animated or dynamic sprite sheets (images with multiple frames on a grid), and provides APIs for managing playback and sequencing.
 
 Shape
@@ -38,6 +38,12 @@ Provides an easy to use API for drawing vector data. Can be used with Shape, or 
 
 Text
 Renders a single line of text to the stage.
+
+DOMElement
+An experimental display object that allows you to manage an HTML element as a part of the display list.
+
+Filter
+The base filter class that other filters (ex. BoxBlurFilter, ColorMatrixFilter, etc) extend.
 
 
 There are also a few helper classes included:
@@ -52,10 +58,10 @@ UID
 Very simple class that provides global, incremental unique numeric IDs.
 
 SpriteSheetUtils
-Contains utility methods for extending existing sprite sheets with flipped frames, and for outputting/debugging frame data objects.
+Contains utility methods for extending existing sprite sheets with flipped frames and extracting individual frames.
 
 SpriteSheet
-Encapsulates all the data associated with a sprite sheet to be used with BitmapSequence.
+Encapsulates all the data associated with a sprite sheet to be used with BitmapAnimation.
 
 Matrix2D
 Represents a 3x3 affine transformation matrix. Used internally for calculating concatenated transformations.

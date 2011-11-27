@@ -209,7 +209,7 @@ var p = Stage.prototype = new Container();
 	 **/
 
 	/**
-	 * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapSequence)
+	 * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapAnimation)
 	 * and render its entire display list to the canvas.
 	 * @method update
 	 **/

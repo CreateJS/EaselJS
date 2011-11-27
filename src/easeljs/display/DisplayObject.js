@@ -237,7 +237,7 @@ var p = DisplayObject.prototype;
 	 * Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage.
 	 * This only applies if the enclosing stage has snapPixelsEnabled set to true, and the display object's composite
 	 * transform does not include any scaling, rotation, or skewing. The snapToPixel property is true by default for
-	 * Bitmap and BitmapSequence instances, and false for all other display objects.
+	 * Bitmap and BitmapAnimation instances, and false for all other display objects.
 	 * @property snapToPixel
 	 * @type Boolean
 	 * @default false
