@@ -19,6 +19,7 @@ Version 0.4 [Nov 29, 2011]
 - support for double click events (thanks to rbarazi)
 - added MouseEvent.nativeEvent and MouseEvent.target properties
 - fixes to Ticker, added second "paused" param when it calls tick
+- added experimental support for requestAnimationFrame to Ticker
 - fixed a problem with caching Container instances
 - fixed an issue with .parent not being assigned on children of cloned Containers
 - added filter support via DisplayObject.filters and Filter objects
@@ -31,7 +32,7 @@ Version 0.4 [Nov 29, 2011]
 - added support for passing an image URI to the Bitmap constructor
 - fixes to Shadow
 - optimizations
-- doc updates
+- documentation updates
 
 
 Version 0.3.2 [Mar 2, 2011]
