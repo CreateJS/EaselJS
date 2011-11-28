@@ -265,6 +265,10 @@ function buildSourceTask(completeHandler)
 			["--js_output_file", tmp_file]
 		);
 		
+	if(verbose)
+	{
+		print(cmd.join(" "));
+	}
 
 	CHILD_PROCESS.exec(
 		cmd.join(" "),
@@ -321,6 +325,11 @@ function buildDocsTask(version, completeHandler)
 		"-m", PROJECT_NAME,
 		"-u", PROJECT_URL
 	];
+	
+	if(verbose)
+	{
+		print(cmd.join(" "));
+	}	
 	
 	CHILD_PROCESS.exec(
 		cmd.join(" "),
