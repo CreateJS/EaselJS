@@ -1,4 +1,4 @@
-For building EaselJS, we use a custom build script written in node.js. It uses the following libraries:
+For building the compiled library and API documentation, we use a custom build script written in node.js. It uses the following libraries:
 
 * "Google Closure compiler":http://code.google.com/closure/compiler/docs/gettingstarted_app.html
 * "YUI Doc":http://developer.yahoo.com/yui/yuidoc/
@@ -14,7 +14,7 @@ YUI Doc requires that Python is installed on your system, along with the followi
 
 View the "YUI Doc":http://developer.yahoo.com/yui/yuidoc/ page for more information.
 
-YUI Doc and Google Closure are included in the EaselJS repository, which makes it easier to run the build, and ensures that we don't have version mismatches between the source and the libraries.
+YUI Doc and Google Closure are included in the repository, which makes it easier to run the build, and ensures that we don't have version mismatches between the source and the libraries.
 
 
 h2. Configuration
@@ -33,7 +33,7 @@ The easiest way to install the required modules is to first install "NPM":http:/
 
 h2. Building the Source
 
-<pre><code>Build Task Manager for EaselJS
+<pre><code>Build Task Manager
 Usage
 node ./build.js [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]
 
@@ -44,7 +44,7 @@ Options:
   --version      Document build version number                                                                      [string]
   --tasks        Task to run                                                                                        [default: "all"]
   -s, --source   Include specified file in compilation. Option can be specified multiple times for multiple files.
-  -o, --output   Name of minified JavaScript file.                                                                  [default: "easel.js"]
+  -o, --output   Name of minified JavaScript file.                                                                  [default: (set in config properties)]
 </code></pre>
 
 h3. Examples
