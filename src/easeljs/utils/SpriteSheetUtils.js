@@ -133,6 +133,9 @@ var SpriteSheetUtils = function() {
 			ctx.drawImage(src,0,0);
 			var img = new Image();
 			img.src = canvas.toDataURL("image/png");
+			// work around a strange bug in Safari:
+			img.width = src.width;
+			img.height = src.height;
 			imgs.push(img);
 		}
 		

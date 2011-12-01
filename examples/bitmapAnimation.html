@@ -13,11 +13,9 @@
 <script src="../src/easeljs/events/MouseEvent.js"></script>
 <script src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 <script src="../src/easeljs/display/SpriteSheet.js"></script>
-<script src="../src/easeljs/display/Shadow.js"></script>
 <script src="../src/easeljs/display/DisplayObject.js"></script>
 <script src="../src/easeljs/display/Container.js"></script>
 <script src="../src/easeljs/display/Stage.js"></script>
-<script src="../src/easeljs/display/Bitmap.js"></script>
 <script src="../src/easeljs/display/BitmapAnimation.js"></script>
 <script src="../src/easeljs/utils/Ticker.js"></script>
 <!-- End EaselJS Imports -->
@@ -77,10 +75,6 @@ function handleImageLoad(event) {
 
 	// start playing the first sequence:
 	bmpAnim.gotoAndPlay("walkRt");		//animate
-
-	// set up a shadow. Note that shadows are ridiculously expensive. You could display hundreds
-	// of animated rats if you disabled the shadow.
-	bmpAnim.shadow = new Shadow("#454", 0, 5, 4);
 
 	// the callback is called each time a sequence completes:
 	bmpAnim.onAnimationEnd = angleChange;
@@ -145,11 +139,10 @@ function angleChange(bmpAnim,animation) {
 <body onload="init();">
 	<div class="description">
 	Dev sample showing how to use <strong>SpriteSheet</strong>, <strong>BitmapAnimation</strong>,
-	<strong>Shadow</strong>, and <strong>SpriteSheetUtils.addFlippedFrames()</strong>. Note that shadows are
-	extremely expensive to render in most browsers.
+	and <strong>SpriteSheetUtils.addFlippedFrames()</strong>.
 	</div>
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="980" height="580" style="background-color:#607559"></canvas>
+		<canvas id="testCanvas" width="980" height="580" style="background-color:#AACCBB"></canvas>
 	</div>
 </body>
 </html>
