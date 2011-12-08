@@ -215,7 +215,7 @@ var p = SpriteSheet.prototype;
 				if (!img.getContext && !img.complete) {
 					this._loadCount++;
 					this.complete = false;
-					img.onload = this._handleImageLoad();
+					(function(o) { img.onload = function() { o._handleImageLoad(); } })(this);
 				}
 			}
 		}
