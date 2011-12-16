@@ -192,12 +192,12 @@ var p = Stage.prototype = new Container();
 	/**
 	 * Initialization method.
 	 * @method initialize
-	 * param {HTMLCanvasElement} canvas
+	 * param {HTMLCanvasElement} canvas A canvas object, or the string id of a canvas object in the current document.
 	 * @protected
 	 **/
 	p.initialize = function(canvas) {
 		this.Container_initialize();
-		this.canvas = canvas;
+		this.canvas = (canvas instanceof HTMLCanvasElement) ? canvas : document.getElementById(canvas);
 		this._enableMouseEvents(true);
 	}
 

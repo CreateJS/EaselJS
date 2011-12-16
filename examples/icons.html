@@ -21,21 +21,20 @@
 <!-- End EaselJS Imports -->
 
 <script>
-var canvas;
 var stage;
 
 var iconSheet = new Image();
 
 function init() {
 	//find canvas and load images, wait for last image to load
-	canvas = document.getElementById("testCanvas");
 	iconSheet.onload = handleImageLoad;
 	iconSheet.src = "img/icons.png";
 }
 
 function handleImageLoad() {
 	// create a new stage and point it at our canvas:
-	stage = new Stage(canvas);
+	// note that we can just pass the id of the canvas:
+	stage = new Stage("testCanvas");
 	
 	/*** FIRST: the "simple" approach ***/
 	// create a simple SpriteSheet using iconSheet with a frame size of 80x80:
