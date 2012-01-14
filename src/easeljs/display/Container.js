@@ -312,7 +312,7 @@ var p = Container.prototype = new DisplayObject();
 	}
 	
 	/**
-	 * Changes the depth of the specified child.
+	 * Changes the depth of the specified child. Fails silently if the child is not a child of this container, or the index is out of range.
 	 * @param child
 	 * @param index
 	 * @method setChildIndex
