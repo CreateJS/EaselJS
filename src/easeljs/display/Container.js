@@ -276,6 +276,57 @@ var p = Container.prototype = new DisplayObject();
 	p.getNumChildren = function() {
 		return this.children.length;
 	}
+	
+	/**
+	 * Swaps the children at the specified indexes. Fails silently if either index is out of range.
+	 * @param index1
+	 * @param index2
+	 * @method swapChildrenAt
+	 **/
+	p.swapChildrenAt = function(index1, index2) {
+		var kids = this.children;
+		var o1 = kids[index1];
+		var o2 = kids[index2];
+		if (!o1 || !o2) { return; } // TODO: throw error?
+		kids[index1] = o2;
+		kids[index2] = o1;
+	}
+	
+	/**
+	 * Swaps the specified children's depth in the display list. Fails silently if either child is not a child of this Container.
+	 * @param child1
+	 * @param child2
+	 * @method swapChildren
+	 **/
+	p.swapChildren = function(child1, child2) {
+		var kids = this.children;
+		var index1,index2;
+		for (var i=0,l=kids.length;i<l;i++) {
+			if (kids[i] == child1) { index1 = i; }
+			if (kids[i] == child2) { index2 = i; }
+			if (index1 != null && index2 != null) { return; }
+		}
+		if (i==l) { return; } // TODO: throw error?
+		kids[index1] = child2;
+		kids[index2] = child1;
+	}
+	
+	/**
+	 * Changes the depth of the specified child.
+	 * @param child
+	 * @param index
+	 * @method setChildIndex
+	 **/
+	p.setChildIndex = function(child, index) {
+		var kids = this.children;
+		for (var i=0,l=kids.length;i<l;i++) {
+			if (kids[i] == child) { break; }
+		}
+		if (i==l || index < 0 || index > l || i == index) { return; }
+		kids.splice(index,1);
+		if (index<i) { i--; }
+		kids.splice(child,i,0); // TODO: test.
+	}
 
 	/**
 	 * Returns true if the specified display object either is this container or is a descendent.
