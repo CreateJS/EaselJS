@@ -53,6 +53,7 @@ var p = Stage.prototype = new Container();
 	/**
 	 * @property _snapToPixelEnabled
 	 * @protected
+	 * @static
 	 * @type Boolean
 	 * @default false
 	 **/
@@ -217,7 +218,7 @@ var p = Stage.prototype = new Container();
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-		if (this.tickOnUpdate) { this._tick(); }
+		if (this.tickOnUpdate) { this._tick(true); }
 		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(this._matrix));
 	}
 

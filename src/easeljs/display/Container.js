@@ -235,7 +235,8 @@ var p = Container.prototype = new DisplayObject();
 	 * @method removeAllChildren
 	 **/
 	p.removeAllChildren = function() {
-		while (this.children.length) { this.removeChildAt(0); }
+		for (var i=0,l=kids.length;i<l;i++) { kids[i].parent = null; }
+		this.children = [];
 	}
 
 	/**
@@ -424,12 +425,12 @@ var p = Container.prototype = new DisplayObject();
 	 * @method _tick
 	 * @protected
 	 **/
-	p._tick = function() {
+	p._tick = function(advance) {
 		for (var i=this.children.length-1; i>=0; i--) {
 			var child = this.children[i];
-			if (child._tick) { child._tick(); }
-			if (child.tick) { child.tick(); }
+			if (child._tick) { child._tick(advance); }
 		}
+		if (this.tick) { this.tick(); }
 	}
 
 	/**
