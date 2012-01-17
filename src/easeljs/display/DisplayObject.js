@@ -675,6 +675,16 @@ var p = DisplayObject.prototype;
 		ctx.shadowOffsetY = shadow.offsetY;
 		ctx.shadowBlur = shadow.blur;
 	}
+	
+	
+	/**
+	 * @method _tick
+	 * @protected
+	 * @param Boolean advance Indicates whether any related animations should advance.
+	 **/
+	p._tick = function(advance) {
+		if (this.tick) { this.tick(); }
+	}
 
 	/**
 	 * @method _testHit
