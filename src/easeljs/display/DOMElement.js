@@ -97,7 +97,7 @@ var p = DOMElement.prototype = new DisplayObject();
 		if (htmlElement) {
 			this._style = htmlElement.style;
 			this._style.position = "absolute";
-			this._style.transformOrigin = this._style.webkitTransformOrigin = this._style.MozTransformOrigin = "0% 0%";
+			this._style.transformOrigin = this._style.webkitTransformOrigin = this._style.msTransformOrigin = this._style.MozTransformOrigin = "0% 0%";
 		}
 	}
 
@@ -132,7 +132,7 @@ var p = DOMElement.prototype = new DisplayObject();
 		o.style.opacity = ""+mtx.alpha;
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
 		o.style.visibility = this.visible ? "visible" : "hidden";
-		o.style.transform = o.style.webkitTransform = o.style.oTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,mtx.tx,mtx.ty+")"].join(",");
+		o.style.transform = o.style.webkitTransform = o.style.oTransform =  o.style.msTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,mtx.tx,mtx.ty+")"].join(",");
 		o.style.MozTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,mtx.tx+"px",mtx.ty+"px)"].join(",");
 		return true;
 	}
