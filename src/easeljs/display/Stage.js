@@ -218,7 +218,11 @@ var p = Stage.prototype = new Container();
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-		if (this.tickOnUpdate) { this._tick(true); }
+		if (this.tickOnUpdate) {
+			if (this.tick == this.update) { var t=1; this.tick = null; }
+			this._tick(true);
+			if (t) { this.tick = this.update; }
+		}
 		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(this._matrix));
 	}
 
