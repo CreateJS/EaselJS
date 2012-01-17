@@ -335,6 +335,15 @@ var p = Stage.prototype = new Container();
 		return "[Stage (name="+  this.name +")]";
 	}
 
+    /** 
+     * Returns a rectangle with values of the canvas element
+     * @method getBounds
+     * @return {Rectangle} a rectangle object.
+     **/
+    p.getBounds = function() {
+        return new Rectangle( this.canvas.offsetLeft, this.canvas.offsetTop, this.canvas.offsetWidth, this.canvas.offsetHeight );  
+    }   
+
 	// private methods:
 
 	/**
