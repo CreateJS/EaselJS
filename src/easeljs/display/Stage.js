@@ -198,7 +198,7 @@ var p = Stage.prototype = new Container();
 	 **/
 	p.initialize = function(canvas) {
 		this.Container_initialize();
-		this.canvas = (canvas instanceof HTMLCanvasElement) ? canvas : document.getElementById(canvas);
+		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
 		this._enableMouseEvents(true);
 	}
 
@@ -349,12 +349,20 @@ var p = Stage.prototype = new Container();
 	 **/
 	p._enableMouseEvents = function() {
 		var o = this;
-		var evtTarget = window.addEventListener ? window : document;
-		evtTarget.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
-		evtTarget.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
-		evtTarget.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
-		// this is to facilitate extending Stage:
-		if (this.canvas) { this.canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false); }
+		var evtTarget = window;
+		var attachMethod = "addEventListener";
+		var evtPrefix = "";
+		if ( !window.addEventListener ) {
+			evtTarget = document;
+			if ( !document.addEventListener ) {
+				attachMethod = "attachEvent";
+				evtPrefix = "on";
+			}
+		}
+		evtTarget[attachMethod](evtPrefix+"mouseup", function(e) { o._handleMouseUp(e); }, false);
+		evtTarget[attachMethod](evtPrefix+"mousemove", function(e) { o._handleMouseMove(e); }, false);
+		evtTarget[attachMethod](evtPrefix+"dblclick", function(e) { o._handleDoubleClick(e); }, false);
+		if (this.canvas) { this.canvas[attachMethod](evtPrefix+"mousedown", function(e) { o._handleMouseDown(e); }, false); }
 	}
 
 	/**

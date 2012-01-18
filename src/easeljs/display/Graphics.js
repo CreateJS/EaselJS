@@ -168,7 +168,7 @@ var p = Graphics.prototype;
 	 * @protected
 	 * @type CanvasRenderingContext2D
 	 **/
-	Graphics._ctx = document.createElement("canvas").getContext("2d");
+	Graphics._ctx = EaselJS.createCanvas().getContext("2d");
 	
 	/**
 	 * @property beginCmd

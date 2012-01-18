@@ -61,7 +61,7 @@ var p = Text.prototype = new DisplayObject();
 	 * @type CanvasRenderingContext2D
 	 * @private
 	 **/
-	Text._workingContext = document.createElement("canvas").getContext("2d");
+	Text._workingContext = EaselJS.createCanvas().getContext("2d");
 
 // public properties:
 	/**
