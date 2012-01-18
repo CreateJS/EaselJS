@@ -64,7 +64,7 @@ var p = DisplayObject.prototype;
 	 * @static
 	 * @protected
 	 **/
-	DisplayObject._hitTestCanvas = document.createElement("canvas");
+	DisplayObject._hitTestCanvas = EaselJS.createCanvas();
 	DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
 
 	/**
@@ -413,7 +413,7 @@ var p = DisplayObject.prototype;
 	 **/
 	p.cache = function(x, y, width, height) {
 		// draw to canvas.
-		if (this.cacheCanvas == null) { this.cacheCanvas = document.createElement("canvas"); }
+		if (this.cacheCanvas == null) { this.cacheCanvas = EaselJS.createCanvas(); }
 		var ctx = this.cacheCanvas.getContext("2d");
 		this.cacheCanvas.width = width;
 		this.cacheCanvas.height = height;

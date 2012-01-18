@@ -5,6 +5,7 @@ CONFIGURATION
 */
 // listing of all source files, with dependencies listed in order:
 var SOURCE_FILES = [
+	"../src/easeljs/EaselJS.js",
 	"../src/easeljs/utils/UID.js",
 	"../src/easeljs/utils/Ticker.js",
 	"../src/easeljs/events/MouseEvent.js",

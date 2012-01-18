@@ -134,6 +134,10 @@ var p = DOMElement.prototype = new DisplayObject();
 		o.style.visibility = this.visible ? "visible" : "hidden";
 		o.style.transform = o.style.webkitTransform = o.style.oTransform =  o.style.msTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,mtx.tx,mtx.ty+")"].join(",");
 		o.style.MozTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,mtx.tx+"px",mtx.ty+"px)"].join(",");
+		if ( o.filters ) {
+			o.style.marginLeft = mtx.tx+"px";
+			o.style.marginTop = mtx.ty+"px";
+		}
 		return true;
 	}
 

@@ -56,7 +56,7 @@ var SpriteSheetUtils = function() {
 	 * @type HTMLCanvasElement
 	 * @protected
 	*/
-	SpriteSheetUtils._workingCanvas = document.createElement("canvas");
+	SpriteSheetUtils._workingCanvas = EaselJS.createCanvas();
 
 	/**
 	 * @property _workingContext
