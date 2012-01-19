@@ -235,8 +235,8 @@ var p = Container.prototype = new DisplayObject();
 	 * @method removeAllChildren
 	 **/
 	p.removeAllChildren = function() {
-		for (var i=0,l=kids.length;i<l;i++) { kids[i].parent = null; }
-		this.children = [];
+		var kids = this.children;
+		while (kids.length) { kids.pop().parent = null; }
 	}
 
 	/**
