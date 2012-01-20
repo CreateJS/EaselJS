@@ -153,6 +153,7 @@ var p = Container.prototype = new DisplayObject();
 	 * @return {DisplayObject} The child that was added, or the last child if multiple children were added.
 	 **/
 	p.addChild = function(child) {
+		if (child == null) { return child; }
 		var l = arguments.length;
 		if (l > 1) {
 			for (var i=0; i<l; i++) { this.addChild(arguments[i]); }
