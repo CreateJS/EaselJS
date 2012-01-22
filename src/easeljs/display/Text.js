@@ -307,7 +307,10 @@ var p = Text.prototype = new DisplayObject();
 	 **/
 	p._drawTextLine = function(ctx, text, y) {
 		if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth); }
-		else { ctx.fillText(text, 0, y, this.maxWidth); }
+		else {
+			if(this.maxWidth != null) { ctx.fillText(text, 0, y, this.maxWidth); }
+			else { ctx.fillText(text, 0, y); }
+		}
 	}
 
 window.Text = Text;
