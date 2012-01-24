@@ -75,6 +75,13 @@ var p = DisplayObject.prototype;
 	 **/
 	DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
 
+	/**
+	 * @property _nextCacheID
+	 * @type Number
+	 * @static
+	 * @protected
+	 **/
+	DisplayObject._nextCacheID = 1;
 
 	/**
 	 * The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque.
@@ -423,7 +430,7 @@ var p = DisplayObject.prototype;
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
 		this._applyFilters();
-		this.cacheID++;
+		this.cacheID = DisplayObject._nextCacheID++;
 	}
 
 	/**
@@ -444,7 +451,7 @@ var p = DisplayObject.prototype;
 		this.draw(ctx, true);
 		if (compositeOperation) { ctx.globalCompositeOperation = "source-over"; }
 		this._applyFilters();
-		this.cacheID++;
+		this.cacheID = DisplayObject._nextCacheID++;
 	}
 
 	/**
@@ -453,7 +460,7 @@ var p = DisplayObject.prototype;
 	 **/
 	p.uncache = function() {
 		this._cacheDataURL = this.cacheCanvas = null;
-		this._cacheOffsetX = this._cacheOffsetY = 0;
+		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = 0;
 	}
 	
 	/**
