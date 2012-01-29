@@ -5,7 +5,7 @@ var Canvas    = require('canvas');
 var Image               = Canvas.Image;
 var Stage               = Easel.Stage;
 var SpriteSheet         = Easel.SpriteSheet;
-var BitmapSequence      = Easel.BitmapSequence;
+var BitmapAnimation     = Easel.BitmapAnimation;
 
 var canvas;
 var stage;
@@ -22,35 +22,52 @@ function init() {
 function handleImageLoad() {
 	// create a new stage and point it at our canvas:
 	stage = new Stage(canvas);
-	
+
+	    console.log(1);
+
 	/*** FIRST: the "simple" approach ***/
 	// create a simple SpriteSheet with a frame size of 80x80 and no frameData:
-	var spriteSheet  = new SpriteSheet(iconSheet, 80, 80);
-	
-	// create a BitmapSequence to display frames from the sprite sheet:
-	var icon1 = new BitmapSequence(spriteSheet);
+
+	    console.log(1);
+    var data = {images:[iconSheet], frames:{width:80, height:80}};
+
+        console.log(1);
+	var spriteSheet  = new SpriteSheet(data);
+
+	    console.log(1);
+
+	// create a BitmapAnimation to display frames from the sprite sheet:
+	var icon1 = new BitmapAnimation(spriteSheet);
 	icon1.y = 100;
 	icon1.x = 90;
-	
+
+	    console.log(1);
+
 	// because we didn't specify frameData, we have to reference frames by number:
 	icon1.gotoAndStop(2);
 	stage.addChild(icon1);
-	
+
 	// we'll clone icon1 to save a little work:
 	var icon2 = icon1.clone();
 	icon2.x += 120;
 	icon2.gotoAndStop(5);
 	stage.addChild(icon2);
-	
-	
-	
+
+
+        console.log(1);
+
+
 	/*** NEXT: the more robust approach ***/
 	// define frameData describing the available icons:
 	// we can use the form {frameName:frameNumber} instead of {frameName:[startFrame,endFrame]} because each "sequence" is only a single frame:
-	var frameData = {trash:0, male:1, wait:2, library:3, female:4, hanger:5, stairs:6, noparking:7};
-	
+    var data = {
+   		images:[iconSheet],
+   		frames:{width:80, height:80},
+   		animations: {trash:0, male:1, wait:2, library:3, female:4, hanger:5, stairs:6, noparking:7}
+   	}
+
 	// create a SpriteSheet using the frameData:
- 	spriteSheet = new SpriteSheet(iconSheet, 80, 80, frameData);
+    spriteSheet = new SpriteSheet(data);
  	
  	// we'll clone icon2, to preserve the x/y, and swap out the SpriteSheet:
  	var icon3 = icon2.clone();

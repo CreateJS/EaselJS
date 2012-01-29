@@ -37,6 +37,9 @@
 // Node.js-ification
 if (typeof module !== 'undefined' && module.exports) {
     var window = module.exports;
+    var Canvas      = require('canvas');
+    var Image       = Canvas.Image;
+    var Rectangle   = require('../geom/Rectangle').Rectangle;
 }
 
 (function(window) {
@@ -117,7 +120,7 @@ if (typeof module !== 'undefined' && module.exports) {
 &#9;frames: {frameWidth:50, frameHeight:50},
 &#9;animations: {run:[0,4], jump:[5,8,"run"]}
 }</code></pre>
- 
+
  * @class SpriteSheet
  * @constructor
  * @param data
@@ -134,63 +137,63 @@ var p = SpriteSheet.prototype;
 	 * @type Boolean
 	 **/
 	p.complete = true;
-	
+
 // private properties:
 	/**
 	 * @property _animations
 	 * @protected
 	 **/
 	p._animations = null;
-	
+
 	/**
 	 * @property _frames
 	 * @protected
 	 **/
 	p._frames = null;
-	
+
 	/**
 	 * @property _images
 	 * @protected
 	 **/
 	p._images = null;
-	
+
 	/**
 	 * @property _data
 	 * @protected
 	 **/
 	p._data = null;
-	
+
 	/**
 	 * @property _loadCount
 	 * @protected
 	 **/
 	p._loadCount = 0;
-	
+
 	// only used for simple frame defs:
 	/**
 	 * @property _frameHeight
 	 * @protected
 	 **/
 	p._frameHeight = 0;
-	
+
 	/**
 	 * @property _frameWidth
 	 * @protected
 	 **/
 	p._frameWidth = 0;
-	
+
 	/**
 	 * @property _numFrames
 	 * @protected
 	 **/
 	p._numFrames = 0;
-	
+
 	/**
 	 * @property _regX
 	 * @protected
 	 **/
 	p._regX = 0;
-	
+
 	/**
 	 * @property _regY
 	 * @protected
@@ -205,13 +208,14 @@ var p = SpriteSheet.prototype;
 	p.initialize = function(data) {
 		var i,l,o,a;
 		if (data == null) { return; }
-		
+
 		// parse images:
 		if (data.images && (l=data.images.length) > 0) {
 			a = this._images = [];
 			for (i=0; i<l; i++) {
 				var img = data.images[i];
 				if (!(img instanceof Image)) {
+                    console.log(8);
 					var src = img;
 					img = new Image();
 					img.src = src;

@@ -36,9 +36,10 @@
 
 // Node.js-ification
 if (typeof module !== 'undefined' && module.exports) {
-    var Container = require('./Container').Container;
-    var Canvas    = require('canvas');
-    var window    = module.exports;
+    var Container         = require('./Container').Container;
+    var Canvas            = require('canvas');
+    var HTMLCanvasElement = Canvas;
+    var window            = module.exports;
     document  = {
         createElement: function() {
             return new Canvas();

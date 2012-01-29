@@ -47,6 +47,13 @@ if (typeof module !== 'undefined' && module.exports) {
             return new Canvas();
         }
     };
+
+    Canvas.prototype.cloneNode = function(deep) {
+        var cloned = new Canvas(this.width, this.height);
+        var ctx    = cloned.getContext('2d');
+        ctx.drawImage(this, 0, 0, this.width, this.height);
+        return cloned;
+    }
 }
 
 (function(window) {

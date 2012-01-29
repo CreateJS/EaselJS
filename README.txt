@@ -69,5 +69,8 @@ Represents a 3x3 affine transformation matrix. Used internally for calculating c
 Rectangle & Point
 Represent geometric data.
 
+Node.JS
+Works with Node.JS.  Look in the examples/node directory for usage examples.
+
 
 Have a look at the included examples and API documentation for more in-depth information.
