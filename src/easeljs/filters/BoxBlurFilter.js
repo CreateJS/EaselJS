@@ -74,33 +74,33 @@ var p = BoxBlurFilter.prototype = new Filter();
 
 // public methods:
 	/**
-	* Returns a rectangle with values indicating the margins required to draw the filter.
-	* For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
-	* (but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0).
-	* @method getBounds
-	* @return {Rectangle} a rectangle object indicating the margins required to draw the filter.
-	**/
+	 * Returns a rectangle with values indicating the margins required to draw the filter.
+	 * For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
+	 * (but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0).
+	 * @method getBounds
+	 * @return {Rectangle} a rectangle object indicating the margins required to draw the filter.
+	 **/
 	p.getBounds = function() {
 		// TODO: this doesn't properly account for blur quality.
 		return new Rectangle(-this.blurX,-this.blurY,2*this.blurX,2*this.blurY);
 	}
 
 	/**
-	* Applies the filter to the specified context.
-	* @method applyFilter
-	* @param ctx The 2D context to use as the source.
-	* @param x The x position to use for the source rect.
-	* @param y The y position to use for the source rect.
-	* @param width The width to use for the source rect.
-	* @param height The height to use for the source rect.
-	* @param targetCtx Optional. The 2D context to draw the result to. Defaults to the context passed to ctx.
-	* @param targetX Optional. The x position to draw the result to. Defaults to the value passed to x.
-	* @param targetY Optional. The y position to draw the result to. Defaults to the value passed to y.
-	**/
+	 * Applies the filter to the specified context.
+	 * @method applyFilter
+	 * @param ctx The 2D context to use as the source.
+	 * @param x The x position to use for the source rect.
+	 * @param y The y position to use for the source rect.
+	 * @param width The width to use for the source rect.
+	 * @param height The height to use for the source rect.
+	 * @param targetCtx Optional. The 2D context to draw the result to. Defaults to the context passed to ctx.
+	 * @param targetX Optional. The x position to draw the result to. Defaults to the value passed to x.
+	 * @param targetY Optional. The y position to draw the result to. Defaults to the value passed to y.
+	 **/
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
 		targetCtx = targetCtx || ctx;
-		if (targetX = null) { targetX = x; }
-		if (targetY = null) { targetY = y; }
+		if (targetX == null) { targetX = x; }
+		if (targetY == null) { targetY = y; }
 		try {
 			var imageData = ctx.getImageData(x, y, width, height);
 		} catch(e) {
@@ -230,15 +230,15 @@ var p = BoxBlurFilter.prototype = new Filter();
 	}
 
 	/**
-	* Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are reverted to their defaults (for example .parent).
-	**/
+	 * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are reverted to their defaults (for example .parent).
+	 **/
 	p.clone = function() {
 		return new BoxBlurFilter(this.blurX, this.blurY, this.quality);
 	}
 
 	/**
-	* Returns a string representation of this object.
-	**/
+	 * Returns a string representation of this object.
+	 **/
 	p.toString = function() {
 		return "[BoxBlurFilter (name="+  this.name +")]";
 	}

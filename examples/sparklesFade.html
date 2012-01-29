@@ -17,7 +17,7 @@
 <script src="../src/easeljs/display/Container.js"></script>
 <script src="../src/easeljs/display/Stage.js"></script>
 <script src="../src/easeljs/display/Bitmap.js"></script>
-<script src="../src/easeljs/display/BitmapSequence.js"></script>
+<script src="../src/easeljs/display/BitmapAnimation.js"></script>
 <script src="../src/easeljs/display/Graphics.js"></script>
 <script src="../src/easeljs/display/Shape.js"></script>
 <script src="../src/easeljs/utils/Ticker.js"></script>
@@ -28,7 +28,7 @@ var canvas;
 var stage;
 
 var imgSeq = new Image();		// The image for the sparkle animation
-var bmpSeq;						// The animated sparkle template to clone
+var bmpAnim;						// The animated sparkle template to clone
 
 function init() {
 	// create a new stage and point it at our canvas:
@@ -49,19 +49,23 @@ function handleImageLoad() {
 	// create a semi-opaque black rectangle that covers the full stage.
 	// drawing this to stage each tick will cause the canvas to fade to black.
 	var shape = new Shape(new Graphics().beginFill('#000').drawRect(0,0,canvas.width+1,canvas.height));
-	shape.alpha = 0.33;
+	shape.alpha = 0.25;
 	stage.addChild(shape);
 
 	// this prevents the stage from automatically clearing itself each tick.
 	// in this demo, it results in the star trails, as the previous draws remain on screen.
 	stage.autoClear = false;
 
-	// this instance will be cloned as needed to create new sparkles.
-	// note that we are using a simple SpriteSheet with no frameData.
-	// by default, it will loop through all of the frames in the image.
-	bmpSeq = new BitmapSequence(new SpriteSheet(imgSeq,21,23));
-	bmpSeq.regX = bmpSeq.frameWidth/2|0;
-	bmpSeq.regY = bmpSeq.frameHeight/2|0;
+	// define simple sprite sheet data specifying the image(s) to use, the size of the frames,
+	// and the registration point of the frame
+	// it will auto-calculate the number of frames from the image dimensions and loop them
+	var data = {
+		images: ["img/sparkle_21x23.png"],
+		frames: {width:21,height:23,regX:10,regY:11}
+	}
+	
+	// set up an animation instance, which we will clone
+	bmpAnim = new BitmapAnimation(new SpriteSheet(data));
 
 	// start the tick and point it at the window so we can do some work before updating the stage:
 	Ticker.addListener(window);
@@ -117,7 +121,7 @@ function addSparkles(count, x, y, speed) {
 	//create the specified number of sparkles
 	for (var i=0; i<count; i++) {
 		// clone the original sparkle, so we don't need to set shared properties:
-		var sparkle = bmpSeq.clone();
+		var sparkle = bmpAnim.clone();
 
 		// set display properties:
 		sparkle.x = x;
@@ -136,7 +140,7 @@ function addSparkles(count, x, y, speed) {
 		sparkle.vA = -Math.random()*0.05-0.01; // alpha
 
 		// start the animation on a random frame:
-		sparkle.currentFrame = Math.random()*12|0;
+		sparkle.gotoAndPlay(Math.random()*sparkle.spriteSheet.getNumFrames()|0);
 
 		// add to the display list:
 		stage.addChild(sparkle);

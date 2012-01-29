@@ -1,19 +1,45 @@
-Version 0.3.3 [NOT RELEASED]
+Version 0.4.1 [Not released]
 ****************************************************************************************************
+- fixed a problem with preloading sprite sheet images when using tile based sheets
+- worked around a bug in Safari with addFlippedFrames
+- added setChildIndex(), swapChildrenAt(), and swapChildren() to Container
+
+
+Version 0.4 [Nov 30, 2011] 
+****************************************************************************************************
+- completely rewrote BitmapSequence (now BitmapAnimation) & SpriteSheet including data format
+	- BitmapSequence was renamed BitmapAnimation
+	- SpriteSheet now handles calculating frame rects
+	- support for multi-image sprite sheets
+	- support for variable frame sizes
+	- support for frame reuse (non-linear frame order)
+	- support for frame registration points
+	- SpriteSheet supports URIs as sources (and will handle preloading)
+- rewrote SpriteSheetUtils to support SpriteSheet changes
+	- renamed .flip() to .addFlippedFrames() and changed functionality significantly
+	- removed .frameDataToString()
+- fixed support for video sources in Bitmap
+- added support for null canvas for Stage
+- added DOMElement, an experimental display object for including DOM elements in the display list
+- separated tick and draw into separate phases to fix possible race conditions
+- added Matrix2D.isIdentity()
 - support for double click events (thanks to rbarazi)
 - added MouseEvent.nativeEvent and MouseEvent.target properties
-- fixes to Ticker
+- fixes to Ticker, added second "paused" param when it calls tick
+- added experimental support for requestAnimationFrame to Ticker
 - fixed a problem with caching Container instances
-- fixed an issue with .parent not being assigned on children of cloned containers
+- fixed an issue with .parent not being assigned on children of cloned Containers
 - added filter support via DisplayObject.filters and Filter objects
-- added sample filters: ColorFilter, ColorMatrixFilter, and BoxBlurFilter
+	- added sample filters: ColorFilter, ColorMatrixFilter, and BoxBlurFilter
 - added DisplayObject.setTransform()
 - added DisplayObject.onDoubleClick handler (thanks to rbarazi)
+- added DisplayObject.cacheID and DisplayObject.getCacheDataURL()
 - performance optimization for DisplayObject drawing (6910e6849856bd0740f8)
 - added support for touch input (single point) via the Touch class
 - added support for passing an image URI to the Bitmap constructor
+- fixes to Shadow
 - optimizations
-- doc updates
+- documentation updates
 
 
 Version 0.3.2 [Mar 2, 2011]

@@ -54,126 +54,141 @@ if (typeof module !== 'undefined' && module.exports) {
 var Ticker = function() {
 	throw "Ticker cannot be instantiated.";
 }
-	
-	Ticker.useInterval = true;
+
+// public static properties:
+	/**
+	 * Indicates whether Ticker should use requestAnimationFrame if it is supported in the browser. If false, Ticker
+	 * will use setTimeout. If you change this value, you must call setInterval or setFPS to reinitialize the Ticker.
+	 * @property useRAF
+	 * @static
+	 * @type Boolean
+	 **/
+	Ticker.useRAF = null;
 	
 	/**
-	* Event broadcast  once each tick / interval. The interval is specified via the 
-	* .setInterval(ms) or setFPS methods.
-	* @event tick
-	* @param {Number} timeElapsed The time elapsed in milliseconds since the last tick event.
+	 * Event broadcast  once each tick / interval. The interval is specified via the 
+	 * .setInterval(ms) or setFPS methods.
+	 * @event tick
+	 * @param {Number} timeElapsed The time elapsed in milliseconds since the last tick event.
 	*/	
 	
 // private static properties:
 
 	
 	/** 
-	* @property _listeners
-	* @type Array[Object]
-	* @protected 
-	**/
+	 * @property _listeners
+	 * @type Array[Object]
+	 * @protected 
+	 **/
 	Ticker._listeners = null;
 	
 	/** 
-	* @property _pauseable
-	* @type Array[Boolean]
-	* @protected 
-	**/
+	 * @property _pauseable
+	 * @type Array[Boolean]
+	 * @protected 
+	 **/
 	Ticker._pauseable = null;
 	
 	/** 
-	* @property _paused
-	* @type Boolean
-	* @protected 
-	**/
+	 * @property _paused
+	 * @type Boolean
+	 * @protected 
+	 **/
 	Ticker._paused = false;
 	
 	/** 
-	* @property _inited
-	* @type Boolean
-	* @protected 
-	**/
+	 * @property _inited
+	 * @type Boolean
+	 * @protected 
+	 **/
 	Ticker._inited = false;
 	
 	/** 
-	* @property _startTime
-	* @type Number
-	* @protected 
-	**/
+	 * @property _startTime
+	 * @type Number
+	 * @protected 
+	 **/
 	Ticker._startTime = 0;
 	
 	/** 
-	* @property _pausedTime
-	* @type Number
-	* @protected 
-	**/
+	 * @property _pausedTime
+	 * @type Number
+	 * @protected 
+	 **/
 	Ticker._pausedTime=0;
 	
 	/** 
-	* Number of ticks that have passed
-	* @property _ticks
-	* @type Number
-	* @protected 
-	**/
+	 * Number of ticks that have passed
+	 * @property _ticks
+	 * @type Number
+	 * @protected 
+	 **/
 	Ticker._ticks = 0;
 	
 	/**
-	* Number of ticks that have passed while Ticker has been paused
-	* @property _pausedTickers
-	* @type Number
-	* @protected 
-	**/
+	 * Number of ticks that have passed while Ticker has been paused
+	 * @property _pausedTickers
+	 * @type Number
+	 * @protected 
+	 **/
 	Ticker._pausedTickers = 0;
 	
 	/** 
-	* @property _interval
-	* @type Number
-	* @protected 
-	**/
+	 * @property _interval
+	 * @type Number
+	 * @protected 
+	 **/
 	Ticker._interval = 50; // READ-ONLY
 	
 	/** 
-	* @property _lastTime
-	* @type Number
-	* @protected 
-	**/
+	 * @property _lastTime
+	 * @type Number
+	 * @protected 
+	 **/
 	Ticker._lastTime = 0;
 	
 	/** 
-	* @property _times
-	* @type Array[Number]
-	* @protected 
-	**/
+	 * @property _times
+	 * @type Array[Number]
+	 * @protected 
+	 **/
 	Ticker._times = null;
 	
 	/** 
-	* @property _tickTimes
-	* @type Array[Number]
-	* @protected 
-	**/
+	 * @property _tickTimes
+	 * @type Array[Number]
+	 * @protected 
+	 **/
 	Ticker._tickTimes = null;
 	
 	/** 
-	* @property _rafActive
-	* @type Boolean
-	* @protected 
-	**/
+	 * @property _rafActive
+	 * @type Boolean
+	 * @protected 
+	 **/
 	Ticker._rafActive = false;
+	
+	/** 
+	 * @property _timeoutID
+	 * @type Number
+	 * @protected 
+	 **/
+	Ticker._timeoutID = null;
 	
 	
 // public static methods:
 	/**
-	* Adds a listener for the tick event. The listener object must expose a .tick() method, 
-	* which will be called once each tick / interval. The interval is specified via the 
-	* .setInterval(ms) method.
-	* The exposed tick method is passed a single parameter, which include the elapsed time between the 
-	* previous tick and the current one.
-	* @method addListener
-	* @static
-	* @param {Object} o The object to add as a listener.
-	* @param {Boolean} pauseable If false, the listener will continue to have tick called 
-	* even when Ticker is paused via Ticker.pause(). Default is true.
-	**/
+	 * Adds a listener for the tick event. The listener object must expose a .tick() method, 
+	 * which will be called once each tick / interval. The interval is specified via the 
+	 * .setInterval(ms) method.
+	 * The exposed tick method is passed two parameters: the elapsed time between the 
+	 * previous tick and the current one, and a boolean indicating whether Ticker is paused.
+	 * @method addListener
+	 * @static
+	 * @param {Object} o The object to add as a listener.
+	 * @param {Boolean} pauseable If false, the listener will continue to have tick called 
+	 * even when Ticker is paused via Ticker.pause(). Default is true.
+	 **/
 	Ticker.addListener = function(o, pauseable) {
 		if (!Ticker._inited) { Ticker.init(); }
 		Ticker.removeListener(o);
@@ -182,11 +197,11 @@ var Ticker = function() {
 	}
 	
 	/**
-	* Initializes or resets the timer, clearing all associated listeners and fps measuring data, starting the tick.
-	* This is called automatically when the first listener is added.
-	* @method init
-	* @static
-	**/
+	 * Initializes or resets the timer, clearing all associated listeners and fps measuring data, starting the tick.
+	 * This is called automatically when the first listener is added.
+	 * @method init
+	 * @static
+	 **/
 	Ticker.init = function() {
 		Ticker._inited = true;
 		Ticker._times = [];
@@ -198,11 +213,11 @@ var Ticker = function() {
 	}
 	
 	/**
-	* Removes the specified listener.
-	* @method removeListener
-	* @static
-	* @param {Object} o The object to remove from listening from the tick event.
-	**/
+	 * Removes the specified listener.
+	 * @method removeListener
+	 * @static
+	 * @param {Object} o The object to remove from listening from the tick event.
+	 **/
 	Ticker.removeListener = function(o) {
 		if (Ticker._listeners == null) { return; }
 		var index = Ticker._listeners.indexOf(o);
@@ -213,78 +228,80 @@ var Ticker = function() {
 	}
 	
 	/**
-	* Removes all listeners.
-	* @method removeAllListeners
-	* @static
-	**/
+	 * Removes all listeners.
+	 * @method removeAllListeners
+	 * @static
+	 **/
 	Ticker.removeAllListeners = function() {
 		Ticker._listeners = [];
 		Ticker._pauseable = [];
 	}
 	
 	/**
-	* Sets the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
-	* Note actual time between ticks may be more than requested depending on CPU load.
-	* @method setInterval
-	* @static
-	* @param {Number} interval Time in milliseconds between ticks. Default value is 50.
-	**/
+	 * Sets the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
+	 * Note actual time between ticks may be more than requested depending on CPU load.
+	 * @method setInterval
+	 * @static
+	 * @param {Number} interval Time in milliseconds between ticks. Default value is 50.
+	 **/
 	Ticker.setInterval = function(interval) {
 		Ticker._lastTime = Ticker._getTime();
 		Ticker._interval = interval;
-		if (!Ticker.useInterval) {
+		if (Ticker.timeoutID != null) { clearTimeout(Ticker.timeoutID); }
+		if (Ticker.useRAF) {
+			if (Ticker._rafActive) { return; }
+			Ticker._rafActive = true;
 			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
 					  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
 			if (f) {
 				f(Ticker._handleAF);
-				Ticker._rafFunction = f;
 				return;
 			}
 		}
-		setTimeout(Ticker._handleTimeout, interval);
+		if (Ticker._inited) { Ticker.timeoutID = setTimeout(Ticker._handleTimeout, interval); }
 	}
 	
 	/**
-	* Returns the current target time between ticks, as set with setInterval.
-	* @method getInterval
-	* @static
-	* @return {Number} The current target interval in milliseconds between tick events.
-	**/
+	 * Returns the current target time between ticks, as set with setInterval.
+	 * @method getInterval
+	 * @static
+	 * @return {Number} The current target interval in milliseconds between tick events.
+	 **/
 	Ticker.getInterval = function() {
 		return Ticker._interval;
 	}
 	
 	/**
-	* Sets the target frame rate in frames per second (FPS). For example, with an interval of 40, getFPS() will 
-	* return 25 (1000ms per second divided by 40 ms per tick = 25fps).
-	* @method setFPS
-	* @static
-	* @param {Number} value Target number of ticks broadcast per second.
-	**/	
+	 * Sets the target frame rate in frames per second (FPS). For example, with an interval of 40, getFPS() will 
+	 * return 25 (1000ms per second divided by 40 ms per tick = 25fps).
+	 * @method setFPS
+	 * @static
+	 * @param {Number} value Target number of ticks broadcast per second.
+	 **/	
 	Ticker.setFPS = function(value) {
 		Ticker.setInterval(1000/value);
 	}
 	
 	/**
-	* Returns the target frame rate in frames per second (FPS). For example, with an 
-	* interval of 40, getFPS() will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
-	* @method getFPS
-	* @static
-	* @return {Number} The current target number of frames / ticks broadcast per second.
-	**/
+	 * Returns the target frame rate in frames per second (FPS). For example, with an 
+	 * interval of 40, getFPS() will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
+	 * @method getFPS
+	 * @static
+	 * @return {Number} The current target number of frames / ticks broadcast per second.
+	 **/
 	Ticker.getFPS = function() {
 		return 1000/Ticker._interval;
 	}
 	
 	/**
-	* Returns the actual frames / ticks per second.
-	* @method getMeasuredFPS
-	* @static
-	* @param {Number} ticks Optional. The number of previous ticks over which to measure the actual 
-	* frames / ticks per second.
-	* @return {Number} The actual frames / ticks per second. Depending on performance, this may differ
-	* from the target frames per second.
-	**/
+	 * Returns the actual frames / ticks per second.
+	 * @method getMeasuredFPS
+	 * @static
+	 * @param {Number} ticks Optional. The number of previous ticks over which to measure the actual 
+	 * frames / ticks per second.
+	 * @return {Number} The actual frames / ticks per second. Depending on performance, this may differ
+	 * from the target frames per second.
+	 **/
 	Ticker.getMeasuredFPS = function(ticks) {
 		if (Ticker._times.length < 2) { return -1; }
 		
@@ -295,82 +312,85 @@ var Ticker = function() {
 	}
 	
 	/**
-	* While Ticker is paused, pausable listeners are not ticked. See addListener for more information.
-	* @method setPaused
-	* @static
-	* @param {Boolean} value Indicates whether to pause (true) or unpause (false) Ticker.
-	**/
+	 * While Ticker is paused, pausable listeners are not ticked. See addListener for more information.
+	 * @method setPaused
+	 * @static
+	 * @param {Boolean} value Indicates whether to pause (true) or unpause (false) Ticker.
+	 **/
 	Ticker.setPaused = function(value) {
 		Ticker._paused = value;
 	}
 	
 	/**
-	* Returns a boolean indicating whether Ticker is currently paused, as set with setPaused.
-	* @method getPaused
-	* @static
-	* @return {Boolean} Whether the Ticker is currently paused.
-	**/
+	 * Returns a boolean indicating whether Ticker is currently paused, as set with setPaused.
+	 * @method getPaused
+	 * @static
+	 * @return {Boolean} Whether the Ticker is currently paused.
+	 **/
 	Ticker.getPaused = function() {
 		return Ticker._paused;
 	}
 	
 	/**
-	* Returns the number of milliseconds that have elapsed since the first tick event listener was added to
-	* Ticker. For example, you could use this in a time synchronized animation to determine the exact amount of 
-	* time that has elapsed.
-	* @method getTime
-	* @static
-	* @param {Boolean} pauseable Indicates whether to include time elapsed
-	* while Ticker was paused. If false only time elapsed while Ticker is not paused will be returned.
-	* If true, the value returned will be total time elapsed since the first tick event listener was added.
-	* @return {Number} Number of milliseconds that have elapsed since Ticker was begun.
-	**/
+	 * Returns the number of milliseconds that have elapsed since the first tick event listener was added to
+	 * Ticker. For example, you could use this in a time synchronized animation to determine the exact amount of 
+	 * time that has elapsed.
+	 * @method getTime
+	 * @static
+	 * @param {Boolean} pauseable Indicates whether to include time elapsed
+	 * while Ticker was paused. If false only time elapsed while Ticker is not paused will be returned.
+	 * If true, the value returned will be total time elapsed since the first tick event listener was added.
+	 * @return {Number} Number of milliseconds that have elapsed since Ticker was begun.
+	 **/
 	Ticker.getTime = function(pauseable) {
 		return Ticker._getTime() - Ticker._startTime - (pauseable ? Ticker._pausedTime : 0);
 	}
 	
 	/**
-	* Returns the number of ticks that have been broadcast by Ticker.
-	* @method getTicks
-	* @static
-	* @param {Boolean} pauseable Indicates whether to include ticks that would have been broadcast
-	* while Ticker was paused. If false only tick events broadcast while Ticker is not paused will be returned.
-	* If true, tick events that would have been broadcast while Ticker was paused will be included in the return
-	* value. The default value is false.
-	* @return {Number} of ticks that have been broadcast.
-	**/
+	 * Returns the number of ticks that have been broadcast by Ticker.
+	 * @method getTicks
+	 * @static
+	 * @param {Boolean} pauseable Indicates whether to include ticks that would have been broadcast
+	 * while Ticker was paused. If false only tick events broadcast while Ticker is not paused will be returned.
+	 * If true, tick events that would have been broadcast while Ticker was paused will be included in the return
+	 * value. The default value is false.
+	 * @return {Number} of ticks that have been broadcast.
+	 **/
 	Ticker.getTicks = function(pauseable) {
 		return  Ticker._ticks - (pauseable ?Ticker._pausedTickers : 0);
 	}
 	
 // private static methods:
 	/**
-	* @method _handleAF
-	* @protected
-	**/
+	 * @method _handleAF
+	 * @protected
+	 **/
 	Ticker._handleAF = function(timeStamp) {
-		console.log(Ticker._rafFunction);
 		if (timeStamp - Ticker._lastTime >= Ticker._interval-1) {
 			Ticker._tick();
 		}
-		var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
-					  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
-		f(Ticker._handleAF, Ticker.animationTarget);
+		if (Ticker.useRAF) {
+			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
+						  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+			f(Ticker._handleAF, Ticker.animationTarget);
+		} else {
+			Ticker._rafActive = false;
+		}
 	}
 	
 	/**
-	* @method _handleTimeout
-	* @protected
-	**/
+	 * @method _handleTimeout
+	 * @protected
+	 **/
 	Ticker._handleTimeout = function() {
 		Ticker._tick();
-		setTimeout(Ticker._handleTimeout, Ticker._interval);
+		if (!Ticker.useRAF) { Ticker.timeoutID = setTimeout(Ticker._handleTimeout, Ticker._interval); }
 	}
 	
 	/**
-	* @method _tick
-	* @protected
-	**/
+	 * @method _tick
+	 * @protected
+	 **/
 	Ticker._tick = function() {
 		Ticker._ticks++;
 		
@@ -391,7 +411,7 @@ var Ticker = function() {
 			var p = pauseable[i];
 			var listener = listeners[i];
 			if (listener == null || (paused && p) || listener.tick == null) { continue; }
-			listener.tick(elapsedTime);
+			listener.tick(elapsedTime,paused);
 		}
 		
 		Ticker._tickTimes.unshift(Ticker._getTime()-time);
@@ -402,9 +422,9 @@ var Ticker = function() {
 	}
 	
 	/**
-	* @method _getTime
-	* @protected
-	**/
+	 * @method _getTime
+	 * @protected
+	 **/
 	Ticker._getTime = function() {
 		return new Date().getTime();
 	}

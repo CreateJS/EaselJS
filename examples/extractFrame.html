@@ -7,6 +7,7 @@
 <link href="styles/styles.css" rel="stylesheet" type="text/css" />
 
 <!-- Import EaselJS Framework -->
+<script src="../src/easeljs/geom/Rectangle.js"></script>
 <script src="../src/easeljs/display/SpriteSheet.js"></script>
 <script src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 <!-- End EaselJS Imports -->
@@ -22,10 +23,17 @@ function init() {
 }
 
 function handleImageLoad() {
-	// create a new sprite sheet from the loaded image, and define the animation sequences in it.
+	// create sprite sheet data from the loaded image, and define the animation sequences in it.
 	// for example, {walkUpRight:[0,19]} defines an animation sequence called "walkUpRight" that
 	// will play back frames 0 to 19 inclusive.
-	var spriteSheet = new SpriteSheet(imgSeq, 64, 68, {walkUpRight:[0,19], walkDownRight:[20,40], walkRight:[41,59]});
+	var data = {
+		images: [imgSeq],
+		frames: {width:64,height:68},
+		animations: {walkUpRight:[0,19], walkDownRight:[20,40], walkRight:[41,59]}
+	};
+	
+	// create a spritesheet from the data:
+	var spriteSheet = new SpriteSheet(data);
 
 	// extract the first frame of the walkRight sequence as a new image:
 	// could alternately use the frame number.

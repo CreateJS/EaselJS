@@ -81,10 +81,10 @@ var p = ColorFilter.prototype = new Filter();
 
 // constructor:
 	/**
-	* Initialization method.
-	* @method initialize
-	* @protected
-	**/
+	 * Initialization method.
+	 * @method initialize
+	 * @protected
+	 **/
 	p.initialize = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
 		this.redMultiplier = redMultiplier != null ? redMultiplier : 1;
 		this.greenMultiplier = greenMultiplier != null ? greenMultiplier : 1;
@@ -98,21 +98,21 @@ var p = ColorFilter.prototype = new Filter();
 
 // public methods:
 	/**
-	* Applies the filter to the specified context.
-	* @method applyFilter
-	* @param ctx The 2D context to use as the source.
-	* @param x The x position to use for the source rect.
-	* @param y The y position to use for the source rect.
-	* @param width The width to use for the source rect.
-	* @param height The height to use for the source rect.
-	* @param targetCtx Optional. The 2D context to draw the result to. Defaults to the context passed to ctx.
-	* @param targetX Optional. The x position to draw the result to. Defaults to the value passed to x.
-	* @param targetY Optional. The y position to draw the result to. Defaults to the value passed to y.
-	**/
+	 * Applies the filter to the specified context.
+	 * @method applyFilter
+	 * @param ctx The 2D context to use as the source.
+	 * @param x The x position to use for the source rect.
+	 * @param y The y position to use for the source rect.
+	 * @param width The width to use for the source rect.
+	 * @param height The height to use for the source rect.
+	 * @param targetCtx Optional. The 2D context to draw the result to. Defaults to the context passed to ctx.
+	 * @param targetX Optional. The x position to draw the result to. Defaults to the value passed to x.
+	 * @param targetY Optional. The y position to draw the result to. Defaults to the value passed to y.
+	 **/
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
 		targetCtx = targetCtx || ctx;
-		if (targetX = null) { targetX = x; }
-		if (targetY = null) { targetY = y; }
+		if (targetX == null) { targetX = x; }
+		if (targetY == null) { targetY = y; }
 		try {
 			var imageData = ctx.getImageData(x, y, width, height);
 		} catch(e) {
@@ -133,20 +133,20 @@ var p = ColorFilter.prototype = new Filter();
 	}
 
 	/**
-	* Returns a string representation of this object.
-	* @method toString
-	* @return {String} a string representation of the instance.
-	**/
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
 	p.toString = function() {
 		return "[ColorFilter]";
 	}
 
 
 	/**
-	* Returns a clone of this ColorFilter instance.
-	* @method clone
+	 * Returns a clone of this ColorFilter instance.
+	 * @method clone
 	 @return {ColorFilter} A clone of the current ColorFilter instance.
-	**/
+	 **/
 	p.clone = function() {
 		return new ColorFilter(this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier, this.redOffset, this.greenOffset, this.blueOffset, this.alphaOffset);
 	}
