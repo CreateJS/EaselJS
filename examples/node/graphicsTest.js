@@ -65,8 +65,6 @@ function run() {
 	// Again, note that the Easel framework was not required, we can draw directly to any context2D:
 	g.draw(ctx);
 
-    stage.update();
-
     var sFile = __filename.replace('.js', '.png');
     fs.writeFile(sFile, canvas.toBuffer(), function() {
         console.log('Wrote', sFile);

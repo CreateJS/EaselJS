@@ -35,18 +35,12 @@
 **/
 
 // Node.js-ification
-if (typeof module !== 'undefined' && module.exports) {
+var isNode = typeof module !== 'undefined' && module.exports;
+if (isNode) {
     var Container = require('./Container').Container;
-    var Canvas    = require('canvas');
     var window    = module.exports;
-    document  = {
-        createElement: function() {
-            return new Canvas();
-        },
-        addEventListener: function() {}
-    };
+    var document  = require('../node/document');
     window.addEventListener = function() {}
-    Canvas.prototype.addEventListener = function() {};
 }
 
 (function(window) {
@@ -213,7 +207,9 @@ var p = Stage.prototype = new Container();
 	p.initialize = function(canvas) {
 		this.Container_initialize();
 		this.canvas = canvas;
-		this._enableMouseEvents(true);
+        if (!isNode) {
+		    this._enableMouseEvents(true);
+        }
 	}
 
 // public methods:
