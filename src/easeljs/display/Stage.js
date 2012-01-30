@@ -37,17 +37,12 @@
 // Node.js-ification
 if (typeof module !== 'undefined' && module.exports) {
     var Container         = require('./Container').Container;
-    var Canvas            = require('canvas');
-    var HTMLCanvasElement = Canvas;
+    var HTMLCanvasElement = require('canvas');
+    var document          = require('../node/document');
     var window            = module.exports;
-    document  = {
-        createElement: function() {
-            return new Canvas();
-        },
-        addEventListener: function() {}
-    };
-    window.addEventListener = function() {}
-    Canvas.prototype.addEventListener = function() {};
+
+    window.addEventListener                      = function() {};
+    HTMLCanvasElement.prototype.addEventListener = function() {};
 }
 
 (function(window) {

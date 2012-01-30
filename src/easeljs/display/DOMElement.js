@@ -37,7 +37,8 @@
 // Node.js-ification
 if (typeof module !== 'undefined' && module.exports) {
     var DisplayObject = require('./DisplayObject').DisplayObject;
-    var window = module.exports;
+    var document      = require('../node/document');
+    var window        = module.exports;
 }
 
 (function(window) {

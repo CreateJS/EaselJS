@@ -35,11 +35,12 @@
  **/
 
 // Node.js-ification
-if (typeof module !== 'undefined' && module.exports) {
-    var window = module.exports;
+var isNode = typeof module !== 'undefined' && module.exports;
+if (isNode) {
     var Canvas      = require('canvas');
     var Image       = Canvas.Image;
     var Rectangle   = require('../geom/Rectangle').Rectangle;
+    var window      = module.exports;
 }
 
 (function(window) {
@@ -213,9 +214,8 @@ var p = SpriteSheet.prototype;
 		if (data.images && (l=data.images.length) > 0) {
 			a = this._images = [];
 			for (i=0; i<l; i++) {
-				var img = data.images[i];
+                var img = data.images[i];
 				if (!(img instanceof Image)) {
-                    console.log(8);
 					var src = img;
 					img = new Image();
 					img.src = src;
@@ -397,4 +397,6 @@ var p = SpriteSheet.prototype;
 	}
 
 window.SpriteSheet = SpriteSheet;
+
+
 }(window));

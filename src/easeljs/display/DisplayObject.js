@@ -41,12 +41,8 @@ if (typeof module !== 'undefined' && module.exports) {
     var Shadow   = require('./Shadow').Shadow;
     var UID      = require('../utils/UID').UID;
     var Matrix2D = require('../geom/Matrix2D').Matrix2D;
+    var document = require('../node/document');
     var window   = module.exports;
-    document = {
-        createElement: function() {
-            return new Canvas();
-        }
-    };
 
     Canvas.prototype.cloneNode = function(deep) {
         var cloned = new Canvas(this.width, this.height);

@@ -37,13 +37,8 @@
 
 // Node.js-ification
 if (typeof module !== 'undefined' && module.exports) {
-    var Canvas   = require('canvas');
+    var document = require('../node/document');
     var window   = module.exports;
-    document = {
-        createElement: function() {
-            return new Canvas();
-        }
-    };
 }
 
 (function(window) {

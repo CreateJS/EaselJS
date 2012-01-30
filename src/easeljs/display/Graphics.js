@@ -41,13 +41,8 @@
  * Also, drawPolyStar did not work in tests (see example: node/graphicsTest.js)
  */
 if (typeof module !== 'undefined' && module.exports) {
-    var Canvas   = require('canvas');
+    var document = require('../node/document');
     var window   = module.exports;
-    document = {
-        createElement: function() {
-            return new Canvas();
-        }
-    };
 }
 
 (function(window) {
