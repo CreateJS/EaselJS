@@ -3,6 +3,7 @@ Version 0.4.1 [Not released]
 - fixed a problem with preloading sprite sheet images when using tile based sheets
 - worked around a bug in Safari with addFlippedFrames
 - added setChildIndex(), swapChildrenAt(), and swapChildren() to Container
+- made frequency param on enableMouseOver optional
 
 
 Version 0.4 [Nov 30, 2011] 
