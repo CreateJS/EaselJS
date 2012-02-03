@@ -42,7 +42,7 @@
  */
 if (typeof module !== 'undefined' && module.exports) {
     var window   = module.exports;
-    var document = require('../node/document');
+        document = require('../node/document');
 }
 
 (function(window) {

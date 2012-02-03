@@ -38,7 +38,7 @@
 if (typeof module !== 'undefined' && module.exports) {
     var DisplayObject = require('./DisplayObject').DisplayObject;
     var Rectangle     = require('../geom/Rectangle').Rectangle;
-    var window = module.exports;
+    var window        = module.exports;
 }
 
 (function(window) {

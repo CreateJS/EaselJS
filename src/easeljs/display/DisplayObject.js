@@ -41,7 +41,7 @@ if (typeof module !== 'undefined' && module.exports) {
     var UID      = require('../utils/UID').UID;
     var Matrix2D = require('../geom/Matrix2D').Matrix2D;
     var window   = module.exports;
-    var document = require('../node/document');
+        document = require('../node/document');
 }
 
 (function(window) {

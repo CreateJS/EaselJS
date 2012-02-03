@@ -38,7 +38,7 @@
 if (typeof module !== 'undefined' && module.exports) {
     var DisplayObject = require('./DisplayObject').DisplayObject;
     var window   = module.exports;
-    var document = require('../node/document');
+        document = require('../node/document');
 }
 
 (function(window) {
