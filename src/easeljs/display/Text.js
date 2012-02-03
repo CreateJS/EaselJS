@@ -306,8 +306,14 @@ var p = Text.prototype = new DisplayObject();
 	 * @protected 
 	 **/
 	p._drawTextLine = function(ctx, text, y) {
-		if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth); }
-		else { ctx.fillText(text, 0, y, this.maxWidth); }
+		if(this.maxWidth != null) {
+			if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth); }
+			else { ctx.fillText(text, 0, y, this.maxWidth); }
+		}
+		else {
+			if (this.outline) { ctx.strokeText(text, 0, y); }
+			else { ctx.fillText(text, 0, y); }
+		}
 	}
 
 window.Text = Text;
