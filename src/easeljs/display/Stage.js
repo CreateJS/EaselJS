@@ -39,8 +39,8 @@ var isNode = typeof module !== 'undefined' && module.exports;
 if (isNode) {
     var Container = require('./Container').Container;
     var window    = module.exports;
-    var document  = require('../node/document');
-    window.addEventListener = function() {}
+        document  = require('../node/document');
+        window.addEventListener = function() {}
 }
 
 (function(window) {
