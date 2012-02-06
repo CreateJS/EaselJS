@@ -13,11 +13,9 @@ var ctx;
 
 var img = new Image();
 
-console.log('This example will NOT work completely until the createPattern method is implemented on the node-canvas library.  Marked broken code with *****.  More info here: https://github.com/LearnBoost/node-canvas/issues/107');
-
 function init() {
 	//find canvas and load images, wait for last image to load
-	canvas = new Canvas(500, 500);
+	canvas = new Canvas(1000, 600);
 	stage = new Stage(canvas);
 	ctx = canvas.getContext("2d");
 	
@@ -34,7 +32,7 @@ function run() {
 	g.beginStroke("#FF0");
 	// or you can chain them together:
 	g.moveTo(50,50).lineTo(100,100).lineTo(100,150);
-	
+
 	g.setStrokeStyle(8).beginStroke("#F0F");
 	g.beginRadialGradientFill(["#FF0","#00F"],[0,1],100,200,0,100,200,40);
 	g.drawCircle(100,200,40);
@@ -49,12 +47,12 @@ function run() {
 	g.endStroke();
 	g.drawRect(200,100,200,100);
 	
-	//*****   g.beginBitmapFill(img);
+	g.beginBitmapFill(img);
 	g.setStrokeStyle(8).beginRadialGradientStroke(["#FFF","#000"],[0,1],150,300,0,150,300,200);
 	g.drawRect(50, 300, 200, 200);
 
 	// example of chaining an entire draw together:
-	//*****   g.endFill().beginBitmapStroke(img).setStrokeStyle(32).drawRect(20,20,940,540);
+	g.endFill().beginBitmapStroke(img).setStrokeStyle(32).drawRect(20,20,940,540);
 
 	// draw a star:
 	g.beginFill("#FF0").endStroke().drawPolyStar(500,200,80,5,0.6,-90);

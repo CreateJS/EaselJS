@@ -60,32 +60,32 @@ var p = ColorMatrixFilter.prototype = new Filter();
 // constructor:
 	// TODO: detailed docs.
 	/** 
-	* Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting.
-	* @method initialize
-	* @protected
-	* @param matrix A 4x5 matrix describing the color operation to perform.
-	**/
+	 * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting.
+	 * @method initialize
+	 * @protected
+	 * @param matrix A 4x5 matrix describing the color operation to perform.
+	 **/
 	p.initialize = function(matrix) {
 		this.matrix = matrix;
 	}
 	
 // public methods:
 	/**
-	* Applies the filter to the specified context.
-	* @method applyFilter
-	* @param ctx The 2D context to use as the source.
-	* @param x The x position to use for the source rect.
-	* @param y The y position to use for the source rect.
-	* @param width The width to use for the source rect.
-	* @param height The height to use for the source rect.
-	* @param targetCtx Optional. The 2D context to draw the result to. Defaults to the context passed to ctx.
-	* @param targetX Optional. The x position to draw the result to. Defaults to the value passed to x.
-	* @param targetY Optional. The y position to draw the result to. Defaults to the value passed to y.
-	**/
+	 * Applies the filter to the specified context.
+	 * @method applyFilter
+	 * @param ctx The 2D context to use as the source.
+	 * @param x The x position to use for the source rect.
+	 * @param y The y position to use for the source rect.
+	 * @param width The width to use for the source rect.
+	 * @param height The height to use for the source rect.
+	 * @param targetCtx Optional. The 2D context to draw the result to. Defaults to the context passed to ctx.
+	 * @param targetX Optional. The x position to draw the result to. Defaults to the value passed to x.
+	 * @param targetY Optional. The y position to draw the result to. Defaults to the value passed to y.
+	 **/
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
 		targetCtx = targetCtx || ctx;
-		if (targetX = null) { targetX = x; }
-		if (targetY = null) { targetY = y; }
+		if (targetX == null) { targetX = x; }
+		if (targetY == null) { targetY = y; }
 		try {
 			var imageData = ctx.getImageData(x, y, width, height);
 		} catch(e) {
@@ -117,20 +117,20 @@ var p = ColorMatrixFilter.prototype = new Filter();
 	}
 
 	/**
-	* Returns a string representation of this object.
-	* @method toString
-	* @return {String} a string representation of the instance.
-	**/
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
 	p.toString = function() {
 		return "[ColorMatrixFilter]";
 	}
 	
 	
 	/**
-	* Returns a clone of this ColorMatrixFilter instance.
-	* @method clone
+	 * Returns a clone of this ColorMatrixFilter instance.
+	 * @method clone
 	 @return {ColorMatrixFilter} A clone of the current ColorMatrixFilter instance.
-	**/
+	 **/
 	p.clone = function() {
 		return new ColorMatrixFilter(this.matrix);
 	}

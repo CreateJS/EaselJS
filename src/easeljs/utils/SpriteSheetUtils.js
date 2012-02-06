@@ -37,12 +37,13 @@
 
 // Node.js-ification
 if (typeof module !== 'undefined' && module.exports) {
+    var Canvas   = require('canvas');
+    var Image    = Canvas.Image;
     var window   = module.exports;
         document = require('../node/document');
 }
 
 (function(window) {
-
 // constructor:
 /**
 * The SpriteSheetUtils class is a collection of static methods for working
@@ -58,180 +59,129 @@ var SpriteSheetUtils = function() {
 }
 
 	/**
-	* @property _workingCanvas
-	* @static
-	* @type HTMLCanvasElement
-	* @protected
+	 * @property _workingCanvas
+	 * @static
+	 * @type HTMLCanvasElement
+	 * @protected
 	*/
 	SpriteSheetUtils._workingCanvas = document.createElement("canvas");
 
 	/**
-	* @property _workingContext
-	* @static
-	* @type CanvasRenderingContext2D
-	* @protected
+	 * @property _workingContext
+	 * @static
+	 * @type CanvasRenderingContext2D
+	 * @protected
 	*/
 	SpriteSheetUtils._workingContext = SpriteSheetUtils._workingCanvas.getContext("2d");
 
 // public static methods:
 	/**
-	* Builds a new extended sprite sheet based on the specified sprite sheet by adding flipped frames
-	* (vertical, horizontal, or both). Flipping elements on the display list by using setting scaleX/scaleY
-	* to -1 is quite expensive in most browsers, so this method allows you to incur the cost of flipping once,
-	* in advance, without increasing the load size of your sprite sheets. Returns a new SpriteSheet instance
-	* containing the generated image and frame data.
-	* @method flip
-	* @static
-	* @param {Image} spriteSheet The sprite sheet to use as the source.
-	* @param {Object} flipData A generic object that specifies which frames will be flipped, what to name the
-	* flipped result, and how to flip the frames (horizontally, vertically, or both). Each property name
-	* indicates the name of a new sequence to create, and should reference an array where the first index is
-	* the name of the original sequence to flip, the second index indicates whether to flip it horizontally,
-	* the third index indicates whether to flip it vertically, and the fourth indicates what the "next" value
-	* for the resulting frame data should be. For example, the following would create a new sequence named
-	* "walk_left" consisting of the frames from the original "walk_right" sequence flipped
-	* horizontally: &#123;walk_left: ["walk_right", true, false]&#125;
-	**/
-	SpriteSheetUtils.flip = function(spriteSheet, flipData) {
-		var image = spriteSheet.image;
-		var frameData = spriteSheet.frameData;
-		var frameWidth = spriteSheet.frameWidth;
-		var frameHeight = spriteSheet.frameHeight;
-
-		var cols = image.width/frameWidth|0;
-		var rows = image.height/frameHeight|0;
-		var ttlFrames = cols*rows;
-
-		// clone frameData:
-		var frData = {};
-		var data;
-		for (var n in frameData) {
-			data = frameData[n];
-			if (data instanceof Array) { data = data.slice(0); }
-			frData[n] = data;
-		}
-
-		// calculate how many new frames we're generating, and build a map:
-		var map = [];
-		var frCount = 0;
-		var i = 0;
-		for (n in flipData) {
-			var fd = flipData[n];
-			data = frameData[fd[0]];
-			if (data ==  null) { continue; }
-			if (data instanceof Array) {
-				var start = data[0];
-				var end = data[1];
-				if (end == null) { end = start; }
-			} else {
-				start = end = data;
-			}
-			map[i] = n;
-			map[i+1] = start;
-			map[i+2] = end;
-			frCount += end-start+1;
-			i+=4;
-		}
-
-		// get the canvas ready:
-		var canvas = SpriteSheetUtils._workingCanvas;
-		canvas.width = image.width;
-		canvas.height = Math.ceil(rows+frCount/cols)*frameHeight;
-		var ctx = SpriteSheetUtils._workingContext;
-		ctx.drawImage(image, 0, 0, cols*frameWidth, rows*frameHeight, 0, 0, cols*frameWidth, rows*frameHeight);
-
-		// draw the new frames, and update the new frameData:
-		var frame = ttlFrames-1;
-		for (i=0; i<map.length; i+=4) {
-			n = map[i];
-			start = map[i+1];
-			end = map[i+2];
-			fd = flipData[n];
-			var flipH = fd[1]?-1:1;
-			var flipV = fd[2]?-1:1;
-			var offH = flipH==-1?frameWidth:0;
-			var offV = flipV==-1?frameHeight:0;
-
-			for (var j=start; j<=end; j++) {
-				frame++;
-				ctx.save();
-				ctx.translate((frame%cols)*frameWidth+offH, (frame/cols|0)*frameHeight+offV);
-				ctx.scale(flipH, flipV);
-				ctx.drawImage(image, (j%cols)*frameWidth, (j/cols|0)*frameHeight, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight);
-
-				ctx.restore();
-			}
-			frData[n] = [frame-(end-start), frame, fd[3]];
-
-		}
-
-		var img = new Image();
-		img.src = canvas.toDataURL("image/png");
-		return new SpriteSheet((img.width > 0)? img : canvas, frameWidth, frameHeight, frData);
-	}
-
-	/**
-	* Returns a string representing the specified frameData object.
-	* @method frameDataToString
-	* @static
-	* @param {Object} frameData The frame data to output.
-	* @return {String} The a String representing the specified frameData object?
-	**/
-	SpriteSheetUtils.frameDataToString = function(frameData) {
-		var str = "";
-		var max = 0;
-		var min = 0;
+	 * <b>This is an experimental method, and is likely to be buggy. Please report issues.</b><br/><br/>
+	 * Extends the existing sprite sheet by flipping the original frames either horizontally, vertically, or both,
+	 * and adding appropriate animation & frame data.
+	 * @method flip
+	 * @static
+	 * @param {Image} spriteSheet The sprite sheet to use as the source.
+	 * @param {Object} flipData A generic object that specifies which frames will be flipped, what to name the
+	 * flipped result, and how to flip the frames (horizontally, vertically, or both). Each property name
+	 * indicates the name of a new sequence to create, and should reference an array where the first index is
+	 * the name of the original sequence to flip, the second index indicates whether to flip it horizontally,
+	 * the third index indicates whether to flip it vertically, and the fourth indicates what the "next" value
+	 * for the resulting frame data should be. For example, the following would create a new sequence named
+	 * "walk_left" consisting of the frames from the original "walk_right" sequence flipped
+	 * horizontally: &#123;walk_left: ["walk_right", true, false]&#125;
+	 **/
+	SpriteSheetUtils.addFlippedFrames = function(spriteSheet, horizontal, vertical, both) {
+		if (!horizontal && !vertical && !both) { return; }
+		
 		var count = 0;
-		var data, next;
-		for (var n in frameData) {
-			count++;
-			data = frameData[n];
-			if (data instanceof Array) {
-				var start = data[0];
-				var end = data[1];
-				if (end == null) { end = start; }
-				next = data[2];
-				if (next == null) { next = n; }
-			} else {
-				start = end = data;
-				next = n;
-			}
-			str += "\n\t"+n+", start="+start+", end="+end+", next="+next;
-			if (next == false) { str += " (stop)"; }
-			else if (next == n) { str += " (loop)"; }
-			if (end > max) { max = end; }
-			if (start < min) { min = start; }
-		}
-		str = count+" sequences, min="+min+", max="+max+str;
-		return str;
+		if (horizontal) { SpriteSheetUtils._flip(spriteSheet,++count,true,false); }
+		if (vertical) { SpriteSheetUtils._flip(spriteSheet,++count,false,true); }
+		if (both) { SpriteSheetUtils._flip(spriteSheet,++count,true,true); }
 	}
 
 	/**
-	* Returns a single frame of the specified sprite sheet as a new PNG image.
-	* @method extractFrame
-	* @static
-	* @param {Image} spriteSheet The SpriteSheet instance to extract a frame from.
-	* @param {Number} frame The frame number or sequence name to extract. If a sequence
-	* name is specified, only the first frame of the sequence will be extracted.
-	* @return {Image} a single frame of the specified sprite sheet as a new PNG image.
+	 * Returns a single frame of the specified sprite sheet as a new PNG image.
+	 * @method extractFrame
+	 * @static
+	 * @param {Image} spriteSheet The SpriteSheet instance to extract a frame from.
+	 * @param {Number} frame The frame number or animation name to extract. If an animation
+	 * name is specified, only the first frame of the animation will be extracted.
+	 * @return {Image} a single frame of the specified sprite sheet as a new PNG image.
 	*/
 	SpriteSheetUtils.extractFrame = function(spriteSheet, frame) {
-		var image = spriteSheet.image;
-		var frameWidth = spriteSheet.frameWidth;
-		var frameHeight = spriteSheet.frameHeight;
-		var cols = image.width/frameWidth|0;
 		if (isNaN(frame)) {
-			var data = spriteSheet.frameData[frame];
-			if (data instanceof Array) { frame = data[0]; }
-			else { frame = data; }
+			frame = spriteSheet.getAnimation(frame).frames[0];
 		}
+		var data = spriteSheet.getFrame(frame);
+		if (!data) { return null; }
+		var r = data.rect;
 		var canvas = SpriteSheetUtils._workingCanvas;
-		canvas.width = frameWidth;
-		canvas.height = frameHeight;
-		SpriteSheetUtils._workingContext.drawImage(image, (frame%cols)*frameWidth, (frame/cols|0)*frameHeight, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight);
+		canvas.width = r.width;
+		canvas.height = r.height;
+		SpriteSheetUtils._workingContext.drawImage(data.image, r.x, r.y, r.width, r.height, 0, 0, r.width, r.height);
 		var img = new Image();
 		img.src = canvas.toDataURL("image/png");
 		return img;
+	}
+
+	
+// private static methods:
+	SpriteSheetUtils._flip = function(spriteSheet, count, h, v) {
+		var imgs = spriteSheet._images;
+		var canvas = SpriteSheetUtils._workingCanvas;
+		var ctx = SpriteSheetUtils._workingContext;
+		var il = imgs.length/count;
+		for (var i=0;i<il;i++) {
+			var src = imgs[i];
+			src.__tmp = i; // a bit hacky, but faster than doing indexOf below.
+			canvas.width = src.width;
+			canvas.height = src.height;
+			ctx.setTransform(h?-1:1, 0, 0, v?-1:1, h?src.width:0, v?src.height:0);
+			ctx.drawImage(src,0,0);
+			var img = new Image();
+			img.src = canvas.toDataURL("image/png");
+			// work around a strange bug in Safari:
+			img.width = src.width;
+			img.height = src.height;
+			imgs.push(img);
+		}
+		
+		var frames = spriteSheet._frames;
+		var fl = frames.length/count;
+		for (i=0;i<fl;i++) {
+			src = frames[i];
+			var rect = src.rect.clone();
+			img = imgs[src.image.__tmp+il*count];
+			
+			var frame = {image:img,rect:rect,regX:src.regX,regY:src.regY};
+			if (h) {
+				rect.x = img.width-rect.x-rect.width; // update rect
+				frame.regX = rect.width-src.regX; // update registration point
+			}
+			if (v) {
+				rect.y = img.height-rect.y-rect.height;  // update rect
+				frame.regY = rect.height-src.regY; // update registration point
+			}
+			frames.push(frame);
+		}
+		
+		var sfx = "_"+(h?"h":"")+(v?"v":"");
+		var names = spriteSheet._animations;
+		var data = spriteSheet._data;
+		var al = names.length/count;
+		for (i=0;i<al;i++) {
+			var name = names[i];
+			src = data[name];
+			var anim = {name:name+sfx,frequency:src.frequency,next:src.next,frames:[]};
+			if (src.next) { anim.next += sfx; }
+			frames = src.frames;
+			for (var j=0,l=frames.length;j<l;j++) {
+				anim.frames.push(frames[j]+fl*count);
+			}
+			data[anim.name] = anim;
+			names.push(anim.name);
+		}
 	}
 
 window.SpriteSheetUtils = SpriteSheetUtils;

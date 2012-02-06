@@ -1,6 +1,6 @@
 
 exports.Bitmap              = require('./display/Bitmap').Bitmap;
-exports.BitmapSequence      = require('./display/BitmapSequence').BitmapSequence;
+exports.BitmapAnimation     = require('./display/BitmapAnimation').BitmapAnimation;
 exports.Container           = require('./display/Container').Container;
 exports.DisplayObject       = require('./display/DisplayObject').DisplayObject;
 exports.DOMElement          = require('./display/DOMElement').DOMElement;

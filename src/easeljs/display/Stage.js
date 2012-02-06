@@ -37,10 +37,13 @@
 // Node.js-ification
 var isNode = typeof module !== 'undefined' && module.exports;
 if (isNode) {
-    var Container = require('./Container').Container;
-    var window    = module.exports;
-        document  = require('../node/document');
-        window.addEventListener = function() {}
+    var Container         = require('./Container').Container;
+    var HTMLCanvasElement = require('canvas');
+    var window            = module.exports;
+		document          = require('../node/document');
+
+    window.addEventListener                      = function() {};
+    HTMLCanvasElement.prototype.addEventListener = function() {};
 }
 
 (function(window) {
@@ -60,190 +63,195 @@ var p = Stage.prototype = new Container();
 
 // static properties:
 	/**
-	* @property _snapToPixelEnabled
-	* @protected
-	* @type Boolean
-	* @default false
-	**/
+	 * @property _snapToPixelEnabled
+	 * @protected
+	 * @static
+	 * @type Boolean
+	 * @default false
+	 **/
 	Stage._snapToPixelEnabled = false; // snapToPixelEnabled is temporarily copied here during a draw to provide global access.
 
 // public properties:
 	/**
-	* Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually
-	* control clearing (for generative art, or when pointing multiple stages at the same canvas for example).
-	* @property autoClear
-	* @type Boolean
-	* @default true
-	**/
+	 * Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually
+	 * control clearing (for generative art, or when pointing multiple stages at the same canvas for example).
+	 * @property autoClear
+	 * @type Boolean
+	 * @default true
+	 **/
 	p.autoClear = true;
 
 	/** The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the
-	* first stage that will be ticked (or they will clear each other's render).
-	* @property canvas
-	* @type HTMLCanvasElement
-	**/
+	 * first stage that will be ticked (or they will clear each other's render).
+	 * @property canvas
+	 * @type HTMLCanvasElement
+	 **/
 	p.canvas = null;
 
 	/**
-	* READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
-	* position over the canvas, and mouseInBounds will be set to false.
-	* @property mouseX
-	* @type Number
-	* @final
-	**/
+	 * READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
+	 * position over the canvas, and mouseInBounds will be set to false.
+	 * @property mouseX
+	 * @type Number
+	 * @final
+	 **/
 	p.mouseX = null;
 
 	/** READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
-	* position over the canvas, and mouseInBounds will be set to false.
-	* @property mouseY
-	* @type Number
-	* @final
-	**/
+	 * position over the canvas, and mouseInBounds will be set to false.
+	 * @property mouseY
+	 * @type Number
+	 * @final
+	 **/
 	p.mouseY = null;
 
 	/** The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param
-	* containing the corresponding MouseEvent instance.
-	* @event onMouseMove
-	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	**/
+	 * containing the corresponding MouseEvent instance.
+	 * @event onMouseMove
+	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
+	 **/
 	p.onMouseMove = null;
 
 	/**
-	* The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler
-	* is passed a single param containing the corresponding MouseEvent instance.
-	* @event onMouseUp
-	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	**/
+	 * The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler
+	 * is passed a single param containing the corresponding MouseEvent instance.
+	 * @event onMouseUp
+	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
+	 **/
 	p.onMouseUp = null;
 
 	/**
-	* The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single
-	* param containing the corresponding MouseEvent instance.
-	* @event onMouseDown
-	* @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	**/
+	 * The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single
+	 * param containing the corresponding MouseEvent instance.
+	 * @event onMouseDown
+	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
+	 **/
 	p.onMouseDown = null;
 
 	/**
-	* Indicates whether this stage should use the snapToPixel property of display objects when rendering them.
-	* @property snapToPixelEnabled
-	* @type Boolean
-	* @default false
-	**/
+	 * Indicates whether this stage should use the snapToPixel property of display objects when rendering them.
+	 * @property snapToPixelEnabled
+	 * @type Boolean
+	 * @default false
+	 **/
 	p.snapToPixelEnabled = false;
 
 	/** Indicates whether the mouse is currently within the bounds of the canvas.
-	* @property mouseInBounds
-	* @type Boolean
-	* @default false
-	**/
+	 * @property mouseInBounds
+	 * @type Boolean
+	 * @default false
+	 **/
 	p.mouseInBounds = false;
 
 	/** If false, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas.
-	* @property tickOnUpdate
-	* @type Boolean
-	* @default false
-	**/
+	 * @property tickOnUpdate
+	 * @type Boolean
+	 * @default false
+	 **/
 	p.tickOnUpdate = true;
 
 // private properties:
 
 	/**
-	* @property _activeMouseEvent
-	* @protected
-	* @type MouseEvent
-	**/
+	 * @property _activeMouseEvent
+	 * @protected
+	 * @type MouseEvent
+	 **/
 	p._activeMouseEvent = null;
 
 	/**
-	* @property _activeMouseTarget
-	* @protected
-	* @type DisplayObject
-	**/
+	 * @property _activeMouseTarget
+	 * @protected
+	 * @type DisplayObject
+	 **/
 	p._activeMouseTarget = null;
 
 	/**
-	* @property _mouseOverIntervalID
-	* @protected
-	* @type Number
-	**/
+	 * @property _mouseOverIntervalID
+	 * @protected
+	 * @type Number
+	 **/
 	p._mouseOverIntervalID = null;
 
 	/**
-	* @property _mouseOverX
-	* @protected
-	* @type Number
-	**/
+	 * @property _mouseOverX
+	 * @protected
+	 * @type Number
+	 **/
 	p._mouseOverX = 0;
 
 	/**
-	* @property _mouseOverY
-	* @protected
-	* @type Number
-	**/
+	 * @property _mouseOverY
+	 * @protected
+	 * @type Number
+	 **/
 	p._mouseOverY = 0;
 
 	/**
-	* @property _mouseOverTarget
-	* @protected
-	* @type DisplayObject
-	**/
+	 * @property _mouseOverTarget
+	 * @protected
+	 * @type DisplayObject
+	 **/
 	p._mouseOverTarget = null;
 
 // constructor:
 	/**
-	* @property DisplayObject_initialize
-	* @type Function
-	* @private
-	**/
+	 * @property DisplayObject_initialize
+	 * @type Function
+	 * @private
+	 **/
 	p.Container_initialize = p.initialize;
 
 	/**
-	* Initialization method.
-	* @method initialize
-	* param {HTMLCanvasElement} canvas
-	* @protected
-	**/
+	 * Initialization method.
+	 * @method initialize
+	 * param {HTMLCanvasElement} canvas A canvas object, or the string id of a canvas object in the current document.
+	 * @protected
+	 **/
 	p.initialize = function(canvas) {
 		this.Container_initialize();
-		this.canvas = canvas;
-        if (!isNode) {
-		    this._enableMouseEvents(true);
-        }
+		this.canvas = (canvas instanceof HTMLCanvasElement) ? canvas : document.getElementById(canvas);
+		if (!isNode) {
+			this._enableMouseEvents(true);
+		}
 	}
 
 // public methods:
 
 	/**
-	* @event tick
-	* Broadcast to children when the stage is updated.
-	**/
+	 * @event tick
+	 * Broadcast to children when the stage is updated.
+	 **/
 
 	/**
-	* Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapSequence)
-	* and render its entire display list to the canvas.
-	* @method update
-	**/
+	 * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapAnimation)
+	 * and render its entire display list to the canvas.
+	 * @method update
+	 **/
 	p.update = function() {
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-		if (this.tickOnUpdate) { this._tick(); }
+		if (this.tickOnUpdate) {
+			if (this.tick == this.update) { var t=1; this.tick = null; }
+			this._tick(true);
+			if (t) { this.tick = this.update; }
+		}
 		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(this._matrix));
 	}
 
 	/**
-	* Calls the update method. Useful for adding stage as a listener to Ticker directly.
-	* @property tick
-	* @private
-	* @type Function
-	**/
+	 * Calls the update method. Useful for adding stage as a listener to Ticker directly.
+	 * @property tick
+	 * @private
+	 * @type Function
+	 **/
 	p.tick = p.update;
 
 	/**
-	* Clears the target canvas. Useful if autoClear is set to false.
-	* @method clear
-	**/
+	 * Clears the target canvas. Useful if autoClear is set to false.
+	 * @method clear
+	 **/
 	p.clear = function() {
 		if (!this.canvas) { return; }
 		var ctx = this.canvas.getContext("2d");
@@ -252,15 +260,15 @@ var p = Stage.prototype = new Container();
 	}
 
 	/**
-	* Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be
-	* specified as the src value of an image element.
-	* @method toDataURL
-	* @param {String} backgroundColor The background color to be used for the generated image. The value can be any value HTML color
-	* value, including HEX colors, rgb and rgba. The default value is a transparent background.
-	* @param {String} mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
-	* is passed in, or if the browser does not support the specified MIME type, the default value will be used.
-	* @return {String} a Base64 encoded image.
-	**/
+	 * Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be
+	 * specified as the src value of an image element.
+	 * @method toDataURL
+	 * @param {String} backgroundColor The background color to be used for the generated image. The value can be any value HTML color
+	 * value, including HEX colors, rgb and rgba. The default value is a transparent background.
+	 * @param {String} mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
+	 * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
+	 * @return {String} a Base64 encoded image.
+	 **/
 	p.toDataURL = function(backgroundColor, mimeType) {
 		if(!mimeType) {
 			mimeType = "image/png";
@@ -308,13 +316,13 @@ var p = Stage.prototype = new Container();
 	}
 
 	/**
-	* Enables or disables (by passing a frequency of 0) mouse over handlers (onMouseOver and onMouseOut) for this stage's display
-	* list. These events can be expensive to generate, so they are disabled by default, and the frequency of the events
-	* can be controlled independently of mouse move events via the frequency parameter.
-	* @method enableMouseOver
-	* @param {Number} frequency The maximum number of times per second to broadcast mouse over/out events. Set to 0 to disable mouse
-	* over events completely. Maximum is 50. A lower frequency is less responsive, but uses less CPU.
-	**/
+	 * Enables or disables (by passing a frequency of 0) mouse over handlers (onMouseOver and onMouseOut) for this stage's display
+	 * list. These events can be expensive to generate, so they are disabled by default, and the frequency of the events
+	 * can be controlled independently of mouse move events via the frequency parameter.
+	 * @method enableMouseOver
+	 * @param {Number} frequency The maximum number of times per second to broadcast mouse over/out events. Set to 0 to disable mouse
+	 * over events completely. Maximum is 50. A lower frequency is less responsive, but uses less CPU.
+	 **/
 	p.enableMouseOver = function(frequency) {
 		if (this._mouseOverIntervalID) {
 			clearInterval(this._mouseOverIntervalID);
@@ -327,9 +335,9 @@ var p = Stage.prototype = new Container();
 	}
 
 	/**
-	* Returns a clone of this Stage.
-	* @return {Stage} A clone of the current Container instance.
-	**/
+	 * Returns a clone of this Stage.
+	 * @return {Stage} A clone of the current Container instance.
+	 **/
 	p.clone = function() {
 		var o = new Stage(null);
 		this.cloneProps(o);
@@ -337,10 +345,10 @@ var p = Stage.prototype = new Container();
 	}
 
 	/**
-	* Returns a string representation of this object.
-	* @method toString
-	* @return {String} a string representation of the instance.
-	**/
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
 	p.toString = function() {
 		return "[Stage (name="+  this.name +")]";
 	}
@@ -348,24 +356,25 @@ var p = Stage.prototype = new Container();
 	// private methods:
 
 	/**
-	* @method _enableMouseEvents
-	* @protected
-	* @param {Boolean} enabled
-	**/
+	 * @method _enableMouseEvents
+	 * @protected
+	 * @param {Boolean} enabled
+	 **/
 	p._enableMouseEvents = function() {
 		var o = this;
 		var evtTarget = window.addEventListener ? window : document;
 		evtTarget.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
 		evtTarget.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
 		evtTarget.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
-		this.canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false);
+		// this is to facilitate extending Stage:
+		if (this.canvas) { this.canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false); }
 	}
 
 	/**
-	* @method _handleMouseMove
-	* @protected
-	* @param {MouseEvent} e
-	**/
+	 * @method _handleMouseMove
+	 * @protected
+	 * @param {MouseEvent} e
+	 **/
 	p._handleMouseMove = function(e) {
 
 		if (!this.canvas) {
@@ -385,11 +394,11 @@ var p = Stage.prototype = new Container();
 	}
 
 	/**
-	* @method _updateMousePosition
-	* @protected
-	* @param {Number} pageX
-	* @param {Number} pageY
-	**/
+	 * @method _updateMousePosition
+	 * @protected
+	 * @param {Number} pageX
+	 * @param {Number} pageY
+	 **/
 	p._updateMousePosition = function(pageX, pageY) {
 
 		var o = this.canvas;
@@ -407,10 +416,10 @@ var p = Stage.prototype = new Container();
 	}
 
 	/**
-	* @method _handleMouseUp
-	* @protected
-	* @param {MouseEvent} e
-	**/
+	 * @method _handleMouseUp
+	 * @protected
+	 * @param {MouseEvent} e
+	 **/
 	p._handleMouseUp = function(e) {
 		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY, this, e);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
@@ -424,10 +433,10 @@ var p = Stage.prototype = new Container();
 	}
 
 	/**
-	* @method _handleMouseDown
-	* @protected
-	* @param {MouseEvent} e
-	**/
+	 * @method _handleMouseDown
+	 * @protected
+	 * @param {MouseEvent} e
+	 **/
 	p._handleMouseDown = function(e) {
 		if (this.onMouseDown) {
 			this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY, this, e));
@@ -444,9 +453,9 @@ var p = Stage.prototype = new Container();
 	}
 
 	/**
-	* @method _testMouseOver
-	* @protected
-	**/
+	 * @method _testMouseOver
+	 * @protected
+	 **/
 	p._testMouseOver = function() {
 		if (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds) { return; }
 		var target = null;
@@ -468,10 +477,10 @@ var p = Stage.prototype = new Container();
 	}
 
 	/**
-	* @method _handleDoubleClick
-	* @protected
-	* @param {MouseEvent} e
-	**/
+	 * @method _handleDoubleClick
+	 * @protected
+	 * @param {MouseEvent} e
+	 **/
 	p._handleDoubleClick = function(e) {
 		if (this.onDoubleClick) {
 			this.onDoubleClick(new MouseEvent("onDoubleClick", this.mouseX, this.mouseY, this, e));

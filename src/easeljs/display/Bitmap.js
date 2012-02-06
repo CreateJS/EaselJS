@@ -56,20 +56,20 @@ var Bitmap = function(imageOrUri) {
 }
 var p = Bitmap.prototype = new DisplayObject();
 
-	// public properties:
+// public properties:
 	/**
-	* The image to render. This can be an Image, a Canvas, or a Video.
-	* @property image
-	* @type Image | HTMLCanvasElement | HTMLVideoElement
-	**/
+	 * The image to render. This can be an Image, a Canvas, or a Video.
+	 * @property image
+	 * @type Image | HTMLCanvasElement | HTMLVideoElement
+	 **/
 	p.image = null;
 	
 	/**
-	* Whether or not the Bitmap should be draw to the canvas at whole pixel coordinates.
-	* @property snapToPixel
-	* @type Boolean
-	* @default true
-	**/
+	 * Whether or not the Bitmap should be draw to the canvas at whole pixel coordinates.
+	 * @property snapToPixel
+	 * @type Boolean
+	 * @default true
+	 **/
 	p.snapToPixel = true;
 
     /**
@@ -99,17 +99,17 @@ var p = Bitmap.prototype = new DisplayObject();
 	// constructor:
 
 	/**
-	* @property DisplayObject_initialize
-	* @type Function
+	 * @property DisplayObject_initialize
+	 * @type Function
     * @private
-	**/
+	 **/
 	p.DisplayObject_initialize = p.initialize;
 
 	/** 
-	* Initialization method.
-	* @method initialize
-	* @protected
-	*/
+	 * Initialization method.
+	 * @method initialize
+	 * @protected
+	 **/
 	p.initialize = function(imageOrUri) {
 		this.DisplayObject_initialize();
 		if (typeof imageOrUri == "string") {
@@ -123,33 +123,33 @@ var p = Bitmap.prototype = new DisplayObject();
 // public methods:
 
 	/**
-	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-	* This does not account for whether it would be visible within the boundaries of the stage.
-	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method isVisible
-	* @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-	**/
+	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+	 * This does not account for whether it would be visible within the boundaries of the stage.
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method isVisible
+	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+	 **/
 	p.isVisible = function() {
-		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.image && (this.image.complete || this.image.getContext);
+		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2);
 	}
 
 	/**
-	* @property DisplayObject_draw
-	* @type Function
-	* @private
-	**/
+	 * @property DisplayObject_draw
+	 * @type Function
+	 * @private
+	 **/
 	p.DisplayObject_draw = p.draw;
 	
 	/**
-	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
-	* Returns true if the draw was handled (useful for overriding functionality).
-	* NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @method draw
-	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache. 
-	* For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	* into itself).
-	**/
+	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	 * Returns true if the draw was handled (useful for overriding functionality).
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method draw
+	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache. 
+	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+	 * into itself).
+	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this.beginClip(ctx);
@@ -162,28 +162,28 @@ var p = Bitmap.prototype = new DisplayObject();
 	//Bitmap. This is why they have no method implementations.
 	
 	/**
-	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	* You should not cache Bitmap instances as it can degrade performance.
-	* @method cache
-	**/
+	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+	 * You should not cache Bitmap instances as it can degrade performance.
+	 * @method cache
+	 **/
 	
 	/**
-	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	* You should not cache Bitmap instances as it can degrade performance.
-	* @method updateCache
-	**/
+	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+	 * You should not cache Bitmap instances as it can degrade performance.
+	 * @method updateCache
+	 **/
 	
 	/**
-	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	* You should not cache Bitmap instances as it can degrade performance.
-	* @method uncache
-	**/
+	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+	 * You should not cache Bitmap instances as it can degrade performance.
+	 * @method uncache
+	 **/
 	
 	/**
-	* Returns a clone of the Bitmap instance.
-	* @method clone
-	* @return {Bitmap} a clone of the Bitmap instance.
-	**/
+	 * Returns a clone of the Bitmap instance.
+	 * @method clone
+	 * @return {Bitmap} a clone of the Bitmap instance.
+	 **/
 	p.clone = function() {
 		var o = new Bitmap(this.image);
 		this.cloneProps(o);
@@ -195,10 +195,10 @@ var p = Bitmap.prototype = new DisplayObject();
 	}
 	
 	/**
-	* Returns a string representation of this object.
-	* @method toString
-	* @return {String} a string representation of the instance.
-	**/
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
 	p.toString = function() {
 		return "[Bitmap (name="+  this.name +")]";
 	}
