@@ -37,8 +37,10 @@
 
 // Node.js-ification
 if (typeof module !== 'undefined' && module.exports) {
-    var document = require('../node/document');
+    var Canvas   = require('canvas');
+    var Image    = Canvas.Image;
     var window   = module.exports;
+        document = require('../node/document');
 }
 
 (function(window) {
