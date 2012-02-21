@@ -62,6 +62,14 @@ var Ticker = function() {
 	Ticker.useRAF = null;
 	
 	/**
+	 * Specifies the animation target to use with requestAnimationFrame if useRAF is true.
+	 * @property animationTarget
+	 * @static
+	 * @type Object
+	 **/
+	Ticker.animationTarget = null;
+	
+	/**
 	 * Event broadcast  once each tick / interval. The interval is specified via the 
 	 * .setInterval(ms) or setFPS methods.
 	 * @event tick
@@ -204,7 +212,7 @@ var Ticker = function() {
 		Ticker._tickTimes = [];
 		Ticker._pauseable = [];
 		Ticker._listeners = [];
-		Ticker._times.push(Ticker._startTime = Ticker._getTime());
+		Ticker._times.push(Ticker._lastTime = Ticker._startTime = Ticker._getTime());
 		Ticker.setInterval(Ticker._interval);
 	}
 	
@@ -241,20 +249,9 @@ var Ticker = function() {
 	 * @param {Number} interval Time in milliseconds between ticks. Default value is 50.
 	 **/
 	Ticker.setInterval = function(interval) {
-		Ticker._lastTime = Ticker._getTime();
 		Ticker._interval = interval;
-		if (Ticker.timeoutID != null) { clearTimeout(Ticker.timeoutID); }
-		if (Ticker.useRAF) {
-			if (Ticker._rafActive) { return; }
-			Ticker._rafActive = true;
-			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
-					  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
-			if (f) {
-				f(Ticker._handleAF);
-				return;
-			}
-		}
-		if (Ticker._inited) { Ticker.timeoutID = setTimeout(Ticker._handleTimeout, interval); }
+		if (!Ticker._inited) { return; }
+		Ticker._setupTick();
 	}
 	
 	/**
@@ -301,8 +298,8 @@ var Ticker = function() {
 	Ticker.getMeasuredFPS = function(ticks) {
 		if (Ticker._times.length < 2) { return -1; }
 		
-		// by default, calculate fps for the past 1/2 second:
-		if (ticks == null) { ticks = Ticker.getFPS()>>1; }
+		// by default, calculate fps for the past 1 second:
+		if (ticks == null) { ticks = Ticker.getFPS()|0; }
 		ticks = Math.min(Ticker._times.length-1, ticks);
 		return 1000/((Ticker._times[0]-Ticker._times[ticks])/ticks);
 	}
@@ -365,13 +362,8 @@ var Ticker = function() {
 		if (timeStamp - Ticker._lastTime >= Ticker._interval-1) {
 			Ticker._tick();
 		}
-		if (Ticker.useRAF) {
-			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
-						  window.oRequestAnimationFrame || window.msRequestAnimationFrame;
-			f(Ticker._handleAF, Ticker.animationTarget);
-		} else {
-			Ticker._rafActive = false;
-		}
+		Ticker._rafActive = false;
+		Ticker._setupTick();
 	}
 	
 	/**
@@ -380,7 +372,21 @@ var Ticker = function() {
 	 **/
 	Ticker._handleTimeout = function() {
 		Ticker._tick();
-		if (!Ticker.useRAF) { Ticker.timeoutID = setTimeout(Ticker._handleTimeout, Ticker._interval); }
+		Ticker.timeoutID = null;
+		Ticker._setupTick();
+	}
+	
+	Ticker._setupTick = function() {
+		if (Ticker._rafActive || Ticker.timeoutID != null) { return; } // avoid duplicates
+		if (Ticker.useRAF) {
+			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+			if (f) {
+				f(Ticker._handleAF, Ticker.animationTarget);
+				Ticker._rafActive = true;
+				return;
+			}
+		}
+		Ticker.timeoutID = setTimeout(Ticker._handleTimeout, Ticker._interval);
 	}
 	
 	/**

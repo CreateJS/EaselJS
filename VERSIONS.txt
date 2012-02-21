@@ -1,9 +1,12 @@
-Version 0.4.1 [Not released]
+Version 0.4.1 [Not tagged]
 ****************************************************************************************************
 - fixed a problem with preloading sprite sheet images when using tile based sheets
 - worked around a bug in Safari with addFlippedFrames
 - added setChildIndex(), swapChildrenAt(), and swapChildren() to Container
 - made frequency param on enableMouseOver optional
+- worked around a Chrome 17 bug that would prevent text w/o maxwidth from rendering
+- additional fixes for video as a Bitmap source
+- rewrite of Ticker to simplify implementation and solve issues with useRAF in Safari
 
 
 Version 0.4 [Nov 30, 2011] 
