@@ -240,13 +240,7 @@ var p = Text.prototype = new DisplayObject();
 		var height = 0;
 		var ctx = this._getWorkingContext();
 		for (var i=0, l=lines.length; i<l; i++) {
-			var w = ctx.measureText(lines[i]).width;
-			if (this.lineWidth == null || w < this.lineWidth) {
-				height += lineHeight;
-				continue;
-			}
-
-			// split up the line
+		    // split up the line
 			var words = lines[i].split(/(\s)/);
 			var str = words[0];
 			for (var j=1, jl=words.length; j<jl; j+=2) {
@@ -258,9 +252,7 @@ var p = Text.prototype = new DisplayObject();
 					str += words[j] + words[j+1];
 				}
 			}
-			height += lineHeight;
 		}
-		height += lineHeight;
 
 		return height;
 	}
