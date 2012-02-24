@@ -1,0 +1,19 @@
+{
+  "author": "Lachie Cox <lachiec@gmail.com>",
+  "name": "EaselJS",
+  "description": "EaselJS build",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/blake-education/EaselJS.git"
+  },
+  "engines": {
+    "node": "~0.6.7"
+  },
+  "dependencies": {
+    "wrench": "*",
+    "optimist": "*"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {}
+}
