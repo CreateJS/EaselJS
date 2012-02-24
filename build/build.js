@@ -85,21 +85,32 @@ var OPTIMIST = require("optimist");
 OPTIMIST.describe("v", "Enable verbose output")
 	.alias("v", "verbose")
 	.boolean("v")
+
 	.describe("l", "List all available tasks")
 	.alias("l", "list")
 	.boolean("l")
+
 	.describe("h", "Display usage")
 	.alias("h", "help")
 	.boolean("h")
+
 	.describe("version", "Document build version number")
 	.string("version")
+
 	.describe("tasks", "Task to run")
 	.default("tasks", "all")
+
 	.describe("s","Include specified file in compilation. Option can be specified multiple times for multiple files.")
 	.alias("s", "source")
+
 	.describe("o", "Name of minified JavaScript file.")
 	.alias("o", "output")
 	.default("o", JS_FILE_NAME)
+
+	.describe("n", "No minification.")
+	.alias("n", "no-minification")
+	.boolean("n")
+
 	.usage("Build Task Manager for "+PROJECT_NAME+"\nUsage\n$0 [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]");
 
 
@@ -170,6 +181,8 @@ function main(argv)
 		);
 	}
 
+  console.log("task", task)
+
 	if(task == TASK.ALL)
 	{	
 		shouldBuildSource = true;
@@ -184,7 +197,16 @@ function main(argv)
 
 	if(shouldBuildSource)
 	{
-		buildSourceTask(function(success)
+    if(argv.n)
+    {
+      sourceBuilder = buildSourceWithoutMinification
+    }
+    else
+    {
+      sourceBuilder = buildSourceTask
+    }
+
+		sourceBuilder(function(success)
 		{		
 			print("Build Source Task Complete");
 			if(shouldBuildDocs)
@@ -303,6 +325,45 @@ function buildSourceTask(completeHandler)
 			completeHandler(true);
 		}
 	);
+}
+
+
+function buildSourceWithoutMinification(completeHandler)
+{
+  if(!PATH.existsSync(OUTPUT_DIR_NAME))
+	{
+		FILE.mkdirSync(OUTPUT_DIR_NAME);
+	}
+
+	var file = SOURCE_FILES.slice();
+	
+	if(extraSourceFiles)
+	{
+    files.concat(extraSourceFiles)
+	}
+	
+	
+  var license_data = FILE.readFileSync("license.txt", "utf8");
+	var final_file = PATH.join(OUTPUT_DIR_NAME, js_file_name);
+
+  console.log("final", final_file);
+
+
+  FILE.open(final_file, 'w', function(err, fd) {
+    pos = 0
+    pos += FILE.writeSync(fd, license_data, pos)
+
+    for( var i=0, l=SOURCE_FILES.length; i<l; i++ ) {
+      fileData = FILE.readFileSync(SOURCE_FILES[i], 'utf8');
+      pos += FILE.writeSync(fd, fileData, pos, 'utf8');
+    }
+
+    FILE.close(fd, function() {
+      completeHandler(true);
+    });
+  })
+
+
 }
 
 function buildDocsTask(version, completeHandler)
