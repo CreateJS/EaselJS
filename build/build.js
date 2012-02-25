@@ -1,490 +1,222 @@
 #!/usr/bin/env node
+(function() {
+  var DOCS_DIR_NAME, DOCS_FILE_NAME, GOOGLE_CLOSURE_PATH, JS_FILE_NAME, OUTPUT_DIR_NAME, PROJECT_NAME, PROJECT_URL, SOURCE_FILES, TEMPLATE_DIR_PATH, TMP_DIR_NAME, YUI_DOC_PATH, YUI_VERSION, buildDocsTask, buildSourceTask, buildSourceWithoutMinificationTask, childProcess, cleanTask, displayTasks, displayUsage, extraSourceFiles, file, fs, js_file_name, knownTasks, main, optimist, os, path, taskMap, verbose, version, waterfall, wrench, _;
 
-/************************************************************
-CONFIGURATION
-*/
-// listing of all source files, with dependencies listed in order:
-var SOURCE_FILES = [
-	"../src/easeljs/utils/UID.js",
-	"../src/easeljs/utils/Ticker.js",
-	"../src/easeljs/events/MouseEvent.js",
-	"../src/easeljs/geom/Matrix2D.js",
-	"../src/easeljs/geom/Point.js",
-	"../src/easeljs/geom/Rectangle.js",
-	"../src/easeljs/display/Shadow.js",
-	"../src/easeljs/display/SpriteSheet.js",
-	"../src/easeljs/display/Graphics.js",
-	"../src/easeljs/display/DisplayObject.js",
-	"../src/easeljs/display/Container.js",
-	"../src/easeljs/display/Stage.js",
-	"../src/easeljs/display/Bitmap.js",
-	"../src/easeljs/display/BitmapAnimation.js",
-	"../src/easeljs/display/Shape.js",
-	"../src/easeljs/display/Text.js",
-	"../src/easeljs/utils/SpriteSheetUtils.js",
-	"../src/easeljs/display/DOMElement.js",
-	"../src/easeljs/filters/Filter.js",
-	//"../src/easeljs/filters/BoxBlurFilter.js",
-	//"../src/easeljs/filters/ColorFilter.js",
-	//"../src/easeljs/filters/ColorMatrixFilter.js",
-	"../src/easeljs/ui/Touch.js"
-];
+  SOURCE_FILES = "utils/UID.js\nutils/Ticker.js\nevents/MouseEvent.js\ngeom/Matrix2D.js\ngeom/Point.js\ngeom/Rectangle.js\ndisplay/Shadow.js\ndisplay/SpriteSheet.js\ndisplay/Graphics.js\ndisplay/DisplayObject.js\ndisplay/Container.js\ndisplay/Stage.js\ndisplay/Bitmap.js\ndisplay/BitmapAnimation.js\ndisplay/Shape.js\ndisplay/Text.js\nutils/SpriteSheetUtils.js\ndisplay/DOMElement.js\nfilters/Filter.js\nui/Touch.js";
 
-// default name for lib output:
-var JS_FILE_NAME = "easel.js";
-
-// project name:
-var PROJECT_NAME = "EaselJS";
-
-// url for website or github repo for project:
-var PROJECT_URL = "http://easeljs.com/";
-
-
-// name of directory for docs:
-var DOCS_DIR_NAME = PROJECT_NAME+"_docs";
-
-// name of file for zipped docs:
-var DOCS_FILE_NAME = DOCS_DIR_NAME+".zip";
-
-// name of directory where generated files are placed
-var OUTPUT_DIR_NAME = "output";
-
-
-// path to directory that includes YUI Doc templates
-var TEMPLATE_DIR_PATH = "template";
-
-// tmp directory used when running scripts:
-var TMP_DIR_NAME = "tmp";
-
-// paths to tools:
-var GOOGLE_CLOSURE_PATH = "tools/google-closure/compiler.jar";
-var YUI_DOC_PATH = "tools/yuidoc/bin/yuidoc.py";
-
-// yui version being used
-var YUI_VERSION = 2;
-
-/*
-END CONFIGURATION
-************************************************************/
-
-
-// TODO: add support for recursively checking to see if we are ommiting any files
-
-
-var FILE = require("fs");
-var PATH = require("path");
-var CHILD_PROCESS = require("child_process");
-var OS = require("os");
-
-//file system utils
-var WRENCH = require("wrench");
-
-//for parsing command line args
-var OPTIMIST = require("optimist");
-
-OPTIMIST.describe("v", "Enable verbose output")
-	.alias("v", "verbose")
-	.boolean("v")
-
-	.describe("l", "List all available tasks")
-	.alias("l", "list")
-	.boolean("l")
-
-	.describe("h", "Display usage")
-	.alias("h", "help")
-	.boolean("h")
-
-	.describe("version", "Document build version number")
-	.string("version")
-
-	.describe("tasks", "Task to run")
-	.default("tasks", "all")
-
-	.describe("s","Include specified file in compilation. Option can be specified multiple times for multiple files.")
-	.alias("s", "source")
-
-	.describe("o", "Name of minified JavaScript file.")
-	.alias("o", "output")
-	.default("o", JS_FILE_NAME)
-
-	.describe("n", "No minification.")
-	.alias("n", "no-minification")
-	.boolean("n")
-
-	.usage("Build Task Manager for "+PROJECT_NAME+"\nUsage\n$0 [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]");
-
-
-
-//name of minified js file.
-var js_file_name = JS_FILE_NAME;
-
-var version;
-var verbose;
-
-var TASK = {
-	ALL:"ALL",
-	BUILDDOCS:"BUILDDOCS",
-	BUILDSOURCE:"BUILDSOURCE",
-	CLEAN:"CLEAN"
-};
-
-var extraSourceFiles;
-
-//main entry point for script. Takes optimist argv object which
-//contains command line arguments.
-//This function is called at the bottom of the script
-function main(argv)
-{
-	if(argv.h)
-	{
-		displayUsage();
-		process.exit(0);
-	}
-
-	if(argv.l)
-	{
-		displayTasks();
-		process.exit(0);
-	}
-
-	//default doesn't seem to be working for OPTIMIST right now
-	//if task is not specified, we default to ALL
-	var task = (!argv.tasks)?"ALL":argv.tasks.toUpperCase();
-
-	if(!taskIsRecognized(task))
-	{
-		print("Unrecognized task : " + task);
-		displayUsage();
-		process.exit(1);
-	}
-
-	verbose = argv.v != undefined;
-	version = argv.version;
-
-	extraSourceFiles = argv.s;
-	
-	if(argv.o)
-	{
-		js_file_name = argv.o;
-	}
-
-	var shouldBuildSource = (task == TASK.BUILDSOURCE);
-	var shouldBuildDocs = (task == TASK.BUILDDOCS);
-
-	if(task==TASK.CLEAN)
-	{
-		cleanTask(
-			function(success)
-			{
-				print("Clean Task Completed");
-			}
-		);
-	}
-
-  console.log("task", task)
-
-	if(task == TASK.ALL)
-	{	
-		shouldBuildSource = true;
-		shouldBuildDocs = true;
-	}
-
-	if(shouldBuildDocs && (version == undefined))
-	{
-		displayUsage();
-		process.exit(0);
-	}
-
-	if(shouldBuildSource)
-	{
-    if(argv.n)
-    {
-      sourceBuilder = buildSourceWithoutMinification
+  SOURCE_FILES = (function() {
+    var _i, _len, _ref, _results;
+    _ref = SOURCE_FILES.split(/\s+/);
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      file = _ref[_i];
+      _results.push("../src/easeljs/" + file);
     }
-    else
-    {
-      sourceBuilder = buildSourceTask
+    return _results;
+  })();
+
+  JS_FILE_NAME = "easel.js";
+
+  PROJECT_NAME = "EaselJS";
+
+  PROJECT_URL = "http://easeljs.com/";
+
+  DOCS_DIR_NAME = PROJECT_NAME + "_docs";
+
+  DOCS_FILE_NAME = DOCS_DIR_NAME + ".zip";
+
+  OUTPUT_DIR_NAME = "output";
+
+  TEMPLATE_DIR_PATH = "template";
+
+  TMP_DIR_NAME = "tmp";
+
+  GOOGLE_CLOSURE_PATH = "tools/google-closure/compiler.jar";
+
+  YUI_DOC_PATH = "tools/yuidoc/bin/yuidoc.py";
+
+  YUI_VERSION = 2;
+
+  knownTasks = "all build_source build_source_nomin build_docs clean".split(/\s+/);
+
+  fs = require("fs");
+
+  path = require("path");
+
+  childProcess = require("child_process");
+
+  os = require("os");
+
+  wrench = require("wrench");
+
+  optimist = require("optimist");
+
+  _ = require("underscore");
+
+  waterfall = require("async").waterfall;
+
+  js_file_name = JS_FILE_NAME;
+
+  version = void 0;
+
+  verbose = void 0;
+
+  extraSourceFiles = void 0;
+
+  optimist.describe("v", "Enable verbose output").alias("v", "verbose").boolean("v").describe("l", "List all available tasks").alias("l", "list").boolean("l").describe("h", "Display usage").alias("h", "help").boolean("h").describe("version", "Document build version number").string("version").describe("s", "Include specified file in compilation. Option can be specified multiple times for multiple files.").alias("s", "source").describe("o", "Name of minified JavaScript file.").alias("o", "output")["default"]("o", JS_FILE_NAME).usage("Build Task Manager for " + PROJECT_NAME + "\nUsage\n$0 [-v] [-h] [-l] [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js] [TASK1] [TASK2]...");
+
+  main = function(argv) {
+    var task, taskFunctions, tasks, _i, _len;
+    if (argv.h) displayUsage();
+    if (argv.l) displayTasks();
+    tasks = _.clone(argv._);
+    if (tasks.length === 0) {
+      tasks.push('build_source');
+      tasks.push('build_docs');
     }
-
-		sourceBuilder(function(success)
-		{		
-			print("Build Source Task Complete");
-			if(shouldBuildDocs)
-			{
-				buildDocsTask(version,
-					function(success)
-					{
-						print("Build Docs Task Complete");
-					}
-				);
-			}
-
-		});
-	}
-
-	if(shouldBuildDocs && task != "ALL")
-	{
-		buildDocsTask(version,
-			function(success)
-			{
-				print("Build Docs Task Complete");
-			}
-		);
-	}	
-}
-
-
-/********** TASKS *************/
-
-
-function cleanTask(completeHandler)
-{
-	if(PATH.existsSync(TMP_DIR_NAME))
-	{	
-		WRENCH.rmdirSyncRecursive(TMP_DIR_NAME);
-	}
-	
-	if(PATH.existsSync(OUTPUT_DIR_NAME))
-	{
-		WRENCH.rmdirSyncRecursive(OUTPUT_DIR_NAME);
-	}
-}
-
-function buildSourceTask(completeHandler)
-{	
-	if(!PATH.existsSync(OUTPUT_DIR_NAME))
-	{
-		FILE.mkdirSync(OUTPUT_DIR_NAME);
-	}
-
-	var file_args = [];
-	var len = SOURCE_FILES.length;
-	for(var i = 0; i < len; i++)
-	{
-		file_args.push("--js");
-		file_args.push(SOURCE_FILES[i]);
-	}
-	
-	if(extraSourceFiles)
-	{
-		len = extraSourceFiles.length;
-		for(var i = 0; i < len; i++)
-		{
-			file_args.push("--js");
-			file_args.push(extraSourceFiles[i]);
-		}
-	}
-	
-	
-	var tmp_file = PATH.join(OUTPUT_DIR_NAME,"tmp.js");
-	var final_file = PATH.join(OUTPUT_DIR_NAME, js_file_name);
-
-	var cmd = [
-		"java", "-jar", GOOGLE_CLOSURE_PATH
-	].concat(
-			file_args
-		).concat(
-			["--js_output_file", tmp_file]
-		);
-		
-	if(verbose)
-	{
-		print(cmd.join(" "));
-	}
-
-	CHILD_PROCESS.exec(
-		cmd.join(" "),
-		function(error, stdout, stderr)
-		{
-			if(verbose)
-			{
-				if(stdout)
-				{
-					print(stdout);
-				}
-			
-				if(stderr)
-				{
-					print(stderr);
-				}
-			}
-
-		    if (error !== null)
-			{
-				print("Error Running Google Closure : " + error);
-				exitWithFailure();
-		    }
-		
-			var license_data = FILE.readFileSync("license.txt", "UTF-8");
-			var final_data = FILE.readFileSync(tmp_file, "UTF-8");
-
-			FILE.writeFileSync(final_file, license_data + final_data, "UTF-8");
-
-			FILE.unlinkSync(tmp_file);
-			
-			completeHandler(true);
-		}
-	);
-}
-
-
-function buildSourceWithoutMinification(completeHandler)
-{
-  if(!PATH.existsSync(OUTPUT_DIR_NAME))
-	{
-		FILE.mkdirSync(OUTPUT_DIR_NAME);
-	}
-
-	var file = SOURCE_FILES.slice();
-	
-	if(extraSourceFiles)
-	{
-    files.concat(extraSourceFiles)
-	}
-	
-	
-  var license_data = FILE.readFileSync("license.txt", "utf8");
-	var final_file = PATH.join(OUTPUT_DIR_NAME, js_file_name);
-
-  console.log("final", final_file);
-
-
-  FILE.open(final_file, 'w', function(err, fd) {
-    pos = 0
-    pos += FILE.writeSync(fd, license_data, pos)
-
-    for( var i=0, l=SOURCE_FILES.length; i<l; i++ ) {
-      fileData = FILE.readFileSync(SOURCE_FILES[i], 'utf8');
-      pos += FILE.writeSync(fd, fileData, pos, 'utf8');
+    for (_i = 0, _len = tasks.length; _i < _len; _i++) {
+      task = tasks[_i];
+      if (!_.include(knownTasks, task)) {
+        console.error("Unrecognized task : " + task);
+        displayUsage(1);
+      }
     }
-
-    FILE.close(fd, function() {
-      completeHandler(true);
+    verbose = argv.v;
+    version = argv.version;
+    extraSourceFiles = argv.s;
+    if (argv.o) js_file_name = argv.o;
+    taskFunctions = (function() {
+      var _j, _len2, _results;
+      _results = [];
+      for (_j = 0, _len2 = tasks.length; _j < _len2; _j++) {
+        task = tasks[_j];
+        _results.push(taskMap[task]);
+      }
+      return _results;
+    })();
+    return waterfall(taskFunctions, function(err, result) {
+      var taskList;
+      taskList = tasks.join(', ');
+      if (err) {
+        console.error("failed running tasks " + taskList);
+        console.error(err);
+        return displayUsage(1);
+      } else {
+        return console.log("finished tasks " + taskList);
+      }
     });
-  })
+  };
 
+  cleanTask = function(cb) {
+    if (path.existsSync(TMP_DIR_NAME)) wrench.rmdirSyncRecursive(TMP_DIR_NAME);
+    if (path.existsSync(OUTPUT_DIR_NAME)) {
+      wrench.rmdirSyncRecursive(OUTPUT_DIR_NAME);
+    }
+    return cb(null);
+  };
 
-}
+  buildSourceTask = function(cb) {
+    var cmd, file, file_args, final_file, tmp_file, _i, _j, _len, _len2;
+    if (!path.existsSync(OUTPUT_DIR_NAME)) fs.mkdirSync(OUTPUT_DIR_NAME);
+    file_args = [];
+    for (_i = 0, _len = SOURCE_FILES.length; _i < _len; _i++) {
+      file = SOURCE_FILES[_i];
+      file_args.push("--js");
+      file_args.push(file);
+    }
+    if (extraSourceFiles) {
+      for (_j = 0, _len2 = extraSourceFiles.length; _j < _len2; _j++) {
+        file = extraSourceFiles[_j];
+        file_args.push("--js");
+        file_args.push(file);
+      }
+    }
+    tmp_file = path.join(OUTPUT_DIR_NAME, "tmp.js");
+    final_file = path.join(OUTPUT_DIR_NAME, js_file_name);
+    cmd = ["java", "-jar", GOOGLE_CLOSURE_PATH].concat(file_args).concat(["--js_output_file", tmp_file]);
+    if (verbose) console.log(cmd.join(" "));
+    return childProcess.exec(cmd.join(" "), function(error, stdout, stderr) {
+      var final_data, license_data;
+      if (verbose) {
+        if (stdout) console.log(stdout);
+        if (stderr) console.log(stderr);
+      }
+      if (error) return cb("Error Running Google Closure : " + error);
+      license_data = fs.readFileSync("license.txt", "UTF-8");
+      final_data = fs.readFileSync(tmp_file, "UTF-8");
+      fs.writeFileSync(final_file, license_data + final_data, "utf8");
+      fs.unlinkSync(tmp_file);
+      return cb(null);
+    });
+  };
 
-function buildDocsTask(version, completeHandler)
-{	
-	var parser_in="../src";
-	var	parser_out= PATH.join(TMP_DIR_NAME , "parser");
+  buildSourceWithoutMinificationTask = function(cb) {
+    var files, final_file, license_data;
+    if (!path.existsSync(OUTPUT_DIR_NAME)) fs.mkdirSync(OUTPUT_DIR_NAME);
+    files = SOURCE_FILES.slice();
+    if (extraSourceFiles) files.concat(extraSourceFiles);
+    license_data = fs.readFileSync("license.txt", "utf8");
+    final_file = path.join(OUTPUT_DIR_NAME, js_file_name);
+    return fs.open(final_file, "w", function(err, fd) {
+      var file, fileData, pos, _i, _len;
+      pos = 0;
+      pos += fs.writeSync(fd, license_data, pos);
+      for (_i = 0, _len = SOURCE_FILES.length; _i < _len; _i++) {
+        file = SOURCE_FILES[_i];
+        fileData = fs.readFileSync(file, "utf8");
+        pos += fs.writeSync(fd, fileData, pos, "utf8");
+      }
+      return fs.close(fd, function() {
+        return cb(null);
+      });
+    });
+  };
 
-	var doc_dir=DOCS_DIR_NAME;
-	
-	var generator_out=PATH.join(OUTPUT_DIR_NAME, doc_dir);
-	
-	var cmd = [
-		"python", YUI_DOC_PATH,
-		parser_in,
-		"-p", parser_out,
-		"-o", generator_out,
-		"-t", TEMPLATE_DIR_PATH,
-		"-v", version,
-		"-Y", YUI_VERSION,
-		"-m", PROJECT_NAME,
-		"-u", PROJECT_URL
-	];
-	
-	if(verbose)
-	{
-		print(cmd.join(" "));
-	}	
-	
-	CHILD_PROCESS.exec(
-		cmd.join(" "),
-		function(error, stdout, stderr)
-		{
-			if(verbose)
-			{
-				if(stdout)
-				{
-					print(stdout);
-				}
-			
-				if(stderr)
-				{
-					print(stderr);
-				}
-			}
+  buildDocsTask = function(cb) {
+    var cmd, doc_dir, generator_out, parser_in, parser_out;
+    if (!version) return cb("no version specified");
+    parser_in = "../src";
+    parser_out = path.join(TMP_DIR_NAME, "parser");
+    doc_dir = DOCS_DIR_NAME;
+    generator_out = path.join(OUTPUT_DIR_NAME, doc_dir);
+    cmd = ["python", YUI_DOC_PATH, parser_in, "-p", parser_out, "-o", generator_out, "-t", TEMPLATE_DIR_PATH, "-v", version, "-Y", YUI_VERSION, "-m", PROJECT_NAME, "-u", PROJECT_URL];
+    if (verbose) console.log(cmd.join(" "));
+    return childProcess.exec(cmd.join(" "), function(error, stdout, stderr) {
+      if (verbose) {
+        if (stdout) console.log(stdout);
+        if (stderr) console.log(stderr);
+      }
+      if (error) return cb("Error Running YUI DOC : " + error);
+      return childProcess.exec("cd " + OUTPUT_DIR_NAME + ";zip -r " + DOCS_FILE_NAME + " " + doc_dir + " -x *.DS_Store", function(error, stdout, stderr) {
+        if (verbose) {
+          if (stdout) console.log(stdout);
+          if (stderr) console.log(stderr);
+        }
+        if (error) return cb("Error ZIPPING Docs : " + error);
+        wrench.rmdirSyncRecursive(TMP_DIR_NAME);
+        return cb(null);
+      });
+    });
+  };
 
-		    if (error !== null)
-			{
-				print("Error Running YUI DOC : " + error);
-				exitWithFailure();
-		    }
-		
-			CHILD_PROCESS.exec(
-				"cd " + OUTPUT_DIR_NAME + ";zip -r " + DOCS_FILE_NAME + " " + doc_dir + " -x *.DS_Store",
-				function(error, stdout, stderr)
-				{
-					if(verbose)
-					{
-						if(stdout)
-						{
-							print(stdout);
-						}
+  displayUsage = function(code) {
+    if (code == null) code = 0;
+    console.log(optimist.help());
+    return process.exit(code);
+  };
 
-						if(stderr)
-						{
-							print(stderr);
-						}
-					}
+  displayTasks = function() {
+    console.log("Available tasks: " + (knownTasks.join(', ')));
+    return process.exit(0);
+  };
 
-				    if (error !== null)
-					{
-						print("Error ZIPPING Docs : " + error);
-						exitWithFailure();
-				    }
-				
-					WRENCH.rmdirSyncRecursive(TMP_DIR_NAME);
-				
-					completeHandler(true);				
-				});		
-		
-		
-		});	
-}
+  taskMap = {
+    build_source: buildSourceTask,
+    build_source_nomin: buildSourceWithoutMinificationTask,
+    build_docs: buildDocsTask,
+    clean: cleanTask
+  };
 
-/*************** some util methods ******************/
+  main(optimist.argv);
 
-function exitWithFailure()
-{
-	process.exit(1);
-}
-
-function displayUsage()
-{
-	print(OPTIMIST.help());
-}
-
-function displayTasks()
-{
-	var out = "Available tasks: ";
-	
-	for(var _t in TASK)
-	{
-		out += TASK[_t] +", "
-	}
-	
-	print(out.slice(0, -2));
-}
-
-function taskIsRecognized(task)
-{
-	return TASK.hasOwnProperty(task);
-}
-
-function print(msg)
-{
-	console.log(msg);
-}
-
-//call the main script entry point
-main(OPTIMIST.argv);
-
-
-
-
-
+}).call(this);
