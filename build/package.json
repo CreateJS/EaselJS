@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "wrench": "*",
-    "optimist": "*"
+    "optimist": "*",
+    "underscore": "*",
+    "async": "*"
   },
   "devDependencies": {},
   "optionalDependencies": {}
