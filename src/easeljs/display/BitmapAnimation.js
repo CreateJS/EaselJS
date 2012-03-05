@@ -286,7 +286,7 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	p._tick = function(elapsedTime, globalPaused, advance) {
 		var f = this._animation ? this._animation.frequency : 1;
 		if (advance && !this.paused && ((++this._advanceCount)+this.offset)%f == 0) {
-			this.advance();
+			this.advance(elapsedTime);
 		}
 		if (this.tick) { this.tick(elapsedTime, paused); }
 	}
