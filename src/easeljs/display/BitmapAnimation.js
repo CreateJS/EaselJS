@@ -277,10 +277,13 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 // private methods:
 	/**
 	 * Advances the currentFrame if paused is not true. This is called automatically when the Stage ticks.
+   * @param {Number} elapsedTime The elapsed time between the previous tick and the current one.
+	 * @param {Boolean} globalPaused Indicates whether the ticker is paused.
+	 * @param {Boolean} advance Indicates whether the animation should advance.
 	 * @protected
 	 * @method _tick
 	 **/
-	p._tick = function(advance) {
+	p._tick = function(elapsedTime, globalPaused, advance) {
 		var f = this._animation ? this._animation.frequency : 1;
 		if (advance && !this.paused && ((++this._advanceCount)+this.offset)%f == 0) {
 			this.advance();
