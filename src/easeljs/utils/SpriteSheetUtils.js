@@ -117,7 +117,28 @@ var SpriteSheetUtils = function() {
 		return img;
 	}
 
-	
+	/**
+	 * clip  image from a big image 
+	 * @method clipImage 
+	 * @static
+	 * @param {Image} image
+	 * @param {Number} sourceX
+          * @param {Number} sourceY
+          * @param {Number} clip area width
+          * @param {Number} clip area height
+	 * name is specified, only the first frame of the animation will be extracted.
+	 * @return {Image} a single frame of the specified sprite sheet as a new PNG image.
+	*/
+    SpriteSheetUtils.clipImage = function (image, sx, sy, sw, sh) {
+        var canvas = SpriteSheetUtils._workingCanvas;
+        canvas.width = sw;
+        canvas.height = sh;
+        SpriteSheetUtils._workingContext.drawImage(image, sx, sy, sw, sh, 0, 0, sw, sh);
+        var img = new Image();
+        img.src = canvas.toDataURL("image/png");
+        return img;
+    }
+
 // private static methods:
 	SpriteSheetUtils._flip = function(spriteSheet, count, h, v) {
 		var imgs = spriteSheet._images;
