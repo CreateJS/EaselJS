@@ -105,6 +105,14 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	 **/
 	p.spriteSheet = null;
 
+    /**
+     * Scale of the image when drawn in the container
+     * @property imageScale
+     * @type number
+     * @default 1
+     */
+    p.imageScale = 1;
+
 	/**
 	 * Whether or not the Bitmap should be draw to the canvas at whole pixel coordinates.
 	 * @property snapToPixel
@@ -205,7 +213,7 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 		var rect = o.rect;
 		// TODO: implement snapToPixel on regX/Y?
 		this.beginClip(ctx);
-		ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, -o.regX, -o.regY, rect.width, rect.height);
+		ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, -o.regX, -o.regY, rect.width * this.imageScale, rect.height * this.imageScale);
 		this.endClip(ctx);
 		return true;
 	}
