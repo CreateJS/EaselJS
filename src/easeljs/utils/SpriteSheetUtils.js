@@ -107,9 +107,12 @@ var SpriteSheetUtils = function() {
 	 * @param {Image} spriteSheet The SpriteSheet instance to extract a frame from.
 	 * @param {Number} frame The frame number or animation name to extract. If an animation
 	 * name is specified, only the first frame of the animation will be extracted.
+	 * @param {Function} method to call once frame image is finished loading
 	 * @return {Image} a single frame of the specified sprite sheet as a new PNG image.
 	*/
-	SpriteSheetUtils.extractFrame = function(spriteSheet, frame) {
+	SpriteSheetUtils.extractFrame = function(spriteSheet, frame, loaded) {
+		loaded = typeof loaded == 'function' ? loaded : function() {};
+
 		if (isNaN(frame)) {
 			frame = spriteSheet.getAnimation(frame).frames[0];
 		}
@@ -121,6 +124,9 @@ var SpriteSheetUtils = function() {
 		canvas.height = r.height;
 		SpriteSheetUtils._workingContext.drawImage(data.image, r.x, r.y, r.width, r.height, 0, 0, r.width, r.height);
 		var img = new Image();
+		img.onload = function() {
+			loaded(img);
+		};
 		img.src = canvas.toDataURL("image/png");
 		return img;
 	}
