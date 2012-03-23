@@ -9,12 +9,7 @@ Version 0.4.1 [Not tagged]
 - rewrite of Ticker to simplify implementation and solve issues with useRAF in Safari
 - animations in BitmapAnimation now default to looping
 - added BitmapAnimation.play/stop()
-*?? currentFrame, totalFrames on MovieClip.
-* added frequency to BitmapAnimation
-* cursor on DisplayObjects
-* onTick change, propagate delta & paused values
-
-
+- added Bitmap.sourceRect
 
 Version 0.4 [Nov 30, 2011] 
 ****************************************************************************************************
