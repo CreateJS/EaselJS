@@ -63,6 +63,14 @@ var p = Bitmap.prototype = new DisplayObject();
 	 * @default true
 	 **/
 	p.snapToPixel = true;
+
+	/**
+	 * Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
+	 * @property sourceRect
+	 * @type Rectangle
+	 * @default null
+	 */
+	p.sourceRect = null;
 	
 	// constructor:
 
@@ -120,7 +128,12 @@ var p = Bitmap.prototype = new DisplayObject();
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		ctx.drawImage(this.image, 0, 0);
+		var rect = this.sourceRect;
+		if (rect) {
+			ctx.drawImage(this.image, rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width, rect.height);
+		} else {
+			ctx.drawImage(this.image, 0, 0);
+		}
 		return true;
 	}
 	
