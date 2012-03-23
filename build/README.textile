@@ -19,55 +19,54 @@ YUI Doc and Google Closure are included in the repository, which makes it easier
 
 h2. Configuration
 
-In order to run the script, you must have "node.js":http://nodejs.org/ installed, along with the "wrench":https://github.com/ryanmcgrath/wrench-js and "optimist":https://github.com/substack/node-optimist modules.
+In order to run the script, you must have "node.js":http://nodejs.org/ installed.
 
 * "node.js":http://nodejs.org/
-* "wrench module":https://github.com/ryanmcgrath/wrench-js
-* "optimist module":https://github.com/substack/node-optimist
 
-The easiest way to install the required modules is to first install "NPM":http://npmjs.org/ (node package manager) and then run:
+The easiest way to install the required modules is to run:
 
-<code>npm install wrench</code>
-<code>npm install optimist</code>
+<code>$ npm install</code>
+
+(NPM is included with Node.js as of version 0.6)
 
 
 h2. Building the Source
 
-<pre><code>Build Task Manager
+<pre><code>
+Build Task Manager for EaselJS
 Usage
-node ./build.js [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]
+./build.js [-v] [-h] [-l] [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js] [TASK1] [TASK2]...
 
 Options:
   -v, --verbose  Enable verbose output                                                                              [boolean]
   -l, --list     List all available tasks                                                                           [boolean]
   -h, --help     Display usage                                                                                      [boolean]
   --version      Document build version number                                                                      [string]
-  --tasks        Task to run                                                                                        [default: "all"]
   -s, --source   Include specified file in compilation. Option can be specified multiple times for multiple files.
-  -o, --output   Name of minified JavaScript file.                                                                  [default: (set in config properties)]
+  -o, --output   Name of minified JavaScript file.                                                                  [default: "easel.js"]
 </code></pre>
 
 h3. Examples
 
 h4. Build Source and Docs
 
-<code>./build.js --tasks=ALL --version=5</code>
+<code>./build.js --version=5</code>
 
 h4. Build Source
 
-<code>./build.js --tasks=BUILDSOURCE</code>
+<code>./build.js build_source</code>
 
 h4. Build Docs
 
-<code>./build.js --tasks=BUILDDOCS --version=5</code>
+<code>./build.js build_docs --version=5</code>
 
 h4. Build Source and include external .js files and rename generated file
 
-<code>./build.js --tasks=BUILDSOURCE -s test.js -s test2.js -o mylib.js</code>
+<code>./build.js build_source -s test.js -s test2.js -o mylib.js</code>
 
 h4. Clean Build Directories
 
-<code>./build.js --tasks=CLEAN</code>
+<code>./build.js clean</code>
 
 
 h2. Tagging the Release
