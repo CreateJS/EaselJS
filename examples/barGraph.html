@@ -157,6 +157,7 @@ function init() {
 	// start the tick and point it at the window so we can do some work before updating the stage:
 	Ticker.setInterval(50);		// 1000 / 50 ms = 20 fps (You could also call Ticker.setFPS(20))
 	Ticker.addListener(window);
+	Ticker.useRAF = true;
 }
 
 function tick() {

@@ -66,8 +66,9 @@ function init() {
 	}
 	
 	// start the tick and point it at the window so we can do some work before updating the stage:
-	Ticker.addListener(window);
+	Ticker.addListener(window, false);
 	Ticker.setFPS(30);
+	Ticker.setPaused(true);
 }
 
 function tick() {

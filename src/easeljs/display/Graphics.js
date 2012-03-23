@@ -681,6 +681,7 @@ var p = Graphics.prototype;
 	p.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
 		this._dirty = this._active = true;
 		var pi = Math.PI, arc=this._ctx.arc, lineTo=this._ctx.lineTo;
+		
 		this._activeInstructions.push(
 			new Command(this._ctx.moveTo, [x+radiusTL, y]),
 			new Command(lineTo, [x+w-radiusTR, y]),

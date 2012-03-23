@@ -11,7 +11,8 @@ version: 1.0.0b1
 
 ''' A class to parse Javadoc style comments out of javascript to document 
     an API. It is designed to parse one module at a time ''' 
-import os, re, simplejson, string, sys, pprint, logging, logging.config
+import os, re, string, sys, pprint, logging, logging.config
+import json as simplejson
 import const
 from cStringIO import StringIO 
 from optparse import OptionParser

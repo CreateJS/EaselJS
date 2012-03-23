@@ -291,7 +291,7 @@ var Ticker = function() {
 	 * @method getMeasuredFPS
 	 * @static
 	 * @param {Number} ticks Optional. The number of previous ticks over which to measure the actual 
-	 * frames / ticks per second.
+	 * frames / ticks per second. Defaults to the number of ticks per second.
 	 * @return {Number} The actual frames / ticks per second. Depending on performance, this may differ
 	 * from the target frames per second.
 	 **/
@@ -376,6 +376,10 @@ var Ticker = function() {
 		Ticker._setupTick();
 	}
 	
+	/**
+	 * @method _setupTick
+	 * @protected
+	 **/
 	Ticker._setupTick = function() {
 		if (Ticker._rafActive || Ticker.timeoutID != null) { return; } // avoid duplicates
 		if (Ticker.useRAF) {

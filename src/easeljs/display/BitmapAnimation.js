@@ -221,6 +221,22 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	 * You should not cache Bitmap instances as it can degrade performance.
 	 * @method uncache
 	 **/
+	
+	/**
+	 * TODO: Doc.
+	 * @method play
+	 **/
+	p.play = function() {
+		this.paused = false;
+	}
+	
+	/**
+	 * TODO: Doc.
+	 * @method stop
+	 **/
+	p.stop = function() {
+		this.paused = true;
+	}
 
 	/**
 	 * Sets paused to false and plays the specified animation name, named frame, or frame number.

@@ -10,7 +10,8 @@ version: 1.0.0b1
 '''
 
 ''' Prints documentation with htmltmpl from the json data outputted by parser.py  ''' 
-import os, re, simplejson, shutil, logging, logging.config, time, datetime
+import os, re, shutil, logging, logging.config, time, datetime
+import json as simplejson
 import const
 from cStringIO import StringIO 
 from Cheetah.Template import Template
