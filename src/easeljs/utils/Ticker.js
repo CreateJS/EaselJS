@@ -182,18 +182,19 @@ var Ticker = function() {
 	
 // public static methods:
 	/**
-	 * Adds a listener for the tick event. The listener object must expose a .tick() method, 
-	 * which will be called once each tick / interval. The interval is specified via the 
+	 * Adds a listener for the tick event. The listener must be either an object exposing a .tick() method,
+	 * or a function. The listener will be called once each tick / interval. The interval is specified via the 
 	 * .setInterval(ms) method.
-	 * The exposed tick method is passed two parameters: the elapsed time between the 
+	 * The tick method or function is passed two parameters: the elapsed time between the 
 	 * previous tick and the current one, and a boolean indicating whether Ticker is paused.
 	 * @method addListener
 	 * @static
-	 * @param {Object} o The object to add as a listener.
+	 * @param {Object} o The object or function to add as a listener.
 	 * @param {Boolean} pauseable If false, the listener will continue to have tick called 
 	 * even when Ticker is paused via Ticker.pause(). Default is true.
 	 **/
 	Ticker.addListener = function(o, pauseable) {
+		if (o == null) { return; }
 		if (!Ticker._inited) { Ticker.init(); }
 		Ticker.removeListener(o);
 		Ticker._pauseable[Ticker._listeners.length] = (pauseable == null) ? true : pauseable;
@@ -220,7 +221,7 @@ var Ticker = function() {
 	 * Removes the specified listener.
 	 * @method removeListener
 	 * @static
-	 * @param {Object} o The object to remove from listening from the tick event.
+	 * @param {Object} o The object or function to remove from listening from the tick event.
 	 **/
 	Ticker.removeListener = function(o) {
 		if (Ticker._listeners == null) { return; }
@@ -414,10 +415,10 @@ var Ticker = function() {
 		var listeners = Ticker._listeners.slice();
 		var l = listeners ? listeners.length : 0;
 		for (var i=0; i<l; i++) {
-			var p = pauseable[i];
 			var listener = listeners[i];
-			if (listener == null || (paused && p) || listener.tick == null) { continue; }
-			listener.tick(elapsedTime,paused);
+			if (listener == null || (paused && pauseable[i])) { continue; }
+			if (listener instanceof Function) { listener(elapsedTime, paused); }
+			else if (listener.tick) { listener.tick(elapsedTime, paused); }
 		}
 		
 		Ticker._tickTimes.unshift(Ticker._getTime()-time);
