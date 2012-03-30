@@ -687,10 +687,12 @@ var p = DisplayObject.prototype;
 	/**
 	 * @method _tick
 	 * @protected
-	 * @param Boolean advance Indicates whether any related animations should advance.
+   * @param {Number} elapsedTime The elapsed time between the previous tick and the current one.
+	 * @param {Boolean} globalPaused Indicates whether the ticker is paused.
+	 * @param {Boolean} advance Indicates whether any related animations should advance.
 	 **/
-	p._tick = function(advance) {
-		if (this.tick) { this.tick(); }
+	p._tick = function(elapsedTime, paused, advance) {
+		if (this.tick) { this.tick(elapsedTime, paused); }
 	}
 
 	/**

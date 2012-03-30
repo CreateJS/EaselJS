@@ -214,13 +214,13 @@ var p = Stage.prototype = new Container();
 	 * and render its entire display list to the canvas.
 	 * @method update
 	 **/
-	p.update = function() {
+	p.update = function(elapsedTime, paused) {
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
 		if (this.tickOnUpdate) {
 			if (this.tick == this.update) { var t=1; this.tick = null; }
-			this._tick(true);
+			this._tick(elapsedTime, paused, true);
 			if (t) { this.tick = this.update; }
 		}
 		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(this._matrix));
