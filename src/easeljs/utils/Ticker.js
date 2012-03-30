@@ -417,8 +417,8 @@ var Ticker = function() {
 		for (var i=0; i<l; i++) {
 			var listener = listeners[i];
 			if (listener == null || (paused && pauseable[i])) { continue; }
-			if (listener instanceof Function) { listener(elapsedTime, paused); }
-			else if (listener.tick) { listener.tick(elapsedTime, paused); }
+			if (listener.tick) { listener.tick(elapsedTime, paused); }
+			else if (listener instanceof Function) { listener(elapsedTime, paused); }
 		}
 		
 		Ticker._tickTimes.unshift(Ticker._getTime()-time);
