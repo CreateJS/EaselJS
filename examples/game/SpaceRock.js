@@ -82,6 +82,7 @@ SpaceRock.prototype = new Shape();
 	
 	//handle what a spaceRock does to itself every frame
 	SpaceRock.prototype.tick = function() {
+		// we're using tick instead of onTick so we can control when it is run.
 		this.rotation += this.spin;
 		this.x += this.vX;
 		this.y += this.vY;

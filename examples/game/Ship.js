@@ -82,6 +82,8 @@ Ship.prototype = new Container();
 	}
 	
 	Ship.prototype.tick = function() {
+		// we're using tick instead of onTick so we can control when it is run.
+	
 		//move by velocity
 		this.x += this.vX;
 		this.y += this.vY;
