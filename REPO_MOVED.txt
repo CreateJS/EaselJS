@@ -1,0 +1,7 @@
+The EaselJS repository has moved to:
+http://github.com/CreateJS/EaselJS/
+
+You will need to update your remote URI. You can do that using this GIT command:
+git remote set-url origin git://github.com/CreateJS/EaselJS.git
+
+If you are using a GIT client UI, check its documentation to learn how to edit the remote path.
