@@ -1,3 +1,10 @@
+Future:
+****************************************************************************************************
+- DisplayObject.hitArea
+- masking / clipping
+- MovieClip timeline caching
+
+
 Version 0.4.1 [Not tagged]
 ****************************************************************************************************
 - fixed a problem with preloading sprite sheet images when using tile based sheets
@@ -10,6 +17,9 @@ Version 0.4.1 [Not tagged]
 - animations in BitmapAnimation now default to looping
 - added BitmapAnimation.play/stop()
 - added Bitmap.sourceRect
+- Ticker now supports an object with a tick method, or a function as a listener
+- renamed DisplayObject.tick to .onTick
+
 
 Version 0.4 [Nov 30, 2011] 
 ****************************************************************************************************

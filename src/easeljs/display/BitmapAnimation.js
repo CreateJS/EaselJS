@@ -296,11 +296,12 @@ var p = BitmapAnimation.prototype = new DisplayObject();
 	 * @protected
 	 * @method _tick
 	 **/
-	p._tick = function(advance) {
+	p._tick = function(data) {
 		var f = this._animation ? this._animation.frequency : 1;
-		if (advance && !this.paused && ((++this._advanceCount)+this.offset)%f == 0) {
+		if (!this.paused && ((++this._advanceCount)+this.offset)%f == 0) {
 			this.advance();
 		}
+		if (this.onTick) { this.onTick(data); }
 	}
 	
 	

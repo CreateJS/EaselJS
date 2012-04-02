@@ -687,10 +687,9 @@ var p = DisplayObject.prototype;
 	/**
 	 * @method _tick
 	 * @protected
-	 * @param Boolean advance Indicates whether any related animations should advance.
 	 **/
-	p._tick = function(advance) {
-		if (this.tick) { this.tick(); }
+	p._tick = function(data) {
+		if (this.onTick) { this.onTick(data); }
 	}
 
 	/**

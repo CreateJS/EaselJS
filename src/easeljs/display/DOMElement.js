@@ -200,9 +200,10 @@ var p = DOMElement.prototype = new DisplayObject();
 	}
 
 // private methods:
-	p._tick = function() {
+	p._tick = function(data) {
 		if (this.htmlElement == null) { return; }
 		this.htmlElement.style.visibility = "hidden";
+		if (this.onTick) { this.onTick(data); }
 	}
 
 	/* Not needed with current setup:

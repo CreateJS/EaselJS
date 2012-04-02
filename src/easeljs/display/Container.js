@@ -426,12 +426,12 @@ var p = Container.prototype = new DisplayObject();
 	 * @method _tick
 	 * @protected
 	 **/
-	p._tick = function(advance) {
+	p._tick = function(data) {
 		for (var i=this.children.length-1; i>=0; i--) {
 			var child = this.children[i];
-			if (child._tick) { child._tick(advance); }
+			if (child._tick) { child._tick(data); }
 		}
-		if (this.tick) { this.tick(); }
+		if (this.onTick) { this.onTick(data); }
 	}
 
 	/**
