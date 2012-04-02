@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Text</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Bitmap.js"></script>
+<script src="../src/easeljs/display/Graphics.js"></script>
+<script src="../src/easeljs/display/Shape.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var canvas;
+var stage;
+
+var bmp;
+
+function init() {
+	//find canvas and load images, wait for last image to load
+	canvas = document.getElementById("testCanvas");
+	stage = new Stage(canvas);
+
+	// Bitmap also supports construction with a URI to an image to load:
+	bmp = new Bitmap("img/daisy.png");
+	stage.addChild(bmp);
+	
+	// we want to do some work before we update the canvas,
+	// otherwise we could use Ticker.addListener(stage);
+	Ticker.addListener(stage);
+}
+
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+		Simple sample showing how to use image URIs with the <strong>Bitmap</strong> class.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580"></canvas>
+	</div>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Using cache and snapToPixel</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/display/SpriteSheet.js"></script>
+<script src="../src/easeljs/display/Shadow.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/display/Text.js"></script>
+<script src="../src/easeljs/display/Graphics.js"></script>
+<script src="../src/easeljs/display/Shape.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var canvas;
+var stage;
+var shape;
+var circleRadius=20;
+
+function init() {
+	// create a new stage and point it at our canvas:
+	canvas = document.getElementById("testCanvas");
+	stage = new Stage(canvas);
+	
+	// create a large number of slightly complex vector shapes, and give them random positions and velocities:
+	for (var i=0; i<1000; i++) {
+		shape = new Shape();
+		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius);
+		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.8);
+		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.6);
+		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.4);
+		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.2);
+		shape.x = Math.random()*canvas.width;
+		shape.y = Math.random()*canvas.height;
+		shape.velX = Math.random()*10-5;
+		shape.velY = Math.random()*10-5;
+		
+		// turn snapToPixel on for all shapes - it's set to false by default on Shape.
+		// it won't do anything until stage.snapToPixelEnabled is set to true.
+		shape.snapToPixel = true;
+		
+		stage.addChild(shape);
+	}
+	
+	// add a text object to output the current FPS:
+	fpsLabel = new Text("-- fps","bold 18px Arial","#FFF");
+	stage.addChild(fpsLabel);
+	fpsLabel.x = 10;
+	fpsLabel.y = 20;
+	
+	// start the tick and point it at the window so we can do some work before updating the stage:
+	Ticker.addListener(window);
+	Ticker.setFPS(50);
+}
+
+function tick() {
+	var w = canvas.width;
+	var h = canvas.height;
+	var l = stage.getNumChildren()-1;
+	
+	// iterate through all the children and move them according to their velocity:
+	for (var i=1; i<l; i++) {
+		var shape = stage.getChildAt(i);
+		shape.x = (shape.x+shape.velX+w)%w;
+		shape.y = (shape.y+shape.velY+h)%h;
+	}
+	
+	fpsLabel.text = Math.round(Ticker.getMeasuredFPS())+" fps";
+	
+	// draw the updates to stage:
+	stage.update();
+}
+
+function toggleCache(value) {
+	// iterate all the children except the fpsLabel, and set up the cache:
+	var l = stage.getNumChildren()-1;
+	
+	for (var i=0; i<l; i++) {
+		var shape = stage.getChildAt(i);
+		if (value) {
+			shape.cache(-circleRadius, -circleRadius, circleRadius*2, circleRadius*2);
+		} else {
+			shape.uncache();
+		}
+	}
+}
+
+
+</script>
+</head>
+	
+<body onload="init();">
+	<!-- background isn't set to black to demonstrate how the darkening applies -->
+	<div class="description">
+	This example demonstrates the effect of <strong>DisplayObject.cache()</strong> and <strong>snapToPixel</strong> on performance. Caching speeds things up because the complex vector shapes do not have to be rerendered each tick. The results for snapToPixel vary between browsers, but in general it will have no effect on the uncached shapes, but a significant effect when cached.
+	<br/><br/>
+	<input type="checkbox" onClick="toggleCache(this.checked);"/> cache enabled
+	<input type="checkbox" onClick="stage.snapToPixelEnabled = !!this.checked;"/> snapToPixel enabled
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="680" style="background-color:#000"></canvas>
+	</div>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Using globalToLocal #1</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/geom/Point.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/display/Graphics.js"></script>
+<script src="../src/easeljs/display/Shape.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var canvas;
+var stage;
+
+var _mouseIsDown;
+var _mouseX;
+var _mouseY;
+
+var spin1;		// nested invisble container to generate a spirograph effect
+var spin2;		// nested invisble container to generate a spirograph effect
+
+var shape;		// drawing shape
+var color;		// drawing color
+var lastPt;		// last draw position
+var graphics;
+var count = 0;
+
+function init() {
+	// create a new stage and point it at our canvas:
+	canvas = document.getElementById("testCanvas");
+	stage = new Stage(canvas);
+	
+	// attach mouse handlers directly to the source canvas
+	// better than calling from canvas tag for cross browser
+	canvas.onmousemove = mouseMove;
+	canvas.onmousedown = mouseDown;
+	canvas.onmouseup = mouseUp;
+	
+	// shape to draw vector data into:
+	shape = new Shape();
+	shape.x = 41;		//position in parent container
+	graphics = shape.graphics;
+	
+	// middle spinner:
+	spin2 = new Container();
+	spin2.addChild(shape);
+	spin2.x = 303;		//position in parent container
+	
+	// outside spinner:
+	spin1 = new Container();
+	spin1.addChild(spin2);
+	
+	// center it on the stage:
+	spin1.x = canvas.width/2;
+	spin1.y = canvas.height/2;
+	stage.addChild(spin1);
+	
+	// start the tick and point it at the window so we can do some work before updating the stage:
+	Ticker.setFPS(30);
+	Ticker.addListener(window);
+}
+
+function tick() {
+	// update rotation:
+	spin1.rotation += 10;
+	spin2.rotation += -7;
+	shape.rotation += 3;
+	
+	if(_mouseIsDown) {
+		var color = Graphics.getHSL(
+			Math.cos((count++)*0.01) * 180, 
+			100, 
+			50, 
+			1.0);		
+		
+		// set up our drawing properties:
+		graphics.setStrokeStyle(Math.random()*20+2,"round").beginStroke(color);
+		
+		// start the line at the last position:
+		graphics.moveTo(lastPt.x,lastPt.y);
+		
+		// calculate the new position in the shape's local coordinate space:
+		lastPt = shape.globalToLocal(_mouseX,_mouseY);
+		
+		// draw the line, and close the path:
+		graphics.lineTo(lastPt.x,lastPt.y);
+	}
+	
+	// update the stage:
+	stage.update();
+}
+
+//start drawing
+function mouseDown(e) {
+	if(!e){ e = window.event; }
+	_mouseIsDown = true;
+	
+	// set up the first point in the new draw, and choose a random color:
+	lastPt = shape.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop);
+	//color = "#"+(Math.random()*0xFFFFFF|0).toString(16);
+
+	
+	// clear the cache, so the vector data is drawn each tick:
+	shape.uncache();
+}
+
+//stop drawing
+function mouseUp() {
+	_mouseIsDown = false;
+	
+	// cache the vector data to a saved canvas, so we don't have to render it each tick:
+	shape.cache(-800,-800,1600,1600);
+}
+
+//update mouse positions
+function mouseMove(e) {
+	if(!e){ e = window.event; }
+	_mouseX = e.pageX-canvas.offsetLeft;
+	_mouseY = e.pageY-canvas.offsetTop;
+}
+
+
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+		Example of <strong>CoordTransform.globalToLocal()</strong> and <strong>DisplayObject.cache()</strong> usage. Click to begin drawing. If you draw a large number of line segments, the animation will start to slow down or stutter due to the amount of vector data being rendered each tick. When you release the mouse, the vector Shape is cached, and it will animate quickly again. When you click again, it will turn off caching in order to draw new line segments.
+    </div>
+    <div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580"></canvas>
+	</div>
+</body>
+</html>

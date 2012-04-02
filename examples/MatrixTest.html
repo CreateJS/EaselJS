@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Rollovers and Drag & Drop</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/geom/Point.js"></script>
+<script src="../src/easeljs/display/SpriteSheet.js"></script>
+<script src="../src/easeljs/display/Shadow.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/display/Graphics.js"></script>
+<script src="../src/easeljs/display/Shape.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+
+var canvas;
+var stage;
+
+var mouseTarget;	// the display object currently under the mouse, or being dragged
+var dragStarted;	// indicates whether we are currently in a drag operation
+var offset = new Point();
+var target;
+var target2;
+var container;
+var ref;
+
+function init() {
+	// create stage and point it to the canvas:
+	canvas = document.getElementById("testCanvas");
+	stage = new Stage(canvas);
+
+	// toss a shape on stage to show what it looks like untransformed:
+	ref = new Shape();
+	stage.addChild(ref);
+	ref.x = ref.y = 60;
+	ref.graphics.beginFill("#888").drawRect(-50,-50,100,100).beginFill("#FFF").drawRect(0,-1,60,2);
+
+
+	// create a container (equivalent to a Sprite)
+	container = new Container();
+	stage.addChild(container);
+
+	container.x = 100;
+	container.y = 50;
+	container.scaleX = 1;
+	container.skewX = -39;
+
+	// create the target we will try to match:
+	target = new Shape();
+	container.addChild(target);
+	target.graphics.beginFill("#F00").drawRect(-50,-50,100,100).beginFill("#FFF").drawRect(0,-1,60,2);
+
+	target.scaleX = -1;
+	target.skewY = 17;
+	target.x = target.y = 100;
+	target.rotation = 30;
+
+	test();
+}
+
+function test() {
+
+	// create another identical looking target to overlay:
+	target2 = new Shape();
+	target2.graphics.beginFill("#00F").drawRect(-50,-50,100,100).beginFill("#FFF").drawRect(0,-1,60,2);
+	stage.addChild(target2);
+
+	var mtx = target.getConcatenatedMatrix();
+	mtx.decompose(target2);
+	target2.y += 100;
+
+	target.onPress = function(evt) { alert("Clicked the red shape"); }
+	
+	stage.update();
+}
+
+
+
+
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+		Test file for Matrix. Grey shape is the original, untransformed shape. Red is the nested shape. Blue has its transform props set from decomposing the concatenated matrix of red and is then moved 100px down. Both shapes will look identical if the test works.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580" style="background-color:#000"></canvas>
+	</div>
+</body>
+</html>

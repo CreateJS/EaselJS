@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Displaying icons using BitmapAnimation and SpriteSheet</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/geom/Rectangle.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
+<script src="../src/easeljs/display/SpriteSheet.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/display/BitmapAnimation.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var stage;
+
+var iconSheet = new Image();
+
+function init() {
+	//find canvas and load images, wait for last image to load
+	iconSheet.onload = handleImageLoad;
+	iconSheet.src = "img/icons.png";
+}
+
+function handleImageLoad() {
+	// create a new stage and point it at our canvas:
+	// note that we can just pass the id of the canvas:
+	stage = new Stage("testCanvas");
+	
+	/*** FIRST: the "simple" approach ***/
+	// create a simple SpriteSheet using iconSheet with a frame size of 80x80:
+	var data = {images:[iconSheet], frames:{width:80, height:80}};
+	var spriteSheet  = new SpriteSheet(data);
+	
+	// create a BitmapAnimation to display frames from the sprite sheet:
+	var icon1 = new BitmapAnimation(spriteSheet);
+	icon1.y = 100;
+	icon1.x = 90;
+	
+	// because we didn't specify frameData, we have to reference frames by number:
+	icon1.gotoAndStop(2);
+	stage.addChild(icon1);
+	
+	// we'll clone icon1 to save a little work:
+	var icon2 = icon1.clone();
+	icon2.x += 120;
+	icon2.gotoAndStop(5);
+	stage.addChild(icon2);
+	
+	
+	
+	/*** NEXT: the more robust approach ***/
+	// define sprite sheet data describing the available icons:
+	// we can use the form {frameName:frameNumber} in animations because each "sequence" is only a single frame:
+	var data = {
+		images:[iconSheet],
+		frames:{width:80, height:80},
+		animations: {trash:0, male:1, wait:2, library:3, female:4, hanger:5, stairs:6, noparking:7}
+	}
+	
+	// create a SpriteSheet using the data:
+ 	spriteSheet = new SpriteSheet(data);
+ 	
+ 	// we'll clone icon2, to preserve the x/y, and swap out the SpriteSheet:
+ 	var icon3 = icon2.clone();
+ 	icon3.spriteSheet = spriteSheet;
+ 	icon3.x += 120;
+ 	
+ 	// we can reference frames by name now:
+ 	icon3.gotoAndStop("male");
+ 	stage.addChild(icon3);
+ 	
+ 	var icon4 = icon3.clone();
+ 	icon4.gotoAndStop("female");
+ 	icon4.x += 120;
+ 	stage.addChild(icon4);
+ 	
+ 	var icon5 = icon4.clone();
+ 	icon5.gotoAndStop("trash");
+ 	icon5.x += 120;
+ 	stage.addChild(icon5);
+ 	
+ 	// finally, we'll add one that just plays through:
+ 	var icon6 = icon1.clone();
+ 	icon6.x = icon5.x + 190;
+ 	icon6.gotoAndPlay(0);
+ 	stage.addChild(icon6);
+	
+	
+	Ticker.setFPS(3); // low, so we can see the icons
+	Ticker.addListener(stage);
+}
+
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+	Shows two approaches to use <strong>BitmapAnimation</strong> to display individual icons or graphics from a <strong>SpriteSheet</strong>.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="280" style="background-color:#FFFFFF"></canvas>
+	</div>
+	<br/><br/>
+	The original icons.png file, images from <a href="http://thenounproject.com/">the Noun project</a>:<br/>
+	<img src="img/icons.png"/>
+</body>
+</html>

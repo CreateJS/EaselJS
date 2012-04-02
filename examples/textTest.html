@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Text</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Text.js"></script>
+<script src="../src/easeljs/display/Graphics.js"></script>
+<script src="../src/easeljs/display/Shape.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var canvas;
+var stage;
+
+var txt;
+var shape;
+var count = 0;
+
+function init() {
+	//find canvas and load images, wait for last image to load
+	canvas = document.getElementById("testCanvas");
+	stage = new Stage(canvas);
+	
+	// Create a new Text object, and position it on stage:
+	txt = new Text("text on the canvas... 0!", "36px Arial", "#FFF");
+	txt.textBaseline = "top"; // draw text relative to the top of the em box.
+	txt.x = 100;
+	txt.y = 80;
+	txt.rotation = 20;
+	//txt.outline = true;
+	stage.addChild(txt);
+	
+	// this shape will be the background for the text:
+	shape = new Shape();
+	shape.x = txt.x;
+	shape.y = txt.y;
+	shape.rotation = txt.rotation;
+	stage.addChildAt(shape,0);
+	
+	// we want to do some work before we update the canvas,
+	// otherwise we could use Ticker.addListener(stage);
+	Ticker.interval = 10;
+	Ticker.addListener(window);
+}
+
+function tick() {
+	count++;
+	
+	// update the text:
+	txt.text = "text on the canvas... "+count+"!";
+	
+	// draw a vector box of the appropriate width behind the text:
+	shape.graphics.clear().beginFill("#F00").drawRect(-10, -10, txt.getMeasuredWidth()+20, 36+20);
+	
+	// update the stage:
+	stage.update();
+}
+
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+		Simple sample showing how to use <strong>Text</strong> elements, and the <strong>Text.getMeasuredWidth()</strong> method.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580"></canvas>
+	</div>
+</body>
+</html>

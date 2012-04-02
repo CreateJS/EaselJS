@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Multi-line text</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+	
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Text.js"></script>
+<script src="../src/easeljs/display/Graphics.js"></script>
+<script src="../src/easeljs/display/Shape.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var stage;
+function init() {
+	stage = new Stage(document.getElementById("testCanvas"));
+
+	var bg = new Shape();
+	bg.graphics.beginFill("#224").drawRect(20,20,770,540);
+	stage.addChild(bg);
+
+	var txt = new Text("", "24px Arial", "#FFF");
+	txt.text = "This text is rendered in canvas using the Text Object:\n\n";
+	txt.text += "The API is loosely based on Flash's display list, and should be easy to pick up for both JS and AS3 developers. The key classes are:\n\n";
+	txt.text += "DisplayObject\nAbstract base class for all display elements in Easel. Exposes all of the display properties (ex. x, y, rotation, scaleX, scaleY, alpha, shadow, etc) that are common to all display objects.\n\n"
+	txt.text += "Stage\nThe root level display container for display elements. Each time tick() is called on Stage, it will update and render the display list to its associated canvas.\n\n";
+	txt.text += "Container\nA nestable display container, which lets you aggregate display objects and manipulate them as a group.\n\n";
+	txt.text += "Text\nRenders text in the context of the display list."
+
+	txt.lineWidth = 750;
+	txt.textAlign = "left";
+	txt.y = 50;
+	txt.x = 30;
+	stage.addChild(txt);
+
+	stage.update();
+}
+</script>
+</head>
+<body onload="init()">
+	<div class="description">
+		Simple sample showing multi-line text and text wrapping with <strong>Text</strong> elements.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580"></canvas>
+	</div>
+</body>
+</html>

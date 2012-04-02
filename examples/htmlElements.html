@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: DOMElement Example</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/display/SpriteSheet.js"></script>
+<script src="../src/easeljs/display/Shadow.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/display/Graphics.js"></script>
+<script src="../src/easeljs/display/Bitmap.js"></script>
+<script src="../src/easeljs/display/DOMElement.js"></script>
+<script src="../src/easeljs/display/Shape.js"></script>
+<script src="../src/easeljs/display/Text.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var stage;
+
+function init() {
+	//return;
+	// create a new stage and point it at our canvas:
+	canvas = document.getElementById("testCanvas");
+	stage = new Stage(canvas);
+
+	var container = new Container();
+	stage.addChild(container);
+
+	var frame = new Shape();
+	frame.graphics.beginFill("#00F").drawRect(0,0,340,280);
+	frame.regX = 170;
+	frame.regY = 140;
+
+	var content = new DOMElement(document.getElementById("foo"));
+	content.regX = 165;
+	content.regY = 135;
+	//content.visible = false;
+
+	var o = content.clone();
+	stage.addChild(o);
+
+	container.addChild(frame,content);
+	container.x = 200; container.y = 200;
+	container.alpha = 0.6;
+	container.rotation = 25;
+	container.scaleX = 1.5;
+	//container.visible = false;
+
+	Ticker.addListener(stage);
+	stage.update();
+}
+
+</script>
+</head>
+
+<body onload="init();">
+	<div class="description">
+	Simple example of using a <strong>DOMElement</strong>. Note how the DOMElement can display outside the canvas boundaries, whereas the blue <strong>Shape</strong> border cannot.<br/>
+	</div>
+	<div class="canvasHolder">
+		<div id="foo" style="z-index: 1; position: absolute; background-color: #FF0000; width:320px; height:260px; padding: 5px; visibility: hidden;">
+			<b>Hello! I'm an HTML div.</b><br/><br/>
+			I am not rendered to the canvas, but I can be included in the display list for positioning and transformations.<br/><br/>
+			This means I can contain any HTML content (rich text, forms, video, etc), but I'm not a full part of the EaselJS display list.<br/><br/>
+			<a href="http://easeljs.com/">This is a link</a>
+		</div>
+		<canvas id="testCanvas" width="980" height="680" style="background-color:#000"></canvas>
+	</div>
+
+
+</body>
+</html>

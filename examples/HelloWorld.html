@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Text</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+
+<script src="../lib/easel.js"></script>
+<script>
+function init() {
+	// get a reference to the canvas we'll be working with:
+	var canvas = document.getElementById("testCanvas");
+	
+	// create a stage object to work with the canvas. This is the top level node in the display list:
+	var stage = new Stage(canvas);
+	
+	// Create a new Text object:
+	var text = new Text("Hello World!", "36px Arial", "#FFF");
+	
+	// add the text as a child of the stage. This means it will be drawn any time the stage is updated
+	// and that it's transformations will be relative to the stage coordinates:
+	stage.addChild(text);
+	
+	// position the text on screen, relative to the stage coordinates:
+	text.x = 100;
+	text.y = 100;
+	
+	// call update on the stage to make it render the current display list to the canvas:
+	stage.update();
+}
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+		Hello World example using <strong>Text</strong> and <strong>Stage</strong>.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580"></canvas>
+	</div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Extracting a frame from a sprite sheet</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/geom/Rectangle.js"></script>
+<script src="../src/easeljs/display/SpriteSheet.js"></script>
+<script src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var imgSeq = new Image();		//bmp of the sprite sheet
+var results;					//frame data to be displayed
+
+function init() {
+	//wait for the image to load
+	imgSeq.onload = handleImageLoad;
+	imgSeq.src = "img/testSeq.png";
+}
+
+function handleImageLoad() {
+	// create sprite sheet data from the loaded image, and define the animation sequences in it.
+	// for example, {walkUpRight:[0,19]} defines an animation sequence called "walkUpRight" that
+	// will play back frames 0 to 19 inclusive.
+	var data = {
+		images: [imgSeq],
+		frames: {width:64,height:68},
+		animations: {walkUpRight:[0,19], walkDownRight:[20,40], walkRight:[41,59]}
+	};
+	
+	// create a spritesheet from the data:
+	var spriteSheet = new SpriteSheet(data);
+
+	// extract the first frame of the walkRight sequence as a new image:
+	// could alternately use the frame number.
+	img = SpriteSheetUtils.extractFrame(spriteSheet, "walkRight");
+
+	// add the newly created image to the bottom of this document:
+	document.body.appendChild(img);
+}
+
+</script>
+</head>
+
+<body onload="init();" bgcolor="#FFFFFF">
+	<!-- allow for alert of frame data-->
+	<div class="description">
+	Tests using the <strong>SpriteSheetUtils.extractFrame()</strong> method to extract a single frame from a loaded sprite sheet as an image.
+	</div>
+	<br/><br/>
+	Original sprite sheet:<br/>
+	<img src="img/testSeq.png"><br/><br/><br/>
+	Extracted frame:<br/>
+</body>
+</html>

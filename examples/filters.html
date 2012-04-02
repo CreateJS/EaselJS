@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Filters test file.</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/geom/Rectangle.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/display/Bitmap.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<script src="../src/easeljs/filters/Filter.js"></script>
+<script src="../src/easeljs/filters/ColorFilter.js"></script>
+<script src="../src/easeljs/filters/BoxBlurFilter.js"></script>
+<script src="../src/easeljs/filters/ColorMatrixFilter.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+
+var img;
+function init() {
+	//wait for the image to load
+	img = new Image();
+	img.onload = handleImageLoad;
+	img.src = "img/photo.jpg";
+}
+
+function handleImageLoad() {
+	//find canvas and load images, wait for last image to load
+	var canvas = document.getElementById("testCanvas");
+	
+	// create a new stage and point it at our canvas:
+	stage = new Stage(canvas);
+
+	
+	var bmp = new Bitmap(img);
+	bmp.x = (canvas.width-2*img.width)/3;
+	bmp.y = (canvas.height-2*img.height)/3;
+	stage.addChild(bmp);
+	
+	
+	var blurFilter = new BoxBlurFilter(32, 2, 2);
+	var margins = blurFilter.getBounds();
+	bmp = bmp.clone();
+	bmp.filters = [blurFilter];
+	// filters are only displayed when the display object is cached
+	// later, you can call updateCache() to update changes to your filters
+	bmp.cache(margins.x,margins.y,img.width+margins.width,img.height+margins.height);
+	bmp.x += bmp.x+img.width;
+	stage.addChild(bmp);
+	
+	
+	var greyScaleFilter = new ColorMatrixFilter([
+		0.33,0.33,0.33,0,0, // red
+		0.33,0.33,0.33,0,0, // green
+		0.33,0.33,0.33,0,0, // blue
+		0,0,0,1,0  // alpha
+	]);
+	bmp = bmp.clone();
+	bmp.filters = [greyScaleFilter];
+	bmp.cache(0,0,img.width,img.height); // color filters don't change the bounds.
+	bmp.y += bmp.y+img.height;
+	stage.addChild(bmp);
+	
+	
+	var removeRedFilter = new ColorFilter(0,1,1,1); // red, green, blue, alpha
+	bmp = bmp.clone();
+	bmp.filters = [removeRedFilter];
+	bmp.cache(0,0,img.width,img.height); // color filters don't change the bounds.
+	bmp.x = (canvas.width-2*img.width)/3;
+	stage.addChild(bmp);
+	
+	// draw to the canvas:
+	stage.update();
+}
+
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+	Demonstrates using filters. Top-left: original. Top-right: <strong>BoxBlurFilter</strong>. Bottom-left: <strong>ColorFilter</strong>. Bottom-right: <strong>ColorMatrixFilter</strong>. Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.
+	</div>
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580"></canvas>
+	</div>
+</body>
+</html>

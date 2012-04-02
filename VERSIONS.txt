@@ -1,0 +1,149 @@
+Future:
+****************************************************************************************************
+- DisplayObject.hitArea
+- masking / clipping
+- MovieClip timeline caching
+
+
+Version 0.4.1 [Not tagged]
+****************************************************************************************************
+- fixed a problem with preloading sprite sheet images when using tile based sheets
+- worked around a bug in Safari with addFlippedFrames
+- added setChildIndex(), swapChildrenAt(), and swapChildren() to Container
+- made frequency param on enableMouseOver optional
+- worked around a Chrome 17 bug that would prevent text w/o maxwidth from rendering
+- additional fixes for video as a Bitmap source
+- rewrite of Ticker to simplify implementation and solve issues with useRAF in Safari
+- animations in BitmapAnimation now default to looping
+- added BitmapAnimation.play/stop()
+- added Bitmap.sourceRect
+- Ticker now supports an object with a tick method, or a function as a listener
+- renamed DisplayObject.tick to .onTick
+
+
+Version 0.4 [Nov 30, 2011] 
+****************************************************************************************************
+- completely rewrote BitmapSequence (now BitmapAnimation) & SpriteSheet including data format
+	- BitmapSequence was renamed BitmapAnimation
+	- SpriteSheet now handles calculating frame rects
+	- support for multi-image sprite sheets
+	- support for variable frame sizes
+	- support for frame reuse (non-linear frame order)
+	- support for frame registration points
+	- SpriteSheet supports URIs as sources (and will handle preloading)
+- rewrote SpriteSheetUtils to support SpriteSheet changes
+	- renamed .flip() to .addFlippedFrames() and changed functionality significantly
+	- removed .frameDataToString()
+- fixed support for video sources in Bitmap
+- added support for null canvas for Stage
+- added DOMElement, an experimental display object for including DOM elements in the display list
+- separated tick and draw into separate phases to fix possible race conditions
+- added Matrix2D.isIdentity()
+- support for double click events (thanks to rbarazi)
+- added MouseEvent.nativeEvent and MouseEvent.target properties
+- fixes to Ticker, added second "paused" param when it calls tick
+- added experimental support for requestAnimationFrame to Ticker
+- fixed a problem with caching Container instances
+- fixed an issue with .parent not being assigned on children of cloned Containers
+- added filter support via DisplayObject.filters and Filter objects
+	- added sample filters: ColorFilter, ColorMatrixFilter, and BoxBlurFilter
+- added DisplayObject.setTransform()
+- added DisplayObject.onDoubleClick handler (thanks to rbarazi)
+- added DisplayObject.cacheID and DisplayObject.getCacheDataURL()
+- performance optimization for DisplayObject drawing (6910e6849856bd0740f8)
+- added support for touch input (single point) via the Touch class
+- added support for passing an image URI to the Bitmap constructor
+- fixes to Shadow
+- optimizations
+- documentation updates
+
+
+Version 0.3.2 [Mar 2, 2011]
+****************************************************************************************************
+- added stage.mouseInBounds
+- added DisplayObject.onMouseOver and onMouseOut callbacks
+- added stage.enableMouseOver(freq)
+- improved support for calculating mouseX/Y in divs with relative positioning
+- fixed Graphics.clone()
+- fixed an issue with shadows not being reset properly
+- migrated to use YUIDocs instead of JSDocs
+- fixed an issue that prevented BitmapSequence instances with frameData from working with gotoAndPlay(frameNumber)
+
+
+Version 0.3.1 [Feb 13, 2011]
+****************************************************************************************************
+- fixed issues with hitTest and mouse event callbacks on Container instances.
+- added recursive clone option to Container and Shape
+- fix for snapToPixel
+- added cache, updateCache, and HelloWorld demos
+- extensive code cleanup, including improved support for jsdoc
+
+
+Version 0.3 [Feb 8, 2011]
+****************************************************************************************************
+- renamed Tick to Ticker
+- adding a listener to Ticker twice will now move it to the end of the listener list
+- added Ticker.getMeasuredFPS()
+- added Ticker.setFPS()
+- renamed Stage.tick to Stage.update and made Stage.tick point to Stage.update
+- made the pauseable param "true" by default on Ticker.addListener()
+- added Stage.toDataURL(backgroundColor, mimeType)
+- renamed Rectangle.w/h to width/height
+- improvements to commenting and documentation
+- formalized inheritance model to make code more readable
+- changed color to null instead of 0 in Shadow.IDENTITY
+- fixed an error with simple sprite sheets that weren't set to loop
+- implemented "tiny" instructions for Graphics. (ex. myGraphics.f("#0FF").c(x,y,r) )
+- fixed problems with Graphics.clone()
+- fixed bug with passing instructions to a Graphics object constructor
+- complete rewrite of the render engine to be cleaner and more flexible
+- added .decompose() method to Matrix2D
+- added .skew() method to Matrix2D
+- added .skewX/Y on DisplayObject
+- added SpriteSheetUtils.extractFrame(spriteSheet,frame) method
+- added basic multi-line support for Text
+- added DisplayObject.suppressCrossDomainErrors property
+- complete rewrite of the hit testing system to be cleaner and run 5-10x faster
+- improved the interaction model:
+	- added .onPress, .onClick callbacks on DisplayObject
+	- removed .mouseChildren from Container
+	- made .mouseEnabled true by default
+	- added .onMouseDown, .onMouseUp, and .onMouseMove callbacks on Stage
+	- added MouseEvent
+- Stage.getObjectsUnderPoint() has been moved to Container
+- added Container.contains(child) method
+- added DisplayObject.compositeOperation
+- added appendProperties() and prependProperties methods to Matrix2D
+- added DisplayObject.hitTest() method
+- added stage.snapToPixelEnabled and displayObject.snapToPixel
+- added DisplayObject.updateCache()
+- renamed minified file from easeljs.js to easel.js
+- Re-factored directory layout
+
+
+Version 0.2.1 [Jan 12, 2011]
+****************************************************************************************************
+- optimized Graphics: reduced overhead by 80-90%
+- added drawPolyStar method to Graphics
+- fixed bug with using canvas as an image source for Bitmap
+- made mouseChildren true by default for stage
+- fixed major bug with Ticker.getTime()
+
+
+Version 0.2 [Jan 6, 2011]
+****************************************************************************************************
+Focus on vector graphics and text.
+- repackaged all class files to "easeljs" instead of "com.gskinner"
+- added Graphics API, and revised Shape to use a Graphics instance
+- added Text class
+- added Point class and updated CoordTransform to use it
+- added Rectangle class
+- fixed minor issue with Ticker
+- added initial implementation of Stage.mouseX/Y (likely to change)
+- added new examples, updated others to work with revised APIs
+- minor tweaks, fixes to code and documentation
+- added support for multiple params on Container.addChild, addChildAt, removeChild & removeChildAt
+
+Version 0.1 [Dec 17, 2010]
+****************************************************************************************************
+Initial release.

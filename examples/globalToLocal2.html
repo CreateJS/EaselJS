@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Using globalToLocal #2</title>
+
+<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+
+<!-- Import EaselJS Framework -->
+<script src="../src/easeljs/utils/UID.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<script src="../src/easeljs/events/MouseEvent.js"></script>
+<script src="../src/easeljs/geom/Point.js"></script>
+<script src="../src/easeljs/display/SpriteSheet.js"></script>
+<script src="../src/easeljs/display/Shadow.js"></script>
+<script src="../src/easeljs/display/DisplayObject.js"></script>
+<script src="../src/easeljs/display/Container.js"></script>
+<script src="../src/easeljs/display/Stage.js"></script>
+<script src="../src/easeljs/display/Bitmap.js"></script>
+<script src="../src/easeljs/display/Graphics.js"></script>
+<script src="../src/easeljs/display/Shape.js"></script>
+<script src="../src/easeljs/utils/Ticker.js"></script>
+<script src="../src/easeljs/geom/Matrix2D.js"></script>
+<!-- End EaselJS Imports -->
+
+<script>
+var canvas;
+var stage;
+
+var _mouseIsDown;
+var _mouseX;
+var _mouseY;
+
+var spin1;		// nested invisble container to generate a spirograph effect
+var spin2;		// nested invisble container to generate a spirograph effect
+
+var shape;		// drawing shape
+var color;		// drawing color
+var lastPt;		// last draw position
+var graphics;
+var count = 0;
+var colorOffset;
+
+//
+//
+// This demo is not heavily commented because it is a direct derivative of globalToLocal1
+//
+//
+
+function init() {
+	canvas = document.getElementById("testCanvas");
+	stage = new Stage(canvas);
+	
+	// this prevents the stage from clearing, so we only draw one vector line each tick, and it
+	// is painted onto the canvas, then removed.
+	stage.autoClear = false;
+	
+	canvas.onmousemove = mouseMove;
+	canvas.onmousedown = mouseDown;
+	canvas.onmouseup = mouseUp;
+	
+	shape = new Shape();
+	shape.y = 276;
+	graphics = shape.graphics;
+	
+	// middle spinner:
+	spin2 = new Container();
+	spin2.addChild(shape);
+	spin2.x = 391;
+	
+	// outside spinner:
+	spin1 = new Container();
+	spin1.addChild(spin2);
+	spin1.x = canvas.width/2;
+	spin1.y = canvas.height/2;
+	stage.addChild(spin1);
+	
+	//start ticking
+	Ticker.setInterval(20);		// 20ms = 50fps
+	Ticker.addListener(window);
+}
+
+function tick() {
+	//spin objects
+	spin1.rotation += 10.7;
+	spin2.rotation += -7.113;
+	shape.rotation += 1.77;
+	
+	if(_mouseIsDown) {
+		
+		var color = Graphics.getHSL(
+			Math.cos((count++)*0.1) * 30 + colorOffset, 
+			100, 
+			50, 
+			0.8);		
+		
+		graphics.setStrokeStyle(Math.random()*20,"round").beginStroke(color);
+		graphics.moveTo(0,0);
+		lastPt = shape.globalToLocal(_mouseX,_mouseY);
+		graphics.lineTo(lastPt.x,lastPt.y);
+		
+		// draw the new vector line to the canvas:
+		stage.update();
+		
+		// then clear the shape's vector data so it isn't rendered again next tick:
+		graphics.clear();
+	}
+}
+
+//start drawing
+function mouseDown(e) {
+	if(!e){ var e = window.event; }
+	if (_mouseIsDown) { return; }
+	_mouseIsDown = true;
+	colorOffset = Math.random()*360;
+	lastPt = shape.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop);
+}
+
+//stop drawing
+function mouseUp() {
+	_mouseIsDown = false;
+}
+
+//update mouse positions
+function mouseMove(e) {
+	if(!e){ var e = window.event; }
+	_mouseX = e.pageX-canvas.offsetLeft;
+	_mouseY = e.pageY-canvas.offsetTop;
+}
+
+
+</script>
+</head>
+	
+<body onload="init();">
+	<div class="description">
+	Similar to globalToLocal1.html, but <strong>Stage.autoClear</strong> is set to false (so the stage never clears itself), and the vector <strong>Shape</strong> is cleared each tick, so only one line is rendered per tick. As such, you can draw continuously without a slow down.
+	</div>
+    <div class="canvasHolder">
+		<canvas id="testCanvas" width="980" height="580"></canvas>
+	</div>
+</body>
+</html>
