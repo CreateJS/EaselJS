@@ -296,11 +296,11 @@ var p = DisplayObject.prototype;
 	p.onMouseOut = null;
 
 	/**
-	 * The tick callback is called on each display object on stage whenever the stage updates.
+	 * The onTick callback is called on each display object on a stage whenever the stage updates.
 	 * This occurs immediately before the rendering (draw) pass.
-	 * @event tick
+	 * @event onTick
 	 **/
-	p.tick = null;
+	p.onTick = null;
 
 	/**
 	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when cache() or

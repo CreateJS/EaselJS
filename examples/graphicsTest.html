@@ -62,6 +62,9 @@ function run() {
 	// draw two hexagons:
 	g.beginFill("#0F0").drawPolyStar(500,350,50,6).drawPolyStar(500,440,50,6);
 	
+	// draw a curve:
+	g.endFill().beginStroke("#0FF").setStrokeStyle(6).moveTo(600,300).curveTo(650,300,650,350);
+	
 	// Again, note that the Easel framework was not required, we can draw directly to any context2D:
 	g.draw(ctx);
 }

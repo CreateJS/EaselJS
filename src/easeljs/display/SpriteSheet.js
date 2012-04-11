@@ -130,6 +130,21 @@ var p = SpriteSheet.prototype;
 	 **/
 	p.complete = true;
 	
+	
+	/**
+	 * The onComplete callback is called when all images are loaded. Note that this only fires if the images
+	 * were not fully loaded when the sprite sheet was initialized. You should check the complete property 
+	 * to prior to adding an onComplete handler. Ex.
+	 * <pre><code>var sheet = new SpriteSheet(data);
+	 * if (!sheet.complete) {
+	 *  &nbsp; // not preloaded, listen for onComplete:
+	 *  &nbsp; sheet.onComplete = handler;
+	 * }</code></pre>
+	 * 
+	 * @event onComplete
+	 **/
+	p.onComplete = null;
+	
 // private properties:
 	/**
 	 * @property _animations
@@ -361,6 +376,7 @@ var p = SpriteSheet.prototype;
 		if (--this._loadCount == 0) {
 			this._calculateFrames();
 			this.complete = true;
+			this.onComplete&&this.onComplete();
 		}
 	}
 	
