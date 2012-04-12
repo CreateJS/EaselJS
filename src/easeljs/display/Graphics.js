@@ -1,9 +1,8 @@
 /*
-* Graphics by Grant Skinner. Dec 5, 2010
-* Visit http://easeljs.com/ for documentation, updates and examples.
+* Graphics
+* Visit http://createjs.com/ for documentation, updates and examples.
 *
-*
-* Copyright (c) 2010 Grant Skinner
+* Copyright (c) 2010 gskinner.com, inc.
 * 
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -26,13 +25,6 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
 */
-
-/**
-* The Easel Javascript library provides a retained graphics mode for canvas 
-* including a full, hierarchical display list, a core interaction model, and 
-* helper classes to make working with Canvas much easier.
-* @module EaselJS
-**/
 
 (function(window) {
 
@@ -835,7 +827,7 @@ var p = Graphics.prototype;
 			var fi = n>>3; // highest order bits 1-3 code for operation.
 			var f = instructions[fi];
 			// check that we have a valid instruction & that the unused bits are empty:
-			if (!f || (n&3)) { throw("bad path data"); return this; }
+			if (!f || (n&3)) { throw("bad path data"); }
 			var pl = paramCount[fi];
 			if (!fi) { x=y=0; }
 			params.length = 0;

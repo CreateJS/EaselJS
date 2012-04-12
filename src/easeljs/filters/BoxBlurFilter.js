@@ -1,10 +1,9 @@
-/**
-* BoxBlurFilter by Mario Klingemann. March 2, 2011
-* Visit http://easeljs.com/ for documentation, updates and examples.
+/*
+* BoxBlurFilter
+* Visit http://createjs.com/ for documentation, updates and examples.
 *
-*
-* Copyright (c) 2011 Mario Klingemann
-*
+* Copyright (c) 2010 gskinner.com, inc.
+* 
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -13,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-*
+* 
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-*
+* 
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -25,7 +24,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-**/
+*/
 
 (function(window) {
 
@@ -56,13 +55,26 @@ var p = BoxBlurFilter.prototype = new Filter();
 
 // public properties:
 
-	/** Horizontal blur radius */
+	/**
+	 * Horizontal blur radius
+	 * @property blurX
+	 * @type Number
+	 **/
 	p.blurX = 0;
 
-	/** Horizontal blur radius */
+	/**
+	 * Vertical blur radius
+	 * @property blurY
+	 * @type Number
+	 **/
 	p.blurY = 0;
 
-	/** Amount of blur iterations  */
+	/**
+	 * Number of blur iterations. For example, a value of 1 will produce a rough blur.
+	 * A value of 2 will produce a smoother blur, but take twice as long to run.
+	 * @property quality
+	 * @type Number
+	 **/
 	p.quality = 1;
 
 // public methods:

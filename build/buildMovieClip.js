@@ -15,7 +15,7 @@ var JS_FILE_NAME = "movieclip-%VERSION%.min.js";
 var PROJECT_NAME = "EaselJS";
 
 // url for website or github repo for project:
-var PROJECT_URL = "http://easeljs.com/";
+var PROJECT_URL = "http://createjs.com/";
 
 
 // name of directory for docs:
