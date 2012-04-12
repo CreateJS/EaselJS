@@ -101,7 +101,7 @@
  * with two animations, "run" looping from frame 0-4 inclusive, and "jump" playing from frame 5-8 and sequencing back to run:
  * <pre><code>data = {
 &#9;images: ["sprites.jpg"],
-&#9;frames: {frameWidth:50, frameHeight:50},
+&#9;frames: {width:50, height:50},
 &#9;animations: {run:[0,4], jump:[5,8,"run"]}
 }</code></pre>
  
