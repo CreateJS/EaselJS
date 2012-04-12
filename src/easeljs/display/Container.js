@@ -306,7 +306,7 @@ var p = Container.prototype = new DisplayObject();
 		for (var i=0,l=kids.length;i<l;i++) {
 			if (kids[i] == child1) { index1 = i; }
 			if (kids[i] == child2) { index2 = i; }
-			if (index1 != null && index2 != null) { continue; }
+			if (index1 != null && index2 != null) { break; }
 		}
 		if (i==l) { return; } // TODO: throw error?
 		kids[index1] = child2;
