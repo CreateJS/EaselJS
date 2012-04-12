@@ -9,3 +9,4 @@ build/tools/yuidoc/.git/*
 build/output/
 build/tmp/
 /.idea/
+*TMP*
