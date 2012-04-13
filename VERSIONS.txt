@@ -2,11 +2,13 @@ Future:
 ****************************************************************************************************
 - DisplayObject.hitArea
 - masking / clipping
-- MovieClip timeline caching
+- SpriteSheetBuilder caching
+- packaging / namespace
 
 
-Version 0.4.1 [Not tagged]
+Version 0.4.1 [Apr 13, 2012]
 ****************************************************************************************************
+- DisplayObject.tick has been renamed to onTick
 - fixed a problem with preloading sprite sheet images when using tile based sheets
 - worked around a bug in Safari with addFlippedFrames
 - added setChildIndex(), swapChildrenAt(), and swapChildren() to Container
@@ -19,6 +21,12 @@ Version 0.4.1 [Not tagged]
 - added Bitmap.sourceRect
 - Ticker now supports an object with a tick method, or a function as a listener
 - renamed DisplayObject.tick to .onTick
+- added MovieClip class
+- added onComplete to SpriteSheet
+- added ColorMatrix class
+- added Graphics.decodePath for compressed vector paths
+- support for passing a canvas string id to the Stage constructor
+- various bug fixes and doc updates
 
 
 Version 0.4 [Nov 30, 2011] 
