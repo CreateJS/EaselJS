@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS Example: Multi-line text</title>
+
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<script src="http://code.createjs.com/easeljs-0.4.1.min.js"></script>
+
+<script>
+var stage;
+function init() {
+	stage = new Stage(document.getElementById("testCanvas"));
+
+	var bg = new Shape();
+	bg.graphics.beginFill("#224").drawRect(20,20,920,360);
+	stage.addChild(bg);
+
+	var txt = new Text("", "17px Arial", "#FFF");
+	txt.text = "This text is rendered in canvas using the Text Object:\n\n";
+	txt.text += "The API is loosely based on Flash's display list, and should be easy to pick up for both JS and AS3 developers. The key classes are:\n\n";
+	txt.text += "DisplayObject\nAbstract base class for all display elements in Easel. Exposes all of the display properties (ex. x, y, rotation, scaleX, scaleY, alpha, shadow, etc) that are common to all display objects.\n\n"
+	txt.text += "Stage\nThe root level display container for display elements. Each time tick() is called on Stage, it will update and render the display list to its associated canvas.\n\n";
+	txt.text += "Container\nA nestable display container, which lets you aggregate display objects and manipulate them as a group.\n\n";
+	txt.text += "Text\nRenders text in the context of the display list."
+
+	txt.lineWidth = 800;
+	txt.textAlign = "left";
+	txt.y = 50;
+	txt.x = 30;
+	stage.addChild(txt);
+
+	stage.update();
+}
+</script>
+</head>
+<body onload="init()">
+
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Bitmap Animation</h1>
+	    <p>Simple sample showing multi-line text and text wrapping with <strong>Text</strong> elements.</p>
+	</header>
+
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="960" height="400"></canvas>
+	</div>
+</body>
+</html>

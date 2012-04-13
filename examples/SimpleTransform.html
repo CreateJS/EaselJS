@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>EaselJS: Simple Transform Example</title>
+
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<script src="http://code.createjs.com/easeljs-0.4.1.min.js"></script>
+
+    <script type="text/javascript">
+        var img;
+        var stage;
+        var angle;
+
+        function init() {
+        	if (window.top != window) {
+        		document.getElementById("header").style.display = "none";
+        	}
+
+            angle = 0;
+            img = new Image();
+            img.onload = handleImageLoad;
+            img.src = "assets/rotateDemoBot.png";
+        }
+
+        function stop() {
+	        Ticker.removeListener(window);
+        }
+
+        function handleImageLoad() {
+            var canvas = document.getElementById("testCanvas");
+            stage = new Stage(canvas);
+            stage.autoClear = true;
+            bmp = new Bitmap(img);
+            bmp.regX = img.width >> 1;
+            bmp.regY = img.height >> 1;
+            bmp.x = canvas.width - (img.width/2)>>1;
+            bmp.y = 140+canvas.height - (img.height/2)>>1;
+            bmp.scaleX = bmp.scaleY = 0.1;
+            stage.addChild(bmp);
+            stage.update();
+
+            Ticker.addListener(window);
+        }
+
+        function tick() {
+            angle += 0.025;
+            var value = (Math.sin(angle) * 360);
+
+            bmp.setTransform (bmp.x , bmp.y , bmp.scaleX , bmp.scaleY , value/2 , bmp.skewX , bmp.skewY , bmp.regX , bmp.regY );
+            bmp.scaleX = bmp.scaleY = ((value)/360) + 0.25;
+            //bmp.rotation = value;
+            stage.update();
+        }
+
+    </script>
+</head>
+<body onload="init()">
+
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Simple Transform Example</h1>
+	    <p>A simple example of EaselJS transformations.</p>
+	</header>
+
+    <canvas id="testCanvas" width="960" height="400"></canvas>
+
+</body>
+</html>

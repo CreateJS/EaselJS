@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+		"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>EaselJS: Simple SpriteSheet Example</title>
+
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<script src="http://code.createjs.com/easeljs-0.4.1.min.js"></script>
+
+	<script type="text/javascript">
+
+		function init() {
+
+			// create a new stage and point it at our canvas:
+			var stage = new Stage(document.getElementById("testCanvas"));
+
+			// Define a spritesheet. Note that this data can be exported by Zoë.
+			var ss = new SpriteSheet({
+				"frames": {
+					"width": 200,
+					"numFrames": 64,
+					"regX": 2,
+					"regY": 2,
+					"height": 361
+				},
+				"animations": {"jump": [26, 63], "run": [0, 25]},
+				"images": ["./assets/runningGrant.png"]
+			});
+
+			var grant = new BitmapAnimation(ss);
+			grant.x = 360;
+			grant.y = 22;
+
+			ss.getAnimation("run").frequency = 2;
+			ss.getAnimation("run").next = "run";
+			grant.gotoAndPlay("run");
+
+			// Add Grant to the stage, and add it as a listener to Ticker to get updates each frame.
+			stage.addChild(grant);
+			Ticker.setFPS(60);
+			Ticker.addListener(stage);
+		}
+
+	</script>
+	<style type="text/css">
+		body {
+			background-color:
+		}
+	</style>
+</head>
+<body onload="init();">
+
+	<header id="header" class="EaselJS">
+		<h1><span class="text-product">Easel<strong>JS</strong></span> Simple SpriteSheet Example</h1>
+		<p>A simple example of a sprite sheet using <strong>BitmapAnimation</strong>. This demos also shows playing named
+			animations (jump and run), and animation chaining using <strong>getAnimation("name").next</strong>.</p>
+	</header>
+
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="960" height="400"></canvas>
+	</div>
+</body>
+</html>

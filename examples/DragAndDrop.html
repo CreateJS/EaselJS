@@ -2,19 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>EaselJS Example: Modernizr</title>
+<title>EaselJS Example: Rollovers and Drag & Drop</title>
 
-<link href="../assets/demoStyles.css" rel="stylesheet" type="text/css" />
-<link href="styles.css" rel="stylesheet" type="text/css" />
-
-<!--
-	Modernizr Library
-	http://www.modernizr.com/
-	
-	Used in this example to detect touch support.
--->
-<script src="modernizr-1.7.js"></script>
-<script type="text/javascript" src="http://code.createjs.com/easeljs-0.4.1.min.js"></script>
+<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+<script src="http://code.createjs.com/easeljs-0.4.1.min.js"></script>
 
 <script>
 
@@ -27,35 +18,30 @@ var offset = new Point();
 var update = true;
 
 function init() {
-	
-	//Make sure the browser supports the canvas element
-	if(!Modernizr.canvas)
-	{
-		var canvasDiv = document.getElementById("canvasContainer");
-		
-		//if canvas is not supported, show a message to the user
-		canvasDiv.innerHTML = "<div id=\"nosupport\">" +
-					"This example requires a browser that supports the HTML5 Canvas element.</div>";
-		
-		//return since the example wont work
-		return;
+	if (window.top != window) {
+		document.getElementById("header").style.display = "none";
 	}
-	
+	document.getElementById("loader").className = "loader";
 	// create stage and point it to the canvas:
 	canvas = document.getElementById("testCanvas");
 	
 	//check to see if we are running in a browser with touch support
-	var useTouch = Modernizr.touch;
-	
-	stage = new Stage(canvas, useTouch);
+	stage = new Stage(canvas);
+
+	// enable touch interactions if supported on the current device:
+	Touch.enable(stage);
 
 	// enabled mouse over / out events
 	stage.enableMouseOver(10);
 	
 	// load the source image:
 	var image = new Image();
-	image.src = "../assets/daisy.png";
+	image.src = "assets/daisy.png";
 	image.onload = handleImageLoad;
+}
+
+function stop() {
+	Ticker.removeListener(window);
 }
 
 function handleImageLoad(event) {
@@ -103,6 +89,7 @@ function handleImageLoad(event) {
 		})(bitmap);
 	}
 
+	document.getElementById("loader").className = "";
 	Ticker.addListener(window);
 }
 
@@ -121,13 +108,16 @@ function tick() {
 </head>
 
 <body onload="init();">
-	<div id="header">
-	<p>This example uses the <a href="../dragAndDrop.html">drag and drop example</a> to show how to use the <a href="http://www.modernizr.com/">Modernizr library</a> to detect browser support for features. In this case, Modernizr is being used to detect for canvas and touch input support.</p>
-	<p>Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.</p>
-	</div>
 
-	<div class="canvasHolder" id="canvasContainer">
-		<canvas id="testCanvas" width="980" height="580"></canvas>
+	<div id="loader"></div>
+
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Drag &amp; Drop Example</h1>
+	    <p>Example of implementing drag &amp; drop using mouse events such as <strong>onPress</strong>, <strong>onMouseUp</strong>, and <strong>onMouseMove</strong>. Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.</p>
+	</header>
+
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="960" height="400"></canvas>
 	</div>
 </body>
 </html>

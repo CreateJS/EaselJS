@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>EaselJS: Reusing Graphics</title>
+
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<script src="http://code.createjs.com/easeljs-0.4.1.min.js"></script>
+
+<script type="text/javascript">
+var canvas;
+var stage;
+var headRadius;
+var g;
+
+function init() {
+	if (window.top != window) {
+		document.getElementById("header").style.display = "none";
+	}
+
+    canvas = document.getElementById('myCanvas');
+    width = canvas.width;
+    height = canvas.height;
+    stage = new Stage(canvas);
+
+    layoutSmiley();
+
+    stage.onMouseDown = handlePress;
+    stage.update();
+
+}
+
+function layoutSmiley() {
+    drawSmiley(Graphics.getRGB(Math.random()*255|0,Math.random()*255|0,Math.random()*255|0), Graphics.getRGB(Math.random()*255|0,Math.random()*255|0,Math.random()*255|0));
+    for(var i=0;i<100;i++) {
+        var shape = new Shape(g);
+        shape.scaleX = shape.scaleY = Math.random() * 0.05 + 0.15;
+        shape.x = Math.random()*(960 - (350 * shape.scaleX));
+        shape.y = Math.random()*(400 - (350 * shape.scaleX));
+        shape.rotation = (Math.random()*90)-45;
+        stage.addChild(shape);
+    }
+
+    stage.update();
+}
+
+function handlePress() {
+    stage.removeAllChildren();
+	layoutSmiley();
+}
+
+function drawSmiley(fillColor, lineColor) {
+    g = new Graphics();
+    var pt1 = new Point(138, 300);
+    var pt2 = new Point(309, 310);
+    var pt3 = new Point(337, 170);
+    var pt4 = new Point(360, 170);
+    var pt5 = new Point(374, 234);
+    var pt6 = new Point(388, 220);
+    var pt7 = new Point(75, 240);
+    var pt8 = new Point(63, 230);
+    var pt9 = new Point(100, 178);
+    var pt10 = new Point(115, 181);
+
+    //Left Eye
+    var pt11 = new Point(169, 119);
+    var pt12 = new Point(198, 115);
+    var pt13 = new Point(175, 153);
+    var pt14 = new Point(205, 148);
+
+    var pt11a = new Point(169, 105);
+    var pt12a = new Point(188, 100);
+    var pt13a = new Point(183, 173);
+    var pt14a = new Point(205, 169);
+
+    //Right Eye
+    var pt15 = new Point(251, 109);
+    var pt16 = new Point(279, 115);
+    var pt17 = new Point(244, 148);
+    var pt18 = new Point(273, 152);
+    var pt15a = new Point(261, 97);
+    var pt16a = new Point(272, 99);
+    var pt17a = new Point(249, 166);
+    var pt18a = new Point(263, 168);
+
+    //Head
+    g.setStrokeStyle(20);
+    g.beginStroke(lineColor);
+    g.beginFill(fillColor);
+    g.drawCircle(225, 223, 200);
+    g.endFill();
+
+    //Left Eye
+    g.setStrokeStyle(1, 'round', 'round');
+    g.beginStroke(lineColor);
+    g.beginFill(lineColor);
+    g.moveTo(169,119);
+    g.lineTo(175,153);
+    g.bezierCurveTo(pt13a.x, pt13a.y, pt14a.x, pt14a.y, 205, 148);
+    g.lineTo(198,115);
+    g.bezierCurveTo(pt12a.x, pt12a.y, pt11a.x, pt11a.y, 169, 119);
+    g.endFill();
+
+    //Right Eye
+    g.setStrokeStyle(1, 'round', 'round');
+    g.beginFill(lineColor);
+    g.beginStroke(lineColor);
+    g.moveTo(251,109);
+    g.lineTo(244, 148);
+    g.bezierCurveTo(pt17a.x, pt17a.y, pt18a.x, pt18a.y, 273, 152);
+    g.lineTo(279, 115);
+    g.bezierCurveTo(pt16a.x, pt16a.y, pt15a.x, pt15a.y, 251, 109);
+    g.endFill();
+
+    //Mouth
+    g.setStrokeStyle(1, 'round', 'round');
+    g.beginStroke(lineColor);
+    g.beginFill(lineColor);
+    g.moveTo(100, 210);
+    g.bezierCurveTo(pt1.x, pt1.y, pt2.x, pt2.y, 351, 205);
+    g.lineTo(340, 187);
+    g.bezierCurveTo(pt3.x, pt3.y, pt4.x, pt4.y, 360, 178);
+    g.lineTo(383, 210);
+    g.bezierCurveTo(pt6.x, pt6.y, pt5.x, pt5.y, 365, 222);
+    g.bezierCurveTo(pt2.x-30, pt2.y+50, pt1.x+30, pt1.y+50, 90, 228);
+    g.bezierCurveTo(pt7.x, pt7.y, pt8.x, pt8.y, 73, 210);
+    g.lineTo(93, 182);
+    g.bezierCurveTo(pt9.x, pt9.y, pt10.x, pt10.y, 109, 197);
+    g.lineTo(100, 210);
+    g.endFill();
+}
+
+</script>
+
+</head>
+<body onload="init()">
+
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Graphics Re-use</h1>
+	    <p>This example shows how a single graphics object can be reused many times, with individual transformations on the shapes that contain the graphics.
+		    Click any smiley face to redraw.</p>
+	</header>
+
+	<canvas id="myCanvas" width="960" height="400"></canvas>
+
+</body>
+</html>

@@ -4,21 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>EaselJS Example: Rollovers and Drag & Drop</title>
 
-<link href="styles/styles.css" rel="stylesheet" type="text/css" />
-
-<!-- Import EaselJS Framework -->
-<script src="../src/easeljs/utils/UID.js"></script>
-<script src="../src/easeljs/geom/Matrix2D.js"></script>
-<script src="../src/easeljs/events/MouseEvent.js"></script>
-<script src="../src/easeljs/geom/Point.js"></script>
-<script src="../src/easeljs/display/SpriteSheet.js"></script>
-<script src="../src/easeljs/display/Shadow.js"></script>
-<script src="../src/easeljs/display/DisplayObject.js"></script>
-<script src="../src/easeljs/display/Container.js"></script>
-<script src="../src/easeljs/display/Stage.js"></script>
-<script src="../src/easeljs/display/Graphics.js"></script>
-<script src="../src/easeljs/display/Shape.js"></script>
-<!-- End EaselJS Imports -->
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<script src="http://code.createjs.com/easeljs-0.4.1.min.js"></script>
 
 <script>
 
@@ -83,18 +70,19 @@ function test() {
 	stage.update();
 }
 
-
-
-
 </script>
 </head>
 	
 <body onload="init();">
-	<div class="description">
-		Test file for Matrix. Grey shape is the original, untransformed shape. Red is the nested shape. Blue has its transform props set from decomposing the concatenated matrix of red and is then moved 100px down. Both shapes will look identical if the test works.
-	</div>
+
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Matrix Testing</h1>
+	    <p>Test file for Matrix. Grey shape is the original, untransformed shape. Red is the nested shape. Blue has its transform props set from decomposing the concatenated matrix of red and is then moved 100px down. Both shapes will look identical if the test works.
+	    </p>
+	</header>
+
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="980" height="580" style="background-color:#000"></canvas>
+		<canvas id="testCanvas" width="960" height="400"></canvas>
 	</div>
 </body>
 </html>

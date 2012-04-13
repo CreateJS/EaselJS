@@ -4,20 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>EaselJS Example: Text</title>
 
-<link href="styles/styles.css" rel="stylesheet" type="text/css" />
-
-<!-- Import EaselJS Framework -->
-<script src="../src/easeljs/utils/UID.js"></script>
-<script src="../src/easeljs/geom/Matrix2D.js"></script>
-<script src="../src/easeljs/events/MouseEvent.js"></script>
-<script src="../src/easeljs/display/DisplayObject.js"></script>
-<script src="../src/easeljs/display/Container.js"></script>
-<script src="../src/easeljs/display/Bitmap.js"></script>
-<script src="../src/easeljs/display/Graphics.js"></script>
-<script src="../src/easeljs/display/Shape.js"></script>
-<script src="../src/easeljs/display/Stage.js"></script>
-<script src="../src/easeljs/utils/Ticker.js"></script>
-<!-- End EaselJS Imports -->
+<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+<script src="http://code.createjs.com/easeljs-0.4.1.min.js"></script>
 
 <script>
 var canvas;
@@ -31,7 +19,7 @@ function init() {
 	stage = new Stage(canvas);
 
 	// Bitmap also supports construction with a URI to an image to load:
-	bmp = new Bitmap("img/daisy.png");
+	bmp = new Bitmap("assets/daisy.png");
 	stage.addChild(bmp);
 	
 	// we want to do some work before we update the canvas,
@@ -43,11 +31,15 @@ function init() {
 </head>
 	
 <body onload="init();">
-	<div class="description">
-		Simple sample showing how to use image URIs with the <strong>Bitmap</strong> class.
-	</div>
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Bitmap URI</h1>
+	    <p>Simple sample showing how to use image URIs with the <strong>Bitmap</strong> class.</p>
+		<p>Some browsers can not load images or access pixel data when running local files, and may throw a security error or not
+	    			work unless the content is running on a server.</p>
+	</header>
+
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="980" height="580"></canvas>
+		<canvas id="testCanvas" width="960" height="400"></canvas>
 	</div>
 </body>
 </html>

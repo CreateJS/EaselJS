@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>EaselJS: Simple Graphics Example</title>
+
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<script src="http://code.createjs.com/easeljs-0.4.1.min.js"></script>
+
+	<script type="text/javascript">
+	var canvas;
+	var stage;
+	function init() {
+	    canvas = document.getElementById('myCanvas');
+	    width = canvas.width;
+	    height = canvas.height;
+	    stage = new Stage(canvas);
+
+	    var s = drawSmiley();
+		s.x = (960-350)/2;
+		s.y = 20;
+	    stage.addChild(s);
+	    stage.update();
+
+	}
+
+	function drawSmiley() {
+	    var s = new Shape();
+	    var g = s.graphics;
+
+	    //Head
+	    g.setStrokeStyle(15, 'round', 'round');
+	    g.beginStroke(Graphics.getRGB(0, 0, 0));
+	    g.beginFill(Graphics.getRGB(255, 255, 0));
+	    g.drawCircle(170, 170, 170); //55,53
+	    g.endFill();
+	    g.setStrokeStyle(1, 'round', 'round');
+
+	    //Right eye
+	    g.setStrokeStyle(5, 'round', 'round');
+	    g.beginStroke(Graphics.getRGB(0, 0, 0));
+	    g.beginFill(Graphics.getRGB(0, 0, 0));
+	    g.drawRoundRect(125, 64, 20, 50, 10);
+	    g.endFill();
+
+	    //Left eye
+	    g.setStrokeStyle(5, 'round', 'round');
+	    g.beginStroke(Graphics.getRGB(0, 0, 0));
+	    g.beginFill(Graphics.getRGB(0, 0, 0));
+	    g.drawRoundRect(200, 64, 20, 50, 10);
+	    g.endFill();
+
+	    //Mouth
+	    g.setStrokeStyle(15, 'round', 'round');
+	    g.beginStroke(Graphics.getRGB(0, 0, 0));
+	    g.moveTo(45, 155);
+	    g.bezierCurveTo(83, 307, 254, 317, 296, 152);
+	    return s;
+	}
+
+	</script>
+
+</head>
+<body onload="init()">
+
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Simple Graphics Example</h1>
+	    <p>This example draws a set of vector shapes as a smiley face.</p>
+	</header>
+
+	<canvas id="myCanvas" width="960" height="400"></canvas>
+
+</body>
+</html>

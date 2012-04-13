@@ -1,0 +1,11 @@
+{
+    "frames": {
+        "numFrames": 64,
+        "regX": 2,
+        "width": 101,
+        "regY": 2,
+        "height": 181
+    },
+    "animations": {"jump": [26, 63], "run": [0, 25]},
+    "images": ["./img/hacked.png"]
+}
