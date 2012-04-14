@@ -95,7 +95,7 @@
 	 */
 	p.initialize = function(brightness,contrast,saturation,hue) {
 		this.reset();
-		if (brightness != null) { this.adjustColor(brightness,contrast,saturation,hue); }
+		this.adjustColor(brightness,contrast,saturation,hue);
 		return this;
 	};
 	
@@ -132,8 +132,8 @@
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.adjustBrightness = function(value) {
+		if (value == 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value,255);
-		if (value == 0 || isNaN(value)) { return; }
 		this._multiplyMatrix([
 			1,0,0,0,value,
 			0,1,0,0,value,
@@ -151,8 +151,8 @@
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.adjustContrast = function(value) {
+		if (value == 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value,100);
-		if (value == 0 || isNaN(value)) { return; }
 		var x;
 		if (value<0) {
 			x = 127+value/100*127;
@@ -182,8 +182,8 @@
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.adjustSaturation = function(value) {
+		if (value == 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value,100);
-		if (value == 0 || isNaN(value)) { return; }
 		var x = 1+((value > 0) ? 3*value/100 : value/100);
 		var lumR = 0.3086;
 		var lumG = 0.6094;
@@ -205,8 +205,8 @@
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.adjustHue = function(value) {
+		if (value == 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value,180)/180*Math.PI;
-		if (value == 0 || isNaN(value)) { return; }
 		var cosVal = Math.cos(value);
 		var sinVal = Math.sin(value);
 		var lumR = 0.213;
@@ -229,7 +229,7 @@
 	 **/
 	p.concat = function(matrix) {
 		matrix = this._fixMatrix(matrix);
-		if (matrix.length != ColorMatrix.LENGTH) { return; }
+		if (matrix.length != ColorMatrix.LENGTH) { return this; }
 		this._multiplyMatrix(matrix);
 		return this;
 	};

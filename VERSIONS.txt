@@ -6,7 +6,7 @@ Future:
 - packaging / namespace
 
 
-Version 0.4.1 [Apr 13, 2012]
+Version 0.4.1 [Apr 14, 2012]
 ****************************************************************************************************
 - DisplayObject.tick has been renamed to onTick
 - fixed a problem with preloading sprite sheet images when using tile based sheets
