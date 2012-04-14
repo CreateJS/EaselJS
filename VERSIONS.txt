@@ -2,7 +2,7 @@ Future:
 ****************************************************************************************************
 - DisplayObject.hitArea
 - masking / clipping
-- SpriteSheetBuilder caching
+- SpriteSheetBuilder
 - packaging / namespace
 
 
@@ -27,6 +27,7 @@ Version 0.4.1 [Apr 13, 2012]
 - added Graphics.decodePath for compressed vector paths
 - support for passing a canvas string id to the Stage constructor
 - various bug fixes and doc updates
+- updateCache now clears the cacheCanvas correctly
 
 
 Version 0.4 [Nov 30, 2011] 

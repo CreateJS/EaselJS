@@ -419,12 +419,13 @@ var p = DisplayObject.prototype;
 	 **/
 	p.cache = function(x, y, width, height) {
 		// draw to canvas.
-		if (this.cacheCanvas == null) { this.cacheCanvas = document.createElement("canvas"); }
-		var ctx = this.cacheCanvas.getContext("2d");
-		this.cacheCanvas.width = width;
-		this.cacheCanvas.height = height;
-		ctx.clearRect(0, 0, width+1, height+1); // because some browsers don't properly clear if the width/height remain the same.
+		var cacheCanvas = this.cacheCanvas;
+		if (cacheCanvas == null) { cacheCanvas = this.cacheCanvas = document.createElement("canvas"); }
+		var ctx = cacheCanvas.getContext("2d");
+		cacheCanvas.width = width;
+		cacheCanvas.height = height;
 		ctx.setTransform(1, 0, 0, 1, -x, -y);
+		ctx.clearRect(x, y, cacheCanvas.width, cacheCanvas.height); // some browsers don't clear correctly.
 		this.draw(ctx, true, this._matrix.reinitialize(1,0,0,1,-x,-y)); // containers require the matrix to work from
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
@@ -442,11 +443,13 @@ var p = DisplayObject.prototype;
 	 * whatwg spec on compositing</a>.
 	 **/
 	p.updateCache = function(compositeOperation) {
-		if (this.cacheCanvas == null) { throw "cache() must be called before updateCache()"; }
-		var ctx = this.cacheCanvas.getContext("2d");
-		ctx.setTransform(1, 0, 0, 1, -this._cacheOffsetX, -this._cacheOffsetY);
-		if (!compositeOperation) { ctx.clearRect(0, 0, this.cacheCanvas.width+1, this.cacheCanvas.height+1); }
-		else { ctx.globalCompositeOperation = compositeOperation; }
+		var cacheCanvas = this.cacheCanvas, offX = this._cacheOffsetX, offY = this._cacheOffsetY;
+		if (cacheCanvas == null) { throw "cache() must be called before updateCache()"; }
+		var ctx = cacheCanvas.getContext("2d");
+		ctx.setTransform(1, 0, 0, 1, -offX, -offY);
+		if (!compositeOperation) {
+			ctx.clearRect(offX, offY, cacheCanvas.width, cacheCanvas.height);
+		} else { ctx.globalCompositeOperation = compositeOperation; }
 		this.draw(ctx, true);
 		if (compositeOperation) { ctx.globalCompositeOperation = "source-over"; }
 		this._applyFilters();
