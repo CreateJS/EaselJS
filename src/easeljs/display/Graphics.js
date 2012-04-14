@@ -812,7 +812,7 @@ var p = Graphics.prototype;
 	 * 
 	 * @method decodePath
 	 * @param {String} str The path string to decode.
-	 * @return {Graphics} A clone of the current Graphics instance.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.p = p.decodePath = function(str) {
 		var instructions = [this.moveTo, this.lineTo, this.quadraticCurveTo, this.bezierCurveTo];

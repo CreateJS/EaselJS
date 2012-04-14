@@ -29,15 +29,19 @@
 (function(window) {
 	
 	/**
-	* Provides helper functions for assembling a matrix for use with the ColorMatrixFilter.
-	* Can be used directly as the matrix for a ColorMatrixFilter.
-	* @class ColorMatrix
-	* @constructor
-	* @augments Array
-	* @param {Array} matrix Optional. An existing matrix to copy initial values from.
-	**/
-	ColorMatrix = function(matrix) {
-	  this.initialize(matrix);
+	 * Provides helper functions for assembling a matrix for use with the ColorMatrixFilter.
+	 * Can be used directly as the matrix for a ColorMatrixFilter. Most methods return the instance
+	 * to facilitate chained calls. Ex. myColorMatrix.adjustHue(20).adjustBrightness(50);
+	 * @class ColorMatrix
+	 * @constructor
+	 * @augments Array
+	 * @param {Number} brightness
+	 * @param {Number} contrast
+	 * @param {Number} saturation
+	 * @param {Number} hue
+	 **/
+	ColorMatrix = function(brightness, contrast, saturation, hue) {
+	  this.initialize(brightness, contrast, saturation, hue);
 	};
 	var p = ColorMatrix.prototype = [];
 	
@@ -89,12 +93,20 @@
 	 * @method initialize
 	 * @protected
 	 */
-	p.initialize = function(matrix) {
-		matrix = matrix == null?ColorMatrix.IDENTITY_MATRIX:matrix;
-		matrix = this._fixMatrix(matrix);
-		this.copyMatrix(((matrix.length == ColorMatrix.LENGTH) ? matrix : ColorMatrix.IDENTITY_MATRIX));
+	p.initialize = function(brightness,contrast,saturation,hue) {
+		this.reset();
+		if (brightness != null) { this.adjustColor(brightness,contrast,saturation,hue); }
+		return this;
 	};
 	
+	/**
+	 * Resets the matrix to identity values.
+	 * @method reset
+	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 */
+	p.reset = function() {
+		return this.copyMatrix(ColorMatrix.IDENTITY_MATRIX);
+	};
 	
 	/**
 	 * Shortcut method to adjust brightness, contrast, saturation and hue.
@@ -104,18 +116,20 @@
 	 * @param {Number} contrast
 	 * @param {Number} saturation
 	 * @param {Number} hue
+	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.adjustColor = function(brightness,contrast,saturation,hue) {
 		this.adjustHue(hue);
 		this.adjustContrast(contrast);
 		this.adjustBrightness(brightness);
-		this.adjustSaturation(saturation);
+		return this.adjustSaturation(saturation);
 	};
 	
 	/**
 	 * Adjusts the brightness of pixel color by adding the specified value to the red, green and blue channels.
 	 * Positive values will make the image brighter, negative values will make it darker.
 	 * @param {Number} value A value between -255 & 255 that will be added to the RGB channels.
+	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.adjustBrightness = function(value) {
 		value = this._cleanValue(value,255);
@@ -127,12 +141,14 @@
 			0,0,0,1,0,
 			0,0,0,0,1
 		]);
+		return this;
 	},
 	
 	/**
 	 * Adjusts the contrast of pixel color.
 	 * Positive values will increase contrast, negative values will decrease contrast.
 	 * @param {Number} value A value between -100 & 100.
+	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.adjustContrast = function(value) {
 		value = this._cleanValue(value,100);
@@ -156,12 +172,14 @@
 			0,0,0,1,0,
 			0,0,0,0,1
 		]);
+		return this;
 	};
 	
 	/**
 	 * Adjusts the color saturation of the pixel.
 	 * Positive values will increase saturation, negative values will decrease saturation (trend towards greyscale).
 	 * @param {Number} value A value between -100 & 100.
+	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.adjustSaturation = function(value) {
 		value = this._cleanValue(value,100);
@@ -177,12 +195,14 @@
 			0,0,0,1,0,
 			0,0,0,0,1
 		]);
+		return this;
 	};
 	
 	
 	/**
 	 * Adjusts the hue of the pixel color.
 	 * @param {Number} value A value between -180 & 180.
+	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.adjustHue = function(value) {
 		value = this._cleanValue(value,180)/180*Math.PI;
@@ -199,16 +219,19 @@
 			0,0,0,1,0,
 			0,0,0,0,1
 		]);
+		return this;
 	};
 	
 	/**
 	 * Concatenates (multiplies) the specified matrix with this one.
 	 * @param {Array} matrix An array or ColorMatrix instance.
+	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.concat = function(matrix) {
 		matrix = this._fixMatrix(matrix);
 		if (matrix.length != ColorMatrix.LENGTH) { return; }
 		this._multiplyMatrix(matrix);
+		return this;
 	};
 	
 	/**
@@ -230,12 +253,14 @@
 	/**
 	 * Copy the specified matrix's values to this matrix.
 	 * @param {Array} matrix An array or ColorMatrix instance.
+	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
 	p.copyMatrix = function(matrix) {
 		var l = ColorMatrix.LENGTH;
 		for (var i=0;i<l;i++) {
 			this[i] = matrix[i];
 		}
+		return this;
 	};
 	
 // private methods:
