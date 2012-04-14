@@ -35,8 +35,8 @@ var TEMPLATE_DIR_PATH = "template";
 var TMP_DIR_NAME = "tmp";
 
 // paths to tools:
-var GOOGLE_CLOSURE_PATH = "tools/google-closure/compiler.jar";
-var YUI_DOC_PATH = "tools/yuidoc/bin/yuidoc.py";
+var GOOGLE_CLOSURE_PATH = "../tools/google-closure/compiler.jar";
+var YUI_DOC_PATH = "../tools/yuidoc/bin/yuidoc.py";
 
 // yui version being used
 var YUI_VERSION = 2;
