@@ -6,6 +6,11 @@ Future:
 - packaging / namespace
 
 
+Version 0.5.0 [Not Released] 
+****************************************************************************************************
+- fixes to ColorMatrix
+
+
 Version 0.4.1 [Apr 14, 2012]
 ****************************************************************************************************
 - DisplayObject.tick has been renamed to onTick
