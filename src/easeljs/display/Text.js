@@ -299,7 +299,7 @@ var p = Text.prototype = new DisplayObject();
 	 **/
 	p._drawTextLine = function(ctx, text, y) {
 		// Chrome 17 will fail to draw the text if the last param is included but null, so we feed it a large value instead:
-			if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth)||0xFFFF; }
+			if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth||0xFFFF); }
 			else { ctx.fillText(text, 0, y, this.maxWidth||0xFFFF); }
 		
 	}
