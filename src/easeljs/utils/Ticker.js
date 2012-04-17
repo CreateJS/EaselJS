@@ -351,11 +351,11 @@ var Ticker = function() {
 	 * @protected
 	 **/
 	Ticker._handleAF = function(timeStamp) {
+		Ticker._rafActive = false;
+		Ticker._setupTick();
 		if (timeStamp - Ticker._lastTime >= Ticker._interval-1) {
 			Ticker._tick();
 		}
-		Ticker._rafActive = false;
-		Ticker._setupTick();
 	}
 	
 	/**
@@ -363,9 +363,9 @@ var Ticker = function() {
 	 * @protected
 	 **/
 	Ticker._handleTimeout = function() {
-		Ticker._tick();
 		Ticker.timeoutID = null;
 		Ticker._setupTick();
+		Ticker._tick();
 	}
 	
 	/**
