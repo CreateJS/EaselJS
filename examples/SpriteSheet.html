@@ -53,7 +53,7 @@
 		loader.loadManifest(manifest);
 		stage.autoClear = false;
 
-		document.onkeypress = handlePress;
+		//document.onkeypress = handlePress;
 	}
 
 	function handleFileLoad(event) {
@@ -123,7 +123,7 @@
 		}
 
 		stage.addChild(sky, ground, hill, hill2, grant);
-		stage.onPress = handlePress;
+		stage.onMouseDown = handlePress;
 
 		Ticker.setFPS(40);
 		Ticker.addListener(window);

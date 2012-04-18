@@ -23,13 +23,16 @@ function init() {
 	stage = new Stage(canvas);
 	
 	// create a large number of slightly complex vector shapes, and give them random positions and velocities:
+
+	var colors = ["#828b20", "#b0ac31", "#cbc53d", "#fad779", "#f9e4ad", "#faf2db", "#563512", "#9b4a0b", "#d36600", "#fe8a00", "#f9a71f"];
+	
 	for (var i=0; i<1000; i++) {
 		shape = new Shape();
-		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius);
-		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.8);
-		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.6);
-		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.4);
-		shape.graphics.beginFill(Graphics.getHSL(Math.random()*360, 100, 50)).drawCircle(0,0,circleRadius*0.2);
+		shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius);
+		shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*0.8);
+		shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*0.6);
+		shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*0.4);
+		shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*0.2);
 		shape.x = Math.random()*canvas.width;
 		shape.y = Math.random()*canvas.height;
 		shape.velX = Math.random()*10-5;
