@@ -6,9 +6,10 @@ Future:
 - packaging / namespace
 
 
-Version 0.5.0 [Not Released] 
+Version 0.4.2 [Apr 18, 2012] 
 ****************************************************************************************************
-- fixes to ColorMatrix
+- hot fix for issues with Ticker that caused reduced frame rates.
+- NO API CHANGES
 
 
 Version 0.4.1 [Apr 14, 2012]
