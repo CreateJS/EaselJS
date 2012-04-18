@@ -814,7 +814,7 @@ var p = Graphics.prototype;
 	 * @param {String} str The path string to decode.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
-	p.p = p.decodePath = function(str) {
+	p.decodePath = function(str) {
 		var instructions = [this.moveTo, this.lineTo, this.quadraticCurveTo, this.bezierCurveTo];
 		var paramCount = [2, 2, 4, 6];
 		var i=0, l=str.length;
@@ -1065,7 +1065,7 @@ var p = Graphics.prototype;
 	 * @protected
 	 * type Function
 	 **/
-	p.p
+	p.p = p.decodePath;
 	
 	
 // private methods:
