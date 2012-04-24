@@ -1,83 +1,169 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>EaselJS Example: Graphics API</title>
+    <title>EaselJS: Simple Graphics</title>
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
 
-<link href="styles/styles.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
 
-<!-- Import EaselJS Framework -->
-<script src="../src/easeljs/display/Graphics.js"></script>
-<!-- End EaselJS Imports -->
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
 
-<script>
-var canvas;
-var ctx;
 
-var img = new Image();
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
 
-function init() {
-	//find canvas and load images, wait for last image to load
-	canvas = document.getElementById("testCanvas");
-	ctx = canvas.getContext("2d");
-	
-	img.onload = run;
-	img.src = "img/daisy.png";
-}
+    <script type="text/javascript">
 
-function run() {
-	// create a new Graphics object. Note that Graphics can be used without any dependency on the rest of Easel.
-	var g = new Graphics();
-	
-	// note that you can call graphics methods individually:
-	g.setStrokeStyle(16, "round", "round")
-	g.beginStroke("#FF0");
-	// or you can chain them together:
-	g.moveTo(50,50).lineTo(100,100).lineTo(100,150);
-	
-	g.setStrokeStyle(8).beginStroke("#F0F");
-	g.beginRadialGradientFill(["#FF0","#00F"],[0,1],100,200,0,100,200,40);
-	g.drawCircle(100,200,40);
-	
-	// Graphics has a few helper methods for creating color strings from numeric color values:
-	g.beginFill(Graphics.getRGB(0x00,0x00,0xFF,0.5));
-	g.setStrokeStyle(4)
-	g.beginLinearGradientStroke(["#F00","#FFF"],[0,1],300,300,300,500);
-	g.drawEllipse(300,300,100,200,8);
-	
-	g.beginLinearGradientFill(["#FFF","#000"],[0,1],0,100,0,200);
-	g.endStroke();
-	g.drawRect(200,100,200,100);
-	
-	g.beginBitmapFill(img);
-	g.setStrokeStyle(8).beginRadialGradientStroke(["#FFF","#000"],[0,1],150,300,0,150,300,200);
-	g.drawRect(50, 300, 200, 200);
-	
-	// example of chaining an entire draw together:
-	g.endFill().beginBitmapStroke(img).setStrokeStyle(32).drawRect(20,20,940,540);
-	
-	// draw a star:
-	g.beginFill("#FF0").endStroke().drawPolyStar(500,200,80,5,0.6,-90);
-	
-	// draw two hexagons:
-	g.beginFill("#0F0").drawPolyStar(500,350,50,6).drawPolyStar(500,440,50,6);
-	
-	// draw a curve:
-	g.endFill().beginStroke("#0FF").setStrokeStyle(6).moveTo(600,300).curveTo(650,300,650,350);
-	
-	// Again, note that the Easel framework was not required, we can draw directly to any context2D:
-	g.draw(ctx);
-}
+        var canvas;
+        var stage;
+        var img;
 
-</script>
+        function init() {
+        	if (window.top != window) {
+        		document.getElementById("header").style.display = "none";
+        	}
+
+            canvas = document.getElementById("testCanvas");
+            // create a new stage and point it at our canvas:
+            stage = new Stage(canvas);
+
+            // grab canvas width and height for later calculations:
+            w = canvas.width;
+            h = canvas.height;
+            img = new Image();
+            img.onload = layout;
+            img.src = "./assets/daisy.png";
+        }
+
+        function layout() {
+            var arr = [createStar, createHex, createLineTo, createRadialGradientFill, createEllipse, createRectGradientFill, createBitmapFill];
+            var padding = 5;
+            var _width = 155;
+            var _height = 155;
+            var cols = 4;
+            var space = 0;
+            var l = arr.length;
+
+            var border = createBorder();
+
+            for(var i=0;i<l;i++) {
+                var tile = arr[i]();
+                tile.x = 42+(_width + padding) *(i%cols);
+                tile.y = 42+(i/cols | 0) * (_height+padding);
+                stage.addChild(tile);
+            }
+            stage.addChild(border);
+            stage.update();
+        }
+
+        function createBorder() {
+            var container = new Container();
+            var s = new Shape();
+            s.graphics.beginBitmapStroke(img).setStrokeStyle(32).drawRect(20,20,920,360);
+            container.addChild(s);
+            return container;
+        }
+
+        function createBitmapFill() {
+            var container = createTile();
+            var s = new Shape();
+            s.graphics.beginBitmapFill(img).setStrokeStyle(8).beginRadialGradientStroke(["#FFF","#000"],[0,1],0,0,0,0,30,130).drawRect(0, 0, 130, 130);
+            s.x = 12;
+            s.y = 10;
+            container.addChild(s);
+            return container;
+        }
+
+        function createRectGradientFill() {
+            var container = createTile();
+            var s = new Shape();
+            s.graphics.beginLinearGradientFill(["#FFF","#000"],[0,1],0,0,0,130).drawRect(0,0,130,130);
+            s.x = 12;
+            s.y = 10;
+            container.addChild(s);
+            return container;
+        }
+
+        function createEllipse() {
+            var container = createTile();
+            var s = new Shape();
+            s.graphics.f(Graphics.getRGB(0,0x66,0x99,0.5)).setStrokeStyle(4).beginLinearGradientStroke(["#F00","#000"],[0,1],0,0,70,140).drawEllipse(0,0,70,140,8);
+            s.x = 40;
+            s.y = 10;
+            container.addChild(s);
+            return container;
+        }
+
+        function createRadialGradientFill() {
+            var container = createTile();
+            var s = new Shape();
+            s.graphics.ss(8).beginStroke("#f0f").beginRadialGradientFill(["#FFF","#0FF"],[0,1],0,0,0,0,0,40).drawCircle(0,0,40);
+            s.x = s.y = 80;
+            container.addChild(s);
+            return container;
+        }
+
+        function createLineTo() {
+            var container = createTile();
+            var s = new Shape();
+            s.graphics.setStrokeStyle(16, "round", "round").beginStroke("#f90").moveTo(20,10).lineTo(90,90).lineTo(90,140);
+            container.addChild(s);
+            return container;
+        }
+
+        function createHex() {
+            var container = createTile();
+            var s = new Shape();
+            s.graphics.beginFill("#0F0").drawPolyStar(0,0,40,6).drawPolyStar(0,75,40,6);
+            s.x = 80
+            s.y = 40;
+
+            container.addChild(s);
+            return container;
+        }
+
+        function createStar() {
+            var container = createTile();
+            var s = new Shape();
+            s.graphics.setStrokeStyle(1).beginStroke(Graphics.getRGB(255, 255, 0)).beginFill("#FF0").endStroke().drawPolyStar(0,0,80,5,0.6,-90);
+            s.x = 80
+            s.y = 85;
+
+            container.addChild(s);
+            return container;
+        }
+
+        function createTile() {
+            var container = new Container();
+            var bg = new Shape();
+            bg.graphics.beginFill('#CCCCCC').drawRect(0, 0, 155, 155).endFill();
+            bg.alpha = 0.25;
+            container.addChild(bg);
+            return container;
+        }
+
+
+    </script>
 </head>
-	
 <body onload="init();">
-	<div class="description">
-	Demo showing how a <strong>Graphics</strong> object can be used to draw vector graphics without an associated <strong>Shape</strong>.
-	</div>
+
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Graphics Test (tiny)</h1>
+	    <p>This demo shows the usage of all of the <b>Graphics</b> APIs.</p>
+	</header>
+
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="980" height="580"></canvas>
+	    <canvas id="testCanvas" width="960" height="400"></canvas>
 	</div>
+
 </body>
 </html>

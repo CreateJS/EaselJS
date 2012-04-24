@@ -1,35 +1,45 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>EaselJS Example: Text</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>EaselJS Example: Text</title>
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
-	<script src="http://code.createjs.com/easeljs-0.4.2.min.js"></script>
 
-<script>
-function init() {
-	// get a reference to the canvas we'll be working with:
-	var canvas = document.getElementById("testCanvas");
-	
-	// create a stage object to work with the canvas. This is the top level node in the display list:
-	var stage = new Stage(canvas);
-	
-	// Create a new Text object:
-	var text = new Text("Hello World!", "36px Arial", "#777");
-	
-	// add the text as a child of the stage. This means it will be drawn any time the stage is updated
-	// and that it's transformations will be relative to the stage coordinates:
-	stage.addChild(text);
-	
-	// position the text on screen, relative to the stage coordinates:
-	text.x = 360;
-	text.y = 200;
-	
-	// call update on the stage to make it render the current display list to the canvas:
-	stage.update();
-}
-</script>
+	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
+
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+
+	<script>
+	function init() {
+		// get a reference to the canvas we'll be working with:
+		var canvas = document.getElementById("testCanvas");
+
+		// create a stage object to work with the canvas. This is the top level node in the display list:
+		var stage = new Stage(canvas);
+
+		// Create a new Text object:
+		var text = new Text("Hello World!", "36px Arial", "#777");
+
+		// add the text as a child of the stage. This means it will be drawn any time the stage is updated
+		// and that it's transformations will be relative to the stage coordinates:
+		stage.addChild(text);
+
+		// position the text on screen, relative to the stage coordinates:
+		text.x = 360;
+		text.y = 200;
+
+		// call update on the stage to make it render the current display list to the canvas:
+		stage.update();
+	}
+	</script>
 </head>
 	
 <body onload="init();">
