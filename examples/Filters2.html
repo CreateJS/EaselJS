@@ -1,50 +1,43 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
     <title>EaselJS: Filters Example</title>
 
-    <script src="http://code.createjs.com/easeljs-0.4.2.min.js"></script>
-    <script src="assets/Filter.js"></script>
-    <script src="assets/BoxBlurFilter.js"></script>
-    <script src="assets/ColorMatrixFilter.js"></script>
-    <script src="assets/ColorFilter.js"></script>
-    <script src="assets/ColorMatrix.js"></script>
     <link type="text/css" href="assets/demoStyles.css" rel="stylesheet" />
     <link type="text/css" href="assets/css/dark-hive/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 
-    <style type="text/css">
-            /* define a width for the sliders by styling the wrapping div */
-        .hueSlider { width:100px; }
-        .saturationSlider { width:100px; }
-        .contrastSlider { width:100px; }
-        .brightnessSlider { width:100px; }
-        .blurXSlider { width:100px; }
-        .blurYSlider { width:100px; }
-        .redChannelSlider { width:100px; }
-        .greenChannelSlider { width:100px; }
-        .blueChannelSlider { width:100px; }
-    </style>
+    <script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/filters/BoxBlurFilter.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/filters/ColorFilter.js"></script>
+    <script type="text/javascript" src="../src/easeljs/filters/ColorMatrix.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/filters/ColorMatrixFilter.js"></script>
+
+   	<!-- We also provide hosted minified versions of all CreateJS libraries.
+   	  http://code.createjs.com -->
 
     <script type="text/javascript">
+
         var img;
         var stage;
         var bmp;
         var DELTA_INDEX;
         var blurXSlider;
-        var blurFilter;
-        var HueFilter;
-        var constrastFilter;
-        var saturationFilter;
-        var brightnessFilter;
-        var redChannelFilter;
-        var greenChannelFilter;
-        var blueChannelFilter;
+        var blurFilter, hueFilter, constrastFilter, saturationFilter, brightnessFilter;
+        var redChannelFilter, greenChannelFilter, blueChannelFilter;
+        var colorFilter;
         var slideInterval = -1;
         var cm;
-        var colorFilter;
+
         function init() {
         	if (window.top != window) {
         		document.getElementById("header").style.display = "none";
@@ -212,6 +205,19 @@
         }
 
     </script>
+
+    <style type="text/css">
+        /* define a width for the sliders by styling the wrapping div */
+        .hueSlider { width:100px; }
+        .saturationSlider { width:100px; }
+        .contrastSlider { width:100px; }
+        .brightnessSlider { width:100px; }
+        .blurXSlider { width:100px; }
+        .blurYSlider { width:100px; }
+        .redChannelSlider { width:100px; }
+        .greenChannelSlider { width:100px; }
+        .blueChannelSlider { width:100px; }
+    </style>
 </head>
 <body onload="init()">
 

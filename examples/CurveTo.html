@@ -5,24 +5,28 @@
     <title>Curve To</title>
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
-	<script src="http://code.createjs.com/easeljs-0.4.2.min.js"></script>
+
+	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
+	<script type="text/javascript" src="../src/easeljs/ui/Touch.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Point.js"></script>
+
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
 
     <script>
-
-        var canvas;
         var stage;
-        var g;
-        var shape;
         var isMouseDown;
-        var oldPosition;
         var currentShape;
-        var ctx;
-        var selectedColor;
-        var oldMidX;
-        var oldMidY;
-        var oldX;
-        var oldY;
-        var firstLoad;
+        var oldMidX, oldMidY, oldX, oldY;
         var txt;
 
         function init() {
@@ -30,14 +34,11 @@
         		document.getElementById("header").style.display = "none";
         	}
 
-            firstLoad = true;
             txt = new Text("Click and Drag to Draw", "36px Arial", "#777777");
             txt.x = 300;
             txt.y = 200;
-            canvas = document.getElementById('myCanvas');
-            ctx = canvas.getContext("2d");
+            var canvas = document.getElementById('myCanvas');
             stage = new Stage(canvas);
-            oldPosition = new Point(stage.mouseX, stage.mouseY);
             stage.autoClear = true;
             stage.onMouseDown = handleMouseDown;
             stage.onMouseUp = handleMouseUp;
@@ -59,7 +60,6 @@
                 var midPoint = new Point(oldX + pt.x>>1, oldY+pt.y>>1);
                 currentShape.graphics.moveTo(midPoint.x, midPoint.y);
                 currentShape.graphics.curveTo(oldX, oldY, oldMidX, oldMidY);
-                currentShape.draw(ctx);
 
                 oldX = pt.x;
                 oldY = pt.y;
@@ -73,10 +73,8 @@
 
         function handleMouseDown() {
             isMouseDown = true;
-            if (firstLoad) {
-                stage.removeChild(txt);
-            }
-            firstLoad = false;
+            stage.removeChild(txt);
+
             var s = new Shape();
             oldX = stage.mouseX;
             oldY = stage.mouseY;
@@ -85,8 +83,8 @@
             var g = s.graphics;
             var thickness = Math.random() * 30 + 10 | 0;
             g.setStrokeStyle(thickness + 1, 'round', 'round');
-            selectedColor = Graphics.getRGB(Math.random()*255 | 0 ,Math.random()*255 | 0, Math.random()*255 | 0);
-            g.beginStroke(selectedColor);
+            var color = Graphics.getRGB(Math.random()*255 | 0 ,Math.random()*255 | 0, Math.random()*255 | 0);
+            g.beginStroke(color);
             stage.addChild(s);
             currentShape = s;
         }

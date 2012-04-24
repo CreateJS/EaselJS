@@ -1,46 +1,59 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>EaselJS Example: Flipping a sprite sheet</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>EaselJS Example: Flipping a sprite sheet</title>
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
-	<script src="http://code.createjs.com/easeljs-0.4.2.min.js"></script>
 
-<script>
-var imgSeq = new Image();		//bmp of the sprite sheet
-var results;					//frame data to be displayed
+	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 
-function init() {
-	//wait for the image to load
-	imgSeq.onload = handleImageLoad;
-	imgSeq.src = "assets/testSeq.png";
-}
+		<!-- We also provide hosted minified versions of all CreateJS libraries.
+		  http://code.createjs.com -->
 
-function handleImageLoad() {
-	// create a new sprite sheet from the loaded image, and define the animation sequences in it.
-	// for example, {walkUpRight:[0,19]} defines an animation sequence called "walkUpRight" that
-	// will play back frames 0 to 19 inclusive.
-	var spriteSheet  = new SpriteSheet({
-		images: ["assets/testSeq.png"],
-		frames: {width:64, height:68},
-		animations: {
-			walkUpRt:[0,19,"walkRt"],
-			walkDnRt:[20,39,"walkUpRt"],
-			walkRt:[41,59,"walkDnRt"]
-		}
-	});
-	
-	// append flipped frames to the sprite sheet. The 2nd, 3rd, and 4th params indicate whether
-	// to add horizontal, vertical, and both horizontally & vertically flipped frames.
-	SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
-	
-	// add the newly created sprite sheet to the bottom of this document. We're accessing a private property "_images"
-	// for demonstration purposes only.
-	document.getElementById("content").appendChild(spriteSheet._images[1]);
-}
 
-</script>
+	<script>
+	var imgSeq = new Image();		//bmp of the sprite sheet
+	var results;					//frame data to be displayed
+
+	function init() {
+		//wait for the image to load
+		imgSeq.onload = handleImageLoad;
+		imgSeq.src = "assets/testSeq.png";
+	}
+
+	function handleImageLoad() {
+		// create a new sprite sheet from the loaded image, and define the animation sequences in it.
+		// for example, {walkUpRight:[0,19]} defines an animation sequence called "walkUpRight" that
+		// will play back frames 0 to 19 inclusive.
+		var spriteSheet  = new SpriteSheet({
+			images: ["assets/testSeq.png"],
+			frames: {width:64, height:68},
+			animations: {
+				walkUpRt:[0,19,"walkRt"],
+				walkDnRt:[20,39,"walkUpRt"],
+				walkRt:[41,59,"walkDnRt"]
+			}
+		});
+
+		// append flipped frames to the sprite sheet. The 2nd, 3rd, and 4th params indicate whether
+		// to add horizontal, vertical, and both horizontally & vertically flipped frames.
+		SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
+
+		// add the newly created sprite sheet to the bottom of this document. We're accessing a private property "_images"
+		// for demonstration purposes only.
+		document.getElementById("content").appendChild(spriteSheet._images[1]);
+	}
+
+	</script>
 </head>
 	
 <body onload="init();" bgcolor="#FFFFFF">
