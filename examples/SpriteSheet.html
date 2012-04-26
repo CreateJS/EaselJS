@@ -5,7 +5,7 @@
 <title>EaselJS: Sprite Sheet Example</title>
 
 <link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
-<script src="http://code.createjs.com/easeljs-0.4.2.min.js"></script>
+<script src="http://code.createjs.com/easeljs-0.4.1.min.js"></script>
 <script src="http://code.createjs.com/preloadjs-0.1.0.min.js"></script>
 <script type="text/javascript">
 
@@ -123,19 +123,14 @@
 		}
 
 		stage.addChild(sky, ground, hill, hill2, grant);
-		stage.onMouseDown = handlePress;
+		stage.onMouseDown = handleJumpStart;
 
 		Ticker.setFPS(40);
 		Ticker.addListener(window);
 	}
 
-	function handlePress(event) {
-		grant.onAnimationEnd = handleJumpStart;
-	}
-
 	function handleJumpStart() {
 		grant.gotoAndPlay("jump");
-		grant.onAnimationEnd = null;
 	}
 
 	function tick() {

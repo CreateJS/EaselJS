@@ -43,7 +43,7 @@ class DocGenerator(object):
                 if head and not os.path.isdir(head): _mkdir(head)
                 if tail: os.mkdir(newdir)
 
-       
+
         self.moduleprefix = const.MODULE_PREFIX
         self.inpath       = os.path.abspath(inpath)
 
@@ -96,7 +96,7 @@ class DocGenerator(object):
 
     def cleanseStr(self, strg):
         cleanregex= re.compile(r"[^\w\-]")
-        cleansed = cleanregex.sub('', strg.lower())
+        cleansed = cleanregex.sub('', strg) # LM: Removed lower(), since it was mucking with the indexing
         # log.warn('cleansed module: %s' %(cleansed));
         return self.moduleprefix + cleansed
 

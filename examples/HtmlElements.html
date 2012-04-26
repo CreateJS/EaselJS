@@ -1,49 +1,62 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>EaselJS Example: DOMElement Example</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>EaselJS Example: DOMElement Example</title>
 
-<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
-<script src="http://code.createjs.com/easeljs-0.4.2.min.js"></script>
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 
-<script>
-var stage;
+	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DOMElement.js"></script>
 
-function init() {
-	//return;
-	// create a new stage and point it at our canvas:
-	canvas = document.getElementById("testCanvas");
-	stage = new Stage(canvas);
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
 
-	var container = new Container();
-	stage.addChild(container);
+	<script>
+	var stage;
 
-	var frame = new Shape();
-	frame.graphics.beginFill("#00F").drawRect(0,0,340,280);
-	frame.regX = 170;
-	frame.regY = 140;
+	function init() {
+		//return;
+		// create a new stage and point it at our canvas:
+		canvas = document.getElementById("testCanvas");
+		stage = new Stage(canvas);
 
-	var content = new DOMElement(document.getElementById("foo"));
-	content.regX = 165;
-	content.regY = 135;
-	//content.visible = false;
+		var container = new Container();
+		stage.addChild(container);
 
-	var o = content.clone();
-	stage.addChild(o);
+		var frame = new Shape();
+		frame.graphics.beginFill("#00F").drawRect(0,0,340,280);
+		frame.regX = 170;
+		frame.regY = 140;
 
-	container.addChild(frame,content);
-	container.x = 300; container.y = 200;
-	container.alpha = 0.6;
-	container.rotation = 25;
-	container.scaleX = 1.5;
-	//container.visible = false;
+		var content = new DOMElement(document.getElementById("foo"));
+		content.regX = 165;
+		content.regY = 135;
+		//content.visible = false;
 
-	Ticker.addListener(stage);
-	stage.update();
-}
+		var o = content.clone();
+		stage.addChild(o);
 
-</script>
+		container.addChild(frame,content);
+		container.x = 300; container.y = 200;
+		container.alpha = 0.6;
+		container.rotation = 25;
+		container.scaleX = 1.5;
+		//container.visible = false;
+
+		Ticker.addListener(stage);
+		stage.update();
+	}
+
+	</script>
 </head>
 
 <body onload="init();">
