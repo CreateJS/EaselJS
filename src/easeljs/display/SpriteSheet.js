@@ -309,7 +309,8 @@ var p = SpriteSheet.prototype;
 	 * property indicating the advance frequency for this animation, a name property, 
 	 * and a next property, which specifies the default next animation. If the animation
 	 * loops, the name and next property will be the same.
-	 * @method getAnimations
+	 * @method getAnimation
+	 * @param name The name of the animation to get.
 	 * @return {Object} a generic object with frames, frequency, name, and next properties.
 	 **/
 	p.getAnimation = function(name) {
