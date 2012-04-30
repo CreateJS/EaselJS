@@ -37,9 +37,10 @@
 * @for Graphics
 * @constructor
 **/
-function Command(f, params) {
+function Command(f, params, path) {
 	this.f = f;
 	this.params = params;
+	this.path = path==null ? true : path;
 }
 
 /**
@@ -179,7 +180,7 @@ var p = Graphics.prototype;
 	 * @protected
 	 * @type Command
 	 **/
-	Graphics.beginCmd = new Command(Graphics._ctx.beginPath, []);
+	Graphics.beginCmd = new Command(Graphics._ctx.beginPath, [], false);
 	
 	/**
 	 * @property fillCmd
@@ -187,7 +188,7 @@ var p = Graphics.prototype;
 	 * @protected
 	 * @type Command
 	 **/
-	Graphics.fillCmd = new Command(Graphics._ctx.fill, []);
+	Graphics.fillCmd = new Command(Graphics._ctx.fill, [], false);
 	
 	/**
 	 * @property strokeCmd
@@ -195,8 +196,11 @@ var p = Graphics.prototype;
 	 * @protected
 	 * @type Command
 	 **/
-	Graphics.strokeCmd = new Command(Graphics._ctx.stroke, []);
+	Graphics.strokeCmd = new Command(Graphics._ctx.stroke, [], false);
+	
+// public properties
 
+// private properties
 	/**
 	 * @property _strokeInstructions
 	 * @protected
@@ -274,12 +278,26 @@ var p = Graphics.prototype;
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
 	 **/
 	p.draw = function(ctx) {
-		if (this._dirty) {
-			this._updateInstructions();
-		}
+		if (this._dirty) { this._updateInstructions(); }
 		var instr = this._instructions;
 		for (var i=0, l=instr.length; i<l; i++) {
 			instr[i].exec(ctx);
+		}
+	}
+	
+	/**
+	 * Draws only the path described for this Graphics instance, skipping any
+	 * non-path instructions, including fill and stroke descriptions.
+	 * Used by DisplayObject.clippingPath to draw the clipping path, for example.
+	 * @method drawAsPath
+	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	 **/
+	p.drawAsPath = function(ctx) {
+		if (this._dirty) { this._updateInstructions(); }
+		var instr, instrs = this._instructions;
+		for (var i=0, l=instrs.length; i<l; i++) {
+			// the first command is always a beginPath command.
+			if ((instr = instrs[i]).path || i==0) { instr.exec(ctx); }
 		}
 	}
 	
@@ -445,7 +463,7 @@ var p = Graphics.prototype;
 	 **/
 	p.beginFill = function(color) {
 		if (this._active) { this._newPath(); }
-		this._fillInstructions = color ? [new Command(this._setProp, ["fillStyle", color])] : null;
+		this._fillInstructions = color ? [new Command(this._setProp, ["fillStyle", color], false)] : null;
 		return this;
 	}
 	
@@ -470,7 +488,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
 		return this;
 	}
 	
@@ -497,7 +515,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
 		return this;
 	}
 	
@@ -513,7 +531,7 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		repetition = repetition || "";
 		var o = this._ctx.createPattern(image, repetition);
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o])];
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
 		return this;
 	}
 	
@@ -522,13 +540,13 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.endFill = function() {
-		this.beginFill();
-		return this;
+		return this.beginFill();
 	}
 	
 	/**
 	 * Sets the stroke style for the current subpath. Like all drawing methods, this can be chained, so you can define the stroke style and color in a single line of code like so:
 	 * myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
+	 * @method setStrokeStyle
 	 * @param thickness The width of the stroke.
 	 * @param caps Optional. Indicates the type of caps to use at the end of lines. One of butt, round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with the tiny API.
 	 * @param joints Optional. Specifies the type of joints that should be used where two lines meet. One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel) for use with the tiny API.
@@ -538,28 +556,30 @@ var p = Graphics.prototype;
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
 		if (this._active) { this._newPath(); }
 		this._strokeStyleInstructions = [
-			new Command(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)]),
-			new Command(this._setProp, ["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))]),
-			new Command(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))]),
-			new Command(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)])
+			new Command(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)], false),
+			new Command(this._setProp, ["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))], false),
+			new Command(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))], false),
+			new Command(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)], false)
 			];
 		return this;
 	}
 	
 	/**
 	 * Begins a stroke with the specified color. This ends the current subpath.
+	 * @method beginStroke
 	 * @param color A CSS compatible color value (ex. "#FF0000" or "rgba(255,0,0,0.5)"). Setting to null will result in no stroke.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginStroke = function(color) {
 		if (this._active) { this._newPath(); }
-		this._strokeInstructions = color ? [new Command(this._setProp, ["strokeStyle", color])] : null;
+		this._strokeInstructions = color ? [new Command(this._setProp, ["strokeStyle", color], false)] : null;
 		return this;
 	}
 	
 	/**
 	 * Begins a linear gradient stroke defined by the line (x0, y0) to (x1, y1). This ends the current subpath. For example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a square to display it:<br/>
 	 * myGraphics.setStrokeStyle(10).beginLinearGradientStroke(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
+	 * @method beginLinearGradientStroke
 	 * @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
 	 * @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
 	 * @param x0 The position of the first point defining the line that defines the gradient direction and size.
@@ -574,7 +594,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
+		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o], false)];
 		return this;
 	}
 	
@@ -582,6 +602,7 @@ var p = Graphics.prototype;
 	/**
 	 * Begins a radial gradient stroke. This ends the current subpath. For example, the following code defines a red to blue radial gradient centered at (100, 100), with a radius of 50, and draws a rectangle to display it:<br/>
 	 * myGraphics.setStrokeStyle(10).beginRadialGradientStroke(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50).drawRect(50, 90, 150, 110);
+	 * @method beginRadialGradientStroke
 	 * @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
 	 * @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color to 100%.
 	 * @param x0 Center position of the inner circle that defines the gradient.
@@ -598,12 +619,13 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
+		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o], false)];
 		return this;
 	}
 	
 	/**
 	 * Begins a pattern fill using the specified image. This ends the current subpath.
+	 * @method beginBitmapStroke
 	 * @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use as the pattern.
 	 * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
 	 * "repeat-y", or "no-repeat". Defaults to "repeat".
@@ -611,9 +633,8 @@ var p = Graphics.prototype;
 	 **/
 	p.beginBitmapStroke = function(image, repetition) {
 		if (this._active) { this._newPath(); }
-		repetition = repetition || "";
-		var o = this._ctx.createPattern(image, repetition);
-		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o])];
+		var o = this._ctx.createPattern(image, repetition || "");
+		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o], false)];
 		return this;
 	}
 	
@@ -864,6 +885,7 @@ var p = Graphics.prototype;
 		if (this._strokeStyleInstructions) { o._strokeStyleInstructions = this._strokeStyleInstructions.slice(); }
 		o._active = this._active;
 		o._dirty = this._dirty;
+		o.drawAsPath = this.drawAsPath;
 		return o;
 	}
 		
@@ -1074,7 +1096,7 @@ var p = Graphics.prototype;
 	 * @protected
 	 **/
 	p._updateInstructions = function() {
-		this._instructions = this._oldInstructions.slice()
+		this._instructions = this._oldInstructions.slice();
 		this._instructions.push(Graphics.beginCmd);
 		 
 		if (this._fillInstructions) { this._instructions.push.apply(this._instructions, this._fillInstructions); }
