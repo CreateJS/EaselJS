@@ -111,12 +111,12 @@ var p = Text.prototype = new DisplayObject();
 	 **/
 	p.outline = false;
 	
-	/** Indicates the line height (vertical distance between baselines) for multi-line text. If null, 
+	/** Indicates the line height (vertical distance between baselines) for multi-line text. If null or 0, 
 	 * the value of getMeasuredLineHeight is used.
 	 * @property lineHeight
 	 * @type Number
 	 **/
-	p.lineHeight = null;
+	p.lineHeight = 0;
 	
 	/**
 	 * Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null, 
@@ -181,41 +181,15 @@ var p = Text.prototype = new DisplayObject();
 		if (this.outline) { ctx.strokeStyle = this.color; }
 		else { ctx.fillStyle = this.color; }
 		ctx.font = this.font;
-		ctx.textAlign = this.textAlign ? this.textAlign : "start";
-		ctx.textBaseline = this.textBaseline ? this.textBaseline : "alphabetic";
+		ctx.textAlign = this.textAlign||"start";
+		ctx.textBaseline = this.textBaseline||"alphabetic";
 
-		var lines = String(this.text).split(/(?:\r\n|\r|\n)/);
-		var lineHeight = (this.lineHeight == null) ? this.getMeasuredLineHeight() : this.lineHeight;
-		var y = 0;
-		for (var i=0, l=lines.length; i<l; i++) {
-			var w = ctx.measureText(lines[i]).width;
-			if (this.lineWidth == null || w < this.lineWidth) {
-				this._drawTextLine(ctx, lines[i], y);
-				y += lineHeight;
-				continue;
-			}
-
-			// split up the line
-			var words = lines[i].split(/(\s)/);
-			var str = words[0];
-			for (var j=1, jl=words.length; j<jl; j+=2) {
-				// Line needs to wrap:
-				if (ctx.measureText(str + words[j] + words[j+1]).width > this.lineWidth) {
-					this._drawTextLine(ctx, str, y);
-					y += lineHeight;
-					str = words[j+1];
-				} else {
-					str += words[j] + words[j+1];
-				}
-			}
-			this._drawTextLine(ctx, str, y); // Draw remaining text
-			y += lineHeight;
-		}
+		this._drawText(ctx);
 		return true;
 	}
 	
 	/**
-	 * Returns the measured, untransformed width of the text.
+	 * Returns the measured, untransformed width of the text without wrapping.
 	 * @method getMeasuredWidth
 	 * @return {Number} The measured, untransformed width of the text.
 	 **/
@@ -232,6 +206,17 @@ var p = Text.prototype = new DisplayObject();
 	 **/
 	p.getMeasuredLineHeight = function() {
 		return this._getWorkingContext().measureText("M").width*1.2;
+	}
+
+	/**
+	 * Returns the approximate height of multiline text by multiplying the number of lines against
+	 * either the lineHeight (if specified) or getMeasuredLineHeight(). Note that this operation
+	 * requires the text flowing logic to run, which has an associated CPU cost.
+	 * @method getMeasuredHeight
+	 * @return {Number} The approximate height of the drawn multiline text.
+	 **/
+	p.getMeasuredHeight = function() {
+		return this._drawText()*(this.lineHeight||this.getMeasuredLineHeight());
 	}
 	
 	/**
@@ -285,9 +270,48 @@ var p = Text.prototype = new DisplayObject();
 	p._getWorkingContext = function() {
 		var ctx = Text._workingContext;
 		ctx.font = this.font;
-		ctx.textAlign = this.textAlign ? this.textAlign : "start";
-		ctx.textBaseline = this.textBaseline ? this.textBaseline : "alphabetic";
+		ctx.textAlign = this.textAlign||"start";
+		ctx.textBaseline = this.textBaseline||"alphabetic";
 		return ctx;
+	}
+	 
+	/**
+	 * Draws multiline text.
+	 * @method _getWorkingContext
+	 * @protected
+	 * @return {Number} The number of lines drawn.
+	 **/
+	p._drawText = function(ctx) {
+		var paint = !!ctx;
+		if (!paint) { ctx = this._getWorkingContext(); }
+		var lines = String(this.text).split(/(?:\r\n|\r|\n)/);
+		var lineHeight = this.lineHeight||this.getMeasuredLineHeight();
+		var count = 0;
+		for (var i=0, l=lines.length; i<l; i++) {
+			var w = ctx.measureText(lines[i]).width;
+			if (this.lineWidth == null || w < this.lineWidth) {
+				if (paint) { this._drawTextLine(ctx, lines[i], count*lineHeight); }
+				count++;
+				continue;
+			}
+
+			// split up the line
+			var words = lines[i].split(/(\s)/);
+			var str = words[0];
+			for (var j=1, jl=words.length; j<jl; j+=2) {
+				// Line needs to wrap:
+				if (ctx.measureText(str + words[j] + words[j+1]).width > this.lineWidth) {
+					if (paint) { this._drawTextLine(ctx, str, count*lineHeight); }
+					count++;
+					str = words[j+1];
+				} else {
+					str += words[j] + words[j+1];
+				}
+			}
+			if (paint) { this._drawTextLine(ctx, str, count*lineHeight); } // Draw remaining text
+			count++;
+		}
+		return count;
 	}
 	
 	/** 
@@ -299,7 +323,7 @@ var p = Text.prototype = new DisplayObject();
 	 **/
 	p._drawTextLine = function(ctx, text, y) {
 		// Chrome 17 will fail to draw the text if the last param is included but null, so we feed it a large value instead:
-			if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth)||0xFFFF; }
+			if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth||0xFFFF); }
 			else { ctx.fillText(text, 0, y, this.maxWidth||0xFFFF); }
 		
 	}

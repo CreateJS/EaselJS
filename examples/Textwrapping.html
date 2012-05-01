@@ -24,9 +24,6 @@
 	function init() {
 		stage = new Stage(document.getElementById("testCanvas"));
 
-		var bg = new Shape();
-		bg.graphics.beginFill("#224").drawRect(20,20,920,360);
-		stage.addChild(bg);
 
 		var txt = new Text("", "17px Arial", "#FFF");
 		txt.text = "This text is rendered in canvas using the Text Object:\n\n";
@@ -37,10 +34,17 @@
 		txt.text += "Text\nRenders text in the context of the display list."
 
 		txt.lineWidth = 800;
+		txt.textBaseline = "top";
 		txt.textAlign = "left";
 		txt.y = 50;
 		txt.x = 30;
 		stage.addChild(txt);
+		
+		// use lineWidth and getMeasuredHeight to dynamically draw a background for our text:
+		var pad = 10;
+		var bg = new Shape();
+		bg.graphics.beginFill("#114").drawRect(txt.x-pad, txt.y-pad, txt.lineWidth+pad*2, txt.getMeasuredHeight()+pad*2);
+		stage.addChildAt(bg,0);
 
 		stage.update();
 	}
