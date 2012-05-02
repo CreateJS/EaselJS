@@ -104,39 +104,26 @@ var p = Container.prototype = new DisplayObject();
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
-	p.draw = function(ctx, ignoreCache, _mtx) {
-		var snap = Stage._snapToPixelEnabled;
+	p.draw = function(ctx, ignoreCache, matrix) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		_mtx = _mtx || this._matrix.reinitialize(1,0,0,1,0,0,this.alpha, this.shadow, this.compositeOperation);
-		var l = this.children.length;
+		// TODO: this is ONLY here for DOMElement, and has a cost associated with it. Might make sense to remove it, in favour of having DOMElement use getConcatenatedMatrix().
+		var mtx = this._getMatrix(matrix);
+		
 		// this ensures we don't have issues with display list changes that occur during a draw:
 		var list = this.children.slice(0);
-		for (var i=0; i<l; i++) {
+		for (var i=0,l=list.length; i<l; i++) {
 			var child = list[i];
 			if (!child.isVisible()) { continue; }
-
-			var shadow = false;
-			var mtx = child._matrix.reinitialize(_mtx.a,_mtx.b,_mtx.c,_mtx.d,_mtx.tx,_mtx.ty,_mtx.alpha,_mtx.shadow,_mtx.compositeOperation);
-			mtx.appendTransform(child.x, child.y, child.scaleX, child.scaleY, child.rotation, child.skewX, child.skewY,
-									child.regX, child.regY);
-			mtx.appendProperties(child.alpha, child.shadow, child.compositeOperation);
-
-			if (!(child instanceof Container && child.cacheCanvas == null)) {
-				if (snap && child.snapToPixel && mtx.a == 1 && mtx.b == 0 && mtx.c == 0 && mtx.d == 1) {
-					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0);
-				} else {
-					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
-				}
-				ctx.globalAlpha = mtx.alpha;
-				ctx.globalCompositeOperation = mtx.compositeOperation || "source-over";
-				if (shadow = mtx.shadow) { this.applyShadow(ctx, shadow); }
-			}
+			
+			// draw the child:
+			ctx.save();
+			child.updateContext(ctx);
 			child.draw(ctx, false, mtx);
-			if (shadow) { this.applyShadow(ctx); }
+			ctx.restore();
 		}
 		return true;
 	}
-
+	
 	/**
 	 * Adds a child to the top of the display list. You can also add multiple children, such as "addChild(child1, child2, ...);".
 	 * Returns the child that was added, or the last child if multiple children were added.

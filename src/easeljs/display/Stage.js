@@ -109,7 +109,8 @@ var p = Stage.prototype = new Container();
 	p.onMouseDown = null;
 
 	/**
-	 * Indicates whether this stage should use the snapToPixel property of display objects when rendering them.
+	 * Indicates whether this stage should use the snapToPixel property of display objects when rendering them. See
+	 * DisplayObject.snapToPixel for more information.
 	 * @property snapToPixelEnabled
 	 * @type Boolean
 	 * @default false

@@ -241,9 +241,13 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage.
-	 * This only applies if the enclosing stage has snapPixelsEnabled set to true, and the display object's composite
-	 * transform does not include any scaling, rotation, or skewing. The snapToPixel property is true by default for
-	 * Bitmap and BitmapAnimation instances, and false for all other display objects.
+	 * Snapping to whole pixels can result in a sharper and faster draw for images (ex. Bitmap & cached objects).
+	 * This only applies if the enclosing stage has snapPixelsEnabled set to true. The snapToPixel property is true
+	 * by default for Bitmap and BitmapAnimation instances, and false for all other display objects.
+	 * <br/><br/>
+	 * Note that this applies only rounds the display object's local position. You should
+	 * ensure that all of the display object's ancestors (parent containers) are also on a whole pixel. You can do this
+	 * by setting the ancestors' snapToPixel property to true.
 	 * @property snapToPixel
 	 * @type Boolean
 	 * @default false
@@ -318,6 +322,16 @@ var p = DisplayObject.prototype;
 	* @default 0
 	*/
 	p.cacheID = 0;
+	
+	/**
+	 * A Shape instance that defines a clipping path (vector mask) for this display object.  The shape's transformation
+	 * will be applied relative to this display object (as if it were a child of the dispay object).
+	 * @property clippingPath
+	 * @type Shape
+	 * @default null
+	 */
+	p.clippingPath = null;
+	
 
 // private properties:
 
@@ -360,6 +374,7 @@ var p = DisplayObject.prototype;
 	 * @default null
 	 **/
 	p._matrix = null;
+	
 
 // constructor:
 	// separated so it can be easily addressed in subclasses:
@@ -395,11 +410,27 @@ var p = DisplayObject.prototype;
 	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
+	 * @param {Matrix2D} matrix Optional. The current aggregate transform matrix if this is being drawn by the display list. Used by objects like DOMElement which don't draw to the context.
 	 **/
-	p.draw = function(ctx, ignoreCache) {
+	p.draw = function(ctx, ignoreCache, matrix) {
 		if (ignoreCache || !this.cacheCanvas) { return false; }
 		ctx.drawImage(this.cacheCanvas, this._cacheOffsetX, this._cacheOffsetY);
 		return true;
+	}
+	
+	/**
+	 * Applies this display object's transformation, alpha, globalCompositeOperation, and shadow to the specified
+	 * context. This is typically called prior to draw.
+	 * @method setupContext
+	 * @param {CanvasRenderingContext2D} ctx The canvas 2D to update.
+	 **/
+	p.updateContext = function(ctx) {
+		var o=this, mtx=o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		if (Stage._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
+		else { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
+		ctx.globalAlpha *= o.alpha;
+		if (o.compositeOperation) { ctx.globalCompositeOperation = o.compositeOperation; }
+		if (o.shadow) { this._applyShadow(ctx, o.shadow); }
 	}
 
 	/**
@@ -587,8 +618,7 @@ var p = DisplayObject.prototype;
 		else { mtx = new Matrix2D(); }
 		var target = this;
 		while (target != null) {
-			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.skewX,
-									target.skewY, target.regX, target.regY);
+			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.skewX, target.skewY, target.regX, target.regY);
 			mtx.prependProperties(target.alpha, target.shadow, target.compositeOperation);
 			target = target.parent;
 		}
@@ -672,12 +702,12 @@ var p = DisplayObject.prototype;
 	}
 
 	/**
-	 * @method applyShadow
+	 * @method _applyShadow
 	 * @protected
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @param {Shadow} shadow
 	 **/
-	p.applyShadow = function(ctx, shadow) {
+	p._applyShadow = function(ctx, shadow) {
 		shadow = shadow || Shadow.identity;
 		ctx.shadowColor = shadow.color;
 		ctx.shadowOffsetX = shadow.offsetX;
@@ -726,6 +756,22 @@ var p = DisplayObject.prototype;
 			this.filters[i].applyFilter(ctx, 0, 0, w, h);
 		}
 	}
+	
+	
+	/**
+	 * Returns a matrix based on this object's transform concatenated with the passed matrix.
+	 * @method _getMatrix
+	 * @protected
+	 * @param {Matrix2D} matrix Optional.
+	 * @return {Matrix2D}
+	 **/
+	p._getMatrix = function(matrix) {
+		var mtx = this._matrix;
+		if (matrix) { mtx.reinitialize(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty); }
+		else { mtx.identity(); }
+		return mtx.appendTransform(this.x, this.y, this.scaleX, this.scaleY, this.rotation, this.skewX, this.skewY, this.regX, this.regY);
+	}
+			  
 
 window.DisplayObject = DisplayObject;
 }(window));
