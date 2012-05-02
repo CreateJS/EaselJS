@@ -138,6 +138,7 @@ var p = Matrix2D.prototype;
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
 	p.initialize = function(a, b, c, d, tx, ty) {
 		if (a != null) { this.a = a; }
@@ -146,6 +147,7 @@ var p = Matrix2D.prototype;
 		if (d != null) { this.d = d; }
 		this.tx = tx || 0;
 		this.ty = ty || 0;
+		return this;
 	}
 
 // public methods:
@@ -158,6 +160,7 @@ var p = Matrix2D.prototype;
 	 * @param {Number} d
 	 * @param {Number} tx
 	 * @param {Number} ty
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.prepend = function(a, b, c, d, tx, ty) {
 		var tx1 = this.tx;
@@ -171,6 +174,7 @@ var p = Matrix2D.prototype;
 		}
 		this.tx = tx1*a+this.ty*c+tx;
 		this.ty = tx1*b+this.ty*d+ty;
+		return this;
 	}
 
 	/**
@@ -182,6 +186,7 @@ var p = Matrix2D.prototype;
 	 * @param {Number} d
 	 * @param {Number} tx
 	 * @param {Number} ty
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.append = function(a, b, c, d, tx, ty) {
 		var a1 = this.a;
@@ -195,6 +200,7 @@ var p = Matrix2D.prototype;
 		this.d  = c*b1+d*d1;
 		this.tx = tx*a1+ty*c1+this.tx;
 		this.ty = tx*b1+ty*d1+this.ty;
+		return this;
 	}
 
 	/**
@@ -205,16 +211,19 @@ var p = Matrix2D.prototype;
 	p.prependMatrix = function(matrix) {
 		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 		this.prependProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
+		return this;
 	}
 
 	/**
 	 * Appends the specified matrix with this matrix.
 	 * @method appendMatrix
 	 * @param {Matrix2D} matrix
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.appendMatrix = function(matrix) {
 		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 		this.appendProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
+		return this;
 	}
 
 	/**
@@ -231,6 +240,7 @@ var p = Matrix2D.prototype;
 	 * @param {Number} skewY
 	 * @param {Number} regX Optional.
 	 * @param {Number} regY Optional.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
@@ -255,7 +265,7 @@ var p = Matrix2D.prototype;
 		} else {
 			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
 		}
-
+		return this;
 	}
 
 	/**
@@ -272,6 +282,7 @@ var p = Matrix2D.prototype;
 	 * @param {Number} skewY
 	 * @param {Number} regX Optional.
 	 * @param {Number} regY Optional.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
@@ -298,12 +309,14 @@ var p = Matrix2D.prototype;
 			this.tx -= regX*this.a+regY*this.c; 
 			this.ty -= regX*this.b+regY*this.d;
 		}
+		return this;
 	}
 
 	/**
 	 * Applies a rotation transformation to the matrix.
 	 * @method rotate
 	 * @param {Number} angle The angle in degrees.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.rotate = function(angle) {
 		var cos = Math.cos(angle);
@@ -319,6 +332,7 @@ var p = Matrix2D.prototype;
 		this.d = c1*sin+this.d*cos;
 		this.tx = tx1*cos-this.ty*sin;
 		this.ty = tx1*sin+this.ty*cos;
+		return this;
 	}
 
 	/**
@@ -326,11 +340,13 @@ var p = Matrix2D.prototype;
 	 * @method skew
 	 * @param {Number} skewX The amount to skew horizontally in degrees.
 	 * @param {Number} skewY The amount to skew vertically in degrees.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
 	p.skew = function(skewX, skewY) {
 		skewX = skewX*Matrix2D.DEG_TO_RAD;
 		skewY = skewY*Matrix2D.DEG_TO_RAD;
 		this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
+		return this;
 	}
 
 	/**
@@ -338,12 +354,14 @@ var p = Matrix2D.prototype;
 	 * @method scale
 	 * @param {Number} x
 	 * @param {Number} y
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.scale = function(x, y) {
 		this.a *= x;
 		this.d *= y;
 		this.tx *= x;
 		this.ty *= y;
+		return this;
 	}
 
 	/**
@@ -351,25 +369,30 @@ var p = Matrix2D.prototype;
 	 * @method translate
 	 * @param {Number} x
 	 * @param {Number} y
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.translate = function(x, y) {
 		this.tx += x;
 		this.ty += y;
+		return this;
 	}
 
 	/**
 	 * Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
 	 * @method identity
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.identity = function() {
 		this.alpha = this.a = this.d = 1;
 		this.b = this.c = this.tx = this.ty = 0;
 		this.shadow = this.compositeOperation = null;
+		return this;
 	}
 
 	/**
 	 * Inverts the matrix, causing it to perform the opposite transformation.
 	 * @method invert
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.invert = function() {
 		var a1 = this.a;
@@ -385,6 +408,7 @@ var p = Matrix2D.prototype;
 		this.d = a1/n;
 		this.tx = (c1*this.ty-d1*tx1)/n;
 		this.ty = -(a1*this.ty-b1*tx1)/n;
+		return this;
 	}
 
 	/**
@@ -402,6 +426,7 @@ var p = Matrix2D.prototype;
 	 * results.
 	 * @method decompose
 	 * @param {Object} target The object to apply the transform properties to. If null, then a new object will be returned.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
 	p.decompose = function(target) {
 		// TODO: it would be nice to be able to solve for whether the matrix can be decomposed into only scale/rotation
@@ -440,6 +465,7 @@ var p = Matrix2D.prototype;
 	 * @param {Number} alpha desired alpha value
 	 * @param {Shadow} shadow desired shadow value
 	 * @param {String} compositeOperation desired composite operation value
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
 	p.reinitialize = function(a,b,c,d,tx,ty,alpha,shadow,compositeOperation) {
 		this.initialize(a,b,c,d,tx,ty);
@@ -455,11 +481,13 @@ var p = Matrix2D.prototype;
 	 * @param {Number} alpha desired alpha value
 	 * @param {Shadow} shadow desired shadow value
 	 * @param {String} compositeOperation desired composite operation value
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
 	p.appendProperties = function(alpha, shadow, compositeOperation) {
 		this.alpha *= alpha;
 		this.shadow = shadow || this.shadow;
 		this.compositeOperation = compositeOperation || this.compositeOperation;
+		return this;
 	}
 
 	/**
@@ -468,11 +496,13 @@ var p = Matrix2D.prototype;
 	 * @param {Number} alpha desired alpha value
 	 * @param {Shadow} shadow desired shadow value
 	 * @param {String} compositeOperation desired composite operation value
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
 	p.prependProperties = function(alpha, shadow, compositeOperation) {
 		this.alpha *= alpha;
 		this.shadow = this.shadow || shadow;
 		this.compositeOperation = this.compositeOperation || compositeOperation;
+		return this;
 	}
 
 	/**
