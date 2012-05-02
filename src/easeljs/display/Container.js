@@ -428,8 +428,9 @@ var p = Container.prototype = new DisplayObject();
 		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick || this.onDoubleClick)) || (mouseEvents&2 &&
 																(this.onMouseOver || this.onMouseOut));
 
-		// if we have a cache handy, we can use it to do a quick check:
-		if (this.cacheCanvas) {
+		// if we have a cache handy & this has a handler, we can use it to do a quick check.
+		// we can't use the cache for screening children, because they might have hitArea set.
+		if (this.cacheCanvas && hasHandler) {
 			this.getConcatenatedMatrix(mtx);
 			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 			ctx.globalAlpha = mtx.alpha;
@@ -437,9 +438,7 @@ var p = Container.prototype = new DisplayObject();
 			if (this._testHit(ctx)) {
 				canvas.width = 0;
 				canvas.width = 1;
-				if (hasHandler) { return this; }
-			} else {
-				return null;
+				return this;
 			}
 		}
 
@@ -459,12 +458,18 @@ var p = Container.prototype = new DisplayObject();
 					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.onPress || child.onClick || child.onDoubleClick)) ||
-														(mouseEvents&2 && (child.onMouseOver || child.onMouseOut))) {
+			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.onPress || child.onClick || child.onDoubleClick)) || (mouseEvents&2 && (child.onMouseOver || child.onMouseOut))) {
+				var hitArea = child.hitArea;
 				child.getConcatenatedMatrix(mtx);
-				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
+				
+				if (hitArea) {
+					mtx.appendTransform(hitArea.x+child.regX, hitArea.y+child.regY, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
+					mtx.alpha *= hitArea.alpha/child.alpha;
+				}
+				
 				ctx.globalAlpha = mtx.alpha;
-				child.draw(ctx);
+				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
+				(hitArea||child).draw(ctx);
 				if (!this._testHit(ctx)) { continue; }
 				canvas.width = 0;
 				canvas.width = 1;

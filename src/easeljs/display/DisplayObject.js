@@ -332,6 +332,16 @@ var p = DisplayObject.prototype;
 	 */
 	p.mask = null;
 	
+	/**
+	 * A display object that will be tested when checking mouse interactions or testing getObjectsUnderPoint. The hit area
+	 * will have its transformation applied relative to this display object's coordinate space (as though the hit test object were a child of this
+	 * display object and relative to its regX/Y). It is NOT used for hitTest().
+	 * @property hitArea
+	 * @type DisplayObject
+	 * @default null
+	 */
+	p.hitArea = null;
+	
 
 // private properties:
 
@@ -437,7 +447,7 @@ var p = DisplayObject.prototype;
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 		}
 		
-		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY)
+		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
 		if (Stage._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
 		else { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
 		ctx.globalAlpha *= o.alpha;

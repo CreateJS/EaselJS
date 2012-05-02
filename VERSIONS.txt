@@ -1,6 +1,5 @@
 Future:
 ****************************************************************************************************
-- DisplayObject.hitArea
 - alpha masking
 - SpriteSheetBuilder
 - packaging / namespace
@@ -14,6 +13,7 @@ Version NEXT [release TBD]
 - added Text.getMeasuredHeight()
 - added DisplayObject.updateContext(ctx)
 - added DisplayObject.getMatrix(matrix)
+- added DisplayObject.hitArea
 
 
 Version 0.4.2 [Apr 18, 2012] 
