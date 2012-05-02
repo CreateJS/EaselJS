@@ -410,9 +410,8 @@ var p = DisplayObject.prototype;
 	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
-	 * @param {Matrix2D} matrix Optional. The current aggregate transform matrix if this is being drawn by the display list. Used by objects like DOMElement which don't draw to the context.
 	 **/
-	p.draw = function(ctx, ignoreCache, matrix) {
+	p.draw = function(ctx, ignoreCache) {
 		if (ignoreCache || !this.cacheCanvas) { return false; }
 		ctx.drawImage(this.cacheCanvas, this._cacheOffsetX, this._cacheOffsetY);
 		return true;
@@ -778,21 +777,6 @@ var p = DisplayObject.prototype;
 		for (var i=0; i<l; i++) {
 			this.filters[i].applyFilter(ctx, 0, 0, w, h);
 		}
-	}
-	
-	
-	/**
-	 * Returns a matrix based on this object's transform, optionally concatenated with a specified matrix. Uses the internal _matrix instance.
-	 * @method _getMatrix
-	 * @protected
-	 * @param {Matrix2D} matrix Optional. Matrix to concatenate.
-	 * @return {Matrix2D}
-	 **/
-	p._getMatrix = function(matrix) {
-		var o=this, mtx = o._matrix;
-		if (matrix) { mtx.reinitialize(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty); }
-		else { mtx.identity(); }
-		return mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
 	}
 	 
 

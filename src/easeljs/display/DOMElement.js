@@ -117,13 +117,13 @@ var p = DOMElement.prototype = new DisplayObject();
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
-	p.draw = function(ctx, ignoreCache, matrix) {
+	p.draw = function(ctx, ignoreCache) {
 		// TODO: possibly save out previous matrix values, to compare against new ones (so layout doesn't need to fire if there is no change)
 		if (this.htmlElement == null) { return; }
-		var mtx = this._getMatrix(matrix);
+		var mtx = this.getConcatenatedMatrix(this._matrix);
 		
 		var o = this.htmlElement;
-		o.style.opacity = ""+(ctx.globalAlpha*this.alpha);
+		o.style.opacity = ""+mtx.alpha;
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
 		o.style.visibility = this.visible ? "visible" : "hidden";
 		o.style.transform = o.style.webkitTransform = o.style.oTransform =  o.style.msTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,mtx.tx,mtx.ty+")"].join(",");

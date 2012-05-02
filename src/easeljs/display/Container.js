@@ -106,8 +106,6 @@ var p = Container.prototype = new DisplayObject();
 	 **/
 	p.draw = function(ctx, ignoreCache, matrix) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		// TODO: this is ONLY here for DOMElement, and has a cost associated with it. Might make sense to remove it, in favour of having DOMElement use getConcatenatedMatrix().
-		var mtx = this._getMatrix(matrix);
 		
 		// this ensures we don't have issues with display list changes that occur during a draw:
 		var list = this.children.slice(0);
@@ -118,7 +116,7 @@ var p = Container.prototype = new DisplayObject();
 			// draw the child:
 			ctx.save();
 			child.updateContext(ctx);
-			child.draw(ctx, false, mtx);
+			child.draw(ctx);
 			ctx.restore();
 		}
 		return true;
