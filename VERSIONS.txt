@@ -1,9 +1,19 @@
 Future:
 ****************************************************************************************************
 - DisplayObject.hitArea
-- masking / clipping
+- alpha masking
 - SpriteSheetBuilder
 - packaging / namespace
+
+
+Version NEXT [release TBD]
+****************************************************************************************************
+- complete rewrite of drawing model to use a hybrid approach (save/restore & matrix)
+- added DisplayObject.mask
+- added Graphics.drawAsPath(ctx)
+- added Text.getMeasuredHeight()
+- added DisplayObject.updateContext(ctx)
+- added DisplayObject.getMatrix(matrix)
 
 
 Version 0.4.2 [Apr 18, 2012] 

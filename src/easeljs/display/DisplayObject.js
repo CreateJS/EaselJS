@@ -324,13 +324,13 @@ var p = DisplayObject.prototype;
 	p.cacheID = 0;
 	
 	/**
-	 * A Shape instance that defines a clipping path (vector mask) for this display object.  The shape's transformation
-	 * will be applied relative to this display object (as if it were a child of the dispay object).
-	 * @property clippingPath
+	 * A Shape instance that defines a vector mask (clipping path) for this display object.  The shape's transformation
+	 * will be applied relative to the display object's parent coordinates (as if it were a child of the parent).
+	 * @property mask
 	 * @type Shape
 	 * @default null
 	 */
-	p.clippingPath = null;
+	p.mask = null;
 	
 
 // private properties:
@@ -419,13 +419,26 @@ var p = DisplayObject.prototype;
 	}
 	
 	/**
-	 * Applies this display object's transformation, alpha, globalCompositeOperation, and shadow to the specified
+	 * Applies this display object's transformation, alpha, globalCompositeOperation, clipping path (mask), and shadow to the specified
 	 * context. This is typically called prior to draw.
 	 * @method setupContext
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D to update.
 	 **/
 	p.updateContext = function(ctx) {
-		var o=this, mtx=o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		var mtx, mask=this.mask, o=this;
+		
+		if (mask && mask.graphics) {
+			mtx = mask.getMatrix(mask._matrix);
+			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+			
+			mask.graphics.drawAsPath(ctx);
+			ctx.clip();
+			
+			mtx.invert();
+			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+		}
+		
+		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY)
 		if (Stage._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
 		else { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
 		ctx.globalAlpha *= o.alpha;
@@ -601,7 +614,19 @@ var p = DisplayObject.prototype;
 		this.regX = regX || 0;
 		this.regY = regY || 0;
 	}
-
+	
+	/**
+	 * Returns a matrix based on this object's transform.
+	 * @method getMatrix
+	 * @param {Matrix2D} matrix Optional. A Matrix2D object to populate with the calculated values. If null, a new
+	 * Matrix object is returned.
+	 * @return {Matrix2D} A matrix representing this display object's transform.
+	 **/
+	p.getMatrix = function(matrix) {
+		var o = this;
+		return (matrix ? matrix.identity() : new Matrix()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
+	}
+	
 	/**
 	 * Generates a concatenated Matrix2D object representing the combined transform of
 	 * the display object and all of its parent Containers up to the highest level ancestor
@@ -613,16 +638,15 @@ var p = DisplayObject.prototype;
 	 * @return {Matrix2D} a concatenated Matrix2D object representing the combined transform of
 	 * the display object and all of its parent Containers up to the highest level ancestor (usually the stage).
 	 **/
-	p.getConcatenatedMatrix = function(mtx) {
-		if (mtx) { mtx.identity(); }
-		else { mtx = new Matrix2D(); }
-		var target = this;
-		while (target != null) {
-			mtx.prependTransform(target.x, target.y, target.scaleX, target.scaleY, target.rotation, target.skewX, target.skewY, target.regX, target.regY);
-			mtx.prependProperties(target.alpha, target.shadow, target.compositeOperation);
-			target = target.parent;
+	p.getConcatenatedMatrix = function(matrix) {
+		if (matrix) { matrix.identity(); }
+		else { matrix = new Matrix2D(); }
+		var o = this;
+		while (o != null) {
+			matrix.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).prependProperties(o.alpha, o.shadow, o.compositeOperation);
+			o = o.parent;
 		}
-		return mtx;
+		return matrix;
 	}
 
 	/**
@@ -735,8 +759,7 @@ var p = DisplayObject.prototype;
 			var hit = ctx.getImageData(0, 0, 1, 1).data[3] > 1;
 		} catch (e) {
 			if (!DisplayObject.suppressCrossDomainErrors) {
-				throw "An error has occured. This is most likely due to security restrictions on reading canvas pixel " +
-				"data with local or cross-domain images.";
+				throw "An error has occurred. This is most likely due to security restrictions on reading canvas pixel data with local or cross-domain images.";
 			}
 		}
 		return hit;
@@ -759,19 +782,19 @@ var p = DisplayObject.prototype;
 	
 	
 	/**
-	 * Returns a matrix based on this object's transform concatenated with the passed matrix.
+	 * Returns a matrix based on this object's transform, optionally concatenated with a specified matrix. Uses the internal _matrix instance.
 	 * @method _getMatrix
 	 * @protected
-	 * @param {Matrix2D} matrix Optional.
+	 * @param {Matrix2D} matrix Optional. Matrix to concatenate.
 	 * @return {Matrix2D}
 	 **/
 	p._getMatrix = function(matrix) {
-		var mtx = this._matrix;
+		var o=this, mtx = o._matrix;
 		if (matrix) { mtx.reinitialize(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty); }
 		else { mtx.identity(); }
-		return mtx.appendTransform(this.x, this.y, this.scaleX, this.scaleY, this.rotation, this.skewX, this.skewY, this.regX, this.regY);
+		return mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
 	}
-			  
+	 
 
 window.DisplayObject = DisplayObject;
 }(window));

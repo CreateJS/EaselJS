@@ -131,7 +131,7 @@ var p = Matrix2D.prototype;
 	 * @property compositeOperation
 	 * @type String
 	 **/
-	p.compositeOperation  = null;
+	p.compositeOperation = null;
 
 // constructor:
 	/**
