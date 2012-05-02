@@ -36,8 +36,8 @@ function init() {
 	
 	// attach mouse handlers directly to the source canvas.
 	// better than calling from canvas tag for cross browser compatibility:
-	canvas.onmousemove = moveCanvas;
-	canvas.onclick = clickCanvas;
+	stage.onMouseMove = moveCanvas;
+	stage.onMouseDown = clickCanvas;
 
 	// define simple sprite sheet data specifying the image(s) to use, the size of the frames,
 	// and the registration point of the frame
@@ -91,12 +91,12 @@ function tick() {
 }
 
 //sparkle explosion
-function clickCanvas(e) {
+function clickCanvas(evt) {
 	addSparkles(Math.random()*200+100|0, stage.mouseX, stage.mouseY,2);
 }
 
 //sparkle trail
-function moveCanvas(e) {
+function moveCanvas(evt) {
 	addSparkles(Math.random()*2+1|0, stage.mouseX, stage.mouseY,1);
 }
 
