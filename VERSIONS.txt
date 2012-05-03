@@ -15,6 +15,7 @@ Version NEXT [release TBD]
 - added DisplayObject.getMatrix(matrix)
 - added DisplayObject.hitArea
 - fixed issue with Text not displaying if .text is 0 or false.
+- fix for setChildIndex
 
 
 Version 0.4.2 [Apr 18, 2012] 

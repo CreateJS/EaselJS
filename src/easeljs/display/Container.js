@@ -304,7 +304,7 @@ var p = Container.prototype = new DisplayObject();
 		if (i==l || index < 0 || index > l || i == index) { return; }
 		kids.splice(index,1);
 		if (index<i) { i--; }
-		kids.splice(child,i,0); // TODO: test.
+		kids.splice(i,0,child);
 	}
 
 	/**
