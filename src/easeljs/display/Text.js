@@ -154,8 +154,7 @@ var p = Text.prototype = new DisplayObject();
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
-		return Boolean(this.visible && this.alpha > 0 && 
-						this.scaleX != 0 && this.scaleY != 0 && this.text != null && this.text != "");
+		return Boolean(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.text != null && this.text !== "");
 	}
 
 	/**
