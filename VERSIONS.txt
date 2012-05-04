@@ -16,6 +16,7 @@ Version NEXT [release TBD]
 - added DisplayObject.hitArea
 - fixed issue with Text not displaying if .text is 0 or false.
 - fix for setChildIndex
+- fix for addChildAt with multiple params
 
 
 Version 0.4.2 [Apr 18, 2012] 
