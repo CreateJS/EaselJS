@@ -147,7 +147,8 @@ var p = Container.prototype = new DisplayObject();
 	 * its parent to this Container. You can also add multiple children, such as "addChildAt(child1, child2, ..., index);". The
 	 * index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list, you could use:
 	 * container.addChildAt(myShape, container.getChildIndex(otherShape)). This would also bump otherShape's index up by one.
-	 * Returns the last child that was added, or the last child if multiple children were added.
+	 * Returns the last child that was added, or the last child if multiple children were added. Fails silently if the index 
+	 * is out of range.
 	 * @method addChildAt
 	 * @param {DisplayObject} child The display object to add.
 	 * @param {Number} index The index to add the child at.
@@ -155,9 +156,10 @@ var p = Container.prototype = new DisplayObject();
 	 **/
 	p.addChildAt = function(child, index) {
 		var l = arguments.length;
+		var indx = arguments[l-1]; // can't use the same name as the index param or it replaces arguments[1]
+		if (indx < 0 || indx > this.children.length) { return arguments[l-2]; }
 		if (l > 2) {
-			index = arguments[i-1];
-			for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i], index+i); }
+			for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i], indx+i); }
 			return arguments[l-2];
 		}
 		if (child.parent) { child.parent.removeChild(child); }
@@ -196,14 +198,14 @@ var p = Container.prototype = new DisplayObject();
 		if (l > 1) {
 			var a = [];
 			for (var i=0; i<l; i++) { a[i] = arguments[i]; }
-			a.sort(function(a, b) { return b-a; })
+			a.sort(function(a, b) { return b-a; });
 			var good = true;
-			for (var i=0; i<l; i++) { good = good && this.removeChildAt(a[i]); }
+			for (i=0; i<l; i++) { good = good && this.removeChildAt(a[i]); }
 			return good;
 		}
 		if (index < 0 || index > this.children.length-1) { return false; }
 		var child = this.children[index];
-		if (child != null) { child.parent = null; }
+		if (child) { child.parent = null; }
 		this.children.splice(index, 1);
 		return true;
 	}
@@ -266,7 +268,7 @@ var p = Container.prototype = new DisplayObject();
 		var kids = this.children;
 		var o1 = kids[index1];
 		var o2 = kids[index2];
-		if (!o1 || !o2) { return; } // TODO: throw error?
+		if (!o1 || !o2) { return; }
 		kids[index1] = o2;
 		kids[index2] = o1;
 	}
@@ -297,14 +299,15 @@ var p = Container.prototype = new DisplayObject();
 	 * @method setChildIndex
 	 **/
 	p.setChildIndex = function(child, index) {
-		var kids = this.children;
-		for (var i=0,l=kids.length;i<l;i++) {
+		var kids = this.children, l=kids.length;
+		if (child.parent != this || index < 0 || index >= l) { return; }
+		for (var i=0;i<l;i++) {
 			if (kids[i] == child) { break; }
 		}
-		if (i==l || index < 0 || index > l || i == index) { return; }
-		kids.splice(index,1);
-		if (index<i) { i--; }
-		kids.splice(i,0,child);
+		if (i==l || i == index) { return; }
+		kids.splice(i,1);
+		if (index<i) { index--; }
+		kids.splice(index,0,child);
 	}
 
 	/**
