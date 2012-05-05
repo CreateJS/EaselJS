@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>EaselJS Example: Text Link</title>
+
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+
+	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
+
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+
+	<script>
+		// define a new TextLink class that extends Text, and handles drawing a hit area
+		// and implementing a hover color.
+		var TextLink = function(text, font, color, hoverColor) {
+			this.initialize(text, font, color, hoverColor);
+		}
+		TextLink.prototype = new Text(); // extend Text.
+		
+		// save off initialize method from Text so we can call it from our own:
+		TextLink.prototype.Text_initialize = TextLink.prototype.initialize;
+		
+		// overwrite Text's initialize method with our own:
+		TextLink.prototype.initialize = function(text, font, color, hoverColor) {
+			this.Text_initialize(text, font, color); 
+			this.hoverColor = hoverColor;
+			this.hover = false;
+			this.hitArea = new Shape();
+			this.textBaseline = "top";
+		}
+		
+		// use the same approach with draw:
+		TextLink.prototype.Text_draw = TextLink.prototype.draw;
+		TextLink.prototype.draw = function(ctx, ignoreCache) {
+			// save default color, and overwrite it with the hover color if appropriate:
+			var color = this.color;
+			if (this.hover) { this.color = this.hoverColor; }
+			
+			// call Text's drawing method to do the real work of drawing to the canvas:
+			this.Text_draw(ctx, ignoreCache);
+			
+			// restore the default color value:
+			this.color = color;
+			
+			// update hit area so the full text area is clickable, not just the characters:
+			this.hitArea.graphics.clear().beginFill("#FFF").drawRect(0,0,this.lineWidth||this.getMeasuredWidth(), this.getMeasuredHeight());
+		}
+		
+		// set up the handlers for mouseover / out:
+		TextLink.prototype.onMouseOver = function() {
+			this.hover = true;
+		}
+		TextLink.prototype.onMouseOut = function() {
+			this.hover = false;
+		}
+	</script>
+
+
+	<script>
+	var canvas;
+	var stage;
+
+	function init() {
+		//find canvas and load images, wait for last image to load
+		canvas = document.getElementById("testCanvas");
+		stage = new Stage(canvas);
+		stage.enableMouseOver(20);
+
+		// Create some TextLinks:
+		var links = ["yellow", "blue", "green", "red", "purple", "orange"];
+		for (var i=0; i<links.length; i++) {
+			var link = new TextLink(links[i]+" link!", "36px Arial", links[i], "#FFF");
+			link.x = 100;
+			link.y = 50+i*50;
+			link.onClick = handleClick;
+			stage.addChild(link);
+		}
+
+		// we want to do some work before we update the canvas,
+		// otherwise we could use Ticker.addListener(stage);
+		Ticker.addListener(stage);
+	}
+	
+	function handleClick(evt) {
+		alert("You clicked on: "+evt.target.text);
+	}
+
+	</script>
+</head>
+	
+<body onload="init();">
+
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Text Sample</h1>
+	    <p>Example showing how you can simulate a text link with hitArea.</p>
+	</header>
+
+	<div class="canvasHolder">
+		<canvas id="testCanvas" width="960" height="400"></canvas>
+	</div>
+</body>
+</html>
