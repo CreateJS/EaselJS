@@ -55,7 +55,7 @@
 &#9;// OR, the complex way that defines individual rects for frames.
 &#9;// The 5th value is the image index per the list defined in "images" (defaults to 0).
 &#9;frames: [
-&#9;	// x, y, width, height, image index, regX, regY
+&#9;	// x, y, width, height, imageIndex, regX, regY
 &#9;	[0,0,64,64,0,32,64],
 &#9;	[64,0,96,64,0]
 &#9;],
@@ -213,7 +213,7 @@ var p = SpriteSheet.prototype;
 			a = this._images = [];
 			for (i=0; i<l; i++) {
 				var img = data.images[i];
-				if (!(img instanceof Image)) {
+				if (!(img instanceof Image) && !(img instanceof HTMLCanvasElement)) {
 					var src = img;
 					img = new Image();
 					img.src = src;
@@ -266,7 +266,8 @@ var p = SpriteSheet.prototype;
 				} else { // complex
 					anim.frequency = obj.frequency;
 					anim.next = obj.next;
-					a = anim.frames = obj.frames.slice(0);
+					var frames = obj.frames;
+					a = anim.frames = !isNaN(frames) ? [frames] : frames.slice(0);
 				}
 				anim.next = (a.length < 2 || anim.next == false) ? null : (anim.next == null || anim.next == true) ? name : anim.next;
 				if (!anim.frequency) { anim.frequency = 1; }
@@ -319,7 +320,7 @@ var p = SpriteSheet.prototype;
 	
 	/**
 	 * Returns an object specifying the image and source rect of the specified frame. The returned object
-	 * has an image property holding a reference to the image object in which the frame frame is found,
+	 * has an image property holding a reference to the image object in which the frame is found,
 	 * and a rect property containing a Rectangle instance which defines the boundaries for the
 	 * frame within that image.
 	 * @method getFrame
