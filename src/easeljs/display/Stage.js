@@ -85,29 +85,6 @@ var p = Stage.prototype = new Container();
 	 **/
 	p.mouseY = null;
 
-	/** The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param
-	 * containing the corresponding MouseEvent instance.
-	 * @event onMouseMove
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
-	p.onMouseMove = null;
-
-	/**
-	 * The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler
-	 * is passed a single param containing the corresponding MouseEvent instance.
-	 * @event onMouseUp
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
-	p.onMouseUp = null;
-
-	/**
-	 * The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single
-	 * param containing the corresponding MouseEvent instance.
-	 * @event onMouseDown
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
-	p.onMouseDown = null;
-
 	/**
 	 * Indicates whether this stage should use the snapToPixel property of display objects when rendering them. See
 	 * DisplayObject.snapToPixel for more information.
@@ -132,20 +109,6 @@ var p = Stage.prototype = new Container();
 	p.tickOnUpdate = true;
 
 // private properties:
-
-	/**
-	 * @property _activeMouseEvent
-	 * @protected
-	 * @type MouseEvent
-	 **/
-	p._activeMouseEvent = null;
-
-	/**
-	 * @property _activeMouseTarget
-	 * @protected
-	 * @type DisplayObject
-	 **/
-	p._activeMouseTarget = null;
 
 	/**
 	 * @property _mouseOverIntervalID
@@ -339,7 +302,8 @@ var p = Stage.prototype = new Container();
 	 * @protected
 	 * @param {Boolean} enabled
 	 **/
-	p._enableMouseEvents = function() {
+	p._enableMouseEvents = function()
+	{
 		var o = this;
 		var evtTarget = window.addEventListener ? window : document;
 		evtTarget.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
@@ -354,8 +318,8 @@ var p = Stage.prototype = new Container();
 	 * @protected
 	 * @param {MouseEvent} e
 	 **/
-	p._handleMouseMove = function(e) {
-
+	p._handleMouseMove = function(e)
+	{
 		if (!this.canvas) {
 			this.mouseX = this.mouseY = null;
 			return;
@@ -365,11 +329,8 @@ var p = Stage.prototype = new Container();
 		var inBounds = this.mouseInBounds;
 		this._updateMousePosition(e.pageX, e.pageY);
 		if (!inBounds && !this.mouseInBounds) { return; }
-
-		var evt = new MouseEvent("onMouseMove", this.mouseX, this.mouseY, this, e);
-
-		if (this.onMouseMove) { this.onMouseMove(evt); }
-		if (this._activeMouseEvent && this._activeMouseEvent.onMouseMove) { this._activeMouseEvent.onMouseMove(evt); }
+		
+		this.dispatchEvent( new MouseEvent(MouseEvent.MOUSE_MOVE, this.mouseX, this.mouseY, this) );
 	}
 
 	/**
@@ -378,8 +339,8 @@ var p = Stage.prototype = new Container();
 	 * @param {Number} pageX
 	 * @param {Number} pageY
 	 **/
-	p._updateMousePosition = function(pageX, pageY) {
-
+	p._updateMousePosition = function(pageX, pageY)
+	{
 		var o = this.canvas;
 		do {
 			pageX -= o.offsetLeft;
@@ -399,16 +360,36 @@ var p = Stage.prototype = new Container();
 	 * @protected
 	 * @param {MouseEvent} e
 	 **/
-	p._handleMouseUp = function(e) {
-		var evt = new MouseEvent("onMouseUp", this.mouseX, this.mouseY, this, e);
-		if (this.onMouseUp) { this.onMouseUp(evt); }
-		if (this._activeMouseEvent && this._activeMouseEvent.onMouseUp) { this._activeMouseEvent.onMouseUp(evt); }
-		if (this._activeMouseTarget && this._activeMouseTarget.onClick &&
-				this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true, (this._mouseOverIntervalID ? 3 : 1)) == this._activeMouseTarget) {
-
-			this._activeMouseTarget.onClick(new MouseEvent("onClick", this.mouseX, this.mouseY, this._activeMouseTarget, e));
+	p._handleMouseUp = function(e)
+	{
+		// which button
+		var mouseUpType = MouseEvent.MOUSE_UP;
+		var clickType = MouseEvent.CLICK;
+		
+		if (e.button == 1)
+		{
+			mouseUpType = MouseEvent.MIDDLE_MOUSE_UP;
+			clickType = MouseEvent.MIDDLE_CLICK;
 		}
-		this._activeMouseEvent = this._activeMouseTarget = null;
+		else if (e.button == 2)
+		{
+			mouseUpType = MouseEvent.RIGHT_MOUSE_UP;
+			clickType = MouseEvent.RIGHT_CLICK;
+		}
+		
+		// dispatch to all object under point
+		var targets = this._getObjectsUnderPoint(this.mouseX, this.mouseY);
+		var mouseUpEvent = new MouseEvent(mouseUpType, this.mouseX, this.mouseY, targets.length > 0 ? targets[0] : this);
+		var clickEvent = new MouseEvent(clickType, this.mouseX, this.mouseY, targets.length > 0 ? targets[0] : this);
+		
+		for (var i = 0; i < targets.length; i++)
+		{
+			targets[i].dispatchEvent( mouseUpEvent );
+			targets[i].dispatchEvent( clickEvent );
+		}
+		
+		this.dispatchEvent( mouseUpEvent );
+		this.dispatchEvent( clickEvent );
 	}
 
 	/**
@@ -416,42 +397,73 @@ var p = Stage.prototype = new Container();
 	 * @protected
 	 * @param {MouseEvent} e
 	 **/
-	p._handleMouseDown = function(e) {
-		if (this.onMouseDown) {
-			this.onMouseDown(new MouseEvent("onMouseDown", this.mouseX, this.mouseY, this, e));
-		}
-		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
-		if (target) {
-			if (target.onPress instanceof Function) {
-				var evt = new MouseEvent("onPress", this.mouseX, this.mouseY, target, e);
-				target.onPress(evt);
-				if (evt.onMouseMove || evt.onMouseUp) { this._activeMouseEvent = evt; }
-			}
-			this._activeMouseTarget = target;
-		}
+	p._handleMouseDown = function(e)
+	{
+		// which button
+		var mouseDownType = MouseEvent.MOUSE_DOWN;
+		
+		if (e.button == 1)
+			mouseDownType = MouseEvent.MIDDLE_MOUSE_DOWN;
+		else if (e.button == 2)
+			mouseDownType = MouseEvent.RIGHT_MOUSE_DOWN;
+		
+		// dispatch to all object under point
+		var targets = this._getObjectsUnderPoint(this.mouseX, this.mouseY);
+		var evt = new MouseEvent(mouseDownType, this.mouseX, this.mouseY, targets.length > 0 ? targets[0] : this);
+		
+		for (var i = 0; i < targets.length; i++)
+			targets[i].dispatchEvent( evt );
+		
+		this.dispatchEvent( evt );
 	}
+	
+	p._stageMouseLeave = false;
+	p._stageMouseIn = true;
 
 	/**
 	 * @method _testMouseOver
 	 * @protected
 	 **/
-	p._testMouseOver = function() {
-		if (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds) { return; }
-		var target = null;
+	p._testMouseOver = function()
+	{
+		// stage mouseIn/mouseLeave
+		if (this.mouseInBounds && this._stageMouseIn)
+		{
+			this.dispatchEvent( new Event( Event.MOUSE_IN ) );
+			this._stageMouseIn = false;
+			this._stageMouseLeave = true;
+		}
+		
+		if (!this.mouseInBounds && this._stageMouseLeave)
+		{
+			this.dispatchEvent( new Event( Event.MOUSE_LEAVE ) );
+			this._stageMouseLeave = false;
+			this._stageMouseIn = true;
+		}
+		
+		// over the highest object (highest mean in the highes depth)
+		if (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)
+			return;
+		
+		var targets = [];
+		
 		if (this.mouseInBounds) {
-			target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, 3);
+			targets = this._getObjectsUnderPoint(this.mouseX, this.mouseY);
 			this._mouseOverX = this.mouseX;
 			this._mouseOverY = this.mouseY;
 		}
-
-		if (this._mouseOverTarget != target) {
-			if (this._mouseOverTarget && this._mouseOverTarget.onMouseOut) {
-				this._mouseOverTarget.onMouseOut(new MouseEvent("onMouseOut", this.mouseX, this.mouseY, this._mouseOverTarget));
+		
+		if (targets.length > 0)
+		{
+			if (this._mouseOverTarget != targets[0])
+			{
+				if (this._mouseOverTarget)
+					this._mouseOverTarget.dispatchEvent( new MouseEvent(MouseEvent.MOUSE_OUT, this.mouseX, this.mouseY, this._mouseOverTarget) );
+				
+				targets[0].dispatchEvent( new MouseEvent(MouseEvent.MOUSE_OVER, this.mouseX, this.mouseY, targets[0]) );
+				
+				this._mouseOverTarget = targets[0];
 			}
-			if (target && target.onMouseOver) {
-				target.onMouseOver(new MouseEvent("onMouseOver", this.mouseX, this.mouseY, target));
-			}
-			this._mouseOverTarget = target;
 		}
 	}
 
@@ -460,16 +472,19 @@ var p = Stage.prototype = new Container();
 	 * @protected
 	 * @param {MouseEvent} e
 	 **/
-	p._handleDoubleClick = function(e) {
-		if (this.onDoubleClick) {
-			this.onDoubleClick(new MouseEvent("onDoubleClick", this.mouseX, this.mouseY, this, e));
-		}
-		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
-		if (target) {
-			if (target.onDoubleClick instanceof Function) {
-				target.onDoubleClick(new MouseEvent("onPress", this.mouseX, this.mouseY, target, e));
-			}
-		}
+	p._handleDoubleClick = function(e)
+	{
+		if (!this.mouseInBounds)
+			return;
+		
+		// dispatch to all object under point
+		var targets = this._getObjectsUnderPoint(this.mouseX, this.mouseY);
+		var evt = new MouseEvent(MouseEvent.DOUBLE_CLICK, this.mouseX, this.mouseY, targets.length > 0 ? targets[0] : this);
+		
+		for (var i = 0; i < targets.length; i++)
+			targets[i].dispatchEvent( evt );
+		
+		this.dispatchEvent( evt );
 	}
 
 window.Stage = Stage;

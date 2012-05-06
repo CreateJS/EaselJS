@@ -6,6 +6,11 @@
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 
+	<script type="text/javascript" src="../src/easeljs/events/EventManager.js"></script>
+    <script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
+    <script type="text/javascript" src="../src/easeljs/events/Event.js"></script>
+    <script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+
 	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
@@ -15,6 +20,8 @@
 	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
+    
+    
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
@@ -31,18 +38,81 @@
 		container.y = 80;
 
 		var target = new Shape();
-		target.graphics.beginFill("#F00").drawRect(-10,-10,300,60).beginFill("#FFF");
+		target.graphics.beginFill("#F00").drawRect(-10,-10,300,60);
 		container.addChild(target);
 
 		var txt = new Text("Double Click Me!", "36px Arial", "#FFF");
 		txt.textBaseline = "top";
 		container.addChild(txt);
-
+		
 		stage.addChild(container);
 
-		container.onDoubleClick = function(evt) { alert("Double Clicked the container object"); }
+		stage.addEventListener(MouseEvent.DOUBLE_CLICK, stage_doubleClickHandler);
+		container.addEventListener(MouseEvent.DOUBLE_CLICK, container_doubleClickHandler);
+		txt.addEventListener(MouseEvent.DOUBLE_CLICK, txt_doubleClickHandler);
+		
+		container.addEventListener(MouseEvent.MOUSE_DOWN, function(e) { console.log("container md") } );
+		container.addEventListener(MouseEvent.CLICK, function(e) { console.log("container click") });
+		
+		//stage.addEventListener(MouseEvent.MOUSE_MOVE, function(e) { console.log(e.currentTarget) });
+		
+		stage.enableMouseOver(30);
+		stage.addEventListener(Event.MOUSE_IN, function(e) { console.log("mouse in") });
+		stage.addEventListener(Event.MOUSE_LEAVE, function(e) { console.log("mouse leave") });
+		txt.addEventListener(MouseEvent.MOUSE_OVER, function(e) { console.log("txt mouse over") });
+		
+		var c = new Container();
+			c.x = 300;
+			c.y = 200;
+		
+		var s = new Shape();
+			s.graphics.beginFill("yellow").drawRect(-10, -10, 70, 60);
+		
+		c.addChild(s);
+		
+		stage.addChild(c);
+		
+		
+		var s2 = new Shape();
+			s2.graphics.beginFill("blue").drawRect(-40, -40, 400, 200);
+			s2.addEventListener(Event.ADDED, s2_addedHandler);
+			s2.addEventListener(Event.REMOVED, s2_removedHandler);
+		
+		container.addChildAt(s2, 0);
+		//container.removeChildAt(0);
 
 		stage.update();
+	}
+	
+	function stage_doubleClickHandler(event)
+	{
+		console.log("stage doubleclick");
+	}
+	
+	function container_doubleClickHandler(event)
+	{
+		console.log("container doubleclick");
+	}
+	
+	function txt_doubleClickHandler(event)
+	{
+		console.log("txt doubleclick");
+	}
+	
+	function s2_addedHandler(event)
+	{
+		console.log("s2 added");
+	}
+	
+	function s2_removedHandler(event)
+	{
+		console.log("s2 removed");
+	}
+	
+	function stage_mouseMoveHandler(event)
+	{
+		//event.target.getChildAt(1).x += 3;
+		//event.target.update();	
 	}
 
 	</script>
@@ -55,7 +125,7 @@
 	</header>
 
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
+		<canvas id="testCanvas" width="960" height="400" style="background:#FFF;"></canvas>
 	</div>
 </body>
 </html>
