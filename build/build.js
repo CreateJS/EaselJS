@@ -22,6 +22,7 @@ var SOURCE_FILES = [
 	"../src/easeljs/display/Shape.js",
 	"../src/easeljs/display/Text.js",
 	"../src/easeljs/utils/SpriteSheetUtils.js",
+	"../src/easeljs/utils/SpriteSheetBuilder.js",
 	"../src/easeljs/display/DOMElement.js",
 	"../src/easeljs/filters/Filter.js",
 	//"../src/easeljs/filters/BoxBlurFilter.js",
