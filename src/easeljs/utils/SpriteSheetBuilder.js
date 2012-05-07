@@ -193,10 +193,12 @@ var p = SpriteSheetBuilder.prototype;
 	}
 	
 	/**
-	 * NOT YET IMPLEMENTED. This will take a MovieClip, and add its frames and labels to this builder. Labels will be added as an animation
+	 * This will take a MovieClip, and add its frames and labels to this builder. Labels will be added as an animation
 	 * running from the label index to the next label. For example, if there is a label named "foo" at frame 0 and a label
 	 * named "bar" at frame 10, in a MovieClip with 15 frames, it will add an animation named "foo" that runs from frame
 	 * index 0 to 9, and an animation named "bar" that runs from frame index 10 to 14.
+	 * <br/><br/>
+	 * Note that this will iterate through the full MovieClip with actionsEnabled set to false, ending on the last frame.
 	 * @method addMovieClip
 	 * @param {MovieClip} source The source MovieClip to add to the sprite sheet.
 	 * @param {Rectangle} sourceRect Optional. A rectangle defining the portion of the source to draw to the frame. If
@@ -205,7 +207,25 @@ var p = SpriteSheetBuilder.prototype;
 	 **/
 	p.addMovieClip = function(source, sourceRect) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
-		throw "addMovieClip is not functional yet."
+		var rects = source.frameBounds;
+		var rect = sourceRect||source.bounds||source.nominalBounds;
+		if (!rect&&source.getBounds) { rect = source.getBounds(); }
+		if (!rect && !rects) { return null; }
+		
+		var l = source.timeline.duration;
+		for (var i=0; i<l; i++) {
+			var r = (rects&&rects[i]) ? rects[i] : rect;
+			this.addFrame(source, r, function(frame) {
+				var ae = this.actionsEnabled;
+				this.actionsEnabled = false;
+				this.gotoAndStop(frame);
+				this.actionsEnabled = ae;
+			}, [i], source);
+		}
+		var labels = source.timeline._labels;
+		for (var n in labels) {
+			this.addAnimation(n, labels[n], true); // for now, this loops all animations.
+		}
 	}
 	
 	/**
@@ -285,22 +305,22 @@ var p = SpriteSheetBuilder.prototype;
 		};
 		
 		var frames = this._frames.slice();
-		frames.sort(function(a,b) { return a.height-b.height; });
+		frames.sort(function(a,b) { return (a.height<=b.height) ? -1 : 1; });
 		
 		if (frames[frames.length-1].sourceRect.height > this.maxHeight) { throw SpriteSheetBuilder.ERR_DIMENSIONS; }
-		var y = 0, x=0;
+		var y = 1, x=1;
 		var img = 0;
 		while (frames.length) {
 			var o = this._fillRow(frames, y, img, dataFrames);
 			if (o.w > x) { x = o.w; }
-			y += o.h;
+			y += o.h+2;
 			if (!o.h || !frames.length) {
 				var canvas = document.createElement("canvas");
 				canvas.width = this._getSize(x,this.maxWidth);
 				canvas.height = this._getSize(y,this.maxHeight);
 				this._data.images[img] = canvas;
 				if (!o.h) {
-					x=y=0;
+					x=y=1;
 					img++;
 				}
 			}
@@ -328,22 +348,24 @@ var p = SpriteSheetBuilder.prototype;
 		var w = this.maxWidth;
 		var maxH = this.maxHeight;
 		var h = maxH-y;
-		var x = 0;
+		var x = 1;
 		var height = 0;
 		for (var i=frames.length-1; i>=0; i--) {
 			var frame = frames[i];
 			var rect = frame.sourceRect;
 			var source = frame.source;
-			var rh = rect.height;
-			var rw = rect.width;
+			var rx = Math.floor(rect.x-1);
+			var ry = Math.floor(rect.y-1);
+			var rh = Math.ceil(rect.height);
+			var rw = Math.ceil(rect.width);
 			if (rw > w) { throw SpriteSheetBuilder.ERR_DIMENSIONS; }
 			if (rh > h || x+rw > w) { continue; }
 			frame.img = img;
 			frame.rect = new Rectangle(x,y,rw,rh);
 			height = height || rh;
 			frames.splice(i,1);
-			dataFrames[frame.index] = [x,y,rw,rh,img,-rect.x+source.regX,-rect.y+source.regY]; // TODO: regX / regY?
-			x += rw;
+			dataFrames[frame.index] = [x-1,y-1,rw+2,rh+2,img,Math.round(-rx+source.regX),Math.round(-ry+source.regY+0.5)]; // TODO: regX / regY?
+			x += rw+2;
 		}
 		return {w:x, h:height};
 	}
@@ -390,9 +412,9 @@ var p = SpriteSheetBuilder.prototype;
 		frame.funct&&frame.funct.apply(frame.scope, frame.params);
 		ctx.save();
 		ctx.beginPath();
-		ctx.rect(rect.x, rect.y, rect.width, rect.height);
+		ctx.rect(rect.x-1, rect.y-1, rect.width+2, rect.height+2);
 		ctx.clip();
-		ctx.translate(rect.x-sourceRect.x, rect.y-sourceRect.y);
+		ctx.translate(rect.x-sourceRect.x+0.5|0, rect.y-sourceRect.y+0.5|0); // we know these are positive
 		frame.source.draw(ctx); // display object will draw itself.
 		ctx.restore();
 		return (++this._index) < this._frames.length;

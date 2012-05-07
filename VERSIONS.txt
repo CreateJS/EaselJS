@@ -1,7 +1,6 @@
 Future:
 ****************************************************************************************************
 - alpha masking
-- SpriteSheetBuilder
 - packaging / namespace
 
 
@@ -17,6 +16,8 @@ Version NEXT [release TBD]
 - fixed issue with Text not displaying if .text is 0 or false.
 - fix for setChildIndex
 - fix for addChildAt with multiple params
+- added SpriteSheetBuilder
+- added MovieClip.actionsEnabled
 
 
 Version 0.4.2 [Apr 18, 2012] 
