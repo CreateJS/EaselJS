@@ -243,31 +243,30 @@ var p = SpriteSheetBuilder.prototype;
 	}
 	
 	/**
-	 * Asynchronously builds a SpriteSheet instance based on the current frames. It will run 10 times per second, using
-	 * an amount of time defined by timeSlice. When it is complete, or if an error occurs it will call the specified callback.
+	 * Asynchronously builds a SpriteSheet instance based on the current frames. It will run 20 times per second, using
+	 * an amount of time defined by timeSlice. When it is complete it will call the specified callback.
 	 * @method buildAsync
 	 * @param {Function} callback Optional. The function to call when the build operation completes. It will be called
 	 * with a single parameter providing a reference back to the builder.
 	 * @param {Number} timeSlice Optional. A number from 0.01 to 1 that indicates what percentage of time the builder can use. This can be
 	 * thought of as the number of seconds per second the builder will use. For example, with a timeSlice value of 0.3,
-	 * the builder will run 10 times per second, using approximately 30ms per build (30% of available time, or 0.3s per second).
+	 * the builder will run 20 times per second, using approximately 15ms per build (30% of available time, or 0.3s per second).
 	 * Defaults to 0.3.
 	 **/
 	p.buildAsync = function(callback, timeSlice) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
 		this._callback = callback;
 		this._startBuild();
-		this._timeSlice = Math.max(0.01, Math.min(0.99, timeSlice||0.3))*100;
+		this._timeSlice = Math.max(0.01, Math.min(0.99, timeSlice||0.3))*50;
 		var _this = this;
-		this._timerID = setTimeout(function() { _this._run(); }, 100-this._timeSlice);
+		this._timerID = setTimeout(function() { _this._run(); }, 50-this._timeSlice);
 	}
 	
 	/**
 	 * Stops the current asynchronous build.
 	 * @method stopAsync
 	 **/
-	p.stopAsync = function(callback, timeSlice) {
-		if (!this._data) { return; }
+	p.stopAsync = function() {
 		clearTimeout(this._timerID);
 		this._data = null;
 	}
@@ -394,7 +393,7 @@ var p = SpriteSheetBuilder.prototype;
 			this._endBuild();
 		} else {
 			var _this = this;
-			this._timerID = setTimeout(function() { _this._run(); }, 100-this._timeSlice);
+			this._timerID = setTimeout(function() { _this._run(); }, 50-this._timeSlice);
 		}
 	}
 	
