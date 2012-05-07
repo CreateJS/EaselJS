@@ -119,6 +119,13 @@ var p = MovieClip.prototype = new Container();
 	 */
 	p.paused = false;
 	
+	/**
+	 * If true, actions in this MovieClip's tweens will be run when the playhead advances.
+	 * @property actionsEnabled
+	 * @type Boolean
+	 */
+	p.actionsEnabled = true;
+	
 // private properties:
 
 	/**
@@ -255,7 +262,7 @@ var p = MovieClip.prototype = new Container();
 	 * @method clone
 	 **/
 	p.clone = function() {
-		// TODO: add support for this?? Need to clone the Timeline & retarget tweens.
+		// TODO: add support for this?? Need to clone the Timeline & retarget tweens - pretty complex.
 		throw("MovieClip cannot be cloned.")
 	}
 	
@@ -324,7 +331,7 @@ var p = MovieClip.prototype = new Container();
 			// TODO: this would be far more ideal if the _synchOffset was somehow provided by the parent, so that reparenting wouldn't cause problems and we can direct draw. Ditto for _off (though less important).
 			tl.setPosition(this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset), Tween.NONE);
 		} else {
-			tl.setPosition(this._prevPosition);
+			tl.setPosition(this._prevPosition, this.actionsEnabled ? null : Tween.NONE);
 		}
 		
 		this._prevPosition = tl._prevPosition;
