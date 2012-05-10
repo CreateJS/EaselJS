@@ -10,7 +10,7 @@
 (function(window) {
 
 /**
-* Applies color transforms.
+* Applies image mask transforms.
 * @class ImageMaskFilter
 * @constructor
 * @augments Filter
