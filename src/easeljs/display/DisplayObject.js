@@ -45,7 +45,7 @@
 var DisplayObject = function() {
   this.initialize();
 }
-var p = DisplayObject.prototype;
+var p = DisplayObject.prototype = new EventDispatcher();
 
 	/**
 	 * Suppresses errors generated when using features like hitTest, onPress/onClick, and getObjectsUnderPoint with cross
@@ -253,57 +253,6 @@ var p = DisplayObject.prototype;
 	 * @default false
 	 **/
 	p.snapToPixel = false;
-
-	/**
-	 * The onPress callback is called when the user presses down on their mouse over this display object. The handler
-	 * is passed a single param containing the corresponding MouseEvent instance. You can subscribe to the onMouseMove
-	 * and onMouseUp callbacks of the event object to receive these events until the user releases the mouse button.
-	 * If an onPress handler is set on a container, it will receive the event if any of its children are clicked.
-	 * @event onPress
-	 * @param {MouseEvent} event MouseEvent with information about the event.
-	 **/
-	p.onPress = null;
-
-	/**
-	 * The onClick callback is called when the user presses down on and then releases the mouse button over this
-	 * display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an
-	 * onClick handler is set on a container, it will receive the event if any of its children are clicked.
-	 * @event onClick
-	 * @param {MouseEvent} event MouseEvent with information about the event.
-	 **/
-	p.onClick = null;
-
-	/**
-	 * The onDoubleClick callback is called when the user double clicks over this display object. The handler is
-	 * passed a single param containing the corresponding MouseEvent instance. If an onDoubleClick handler is set
-	 * on a container, it will receive the event if any of its children are clicked.
-	 * @event onDoubleClick
-	 * @param {MouseEvent} event MouseEvent with information about the event.
-	 **/
-	p.onDoubleClick = null;
-
-	/**
-	 * The onMouseOver callback is called when the user rolls over the display object. You must enable this event using
-	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
-	 * @event onMouseOver
-	 * @param {MouseEvent} event MouseEvent with information about the event.
-	 **/
-	p.onMouseOver = null;
-
-	/**
-	 * The onMouseOut callback is called when the user rolls off of the display object. You must enable this event using
-	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
-	 * @event onMouseOut
-	 * @param {MouseEvent} event MouseEvent with information about the event.
-	 **/
-	p.onMouseOut = null;
-
-	/**
-	 * The onTick callback is called on each display object on a stage whenever the stage updates.
-	 * This occurs immediately before the rendering (draw) pass.
-	 * @event onTick
-	 **/
-	p.onTick = null;
 
 	/**
 	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when cache() or

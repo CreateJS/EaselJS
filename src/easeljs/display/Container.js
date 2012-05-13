@@ -139,6 +139,9 @@ var p = Container.prototype = new DisplayObject();
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.push(child);
+		
+		child.dispatchEvent( new Event( Event.ADDED ) );
+		
 		return child;
 	}
 
@@ -165,6 +168,9 @@ var p = Container.prototype = new DisplayObject();
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.splice(index, 0, child);
+		
+		child.dispatchEvent( new Event( Event.ADDED ) );
+		
 		return child;
 	}
 
@@ -207,6 +213,9 @@ var p = Container.prototype = new DisplayObject();
 		var child = this.children[index];
 		if (child) { child.parent = null; }
 		this.children.splice(index, 1);
+		
+		child.dispatchEvent( new Event( Event.REMOVED ) );
+		
 		return true;
 	}
 
@@ -424,12 +433,65 @@ var p = Container.prototype = new DisplayObject();
 	 * @return {Array[DisplayObject]}
 	 * @protected
 	 **/
-	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
+	p._getObjectsUnderPoint = function(x, y)
+	{
+		var result = new Array();
+		
 		var ctx = DisplayObject._hitTestContext;
 		var canvas = DisplayObject._hitTestCanvas;
 		var mtx = this._matrix;
-		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick || this.onDoubleClick)) || (mouseEvents&2 &&
-																(this.onMouseOver || this.onMouseOut));
+		
+		for (var i = this.children.length - 1; i >= 0; i--)
+		{
+			var child = this.children[i];
+			
+			if (!child.isVisible() || !child.mouseEnabled)
+				continue;
+			
+			if (child instanceof Container)
+			{
+				var targets = child._getObjectsUnderPoint(x, y);
+				
+				for (var j = 0; j < targets.length; j++)
+					result.push( targets[j] );
+					
+				if (targets.length > 0)
+					result.push(child);
+			}
+			else// child is instance of DisplayObject
+			{
+				var hitArea = child.hitArea;
+				
+				child.getConcatenatedMatrix(mtx);
+
+				if (hitArea) {
+					mtx.appendTransform(hitArea.x+child.regX, hitArea.y+child.regY, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
+					mtx.alpha *= hitArea.alpha/child.alpha;
+				}
+
+				ctx.globalAlpha = mtx.alpha;
+				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
+				
+				(hitArea||child).draw(ctx);
+				
+				if (!this._testHit(ctx)) { continue; }
+				
+				canvas.width = 0;
+				canvas.width = 1;
+				
+				result.push(child);
+			}
+		}
+		
+		
+		
+		return result;
+		
+		/*
+		var ctx = DisplayObject._hitTestContext;
+		var canvas = DisplayObject._hitTestCanvas;
+		var mtx = this._matrix;
+		var hasHandler = true;
 
 		// if we have a cache handy & this has a handler, we can use it to do a quick check.
 		// we can't use the cache for screening children, because they might have hitArea set.
@@ -456,20 +518,20 @@ var p = Container.prototype = new DisplayObject();
 				if (hasHandler) {
 					// only concerned about the first hit, because this container is going to claim it anyway:
 					result = child._getObjectsUnderPoint(x, y);
-					if (result) { return this; }
+					if (result) { return result; }// !!!!!!!!!!!!!!! predtim return this
 				} else {
 					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.onPress || child.onClick || child.onDoubleClick)) || (mouseEvents&2 && (child.onMouseOver || child.onMouseOut))) {
+			} else if (!mouseEvents || hasHandler || true) {
 				var hitArea = child.hitArea;
 				child.getConcatenatedMatrix(mtx);
-				
+
 				if (hitArea) {
 					mtx.appendTransform(hitArea.x+child.regX, hitArea.y+child.regY, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
 					mtx.alpha *= hitArea.alpha/child.alpha;
 				}
-				
+
 				ctx.globalAlpha = mtx.alpha;
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				(hitArea||child).draw(ctx);
@@ -482,6 +544,7 @@ var p = Container.prototype = new DisplayObject();
 			}
 		}
 		return null;
+		*/
 	}
 
 window.Container = Container;
