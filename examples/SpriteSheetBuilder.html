@@ -64,7 +64,7 @@
 		for (var i=0; i<5; i++) {
 			// we're defining a setup function that will update the text before each frame draw.
 			// the setup function will be called right before the draw, and passed the setup params "[i]":
-			index = builder.addFrame(square, null, function(num) { squareFld.text=num; }, [i]);
+			index = builder.addFrame(square, null, 1, function(num) { squareFld.text=num; }, [i]);
 			// save off the index of each frame in order to use when defining the animation:
 			frames.push(index);
 		}
