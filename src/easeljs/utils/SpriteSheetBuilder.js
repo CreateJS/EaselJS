@@ -78,6 +78,15 @@ var p = SpriteSheetBuilder.prototype;
 	 * @type SpriteSheet
 	 **/
 	p.spriteSheet = null;
+	
+	/**
+	 * The scale to apply when drawing all frames to the sprite sheet. This is multiplied against any scale specified
+	 * in the addFrame call. This can be used, for example, to generate a sprite sheet at run time that is tailored to
+	 * the a specific device resolution (ex. tablet vs mobile).
+	 * @property defaultScale
+	 * @type Number
+	 **/
+	p.scale = 1;
 
 // private properties:
 
@@ -136,6 +145,13 @@ var p = SpriteSheetBuilder.prototype;
 	 * @type Number
 	 **/
 	p._timerID = null;
+	
+	/**
+	 * @property _scale
+	 * @protected
+	 * @type Number
+	 **/
+	p._scale = 1;
 
 // constructor:
 	/**
@@ -163,17 +179,19 @@ var p = SpriteSheetBuilder.prototype;
 	 * @param {Rectangle} sourceRect Optional. A rectangle defining the portion of the source to draw to the frame. If
 	 * not specified, it will look for a getBounds method, bounds property, or nominalBounds property on the source to use.
 	 * If one is not found, the frame will be skipped.
+	 * @param {Number} scale Optional. The scale to draw this frame at. Default is 1.
 	 * @param {Function} setupFunction Optional. A function to call immediately before drawing this frame.
 	 * @param {Array} setupParams Optional. Parameters to pass to the setup function.
 	 * @param {Object} setupScope Optional. The scope to call the setupFunction in.
 	 * @return {Number} The index of the frame that was just added, or null if a sourceRect could not be determined.
 	 **/
-	p.addFrame = function(source, sourceRect, setupFunction, setupParams, setupScope) {
+	p.addFrame = function(source, sourceRect, scale, setupFunction, setupParams, setupScope) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
 		var rect = sourceRect||source.bounds||source.nominalBounds;
 		if (!rect&&source.getBounds) { rect = source.getBounds(); }
 		if (!rect) { return null; }
-		return this._frames.push({source:source, sourceRect:rect, funct:setupFunction, params:setupParams, scope:setupScope, index:this._frames.length, height:rect.height})-1;
+		scale = scale||1;
+		return this._frames.push({source:source, sourceRect:rect, scale:scale, funct:setupFunction, params:setupParams, scope:setupScope, index:this._frames.length, height:rect.height*scale})-1;
 	}
 	
 	/**
@@ -204,8 +222,9 @@ var p = SpriteSheetBuilder.prototype;
 	 * @param {Rectangle} sourceRect Optional. A rectangle defining the portion of the source to draw to the frame. If
 	 * not specified, it will look for a getBounds method, frameBounds array, bounds property, or nominalBounds property
 	 * on the source to use. If one is not found, the MovieClip will be skipped.
+	 * @param {Number} scale Optional. The scale to draw the movie clip at. Default is 1.
 	 **/
-	p.addMovieClip = function(source, sourceRect) {
+	p.addMovieClip = function(source, sourceRect, scale) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
 		var rects = source.frameBounds;
 		var rect = sourceRect||source.bounds||source.nominalBounds;
@@ -215,7 +234,7 @@ var p = SpriteSheetBuilder.prototype;
 		var l = source.timeline.duration;
 		for (var i=0; i<l; i++) {
 			var r = (rects&&rects[i]) ? rects[i] : rect;
-			this.addFrame(source, r, function(frame) {
+			this.addFrame(source, r, scale, function(frame) {
 				var ae = this.actionsEnabled;
 				this.actionsEnabled = false;
 				this.gotoAndStop(frame);
@@ -296,6 +315,7 @@ var p = SpriteSheetBuilder.prototype;
 	p._startBuild = function() {
 		this.spriteSheet = null;
 		this._index = 0;
+		this._scale = this.scale;
 		var dataFrames = [];
 		this._data = {
 			images: [],
@@ -306,7 +326,7 @@ var p = SpriteSheetBuilder.prototype;
 		var frames = this._frames.slice();
 		frames.sort(function(a,b) { return (a.height<=b.height) ? -1 : 1; });
 		
-		if (frames[frames.length-1].sourceRect.height > this.maxHeight) { throw SpriteSheetBuilder.ERR_DIMENSIONS; }
+		if (frames[frames.length-1].height > this.maxHeight) { throw SpriteSheetBuilder.ERR_DIMENSIONS; }
 		var y = 1, x=1;
 		var img = 0;
 		while (frames.length) {
@@ -343,7 +363,6 @@ var p = SpriteSheetBuilder.prototype;
 	 * @return {Number} The width & height of the row.
 	 **/
 	p._fillRow = function(frames, y, img, dataFrames) {
-		// TODO: round pixel values?
 		var w = this.maxWidth;
 		var maxH = this.maxHeight;
 		var h = maxH-y;
@@ -351,19 +370,20 @@ var p = SpriteSheetBuilder.prototype;
 		var height = 0;
 		for (var i=frames.length-1; i>=0; i--) {
 			var frame = frames[i];
+			var sc = this._scale*frame.scale;
 			var rect = frame.sourceRect;
 			var source = frame.source;
-			var rx = Math.floor(rect.x-1);
-			var ry = Math.floor(rect.y-1);
-			var rh = Math.ceil(rect.height);
-			var rw = Math.ceil(rect.width);
+			var rx = Math.floor(sc*rect.x-1);
+			var ry = Math.floor(sc*rect.y-1);
+			var rh = Math.ceil(sc*rect.height);
+			var rw = Math.ceil(sc*rect.width);
 			if (rw > w) { throw SpriteSheetBuilder.ERR_DIMENSIONS; }
 			if (rh > h || x+rw > w) { continue; }
 			frame.img = img;
 			frame.rect = new Rectangle(x,y,rw,rh);
 			height = height || rh;
 			frames.splice(i,1);
-			dataFrames[frame.index] = [x-1,y-1,rw+2,rh+2,img,Math.round(-rx+source.regX),Math.round(-ry+source.regY+0.5)]; // TODO: regX / regY?
+			dataFrames[frame.index] = [x-1,y-1,rw+2,rh+2,img,Math.round(-rx+sc*source.regX),Math.round(-ry+sc*source.regY)];
 			x += rw+2;
 		}
 		return {w:x, h:height};
@@ -404,6 +424,7 @@ var p = SpriteSheetBuilder.prototype;
 	 **/
 	p._drawNext = function() {
 		var frame = this._frames[this._index];
+		var sc = frame.scale*this._scale;
 		var rect = frame.rect;
 		var sourceRect = frame.sourceRect;
 		var canvas = this._data.images[frame.img];
@@ -413,7 +434,8 @@ var p = SpriteSheetBuilder.prototype;
 		ctx.beginPath();
 		ctx.rect(rect.x-1, rect.y-1, rect.width+2, rect.height+2);
 		ctx.clip();
-		ctx.translate(rect.x-sourceRect.x+0.5|0, rect.y-sourceRect.y+0.5|0); // we know these are positive
+		ctx.translate(rect.x-sourceRect.x*sc+0.5|0, rect.y-sourceRect.y*sc+0.5|0); // we know these are positive
+		ctx.scale(sc,sc);
 		frame.source.draw(ctx); // display object will draw itself.
 		ctx.restore();
 		return (++this._index) < this._frames.length;
