@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EaselJS: API Test</title>
+
+	<link href="assets/tricolore.css" rel="stylesheet" type="text/css" />
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+	<script src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.4.min.js"></script>
+
+	<script type="text/javascript" src="assets/StringUtils.js"></script>
+	<script type="text/javascript" src="assets/DelayedCall.js"></script>
+
+	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Point.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/BitmapAnimation.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
+	<script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
+	<script type="text/javascript" src="../src/easeljs/filters/BoxBlurFilter.js"></script>
+	<script type="text/javascript" src="../src/easeljs/filters/ColorFilter.js"></script>
+	<script type="text/javascript" src="../src/easeljs/filters/ColorMatrixFilter.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DOMElement.js"></script>
+
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+
+	<script src="assets/rainbow-custom.min.js"></script>
+
+    <script type="text/javascript">
+
+        var canvas;
+        var stage;
+        var img;
+		var demos;
+		var STROKE_COLOR = 'rgba(255,255,255,1)';
+		var FILL_COLOR = 'rgba(255,255,255,1)';
+
+        function init() {
+        	if (window.top != window) {
+        		document.getElementById("header").style.display = "none";
+        	}
+
+			img = new Image();
+			img.onload = layout;
+			img.src = "./assets/daisy.png";
+
+			canvasHolder = document.getElementsByClassName('canvasHolder')[0];
+
+			/*
+			g.decodePath(str);
+			*/
+
+			demos = [
+				{label:'lineTo();', graphics:function () { return new Graphics().beginStroke(STROKE_COLOR).moveTo(5, 35).lineTo(110,75).endStroke(); }},
+				{label:'arcTo();', graphics:function () { return new Graphics().beginStroke(STROKE_COLOR).moveTo(50,20).arcTo(150,20,150,70,50).endStroke(); }},
+				{label:'quadraticCurveTo();', graphics:function () { return new Graphics().beginStroke(STROKE_COLOR).moveTo(0, 25).quadraticCurveTo(45,50,35,25).endStroke(); }},
+				{label:'bezierCurveTo();', graphics:function () { return new Graphics().beginStroke(STROKE_COLOR).moveTo(5, 75).bezierCurveTo(45,90,75,75,-25,-25).endStroke(); }},
+				{label:'beginLinearGradientStroke();', graphics:function () { return new Graphics().beginLinearGradientStroke([STROKE_COLOR,"rgba(50, 50, 50, 1)"],[0,.4],0,0,70,140).moveTo(5, 25).lineTo(110,25).endStroke(); }},
+				{label:'drawRect();', graphics:function () { return new Graphics().beginFill(FILL_COLOR).rect(5,5,80,80); }},
+				{label:'drawRoundRect();', graphics:function () { return new Graphics().beginFill(FILL_COLOR).drawRoundRect(0,0, 120, 120, 5); }},
+				{label:'beginLinearGradientFill() with drawRoundRect();', graphics:function () { return new Graphics().beginLinearGradientFill([FILL_COLOR, "rgba(0,0,0,1)"], [0,1],0,0,0,130).drawRoundRect(0,0, 120, 120, 5); }},
+				{label:'drawCircle();', graphics:function () { return new Graphics().beginFill(FILL_COLOR).drawCircle(40,40,40); }},
+				{label:'beginRadialGradientFill() with drawCircle();', graphics:function () { return new Graphics().beginRadialGradientFill([FILL_COLOR,"rgba(0,0,0,1)"],[0,1],0,0,0,0,0,60).drawCircle(40,40,40); }},
+				{label:'drawEllipse();', graphics:function () { return new Graphics().beginFill(FILL_COLOR).drawEllipse(5,5,60,120); }},
+				{label:'Draw Hexagon using drawPolyStar();', graphics:function () { return new Graphics().beginFill(FILL_COLOR).drawPolyStar(60,60,60,6,0,45); }},
+				{label:'Draw a star using drawPolyStar();', graphics:function () { return new Graphics().beginFill(FILL_COLOR).drawPolyStar(80,80,70,5,0.6,-90); }},
+				{label:'beginBitmapStroke() with drawRect();', graphics:function () { return new Graphics().setStrokeStyle(25).beginBitmapStroke(img).rect(5,5,100,100); }},
+				{label:'drawRoundRectComplex();', graphics:function () { return new Graphics().beginFill(FILL_COLOR).drawRoundRectComplex(5,5,70,70,5,10,15,25); }},
+				{label:'drawCircle(); with beginBitmapFill();', graphics:function () { return new Graphics().beginStroke(STROKE_COLOR).beginBitmapFill(img).drawCircle(30,30,30).endStroke(); }},
+				{label:'Text', code:textDemo },
+				{label:'BitmapAnimation', code:bitmapAnimationDemo },
+				{label:'Blur Filter', code:blurFilter },
+				{label:'Remove Red Color Filter', code:colorFilter },
+				{label:'ColorMatrixFilter', code:colorMatrixFilter },
+				//{label:'Mouse Interaction ', code:mouseDemo},
+				{label:'Mask', code:maskDemo },
+				//{label:'DOMElement', code:domElementDemo, delay:true }
+			];
+        }
+
+		function mouseDemo(stage) {
+//Click one of the shapes.
+var sprite = new Shape();
+sprite.graphics.beginFill(FILL_COLOR).drawCircle(30,30,20).moveTo(50, 50).drawRect(50,50,25,25);
+sprite.onClick = function () {
+	alert('Click!');
+};
+
+stage.addChild(sprite);
+		}
+
+		function domElementDemo(stage, canvas) {
+var btn = document.createElement('input');
+btn.type = 'submit';
+
+canvas.parentNode.appendChild(btn);
+
+//Draw a border around the object.
+var shape = new Shape();
+var r = 15;
+shape.graphics.beginFill(FILL_COLOR).drawRoundRectComplex(0, 0, btn.offsetWidth+10, btn.offsetHeight+10, r,r,r,r);
+shape.x = 5;
+shape.y = 55;
+
+var dom = new DOMElement(btn);
+var pt = shape.localToGlobal(0, 0);
+btn.style.left = Math.round(pt.x + $(canvas).offset().left + 3) + "px";
+btn.style.top = Math.round($(canvas).offset().top+58) + "px";
+
+
+stage.addChild(shape, dom);
+		}
+
+		function maskDemo(stage) {var shape =  new Shape();
+shape.graphics = new Graphics().beginStroke(STROKE_COLOR).beginBitmapFill(img).drawCircle(35,25,20).endStroke();
+var image = new Bitmap(img);
+image.mask = shape;
+
+stage.addChild(image);
+		}
+
+		function colorMatrixFilter(stage) {
+var greyScaleFilter = new ColorMatrixFilter([
+	0.33,0.33,0.33,0,0, // red
+	0.33,0.33,0.33,0,0, // green
+	0.33,0.33,0.33,0,0, // blue
+	0,0,0,1,0  // alpha
+]);
+
+var image = new Bitmap(img);
+image.filters = [greyScaleFilter];
+image.cache(0,0,img.width,img.height);
+stage.addChild(image);
+		}
+
+		function blurFilter(stage) {var blurFilter = new BoxBlurFilter(5, 2, 2);
+var margins = blurFilter.getBounds();
+var image = new Bitmap(img);
+image.filters = [blurFilter];
+// filters are only displayed when the display object is cached
+// later, you can call updateCache() to update changes to your filters
+image.cache(margins.x,margins.y,img.width+margins.width,img.height+margins.height);
+image.x += image.x+image.width;
+stage.addChild(image);
+		}
+
+		function colorFilter(stage) {var removeRedFilter = new ColorFilter(0,1,1,1);
+var image = new Bitmap(img);
+image.filters = [removeRedFilter];
+image.cache(0,0,img.width,img.height);
+stage.addChild(image);
+		}
+
+		function textDemo(stage) {var txt = new Text("Hello CreateJS!", "15px Arial", "#FFF");
+txt.y = 45;
+stage.addChild(txt); }
+
+		function bitmapAnimationDemo(stage) {var ss = new SpriteSheet({
+	"frames": {
+		"width": 200,
+		"numFrames": 64,
+		"regX": 2,
+		"regY": 2,
+		"height": 361
+	},
+	"animations": {"jump": [26, 63], "run": [0, 25]},
+	"images": ["./assets/runningGrant.png"]
+});
+
+ss.getAnimation("run").frequency = 2;
+ss.getAnimation("run").next = "jump";
+ss.getAnimation("jump").next = "run";
+
+var bitmapAnimation = new BitmapAnimation(ss);
+bitmapAnimation.scaleY = bitmapAnimation.scaleX = .4;
+
+bitmapAnimation.gotoAndPlay("run");
+
+Ticker.setFPS(60);
+Ticker.addListener(stage);
+stage.addChild(bitmapAnimation);}
+
+        function layout() {
+			if (demos.length == 0) {
+				$('#toc').toc();
+				Rainbow.color();
+				return;
+			}
+
+			var demo = demos.shift();
+
+			var demoWrap = $('<table width="100%"><tr><td width="50" valign="top"></td><td valign="top"></td></tr></table>');
+			var canvas = $('<canvas width="150" height="150" style="clear: left;" />');
+
+			demoWrap.prepend($('<h2 style="visibility: collapse; width: 1px; height: 1px;" id="'+demos.length+'">' + demo.label + '</h1>'))
+
+			var codeString;
+
+			if (demo.graphics) {
+				codeString = demo.graphics.toString();
+				codeString = codeString.substring(codeString.indexOf('return ')+7, codeString.lastIndexOf('}'));
+			} else {
+				codeString = demo.code.toString();
+				codeString = codeString.substring(codeString.indexOf('{')+1, codeString.lastIndexOf('}'));
+
+			}
+
+			codeString = codeString.split('STROKE_COLOR').join('"' + STROKE_COLOR + '"').split('FILL_COLOR').join('"' + FILL_COLOR + '"');
+			codeString = codeString.trim();
+			codeString = '//' + demo.label + '\n' + codeString;
+
+			var code = $('<div style="width:750px"><pre><code data-language="javascript" /></pre></div>');
+			code.find('code')[0].innerHTML = codeString;
+
+			$(demoWrap.find('td')[0]).append(canvas);
+			$(demoWrap.find('td')[1]).append(code);
+
+			canvasHolder.appendChild(demoWrap.get(0));
+
+			if (!demo.delay) {
+				drawToCanvas(stage, canvas, demo);
+			} else {
+				new DelayedCall(this, drawToCanvas, 5, [stage, canvas, demo]);
+			}
+
+			layout();
+			//setTimeout(function() { layout(); }, 100);
+        }
+
+		function drawToCanvas(stage, canvas, data) {
+			var stage = new Stage(canvas.get(0));
+
+			if (data.graphics) {
+				var shape = new Shape(data.graphics());
+				stage.addChild(shape);
+			} else {
+				data.code(stage, canvas.get(0));
+			}
+
+			stage.update();
+		}
+
+    </script>
+</head>
+<body onload="init();">
+
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> API Test</h1>
+	    <p>This demo shows the usage of all of the visual APIs.</p>
+	</header>
+
+	<!--
+
+	-->
+	<div style="width: 960px; height: 400px; overflow: scroll; position: relative;" id="wrap">
+		<div id="toc"></div>
+
+		<div class="canvasHolder" style=" padding-left:25px; float: left; height: 150px">
+		</div>
+	</div>
+
+</body>
+</html>
