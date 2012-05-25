@@ -213,7 +213,7 @@ var p = SpriteSheet.prototype;
 			a = this._images = [];
 			for (i=0; i<l; i++) {
 				var img = data.images[i];
-				if (!(img instanceof Image) && !(img instanceof HTMLCanvasElement)) {
+				if (typeof img == "string") {
 					var src = img;
 					img = new Image();
 					img.src = src;
