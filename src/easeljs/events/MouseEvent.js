@@ -29,10 +29,8 @@
 (function(window) {
 
 /**
-* This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, and onClick handlers on
-* DisplayObject instances.
-* By default, mouse events are disabled for performance reasons. In order to enabled them for a specified stage
-* set mouseEventsEnabled to true on your stage instance.
+* This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, onMouseOver, onMouseOut and onClick
+* handlers on DisplayObject instances.
 * @class MouseEvent
 * @constructor
 * @param {String} type The event type.
