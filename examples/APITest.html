@@ -166,16 +166,16 @@ stage.addChild(image);
 txt.y = 45;
 stage.addChild(txt); }
 
-		function bitmapAnimationDemo(stage) {var ss = new SpriteSheet({
-	"frames": {
-		"width": 200,
-		"numFrames": 64,
-		"regX": 2,
-		"regY": 2,
-		"height": 361
-	},
-	"animations": {"jump": [26, 63], "run": [0, 25]},
-	"images": ["./assets/runningGrant.png"]
+		function bitmapAnimationDemo(stage) {var ss = new SpriteSheet({ "animations": {
+"run": [0, 25],
+"jump": [26, 63]},
+"images": ["assets/runningGrant.png"],
+"frames": {
+	"regX": 0,
+	"regY": 0,
+	"height": 292.5,
+	"width":165.75,
+	"count": 64 }
 });
 
 ss.getAnimation("run").frequency = 2;

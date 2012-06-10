@@ -28,25 +28,32 @@
 			// create a new stage and point it at our canvas:
 			var stage = new Stage(document.getElementById("testCanvas"));
 
-			// Define a spritesheet. Note that this data can be exported by Zoë.
-			var ss = new SpriteSheet({
-				"frames": {
-					"width": 200,
-					"numFrames": 64,
-					"regX": 2,
-					"regY": 2,
-					"height": 361
-				},
-				"animations": {"jump": [26, 63], "run": [0, 25]},
-				"images": ["./assets/runningGrant.png"]
-			});
+			// Define a spritesheet. Note that this data was exported by Zoë.
+			var ss = new SpriteSheet(
+					{
+						"animations":
+						{
+							"run": [0, 25],
+							"jump": [26, 63]},
+							"images": ["assets/runningGrant.png"],
+							"frames":
+								{
+									"regX": 0,
+									"regY": 0,
+									"height": 292.5,
+									"width":165.75,
+									"count": 64
+								}
+					}
+			);
 
 			var grant = new BitmapAnimation(ss);
 			grant.x = 360;
 			grant.y = 22;
 
 			ss.getAnimation("run").frequency = 2;
-			ss.getAnimation("run").next = "run";
+			ss.getAnimation("run").next = "jump";
+			ss.getAnimation("jump").next = "run";
 			grant.gotoAndPlay("run");
 
 			// Add Grant to the stage, and add it as a listener to Ticker to get updates each frame.
@@ -56,11 +63,6 @@
 		}
 
 	</script>
-	<style type="text/css">
-		body {
-			background-color:
-		}
-	</style>
 </head>
 <body onload="init();">
 

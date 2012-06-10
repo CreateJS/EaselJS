@@ -21,28 +21,38 @@
 
 
 	<script>
+
 	var imgSeq = new Image();		//bmp of the sprite sheet
-	var results;					//frame data to be displayed
+	var results;				//frame data to be displayed
+	var imageSrc = "assets/runningGrantSmall.png";
 
 	function init() {
+		document.getElementById('origImage').src = imageSrc;
+
 		//wait for the image to load
 		imgSeq.onload = handleImageLoad;
-		imgSeq.src = "assets/testSeq.png";
+		imgSeq.src = imageSrc;
 	}
 
 	function handleImageLoad() {
 		// create a new sprite sheet from the loaded image, and define the animation sequences in it.
 		// for example, {walkUpRight:[0,19]} defines an animation sequence called "walkUpRight" that
 		// will play back frames 0 to 19 inclusive.
-		var spriteSheet  = new SpriteSheet({
-			images: ["assets/testSeq.png"],
-			frames: {width:64, height:68},
-			animations: {
-				walkUpRt:[0,19,"walkRt"],
-				walkDnRt:[20,39,"walkUpRt"],
-				walkRt:[41,59,"walkDnRt"]
-			}
-		});
+		var spriteSheet  = new SpriteSheet(
+				{"animations":
+					{
+					"run": [0, 15]},
+					"images": ["assets/runningGrantSmall.png"],
+					"frames":
+					{
+						"regX": 0,
+						"regY": 0,
+						"width": 51,
+						"height": 90,
+						"count": 16
+					}
+				}
+		);
 
 		// append flipped frames to the sprite sheet. The 2nd, 3rd, and 4th params indicate whether
 		// to add horizontal, vertical, and both horizontally & vertically flipped frames.
@@ -55,9 +65,9 @@
 
 	</script>
 </head>
-	
-<body onload="init();" bgcolor="#FFFFFF">
 
+
+<body onload="init();" bgcolor="#FFFFFF">
 	<header id="header" class="EaselJS">
 	    <h1><span class="text-product">Easel<strong>JS</strong></span> SpriteSheet Flip Sample</h1>
 	    <p>Tests using the <strong>SpriteSheetUtils.flip()</strong> method to extend a loaded sprite sheet with horizontally flipped frames.
@@ -65,10 +75,12 @@
 	    </p>
 	</header>
 
-	<div id="content" class="content">
-		Original sprite sheet:<br/>
-		<img src="assets/testSeq.png"><br/><br/><br/>
-		Appended sprite sheet:<br/>
+	<div class="content">
+		<div id="content" style="margin-top: 90px; margin-left: 70px; font-weight: bold;">
+			Original sprite sheet<br/><br/>
+			<img id="origImage"><br/><br/><br/>
+			Generated sprite sheet<br/><br/>
+		</div>
 	</div>
 </body>
 </html>
