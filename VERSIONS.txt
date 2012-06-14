@@ -6,6 +6,7 @@ Future:
 
 Version NEXT [release TBD]
 ****************************************************************************************************
+- added support for multitouch
 - complete rewrite of drawing model to use a hybrid approach (save/restore & matrix)
 - added DisplayObject.mask
 - added Graphics.drawAsPath(ctx)

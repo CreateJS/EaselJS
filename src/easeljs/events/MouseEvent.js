@@ -104,18 +104,34 @@ var p = MouseEvent.prototype;
 	*/
 	p.target = null;
 
+	/**
+	 * 
+	 * @property pointerID
+	 * @type {Number}
+	 */
+	p.pointerID = 0;
+
+	/**
+	 * 
+	 * @property primaryPointer
+	 * @type {Boolean}
+	 */
+	p.primary = false;
+
 // constructor:
 	/**
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
 	 **/
-	p.initialize = function(type, stageX, stageY, target, nativeEvent) {
+	p.initialize = function(type, stageX, stageY, target, nativeEvent, pointerID, primary) {
 		this.type = type;
 		this.stageX = stageX;
 		this.stageY = stageY;
 		this.target = target;
 		this.nativeEvent = nativeEvent;
+		this.pointerID = pointerID;
+		this.primary = primary;
 	}
 
 // public methods:
@@ -125,7 +141,7 @@ var p = MouseEvent.prototype;
 	 * @return {MouseEvent} a clone of the MouseEvent instance.
 	 **/
 	p.clone = function() {
-		return new MouseEvent(this.type, this.stageX, this.stageY, this.target, this.nativeEvent);
+		return new MouseEvent(this.type, this.stageX, this.stageY, this.target, this.nativeEvent, this.pointerID, this.primary);
 	}
 
 	/**

@@ -29,131 +29,165 @@
 
 (function(window) {
 
+// TODO: support for double tap.
 /**
-* Global utility for working with touch enabled devices in EaselJS.
-* @class Touch
-* @static
-**/
+ * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API (iOS & modern Android browser).
+ * Has stubbed in support for IE10, though this is completely untested.
+ * @class Touch
+ * @static
+ **/
 var Touch = function() {
 	throw "Touch cannot be instantiated";
 }
 
+// Public static methods:
 	/**
-	 * Enables touch interaction for the specified EaselJS stage. This
-	 * currently only supports iOS, and simply maps single touch events
-	 * to the existing EaselJS mouse events.
+	 * Returns true if touch is supported in the current browser.
 	 * @method isSupported
-	 * @return {Boolean} A boolean indicating whether touch is supported in the current environment.
+	 * @return {Boolean} A boolean indicating whether touch is supported in the current browser.
 	 * @static
 	 **/
 	Touch.isSupported = function() {
-		return ('ontouchstart' in window);
+		return	('ontouchstart' in window) || // iOS
+					(window.navigator['msPointerEnabled']); // IE10
 	}
 
 	/**
-	 * Enables touch interaction for the specified EaselJS stage. This
-	 * currently only supports iOS, and simply maps single touch events
-	 * to the existing EaselJS mouse events.
+	 * Enables touch interaction for the specified EaselJS stage. Currently supports iOS (and compatible browsers, such
+	 * as modern Android browsers), and has initial support for IE10 on tablets, though this is currently untested.
+	 * Supports both single touch and multi-touch modes. Extends the EaselJS MouseEvent model, but without support for
+	 * double click or over/out events. See MouseEvent.pointerID for more information.
 	 * @method enable
 	 * @param {Stage} stage The stage to enable touch on.
+	 * @param {Boolean} singleTouch If true, only a single touch will be active at a time. Default is false.
+	 * @param {Boolean} allowDefault If true, then default gesture actions (ex. scrolling, zooming) will be allowed when the user is interacting with the target canvas. Default is false.
+	 * @return {Boolean} Returns true if touch was successfully enabled on the target stage.
 	 * @static
 	 **/
-	Touch.enable = function(stage) {
-		if (stage == null || !Touch.isSupported()) { return; }
-		var o = stage;
+	Touch.enable = function(stage, singleTouch, allowDefault) {
+		if (stage == null || !Touch.isSupported()) { return false; }
 
 		// inject required properties on stage:
-		o._primaryTouchId = -1;
-		o._handleTouchMoveListener = null;
-
+		stage.__touch = {pointers:{}, multitouch:!singleTouch, preventDefault:!allowDefault, count:0};
+		
 		// note that in the future we may need to disable the standard mouse event model before adding
 		// these to prevent duplicate calls. It doesn't seem to be an issue with iOS devices though.
-		o.canvas.addEventListener("touchstart", function(e) {
-			Touch._handleTouchStart(o,e);
-		}, false);
+		if ('ontouchstart' in window) { Touch._IOS_enable(stage); }
+		else if (window.navigator['msPointerEnabled']) { Touch._IE_enable(stage); }
+		return true;
+	}
+	
+// Private static methods:
 
-		document.addEventListener("touchend", function(e) {
-			Touch._handleTouchEnd(o,e);
-		}, false);
+	/**
+	 * @method _IOS_enable
+	 * @protected
+	 * @param {Stage} stage
+	 **/
+	Touch._IOS_enable = function(stage) {
+		var canvas = stage.canvas;
+		canvas.addEventListener("touchstart", function(e) { Touch._IOS_handleEvent(stage,e); }, false);
+		canvas.addEventListener("touchmove", function(e) { Touch._IOS_handleEvent(stage,e); }, false);
+		canvas.addEventListener("touchend", function(e) { Touch._IOS_handleEvent(stage,e); }, false);
+		canvas.addEventListener("touchcancel", function(e) { Touch._IOS_handleEvent(stage,e); }, false);
 	}
 
 	/**
-	 * @method _handleTouchStart
+	 * @method _IOS_handleEvent
 	 * @protected
-	 * @param {Stage} stage
-	 * @param {TouchEvent} e
 	 **/
-	Touch._handleTouchStart = function(stage,e) {
-		e.preventDefault();
-
-		if(stage._primaryTouchId != -1) {
-			//we are already tracking an id
-			return;
-		}
-
-		stage._handleTouchMoveListener = stage._handleTouchMoveListener || function(e){
-			Touch._handleTouchMove(stage,e);
-		}
-
-		//for touch we only need to listen to move events once a touch has started
-		//on the canvas
-		document.addEventListener("touchmove", stage._handleTouchMoveListener, false);
-
-		var touch = e.changedTouches[0];
-		stage._primaryTouchId = touch.identifier;
-		stage._updateMousePosition(touch.pageX, touch.pageY);
-		stage._handleMouseDown(touch);
-	}
-
-	/**
-	 * @method _handleTouchMove
-	 * @protected
-	 * @param {Stage} stage
-	 * @param {TouchEvent} e
-	 **/
-	Touch._handleTouchMove = function(stage,e) {
-		var touch = Touch._findPrimaryTouch(stage,e.changedTouches);
-		if(touch) {
-			stage._handleMouseMove(touch);
-		}
-	}
-
-	/**
-	 * @method _handleTouchEnd
-	 * @protected
-	 * @param {Stage} stage
-	 * @param {TouchEvent} e
-	 **/
-	Touch._handleTouchEnd = function(stage,e) {
-		var touch = Touch._findPrimaryTouch(stage,e.changedTouches);
-
-		if(touch) {
-			stage._primaryTouchId = -1;
-			stage._handleMouseUp(touch);
-			//stop listening for move events, until another new touch starts on the canvas
-			document.removeEventListener("touchmove", stage._handleTouchMoveListener);
-			stage._handleTouchMoveListener = null;
-		}
-	}
-
-	/**
-	 * @method _findPrimaryTouch
-	 * @protected
-	 * @param {Stage} stage
-	 * @param {Array[Touch]} touches
-	 **/
-	Touch._findPrimaryTouch = function(stage,touches) {
-		var l = touches.length;
-		for(var i = 0; i < l; i++){
+	Touch._IOS_handleEvent = function(stage, e) {
+		if (stage.__touch.preventDefault) { e.preventDefault&&e.preventDefault(); }
+		var touches = e.changedTouches;
+		var type = e.type;
+		for (var i= 0,l=touches.length; i<l; i++) {
 			var touch = touches[i];
-
-			//find the primary touchPoint by id
-			if(touch.identifier == stage._primaryTouchId) {
-				return touch;
+			var id = touch.identifier;
+			if (touch.target != stage.canvas) { continue; }
+			
+			if (type == "touchstart") {
+				this._handleStart(stage, id, e, touch.pageX, touch.pageY);
+			} else if (type == "touchmove") {
+				this._handleMove(stage, id, e, touch.pageX, touch.pageY);
+			} else if (type == "touchend" || type == "touchcancel") {
+				this._handleEnd(stage, id, e);
 			}
 		}
-		return null;
 	}
+	
+	/**
+		 * @method _IE_enable
+		 * @protected
+		 * @param {Stage} stage
+		 **/
+		Touch._IE_enable = function(stage) {
+			var canvas = stage.canvas;
+			canvas.addEventListener("MSPointerDown", function(e) { Touch._IE_handleEvent(stage,e); }, false);
+			canvas.addEventListener("MSPointerMove", function(e) { Touch._IE_handleEvent(stage,e); }, false);
+			canvas.addEventListener("MSPointerUp", function(e) { Touch._IE_handleEvent(stage,e); }, false);
+			canvas.addEventListener("MSPointerCancel", function(e) { Touch._IE_handleEvent(stage,e); }, false);
+		}
+	
+		/**
+		 * @method _IE_handleEvent
+		 * @protected
+		 **/
+		Touch._IE_handleEvent = function(stage, e) {
+			if (stage.__touch.preventDefault) {
+				e.preventDefault&&e.preventDefault();
+				e.preventManipulation&&e.preventManipulation();
+			}
+			var type = e.type;
+			var id = e.pointerID;
+			if (e.srcElement != stage.canvas) { return; }
+			
+			if (type == "MSPointerDown") {
+				this._handleStart(stage, id, e, e.pageX, e.pageY);
+			} else if (type == "MSPointerMove") {
+				this._handleMove(stage, id, e, e.pageX, e.pageY);
+			} else if (type == "MSPointerUp" || type == "MSPointerCancel") {
+				this._handleEnd(stage, id, e);
+			}
+		}
+	
+	
+	/**
+	 * @method _handleStart
+	 * @protected
+	 **/
+	Touch._handleStart = function(stage, id, e, x, y) {
+		var props = stage.__touch;
+		if (!props.multitouch && props.count) { return; }
+		var ids = props.pointers;
+		if (ids[id]) { return; }
+		ids[id] = true;
+		props.count++;
+		stage._handlePointerDown(id, e, x, y);
+	}
+	
+	/**
+	 * @method _handleMove
+	 * @protected
+	 **/
+	Touch._handleMove = function(stage, id, e, x, y) {
+		if (!stage.__touch.pointers[id]) { return; }
+		stage._handlePointerMove(id, e, x, y);
+	}
+	
+	/**
+	 * @method _handleEnd
+	 * @protected
+	 **/
+	Touch._handleEnd = function(stage, id, e) {
+		// TODO: cancel should be handled differently for proper UI (ex. an up would trigger a click, a cancel would more closely resemble an out).
+		var props = stage.__touch;
+		var ids = props.pointers;
+		if (!ids[id]) { return; }
+		props.count--;
+		stage._handlePointerUp(id, e, true);
+		delete(ids[id]);
+	}
+
 
 window.Touch = Touch;
 }(window));
