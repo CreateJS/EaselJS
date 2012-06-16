@@ -65,7 +65,7 @@ var Touch = function() {
 	 * @static
 	 **/
 	Touch.enable = function(stage, singleTouch, allowDefault) {
-		if (stage == null || !Touch.isSupported()) { return false; }
+		if (!stage || !stage.canvas || !Touch.isSupported()) { return false; }
 
 		// inject required properties on stage:
 		stage.__touch = {pointers:{}, multitouch:!singleTouch, preventDefault:!allowDefault, count:0};
@@ -126,6 +126,7 @@ var Touch = function() {
 			canvas.addEventListener("MSPointerMove", function(e) { Touch._IE_handleEvent(stage,e); }, false);
 			canvas.addEventListener("MSPointerUp", function(e) { Touch._IE_handleEvent(stage,e); }, false);
 			canvas.addEventListener("MSPointerCancel", function(e) { Touch._IE_handleEvent(stage,e); }, false);
+			if (stage.__touch.preventDefault) { canvas.style.msContentZooming = canvas.style.msTouchAction = "none"; }
 		}
 	
 		/**
@@ -138,7 +139,7 @@ var Touch = function() {
 				e.preventManipulation&&e.preventManipulation();
 			}
 			var type = e.type;
-			var id = e.pointerID;
+			var id = e.pointerId;
 			if (e.srcElement != stage.canvas) { return; }
 			
 			if (type == "MSPointerDown") {
