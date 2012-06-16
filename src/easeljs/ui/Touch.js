@@ -31,8 +31,8 @@
 
 // TODO: support for double tap.
 /**
- * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API (iOS & modern Android browser).
- * Has stubbed in support for IE10, though this is completely untested.
+ * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API
+ * (iOS & modern Android browser) and IE10.
  * @class Touch
  * @static
  **/
@@ -54,7 +54,7 @@ var Touch = function() {
 
 	/**
 	 * Enables touch interaction for the specified EaselJS stage. Currently supports iOS (and compatible browsers, such
-	 * as modern Android browsers), and has initial support for IE10 on tablets, though this is currently untested.
+	 * as modern Android browsers), and IE10.
 	 * Supports both single touch and multi-touch modes. Extends the EaselJS MouseEvent model, but without support for
 	 * double click or over/out events. See MouseEvent.pointerID for more information.
 	 * @method enable
