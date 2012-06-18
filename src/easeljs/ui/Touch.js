@@ -126,7 +126,7 @@ var Touch = function() {
 			canvas.addEventListener("MSPointerMove", function(e) { Touch._IE_handleEvent(stage,e); }, false);
 			canvas.addEventListener("MSPointerUp", function(e) { Touch._IE_handleEvent(stage,e); }, false);
 			canvas.addEventListener("MSPointerCancel", function(e) { Touch._IE_handleEvent(stage,e); }, false);
-			if (stage.__touch.preventDefault) { canvas.style.msContentZooming = canvas.style.msTouchAction = "none"; }
+			if (stage.__touch.preventDefault) { canvas.style.msTouchAction = "none"; }
 		}
 	
 		/**
@@ -136,7 +136,6 @@ var Touch = function() {
 		Touch._IE_handleEvent = function(stage, e) {
 			if (stage.__touch.preventDefault) {
 				e.preventDefault&&e.preventDefault();
-				e.preventManipulation&&e.preventManipulation();
 			}
 			var type = e.type;
 			var id = e.pointerId;
