@@ -82,7 +82,7 @@ var p = AlphaMaskFilter.prototype = new Filter();
 		
 		targetCtx.save();
 		if (ctx != targetCtx) {
-			TODO: support targetCtx and targetX/Y
+			// TODO: support targetCtx and targetX/Y
 			// clearRect, then draw the ctx in?
 		}
 		
