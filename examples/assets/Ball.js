@@ -11,7 +11,7 @@ function Ball(imageSource) {
 
 }
 
-Ball.prototype = new Container();
+Ball.prototype = new createjs.Container();
 
 Ball.prototype.vx = 0;
 Ball.prototype.vy = 0;
@@ -25,13 +25,13 @@ Ball.prototype.imageSource;
 Ball.prototype.Container_initialize = Ball.prototype.initialize;
     Ball.prototype.initialize = function() {
         this.Container_initialize();
-        var bmp = new Bitmap(this.imageSource.result);
+        var bmp = new createjs.Bitmap(this.imageSource.result);
         this.addChild(bmp);
 
     }
 
     function handleImageLoad() {
-       var bmp = new Bitmap(this.img);
+       var bmp = new createjs.Bitmap(this.img);
        this.addChild(bmp);
     }
 

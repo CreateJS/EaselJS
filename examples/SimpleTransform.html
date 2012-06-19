@@ -36,14 +36,14 @@
         }
 
         function stop() {
-	        Ticker.removeListener(window);
+			createjs.Ticker.removeListener(window);
         }
 
         function handleImageLoad() {
             var canvas = document.getElementById("testCanvas");
-            stage = new Stage(canvas);
+            stage = new createjs.Stage(canvas);
             stage.autoClear = true;
-            bmp = new Bitmap(img);
+            bmp = new createjs.Bitmap(img);
             bmp.regX = img.width >> 1;
             bmp.regY = img.height >> 1;
             bmp.x = canvas.width - (img.width/2)>>1;
@@ -52,7 +52,7 @@
             stage.addChild(bmp);
             stage.update();
 
-            Ticker.addListener(window);
+			createjs.Ticker.addListener(window);
         }
 
         function tick() {
@@ -61,7 +61,6 @@
 
             bmp.setTransform (bmp.x , bmp.y , bmp.scaleX , bmp.scaleY , value/2 , bmp.skewX , bmp.skewY , bmp.regX , bmp.regY );
             bmp.scaleX = bmp.scaleY = ((value)/360) + 0.25;
-            //bmp.rotation = value;
             stage.update();
         }
 

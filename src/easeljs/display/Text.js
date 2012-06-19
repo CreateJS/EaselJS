@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(window) {
+(function(ns) {
 	
 /**
 * Allows you to display one or more lines of dynamic text (not user editable) in the display list.
@@ -45,7 +45,7 @@
 var Text = function(text, font, color) {
   this.initialize(text, font, color);
 }
-var p = Text.prototype = new DisplayObject();
+var p = Text.prototype = new ns.DisplayObject();
 
 
 	/**
@@ -154,6 +154,7 @@ var p = Text.prototype = new DisplayObject();
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
+		// Note: this.text = "0" will evaluate to false in JS.
 		return Boolean(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.text != null && this.text !== "");
 	}
 
@@ -327,5 +328,6 @@ var p = Text.prototype = new DisplayObject();
 		
 	}
 
-window.Text = Text;
-}(window));
+ns.Text = Text;
+}(createjs||(createjs={})));
+var createjs;

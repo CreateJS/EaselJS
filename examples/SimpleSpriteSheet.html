@@ -26,40 +26,35 @@
 		function init() {
 
 			// create a new stage and point it at our canvas:
-			var stage = new Stage(document.getElementById("testCanvas"));
+			var stage = new createjs.Stage(document.getElementById("testCanvas"));
 
 			// Define a spritesheet. Note that this data was exported by Zoë.
-			var ss = new SpriteSheet(
-					{
-						"animations":
+			var ss = new createjs.SpriteSheet({
+				"animations":
+				{
+					"run": [0, 25, "jump"],
+					"jump": [26, 63, "run"]},
+					"images": ["assets/runningGrant.png"],
+					"frames":
 						{
-							"run": [0, 25],
-							"jump": [26, 63]},
-							"images": ["assets/runningGrant.png"],
-							"frames":
-								{
-									"regX": 0,
-									"regY": 0,
-									"height": 292.5,
-									"width":165.75,
-									"count": 64
-								}
-					}
-			);
+							"regX": 0,
+							"regY": 0,
+							"height": 292.5,
+							"width":165.75,
+							"count": 64
+						}
+				});
 
-			var grant = new BitmapAnimation(ss);
+			var grant = new createjs.BitmapAnimation(ss);
 			grant.x = 360;
 			grant.y = 22;
 
-			ss.getAnimation("run").frequency = 2;
-			ss.getAnimation("run").next = "jump";
-			ss.getAnimation("jump").next = "run";
 			grant.gotoAndPlay("run");
 
 			// Add Grant to the stage, and add it as a listener to Ticker to get updates each frame.
 			stage.addChild(grant);
-			Ticker.setFPS(60);
-			Ticker.addListener(stage);
+			createjs.Ticker.setFPS(60);
+			createjs.Ticker.addListener(stage);
 		}
 
 	</script>

@@ -11,7 +11,7 @@
 
     }
 
-    SimpleBall.prototype = new Container();
+    SimpleBall.prototype = new createjs.Container();
 
     SimpleBall.prototype.vx = 0;
     SimpleBall.prototype.vy = 0;
@@ -36,7 +36,7 @@
         this.s.graphics.clear();
         var g = this.s.graphics;
         g.setStrokeStyle(5, 'round', 'round');
-        g.beginStroke(Graphics.getRGB('#000000'));
+        g.beginStroke('#000000');
         g.beginFill(this.selectedColor);
         g.drawCircle(0, 0, this.radius);
         g.moveTo(0,0);
@@ -46,7 +46,7 @@
     }
 
     SimpleBall.prototype.getSprite = function() {
-        var s = new Shape();
+        var s = new createjs.Shape();
         var g = s.graphics;
         g.setStrokeStyle(1);
         g.beginFill(this.selectedColor);

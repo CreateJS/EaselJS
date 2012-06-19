@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(window) {
+(function(ns) {
 
 /**
 * A Container is a nestable display lists that allows you to work with compound display elements. For
@@ -43,7 +43,7 @@
 var Container = function() {
   this.initialize();
 }
-var p = Container.prototype = new DisplayObject();
+var p = Container.prototype = new ns.DisplayObject();
 
 // public properties:
 	/**
@@ -425,8 +425,8 @@ var p = Container.prototype = new DisplayObject();
 	 * @protected
 	 **/
 	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
-		var ctx = DisplayObject._hitTestContext;
-		var canvas = DisplayObject._hitTestCanvas;
+		var ctx = createjs.DisplayObject._hitTestContext;
+		var canvas = createjs.DisplayObject._hitTestCanvas;
 		var mtx = this._matrix;
 		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick || this.onDoubleClick)) || (mouseEvents&2 &&
 																(this.onMouseOver || this.onMouseOut));
@@ -484,5 +484,6 @@ var p = Container.prototype = new DisplayObject();
 		return null;
 	}
 
-window.Container = Container;
-}(window));
+ns.Container = Container;
+}(createjs||(createjs={})));
+var createjs;

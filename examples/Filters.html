@@ -37,15 +37,15 @@
 		var canvas = document.getElementById("testCanvas");
 
 		// create a new stage and point it at our canvas:
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 
-		var bmp = new Bitmap(img);
+		var bmp = new createjs.Bitmap(img);
 		bmp.x = (canvas.width-2*img.width)/3;
 		bmp.y = (canvas.height-2*img.height)/3;
 		stage.addChild(bmp);
 
 
-		var blurFilter = new BoxBlurFilter(32, 2, 2);
+		var blurFilter = new createjs.BoxBlurFilter(32, 2, 2);
 		var margins = blurFilter.getBounds();
 		bmp = bmp.clone();
 		bmp.filters = [blurFilter];
@@ -56,7 +56,7 @@
 		stage.addChild(bmp);
 
 
-		var greyScaleFilter = new ColorMatrixFilter([
+		var greyScaleFilter = new createjs.ColorMatrixFilter([
 			0.33,0.33,0.33,0,0, // red
 			0.33,0.33,0.33,0,0, // green
 			0.33,0.33,0.33,0,0, // blue
@@ -69,7 +69,7 @@
 		stage.addChild(bmp);
 
 
-		var removeRedFilter = new ColorFilter(0,1,1,1); // red, green, blue, alpha
+		var removeRedFilter = new createjs.ColorFilter(0,1,1,1); // red, green, blue, alpha
 		bmp = bmp.clone();
 		bmp.filters = [removeRedFilter];
 		bmp.cache(0,0,img.width,img.height); // color filters don't change the bounds.

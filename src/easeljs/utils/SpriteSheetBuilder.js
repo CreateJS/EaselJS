@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(window) {
+(function(ns) {
 
 /**
  * The SpriteSheetBuilder allows you to generate sprite sheets at run time from any display object. This can allow
@@ -295,7 +295,7 @@ var p = SpriteSheetBuilder.prototype;
 	 * @method clone
 	 **/
 	p.clone = function() {
-		throw("SpriteSheet cannot be cloned.");
+		throw("SpriteSheetBuilder cannot be cloned.");
 	}
 
 	/**
@@ -380,7 +380,7 @@ var p = SpriteSheetBuilder.prototype;
 			if (rw > w) { throw SpriteSheetBuilder.ERR_DIMENSIONS; }
 			if (rh > h || x+rw > w) { continue; }
 			frame.img = img;
-			frame.rect = new Rectangle(x,y,rw,rh);
+			frame.rect = new ns.Rectangle(x,y,rw,rh);
 			height = height || rh;
 			frames.splice(i,1);
 			dataFrames[frame.index] = [x-1,y-1,rw+2,rh+2,img,Math.round(-rx+sc*source.regX),Math.round(-ry+sc*source.regY)];
@@ -394,7 +394,7 @@ var p = SpriteSheetBuilder.prototype;
 	 * @protected
 	 **/
 	p._endBuild = function() {
-		this.spriteSheet = new SpriteSheet(this._data);
+		this.spriteSheet = new ns.SpriteSheet(this._data);
 		this._data = null;
 		if (this._callback) { this._callback(this); }
 	}
@@ -441,5 +441,6 @@ var p = SpriteSheetBuilder.prototype;
 		return (++this._index) < this._frames.length;
 	}
 
-window.SpriteSheetBuilder = SpriteSheetBuilder;
-}(window));
+ns.SpriteSheetBuilder = SpriteSheetBuilder;
+}(createjs||(createjs={})));
+var createjs;

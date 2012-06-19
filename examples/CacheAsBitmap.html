@@ -33,14 +33,14 @@
 
 		// create a new stage and point it at our canvas:
 		canvas = document.getElementById("testCanvas");
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 
 		// create a large number of slightly complex vector shapes, and give them random positions and velocities:
 
 		var colors = ["#828b20", "#b0ac31", "#cbc53d", "#fad779", "#f9e4ad", "#faf2db", "#563512", "#9b4a0b", "#d36600", "#fe8a00", "#f9a71f"];
 
 		for (var i=0; i<1000; i++) {
-			shape = new Shape();
+			shape = new createjs.Shape();
 			shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius);
 			shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*0.8);
 			shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*0.6);
@@ -59,14 +59,14 @@
 		}
 
 		// add a text object to output the current FPS:
-		fpsLabel = new Text("-- fps","bold 18px Arial","#FFF");
+		fpsLabel = new createjs.Text("-- fps","bold 18px Arial","#FFF");
 		stage.addChild(fpsLabel);
 		fpsLabel.x = 10;
 		fpsLabel.y = 20;
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
-		Ticker.addListener(window);
-		Ticker.setFPS(50);
+		createjs.Ticker.addListener(window);
+		createjs.Ticker.setFPS(50);
 	}
 
 	function tick() {
@@ -82,7 +82,7 @@
 			shape.y = (shape.y+shape.velY+h)%h;
 		}
 
-		fpsLabel.text = Math.round(Ticker.getMeasuredFPS())+" fps";
+		fpsLabel.text = Math.round(createjs.Ticker.getMeasuredFPS())+" fps";
 
 		// draw the updates to stage:
 		stage.update();

@@ -48,7 +48,7 @@
 
 	function init() {
 		canvas = document.getElementById("testCanvas");
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 
 		// this prevents the stage from clearing, so we only draw one vector line each tick, and it
 		// is painted onto the canvas, then removed.
@@ -59,33 +59,33 @@
 		canvas.onmouseup = mouseUp;
 
 		// Alpha Rectangle, applied each frame at the bottom, fading out the previous content over time.
-		var fade = new Shape(new Graphics().f("#333333").dr(0,0,canvas.width, canvas.height));
+		var fade = new createjs.Shape(new createjs.Graphics().f("#333333").dr(0,0,canvas.width, canvas.height));
 		fade.alpha = 0.02;
 		stage.addChild(fade);
 
-		shape = new Shape();
+		shape = new createjs.Shape();
 		shape.y = 276;
 		graphics = shape.graphics;
 
 		// middle spinner:
-		spin2 = new Container();
+		spin2 = new createjs.Container();
 		spin2.addChild(shape);
 		spin2.x = 391;
 
 		// outside spinner:
-		spin1 = new Container();
+		spin1 = new createjs.Container();
 		spin1.addChild(spin2);
 		spin1.x = canvas.width/2;
 		spin1.y = canvas.height/2;
 		stage.addChild(spin1);
 
-		text = new Text("Click and Drag", "36px Arial", "#777777");
+		text = new createjs.Text("Click and Drag", "36px Arial", "#777777");
 		text.x = 360; text.y = 200;
 		stage.addChild(text);
 
 		//start ticking
-		Ticker.setInterval(20);		// 20ms = 50fps
-		Ticker.addListener(window);
+		createjs.Ticker.setInterval(20);		// 20ms = 50fps
+		createjs.Ticker.addListener(window);
 
 		stage.update(); // Draw the stage once
 	}
@@ -98,7 +98,7 @@
 
 		if(_mouseIsDown) {
 
-			var color = Graphics.getHSL(
+			var color = createjs.Graphics.getHSL(
 				Math.cos((count++)*0.1) * 30 + colorOffset,
 				100,
 				50,

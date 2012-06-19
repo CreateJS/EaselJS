@@ -41,47 +41,41 @@
         function init() {
         	if (window.top != window) {
         		document.getElementById("header").style.display = "none";
-        	}
+			}
 
             // create stage and point it to the canvas:
             canvas = document.getElementById("testCanvas");
-            stage = new Stage(canvas);
+            stage = new createjs.Stage(canvas);
             rate = 0;
             offset = 100;
 
             body = new Segment(120, 30, '#FFFF99');
             body.rotation = 90;
             body.y = -120;
-            body.shadow = new Shadow('#000000', 1, 1, 5);
 
             rightArm = new Segment(85, 25, '#FFFF99');
             rightArm.x = body.getPoint().x;
             rightArm.y = body.y;
-            rightArm.shadow = new Shadow('#000000', 1, 1, 5);
             rightArm.rotation = 90;
 
             rightForeArm = new Segment(80, 20, '#FFFF99');
             rightForeArm.x = rightArm.getPoint().x;
             rightForeArm.y = rightArm.getPoint().y;
-            rightForeArm.shadow = new Shadow('#000000', 1, 1, 5);
             rightForeArm.rotation = 90;
 
             leftArm = new Segment(85, 25, '#FFFF99');
             leftArm.x = body.getPoint().x;
             leftArm.y = body.y;
-            leftArm.shadow = new Shadow('#000000', 1, 1, 5);
             leftArm.rotation = 90;
 
             leftForeArm = new Segment(80, 20, '#FFFF99');
             leftForeArm.x = rightArm.getPoint().x;
             leftForeArm.y = rightArm.getPoint().y;
-            leftForeArm.shadow = new Shadow('#000000', 1, 1, 5);
             leftForeArm.rotation = 90;
 
             rightThigh = new Segment(95, 20, '#FFFF99');
             rightThigh.x = body.getPoint().x;
             rightThigh.y = body.getPoint().y;
-            rightThigh.shadow = new Shadow('#000000', 1, 1, 5);
             rightThigh.rotation = 90;
 
             right = new Segment(110, 30, '#FFFF99');
@@ -107,20 +101,8 @@
             leftFoot.x = left.getPoint().x;
             leftFoot.y = left.getPoint().y;
 
-            right.shadow = rightFoot.shadow = leftThigh.shadow = left.shadow = leftFoot.shadow = rightThigh.shadow;
-
-            container = new Container();
-            container.addChild(leftArm);
-            container.addChild(leftForeArm);
-            container.addChild(leftThigh);
-            container.addChild(leftFoot);
-            container.addChild(left);
-            container.addChild(body);
-            container.addChild(right);
-            container.addChild(rightThigh);
-            container.addChild(rightFoot);
-            container.addChild(rightForeArm);
-            container.addChild(rightArm);
+            container = new createjs.Container();
+            container.addChild(leftArm,leftForeArm,leftThigh,leftFoot,left,body,right,rightThigh,rightFoot,rightForeArm,rightArm);
             container.x = 275;
             container.y = 137;
 
@@ -129,11 +111,11 @@
             stage.addChild(container);
             stage.update();
 
-            Ticker.addListener(window);
+			createjs.Ticker.addListener(window);
         }
 
         function stop() {
-	        Ticker.removeListener(window);
+			createjs.Ticker.removeListener(window);
         }
 
         function move(segA, segB, segC, p_rate) {

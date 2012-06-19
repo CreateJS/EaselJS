@@ -36,7 +36,7 @@
 
 		// create a new stage and point it at our canvas:
 		canvas = document.getElementById("testCanvas");
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 
 		// load the sprite sheet image, and wait for it to complete before proceeding:
 		imgSeq.onload = handleImageLoad;
@@ -51,7 +51,7 @@
 
 		// create a semi-opaque black rectangle that covers the full stage.
 		// drawing this to stage each tick will cause the canvas to fade to black.
-		var shape = new Shape(new Graphics().beginFill('#333').drawRect(0,0,canvas.width+1,canvas.height));
+		var shape = new createjs.Shape(new createjs.Graphics().beginFill('#333').drawRect(0,0,canvas.width+1,canvas.height));
 		shape.alpha = 0.35;
 		stage.addChild(shape);
 
@@ -68,10 +68,10 @@
 		}
 
 		// set up an animation instance, which we will clone
-		bmpAnim = new BitmapAnimation(new SpriteSheet(data));
+		bmpAnim = new createjs.BitmapAnimation(new createjs.SpriteSheet(data));
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
-		Ticker.addListener(window);
+		createjs.Ticker.addListener(window);
 	}
 
 	function tick() {

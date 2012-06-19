@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(window) {
+(function(ns) {
 
 /**
 * Encapsulates the properties required to define a shadow to apply to a DisplayObject via it's .shadow property.
@@ -121,5 +121,6 @@ var p = Shadow.prototype;
 	// this has to be populated after the class is defined:
 	Shadow.identity = new Shadow("transparent", 0, 0, 0);
 	
-window.Shadow = Shadow;
-}(window));
+ns.Shadow = Shadow;
+}(createjs||(createjs={})));
+var createjs;

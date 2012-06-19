@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(window) {
+(function(ns) {
 
 // used to create the instruction lists used in Graphics:
 
@@ -1136,5 +1136,6 @@ var p = Graphics.prototype;
 		this[name] = value;
 	}
 
-window.Graphics = Graphics;
-}(window));
+ns.Graphics = Graphics;
+}(createjs||(createjs={})));
+var createjs;

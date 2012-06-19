@@ -33,7 +33,7 @@
 * @module EaselJS
 **/
 
-(function(window) {
+(function(ns) {
 
 /**
 * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
@@ -395,8 +395,8 @@ var p = DisplayObject.prototype;
 	 * @protected
 	*/
 	p.initialize = function() {
-		this.id = UID.get();
-		this._matrix = new Matrix2D();
+		this.id = ns.UID.get();
+		this._matrix = new ns.Matrix2D();
 	}
 
 // public methods:
@@ -448,7 +448,7 @@ var p = DisplayObject.prototype;
 		}
 		
 		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
-		if (Stage._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
+		if (ns.Stage._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
 		else { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
 		ctx.globalAlpha *= o.alpha;
 		if (o.compositeOperation) { ctx.globalCompositeOperation = o.compositeOperation; }
@@ -540,7 +540,7 @@ var p = DisplayObject.prototype;
 		while (o.parent) {
 			o = o.parent;
 		}
-		if (o instanceof Stage) { return o; }
+		if (o instanceof ns.Stage) { return o; }
 		return null;
 	}
 
@@ -559,7 +559,7 @@ var p = DisplayObject.prototype;
 		var mtx = this.getConcatenatedMatrix(this._matrix);
 		if (mtx == null) { return null; }
 		mtx.append(1, 0, 0, 1, x, y);
-		return new Point(mtx.tx, mtx.ty);
+		return new ns.Point(mtx.tx, mtx.ty);
 	}
 
 	/**
@@ -578,7 +578,7 @@ var p = DisplayObject.prototype;
 		if (mtx == null) { return null; }
 		mtx.invert();
 		mtx.append(1, 0, 0, 1, x, y);
-		return new Point(mtx.tx, mtx.ty);
+		return new ns.Point(mtx.tx, mtx.ty);
 	}
 
 	/**
@@ -633,7 +633,7 @@ var p = DisplayObject.prototype;
 	 **/
 	p.getMatrix = function(matrix) {
 		var o = this;
-		return (matrix ? matrix.identity() : new Matrix()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
+		return (matrix ? matrix.identity() : new ns.Matrix2D()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
 	}
 	
 	/**
@@ -649,7 +649,7 @@ var p = DisplayObject.prototype;
 	 **/
 	p.getConcatenatedMatrix = function(matrix) {
 		if (matrix) { matrix.identity(); }
-		else { matrix = new Matrix2D(); }
+		else { matrix = new ns.Matrix2D(); }
 		var o = this;
 		while (o != null) {
 			matrix.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).prependProperties(o.alpha, o.shadow, o.compositeOperation);
@@ -790,5 +790,6 @@ var p = DisplayObject.prototype;
 	}
 	 
 
-window.DisplayObject = DisplayObject;
-}(window));
+ns.DisplayObject = DisplayObject;
+}(createjs||(createjs={})));
+var createjs;

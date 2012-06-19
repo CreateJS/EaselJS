@@ -42,7 +42,7 @@
 	function init() {
 		// create a new stage and point it at our canvas:
 		canvas = document.getElementById("testCanvas");
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 
 		// attach mouse handlers directly to the source canvas
 		// better than calling from canvas tag for cross browser
@@ -50,22 +50,22 @@
 		canvas.onmousedown = mouseDown;
 		canvas.onmouseup = mouseUp;
 
-		text = new Text("Click and Drag", "36px Arial", "#777777");
+		text = new createjs.Text("Click and Drag", "36px Arial", "#777777");
 		text.x = 360; text.y = 200;
 		stage.addChild(text);
 
 		// shape to draw vector data into:
-		shape = new Shape();
+		shape = new createjs.Shape();
 		shape.x = 41;		//position in parent container
 		graphics = shape.graphics;
 
 		// middle spinner:
-		spin2 = new Container();
+		spin2 = new createjs.Container();
 		spin2.addChild(shape);
 		spin2.x = 303;		//position in parent container
 
 		// outside spinner:
-		spin1 = new Container();
+		spin1 = new createjs.Container();
 		spin1.addChild(spin2);
 
 		// center it on the stage:
@@ -74,8 +74,8 @@
 		stage.addChild(spin1);
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
-		Ticker.setFPS(30);
-		Ticker.addListener(window);
+		createjs.Ticker.setFPS(30);
+		createjs.Ticker.addListener(window);
 	}
 
 	function tick() {
@@ -85,7 +85,7 @@
 		shape.rotation += 3;
 
 		if(_mouseIsDown) {
-			var color = Graphics.getHSL(
+			var color = createjs.Graphics.getHSL(
 				Math.cos((count++)*0.01) * 180,
 				100,
 				50,

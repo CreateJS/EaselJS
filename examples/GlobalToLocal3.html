@@ -40,10 +40,10 @@
         	}
 
             canvas = document.getElementById('myCanvas');
-            butt = new DOMElement(document.getElementById("myButton"));
-            butt2 = new DOMElement(document.getElementById("myButton2"));
+            butt = new createjs.DOMElement(document.getElementById("myButton"));
+            butt2 = new createjs.DOMElement(document.getElementById("myButton2"));
 
-	        stage = new Stage(canvas);
+	        stage = new createjs.Stage(canvas);
             balls = [];
 
             bottom = (canvas.height);
@@ -58,7 +58,7 @@
 
             stage.addChild(ball, ball2, butt, butt2);
             stage.update();
-            Ticker.addListener(window);
+			createjs.Ticker.addListener(window);
         }
 
         function checkbounds(ball) {

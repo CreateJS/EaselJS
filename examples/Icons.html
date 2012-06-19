@@ -34,15 +34,15 @@
 	function handleImageLoad() {
 		// create a new stage and point it at our canvas:
 		// note that we can just pass the id of the canvas:
-		stage = new Stage("testCanvas");
+		stage = new createjs.Stage("testCanvas");
 
 		/*** FIRST: the "simple" approach ***/
 		// create a simple SpriteSheet using iconSheet with a frame size of 80x80:
 		var data = {images:[iconSheet], frames:{width:80, height:80}};
-		var spriteSheet  = new SpriteSheet(data);
+		var spriteSheet  = new createjs.SpriteSheet(data);
 
 		// create a BitmapAnimation to display frames from the sprite sheet:
-		var icon1 = new BitmapAnimation(spriteSheet);
+		var icon1 = new createjs.BitmapAnimation(spriteSheet);
 		icon1.y = 100;
 		icon1.x = 90;
 
@@ -66,7 +66,7 @@
 		}
 
 		// create a SpriteSheet using the data:
-	    spriteSheet = new SpriteSheet(data);
+	    spriteSheet = new createjs.SpriteSheet(data);
 
 	    // we'll clone icon2, to preserve the x/y, and swap out the SpriteSheet:
 	    var icon3 = icon2.clone();
@@ -93,8 +93,8 @@
 	    icon6.gotoAndPlay(0);
 	    stage.addChild(icon6);
 
-		Ticker.setFPS(3); // low, so we can see the icons
-		Ticker.addListener(stage);
+		createjs.Ticker.setFPS(3); // slow, so we can see the icons
+		createjs.Ticker.addListener(stage);
 	}
 
 	</script>

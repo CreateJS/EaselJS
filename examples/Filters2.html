@@ -54,9 +54,9 @@
 
             var canvas = document.getElementById("testCanvas");
 
-            stage = new Stage(canvas);
+            stage = new createjs.Stage(canvas);
 
-            bmp = new Bitmap(img);
+            bmp = new createjs.Bitmap(img);
 	        bmp.scaleX = bmp.scaleY = 2;
             bmp.cache(0,0,img.width,img.height);
             stage.addChild(bmp);
@@ -172,14 +172,14 @@
             var greenChannelValue = $(".greenChannelSlider").slider("option", "value");
             var blueChannelValue = $(".blueChannelSlider").slider("option", "value");
 
-            cm = new ColorMatrix();
+            cm = new createjs.ColorMatrix();
             cm.adjustColor(brightnessValue, contrastValue, saturationValue, hueValue);
 
-            colorFilter = new ColorMatrixFilter(cm);
-            blurFilter = new BoxBlurFilter(blurXValue,  blurYValue, 2);
-            redChannelFilter = new ColorFilter(redChannelvalue/255,1,1,1);
-            greenChannelFilter = new ColorFilter(1,greenChannelValue/255,1,1);
-            blueChannelFilter = new ColorFilter(1,1,blueChannelValue/255,1);
+            colorFilter = new createjs.ColorMatrixFilter(cm);
+            blurFilter = new createjs.BoxBlurFilter(blurXValue,  blurYValue, 2);
+            redChannelFilter = new createjs.ColorFilter(redChannelvalue/255,1,1,1);
+            greenChannelFilter = new createjs.ColorFilter(1,greenChannelValue/255,1,1);
+            blueChannelFilter = new createjs.ColorFilter(1,1,blueChannelValue/255,1);
 
             updateImage();
         }

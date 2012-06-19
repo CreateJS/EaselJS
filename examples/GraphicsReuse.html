@@ -32,7 +32,7 @@
 	    canvas = document.getElementById('myCanvas');
 	    width = canvas.width;
 	    height = canvas.height;
-	    stage = new Stage(canvas);
+	    stage = new createjs.Stage(canvas);
 
 	    layoutSmiley();
 
@@ -42,9 +42,9 @@
 	}
 
 	function layoutSmiley() {
-	    drawSmiley(Graphics.getRGB(Math.random()*255|0,Math.random()*255|0,Math.random()*255|0), Graphics.getRGB(Math.random()*255|0,Math.random()*255|0,Math.random()*255|0));
+	    drawSmiley(createjs.Graphics.getRGB(Math.random()*255|0,Math.random()*255|0,Math.random()*255|0), createjs.Graphics.getRGB(Math.random()*255|0,Math.random()*255|0,Math.random()*255|0));
 	    for(var i=0;i<100;i++) {
-	        var shape = new Shape(g);
+	        var shape = new createjs.Shape(g);
 	        shape.scaleX = shape.scaleY = Math.random() * 0.05 + 0.15;
 	        shape.x = Math.random()*(960 - (350 * shape.scaleX));
 	        shape.y = Math.random()*(400 - (350 * shape.scaleX));
@@ -61,7 +61,8 @@
 	}
 
 	function drawSmiley(fillColor, lineColor) {
-	    g = new Graphics();
+		var Point = createjs.Point; // temporary shortcut to the class
+	    g = new createjs.Graphics();
 	    var pt1 = new Point(138, 300);
 	    var pt2 = new Point(309, 310);
 	    var pt3 = new Point(337, 170);

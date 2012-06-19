@@ -26,19 +26,19 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(window) {
+(function(ns) {
 
 /**
-* Applies color transforms.
+* Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting.
 * @class ColorMatrixFilter
 * @constructor
 * @augments Filter
-* @param {Number} blurX
+* @param matrix A 4x5 matrix describing the color operation to perform. See also the ColorMatrix class.
 **/
 var ColorMatrixFilter = function(matrix) {
   this.initialize(matrix);
 }
-var p = ColorMatrixFilter.prototype = new Filter();
+var p = ColorMatrixFilter.prototype = new ns.Filter();
 
 // public properties:
 	p.matrix = null;
@@ -46,7 +46,6 @@ var p = ColorMatrixFilter.prototype = new Filter();
 // constructor:
 	// TODO: detailed docs.
 	/** 
-	 * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting.
 	 * @method initialize
 	 * @protected
 	 * @param matrix A 4x5 matrix describing the color operation to perform.
@@ -121,5 +120,6 @@ var p = ColorMatrixFilter.prototype = new Filter();
 		return new ColorMatrixFilter(this.matrix);
 	}
 	
-window.ColorMatrixFilter = ColorMatrixFilter;
-}(window));
+ns.ColorMatrixFilter = ColorMatrixFilter;
+}(createjs||(createjs={})));
+var createjs;

@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(window) {
+(function(ns) {
 
 /**
 * A Shape allows you to display vector art in the display list. It composites a Graphics instance which exposes all of the vector
@@ -39,7 +39,7 @@
 var Shape = function(graphics) {
   this.initialize(graphics);
 }
-var p = Shape.prototype = new DisplayObject();
+var p = Shape.prototype = new ns.DisplayObject();
 
 // public properties:
 	/**
@@ -65,7 +65,7 @@ var p = Shape.prototype = new DisplayObject();
 	 **/
 	p.initialize = function(graphics) {
 		this.DisplayObject_initialize();
-		this.graphics = graphics ? graphics : new Graphics();
+		this.graphics = graphics ? graphics : new ns.Graphics();
 	}
 
 	/**
@@ -124,5 +124,6 @@ var p = Shape.prototype = new DisplayObject();
 		return "[Shape (name="+  this.name +")]";
 	}
 
-window.Shape = Shape;
-}(window));
+ns.Shape = Shape;
+}(createjs||(createjs={})));
+var createjs;

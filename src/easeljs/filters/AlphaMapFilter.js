@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(window) {
+(function(ns) {
 
 /**
  * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
@@ -42,7 +42,7 @@
 var AlphaMapFilter = function(alphaMap) {
   this.initialize(alphaMap);
 }
-var p = AlphaMapFilter.prototype = new Filter();
+var p = AlphaMapFilter.prototype = new ns.Filter();
 
 // constructor:
 	/** @ignore */
@@ -145,5 +145,6 @@ var p = AlphaMapFilter.prototype = new Filter();
 	}
 
 
-window.AlphaMapFilter = AlphaMapFilter;
-}(window));
+ns.AlphaMapFilter = AlphaMapFilter;
+}(createjs||(createjs={})));
+var createjs;

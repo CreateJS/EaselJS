@@ -3,7 +3,14 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>CreateJS Example: Space Rocks Game</title>
-
+	
+	
+	<script>
+		// this sets the namespace for CreateJS to the window object, so you can instantiate objects without specifying 
+		// the namespace: "new Graphics()" instead of "new createjs.Graphics()"
+		var createjs = window;
+	</script>
+	
 	<script type="text/javascript" src="http://code.createjs.com/preloadjs-0.1.0.min.js"></script>
 	<script type="text/javascript" src="http://code.createjs.com/soundjs-0.2.0.min.js"></script>
 

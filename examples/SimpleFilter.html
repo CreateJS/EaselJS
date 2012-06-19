@@ -30,7 +30,7 @@
         function init() {
             angle = 0;
             range = 30;
-            speed = 0.15;
+            speed = 0.1;
             img = new Image();
             img.onload = handleImageLoad;
             img.src = "assets/flowers.jpg";
@@ -38,15 +38,15 @@
 
         function handleImageLoad() {
             canvas = document.getElementById("testCanvas");
-            stage = new Stage(canvas);
+            stage = new createjs.Stage(canvas);
 
-            bmp = new Bitmap(img);
+            bmp = new createjs.Bitmap(img);
             bmp.cache(0, 0, img.width, img.height);
 
             stage.addChild(bmp);
 
-	        Ticker.setFPS(15);
-            Ticker.addListener(window);
+			createjs.Ticker.setFPS(15);
+			createjs.Ticker.addListener(window);
         }
 
         function tick() {
@@ -57,7 +57,7 @@
         function updateImage() {
             var value = Math.sin(angle)*range;
             bmp.updateCache();
-            bmp.filters = [new BoxBlurFilter(value,  value, 2)];
+            bmp.filters = [new createjs.BoxBlurFilter(value,  value, 2)];
             stage.update();
         }
 

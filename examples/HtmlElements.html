@@ -24,20 +24,19 @@
 	var stage;
 
 	function init() {
-		//return;
 		// create a new stage and point it at our canvas:
 		canvas = document.getElementById("testCanvas");
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 
-		var container = new Container();
+		var container = new createjs.Container();
 		stage.addChild(container);
 
-		var frame = new Shape();
+		var frame = new createjs.Shape();
 		frame.graphics.beginFill("#00F").drawRect(0,0,340,280);
 		frame.regX = 170;
 		frame.regY = 140;
 
-		var content = new DOMElement(document.getElementById("foo"));
+		var content = new createjs.DOMElement("foo");
 		content.regX = 165;
 		content.regY = 135;
 		//content.visible = false;
@@ -52,7 +51,6 @@
 		container.scaleX = 1.5;
 		//container.visible = false;
 
-		Ticker.addListener(stage);
 		stage.update();
 	}
 

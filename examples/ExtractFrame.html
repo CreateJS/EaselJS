@@ -6,12 +6,6 @@
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 
-	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
-	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
-	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
 	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
@@ -40,11 +34,11 @@
 		};
 
 		// create a spritesheet from the data:
-		var spriteSheet = new SpriteSheet(data);
+		var spriteSheet = new createjs.SpriteSheet(data);
 
 		// extract the first frame of the walkRight sequence as a new image:
 		// could alternately use the frame number.
-		img = SpriteSheetUtils.extractFrame(spriteSheet, "walkRight");
+		img = createjs.SpriteSheetUtils.extractFrame(spriteSheet, "walkRight");
 
 		// add the newly created image to the bottom of this document:
 		document.getElementById("content").appendChild(img);

@@ -15,7 +15,6 @@
 	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
 	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
-	<script type="text/javascript" src="../src/easeljs/geom/Point.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
 	<script type="text/javascript" src="../src/easeljs/ui/Touch.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
@@ -29,7 +28,7 @@
 
 	var mouseTarget;	// the display object currently under the mouse, or being dragged
 	var dragStarted;	// indicates whether we are currently in a drag operation
-	var offset = new Point();
+	var offset;
 	var update = true;
 
 	function init() {
@@ -41,10 +40,10 @@
 		canvas = document.getElementById("testCanvas");
 
 		//check to see if we are running in a browser with touch support
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 
 		// enable touch interactions if supported on the current device:
-		Touch.enable(stage);
+		createjs.Touch.enable(stage);
 
 		// enabled mouse over / out events
 		stage.enableMouseOver(10);
@@ -62,12 +61,12 @@
 	function handleImageLoad(event) {
 		var image = event.target;
 		var bitmap;
-		var container = new Container();
+		var container = new createjs.Container();
 		stage.addChild(container);
 
 		// create and populate the screen with random daisies:
 		for(var i = 0; i < 100; i++){
-			bitmap = new Bitmap(image);
+			bitmap = new createjs.Bitmap(image);
 			container.addChild(bitmap);
 			bitmap.x = canvas.width * Math.random()|0;
 			bitmap.y = canvas.height * Math.random()|0;
@@ -105,7 +104,7 @@
 		}
 
 		document.getElementById("loader").className = "";
-		Ticker.addListener(window);
+		createjs.Ticker.addListener(window);
 	}
 
 	function tick() {

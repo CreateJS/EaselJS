@@ -23,18 +23,18 @@
 	function init() {
 		//find canvas and load images, wait for last image to load
 		var canvas = document.getElementById("testCanvas");
-		var stage = new Stage(canvas);
+		var stage = new createjs.Stage(canvas);
 
 		// Create a new Text object and a rectangle Shape object, and position them inside a container:
-		var container = new Container;
+		var container = new createjs.Container();
 		container.x = 100;
 		container.y = 80;
 
-		var target = new Shape();
+		var target = new createjs.Shape();
 		target.graphics.beginFill("#F00").drawRect(-10,-10,300,60).beginFill("#FFF");
 		container.addChild(target);
 
-		var txt = new Text("Double Click Me!", "36px Arial", "#FFF");
+		var txt = new createjs.Text("Double Click Me!", "36px Arial", "#FFF");
 		txt.textBaseline = "top";
 		container.addChild(txt);
 

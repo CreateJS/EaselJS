@@ -34,7 +34,7 @@
 		canvas = document.getElementById("testCanvas");
 
 		// create a new stage and point it at our canvas:
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 
 		img = new Image();
 		img.src = "assets/testSeq.png";
@@ -47,7 +47,7 @@
 		var h = canvas.height;
 
 		// create spritesheet and assign the associated data.
-		var spriteSheet  = new SpriteSheet({
+		var spriteSheet  = new createjs.SpriteSheet({
 			images: [img],
 			frames: {width:64, height:68, regX:32, regY:34},
 			animations: {
@@ -61,7 +61,7 @@
 		// we could flip the display objects with scaleX=-1, but this is expensive in some browsers
 		// instead, we append flipped versions of the frames to our sprite sheet
 		// this adds only horizontally flipped frames:
-		SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
+		createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
 
 		// we could rewire the "next" sequences to make them work like so:
 		// but instead we will use code in the angleChange function.
@@ -73,7 +73,7 @@
 		*/
 
 		// create a BitmapAnimation instance to display and play back the sprite sheet:
-		var bmpAnim = new BitmapAnimation(spriteSheet);
+		var bmpAnim = new createjs.BitmapAnimation(spriteSheet);
 
 		// start playing the first sequence:
 		bmpAnim.gotoAndPlay("walkRt");		//animate
@@ -105,7 +105,7 @@
 
 		// we want to do some work before we update the canvas,
 		// otherwise we could use Ticker.addListener(stage);
-		Ticker.addListener(window);
+		createjs.Ticker.addListener(window);
 	}
 
 	//called if there is an error loading the image (usually due to a 404)

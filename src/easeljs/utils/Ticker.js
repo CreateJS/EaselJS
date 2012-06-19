@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(window) {
+(function(ns) {
 
 // constructor:
 /**
@@ -427,5 +427,6 @@ var Ticker = function() {
 		return new Date().getTime();
 	}
 
-window.Ticker = Ticker;
-}(window));
+ns.Ticker = Ticker;
+}(createjs||(createjs={})));
+var createjs;

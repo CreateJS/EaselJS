@@ -34,30 +34,29 @@
         		document.getElementById("header").style.display = "none";
         	}
 
-            txt = new Text("Click and Drag to Draw", "36px Arial", "#777777");
+            txt = new createjs.Text("Click and Drag to Draw", "36px Arial", "#777777");
             txt.x = 300;
             txt.y = 200;
-            var canvas = document.getElementById('myCanvas');
-            stage = new Stage(canvas);
+            stage = new createjs.Stage("myCanvas");
             stage.autoClear = true;
             stage.onMouseDown = handleMouseDown;
             stage.onMouseUp = handleMouseUp;
 
-	        Touch.enable(stage);
+			createjs.Touch.enable(stage);
 
             stage.addChild(txt);
             stage.update();
-            Ticker.addListener(window);
+			createjs.Ticker.addListener(window);
         }
 
         function stop() {
-	        Ticker.removeListener(window);
+			createjs.Ticker.removeListener(window);
         }
 
         function tick() {
             if (isMouseDown) {
-                var pt = new Point(stage.mouseX, stage.mouseY);
-                var midPoint = new Point(oldX + pt.x>>1, oldY+pt.y>>1);
+                var pt = new createjs.Point(stage.mouseX, stage.mouseY);
+                var midPoint = new createjs.Point(oldX + pt.x>>1, oldY+pt.y>>1);
                 currentShape.graphics.moveTo(midPoint.x, midPoint.y);
                 currentShape.graphics.curveTo(oldX, oldY, oldMidX, oldMidY);
 
@@ -75,7 +74,7 @@
             isMouseDown = true;
             stage.removeChild(txt);
 
-            var s = new Shape();
+            var s = new createjs.Shape();
             oldX = stage.mouseX;
             oldY = stage.mouseY;
             oldMidX = stage.mouseX;
@@ -83,7 +82,7 @@
             var g = s.graphics;
             var thickness = Math.random() * 30 + 10 | 0;
             g.setStrokeStyle(thickness + 1, 'round', 'round');
-            var color = Graphics.getRGB(Math.random()*255 | 0 ,Math.random()*255 | 0, Math.random()*255 | 0);
+            var color = createjs.Graphics.getRGB(Math.random()*255 | 0 ,Math.random()*255 | 0, Math.random()*255 | 0);
             g.beginStroke(color);
             stage.addChild(s);
             currentShape = s;

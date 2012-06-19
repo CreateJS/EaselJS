@@ -1,11 +1,6 @@
-Future:
-****************************************************************************************************
-- alpha masking
-- packaging / namespace
-
-
 Version NEXT [release TBD]
 ****************************************************************************************************
+- moved all classes into a configurable createjs namespace
 - added AlphaMapFilter & AlphaMaskFilter
 - added support for multitouch
 - complete rewrite of drawing model to use a hybrid approach (save/restore & matrix)

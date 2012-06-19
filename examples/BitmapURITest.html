@@ -27,15 +27,15 @@
 	function init() {
 		//find canvas and load images, wait for last image to load
 		canvas = document.getElementById("testCanvas");
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 
 		// Bitmap also supports construction with a URI to an image to load:
-		bmp = new Bitmap("assets/daisy.png");
+		bmp = new createjs.Bitmap("assets/daisy.png");
 		stage.addChild(bmp);
 
 		// we want to do some work before we update the canvas,
 		// otherwise we could use Ticker.addListener(stage);
-		Ticker.addListener(stage);
+		createjs.Ticker.addListener(stage);
 	}
 
 	</script>

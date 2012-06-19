@@ -5,6 +5,12 @@
     <title>EaselJS Example: Rollovers and Drag & Drop</title>
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<script>
+		// this sets the namespace for CreateJS to the window object, so you can instantiate objects without specifying 
+		// the namespace: "new Graphics()" instead of "new createjs.Graphics()"
+		var createjs = window;
+	</script>
+	
 	<script src="http://code.createjs.com/preloadjs-0.1.0.min.js"></script>
 
     <script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>

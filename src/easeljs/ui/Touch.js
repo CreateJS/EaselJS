@@ -27,7 +27,7 @@
 */
 
 
-(function(window) {
+(function(ns) {
 
 // TODO: support for double tap.
 /**
@@ -189,5 +189,6 @@ var Touch = function() {
 	}
 
 
-window.Touch = Touch;
-}(window));
+ns.Touch = Touch;
+}(createjs||(createjs={})));
+var createjs;

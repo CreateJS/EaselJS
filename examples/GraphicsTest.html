@@ -34,7 +34,7 @@
 
             canvas = document.getElementById("testCanvas");
             // create a new stage and point it at our canvas:
-            stage = new Stage(canvas);
+            stage = new createjs.Stage(canvas);
 
             // grab canvas width and height for later calculations:
             w = canvas.width;
@@ -66,8 +66,8 @@
         }
 
         function createBorder() {
-            var container = new Container();
-            var s = new Shape();
+            var container = new createjs.Container();
+            var s = new createjs.Shape();
             s.graphics.beginBitmapStroke(img).setStrokeStyle(32).drawRect(20,20,920,360);
             container.addChild(s);
             return container;
@@ -75,7 +75,7 @@
 
         function createBitmapFill() {
             var container = createTile();
-            var s = new Shape();
+            var s = new createjs.Shape();
             s.graphics.beginBitmapFill(img).setStrokeStyle(8).beginRadialGradientStroke(["#FFF","#000"],[0,1],0,0,0,0,30,130).drawRect(0, 0, 130, 130);
             s.x = 12;
             s.y = 10;
@@ -85,7 +85,7 @@
 
         function createRectGradientFill() {
             var container = createTile();
-            var s = new Shape();
+            var s = new createjs.Shape();
             s.graphics.beginLinearGradientFill(["#FFF","#000"],[0,1],0,0,0,130).drawRect(0,0,130,130);
             s.x = 12;
             s.y = 10;
@@ -95,8 +95,8 @@
 
         function createEllipse() {
             var container = createTile();
-            var s = new Shape();
-            s.graphics.f(Graphics.getRGB(0,0x66,0x99,0.5)).setStrokeStyle(4).beginLinearGradientStroke(["#F00","#000"],[0,1],0,0,70,140).drawEllipse(0,0,70,140,8);
+            var s = new createjs.Shape();
+            s.graphics.f(createjs.Graphics.getRGB(0,0x66,0x99,0.5)).setStrokeStyle(4).beginLinearGradientStroke(["#F00","#000"],[0,1],0,0,70,140).drawEllipse(0,0,70,140,8);
             s.x = 40;
             s.y = 10;
             container.addChild(s);
@@ -105,7 +105,7 @@
 
         function createRadialGradientFill() {
             var container = createTile();
-            var s = new Shape();
+            var s = new createjs.Shape();
             s.graphics.ss(8).beginStroke("#f0f").beginRadialGradientFill(["#FFF","#0FF"],[0,1],0,0,0,0,0,40).drawCircle(0,0,40);
             s.x = s.y = 80;
             container.addChild(s);
@@ -114,7 +114,7 @@
 
         function createLineTo() {
             var container = createTile();
-            var s = new Shape();
+            var s = new createjs.Shape();
             s.graphics.setStrokeStyle(16, "round", "round").beginStroke("#f90").moveTo(20,10).lineTo(90,90).lineTo(90,140);
             container.addChild(s);
             return container;
@@ -122,7 +122,7 @@
 
         function createHex() {
             var container = createTile();
-            var s = new Shape();
+            var s = new createjs.Shape();
             s.graphics.beginFill("#0F0").drawPolyStar(0,0,40,6).drawPolyStar(0,75,40,6);
             s.x = 80
             s.y = 40;
@@ -133,8 +133,8 @@
 
         function createStar() {
             var container = createTile();
-            var s = new Shape();
-            s.graphics.setStrokeStyle(1).beginStroke(Graphics.getRGB(255, 255, 0)).beginFill("#FF0").endStroke().drawPolyStar(0,0,80,5,0.6,-90);
+            var s = new createjs.Shape();
+            s.graphics.setStrokeStyle(1).beginStroke(createjs.Graphics.getRGB(255, 255, 0)).beginFill("#FF0").endStroke().drawPolyStar(0,0,80,5,0.6,-90);
             s.x = 80
             s.y = 85;
 
@@ -143,8 +143,8 @@
         }
 
         function createTile() {
-            var container = new Container();
-            var bg = new Shape();
+            var container = new createjs.Container();
+            var bg = new createjs.Shape();
             bg.graphics.beginFill('#CCCCCC').drawRect(0, 0, 155, 155).endFill();
             bg.alpha = 0.25;
             container.addChild(bg);
@@ -157,7 +157,7 @@
 <body onload="init();">
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Graphics Test (tiny)</h1>
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Graphics Test</h1>
 	    <p>This demo shows the usage of all of the <b>Graphics</b> APIs.</p>
 	</header>
 

@@ -38,7 +38,7 @@
 		// create a new sprite sheet from the loaded image, and define the animation sequences in it.
 		// for example, {walkUpRight:[0,19]} defines an animation sequence called "walkUpRight" that
 		// will play back frames 0 to 19 inclusive.
-		var spriteSheet  = new SpriteSheet(
+		var spriteSheet  = new createjs.SpriteSheet(
 				{"animations":
 					{
 					"run": [0, 15]},
@@ -56,7 +56,7 @@
 
 		// append flipped frames to the sprite sheet. The 2nd, 3rd, and 4th params indicate whether
 		// to add horizontal, vertical, and both horizontally & vertically flipped frames.
-		SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
+		createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
 
 		// add the newly created sprite sheet to the bottom of this document. We're accessing a private property "_images"
 		// for demonstration purposes only.
@@ -79,7 +79,7 @@
 		<div id="content" style="margin-top: 90px; margin-left: 70px; font-weight: bold;">
 			Original sprite sheet<br/><br/>
 			<img id="origImage"><br/><br/><br/>
-			Generated sprite sheet<br/><br/>
+			Appended sprites<br/><br/>
 		</div>
 	</div>
 </body>

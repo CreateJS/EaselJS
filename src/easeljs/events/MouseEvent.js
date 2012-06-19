@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(window) {
+(function(ns) {
 
 /**
 * This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, onMouseOver, onMouseOut and onClick
@@ -153,5 +153,6 @@ var p = MouseEvent.prototype;
 		return "[MouseEvent (type="+this.type+" stageX="+this.stageX+" stageY="+this.stageY+")]";
 	}
 
-window.MouseEvent = MouseEvent;
-}(window));
+ns.MouseEvent = MouseEvent;
+}(createjs||(createjs={})));
+var createjs;

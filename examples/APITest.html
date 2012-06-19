@@ -11,6 +11,11 @@
 	<script type="text/javascript" src="assets/StringUtils.js"></script>
 	<script type="text/javascript" src="assets/DelayedCall.js"></script>
 
+	<script>
+		// this sets the namespace for CreateJS to the window object, so you can instantiate objects without specifying 
+		// the namespace: "new Graphics()" instead of "new createjs.Graphics()"
+		var createjs = window;
+	</script>
 	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>

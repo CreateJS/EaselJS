@@ -23,10 +23,10 @@
 		var canvas = document.getElementById("testCanvas");
 
 		// create a stage object to work with the canvas. This is the top level node in the display list:
-		var stage = new Stage(canvas);
+		var stage = new createjs.Stage(canvas);
 
 		// Create a new Text object:
-		var text = new Text("Hello World!", "36px Arial", "#777");
+		var text = new createjs.Text("Hello World!", "36px Arial", "#777");
 
 		// add the text as a child of the stage. This means it will be drawn any time the stage is updated
 		// and that it's transformations will be relative to the stage coordinates:

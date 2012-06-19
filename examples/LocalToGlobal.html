@@ -44,12 +44,12 @@
 		whee = document.getElementById("whee");
 
 		// create a new stage and point it at our canvas:
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 
 		// set up arms:
 
 		// this is the shape that represents the end (red) arm:
-		bar3 = new Shape();
+		bar3 = new createjs.Shape();
 		var g = bar3.graphics;
 		g.beginFill("#8B2222");
 		g.drawRect(-3,-3,6,130);
@@ -60,26 +60,26 @@
 		// because there are no other children.
 
 		// visible middle (green) bar
-		bar2 = new Shape();
+		bar2 = new createjs.Shape();
 		g = bar2.graphics;
 		g.beginFill("#228B22");
 		g.drawRect(-5,-5,10,110);
 
 		// arm container that holds the green bar, and the nested red bar:
-		arm2 = new Container();
+		arm2 = new createjs.Container();
 		arm2.addChild(bar2);
 		arm2.addChild(bar3);
 		arm2.regY = 20;
 		arm2.y = 72;		//position in parent object
 
 		// visible anchor (blue) bar:
-		bar1 = new Shape();
+		bar1 = new createjs.Shape();
 		g = bar1.graphics;
 		g.beginFill("#22228B");
 		g.drawRect(-8,-8,16,80);
 
 		// arm container that holds the blue bar, and the nested green bar:
-		arm1 = new Container();
+		arm1 = new createjs.Container();
 		arm1.addChild(bar1);
 		arm1.addChild(arm2);
 
@@ -89,8 +89,8 @@
 		stage.addChild(arm1);
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
-		Ticker.setInterval(20);		// in ms, so 50 fps
-		Ticker.addListener(window);
+		createjs.Ticker.setInterval(20);		// in ms, so 50 fps
+		createjs.Ticker.addListener(window);
 	}
 
 	function tick() {
