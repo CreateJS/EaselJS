@@ -123,10 +123,11 @@ var Touch = function() {
 		Touch._IE_enable = function(stage) {
 			var canvas = stage.canvas;
 			canvas.addEventListener("MSPointerDown", function(e) { Touch._IE_handleEvent(stage,e); }, false);
-			canvas.addEventListener("MSPointerMove", function(e) { Touch._IE_handleEvent(stage,e); }, false);
-			canvas.addEventListener("MSPointerUp", function(e) { Touch._IE_handleEvent(stage,e); }, false);
-			canvas.addEventListener("MSPointerCancel", function(e) { Touch._IE_handleEvent(stage,e); }, false);
+			window.addEventListener("MSPointerMove", function(e) { Touch._IE_handleEvent(stage,e); }, false);
+			window.addEventListener("MSPointerUp", function(e) { Touch._IE_handleEvent(stage,e); }, false);
+			window.addEventListener("MSPointerCancel", function(e) { Touch._IE_handleEvent(stage,e); }, false);
 			if (stage.__touch.preventDefault) { canvas.style.msTouchAction = "none"; }
+			stage.__touch.activeIDs = {};
 		}
 	
 		/**
@@ -139,14 +140,19 @@ var Touch = function() {
 			}
 			var type = e.type;
 			var id = e.pointerId;
-			if (e.srcElement != stage.canvas) { return; }
+			var ids = stage.__touch.activeIDs;
 			
 			if (type == "MSPointerDown") {
+				if (e.srcElement != stage.canvas) { return; }
+				ids[id] = true;
 				this._handleStart(stage, id, e, e.pageX, e.pageY);
-			} else if (type == "MSPointerMove") {
-				this._handleMove(stage, id, e, e.pageX, e.pageY);
-			} else if (type == "MSPointerUp" || type == "MSPointerCancel") {
-				this._handleEnd(stage, id, e);
+			} else if (ids[id]) { // it's an id we're watching
+				if (type == "MSPointerMove") {
+					this._handleMove(stage, id, e, e.pageX, e.pageY);
+				} else if (type == "MSPointerUp" || type == "MSPointerCancel") {
+					delete(ids[id]);
+					this._handleEnd(stage, id, e);
+				}
 			}
 		}
 	
