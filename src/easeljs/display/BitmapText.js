@@ -10,6 +10,11 @@
  * http://github.com/martensms/lycheeJS
  *
  *
+ * The Sprites and Font settings were generated with
+ * the Font Tool that is part of lycheeJS:
+ * http://martens.ms/lycheeJS/tool/Font.html
+ *
+ *
  * An example call for the BitmapText would look like:
  *
  * new BitmapText('Hello World!', {
@@ -60,6 +65,7 @@ var p = BitmapText.prototype = new DisplayObject();
 
 	BitmapText._workingContext = document.createElement("canvas").getContext("2d");
 
+	p.charset = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 	p.text = "";
 	p.font = null;
 	p.textAlign = null;
@@ -77,14 +83,6 @@ var p = BitmapText.prototype = new DisplayObject();
 		this.__sprite = null;
 		this.__settings = null;
 	};
-
-	/*
-	 *
-	 * BitmapText.FONTS['12px Times New Roman'] = {
-	 *	sprite: image,
-	 *	settings: {}
-	 * }
-	 */
 
 	p.isVisible = function() {
 		return Boolean(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.text != null && this.text !== "");
@@ -191,8 +189,9 @@ var p = BitmapText.prototype = new DisplayObject();
 
 			font.__characters = {};
 
-			var charset = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
-			var offset = font.settings.spacing;
+			var charset = font.settings.charset || this.charset;
+
+			var offset = font.settings.spacing || 0;
 			for (var c = 0, l = charset.length; c < l; c++) {
 
 				var chr = {
