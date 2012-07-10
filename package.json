@@ -9,6 +9,6 @@
         "node" : ">=0.5.2"
     },
     "dependencies": {
-        "canvas":  "git://github.com/enobrev/node-canvas.git"
+        "canvas":  "git://github.com/victusfate/node-canvas.git"
     }
 }
