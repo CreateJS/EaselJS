@@ -117,7 +117,7 @@ var SpriteSheetUtils = function() {
 			frame = spriteSheet.getAnimation(frame).frames[0];
 		}
 		var data = spriteSheet.getFrame(frame);
-		if (!data) { return null; }
+        if (!data) { loaded(null); return null; }
 		var r = data.rect;
 		var canvas = SpriteSheetUtils._workingCanvas;
 		canvas.width = r.width;
