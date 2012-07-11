@@ -156,7 +156,9 @@
 		count = numBars*10;
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
-		createjs.Ticker.setInterval(25);		// 1000 / 25 ms = 40 fps (You could also call Ticker.setFPS(40))
+		createjs.Ticker.useRAF = true;
+		// if we use requestAnimationFrame, we should use a framerate that is a factor of 60:
+		createjs.Ticker.setFPS(30);
 		createjs.Ticker.addListener(window);
 	}
 

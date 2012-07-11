@@ -45,20 +45,13 @@ var Ticker = function() {
 // public static properties:
 	/**
 	 * Indicates whether Ticker should use requestAnimationFrame if it is supported in the browser. If false, Ticker
-	 * will use setTimeout. If you change this value, you must call setInterval or setFPS to reinitialize the Ticker.
+	 * will use setTimeout. If you use RAF, it is recommended that you set the framerate to a divisor of 60 (ex. 15,
+	 * 20, 30, 60).
 	 * @property useRAF
 	 * @static
 	 * @type Boolean
 	 **/
 	Ticker.useRAF = null;
-	
-	/**
-	 * Specifies the animation target to use with requestAnimationFrame if useRAF is true.
-	 * @property animationTarget
-	 * @static
-	 * @type Object
-	 **/
-	Ticker.animationTarget = null;
 	
 	/**
 	 * Event broadcast  once each tick / interval. The interval is specified via the 
@@ -122,11 +115,11 @@ var Ticker = function() {
 	
 	/**
 	 * Number of ticks that have passed while Ticker has been paused
-	 * @property _pausedTickers
+	 * @property _pausedTicks
 	 * @type Number
 	 * @protected 
 	 **/
-	Ticker._pausedTickers = 0;
+	Ticker._pausedTicks = 0;
 	
 	/** 
 	 * @property _interval
@@ -342,7 +335,7 @@ var Ticker = function() {
 	 * @return {Number} of ticks that have been broadcast.
 	 **/
 	Ticker.getTicks = function(pauseable) {
-		return  Ticker._ticks - (pauseable ?Ticker._pausedTickers : 0);
+		return  Ticker._ticks - (pauseable ?Ticker._pausedTicks : 0);
 	}
 	
 // private static methods:
@@ -350,10 +343,11 @@ var Ticker = function() {
 	 * @method _handleAF
 	 * @protected
 	 **/
-	Ticker._handleAF = function(timeStamp) {
+	Ticker._handleAF = function() {
 		Ticker._rafActive = false;
 		Ticker._setupTick();
-		if (timeStamp - Ticker._lastTime >= Ticker._interval-1) {
+		// run if enough time has elapsed, with a little bit of flexibility to be early, because RAF seems to run a little faster than 60hz:
+		if (Ticker._getTime() - Ticker._lastTime >= (Ticker._interval-1)*0.97) {
 			Ticker._tick();
 		}
 	}
@@ -377,7 +371,7 @@ var Ticker = function() {
 		if (Ticker.useRAF) {
 			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
 			if (f) {
-				f(Ticker._handleAF, Ticker.animationTarget);
+				f(Ticker._handleAF);
 				Ticker._rafActive = true;
 				return;
 			}
@@ -390,14 +384,15 @@ var Ticker = function() {
 	 * @protected
 	 **/
 	Ticker._tick = function() {
+		var time = Ticker._getTime();
 		Ticker._ticks++;
 		
-		var time = Ticker._getTime();
 		var elapsedTime = time-Ticker._lastTime;
+		
 		var paused = Ticker._paused;
 		
 		if (paused) {
-			Ticker._pausedTickers++;
+			Ticker._pausedTicks++;
 			Ticker._pausedTime += elapsedTime;
 		}
 		Ticker._lastTime = time;
@@ -423,8 +418,9 @@ var Ticker = function() {
 	 * @method _getTime
 	 * @protected
 	 **/
+	var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
 	Ticker._getTime = function() {
-		return new Date().getTime();
+		return (now&&now.call(performance))||(new Date().getTime());
 	}
 
 ns.Ticker = Ticker;
