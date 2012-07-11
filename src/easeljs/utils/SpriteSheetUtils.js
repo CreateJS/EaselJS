@@ -37,10 +37,10 @@
 
 // Node.js-ification
 if (typeof module !== 'undefined' && module.exports) {
-    var Canvas   = require('canvas');
-    var Image    = Canvas.Image;
-    var window   = module.exports;
-        document = require('../node/document');
+	var Canvas   = require('canvas');
+	var Image    = Canvas.Image;
+	var window   = module.exports;
+		document = require('../node/document');
 }
 
 (function(window) {
@@ -124,10 +124,12 @@ var SpriteSheetUtils = function() {
 		canvas.height = r.height;
 		SpriteSheetUtils._workingContext.drawImage(data.image, r.x, r.y, r.width, r.height, 0, 0, r.width, r.height);
 		var img = new Image();
-		img.onload = function() {
-			loaded(img);
-		};
-		img.src = canvas.toDataURL("image/png");
+		canvas.toDataURL("image/png", function(err, canvas_data) {
+			img.onload = function() {
+				loaded(img);
+			};
+			img.src = canvas_data;
+		});
 		return img;
 	}
 
