@@ -15,6 +15,8 @@ Version NEXT [release TBD]
 - fix for addChildAt with multiple params
 - added SpriteSheetBuilder
 - added MovieClip.actionsEnabled
+- updates to Ticker to improve support for requestAnimationFrame
+- better support for negative corner values on .drawRoundRectComplex
 
 
 Version 0.4.2 [Apr 18, 2012] 
@@ -45,7 +47,6 @@ Version 0.4.1 [Apr 14, 2012]
 - support for passing a canvas string id to the Stage constructor
 - various bug fixes and doc updates
 - updateCache now clears the cacheCanvas correctly
-- updates to Ticker to improve support for requestAnimationFrame
 
 
 Version 0.4 [Nov 30, 2011] 
