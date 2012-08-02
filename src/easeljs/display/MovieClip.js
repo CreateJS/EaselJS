@@ -437,7 +437,7 @@ ns.MovieClip = MovieClip;
 	 * @private
 	 **/
 	MovieClipPlugin.tween = function(tween, prop, value, startValues, endValues, ratio, position, end) {
-		if (!(tween._target instanceof nsMovieClip)) { return value; }
+		if (!(tween._target instanceof ns.MovieClip)) { return value; }
 		return (ratio == 1 ? endValues[prop] : startValues[prop]);
 	}
 
