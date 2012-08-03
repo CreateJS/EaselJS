@@ -133,6 +133,15 @@ var p = Stage.prototype = new ns.Container();
 	 * @default false
 	 **/
 	p.tickOnUpdate = true;
+	
+	/**
+	 * If true, onMouseMove handlers will continue to be called when the mouse leaves the target canvas. See
+	 * mouseInBounds, and MouseEvent.x/y/rawX/rawY.
+	 * @property tickOnUpdate
+	 * @type mouseMoveOutside
+	 * @default false
+	 **/
+	p.mouseMoveOutside = false;
 
 // private properties:
 
@@ -379,11 +388,15 @@ var p = Stage.prototype = new ns.Container();
 
 		var inBounds = o.inBounds;
 		this._updatePointerPosition(id, pageX, pageY);
-		if (!inBounds && !o.inBounds) { return; }
-		var evt = new ns.MouseEvent("onMouseMove", o.x, o.y, this, e, id, id == this._primaryPointerID);
+		if (!inBounds && !o.inBounds && !this.mouseMoveOutside) { return; }
+		var evt = new ns.MouseEvent("onMouseMove", o.x, o.y, this, e, id, id == this._primaryPointerID, o.rawX, o.rawY);
 
 		if (this.onMouseMove) { this.onMouseMove(evt); }
-		if (o.event && o.event.onMouseMove) { o.event.onMouseMove(evt); }
+		if (o.event && o.event.onMouseMove) {
+			evt = evt.clone(); // not sure this is entirely necessary.
+			evt.target = o.event.target;
+			o.event.onMouseMove(evt);
+		}
 	}
 
 	/**
@@ -400,11 +413,19 @@ var p = Stage.prototype = new ns.Container();
 			pageY -= element.offsetTop;
 		} while (element = element.offsetParent);
 		
+		var w = this.canvas.width;
+		var h = this.canvas.height;
 		var o = this._getPointerData(id);
-		if (o.inBounds = (pageX >= 0 && pageY >= 0 && pageX < this.canvas.width && pageY < this.canvas.height)) {
+		if (o.inBounds = (pageX >= 0 && pageY >= 0 && pageX <= w-1 && pageY <= h-1)) {
 			o.x = pageX;
 			o.y = pageY;
+		} else if (this.mouseMoveOutside) {
+			o.x = pageX < 0 ? 0 : (pageX > w-1 ? w-1 : pageX);
+			o.y = pageY < 0 ? 0 : (pageY > h-1 ? h-1 : pageY);
 		}
+		
+		o.rawX = pageX;
+		o.rawY = pageY;
 		
 		if (id == this._primaryPointerID) {
 			this.mouseX = o.x;
@@ -432,12 +453,15 @@ var p = Stage.prototype = new ns.Container();
 	p._handlePointerUp = function(id, e, clear) {
 		var o = this._getPointerData(id);
 		
-		var evt = new ns.MouseEvent("onMouseUp", o.x, o.y, this, e, id, id==this._primaryPointerID);
+		var evt = new ns.MouseEvent("onMouseUp", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
-		// TODO: should this event have the target set to the original target? Ditto for mousemove.
-		if (o.event && o.event.onMouseUp) { o.event.onMouseUp(evt); }
+		if (o.event && o.event.onMouseUp) {
+			evt = evt.clone(); // not sure this is entirely necessary.
+			evt.target = o.event.target;
+			o.event.onMouseUp(evt);
+		}
 		if (o.target && o.target.onClick && this._getObjectsUnderPoint(o.x, o.y, null, true, (this._mouseOverIntervalID ? 3 : 1)) == o.target) {
-			o.target.onClick(new ns.MouseEvent("onClick", o.x, o.y, o.target, e, id, id==this._primaryPointerID));
+			o.target.onClick(new ns.MouseEvent("onClick", o.x, o.y, o.target, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
 		}
 		if (clear) {
 			if (id == this._primaryPointerID) { this._primaryPointerID = null; }
@@ -467,12 +491,12 @@ var p = Stage.prototype = new ns.Container();
 		if (y != null) { this._updatePointerPosition(id, x, y); }
 		
 		if (this.onMouseDown) {
-			this.onMouseDown(new ns.MouseEvent("onMouseDown", o.x, o.y, this, e, id, id==this._primaryPointerID));
+			this.onMouseDown(new ns.MouseEvent("onMouseDown", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
 		}
 		var target = this._getObjectsUnderPoint(o.x, o.y, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
 			if (target.onPress) {
-				var evt = new ns.MouseEvent("onPress", o.x, o.y, target, e, id, id==this._primaryPointerID);
+				var evt = new ns.MouseEvent("onPress", o.x, o.y, target, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
 				target.onPress(evt);
 				if (evt.onMouseMove || evt.onMouseUp) { o.event = evt; }
 			}
@@ -515,11 +539,11 @@ var p = Stage.prototype = new ns.Container();
 	p._handleDoubleClick = function(e) {
 		// TODO: add Touch support for double tap.
 		if (this.onDoubleClick) {
-			this.onDoubleClick(new ns.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, this, e, NaN, true));
+			this.onDoubleClick(new ns.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, this, e, -1, true));
 		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target && target.onDoubleClick) {
-			target.onDoubleClick(new ns.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, target, e));
+			target.onDoubleClick(new ns.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, target, e, -1, true));
 		}
 	}
 

@@ -17,6 +17,7 @@ Version NEXT [release TBD]
 - added MovieClip.actionsEnabled
 - updates to Ticker to improve support for requestAnimationFrame
 - better support for negative corner values on .drawRoundRectComplex
+- added stage.mouseMoveOutside & mouseEvent.rawX/Y
 
 
 Version 0.4.2 [Apr 18, 2012] 

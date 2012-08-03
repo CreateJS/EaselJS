@@ -34,31 +34,51 @@
 * @class MouseEvent
 * @constructor
 * @param {String} type The event type.
-* @param {Number} stageX The mouseX position relative to the stage.
-* @param {Number} stageY The mouseY position relative to the stage.
+* @param {Number} stageX The normalized x position relative to the stage.
+* @param {Number} stageY The normalized y position relative to the stage.
 * @param {DisplayObject} target The display object this event relates to.
 * @param {MouseEvent} nativeEvent The native DOM event related to this mouse event.
+ * @param {Number} pointerID The unique id for the pointer.
+ * @param {Boolean} primary Indicates whether this is the primary pointer in a multitouch environment.
+ * @param {Number} rawX The raw x position relative to the stage.
+ * @param {Number} rawY The raw y position relative to the stage.
 **/
-var MouseEvent = function(type, stageX, stageY, target, nativeEvent) {
-  this.initialize(type, stageX, stageY, target, nativeEvent);
+var MouseEvent = function(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY) {
+  this.initialize(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY);
 }
 var p = MouseEvent.prototype;
 
 // public properties:
 
 	/**
-	 * The mouseX position on the stage.
+	 * The normalized x position on the stage. This will always be within the range 0 to stage width.
 	 * @property stageX
 	 * @type Number
 	*/
 	p.stageX = 0;
 
 	/**
-	 * The mouseY position on the stage.
+	 * The normalized y position on the stage. This will always be within the range 0 to stage height.
 	 * @property stageY
 	 * @type Number
 	 **/
 	p.stageY = 0;
+	
+	/**
+	 * The raw x position relative to the stage. Normally this will be the same as the stageX value, unless
+	 * stage.mouseMoveOutside is true and the pointer is outside of the stage bounds.
+	 * @property rawX
+	 * @type Number
+	*/
+	p.rawX = 0;
+
+	/**
+	 * The raw y position relative to the stage. Normally this will be the same as the stageY value, unless
+	 * stage.mouseMoveOutside is true and the pointer is outside of the stage bounds.
+	 * @property rawY
+	 * @type Number
+	*/
+	p.rawY = 0;
 
 	/**
 	 * The type of mouse event. This will be the same as the handler it maps to (onPress,
@@ -79,7 +99,7 @@ var p = MouseEvent.prototype;
 	p.nativeEvent = null;
 
 	/**
-	 * For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseMove
+	 * For events of type "onPress" only you can assign a handler to the onMouseMove
 	 * property. This handler will be called every time the mouse is moved until the mouse is released.
 	 * This is useful for operations such as drag and drop.
 	 * @event onMouseMove
@@ -88,7 +108,7 @@ var p = MouseEvent.prototype;
 	p.onMouseMove = null;
 
 	/**
-	 * For events of type "onPress" and "onMouseDown" only you can assign a handler to the onMouseUp
+	 * For events of type "onPress" only you can assign a handler to the onMouseUp
 	 * property. This handler will be called every time the mouse is moved until the mouse is released.
 	 * This is useful for operations such as drag and drop.
 	 * @event onMouseUp
@@ -105,14 +125,16 @@ var p = MouseEvent.prototype;
 	p.target = null;
 
 	/**
-	 * 
+	 * The unique id for the pointer (touch point or cursor). This will be either -1 for the mouse, or the system
+	 * supplied id value.
 	 * @property pointerID
 	 * @type {Number}
 	 */
 	p.pointerID = 0;
 
 	/**
-	 * 
+	 * Indicates whether this is the primary pointer in a multitouch environment. This will always be true for the mouse.
+	 * For touch pointers, the first pointer in the current stack will be considered the primary pointer.
 	 * @property primaryPointer
 	 * @type {Boolean}
 	 */
@@ -124,7 +146,7 @@ var p = MouseEvent.prototype;
 	 * @method initialize
 	 * @protected
 	 **/
-	p.initialize = function(type, stageX, stageY, target, nativeEvent, pointerID, primary) {
+	p.initialize = function(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY) {
 		this.type = type;
 		this.stageX = stageX;
 		this.stageY = stageY;
@@ -132,6 +154,8 @@ var p = MouseEvent.prototype;
 		this.nativeEvent = nativeEvent;
 		this.pointerID = pointerID;
 		this.primary = primary;
+		this.rawX = (rawX==null)?stageX:rawX;
+		this.rawY = (rawY==null)?stageY:rawY;
 	}
 
 // public methods:
@@ -141,7 +165,7 @@ var p = MouseEvent.prototype;
 	 * @return {MouseEvent} a clone of the MouseEvent instance.
 	 **/
 	p.clone = function() {
-		return new MouseEvent(this.type, this.stageX, this.stageY, this.target, this.nativeEvent, this.pointerID, this.primary);
+		return new MouseEvent(this.type, this.stageX, this.stageY, this.target, this.nativeEvent, this.pointerID, this.primary, this.rawX, this.rawY);
 	}
 
 	/**
