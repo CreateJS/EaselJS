@@ -47,7 +47,7 @@ var SpriteSheetUtils = function() {
 	 * @type HTMLCanvasElement
 	 * @protected
 	*/
-	SpriteSheetUtils._workingCanvas = document.createElement("canvas");
+	SpriteSheetUtils._workingCanvas = ns.getCanvas?ns.getCanvas():document.createElement("canvas");
 
 	/**
 	 * @property _workingContext
@@ -108,6 +108,31 @@ var SpriteSheetUtils = function() {
 		return img;
 	}
 
+	/**
+	 * Merges the rgb channels of one image with the alpha channel of another. This can be used to combine a compressed
+	 * JPEG image containing color data with a PNG32 monochromatic image containing alpha data. With certain types of
+	 * images (those with detail that lend itself to JPEG compression) this can provide significant file size savings
+	 * versus a single RGBA PNG32. This method is very fast (generally on the order of 1-2 ms to run).
+	 * @method mergeAlpha
+	 * @static
+	 * @param {Image} rbgImage The image (or canvas) containing the RGB channels to use.
+	 * @param {Image} alphaImage The image (or canvas) containing the alpha channel to use.
+	 * @param {Canvas} canvas Optional. If specified, this canvas will be used and returned. If not, a new canvas will be created.
+	 * @return {Canvas} A canvas with the combined image data. This can be used as a source for Bitmap or SpriteSheet.
+	*/
+	SpriteSheetUtils.mergeAlpha = function(rgbImage, alphaImage, canvas) {
+		if (!canvas) { canvas = ns.getCanvas?ns.getCanvas():document.createElement("canvas"); }
+		canvas.width = Math.max(alphaImage.width, rgbImage.width);
+		canvas.height = Math.max(alphaImage.height, rgbImage.height);
+		var ctx = canvas.getContext("2d");
+		ctx.save();
+		ctx.drawImage(rgbImage,0,0);
+		ctx.globalCompositeOperation = "destination-in";
+		ctx.drawImage(alphaImage,0,0);
+		ctx.restore();
+		return canvas;
+	}
+
 	
 // private static methods:
 	SpriteSheetUtils._flip = function(spriteSheet, count, h, v) {
@@ -166,6 +191,7 @@ var SpriteSheetUtils = function() {
 			names.push(anim.name);
 		}
 	}
+	
 
 ns.SpriteSheetUtils = SpriteSheetUtils;
 }(createjs||(createjs={})));

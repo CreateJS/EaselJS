@@ -53,7 +53,7 @@ var p = Text.prototype = new ns.DisplayObject();
 	 * @type CanvasRenderingContext2D
 	 * @private
 	 **/
-	Text._workingContext = document.createElement("canvas").getContext("2d");
+	Text._workingContext = (ns.getCanvas?ns.getCanvas():document.createElement("canvas")).getContext("2d");
 
 // public properties:
 	/**

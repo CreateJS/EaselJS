@@ -63,7 +63,7 @@ var p = DisplayObject.prototype;
 	 * @static
 	 * @protected
 	 **/
-	DisplayObject._hitTestCanvas = document.createElement("canvas");
+	DisplayObject._hitTestCanvas = ns.getCanvas?ns.getCanvas():document.createElement("canvas");
 	DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
 
 	/**
@@ -472,18 +472,12 @@ var p = DisplayObject.prototype;
 	 **/
 	p.cache = function(x, y, width, height) {
 		// draw to canvas.
-		var cacheCanvas = this.cacheCanvas;
-		if (cacheCanvas == null) { cacheCanvas = this.cacheCanvas = document.createElement("canvas"); }
-		var ctx = cacheCanvas.getContext("2d");
-		cacheCanvas.width = width;
-		cacheCanvas.height = height;
-		ctx.setTransform(1, 0, 0, 1, -x, -y);
-		ctx.clearRect(x, y, cacheCanvas.width, cacheCanvas.height); // some browsers don't clear correctly.
-		this.draw(ctx, true, this._matrix.reinitialize(1,0,0,1,-x,-y)); // containers require the matrix to work from
+		if (!this.cacheCanvas) { this.cacheCanvas = ns.getCanvas?ns.getCanvas():document.createElement("canvas"); }
+		this.cacheCanvas.width = width;
+		this.cacheCanvas.height = height;
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
-		this._applyFilters();
-		this.cacheID = DisplayObject._nextCacheID++;
+		this.updateCache();
 	}
 
 	/**
@@ -497,14 +491,13 @@ var p = DisplayObject.prototype;
 	 **/
 	p.updateCache = function(compositeOperation) {
 		var cacheCanvas = this.cacheCanvas, offX = this._cacheOffsetX, offY = this._cacheOffsetY;
-		if (cacheCanvas == null) { throw "cache() must be called before updateCache()"; }
+		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
 		var ctx = cacheCanvas.getContext("2d");
+		if (!compositeOperation) { ctx.clearRect(0, 0, cacheCanvas.width, cacheCanvas.height); }
+		else { ctx.globalCompositeOperation = compositeOperation; }
 		ctx.setTransform(1, 0, 0, 1, -offX, -offY);
-		if (!compositeOperation) {
-			ctx.clearRect(offX, offY, cacheCanvas.width, cacheCanvas.height);
-		} else { ctx.globalCompositeOperation = compositeOperation; }
-		this.draw(ctx, true);
-		if (compositeOperation) { ctx.globalCompositeOperation = "source-over"; }
+		this.draw(ctx, true, this._matrix.reinitialize(1,0,0,1,-offX,-offY)); // containers require the matrix to work from
+		ctx.globalCompositeOperation = "source-over";
 		this._applyFilters();
 		this.cacheID = DisplayObject._nextCacheID++;
 	}
