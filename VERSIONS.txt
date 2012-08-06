@@ -18,6 +18,7 @@ Version NEXT [release TBD]
 - updates to Ticker to improve support for requestAnimationFrame
 - better support for negative corner values on .drawRoundRectComplex
 - added stage.mouseMoveOutside & mouseEvent.rawX/Y
+- added support for "createjs.getCanvas()" to provide support for alternative canvases (ex. exCanvas, fxCanvas)
 
 
 Version 0.4.2 [Apr 18, 2012] 
