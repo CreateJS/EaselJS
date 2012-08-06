@@ -846,12 +846,12 @@ var p = Graphics.prototype;
 		var base64 = Graphics.BASE_64;
 		
 		while (i<l) {
-			var char = str.charAt(i);
-			var n = base64[char];
+			var c = str.charAt(i);
+			var n = base64[c];
 			var fi = n>>3; // highest order bits 1-3 code for operation.
 			var f = instructions[fi];
 			// check that we have a valid instruction & that the unused bits are empty:
-			if (!f || (n&3)) { throw("bad path data (@"+i+"): "+char); }
+			if (!f || (n&3)) { throw("bad path data (@"+i+"): "+c); }
 			var pl = paramCount[fi];
 			if (!fi) { x=y=0; }
 			params.length = 0;
