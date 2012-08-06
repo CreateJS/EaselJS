@@ -104,7 +104,7 @@ var p = Container.prototype = new ns.DisplayObject();
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
-	p.draw = function(ctx, ignoreCache, matrix) {
+	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		
 		// this ensures we don't have issues with display list changes that occur during a draw:

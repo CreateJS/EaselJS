@@ -19,6 +19,7 @@ Version NEXT [release TBD]
 - better support for negative corner values on .drawRoundRectComplex
 - added stage.mouseMoveOutside & mouseEvent.rawX/Y
 - added support for "createjs.getCanvas()" to provide support for alternative canvases (ex. exCanvas, fxCanvas)
+- added "scale" parameter to cache() and cleaned up the implementation
 
 
 Version 0.4.2 [Apr 18, 2012] 
