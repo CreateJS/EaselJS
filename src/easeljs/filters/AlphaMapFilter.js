@@ -127,7 +127,7 @@ var p = AlphaMapFilter.prototype = new ns.Filter();
 		if (map instanceof HTMLCanvasElement) {
 			ctx = canvas.getContext("2d");
 		} else {
-			canvas = ns.getCanvas?ns.getCanvas():document.createElement("canvas");
+			canvas = ns.createCanvas?ns.createCanvas():document.createElement("canvas");
 			canvas.width = map.width;
 			canvas.height = map.height;
 			ctx = canvas.getContext("2d");

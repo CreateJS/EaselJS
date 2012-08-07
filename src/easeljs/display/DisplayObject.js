@@ -63,7 +63,7 @@ var p = DisplayObject.prototype;
 	 * @static
 	 * @protected
 	 **/
-	DisplayObject._hitTestCanvas = ns.getCanvas?ns.getCanvas():document.createElement("canvas");
+	DisplayObject._hitTestCanvas = ns.createCanvas?ns.createCanvas():document.createElement("canvas");
 	DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
 
 	/**
@@ -486,7 +486,7 @@ var p = DisplayObject.prototype;
 	p.cache = function(x, y, width, height, scale) {
 		// draw to canvas.
 		scale = scale||1;
-		if (!this.cacheCanvas) { this.cacheCanvas = ns.getCanvas?ns.getCanvas():document.createElement("canvas"); }
+		if (!this.cacheCanvas) { this.cacheCanvas = ns.createCanvas?ns.createCanvas():document.createElement("canvas"); }
 		this.cacheCanvas.width = Math.ceil(width*scale);
 		this.cacheCanvas.height = Math.ceil(height*scale);
 		this._cacheOffsetX = x;

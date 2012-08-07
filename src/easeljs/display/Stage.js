@@ -214,9 +214,7 @@ var p = Stage.prototype = new ns.Container();
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-		if (this.tickOnUpdate) {
-			this._tick(data);
-		}
+		if (this.tickOnUpdate) { this._tick(data); }
 		var ctx = this.canvas.getContext("2d");
 		ctx.save();
 		this.updateContext(ctx);

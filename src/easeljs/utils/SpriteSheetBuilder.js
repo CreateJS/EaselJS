@@ -334,7 +334,7 @@ var p = SpriteSheetBuilder.prototype;
 			if (o.w > x) { x = o.w; }
 			y += o.h+2;
 			if (!o.h || !frames.length) {
-				var canvas = ns.getCanvas?ns.getCanvas():document.createElement("canvas");
+				var canvas = ns.createCanvas?ns.createCanvas():document.createElement("canvas");
 				canvas.width = this._getSize(x,this.maxWidth);
 				canvas.height = this._getSize(y,this.maxHeight);
 				this._data.images[img] = canvas;

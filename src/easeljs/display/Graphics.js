@@ -172,7 +172,7 @@ var p = Graphics.prototype;
 	 * @protected
 	 * @type CanvasRenderingContext2D
 	 **/
-	Graphics._ctx = (ns.getCanvas?ns.getCanvas():document.createElement("canvas")).getContext("2d");
+	Graphics._ctx = (ns.createCanvas?ns.createCanvas():document.createElement("canvas")).getContext("2d");
 	
 	/**
 	 * @property beginCmd
