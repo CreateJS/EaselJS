@@ -90,7 +90,7 @@ var p = DOMElement.prototype = new ns.DisplayObject();
 		if (htmlElement) {
 			this._style = htmlElement.style;
 			this._style.position = "absolute";
-			this._style.transformOrigin = this._style.webkitTransformOrigin = this._style.msTransformOrigin = this._style.MozTransformOrigin = this._style.OTransformOrigin = "0% 0%";
+			this._style.transformOrigin = this._style.WebkitTransformOrigin = this._style.msTransformOrigin = this._style.MozTransformOrigin = this._style.OTransformOrigin = "0% 0%";
 		}
 	}
 
@@ -126,7 +126,7 @@ var p = DOMElement.prototype = new ns.DisplayObject();
 		o.style.opacity = ""+mtx.alpha;
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
 		o.style.visibility = this.visible ? "visible" : "hidden";
-		o.style.transform = o.style.webkitTransform = o.style.OTransform =  o.style.msTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,(mtx.tx+0.5|0),(mtx.ty+0.5|0)+")"].join(",");
+		o.style.transform = o.style.WebkitTransform = o.style.OTransform =  o.style.msTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,(mtx.tx+0.5|0),(mtx.ty+0.5|0)+")"].join(",");
 		o.style.MozTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,(mtx.tx+0.5|0)+"px",(mtx.ty+0.5|0)+"px)"].join(",");
 		return true;
 	}
