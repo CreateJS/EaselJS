@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+if(!this.createjs)
+	createjs = {};
+
+(function() {
 
 /**
  * The SpriteSheetBuilder allows you to generate sprite sheets at run time from any display object. This can allow
@@ -334,7 +337,7 @@ var p = SpriteSheetBuilder.prototype;
 			if (o.w > x) { x = o.w; }
 			y += o.h+2;
 			if (!o.h || !frames.length) {
-				var canvas = ns.createCanvas?ns.createCanvas():document.createElement("canvas");
+				var canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 				canvas.width = this._getSize(x,this.maxWidth);
 				canvas.height = this._getSize(y,this.maxHeight);
 				this._data.images[img] = canvas;
@@ -380,7 +383,7 @@ var p = SpriteSheetBuilder.prototype;
 			if (rw > w) { throw SpriteSheetBuilder.ERR_DIMENSIONS; }
 			if (rh > h || x+rw > w) { continue; }
 			frame.img = img;
-			frame.rect = new ns.Rectangle(x,y,rw,rh);
+			frame.rect = new createjs.Rectangle(x,y,rw,rh);
 			height = height || rh;
 			frames.splice(i,1);
 			dataFrames[frame.index] = [x-1,y-1,rw+2,rh+2,img,Math.round(-rx+sc*source.regX),Math.round(-ry+sc*source.regY)];
@@ -394,7 +397,7 @@ var p = SpriteSheetBuilder.prototype;
 	 * @protected
 	 **/
 	p._endBuild = function() {
-		this.spriteSheet = new ns.SpriteSheet(this._data);
+		this.spriteSheet = new createjs.SpriteSheet(this._data);
 		this._data = null;
 		if (this._callback) { this._callback(this); }
 	}
@@ -441,6 +444,5 @@ var p = SpriteSheetBuilder.prototype;
 		return (++this._index) < this._frames.length;
 	}
 
-ns.SpriteSheetBuilder = SpriteSheetBuilder;
-}(createjs||(createjs={})));
-var createjs;
+createjs.SpriteSheetBuilder = SpriteSheetBuilder;
+}());

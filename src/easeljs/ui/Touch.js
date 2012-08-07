@@ -26,8 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
+if(!this.createjs)
+	createjs = {};
 
-(function(ns) {
+(function() {
 
 // TODO: support for double tap.
 /**
@@ -194,7 +196,5 @@ var Touch = function() {
 		delete(ids[id]);
 	}
 
-
-ns.Touch = Touch;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Touch = Touch;
+}());

@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+if(!this.createjs)
+	createjs = {};
+
+(function() {
 
 /**
  * Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
@@ -42,7 +45,7 @@
 var AlphaMaskFilter = function(mask) {
   this.initialize(mask);
 }
-var p = AlphaMaskFilter.prototype = new ns.Filter();
+var p = AlphaMaskFilter.prototype = new createjs.Filter();
 
 // constructor:
 	/** @ignore */
@@ -108,8 +111,5 @@ var p = AlphaMaskFilter.prototype = new ns.Filter();
 
 // private methods:
 
-
-
-ns.AlphaMaskFilter = AlphaMaskFilter;
-}(createjs||(createjs={})));
-var createjs;
+createjs.AlphaMaskFilter = AlphaMaskFilter;
+}());

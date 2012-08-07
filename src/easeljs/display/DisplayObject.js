@@ -33,7 +33,10 @@
 * @module EaselJS
 **/
 
-(function(ns) {
+if(!this.createjs)
+	createjs = {};
+
+(function() {
 
 /**
 * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
@@ -63,7 +66,7 @@ var p = DisplayObject.prototype;
 	 * @static
 	 * @protected
 	 **/
-	DisplayObject._hitTestCanvas = ns.createCanvas?ns.createCanvas():document.createElement("canvas");
+	DisplayObject._hitTestCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 	DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
 
 	/**
@@ -403,8 +406,8 @@ var p = DisplayObject.prototype;
 	 * @protected
 	*/
 	p.initialize = function() {
-		this.id = ns.UID.get();
-		this._matrix = new ns.Matrix2D();
+		this.id = createjs.UID.get();
+		this._matrix = new createjs.Matrix2D();
 	}
 
 // public methods:
@@ -458,7 +461,7 @@ var p = DisplayObject.prototype;
 		}
 		
 		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
-		if (ns.Stage._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
+		if (createjs.Stage._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
 		else { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
 		ctx.globalAlpha *= o.alpha;
 		if (o.compositeOperation) { ctx.globalCompositeOperation = o.compositeOperation; }
@@ -486,7 +489,7 @@ var p = DisplayObject.prototype;
 	p.cache = function(x, y, width, height, scale) {
 		// draw to canvas.
 		scale = scale||1;
-		if (!this.cacheCanvas) { this.cacheCanvas = ns.createCanvas?ns.createCanvas():document.createElement("canvas"); }
+		if (!this.cacheCanvas) { this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
 		this.cacheCanvas.width = Math.ceil(width*scale);
 		this.cacheCanvas.height = Math.ceil(height*scale);
 		this._cacheOffsetX = x;
@@ -550,7 +553,7 @@ var p = DisplayObject.prototype;
 		while (o.parent) {
 			o = o.parent;
 		}
-		if (o instanceof ns.Stage) { return o; }
+		if (o instanceof createjs.Stage) { return o; }
 		return null;
 	}
 
@@ -569,7 +572,7 @@ var p = DisplayObject.prototype;
 		var mtx = this.getConcatenatedMatrix(this._matrix);
 		if (mtx == null) { return null; }
 		mtx.append(1, 0, 0, 1, x, y);
-		return new ns.Point(mtx.tx, mtx.ty);
+		return new createjs.Point(mtx.tx, mtx.ty);
 	}
 
 	/**
@@ -588,7 +591,7 @@ var p = DisplayObject.prototype;
 		if (mtx == null) { return null; }
 		mtx.invert();
 		mtx.append(1, 0, 0, 1, x, y);
-		return new ns.Point(mtx.tx, mtx.ty);
+		return new createjs.Point(mtx.tx, mtx.ty);
 	}
 
 	/**
@@ -643,7 +646,7 @@ var p = DisplayObject.prototype;
 	 **/
 	p.getMatrix = function(matrix) {
 		var o = this;
-		return (matrix ? matrix.identity() : new ns.Matrix2D()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
+		return (matrix ? matrix.identity() : new createjs.Matrix2D()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
 	}
 	
 	/**
@@ -659,7 +662,7 @@ var p = DisplayObject.prototype;
 	 **/
 	p.getConcatenatedMatrix = function(matrix) {
 		if (matrix) { matrix.identity(); }
-		else { matrix = new ns.Matrix2D(); }
+		else { matrix = new createjs.Matrix2D(); }
 		var o = this;
 		while (o != null) {
 			matrix.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).prependProperties(o.alpha, o.shadow, o.compositeOperation);
@@ -800,6 +803,5 @@ var p = DisplayObject.prototype;
 	}
 	 
 
-ns.DisplayObject = DisplayObject;
-}(createjs||(createjs={})));
-var createjs;
+createjs.DisplayObject = DisplayObject;
+}());

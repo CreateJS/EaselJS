@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+if(!this.createjs)
+	createjs = {};
+
+(function() {
 
 /**
 * Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
@@ -103,6 +106,5 @@ var p = Rectangle.prototype;
 		return "[Rectangle (x="+this.x+" y="+this.y+" width="+this.width+" height="+this.height+")]";
 	}
 	
-ns.Rectangle = Rectangle;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Rectangle = Rectangle;
+}());

@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+if(!this.createjs)
+	createjs = {};
+
+(function() {
 
 /**
  * The MovieClip class associates a TweenJS Timeline with an EaselJS Container. It allows you to create objects which
@@ -46,7 +49,7 @@
 var MovieClip = function(mode, startPosition, loop, labels) {
   this.initialize(mode, startPosition, loop, labels);
 }
-var p = MovieClip.prototype = new ns.Container();
+var p = MovieClip.prototype = new createjs.Container();
 
 	/**
 	 * Read-only. The MovieClip will advance independently of its parent, even if its parent is paused.
@@ -180,7 +183,7 @@ var p = MovieClip.prototype = new ns.Container();
 		this.loop = loop;
 		props = {paused:true, position:startPosition, useTicks:true};
 		this.Container_initialize();
-		this.timeline = new ns.Timeline(null, labels, props);
+		this.timeline = new createjs.Timeline(null, labels, props);
 		this._managed = {};
 	}
 	
@@ -329,9 +332,9 @@ var p = MovieClip.prototype = new ns.Container();
 		// update timeline position, ignoring actions if this is a graphic.
 		if (synched) {
 			// TODO: this would be far more ideal if the _synchOffset was somehow provided by the parent, so that reparenting wouldn't cause problems and we can direct draw. Ditto for _off (though less important).
-			tl.setPosition(this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset), ns.Tween.NONE);
+			tl.setPosition(this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset), createjs.Tween.NONE);
 		} else {
-			tl.setPosition(this._prevPosition, this.actionsEnabled ? null : ns.Tween.NONE);
+			tl.setPosition(this._prevPosition, this.actionsEnabled ? null : createjs.Tween.NONE);
 		}
 		
 		this._prevPosition = tl._prevPosition;
@@ -346,7 +349,7 @@ var p = MovieClip.prototype = new ns.Container();
 			if (target == this) { continue; } // TODO: this assumes this is the actions tween. Valid?
 			var offset = tween._stepPosition;
 			
-			if (target instanceof ns.DisplayObject) {
+			if (target instanceof createjs.DisplayObject) {
 				// motion tween.
 				this._addManagedChild(target, offset);
 			} else {
@@ -396,7 +399,7 @@ var p = MovieClip.prototype = new ns.Container();
 	}
 	
 
-ns.MovieClip = MovieClip;
+createjs.MovieClip = MovieClip;
 
 
 
@@ -421,7 +424,7 @@ ns.MovieClip = MovieClip;
 	 * @private
 	 **/
 	MovieClipPlugin.install = function() {
-		ns.Tween.installPlugin(MovieClipPlugin, ["startPosition"]);
+		createjs.Tween.installPlugin(MovieClipPlugin, ["startPosition"]);
 	}
 	
 	/**
@@ -429,7 +432,7 @@ ns.MovieClip = MovieClip;
 	 * @private
 	 **/
 	MovieClipPlugin.init = function(tween, prop, value) {
-		if (prop == "startPosition" || !(tween._target instanceof ns.MovieClip)) { return value; }
+		if (prop == "startPosition" || !(tween._target instanceof createjs.MovieClip)) { return value; }
 	}
 	
 	/** 
@@ -437,11 +440,9 @@ ns.MovieClip = MovieClip;
 	 * @private
 	 **/
 	MovieClipPlugin.tween = function(tween, prop, value, startValues, endValues, ratio, position, end) {
-		if (!(tween._target instanceof ns.MovieClip)) { return value; }
+		if (!(tween._target instanceof createjs.MovieClip)) { return value; }
 		return (ratio == 1 ? endValues[prop] : startValues[prop]);
 	}
 
 	MovieClipPlugin.install();
-
-}(createjs||(createjs={})));
-var createjs;
+}());

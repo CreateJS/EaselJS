@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+if(!this.createjs)
+	createjs = {};
+
+(function() {
 
 /**
 * BoxBlurFilter applies a box blur to DisplayObjects
@@ -40,7 +43,7 @@
 var BoxBlurFilter = function( blurX, blurY, quality ) {
   this.initialize( blurX, blurY, quality );
 }
-var p = BoxBlurFilter.prototype = new ns.Filter();
+var p = BoxBlurFilter.prototype = new createjs.Filter();
 
 // constructor:
 	/** @ignore */
@@ -87,7 +90,7 @@ var p = BoxBlurFilter.prototype = new ns.Filter();
 	 **/
 	p.getBounds = function() {
 		// TODO: this doesn't properly account for blur quality.
-		return new ns.Rectangle(-this.blurX,-this.blurY,2*this.blurX,2*this.blurY);
+		return new createjs.Rectangle(-this.blurX,-this.blurY,2*this.blurX,2*this.blurY);
 	}
 
 	/**
@@ -252,6 +255,5 @@ var p = BoxBlurFilter.prototype = new ns.Filter();
 
 
 
-ns.BoxBlurFilter = BoxBlurFilter;
-}(createjs||(createjs={})));
-var createjs;
+createjs.BoxBlurFilter = BoxBlurFilter;
+}());
