@@ -20,6 +20,8 @@ Version NEXT [release TBD]
 - added stage.mouseMoveOutside & mouseEvent.rawX/Y
 - added support for "createjs.getCanvas()" to provide support for alternative canvases (ex. exCanvas, fxCanvas)
 - added "scale" parameter to cache() and cleaned up the implementation
+- fix for DOMElement with Opera
+- various bug fixes and doc updates
 
 
 Version 0.4.2 [Apr 18, 2012] 
