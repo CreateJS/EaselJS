@@ -217,7 +217,11 @@ var p = Stage.prototype = new ns.Container();
 		if (this.tickOnUpdate) {
 			this._tick(data);
 		}
-		this.draw(this.canvas.getContext("2d"), false, this.getConcatenatedMatrix(this._matrix));
+		var ctx = this.canvas.getContext("2d");
+		ctx.save();
+		this.updateContext(ctx);
+		this.draw(ctx, false);
+		ctx.restore();
 	}
 
 	/**
