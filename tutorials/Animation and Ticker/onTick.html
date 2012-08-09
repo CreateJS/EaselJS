@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS demo: DisplayObject.onTick</title>
+	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
+	<script src="../../lib/easeljs-NEXT.min.js"></script>
+	<script>
+		
+		var stage, circle;
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+			
+			circle = new createjs.Shape();
+			circle.graphics.beginFill("red").drawCircle(0, 0, 40);
+			circle.y = 50;
+			circle.onTick = function() {
+				this.x += 5;
+				if (this.x > stage.canvas.width) { this.x = 0; }
+			}
+			stage.addChild(circle);
+			
+			createjs.Ticker.addListener(stage);
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="500" height="100">
+		alternate content
+	</canvas>
+</body>
+</html>

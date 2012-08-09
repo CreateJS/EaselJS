@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS demo: Simple animation</title>
+	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
+	<script src="../../lib/easeljs-NEXT.min.js"></script>
+	<script>
+		
+		var stage, circle;
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+			
+			circle = new createjs.Shape();
+			circle.graphics.beginFill("red").drawCircle(0, 0, 40);
+			circle.y = 50;
+			stage.addChild(circle);
+			
+			createjs.Ticker.addListener(window);
+			createjs.Ticker.setFPS(30);
+		}
+		
+		function tick() {
+			circle.x = circle.x + 5;
+			if (circle.x > stage.canvas.width) { circle.x = 0; }
+			stage.update(); // important!!
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="500" height="100">
+		alternate content
+	</canvas>
+</body>
+</html>

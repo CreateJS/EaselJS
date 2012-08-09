@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS demo: Time based animation</title>
+	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
+	<script src="../../lib/easeljs-NEXT.min.js"></script>
+	<script>
+		
+		var stage, timeCircle, tickCircle;
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+			
+			timeCircle = new createjs.Shape();
+			timeCircle.graphics.beginFill("red").drawCircle(0, 0, 40);
+			timeCircle.y = 50;
+			stage.addChild(timeCircle);
+			
+			tickCircle = new createjs.Shape();
+			tickCircle.graphics.beginFill("blue").drawCircle(0, 0, 40);
+			tickCircle.y = 150;
+			stage.addChild(tickCircle);
+			
+			createjs.Ticker.addListener(window);
+			createjs.Ticker.setFPS(20);
+		}
+		
+		function tick(elapsedTime) {
+			// time based
+			timeCircle.x = timeCircle.x + elapsedTime/1000*100;
+			if (timeCircle.x > stage.canvas.width) { timeCircle.x = 0; }
+			
+			// not time based:
+			tickCircle.x = tickCircle.x + 5; // 100 / 20 = 5
+			if (tickCircle.x > stage.canvas.width) { tickCircle.x = 0; }
+			
+			stage.update();
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<select onchange="createjs.Ticker.setFPS(Number(this.value));">
+		<option value="10">10 fps</option>
+		<option value="20" selected>20 fps</option>
+		<option value="30">30 fps</option>
+		<option value="40">40 fps</option>
+		<option value="50">50 fps</option>
+		<option value="60">60 fps</option>
+	</select><br>
+	<canvas id="demoCanvas" width="500" height="200">
+		alternate content
+	</canvas>
+</body>
+</html>
