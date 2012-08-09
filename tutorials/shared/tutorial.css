@@ -24,7 +24,9 @@ header p {
 	color: #aaafbb;
 	background-color: rgba(250,252,255,0.25);
 	margin: 0;
-	padding: 0.5em;
+	padding: 0.8em;
+	line-height: 1.6em;
+	font-size: 0.9em;
 }
 
 header p strong {
@@ -52,17 +54,36 @@ h1, h2 {
 	background: linear-gradient(to bottom, #555 0%,#333 50%,#222 52%,#222 100%); /* W3C */
 }
 
-
 h2 {
 	color: rgba(255,255,255,0.7);
 	font-size: 1.5em;
-	margin-top: 2em;
 }
 
-iframe {
-	background-color: rgba(255,255,255,0.2);
-	border: none;
+div.demo {
+	border: solid 2px rgba(255,255,255,0.4);
 }
+
+div.demo p {
+	margin: 0;
+	padding: 4px;
+	font-size: 0.9em;
+}
+
+textarea {
+	width: 100%;
+	height: 60px;
+}
+
+div.demo p a {
+	float: right;
+}
+
+iframe.demo {
+	background-color: rgba(255,255,255,0.25);
+	border: none;
+	margin-right: 8px;
+}
+
 
 code {
 	color: black;

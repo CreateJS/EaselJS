@@ -3,8 +3,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>EaselJS Tutorial: Using hitTest</title>
-	<link href="../shared/styles.css" rel="stylesheet" type="text/css">
-	<script src="../shared/tutorials.js"></script>
+	<link href="../shared/tutorial.css" rel="stylesheet" type="text/css">
+	<script src="../shared/tutorial.js"></script>
 	
 	<!-- SyntaxHighlighter-->
 	<script src="../shared/SyntaxHighlighter/shCore.js"></script>
@@ -14,13 +14,15 @@
 	<link href="../shared/SyntaxHighlighter/shThemeCreateJS.css" rel="stylesheet" type="text/css">
 </head>
 	
-<body onLoad="formatCodeAreas();">
+<body onLoad="initTutorial();">
 	<article>
 		<header>
 			<h1>EaselJS: Using HitTest</h1>
-			<p><strong>Synopsis:</strong> Using the DisplayObject.hitTest method with globalToLocal and localToLocal.</p>
-			<p><strong>Topics:</strong> hitTest, globalToLocal, localToLocal, hit detection</p>
-			<p><strong>Target:</strong> EaselJS v0.5.0</p>
+			<p>
+				<strong>Synopsis:</strong> Using the DisplayObject.hitTest method with globalToLocal and localToLocal.<br>
+				<strong>Topics:</strong> hitTest, globalToLocal, localToLocal, hit detection<br>
+				<strong>Target:</strong> EaselJS v0.5.0
+			</p>
 		</header>
 		
 		<section>
@@ -30,13 +32,13 @@
 			<p>
 				The <code>hitTest</code> method checks a specified point in a display object and returns true if that point is not fully transparent (ie. if it will draw to that pixel). This can be used for checking if a specific object is under the mouse and hit detection.
 			</p>
-			<textarea class="brush: js;">
+			<textarea class="brush: js;" readonly>
 myDisplayObject.hitTest(localX, localY);
 			</textarea>
 			<p>
 				The following demo calls <code>circle.hitTest(stage.mouseX, stage.mouseY)</code> to determine if the mouse is over the red circle.
 			</p>
-			<iframe src="hitTest.html" width="100%" height="120px"></iframe>
+			<iframe src="hitTest.html" class="demo" longdesc="mouse over the circle to see hitTest in action" width="100%" height="120px"></iframe>
 			<p>
 				This simple implementation works fine when the circle hasn't been moved or transformed, but <code>hitTest</code> expects the position passed to it to be in the local coordinate space. The <code>stage.mouseX</code> and <code>stage.mouseY</code> position is a global (stage) coordinate. To see this behaviour, try changing the <code>circle.x</code> in the hitTest.html example file.
 			</p>
@@ -49,14 +51,14 @@ myDisplayObject.hitTest(localX, localY);
 			<p>
 				To convert a global position into a local one, we can use the <code>globalToLocal</code> method. This method takes a global x & y value, and returns an object with x & y properties that have been transformed using the target object's concatenated transformation (ie. including its parent transformations).
 			</p>
-			<textarea class="brush: js;">
+			<textarea class="brush: js;" readonly>
 var pt = myDisplayObject.globalToLocal(stage.mouseX, stage.mouseY);
 console.log(pt.x, pt.y);
 			</textarea>
 			<p>
 				This code converts the stage mouse position into a local position and outputs it to the console. The demo below applies this same code to check when transformed shapes are under the mouse. Check out the source in globalToLocal.html to see how it was done.
 			</p>
-			<iframe src="globalToLocal.html" width="100%" height="320px"></iframe>
+			<iframe src="globalToLocal.html" class="demo" longdesc="mouse over the circles to see globalToLocal and hitTest in action" width="100%" height="320px"></iframe>
 		</section>
 		
 		<section>
@@ -69,7 +71,7 @@ console.log(pt.x, pt.y);
 			<p>
 				You could use <code>localToGlobal</code> and then its counterpart <code>globalToLocal</code> to convert the point from one object's coordinate space to another's, but the <code>localToLocal</code> method does the same thing with a little less code.
 			</p>
-			<textarea class="brush: js;">
+			<textarea class="brush: js;" readonly>
 var pt = objA.localToLocal(posX, posY, objB);
 console.log(pt.x, pt.y); // the position local to objB
 			</textarea>
@@ -77,7 +79,7 @@ console.log(pt.x, pt.y); // the position local to objB
 				The following example show this being used to convert a position (100,0) on a rotating arm into a position relative to a target shape, to show when that point intersects the target. Check out localToLocal.html to see how it works.
 			</p>
 			
-			<iframe src="localToLocal.html" width="100%" height="320px"></iframe>
+			<iframe src="localToLocal.html" class="demo" longDesc="the target lights up when the center of the blue circle touches it" width="100%" height="320px"></iframe>
 		</section>
 		
 	</article>

@@ -3,8 +3,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>EaselJS Tutorial: Getting Started</title>
-	<link href="../shared/styles.css" rel="stylesheet" type="text/css">
-	<script src="../shared/tutorials.js"></script>
+	<link href="../shared/tutorial.css" rel="stylesheet" type="text/css">
+	<script src="../shared/tutorial.js"></script>
 	
 	<!-- SyntaxHighlighter-->
 	<script src="../shared/SyntaxHighlighter/shCore.js"></script>
@@ -14,13 +14,15 @@
 	<link href="../shared/SyntaxHighlighter/shThemeCreateJS.css" rel="stylesheet" type="text/css">
 </head>
 	
-<body onLoad="formatCodeAreas();">
+<body onLoad="initTutorial();">
 	<article>
 		<header>
 			<h1>EaselJS: Getting Started</h1>
-			<p><strong>Synopsis:</strong> Set up an HTML document with a canvas tag and the EaselJS libraries, and draw a shape to the stage.</p>
-			<p><strong>Topics:</strong> linking libraries, Stage, Shape, addChild, Stage.update(), CDN, source files</p>
-			<p><strong>Target:</strong> EaselJS v0.5.0</p>
+			<p>
+				<strong>Synopsis:</strong> Set up an HTML document with a canvas tag and the EaselJS libraries, and draw a shape to the stage.<br>
+				<strong>Topics:</strong> linking libraries, Stage, Shape, addChild, Stage.update(), CDN, source files<br>
+				<strong>Target:</strong> EaselJS v0.5.0
+			</p>
 		</header>
 		
 		<section>
@@ -30,7 +32,7 @@
 			<p>
 				Below is an HTML document stripped down to just the elements we're interested in.
 			</p>
-			<textarea class="brush: xml; highlight: [7];">
+			<textarea class="brush: xml; highlight: [7];" readonly>
 <!DOCTYPE html>
 <html>
 <head>
@@ -70,7 +72,7 @@
 			<p>
 				Lets add some code in our empty script tag from above. We'll start by defining a stage that will draw to the canvas.</p>
 			</p>
-			<textarea class="brush: js;">
+			<textarea class="brush: js;" readonly>
 var stage = new createjs.Stage("demoCanvas");
 			</textarea>
 			<p>
@@ -88,7 +90,7 @@ var stage = new createjs.Stage("demoCanvas");
 			<p>
 				Next, we'll create a <code>Shape</code> object, tell it to draw a red circle, position it, and add it to our stage.
 			</p>
-			<textarea class="brush: js;">
+			<textarea class="brush: js;" readonly>
 var circle = new createjs.Shape();
 circle.graphics.beginFill("red").drawCircle(0, 0, 50);
 circle.x = 100;
@@ -104,7 +106,7 @@ stage.addChild(circle);
 			</p><p>
 				EaselJS also supports shortcuts to let you chain together your calls. In fact, if you really wanted to you could write all of the above code in a single line:
 			</p>
-			<textarea class="brush: js;">
+			<textarea class="brush: js;" readonly>
 stage.addChild(new createjs.Shape()).setTransform(100,100).graphics.f("red").dc(0,0,50);
 			</textarea>
 		</section>	
@@ -116,13 +118,13 @@ stage.addChild(new createjs.Shape()).setTransform(100,100).graphics.f("red").dc(
 			<p>
 				We've set up our display list, but it isn't drawn to the canvas until we tell the stage to <code>update</code>:
 			</p>
-			<textarea class="brush: js;">
+			<textarea class="brush: js;" readonly>
 stage.update();
 			</textarea>
 			<p>
 				This tells the stage to clear the canvas, then run through all of its children and draw them to the canvas. You can see the working demo below. Be sure to open it up and check out the complete code.
 			</p>
-			<iframe src="demo.html" width="100%" height="220px"></iframe>
+			<iframe src="demo.html" class="demo" longDesc="drawing a circle with EaselJS" width="100%" height="220px"></iframe>
 		</section>
 		
 	</article>
