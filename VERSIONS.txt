@@ -18,10 +18,13 @@ Version NEXT [release TBD]
 - updates to Ticker to improve support for requestAnimationFrame
 - better support for negative corner values on .drawRoundRectComplex
 - added stage.mouseMoveOutside & mouseEvent.rawX/Y
-- added support for "createjs.createCanvas()" to provide support for alternative canvases (ex. exCanvas, fxCanvas)
+- added "createjs.createCanvas()" to support for alternative canvases (ex. exCanvas)
 - added "scale" parameter to cache() and cleaned up the implementation
 - fix for DOMElement with Opera
 - various bug fixes and doc updates
+- changed setTransform to return the instance for use in chaining
+- started adding tutorials to address common questions and make it easier to get started
+- stage.mouseX/Y now defaults to 0 instead of null
 
 
 Version 0.4.2 [Apr 18, 2012] 

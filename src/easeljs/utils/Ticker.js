@@ -208,10 +208,11 @@ var Ticker = function() {
 	 * @param {Object} o The object or function to remove from listening from the tick event.
 	 **/
 	Ticker.removeListener = function(o) {
-		if (Ticker._listeners == null) { return; }
-		var index = Ticker._listeners.indexOf(o);
+		var listeners = Ticker._listeners;
+		if (!listeners) { return; }
+		var index = listeners.indexOf(o);
 		if (index != -1) {
-			Ticker._listeners.splice(index, 1);
+			listeners.splice(index, 1);
 			Ticker._pauseable.splice(index, 1);
 		}
 	}
