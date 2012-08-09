@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>EaselJS Tutorial: Getting Started</title>
+	<link href="../shared/styles.css" rel="stylesheet" type="text/css">
+	<script src="../shared/tutorials.js"></script>
+	
+	<!-- SyntaxHighlighter-->
+	<script src="../shared/SyntaxHighlighter/shCore.js"></script>
+	<script src="../shared/SyntaxHighlighter/shBrushJScript.js"></script>
+	<script src="../shared/SyntaxHighlighter/shBrushXml.js"></script>
+	<link href="../shared/SyntaxHighlighter/shCore.css" rel="stylesheet" type="text/css">
+	<link href="../shared/SyntaxHighlighter/shThemeCreateJS.css" rel="stylesheet" type="text/css">
+</head>
+	
+<body onLoad="formatCodeAreas();">
+	<article>
+		<header>
+			<h1>EaselJS: Getting Started</h1>
+			<p><strong>Synopsis:</strong> Set up an HTML document with a canvas tag and the EaselJS libraries, and draw a shape to the stage.</p>
+			<p><strong>Topics:</strong> linking libraries, Stage, Shape, addChild, Stage.update(), CDN, source files</p>
+			<p><strong>Target:</strong> EaselJS v0.5.0</p>
+		</header>
+		
+		<section>
+			<header>
+				<h2>Setting up your html document</h2>
+			</header>
+			<p>
+				Below is an HTML document stripped down to just the elements we're interested in.
+			</p>
+			<textarea class="brush: xml; highlight: [7];">
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="../../lib/easeljs-NEXT.min.js"></script>
+	<script>
+		function init() {
+			// code here.
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="500" height="300">
+		alternate content
+	</canvas>
+</body>
+</html>
+			</textarea>
+			<p>
+				The script tag on line 4 includes the EaselJS library in our document so that we can work with it. We have a few options for how we do this:<ol>
+				<li> link to a local copy of the compiled library (as in this example).</li>
+				<li> link to the compiled library on the the CreateJS CDN. This allows the library to be cached for users across all sites that use the library, but only stable versions of the library are available.</li>
+				<li> link to individual, uncompiled source files (in the /src/ directory). This can be very useful for debugging and learning about the library, because you will get more useful errors. However, you must make sure they are loaded in the correct order, which you can find in /build/build.js</li>
+				</ol>
+			</p>
+			<p>
+				The script tag on line 5 contains an empty function that will be called when the page loads. Line 7 is where we are going to put the javascript we'll be writing a bit later.
+			</p>
+			<p>
+				The canvas tag on line 12 has an id so that we can reference it easily, and a defined width and height. It's important to understand that the width & height attributes here set the pixel dimensions of the canvas. If you change the width & height with CSS, it will scale the canvas and your graphics could look fuzzy or pixelated.
+			</p>
+		</section>
+		
+		<section>
+			<header>
+				<h2>Setting up the stage</h2>
+			</header>
+			<p>
+				Lets add some code in our empty script tag from above. We'll start by defining a stage that will draw to the canvas.</p>
+			</p>
+			<textarea class="brush: js;">
+var stage = new createjs.Stage("demoCanvas");
+			</textarea>
+			<p>
+				This line creates a new <code>Stage</code> and points it at our canvas. The stage contains all of the display objects we will be painting to our canvas. You can either pass the ID of the canvas you want to use, or a reference to it.
+			</p>
+			<p>
+			You'll notice that the <code>Stage</code> class definition is inside of the <code>createjs</code> namespace. This keeps all of the classes in CreateJS from colliding with other libraries' classes. You can configure this namespace if you like, just point the <code>createjs</code> var somewhere else before loading the library.
+			</p>
+		</section>
+		
+		<section>
+			<header>
+				<h2>Creating a shape</h2>
+			</header>
+			<p>
+				Next, we'll create a <code>Shape</code> object, tell it to draw a red circle, position it, and add it to our stage.
+			</p>
+			<textarea class="brush: js;">
+var circle = new createjs.Shape();
+circle.graphics.beginFill("red").drawCircle(0, 0, 50);
+circle.x = 100;
+circle.y = 100;
+stage.addChild(circle);
+			</textarea>
+			<p>
+				Line 1 creates a new <code>Shape</code> instance. Shapes are display objects that draw vector graphics to our canvas. All display objects share common properties for positioning and transforming them on the canvas, such as <code>x</code> & <code>y</code> on lines 3 & 4.
+			</p><p>	
+				Shapes also have a special property called graphics, which points to a <code>Graphics</code> instance, which holds all of the methods we use to define our vector shapes. In this case, we are telling the graphics object to draw a circle with radius 50, centered at 0,0 (relative to the shape's position), and filled with red.
+			</p><p>
+				In order for a display object to be drawn, we need to add it to the stage, as shown in line 5.
+			</p><p>
+				EaselJS also supports shortcuts to let you chain together your calls. In fact, if you really wanted to you could write all of the above code in a single line:
+			</p>
+			<textarea class="brush: js;">
+var circle = stage.addChild(new createjs.Shape()).transform(100,100).graphics.f("red").dc(0,0,50);
+			</textarea>
+		</section>	
+			
+		<section>
+			<header>
+				<h2>Updating the stage</h2>
+			</header>
+			<p>
+				We've set up our display list, but it isn't drawn to the canvas until we tell the stage to <code>update</code>:
+			</p>
+			<textarea class="brush: js;">
+stage.update();
+			</textarea>
+			<p>
+				This tells the stage to clear the canvas, then run through all of its children and draw them to the canvas. You can see the working demo below. Be sure to open it up and check out the complete code.
+			</p>
+			<iframe src="demo.html" width="100%" height="300px"></iframe>
+		</section>
+		
+	</article>
+</body>
+</html>

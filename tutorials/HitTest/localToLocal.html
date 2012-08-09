@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="../../lib/easeljs-NEXT.min.js"></script>
+	<script>
+		var stage, arm;
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+			
+			target = stage.addChild(new createjs.Shape());
+			target.graphics.beginFill("red").drawCircle(0,0,45)
+				.beginFill("white").drawCircle(0,0,30)
+				.beginFill("red").drawCircle(0,0,15);
+			target.x = 100;
+			target.y = 180;
+			
+			arm = stage.addChild(new createjs.Shape());
+			arm.graphics.beginFill("black").drawRect(-2,-2,100,6)
+				.beginFill("blue").drawCircle(100,0,10);
+			arm.x = 180;
+			arm.y = 100;
+			
+			createjs.Ticker.addListener(this);
+		}
+		
+		function tick() {
+			arm.rotation += 5;
+			
+			target.alpha = 0.2;
+			var pt = arm.localToLocal(100,0,target);
+			if (target.hitTest(pt.x, pt.y)) { target.alpha = 1; }
+			
+			stage.update();
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="300" height="300">
+		alternate content
+	</canvas>
+</body>
+</html>

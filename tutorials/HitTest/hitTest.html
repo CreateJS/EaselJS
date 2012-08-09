@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="../../lib/easeljs-NEXT.min.js"></script>
+	<script>
+		var stage, circle;
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+			
+			circle = stage.addChild(new createjs.Shape());
+			circle.graphics.beginFill("red").drawCircle(50,50,50);
+			circle.x = 0;
+			circle.y = 0;
+			
+			createjs.Ticker.addListener(this);
+		}
+		
+		function tick() {
+			circle.alpha = 0.2;
+			if (circle.hitTest(stage.mouseX, stage.mouseY)) { circle.alpha = 1; }
+			stage.update();
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="300" height="100">
+		alternate content
+	</canvas>
+</body>
+</html>
