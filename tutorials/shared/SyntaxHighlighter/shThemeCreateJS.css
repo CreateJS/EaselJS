@@ -24,7 +24,7 @@
   background-color: white !important;
 }
 .syntaxhighlighter .line.highlighted.alt1, .syntaxhighlighter .line.highlighted.alt2 {
-  background-color: #ccf3ff !important;
+  background-color: #ddeeff !important;
 }
 .syntaxhighlighter .line.highlighted.number {
   color: white !important;
@@ -39,7 +39,7 @@
   border-right: 3px solid #ccd3d9 !important;
 }
 .syntaxhighlighter .gutter .line.highlighted {
-  background-color: #66e6f9 !important;
+  background-color: #39f !important;
   color: white !important;
 }
 .syntaxhighlighter.printing .line .content {

@@ -57,11 +57,11 @@ window.Button = Button;
 			
 		<section>
 			<header>
-				<h2>initialize</h2>
+				<h2>The initialize method</h2>
 			</header>
 			
 			<p>
-				In the constructor on line 4, I call the <code>initialize</code> method, and pass through the constructor parameters. The <code>initialize</code> method handles all of the set up work for new instances, and it is vital that it get called.
+				In the constructor on line 4, we call the <code>initialize</code> method, and pass through the constructor parameters. The <code>initialize</code> method handles all of the set up work for new instances, and it is vital that it gets called.
 			</p>
 			<p>
 				For this class, we are overriding <code>Container</code>'s <code>initialize</code> method so that we can do some custom set up, however, we still need to make sure that the super class's <code>initialize</code> method gets called. <strong>This is VERY important</strong>, especially for classes that inherit from <code>Container</code>.

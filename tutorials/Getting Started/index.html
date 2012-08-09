@@ -51,7 +51,7 @@
 			<p>
 				The script tag on line 4 includes the EaselJS library in our document so that we can work with it. We have a few options for how we do this:<ol>
 				<li> link to a local copy of the compiled library (as in this example).</li>
-				<li> link to the compiled library on the the CreateJS CDN. This allows the library to be cached for users across all sites that use the library, but only stable versions of the library are available.</li>
+				<li> link to the compiled library on the the <a href="http://code.createjs.com">CreateJS CDN</a>. This allows the library to be cached for users across all sites that use the library, but only stable versions of the library are available.</li>
 				<li> link to individual, uncompiled source files (in the /src/ directory). This can be very useful for debugging and learning about the library, because you will get more useful errors. However, you must make sure they are loaded in the correct order, which you can find in /build/build.js</li>
 				</ol>
 			</p>
@@ -105,7 +105,7 @@ stage.addChild(circle);
 				EaselJS also supports shortcuts to let you chain together your calls. In fact, if you really wanted to you could write all of the above code in a single line:
 			</p>
 			<textarea class="brush: js;">
-var circle = stage.addChild(new createjs.Shape()).transform(100,100).graphics.f("red").dc(0,0,50);
+stage.addChild(new createjs.Shape()).setTransform(100,100).graphics.f("red").dc(0,0,50);
 			</textarea>
 		</section>	
 			
@@ -122,7 +122,7 @@ stage.update();
 			<p>
 				This tells the stage to clear the canvas, then run through all of its children and draw them to the canvas. You can see the working demo below. Be sure to open it up and check out the complete code.
 			</p>
-			<iframe src="demo.html" width="100%" height="300px"></iframe>
+			<iframe src="demo.html" width="100%" height="220px"></iframe>
 		</section>
 		
 	</article>

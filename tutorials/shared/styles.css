@@ -9,12 +9,11 @@ body {
 }
 
 article {
-	width: 60em;
+	width: 55em;
 }
 
 a:link, a:visited {
-	color:			#e7841d;
-	font-weight:	bold;
+	color: #39f;
 	text-decoration: none;
 }
 a:hover {
@@ -33,24 +32,36 @@ header p strong {
 }
 
 h1, h2 {
-	color: #f6f6f6;
+	color: rgba(255,255,255,0.9);
 	font-size: 2em;
 	margin-bottom: 0.05em;
 	padding: 0.5em;
-	background-color: #222;
-	text-shadow: 0.07em 0.07em 0.1em rgba(0,0,0,0.2);
-	box-shadow: 0.05em 0.05em 0.15em rgba(0,0,0,0.08);
-	border-bottom: solid 2px #3399bb;
+	background-color: #333;
+	text-shadow: 1px 2px 2px rgba(0,0,0,0.7);
+	box-shadow: 0 0.4em 0.6em rgba(40,150,255,0.2);
+	border-bottom: solid 3px #39f;
+	border-top: solid 2px #666;
+	
+	border-radius: 0.25em 0.25em 2px 2px;
+	
+	background: -moz-linear-gradient(top, #555 0%, #333 50%, #222 52%, #222 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#555), color-stop(50%,#333), color-stop(54%,#222), color-stop(100%,#222)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #555 0%,#333 50%,#222 52%,#222 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #555 0%,#333 50%,#222 52%,#222 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #555 0%,#333 50%,#222 52%,#222 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #555 0%,#333 50%,#222 52%,#222 100%); /* W3C */
 }
 
+
 h2 {
-	color: #eee;
+	color: rgba(255,255,255,0.7);
 	font-size: 1.5em;
 	margin-top: 2em;
 }
 
 iframe {
-	border: solid 1px white;
+	background-color: rgba(255,255,255,0.2);
+	border: none;
 }
 
 code {

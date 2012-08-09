@@ -27,7 +27,7 @@
 				var child = holder.getChildAt(i);
 				child.alpha = 0.1;
 				var pt = child.globalToLocal(stage.mouseX, stage.mouseY);
-				if (child.hitTest(pt.x, pt.y)) { child.alpha = 1; }
+				if (stage.mouseInBounds && child.hitTest(pt.x, pt.y)) { child.alpha = 1; }
 			}
 			
 			stage.update();
