@@ -207,14 +207,15 @@ var p = Stage.prototype = new ns.Container();
 
 	/**
 	 * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapAnimation)
-	 * and render its entire display list to the canvas.
+	 * and render its entire display list to the canvas. Any parameters passed to update will be passed on to any
+	 * onTick handlers.
 	 * @method update
 	 **/
-	p.update = function(data) {
+	p.update = function() {
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-		if (this.tickOnUpdate) { this._tick(data); }
+		if (this.tickOnUpdate) { this._tick((arguments.length ? arguments : null)); }
 		var ctx = this.canvas.getContext("2d");
 		ctx.save();
 		this.updateContext(ctx);

@@ -284,16 +284,23 @@ var p = BitmapAnimation.prototype = new ns.DisplayObject();
 
 // private methods:
 	/**
+	 * @property DisplayObject__tick
+	 * @type Function
+	 * @private
+	 **/
+	p.DisplayObject__tick = p._tick;
+	
+	/**
 	 * Advances the currentFrame if paused is not true. This is called automatically when the Stage ticks.
 	 * @protected
 	 * @method _tick
 	 **/
-	p._tick = function(data) {
+	p._tick = function(params) {
 		var f = this._animation ? this._animation.frequency : 1;
 		if (!this.paused && ((++this._advanceCount)+this.offset)%f == 0) {
 			this.advance();
 		}
-		if (this.onTick) { this.onTick(data); }
+		this.DisplayObject__tick(params);
 	}
 	
 	

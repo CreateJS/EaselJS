@@ -765,8 +765,10 @@ var p = DisplayObject.prototype;
 	 * @method _tick
 	 * @protected
 	 **/
-	p._tick = function(data) {
-		if (this.onTick) { this.onTick(data); }
+	p._tick = function(params) {
+		if (!this.onTick) { return; }
+		if (params) { this.onTick.apply(this, params); }
+		else { this.onTick(); }
 	}
 
 	/**

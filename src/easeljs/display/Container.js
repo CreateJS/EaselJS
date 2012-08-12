@@ -403,15 +403,22 @@ var p = Container.prototype = new ns.DisplayObject();
 
 // private properties:
 	/**
+	 * @property DisplayObject__tick
+	 * @type Function
+	 * @private
+	 **/
+	p.DisplayObject__tick = p._tick;
+	
+	/**
 	 * @method _tick
 	 * @protected
 	 **/
-	p._tick = function(data) {
+	p._tick = function(params) {
 		for (var i=this.children.length-1; i>=0; i--) {
 			var child = this.children[i];
-			if (child._tick) { child._tick(data); }
+			if (child._tick) { child._tick(params); }
 		}
-		if (this.onTick) { this.onTick(data); }
+		this.DisplayObject__tick(params);
 	}
 
 	/**

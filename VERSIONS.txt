@@ -25,6 +25,11 @@ Version NEXT [release TBD]
 - changed setTransform to return the instance for use in chaining
 - started adding tutorials to address common questions and make it easier to get started
 - stage.mouseX/Y now defaults to 0 instead of null
+- text.textBaseline now defaults to "top" instead of null (resolved to "alphabetic")
+- text.textAlign now defaults to "left" instead of null
+- text.color now defaults to "#000" instead of null
+- parameters passed to Stage.update are now passed on to onTick handlers
+	- for example, Ticker elapsedTime and paused params
 
 
 Version 0.4.2 [Apr 18, 2012] 

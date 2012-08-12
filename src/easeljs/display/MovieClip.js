@@ -288,11 +288,11 @@ var p = MovieClip.prototype = new ns.Container();
 	 * @method _tick
 	 * @private
 	 **/
-	p._tick = function() {
+	p._tick = function(params) {
 		if (!this.paused && this.mode == MovieClip.INDEPENDENT) {
 			this._prevPosition = (this._prevPos<0) ? 0 : this._prevPosition+1;
 		}
-		this.Container__tick();
+		this.Container__tick(params);
 	}
 	
 	/**
