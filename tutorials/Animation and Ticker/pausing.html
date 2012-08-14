@@ -32,11 +32,6 @@
 			
 			
 			// UI code:
-			stage.onMouseDown = function() {
-				// toggle paused when the stage is clicked:
-				createjs.Ticker.setPaused( !createjs.Ticker.getPaused() );
-			}
-			
 			output = stage.addChild(new createjs.Text("", "14px monospace", "#000"));
 			output.lineHeight = 15;
 			output.textBaseline = "top";
@@ -54,9 +49,16 @@
 			
 			stage.update(); // important!!
 		}
+		
+		function togglePause() {
+			var paused = !createjs.Ticker.getPaused();
+			createjs.Ticker.setPaused(paused);
+			document.getElementById("pauseBtn").value = paused ? "unpause" : "pause";
+		}
 	</script>
 </head>
 <body onLoad="init();">
+	<input type="button" value="pause" id="pauseBtn" onclick="togglePause();"><br>
 	<canvas id="demoCanvas" width="500" height="200">
 		alternate content
 	</canvas>

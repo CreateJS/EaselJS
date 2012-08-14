@@ -13,11 +13,14 @@
 			circle = new createjs.Shape();
 			circle.graphics.beginFill("red").drawCircle(0, 0, 40);
 			circle.y = 50;
-			circle.onTick = function() {
-				this.x += 5;
+			stage.addChild(circle);
+			
+			// Ticker will pass elapsedTime and paused params when it calls stage.update()
+			// which will pass them to onTick() handlers for us in time based animation.
+			circle.onTick = function(elapsedTime) {
+				this.x += elapsedTime/1000*100;
 				if (this.x > stage.canvas.width) { this.x = 0; }
 			}
-			stage.addChild(circle);
 			
 			createjs.Ticker.addListener(stage);
 		}

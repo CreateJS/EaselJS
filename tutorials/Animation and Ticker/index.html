@@ -40,7 +40,7 @@ circle.x = circle.x + 3;
 if (circle.x > stage.canvas.width) { circle.x = 0; }
 			</textarea>
 			<p>
-				Simple, but what's the best way to set up that regular interval? You could use your own implementation with setInterval, or setTimeout, requestAnimationFrame, and EaselJS would work perfectly, as long as you remember to call <code>stage.update()</code> after updating your display list.
+				Simple, but what's the best way to set up that regular interval? You could use your own implementation with setInterval, setTimeout, or requestAnimationFrame, and EaselJS would work perfectly, as long as you remember to call <code>stage.update()</code> after updating your display list.
 			</p>
 			<p>
 				To make things easy, EaselJS comes with the <code>Ticker</code> class, which provides a regular heartbeat (tick) for your application, provides pause and time deltas, and wraps both setTimeout and requestAnimationFrame so you can use them interchangeably.
@@ -57,16 +57,16 @@ if (circle.x > stage.canvas.width) { circle.x = 0; }
 			<p>
 				The code below adds the window as a listener, and defines a tick function that will be called 20 times per second (<code>Ticker</code>'s default framerate):
 			<textarea class="brush: js;" readonly>
-easeljs.Ticker.addListener(window);
+createjs.Ticker.addListener(window);
 function tick() { console.log("TICK!!!"); }
 			</textarea>
 			<p>
-				We can easily change the default framerate by either setting an interval (the time between ticks) or a framerate (the number of ticks per frame).
+				You can easily change the default framerate by either setting an interval (the time between ticks) or a framerate (the number of ticks per frame).
 			</p>
 			<textarea class="brush: js;" readonly>
 // these are equivalent, 1000ms / 40fps = 25ms
-easeljs.Ticker.setInterval(25);
-easeljs.Ticker.setFPS(40);
+createjs.Ticker.setInterval(25);
+createjs.Ticker.setFPS(40);
 			</textarea>
 			<p>
 				Let's combine all of that to make a circle move across the stage at 30 frames per second. And don't forget to call <code>stage.update()</code> at the end of each tick to draw the changes to the canvas! Check out the source for simple.html for the complete code.
@@ -84,7 +84,7 @@ easeljs.Ticker.setFPS(40);
 			<p>
 				<code>Ticker</code> makes time based animations easy, by passing your listener a parameter that indicates the amount of time that has elapsed since the previous tick. It also exposes a <code>getTime</code> method which provides you with the total time elapsed since <code>Ticker</code> initialized.
 			</p>
-				You can make our animation time based by simply factoring in the elapsed time when we make our property changes.
+				You can make your animation time based by simply factoring in the elapsed time when we make our property changes.
 			<textarea class="brush: js;" readonly>
 function tick(elapsedTime) {
 	// move 100 pixels per second (elapsedTimeInMS / 1000msPerSecond * pixelsPerSecond):
@@ -122,7 +122,7 @@ createjs.Ticker.addListener(myListener, false);
 			<p>
 				In the following demo, play with toggling pause, and see how the red "pauseable" circle stops, where the green "unpauseable" circle does not. You can also see how the total pauseable time stops updating when <code>Ticker</code> is paused.
 			</p>
-			<iframe src="pausing.html" class="demo" longDesc="showing Ticker.setPaused() at work. Click to toggle pause." width="100%" height="220px"></iframe>
+			<iframe src="pausing.html" class="demo" longDesc="showing Ticker.setPaused() at work. Click to toggle pause." width="100%" height="245px"></iframe>
 		</section>
 		
 		<section>
@@ -130,7 +130,7 @@ createjs.Ticker.addListener(myListener, false);
 				<h2>onTick</h2>
 			</header>
 			<p>
-				When you call <code>stage.update()</code>, it calls <code>onTick()</code> on every display object before drawing to the canvas. This lets you handle your animation in the context of your display object.
+				When you call <code>stage.update()</code>, it calls <code>onTick()</code> on every display object before drawing to the canvas. Any parameters passed to <code>update()</code> will be passed on to <code>onTick()</code> handlers. This lets you handle your animation in the context of your display object.
 			</p>
 			<textarea class="brush: js;" readonly>
 circle.onTick = function() { this.x += 5; }
