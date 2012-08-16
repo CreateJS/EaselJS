@@ -85,8 +85,17 @@ var p = SpriteSheetBuilder.prototype;
 	 * the a specific device resolution (ex. tablet vs mobile).
 	 * @property defaultScale
 	 * @type Number
+	 * @default 1
 	 **/
 	p.scale = 1;
+	
+	/**
+	* The padding to use between frames. This is helpful to preserve antialiasing on drawn vector content.
+	* @property padding
+	* @type Number
+	* @default 1
+	**/
+	p.padding = 1;
 
 // private properties:
 
@@ -231,8 +240,8 @@ var p = SpriteSheetBuilder.prototype;
 		if (!rect&&source.getBounds) { rect = source.getBounds(); }
 		if (!rect && !rects) { return null; }
 		
-		var l = source.timeline.duration;
-		for (var i=0; i<l; i++) {
+		var duration = source.timeline.duration;
+		for (var i=0; i<duration; i++) {
 			var r = (rects&&rects[i]) ? rects[i] : rect;
 			this.addFrame(source, r, scale, function(frame) {
 				var ae = this.actionsEnabled;
@@ -242,8 +251,20 @@ var p = SpriteSheetBuilder.prototype;
 			}, [i], source);
 		}
 		var labels = source.timeline._labels;
+		var lbls = [];
 		for (var n in labels) {
-			this.addAnimation(n, labels[n], true); // for now, this loops all animations.
+			lbls.push({index:labels[n], label:n});
+		}
+		if (lbls.length) {
+			lbls.sort(function(a,b){ return a.index-b.index; });
+			for (var i=0,l=lbls.length; i<l; i++) {
+				var label = lbls[i].label;
+				var start = lbls[i].index;
+				var end = (i == l-1) ? duration : lbls[i+1].index;
+				var frames = [];
+				for (var j=start; j<end; j++) { frames.push(j); }
+				this.addAnimation(label, frames, true); // for now, this loops all animations.
+			}
 		}
 	}
 	
@@ -313,6 +334,7 @@ var p = SpriteSheetBuilder.prototype;
 	 * @protected
 	 **/
 	p._startBuild = function() {
+		var pad = this.padding||0;
 		this.spriteSheet = null;
 		this._index = 0;
 		this._scale = this.scale;
@@ -326,20 +348,20 @@ var p = SpriteSheetBuilder.prototype;
 		var frames = this._frames.slice();
 		frames.sort(function(a,b) { return (a.height<=b.height) ? -1 : 1; });
 		
-		if (frames[frames.length-1].height > this.maxHeight) { throw SpriteSheetBuilder.ERR_DIMENSIONS; }
-		var y = 1, x=1;
+		if (frames[frames.length-1].height+pad*2 > this.maxHeight) { throw SpriteSheetBuilder.ERR_DIMENSIONS; }
+		var y=0, x=0;
 		var img = 0;
 		while (frames.length) {
-			var o = this._fillRow(frames, y, img, dataFrames);
+			var o = this._fillRow(frames, y, img, dataFrames, pad);
 			if (o.w > x) { x = o.w; }
-			y += o.h+2;
+			y += o.h;
 			if (!o.h || !frames.length) {
 				var canvas = ns.createCanvas?ns.createCanvas():document.createElement("canvas");
 				canvas.width = this._getSize(x,this.maxWidth);
 				canvas.height = this._getSize(y,this.maxHeight);
 				this._data.images[img] = canvas;
 				if (!o.h) {
-					x=y=1;
+					x=y=0;
 					img++;
 				}
 			}
@@ -362,29 +384,30 @@ var p = SpriteSheetBuilder.prototype;
 	 * @protected
 	 * @return {Number} The width & height of the row.
 	 **/
-	p._fillRow = function(frames, y, img, dataFrames) {
+	p._fillRow = function(frames, y, img, dataFrames, pad) {
 		var w = this.maxWidth;
 		var maxH = this.maxHeight;
 		var h = maxH-y;
-		var x = 1;
+		var x = pad;
+		y += pad;
 		var height = 0;
 		for (var i=frames.length-1; i>=0; i--) {
 			var frame = frames[i];
 			var sc = this._scale*frame.scale;
 			var rect = frame.sourceRect;
 			var source = frame.source;
-			var rx = Math.floor(sc*rect.x-1);
-			var ry = Math.floor(sc*rect.y-1);
-			var rh = Math.ceil(sc*rect.height);
-			var rw = Math.ceil(sc*rect.width);
+			var rx = Math.floor(sc*rect.x-pad);
+			var ry = Math.floor(sc*rect.y-pad);
+			var rh = Math.ceil(sc*rect.height+pad*2);
+			var rw = Math.ceil(sc*rect.width+pad*2);
 			if (rw > w) { throw SpriteSheetBuilder.ERR_DIMENSIONS; }
 			if (rh > h || x+rw > w) { continue; }
 			frame.img = img;
 			frame.rect = new ns.Rectangle(x,y,rw,rh);
 			height = height || rh;
 			frames.splice(i,1);
-			dataFrames[frame.index] = [x-1,y-1,rw+2,rh+2,img,Math.round(-rx+sc*source.regX),Math.round(-ry+sc*source.regY)];
-			x += rw+2;
+			dataFrames[frame.index] = [x,y,rw,rh,img,Math.round(-rx+sc*source.regX-pad),Math.round(-ry+sc*source.regY-pad)];
+			x += rw;
 		}
 		return {w:x, h:height};
 	}
@@ -432,9 +455,9 @@ var p = SpriteSheetBuilder.prototype;
 		frame.funct&&frame.funct.apply(frame.scope, frame.params);
 		ctx.save();
 		ctx.beginPath();
-		ctx.rect(rect.x-1, rect.y-1, rect.width+2, rect.height+2);
+		ctx.rect(rect.x, rect.y, rect.width, rect.height);
 		ctx.clip();
-		ctx.translate(rect.x-sourceRect.x*sc+0.5|0, rect.y-sourceRect.y*sc+0.5|0); // we know these are positive
+		ctx.translate(Math.ceil(rect.x-sourceRect.x*sc), Math.ceil(rect.y-sourceRect.y*sc));
 		ctx.scale(sc,sc);
 		frame.source.draw(ctx); // display object will draw itself.
 		ctx.restore();

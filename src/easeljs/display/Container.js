@@ -200,7 +200,7 @@ var p = Container.prototype = new ns.DisplayObject();
 			for (var i=0; i<l; i++) { a[i] = arguments[i]; }
 			a.sort(function(a, b) { return b-a; });
 			var good = true;
-			for (i=0; i<l; i++) { good = good && this.removeChildAt(a[i]); }
+			for (var i=0; i<l; i++) { good = good && this.removeChildAt(a[i]); }
 			return good;
 		}
 		if (index < 0 || index > this.children.length-1) { return false; }

@@ -300,7 +300,12 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * The onTick callback is called on each display object on a stage whenever the stage updates.
-	 * This occurs immediately before the rendering (draw) pass.
+	 * This occurs immediately before the rendering (draw) pass. When stage.update() is called, first all display objects
+	 * on the stage have onTick called, then all of the display objects are drawn to stage. Children will have their
+	 * onTick called in order of their depth prior to onTick being called on their parent.
+	 * <br/><br/>
+	 * Any parameters passed in to stage.update() are passed on to the onTick() handlers. For example, if you call
+	 * stage.update("hello"), all of the display objects with a handler will have onTick("hello") called.
 	 * @event onTick
 	 **/
 	p.onTick = null;
