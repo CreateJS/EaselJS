@@ -410,14 +410,14 @@ var p = Stage.prototype = new ns.Container();
 	 * @param {Number} pageY
 	 **/
 	p._updatePointerPosition = function(id, pageX, pageY) {
-		var element = this.canvas;
-		do {
-			pageX -= element.offsetLeft;
-			pageY -= element.offsetTop;
-		} while (element = element.offsetParent);
+		var rect = this._getElementRect(this.canvas);
+		pageX -= rect.left;
+		pageY -= rect.top;
 		
 		var w = this.canvas.width;
 		var h = this.canvas.height;
+		pageX /= (rect.right-rect.left)/w;
+		pageY /= (rect.bottom-rect.top)/h;
 		var o = this._getPointerData(id);
 		if (o.inBounds = (pageX >= 0 && pageY >= 0 && pageX <= w-1 && pageY <= h-1)) {
 			o.x = pageX;
@@ -434,6 +434,32 @@ var p = Stage.prototype = new ns.Container();
 			this.mouseX = o.x;
 			this.mouseY = o.y;
 			this.mouseInBounds = o.inBounds;
+		}
+	}
+	
+	/**
+	 * @method _getElementRect
+	 * @protected
+	 * @param {HTMLElement} e
+	 **/
+	p._getElementRect = function(e) {
+		// TODO: should we add support for padding and borders here?
+		var bounds = e.getBoundingClientRect();
+		var offX = (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || document.body.clientLeft || 0);
+		var offY = (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || document.body.clientTop  || 0);
+		
+		var styles = window.getComputedStyle ? getComputedStyle(e) : e.currentStyle; // IE <9 compatibility.
+		var padL = parseInt(styles.paddingLeft)+parseInt(styles.borderLeftWidth);
+		var padT = parseInt(styles.paddingTop)+parseInt(styles.borderTopWidth);
+		var padR = parseInt(styles.paddingRight)+parseInt(styles.borderRightWidth);
+		var padB = parseInt(styles.paddingBottom)+parseInt(styles.borderBottomWidth);
+		
+		// note: in some browsers bounds properties are read only.
+		return {
+			left: bounds.left+offX+padL,
+			right: bounds.right+offX-padR,
+			top: bounds.top+offY+padT,
+			bottom: bounds.bottom+offY-padB
 		}
 	}
 

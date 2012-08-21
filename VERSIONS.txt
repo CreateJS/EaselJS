@@ -1,7 +1,6 @@
 Version NEXT [release TBD]
 ****************************************************************************************************
 - moved all classes into a configurable createjs namespace
-- added AlphaMapFilter & AlphaMaskFilter
 - added support for multitouch
 - complete rewrite of drawing model to use a hybrid approach (save/restore & matrix)
 - added DisplayObject.mask
@@ -30,6 +29,8 @@ Version NEXT [release TBD]
 - text.color now defaults to "#000" instead of null
 - parameters passed to Stage.update are now passed on to onTick handlers
 	- for example, Ticker elapsedTime and paused params
+- correctly resolves mouse positions for CSS scaled canvases & canvases with borders/padding
+- added AlphaMapFilter & AlphaMaskFilter
 
 
 Version 0.4.2 [Apr 18, 2012] 
