@@ -443,7 +443,6 @@ var p = Stage.prototype = new ns.Container();
 	 * @param {HTMLElement} e
 	 **/
 	p._getElementRect = function(e) {
-		// TODO: should we add support for padding and borders here?
 		var bounds = e.getBoundingClientRect();
 		var offX = (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || document.body.clientLeft || 0);
 		var offY = (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || document.body.clientTop  || 0);
