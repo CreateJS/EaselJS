@@ -31,6 +31,7 @@ Version NEXT [release TBD]
 	- for example, Ticker elapsedTime and paused params
 - correctly resolves mouse positions for CSS scaled canvases & canvases with borders/padding
 - added AlphaMapFilter & AlphaMaskFilter
+- added Touch.disable(stage)
 
 
 Version 0.4.2 [Apr 18, 2012] 
