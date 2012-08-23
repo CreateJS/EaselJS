@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 
 /**
 * This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, onMouseOver, onMouseOut and onClick
@@ -177,6 +180,5 @@ var p = MouseEvent.prototype;
 		return "[MouseEvent (type="+this.type+" stageX="+this.stageX+" stageY="+this.stageY+")]";
 	}
 
-ns.MouseEvent = MouseEvent;
-}(createjs||(createjs={})));
-var createjs;
+createjs.MouseEvent = MouseEvent;
+}());

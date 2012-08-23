@@ -25,7 +25,10 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
 */
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 
 /**
 * Global utility for generating sequential unique ID numbers.
@@ -54,6 +57,5 @@ var UID = function() {
 		return UID._nextID++;
 	}
 
-ns.UID = UID;
-}(createjs||(createjs={})));
-var createjs;
+createjs.UID = UID;
+}());

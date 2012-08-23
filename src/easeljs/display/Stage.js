@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 
 /**
 * A stage is the root level Container for a display list. Each time its tick method is called, it will render its display
@@ -39,7 +42,7 @@
 var Stage = function(canvas) {
   this.initialize(canvas);
 }
-var p = Stage.prototype = new ns.Container();
+var p = Stage.prototype = new createjs.Container();
 
 // static properties:
 	/**
@@ -392,7 +395,7 @@ var p = Stage.prototype = new ns.Container();
 		var inBounds = o.inBounds;
 		this._updatePointerPosition(id, pageX, pageY);
 		if (!inBounds && !o.inBounds && !this.mouseMoveOutside) { return; }
-		var evt = new ns.MouseEvent("onMouseMove", o.x, o.y, this, e, id, id == this._primaryPointerID, o.rawX, o.rawY);
+		var evt = new createjs.MouseEvent("onMouseMove", o.x, o.y, this, e, id, id == this._primaryPointerID, o.rawX, o.rawY);
 
 		if (this.onMouseMove) { this.onMouseMove(evt); }
 		if (o.event && o.event.onMouseMove) {
@@ -481,7 +484,7 @@ var p = Stage.prototype = new ns.Container();
 	p._handlePointerUp = function(id, e, clear) {
 		var o = this._getPointerData(id);
 		
-		var evt = new ns.MouseEvent("onMouseUp", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
+		var evt = new createjs.MouseEvent("onMouseUp", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
 		if (this.onMouseUp) { this.onMouseUp(evt); }
 		if (o.event && o.event.onMouseUp) {
 			evt = evt.clone(); // not sure this is entirely necessary.
@@ -489,7 +492,7 @@ var p = Stage.prototype = new ns.Container();
 			o.event.onMouseUp(evt);
 		}
 		if (o.target && o.target.onClick && this._getObjectsUnderPoint(o.x, o.y, null, true, (this._mouseOverIntervalID ? 3 : 1)) == o.target) {
-			o.target.onClick(new ns.MouseEvent("onClick", o.x, o.y, o.target, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
+			o.target.onClick(new createjs.MouseEvent("onClick", o.x, o.y, o.target, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
 		}
 		if (clear) {
 			if (id == this._primaryPointerID) { this._primaryPointerID = null; }
@@ -519,12 +522,12 @@ var p = Stage.prototype = new ns.Container();
 		if (y != null) { this._updatePointerPosition(id, x, y); }
 		
 		if (this.onMouseDown) {
-			this.onMouseDown(new ns.MouseEvent("onMouseDown", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
+			this.onMouseDown(new createjs.MouseEvent("onMouseDown", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
 		}
 		var target = this._getObjectsUnderPoint(o.x, o.y, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
 			if (target.onPress) {
-				var evt = new ns.MouseEvent("onPress", o.x, o.y, target, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
+				var evt = new createjs.MouseEvent("onPress", o.x, o.y, target, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
 				target.onPress(evt);
 				if (evt.onMouseMove || evt.onMouseUp) { o.event = evt; }
 			}
@@ -550,10 +553,10 @@ var p = Stage.prototype = new ns.Container();
 
 		if (this._mouseOverTarget != target) {
 			if (this._mouseOverTarget && this._mouseOverTarget.onMouseOut) {
-				this._mouseOverTarget.onMouseOut(new ns.MouseEvent("onMouseOut", this.mouseX, this.mouseY, this._mouseOverTarget));
+				this._mouseOverTarget.onMouseOut(new createjs.MouseEvent("onMouseOut", this.mouseX, this.mouseY, this._mouseOverTarget));
 			}
 			if (target && target.onMouseOver) {
-				target.onMouseOver(new ns.MouseEvent("onMouseOver", this.mouseX, this.mouseY, target));
+				target.onMouseOver(new createjs.MouseEvent("onMouseOver", this.mouseX, this.mouseY, target));
 			}
 			this._mouseOverTarget = target;
 		}
@@ -567,14 +570,13 @@ var p = Stage.prototype = new ns.Container();
 	p._handleDoubleClick = function(e) {
 		// TODO: add Touch support for double tap.
 		if (this.onDoubleClick) {
-			this.onDoubleClick(new ns.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, this, e, -1, true));
+			this.onDoubleClick(new createjs.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, this, e, -1, true));
 		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target && target.onDoubleClick) {
-			target.onDoubleClick(new ns.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, target, e, -1, true));
+			target.onDoubleClick(new createjs.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, target, e, -1, true));
 		}
 	}
 
-ns.Stage = Stage;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Stage = Stage;
+}());

@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 
 /**
 * A Bitmap represents an Image, Canvas, or Video in the display list.
@@ -38,7 +41,7 @@
 var Bitmap = function(imageOrUri) {
   this.initialize(imageOrUri);
 }
-var p = Bitmap.prototype = new ns.DisplayObject();
+var p = Bitmap.prototype = new createjs.DisplayObject();
 
 // public properties:
 	/**
@@ -172,6 +175,5 @@ var p = Bitmap.prototype = new ns.DisplayObject();
 
 // private methods:
 
-ns.Bitmap = Bitmap;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Bitmap = Bitmap;
+}());

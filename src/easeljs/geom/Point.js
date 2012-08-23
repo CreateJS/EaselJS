@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 
 /**
 * Represents a point on a 2 dimensional x / y coordinate system.
@@ -86,6 +89,5 @@ var p = Point.prototype;
 		return "[Point (x="+this.x+" y="+this.y+")]";
 	}
 	
-ns.Point = Point;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Point = Point;
+}());

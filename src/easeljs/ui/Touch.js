@@ -27,7 +27,10 @@
 */
 
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 
 // TODO: support for double tap.
 /**
@@ -245,6 +248,5 @@ var Touch = function() {
 	};
 
 
-ns.Touch = Touch;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Touch = Touch;
+}());

@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 
 /**
 * Applies color transforms.
@@ -45,7 +48,7 @@
 var ColorFilter = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
   this.initialize(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset);
 }
-var p = ColorFilter.prototype = new ns.Filter();
+var p = ColorFilter.prototype = new createjs.Filter();
 
 // public properties:
 	/**
@@ -176,6 +179,5 @@ var p = ColorFilter.prototype = new ns.Filter();
 		return new ColorFilter(this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier, this.redOffset, this.greenOffset, this.blueOffset, this.alphaOffset);
 	}
 
-ns.ColorFilter = ColorFilter;
-}(createjs||(createjs={})));
-var createjs;
+createjs.ColorFilter = ColorFilter;
+}());

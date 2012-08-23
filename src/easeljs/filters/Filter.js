@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 
 /**
 * Base class that all filters should inherit from.
@@ -55,7 +58,7 @@ var p = Filter.prototype;
 	 * @return {Rectangle} a rectangle object indicating the margins required to draw the filter.
 	 **/
 	p.getBounds = function() {
-		return new ns.Rectangle(0,0,0,0);
+		return new createjs.Rectangle(0,0,0,0);
 	}
 	
 	/**
@@ -91,6 +94,5 @@ var p = Filter.prototype;
 		return new Filter();
 	}
 	
-ns.Filter = Filter;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Filter = Filter;
+}());
