@@ -24,7 +24,8 @@
 	var canvas;
 	var stage;
 	var shape;
-	var circleRadius=20;
+	var circleRadius=30;
+	var rings = 30;
 
 	function init() {
 		if (window.top != window) {
@@ -39,13 +40,11 @@
 
 		var colors = ["#828b20", "#b0ac31", "#cbc53d", "#fad779", "#f9e4ad", "#faf2db", "#563512", "#9b4a0b", "#d36600", "#fe8a00", "#f9a71f"];
 
-		for (var i=0; i<1000; i++) {
+		for (var i=0; i<200; i++) {
 			shape = new createjs.Shape();
-			shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius);
-			shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*0.8);
-			shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*0.6);
-			shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*0.4);
-			shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*0.2);
+			for (var j=rings; j>0; j--) {
+				shape.graphics.beginFill(colors[Math.random()*colors.length |0]).drawCircle(0,0,circleRadius*j/rings);
+			}
 			shape.x = Math.random()*canvas.width;
 			shape.y = Math.random()*canvas.height;
 			shape.velX = Math.random()*10-5;
@@ -116,10 +115,9 @@
 
 	<header id="header" class="EaselJS">
 	    <h1><span class="text-product">Easel<strong>JS</strong></span> Cache as Bitmap Example</h1>
-	    <p>This example demonstrates the effect of <strong>DisplayObject.cache()</strong> and <strong>snapToPixel</strong> on performance. Caching speeds things up because the complex vector shapes do not have to be rerendered each tick. The results for snapToPixel vary between browsers, but in general it will have no effect on the uncached shapes, but a significant effect when cached.</p>
+	    <p>This example demonstrates the effect of <strong>DisplayObject.cache()</strong> and <strong>snapToPixel</strong> on performance. Caching can provide performance benefits for some types of content because the complex vector shapes do not have to be rerendered each tick. Different browsers have different thresholds for when caching makes sense. The results for snapToPixel vary between browsers, but in general it will have no effect on the uncached shapes, but a significant effect when cached.</p>
 	</header>
 
-	<!-- background isn't set to black to demonstrate how the darkening applies -->
 	<div class="controls">
 		<input type="checkbox" onClick="toggleCache(this.checked);"/> cache enabled
 		<input type="checkbox" onClick="stage.snapToPixelEnabled = !!this.checked;"/> snapToPixel enabled

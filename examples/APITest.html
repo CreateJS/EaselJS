@@ -11,11 +11,14 @@
 	<script type="text/javascript" src="assets/StringUtils.js"></script>
 	<script type="text/javascript" src="assets/DelayedCall.js"></script>
 
+	
 	<script>
 		// this sets the namespace for CreateJS to the window object, so you can instantiate objects without specifying 
 		// the namespace: "new Graphics()" instead of "new createjs.Graphics()"
+		// this is a quick way to make projects built on pervious versions of EaselJS run without extensive modifications
 		var createjs = window;
 	</script>
+	
 	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
@@ -263,7 +266,7 @@ stage.addChild(bitmapAnimation);}
 
 	<header id="header" class="EaselJS">
 	    <h1><span class="text-product">Easel<strong>JS</strong></span> API Test</h1>
-	    <p>This demo shows the usage of all of the visual APIs.</p>
+	    <p>This demo shows the usage of many of the visual APIs.</p>
 	</header>
 
 	<!--
