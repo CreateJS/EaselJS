@@ -38,7 +38,7 @@
 * @constructor
 * @param {String} text Optional. The text to display.
 * @param {String} font Optional. The font style to use. Any valid value for the CSS font attribute is 
-* acceptable (ex. "36px bold Arial").
+* acceptable (ex. "bold 36px Arial").
 * @param {String} color Optional. The color to draw the text in. Any valid value for the CSS color attribute
 * is acceptable (ex. "#F00").
 **/
