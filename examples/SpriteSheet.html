@@ -6,11 +6,14 @@
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 	
 	
+	
 	<script>
 		// this sets the namespace for CreateJS to the window object, so you can instantiate objects without specifying 
 		// the namespace: "new Graphics()" instead of "new createjs.Graphics()"
+		// this is a quick way to make projects built on pervious versions of EaselJS run without extensive modifications
 		var createjs = window;
 	</script>
+	
 	<script src="http://code.createjs.com/preloadjs-0.1.0.min.js"></script>
 
 	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
@@ -92,7 +95,7 @@
 		stage.autoClear = false;
 	}
 
-		function handleFileLoad(event) {
+		function handleFileLoad(event) {crazy
 			assets.push(event);
 		}
 
@@ -106,31 +109,31 @@
 					var bmp = new Bitmap(result);
 				}
 
-			switch (id) {
-				case "sky":
-					sky = new Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,w,h));
-					break;
-				case "ground":
-					ground = new Shape();
-					var g = ground.graphics;
-					g.beginBitmapFill(result);
-					g.drawRect(0, 0, w+330, 79);
-					ground.y = h-79;
-					break;
-				case "hill":
-					hill = new Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,282,59));
-					hill.x = Math.random() * w;
-					hill.scaleX = hill.scaleY = 3;
-					hill.y = 144;
-					break;
-				case "hill2":
-					hill2 = new Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,212,50));
-					hill2.x = Math.random() * w;
-					hill2.scaleX = hill2.scaleY = 3;
-					hill2.y = 171;
-					break;
+				switch (id) {
+					case "sky":
+						sky = new Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,w,h));
+						break;
+					case "ground":
+						ground = new Shape();
+						var g = ground.graphics;
+						g.beginBitmapFill(result);
+						g.drawRect(0, 0, w+330, 79);
+						ground.y = h-79;
+						break;
+					case "hill":
+						hill = new Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,282,59));
+						hill.x = Math.random() * w;
+						hill.scaleX = hill.scaleY = 3;
+						hill.y = 144;
+						break;
+					case "hill2":
+						hill2 = new Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,212,50));
+						hill2.x = Math.random() * w;
+						hill2.scaleX = hill2.scaleY = 3;
+						hill2.y = 171;
+						break;
+				}
 			}
-		}
 
 			document.getElementById("loader").className = "";
 

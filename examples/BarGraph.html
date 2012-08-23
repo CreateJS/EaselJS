@@ -79,7 +79,7 @@
 		label = new createjs.Text("Bar Graph Example", "bold 30px Arial", "#FFF");
 		label.textAlign = "center";
 		label.x = canvas.width/2;
-		label.y = 50;
+		label.y = 20;
 		stage.addChild(label);
 
 		// draw the bars:
@@ -124,7 +124,7 @@
 			label.textAlign = "center";
 			label.x = barWidth/2;
 			label.maxWidth = barWidth;
-			label.y = 26;
+			label.y = 12;
 			label.alpha = 0.5;
 
 			// draw the tab that is placed under the label:
@@ -184,7 +184,7 @@
 		var val = bar.getChildAt(3);
 		val.text = value|0;
 		val.visible = (h>28);
-		val.y = -h+22;
+		val.y = -h+10;
 
 		// scale the front panel, and position the top:
 		bar.getChildAt(1).scaleY = h/100;
