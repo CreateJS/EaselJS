@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+if(!this.createjs)
+	createjs = {};
+
+(function() {
 
 /**
 * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting.
@@ -38,7 +41,7 @@
 var ColorMatrixFilter = function(matrix) {
   this.initialize(matrix);
 }
-var p = ColorMatrixFilter.prototype = new ns.Filter();
+var p = ColorMatrixFilter.prototype = new createjs.Filter();
 
 // public properties:
 	p.matrix = null;
@@ -120,6 +123,5 @@ var p = ColorMatrixFilter.prototype = new ns.Filter();
 		return new ColorMatrixFilter(this.matrix);
 	}
 	
-ns.ColorMatrixFilter = ColorMatrixFilter;
-}(createjs||(createjs={})));
-var createjs;
+createjs.ColorMatrixFilter = ColorMatrixFilter;
+}());

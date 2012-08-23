@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+if(!this.createjs)
+	createjs = {};
+
+(function() {
 
 /**
 * A Container is a nestable display lists that allows you to work with compound display elements. For
@@ -43,7 +46,7 @@
 var Container = function() {
   this.initialize();
 }
-var p = Container.prototype = new ns.DisplayObject();
+var p = Container.prototype = new createjs.DisplayObject();
 
 // public properties:
 	/**
@@ -491,6 +494,5 @@ var p = Container.prototype = new ns.DisplayObject();
 		return null;
 	}
 
-ns.Container = Container;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Container = Container;
+}());

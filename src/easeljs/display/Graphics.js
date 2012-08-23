@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+if(!this.createjs)
+	createjs = {};
+
+(function() {
 
 // used to create the instruction lists used in Graphics:
 
@@ -172,7 +175,7 @@ var p = Graphics.prototype;
 	 * @protected
 	 * @type CanvasRenderingContext2D
 	 **/
-	Graphics._ctx = (ns.createCanvas?ns.createCanvas():document.createElement("canvas")).getContext("2d");
+	Graphics._ctx = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas")).getContext("2d");
 	
 	/**
 	 * @property beginCmd
@@ -1158,6 +1161,5 @@ var p = Graphics.prototype;
 		this[name] = value;
 	}
 
-ns.Graphics = Graphics;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Graphics = Graphics;
+}());

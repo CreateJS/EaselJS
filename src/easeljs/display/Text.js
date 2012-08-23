@@ -26,8 +26,11 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
-	
+if(!this.createjs)
+	createjs = {};
+
+(function() {
+
 /**
 * Allows you to display one or more lines of dynamic text (not user editable) in the display list.
 * Line wrapping support (using the lineWidth is very basic, wrapping on spaces and tabs only. Note
@@ -45,7 +48,7 @@
 var Text = function(text, font, color) {
   this.initialize(text, font, color);
 }
-var p = Text.prototype = new ns.DisplayObject();
+var p = Text.prototype = new createjs.DisplayObject();
 
 
 	/**
@@ -53,7 +56,7 @@ var p = Text.prototype = new ns.DisplayObject();
 	 * @type CanvasRenderingContext2D
 	 * @private
 	 **/
-	Text._workingContext = (ns.createCanvas?ns.createCanvas():document.createElement("canvas")).getContext("2d");
+	Text._workingContext = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas")).getContext("2d");
 
 // public properties:
 	/**
@@ -328,6 +331,5 @@ var p = Text.prototype = new ns.DisplayObject();
 		
 	}
 
-ns.Text = Text;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Text = Text;
+}());
