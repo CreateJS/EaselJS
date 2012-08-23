@@ -40,7 +40,7 @@ this.createjs = this.createjs||{};
 
 /**
 * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
-* Sprite, Bitmap, and Shape. DisplayObject is the base class for all display classes in the CanvasDisplay library.
+* Container, Bitmap, and Shape. DisplayObject is the base class for all display classes in the EaselJS library.
 * It defines the core properties and methods that are shared between all display objects.
 * @class DisplayObject
 * @constructor
@@ -111,8 +111,9 @@ var p = DisplayObject.prototype;
 	p.id = -1;
 
 	/**
-	 * Indicates whether to include this object when running Stage.getObjectsUnderPoint(). Setting this to true for
-	 * Sprites will cause the Sprite to be returned (not its children) regardless of whether it's mouseChildren property
+	 * Indicates whether to include this object when running Stage.getObjectsUnderPoint(), and thus for mouse
+	 * interactions. Setting this to true for
+	 * Containers will cause the Container to be returned (not its children) regardless of whether it's mouseChildren property
 	 * is true.
 	 * @property mouseEnabled
 	 * @type Boolean
@@ -129,7 +130,7 @@ var p = DisplayObject.prototype;
 	p.name = null;
 
 	/**
-	 * A reference to the Sprite or Stage object that contains this display object, or null if it has not been added to
+	 * A reference to the Container or Stage object that contains this display object, or null if it has not been added to
 	 * one. READ-ONLY.
 	 * @property parent
 	 * @final
@@ -466,7 +467,8 @@ var p = DisplayObject.prototype;
 		}
 		
 		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
-		if (createjs.Stage._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
+		// TODO: should be a better way to manage this setting. For now, using dynamic access to avoid circular dependencies:
+		if (createjs["Stage"]._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
 		else { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
 		ctx.globalAlpha *= o.alpha;
 		if (o.compositeOperation) { ctx.globalCompositeOperation = o.compositeOperation; }
@@ -475,7 +477,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * Draws the display object into a new canvas, which is then used for subsequent draws. For complex content
-	 * that does not change frequently (ex. a Sprite with many children that do not move, or a complex vector Shape),
+	 * that does not change frequently (ex. a Container with many children that do not move, or a complex vector Shape),
 	 * this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
 	 * cached display object can be moved, rotated, faded, etc freely, however if it's content changes, you must manually
 	 * update the cache by calling updateCache() or cache() again. You must specify the cache area via the x, y, w,
@@ -558,7 +560,8 @@ var p = DisplayObject.prototype;
 		while (o.parent) {
 			o = o.parent;
 		}
-		if (o instanceof createjs.Stage) { return o; }
+		// using dynamic access to avoid circular dependencies;
+		if (o instanceof createjs["Stage"]) { return o; }
 		return null;
 	}
 
