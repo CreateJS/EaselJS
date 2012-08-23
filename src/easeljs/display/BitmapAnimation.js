@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 	
 /**
 * Displays frames or sequences of frames (ie. animations) from a sprite sheet image. A sprite sheet is a series of images
@@ -43,7 +46,7 @@
 var BitmapAnimation = function(spriteSheet) {
   this.initialize(spriteSheet);
 }
-var p = BitmapAnimation.prototype = new ns.DisplayObject();
+var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 
 // public properties:
 
@@ -376,6 +379,5 @@ var p = BitmapAnimation.prototype = new ns.DisplayObject();
 		}
 	}
 
-ns.BitmapAnimation = BitmapAnimation;
-}(createjs||(createjs={})));
-var createjs;
+createjs.BitmapAnimation = BitmapAnimation;
+}());

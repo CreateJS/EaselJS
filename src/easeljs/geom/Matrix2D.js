@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 
 /**
 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
@@ -530,6 +533,5 @@ var p = Matrix2D.prototype;
 	// this has to be populated after the class is defined:
 	Matrix2D.identity = new Matrix2D(1, 0, 0, 1, 0, 0);
 
-ns.Matrix2D = Matrix2D;
-}(createjs||(createjs={})));
-var createjs;
+createjs.Matrix2D = Matrix2D;
+}());

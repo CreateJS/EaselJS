@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 // TODO: fix problems with rotation.
 // TODO: exclude from getObjectsUnderPoint
 
@@ -52,7 +55,7 @@
 var DOMElement = function(htmlElement) {
   this.initialize(htmlElement);
 }
-var p = DOMElement.prototype = new ns.DisplayObject();
+var p = DOMElement.prototype = new createjs.DisplayObject();
 
 // public properties:
 	/**
@@ -210,6 +213,5 @@ var p = DOMElement.prototype = new ns.DisplayObject();
 		return true;
 	}
 	*/
-ns.DOMElement = DOMElement;
-}(createjs||(createjs={})));
-var createjs;
+createjs.DOMElement = DOMElement;
+}());

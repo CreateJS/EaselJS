@@ -26,7 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ns) {
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
 // constructor:
 /**
 * The SpriteSheetUtils class is a collection of static methods for working
@@ -47,7 +50,7 @@ var SpriteSheetUtils = function() {
 	 * @type HTMLCanvasElement
 	 * @protected
 	*/
-	SpriteSheetUtils._workingCanvas = ns.createCanvas?ns.createCanvas():document.createElement("canvas");
+	SpriteSheetUtils._workingCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 
 	/**
 	 * @property _workingContext
@@ -121,7 +124,7 @@ var SpriteSheetUtils = function() {
 	 * @return {Canvas} A canvas with the combined image data. This can be used as a source for Bitmap or SpriteSheet.
 	*/
 	SpriteSheetUtils.mergeAlpha = function(rgbImage, alphaImage, canvas) {
-		if (!canvas) { canvas = ns.createCanvas?ns.createCanvas():document.createElement("canvas"); }
+		if (!canvas) { canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
 		canvas.width = Math.max(alphaImage.width, rgbImage.width);
 		canvas.height = Math.max(alphaImage.height, rgbImage.height);
 		var ctx = canvas.getContext("2d");
@@ -194,6 +197,5 @@ var SpriteSheetUtils = function() {
 	}
 	
 
-ns.SpriteSheetUtils = SpriteSheetUtils;
-}(createjs||(createjs={})));
-var createjs;
+createjs.SpriteSheetUtils = SpriteSheetUtils;
+}());
