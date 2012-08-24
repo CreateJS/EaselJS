@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS demo: onClick</title>
+	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
+	<script src="../../lib/easeljs-0.5.0.min.js"></script>
+	<script>
+		function init() {
+			var stage = new createjs.Stage("demoCanvas");
+			stage.enableMouseOver();
+			
+			var label1 = new createjs.Text("text without hitArea", "48px Arial", "#F00");
+			label1.x = label1.y = 10;
+			label1.alpha = 0.5;
+			
+			var label2 = new createjs.Text("text with hitArea", "48px Arial", "#00F");
+			label2.x = 10;
+			label2.y = 80;
+			label2.alpha = 0.5;
+			
+			// create a rectangle shape the same size as the text, and assign it as the hitArea
+			// note that it is never added to the display list.
+			var hit = new createjs.Shape();
+			hit.graphics.beginFill("#000").drawRect(0, 0, label2.getMeasuredWidth(), label2.getMeasuredHeight());
+			label2.hitArea = hit;
+			
+			label1.onMouseOver = label2.onMouseOver = function(evt) { evt.target.alpha = 1; }
+			label1.onMouseOut = label2.onMouseOut = function(evt) { evt.target.alpha = 0.5; }
+			
+			stage.addChild(label1, label2);
+			
+			createjs.Ticker.addListener(stage);
+			stage.update();
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="500" height="150">
+		alternate content
+	</canvas>
+</body>
+</html>

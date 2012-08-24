@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS demo: Mouse Events</title>
+	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
+	<script src="../../lib/easeljs-0.5.0.min.js"></script>
+	<script>
+		var stage, output;
+		
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+			
+			// to get onMouseOver & onMouseOut events, we need to enable them on the stage:
+			stage.enableMouseOver();
+			
+			output = new createjs.Text("Test press, click, doubleclick, mouseover, and mouseout", "14px Arial");
+			output.x = output.y = 10;
+			stage.addChild(output);
+			
+			var circle = new createjs.Shape();
+			circle.graphics.beginFill("red").drawCircle(0, 0, 50);
+			circle.x = circle.y = 100;
+			circle.name = "circle";
+			stage.addChild(circle);
+			
+			var square = new createjs.Shape();
+			square.graphics.beginFill("green").drawRect(-50, -50, 100, 100);
+			square.x = 250;
+			square.y = 100;
+			square.name = "square";
+			stage.addChild(square);
+			
+			// add a handler for all the events we're interested in:
+			circle.onClick = circle.onPress = circle.onDoubleClick = circle.onMouseOver = circle.onMouseOut = handleMouseEvent;
+			square.onClick = square.onPress = square.onDoubleClick = square.onMouseOver = square.onMouseOut = handleMouseEvent;
+			
+			stage.update();
+		}
+		
+		function handleMouseEvent(evt) {
+			output.text = "evt.target: "+evt.target+", evt.type: "+evt.type;
+			
+			// to save CPU, we're only updating when we need to, instead of on a tick:1
+			stage.update();
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="500" height="200">
+		alternate content
+	</canvas>
+</body>
+</html>
