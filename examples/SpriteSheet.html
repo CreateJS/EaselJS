@@ -14,7 +14,7 @@
 		var createjs = window;
 	</script>
 	
-	<script src="http://code.createjs.com/preloadjs-0.1.0.min.js"></script>
+	<script src="assets/preloadjs-0.2.0.min.js"></script>
 
 	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
@@ -88,14 +88,14 @@
 		];
 
 		loader = new PreloadJS();
-		//loader.useXHR = false; //Loads the images using tag loading.
+		loader.useXHR = false;  // XHR loading is not reliable when running locally.
 		loader.onFileLoad = handleFileLoad;
 		loader.onComplete = handleComplete;
 		loader.loadManifest(manifest);
 		stage.autoClear = false;
 	}
 
-		function handleFileLoad(event) {crazy
+		function handleFileLoad(event) {
 			assets.push(event);
 		}
 

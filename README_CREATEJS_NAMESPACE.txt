@@ -1,4 +1,4 @@
-In the NEXT version of CreateJS class definitions reside in a "createjs" namespace by default.
+In this version of CreateJS class definitions reside in a "createjs" namespace by default.
 
 For example, instead of instantiating a Shape like this:
 var foo = new Shape();

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS demo: Container events</title>
+	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
+	<script src="../../lib/easeljs-0.5.0.min.js"></script>
+	<script>
+		var stage, output;
+		
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+			
+			// this lets our drag continue to track the mouse even when it leaves the canvas:
+			//stage.mouseMoveOutside = true; 
+			
+			var background = new createjs.Shape();
+			background.name = "background";
+			background.graphics.beginFill("red").drawRoundRect(0, 0, 200, 60, 10);
+			
+			var label = new createjs.Text("click me!", "bold 24px Arial", "#FFFFFF");
+			label.name = "label";
+			label.textAlign = "center";
+			label.textBaseline = "middle";
+			label.x = 200/2;
+			label.y = 60/2;
+			
+			var button = new createjs.Container();
+			button.name = "button";
+			button.x = 50;
+			button.y = 25;
+			button.addChild(background, label);
+			stage.addChild(button);
+			
+			background.onClick = label.onClick = handleClick;
+			
+			// if we define a handler on button, then it will be called, but handlers
+			// on the children will not. You can comment out the next line to test:
+			button.onClick = handleClick;
+			
+			createjs.Ticker.addListener(stage);
+			stage.update();
+		}
+		
+		function handleClick(evt) {
+			alert("Clicked on: "+evt.target.name);
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="500" height="100">
+		alternate content
+	</canvas>
+</body>
+</html>

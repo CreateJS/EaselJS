@@ -99,6 +99,7 @@ function tick(elapsedTime) {
 			<iframe src="timeBased.html" class="demo" longDesc="time based animation, the red circle is using time based animation" width="100%" height="250px"></iframe>
 			<p>
 				Notice in the above demo how when you change the FPS, the red circle still moves at the same velocity, whereas the blue circle's velocity is relative to the framerate. Also note how at 20fps, the red circle moves very slightly faster than the blue circle, because it accounts for frames that take slightly longer than the expected 50ms.
+			</p>
 		</section>
 			
 		<section>
@@ -137,6 +138,7 @@ circle.onTick = function() { this.x += 5; }
 			</textarea>
 			<p>
 				You can also add your stage directly as a listener to <code>Ticker</code>, because <code>Stage</code> has a <code>tick</code> method that shortcuts to <code>update</code>. It's rare that you would want to use this, but it can be handy for quick tests. See the source of <a href="onTick.html">onTick.html</a> for an example.
+			</p>
 		</section>
 		
 		<section>

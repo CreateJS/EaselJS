@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS demo: Mouse Events on Stage</title>
+	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
+	<script src="../../lib/easeljs-0.5.0.min.js"></script>
+	<script>
+		var stage, label, shape, oldX, oldY, size, color;
+		
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+			
+			label = new createjs.Text("finger paint", "24px Arial");
+			label.x = label.y = 10;
+			
+			shape = new createjs.Shape();
+			stage.addChild(shape, label);
+			
+			// set up our defaults:
+			color = "#0FF";
+			size = 2;
+			
+			// add handler for stage mouse events:
+			stage.onMouseDown = function() {
+				size = 10;
+			}
+			stage.onMouseUp = function() {
+				color = createjs.Graphics.getHSL(Math.random()*360, 100, 50);
+				size = 2;
+			}
+			stage.onMouseMove = function(evt) {
+				if (oldX) {
+					shape.graphics.beginStroke(color)
+								  .setStrokeStyle(size, "round")
+								  .moveTo(oldX, oldY)
+								  .lineTo(evt.stageX, evt.stageY);
+					stage.update();
+				}
+				oldX = evt.stageX;
+				oldY = evt.stageY;
+			}
+			
+			stage.update();
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="500" height="200">
+		alternate content
+	</canvas>
+</body>
+</html>

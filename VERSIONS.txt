@@ -1,4 +1,4 @@
-Version NEXT [release TBD]
+Version 0.5.0 [Aug 24, 2012]
 ****************************************************************************************************
 - moved all classes into a configurable createjs namespace
 - added support for multitouch
