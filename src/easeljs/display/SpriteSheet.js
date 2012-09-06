@@ -314,7 +314,7 @@ var p = SpriteSheet.prototype;
 	 * and a next property, which specifies the default next animation. If the animation
 	 * loops, the name and next property will be the same.
 	 * @method getAnimation
-	 * @param name The name of the animation to get.
+	 * @param {String} name The name of the animation to get.
 	 * @return {Object} a generic object with frames, frequency, name, and next properties.
 	 **/
 	p.getAnimation = function(name) {

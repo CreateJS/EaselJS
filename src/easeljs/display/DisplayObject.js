@@ -709,7 +709,7 @@ var p = DisplayObject.prototype;
 	 * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
 	 * reverted to their defaults (for example .parent).
 	 * @method clone
-	 @return {DisplayObject} A clone of the current DisplayObject instance.
+	 * @return {DisplayObject} A clone of the current DisplayObject instance.
 	 **/
 	p.clone = function() {
 		var o = new DisplayObject();
