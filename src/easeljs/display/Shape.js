@@ -63,7 +63,7 @@ var p = Shape.prototype = new createjs.DisplayObject();
 	/** 
 	 * Initialization method.
 	 * @method initialize
-	 * param {Graphics} graphics
+	 * @param {Graphics} graphics
 	 * @protected
 	 **/
 	p.initialize = function(graphics) {
