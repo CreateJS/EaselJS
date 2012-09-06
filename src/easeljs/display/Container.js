@@ -263,8 +263,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 	
 	/**
 	 * Swaps the children at the specified indexes. Fails silently if either index is out of range.
-	 * @param index1
-	 * @param index2
+	 * @param {Number} index1
+	 * @param {Number} index2
 	 * @method swapChildrenAt
 	 **/
 	p.swapChildrenAt = function(index1, index2) {
@@ -278,8 +278,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 	
 	/**
 	 * Swaps the specified children's depth in the display list. Fails silently if either child is not a child of this Container.
-	 * @param child1
-	 * @param child2
+	 * @param {DisplayObject} child1
+	 * @param {DisplayObject} child2
 	 * @method swapChildren
 	 **/
 	p.swapChildren = function(child1, child2) {
@@ -297,8 +297,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 	
 	/**
 	 * Changes the depth of the specified child. Fails silently if the child is not a child of this container, or the index is out of range.
-	 * @param child
-	 * @param index
+	 * @param {DisplayObject} child
+	 * @param {Number} index  
 	 * @method setChildIndex
 	 **/
 	p.setChildIndex = function(child, index) {
@@ -333,8 +333,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * position). This ignores the alpha, shadow and compositeOperation of the display object, and all transform properties
 	 * including regX/Y.
 	 * @method hitTest
-	 * @param x The x position to check in the display object's local coordinates.
-	 * @param y The y position to check in the display object's local coordinates.
+	 * @param {Number} x The x position to check in the display object's local coordinates.
+	 * @param {Number} y The y position to check in the display object's local coordinates.
 	 * @return {Boolean} A Boolean indicating whether there is a visible section of a DisplayObject that overlaps the specified
 	 * coordinates.
 	 **/
