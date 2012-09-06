@@ -194,7 +194,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * children, such as "removeChildAt(2, 7, ...);". Returns true if the child (or children) was removed, or false if any index
 	 * was out of range.
 	 * @param {Number} index The index of the child to remove.
-	 * @return true if the child (or children) was removed, or false if any index was out of range.
+	 * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
 	 **/
 	p.removeChildAt = function(index) {
 		var l = arguments.length;

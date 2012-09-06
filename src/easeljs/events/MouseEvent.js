@@ -32,20 +32,20 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, onMouseOver, onMouseOut and onClick
-* handlers on DisplayObject instances.
-* @class MouseEvent
-* @constructor
-* @param {String} type The event type.
-* @param {Number} stageX The normalized x position relative to the stage.
-* @param {Number} stageY The normalized y position relative to the stage.
-* @param {DisplayObject} target The display object this event relates to.
-* @param {MouseEvent} nativeEvent The native DOM event related to this mouse event.
+ * This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, onMouseOver, onMouseOut and onClick
+ * handlers on DisplayObject instances.
+ * @class MouseEvent
+ * @constructor
+ * @param {String} type The event type.
+ * @param {Number} stageX The normalized x position relative to the stage.
+ * @param {Number} stageY The normalized y position relative to the stage.
+ * @param {DisplayObject} target The display object this event relates to.
+ * @param {MouseEvent} nativeEvent The native DOM event related to this mouse event.
  * @param {Number} pointerID The unique id for the pointer.
  * @param {Boolean} primary Indicates whether this is the primary pointer in a multitouch environment.
  * @param {Number} rawX The raw x position relative to the stage.
  * @param {Number} rawY The raw y position relative to the stage.
-**/
+ **/
 var MouseEvent = function(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY) {
   this.initialize(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY);
 }
