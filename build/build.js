@@ -1,5 +1,16 @@
 #!/usr/bin/env node
 
+var FILE = require("fs");
+var PATH = require("path");
+var CHILD_PROCESS = require("child_process");
+var OS = require("os");
+
+//file system utils
+var WRENCH = require("wrench");
+
+//for parsing command line args
+var OPTIMIST = require("optimist");
+
 /************************************************************
 CONFIGURATION
 */
@@ -40,6 +51,9 @@ var PROJECT_NAME = "EaselJS";
 // url for website or github repo for project:
 var PROJECT_URL = "http://createjs.com/";
 
+var PROJECT_VERSION =
+	JSON.parse(FILE.readFileSync(__dirname + "/../package.json", "utf8")).version;
+
 
 // name of directory for docs:
 var DOCS_DIR_NAME = PROJECT_NAME+"_docs-%VERSION%";
@@ -71,18 +85,6 @@ END CONFIGURATION
 
 
 // TODO: add support for recursively checking to see if we are ommiting any files
-
-
-var FILE = require("fs");
-var PATH = require("path");
-var CHILD_PROCESS = require("child_process");
-var OS = require("os");
-
-//file system utils
-var WRENCH = require("wrench");
-
-//for parsing command line args
-var OPTIMIST = require("optimist");
 
 OPTIMIST.describe("v", "Enable verbose output")
 	.alias("v", "verbose")
@@ -157,7 +159,7 @@ function main(argv)
 	}
 
 	verbose = argv.v != undefined;
-	version = argv.version;
+	version = argv.version || PROJECT_VERSION;
 	// Defaulting the "minify" option to "true" manually since the node-optimist
 	// "default" option doesn't seem to be working.
 	minify =
