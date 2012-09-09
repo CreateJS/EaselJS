@@ -65,7 +65,7 @@ var SpriteSheetUtils = function() {
 	 * <b>This is an experimental method, and may be buggy. Please report issues.</b><br/><br/>
 	 * Extends the existing sprite sheet by flipping the original frames horizontally, vertically, or both,
 	 * and adding appropriate animation & frame data. The flipped animations will have a suffix added to their names
-	 * (_h, _v, _hv as appropriate).
+	 * (_h, _v, _hv as appropriate). Make sure the sprite sheet images are fully loaded before using this method.
 	 * <br/><br/>
 	 * For example:<br/>
 	 * SpriteSheetUtils.addFlippedFrames(mySpriteSheet, true, true);
