@@ -243,7 +243,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	/**
 	 * Advances this movie clip to the specified position or label and sets paused to false.
 	 * @method gotoAndPlay
-	 * @param {String} positionOrLabel
+	 * @param {String|Number} positionOrLabel
 	 **/
 	p.gotoAndPlay = function(positionOrLabel) {
 		this.paused = false;
@@ -253,7 +253,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	/**
 	 * Advances this movie clip to the specified position or label and sets paused to true.
 	 * @method gotoAndStop
-	 * @param {String} positionOrLabel
+	 * @param {String|Number} positionOrLabel
 	 **/
 	p.gotoAndStop = function(positionOrLabel) {
 		this.paused = true;
