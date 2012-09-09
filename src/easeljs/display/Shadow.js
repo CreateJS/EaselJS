@@ -115,7 +115,7 @@ var p = Shadow.prototype;
 	/**
 	 * Returns a clone of this Shadow instance.
 	 * @method clone
-	 @return {Shadow} A clone of the current Shadow instance.
+	 * @return {Shadow} A clone of the current Shadow instance.
 	 **/
 	p.clone = function() {
 		return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);

@@ -191,7 +191,7 @@ var p = Stage.prototype = new createjs.Container();
 	/**
 	 * Initialization method.
 	 * @method initialize
-	 * param {HTMLCanvasElement} canvas A canvas object, or the string id of a canvas object in the current document.
+	 * @param {HTMLCanvasElement} canvas A canvas object, or the string id of a canvas object in the current document.
 	 * @protected
 	 **/
 	p.initialize = function(canvas) {
