@@ -32,7 +32,7 @@ var SOURCE_FILES = [
 ];
 
 // default name for lib output:
-var JS_FILE_NAME = "easeljs-%VERSION%.min.js";
+var JS_FILE_NAME = "easeljs-%VERSION%%MIN%.js";
 
 // project name:
 var PROJECT_NAME = "EaselJS";
@@ -102,7 +102,13 @@ OPTIMIST.describe("v", "Enable verbose output")
 	.describe("o", "Name of minified JavaScript file.")
 	.alias("o", "output")
 	.default("o", JS_FILE_NAME)
-	.usage("Build Task Manager for "+PROJECT_NAME+"\nUsage\n$0 [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]");
+	.options('m', {
+		describe: "Minify source output",
+		alias: "minify",
+		type: "boolean",
+		default: true
+	})
+	.usage("Build Task Manager for "+PROJECT_NAME+"\nUsage\n$0 [-v] [-h] [-l] [-m] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]");
 
 
 
@@ -111,6 +117,7 @@ var js_file_name = JS_FILE_NAME;
 
 var version;
 var verbose;
+var minify;
 
 var TASK = {
 	ALL:"ALL",
@@ -151,6 +158,10 @@ function main(argv)
 
 	verbose = argv.v != undefined;
 	version = argv.version;
+	// Defaulting the "minify" option to "true" manually since the node-optimist
+	// "default" option doesn't seem to be working.
+	minify =
+		(argv.minify === undefined && argv.m === undefined) ? true : argv.minify || argv.m;
 	
 	extraSourceFiles = argv.s;
 	
@@ -187,7 +198,7 @@ function main(argv)
 	if(shouldBuildSource)
 	{
 		buildSourceTask(function(success)
-		{		
+		{
 			print("Build Source Task Complete");
 			if(shouldBuildDocs)
 			{
@@ -199,7 +210,7 @@ function main(argv)
 				);
 			}
 
-		});
+		}, { minify: minify });
 	}
 
 	if(shouldBuildDocs && task != "ALL")
@@ -216,6 +227,16 @@ function main(argv)
 
 /********** TASKS *************/
 
+function concat(options) {
+  var filePathList = options.src;
+  var outputPath = options.dest;
+  var filesContent = filePathList.map(function(filePath) {
+    return FILE.readFileSync(filePath, "utf-8");
+  });
+
+  FILE.writeFileSync(outputPath, filesContent.join("\n"));
+  print(outputPath + " built.");
+};
 
 function cleanTask(completeHandler)
 {
@@ -230,7 +251,7 @@ function cleanTask(completeHandler)
 	}
 }
 
-function buildSourceTask(completeHandler)
+function buildSourceTask(completeHandler, options)
 {	
 	if(!PATH.existsSync(OUTPUT_DIR_NAME))
 	{
@@ -238,6 +259,8 @@ function buildSourceTask(completeHandler)
 	}
 	
 	js_file_name = js_file_name.split("%VERSION%").join(version);
+	js_file_name =
+		js_file_name.split("%MIN%").join((options && options.minify) ? '.min' : '');
 
 	var file_args = [];
 	var len = SOURCE_FILES.length;
@@ -261,49 +284,55 @@ function buildSourceTask(completeHandler)
 	var tmp_file = PATH.join(OUTPUT_DIR_NAME,"tmp.js");
 	var final_file = PATH.join(OUTPUT_DIR_NAME, js_file_name);
 
-	var cmd = [
-		"java", "-jar", GOOGLE_CLOSURE_PATH
-	].concat(
-			file_args
-		).concat(
-			["--js_output_file", tmp_file]
-		);
-		
+	if (options && options.minify) {
+		var cmd = [
+			"java", "-jar", GOOGLE_CLOSURE_PATH
+		].concat(
+				file_args
+			).concat(
+				["--js_output_file", tmp_file]
+			);
 
-	CHILD_PROCESS.exec(
-		cmd.join(" "),
-		function(error, stdout, stderr)
-		{
-			if(verbose)
+		CHILD_PROCESS.exec(
+			cmd.join(" "),
+			function(error, stdout, stderr)
 			{
-				if(stdout)
+				if(verbose)
 				{
-					print(stdout);
+					if(stdout)
+					{
+						print(stdout);
+					}
+
+					if(stderr)
+					{
+						print(stderr);
+					}
 				}
-			
-				if(stderr)
+
+					if (error !== null)
 				{
-					print(stderr);
-				}
+					print("Error Running Google Closure : " + error);
+					exitWithFailure();
+					}
+
+				var license_data = FILE.readFileSync("license.txt", "UTF-8");
+				var final_data = FILE.readFileSync(tmp_file, "UTF-8");
+
+				FILE.writeFileSync(final_file, license_data + final_data, "UTF-8");
+
+				FILE.unlinkSync(tmp_file);
+
+				completeHandler(true);
 			}
-
-		    if (error !== null)
-			{
-				print("Error Running Google Closure : " + error);
-				exitWithFailure();
-		    }
-		
-			var license_data = FILE.readFileSync("license.txt", "UTF-8");
-			var final_data = FILE.readFileSync(tmp_file, "UTF-8");
-
-			FILE.writeFileSync(final_file, license_data + final_data, "UTF-8");
-
-			FILE.unlinkSync(tmp_file);
-			
-			completeHandler(true);
-		}
-	);
-}
+		);
+	} else {
+		concat({
+			src: SOURCE_FILES,
+			dest: final_file
+		});
+	}
+};
 
 function buildDocsTask(version, completeHandler)
 {	
