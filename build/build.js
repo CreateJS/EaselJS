@@ -5,30 +5,30 @@ CONFIGURATION
 */
 // listing of all source files, with dependencies listed in order:
 var SOURCE_FILES = [
-	"../src/easeljs/utils/UID.js",
-	"../src/easeljs/utils/Ticker.js",
-	"../src/easeljs/events/MouseEvent.js",
-	"../src/easeljs/geom/Matrix2D.js",
-	"../src/easeljs/geom/Point.js",
-	"../src/easeljs/geom/Rectangle.js",
-	"../src/easeljs/display/Shadow.js",
-	"../src/easeljs/display/SpriteSheet.js",
-	"../src/easeljs/display/Graphics.js",
-	"../src/easeljs/display/DisplayObject.js",
-	"../src/easeljs/display/Container.js",
-	"../src/easeljs/display/Stage.js",
-	"../src/easeljs/display/Bitmap.js",
-	"../src/easeljs/display/BitmapAnimation.js",
-	"../src/easeljs/display/Shape.js",
-	"../src/easeljs/display/Text.js",
-	"../src/easeljs/utils/SpriteSheetUtils.js",
-	"../src/easeljs/utils/SpriteSheetBuilder.js",
-	"../src/easeljs/display/DOMElement.js",
-	"../src/easeljs/filters/Filter.js",
-	//"../src/easeljs/filters/BoxBlurFilter.js",
-	//"../src/easeljs/filters/ColorFilter.js",
-	//"../src/easeljs/filters/ColorMatrixFilter.js",
-	"../src/easeljs/ui/Touch.js"
+	__dirname + "/../src/easeljs/utils/UID.js",
+	__dirname + "/../src/easeljs/utils/Ticker.js",
+	__dirname + "/../src/easeljs/events/MouseEvent.js",
+	__dirname + "/../src/easeljs/geom/Matrix2D.js",
+	__dirname + "/../src/easeljs/geom/Point.js",
+	__dirname + "/../src/easeljs/geom/Rectangle.js",
+	__dirname + "/../src/easeljs/display/Shadow.js",
+	__dirname + "/../src/easeljs/display/SpriteSheet.js",
+	__dirname + "/../src/easeljs/display/Graphics.js",
+	__dirname + "/../src/easeljs/display/DisplayObject.js",
+	__dirname + "/../src/easeljs/display/Container.js",
+	__dirname + "/../src/easeljs/display/Stage.js",
+	__dirname + "/../src/easeljs/display/Bitmap.js",
+	__dirname + "/../src/easeljs/display/BitmapAnimation.js",
+	__dirname + "/../src/easeljs/display/Shape.js",
+	__dirname + "/../src/easeljs/display/Text.js",
+	__dirname + "/../src/easeljs/utils/SpriteSheetUtils.js",
+	__dirname + "/../src/easeljs/utils/SpriteSheetBuilder.js",
+	__dirname + "/../src/easeljs/display/DOMElement.js",
+	__dirname + "/../src/easeljs/filters/Filter.js",
+	//__dirname + "/../src/easeljs/filters/BoxBlurFilter.js",
+	//__dirname + "/../src/easeljs/filters/ColorFilter.js",
+	//__dirname + "/../src/easeljs/filters/ColorMatrixFilter.js",
+	__dirname + "/../src/easeljs/ui/Touch.js"
 ];
 
 // default name for lib output:
@@ -48,18 +48,18 @@ var DOCS_DIR_NAME = PROJECT_NAME+"_docs-%VERSION%";
 var DOCS_FILE_NAME = DOCS_DIR_NAME+".zip";
 
 // name of directory where generated files are placed
-var OUTPUT_DIR_NAME = "output";
+var OUTPUT_DIR_NAME = __dirname + "/output";
 
 
 // path to directory that includes YUI Doc templates
-var TEMPLATE_DIR_PATH = "template";
+var TEMPLATE_DIR_PATH = __dirname + "/template";
 
 // tmp directory used when running scripts:
-var TMP_DIR_NAME = "tmp";
+var TMP_DIR_NAME = __dirname + "/tmp";
 
 // paths to tools:
-var GOOGLE_CLOSURE_PATH = "../tools/google-closure/compiler.jar";
-var YUI_DOC_PATH = "../tools/yuidoc/bin/yuidoc.py";
+var GOOGLE_CLOSURE_PATH = __dirname + "/../tools/google-closure/compiler.jar";
+var YUI_DOC_PATH = __dirname + "/../tools/yuidoc/bin/yuidoc.py";
 
 // yui version being used
 var YUI_VERSION = 2;
@@ -293,7 +293,7 @@ function buildSourceTask(completeHandler)
 				exitWithFailure();
 		    }
 		
-			var license_data = FILE.readFileSync("license.txt", "UTF-8");
+			var license_data = FILE.readFileSync(__dirname + "/license.txt", "UTF-8");
 			var final_data = FILE.readFileSync(tmp_file, "UTF-8");
 
 			FILE.writeFileSync(final_file, license_data + final_data, "UTF-8");
