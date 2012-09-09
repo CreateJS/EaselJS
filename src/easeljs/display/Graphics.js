@@ -96,7 +96,7 @@ var p = Graphics.prototype;
 	 * @param {Number} g The green component for the color, between 0 and 0xFF (255).
 	 * @param {Number} b The blue component for the color, between 0 and 0xFF (255).
 	 * @param {Number} alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
-	 * @return A CSS compatible color string based on the specified RGB numeric color values in the format 
+	 * @return {String} A CSS compatible color string based on the specified RGB numeric color values in the format 
 	 * "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)".
 	 **/
 	Graphics.getRGB = function(r, g, b, alpha) {
@@ -123,7 +123,7 @@ var p = Graphics.prototype;
 	 * @param {Number} saturation The saturation component for the color, between 0 and 100.
 	 * @param {Number} lightness The lightness component for the color, between 0 and 100.
 	 * @param {Number} alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
-	 * @return a CSS compatible color string based on the specified HSL numeric color values in the format 
+	 * @return {String} A CSS compatible color string based on the specified HSL numeric color values in the format 
 	 * "hsla(360,100,100,1.0)", or if alpha is null then in the format "hsl(360,100,100)". For example, 
 	 * Graphics.getHSL(150, 100, 70) will return "hsl(150,100,70)".
 	 **/
@@ -266,7 +266,6 @@ var p = Graphics.prototype;
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
-	 * @param {String} instructions
 	 **/
 	p.initialize = function() {
 		this.clear();
@@ -525,7 +524,7 @@ var p = Graphics.prototype;
 	/**
 	 * Begins a pattern fill using the specified image. This ends the current subpath.
 	 * @method beginBitmapFill
-	 * @param image The Image, Canvas, or Video object to use as the pattern.
+	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use as the pattern.
 	 * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
 	 * "repeat-y", or "no-repeat". Defaults to "repeat".
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
@@ -550,10 +549,10 @@ var p = Graphics.prototype;
 	 * Sets the stroke style for the current subpath. Like all drawing methods, this can be chained, so you can define the stroke style and color in a single line of code like so:
 	 * myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
 	 * @method setStrokeStyle
-	 * @param thickness The width of the stroke.
-	 * @param caps Optional. Indicates the type of caps to use at the end of lines. One of butt, round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with the tiny API.
-	 * @param joints Optional. Specifies the type of joints that should be used where two lines meet. One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel) for use with the tiny API.
-	 * @param miter Optional. If joints is set to "miter", then you can specify a miter limit ratio which controls at what point a mitered joint will be clipped.
+	 * @param {Number} thickness The width of the stroke.
+	 * @param {String | Number} caps Optional. Indicates the type of caps to use at the end of lines. One of butt, round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with the tiny API.
+	 * @param {String | Number} joints Optional. Specifies the type of joints that should be used where two lines meet. One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel) for use with the tiny API.
+	 * @param {Number} miter Optional. If joints is set to "miter", then you can specify a miter limit ratio which controls at what point a mitered joint will be clipped.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
@@ -570,7 +569,7 @@ var p = Graphics.prototype;
 	/**
 	 * Begins a stroke with the specified color. This ends the current subpath.
 	 * @method beginStroke
-	 * @param color A CSS compatible color value (ex. "#FF0000" or "rgba(255,0,0,0.5)"). Setting to null will result in no stroke.
+	 * @param {String} color A CSS compatible color value (ex. "#FF0000" or "rgba(255,0,0,0.5)"). Setting to null will result in no stroke.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginStroke = function(color) {
@@ -583,12 +582,12 @@ var p = Graphics.prototype;
 	 * Begins a linear gradient stroke defined by the line (x0, y0) to (x1, y1). This ends the current subpath. For example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a square to display it:<br/>
 	 * myGraphics.setStrokeStyle(10).beginLinearGradientStroke(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
 	 * @method beginLinearGradientStroke
-	 * @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
-	 * @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
-	 * @param x0 The position of the first point defining the line that defines the gradient direction and size.
-	 * @param y0 The position of the first point defining the line that defines the gradient direction and size.
-	 * @param x1 The position of the second point defining the line that defines the gradient direction and size.
-	 * @param y1 The position of the second point defining the line that defines the gradient direction and size.
+	 * @param {Array[String]} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
+	 * @param {Array[Number]} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+	 * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
+	 * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
+	 * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
+	 * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginLinearGradientStroke = function(colors, ratios, x0, y0, x1, y1) {
@@ -600,20 +599,20 @@ var p = Graphics.prototype;
 		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o], false)];
 		return this;
 	}
-	
+
 	
 	/**
 	 * Begins a radial gradient stroke. This ends the current subpath. For example, the following code defines a red to blue radial gradient centered at (100, 100), with a radius of 50, and draws a rectangle to display it:<br/>
 	 * myGraphics.setStrokeStyle(10).beginRadialGradientStroke(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50).drawRect(50, 90, 150, 110);
 	 * @method beginRadialGradientStroke
-	 * @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
-	 * @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color to 100%.
-	 * @param x0 Center position of the inner circle that defines the gradient.
-	 * @param y0 Center position of the inner circle that defines the gradient.
-	 * @param r0 Radius of the inner circle that defines the gradient.
-	 * @param x1 Center position of the outer circle that defines the gradient.
-	 * @param y1 Center position of the outer circle that defines the gradient.
-	 * @param r1 Radius of the outer circle that defines the gradient.
+	 * @param {Array[String]} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient drawing from red to blue.
+	 * @param {Array[Number]} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color to 100%.
+	 * @param {Number} x0 Center position of the inner circle that defines the gradient.
+	 * @param {Number} y0 Center position of the inner circle that defines the gradient.
+	 * @param {Number} r0 Radius of the inner circle that defines the gradient.
+	 * @param {Number} x1 Center position of the outer circle that defines the gradient.
+	 * @param {Number} y1 Center position of the outer circle that defines the gradient.
+	 * @param {Number} r1 Radius of the outer circle that defines the gradient.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)	
 	 **/
 	p.beginRadialGradientStroke = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
@@ -629,7 +628,7 @@ var p = Graphics.prototype;
 	/**
 	 * Begins a pattern fill using the specified image. This ends the current subpath.
 	 * @method beginBitmapStroke
-	 * @param {Image | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use as the pattern.
+	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use as the pattern.
 	 * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
 	 * "repeat-y", or "no-repeat". Defaults to "repeat".
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)	
@@ -879,7 +878,7 @@ var p = Graphics.prototype;
 	/**
 	 * Returns a clone of this Graphics instance.
 	 * @method clone
-	 @return {Graphics} A clone of the current Graphics instance.
+	 * @return {Graphics} A clone of the current Graphics instance.
 	 **/
 	p.clone = function() {
 		var o = new Graphics();
