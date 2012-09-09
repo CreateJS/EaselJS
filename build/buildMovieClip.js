@@ -5,7 +5,7 @@ CONFIGURATION
 */
 // listing of all source files, with dependencies listed in order:
 var SOURCE_FILES = [
-	"../src/easeljs/display/MovieClip.js"
+	__dirname + "/../src/easeljs/display/MovieClip.js"
 ];
 
 // default name for lib output:
@@ -25,18 +25,17 @@ var DOCS_DIR_NAME = PROJECT_NAME+"_docs-%VERSION%";
 var DOCS_FILE_NAME = DOCS_DIR_NAME+".zip";
 
 // name of directory where generated files are placed
-var OUTPUT_DIR_NAME = "output";
-
+var OUTPUT_DIR_NAME = __dirname + "/output";
 
 // path to directory that includes YUI Doc templates
-var TEMPLATE_DIR_PATH = "template";
+var TEMPLATE_DIR_PATH = __dirname + "/template";
 
 // tmp directory used when running scripts:
-var TMP_DIR_NAME = "tmp";
+var TMP_DIR_NAME = __dirname + "/tmp";
 
 // paths to tools:
-var GOOGLE_CLOSURE_PATH = "../tools/google-closure/compiler.jar";
-var YUI_DOC_PATH = "../tools/yuidoc/bin/yuidoc.py";
+var GOOGLE_CLOSURE_PATH = __dirname + "/../tools/google-closure/compiler.jar";
+var YUI_DOC_PATH = __dirname + "/../tools/yuidoc/bin/yuidoc.py";
 
 // yui version being used
 var YUI_VERSION = 2;
@@ -278,7 +277,7 @@ function buildSourceTask(completeHandler)
 				exitWithFailure();
 		    }
 		
-			var license_data = FILE.readFileSync("license.txt", "UTF-8");
+			var license_data = FILE.readFileSync(__dirname + "/license.txt", "UTF-8");
 			var final_data = FILE.readFileSync(tmp_file, "UTF-8");
 
 			FILE.writeFileSync(final_file, license_data + final_data, "UTF-8");
