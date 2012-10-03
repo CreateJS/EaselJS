@@ -45,11 +45,13 @@ this.createjs = this.createjs||{};
  * @param {Boolean} primary Indicates whether this is the primary pointer in a multitouch environment.
  * @param {Number} rawX The raw x position relative to the stage.
  * @param {Number} rawY The raw y position relative to the stage.
+ * @param {Number} delta
  **/
-var MouseEvent = function(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY) {
-  this.initialize(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY);
+var MouseEvent = function(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY, delta) {
+  this.initialize(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY, delta);
 }
 var p = MouseEvent.prototype = new createjs.NativeEvent();
+var s = MouseEvent;
 
 // public properties:
 	/**
@@ -81,6 +83,12 @@ var p = MouseEvent.prototype = new createjs.NativeEvent();
 	 * @type Number
 	 **/
 	p.rawY = 0;
+
+	/**
+	 * @property delta
+	 * @type Number
+	 **/
+	p.delta = 0;
 
 	/**
 	 * The unique id for the pointer (touch point or cursor). This will be either -1 for the mouse, or the system
@@ -167,7 +175,7 @@ var p = MouseEvent.prototype = new createjs.NativeEvent();
 	 * @method initialize
 	 * @protected
 	 **/
-	p.initialize = function(type, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY) {
+	p.initialize = function(type, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY, delta) {
 		this.NativeEvent_initialize(type, nativeEvent);
 		this.stageX = stageX;
 		this.stageY = stageY;
@@ -175,6 +183,7 @@ var p = MouseEvent.prototype = new createjs.NativeEvent();
 		this.primary = primary;
 		this.rawX = (rawX==null)?stageX:rawX;
 		this.rawY = (rawY==null)?stageY:rawY;
+		this.delta = delta;
 	}
 
 // public methods:
@@ -184,7 +193,7 @@ var p = MouseEvent.prototype = new createjs.NativeEvent();
 	 * @return {MouseEvent} a clone of the MouseEvent instance.
 	 **/
 	p.clone = function() {
-		return new createjs.MouseEvent(this.type, this.stageX, this.stageY, this.nativeEvent, this.pointerID, this.primary, this.rawX, this.rawY);
+		return new createjs.MouseEvent(this.type, this.stageX, this.stageY, this.nativeEvent, this.pointerID, this.primary, this.rawX, this.rawY, this.delta);
 	}
 
 	/**

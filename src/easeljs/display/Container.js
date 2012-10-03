@@ -478,7 +478,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var ctx = createjs.DisplayObject._hitTestContext;
 		var canvas = createjs.DisplayObject._hitTestCanvas;
 		var mtx = this._matrix;
-		var hasHandler = (mouseEvents&1 && !(this instanceof Stage) && (this.hasEventListener("mouseDown") || this.hasEventListener("click")
+		var hasHandler = (mouseEvents&1 && !(this instanceof createjs.Stage) && (this.hasEventListener("mouseDown") || this.hasEventListener("click")
 			|| this.hasEventListener("doubleClick"))) || (mouseEvents&2 && (this.hasEventListener("rollOver")
 			|| this.hasEventListener("rollOut")));
 

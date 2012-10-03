@@ -89,30 +89,6 @@ var p = Stage.prototype = new createjs.Container();
 	p.mouseY = 0;
 
 	/**
-	 * The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param
-	 * containing the corresponding MouseEvent instance.
-	 * @event onMouseMove
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
-	p.onMouseMove = null;
-
-	/**
-	 * The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler
-	 * is passed a single param containing the corresponding MouseEvent instance.
-	 * @event onMouseUp
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
-	p.onMouseUp = null;
-
-	/**
-	 * The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single
-	 * param containing the corresponding MouseEvent instance.
-	 * @event onMouseDown
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
-	p.onMouseDown = null;
-
-	/**
 	 * Indicates whether this stage should use the snapToPixel property of display objects when rendering them. See
 	 * DisplayObject.snapToPixel for more information.
 	 * @property snapToPixelEnabled
@@ -217,10 +193,9 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.update = function() {
 		if (!this.canvas) { return; }
-		if (this.hasEventListener("enterFrame")) { this.dispatchEvent(new createjs.Event("enterFrame")); }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-		if (this.tickOnUpdate) { this._tick((arguments.length ? arguments : null)); }
+		if (this.hasEventListener("enterFrame")) { this.dispatchEvent(new createjs.Event("enterFrame")); }
 		var ctx = this.canvas.getContext("2d");
 		ctx.save();
 		this.updateContext(ctx);
@@ -354,6 +329,8 @@ var p = Stage.prototype = new createjs.Container();
 		evtTarget.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
 		evtTarget.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
 		evtTarget.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
+		evtTarget.addEventListener("mousewheel", function(e) { o._handleMouseWheel(e); }, false);
+		evtTarget.addEventListener("DOMMouseScroll", function(e) { o._handleMouseWheel(e); }, false);
 		// this is to facilitate extending Stage:
 		if (this.canvas) { this.canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false); }
 	}
@@ -569,7 +546,7 @@ var p = Stage.prototype = new createjs.Container();
 		var target = this._getObjectsUnderPoint(o.x, o.y, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
 			if (target.hasEventListener("mouseDown")) {
-				var evt = new createjs.MouseEvent("mouseDown", o.x, o.y, target, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
+				var evt = new createjs.MouseEvent("mouseDown", o.x, o.y, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
 				target.dispatchEvent(evt);
 				if (evt.hasEventListener("mouseMove") || evt.hasEventListener("mouseUp")) { o.event = evt; }
 			}
@@ -612,11 +589,24 @@ var p = Stage.prototype = new createjs.Container();
 	p._handleDoubleClick = function(e) {
 		// TODO: add Touch support for double tap.
 		if (this.hasEventListener("doubleClick")) {
-			this.dispatchEvent(new createjs.MouseEvent("doubleClick", this.mouseX, this.mouseY, this, e, -1, true));
+			this.dispatchEvent(new createjs.MouseEvent("doubleClick", this.mouseX, this.mouseY, e, -1, true));
 		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target && target.hasEventListener("doubleClick")) {
-			target.dispatchEvent(new createjs.MouseEvent("doubleClick", this.mouseX, this.mouseY, target, e, -1, true));
+			target.dispatchEvent(new createjs.MouseEvent("doubleClick", this.mouseX, this.mouseY, e, -1, true));
+		}
+	}
+
+	/**
+	 * @method _handleMouseWheel
+	 * @protected
+	 * @param {MouseEvent} e
+	 **/
+	p._handleMouseWheel = function(e) {
+		var o = this._getPointerData(-1);
+		if ((o.inBounds || this.mouseMoveOutside) && this.hasEventListener("mouseWheel")) {
+			var delta = e.wheelDelta/120 || -e.detail/3;
+			this.dispatchEvent(new createjs.MouseEvent("mouseWheel", this.mouseX, this.mouseY, e, -1, true, null, null, delta));
 		}
 	}
 

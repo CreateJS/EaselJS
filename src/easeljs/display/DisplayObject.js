@@ -259,18 +259,6 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p.snapToPixel = false;
 
 	/**
-	 * The onTick callback is called on each display object on a stage whenever the stage updates.
-	 * This occurs immediately before the rendering (draw) pass. When stage.update() is called, first all display objects
-	 * on the stage have onTick called, then all of the display objects are drawn to stage. Children will have their
-	 * onTick called in order of their depth prior to onTick being called on their parent.
-	 * <br/><br/>
-	 * Any parameters passed in to stage.update() are passed on to the onTick() handlers. For example, if you call
-	 * stage.update("hello"), all of the display objects with a handler will have onTick("hello") called.
-	 * @event onTick
-	 **/
-	p.onTick = null;
-
-	/**
 	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when cache() or
 	 * updateCache() is called on the display object, and only apply to the area that is cached.
 	 * @property filters
@@ -732,17 +720,6 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		ctx.shadowOffsetX = shadow.offsetX;
 		ctx.shadowOffsetY = shadow.offsetY;
 		ctx.shadowBlur = shadow.blur;
-	}
-	
-	
-	/**
-	 * @method _tick
-	 * @protected
-	 **/
-	p._tick = function(params) {
-		if (!this.onTick) { return; }
-		if (params) { this.onTick.apply(this, params); }
-		else { this.onTick(); }
 	}
 
 	/**
