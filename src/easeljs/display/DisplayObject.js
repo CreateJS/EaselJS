@@ -402,6 +402,13 @@ var p = DisplayObject.prototype;
 	 **/
 	p._matrix = null;
 	
+	/**
+	 * @property _userMatrix
+	 * @protected
+	 * @type Matrix2D
+	 * @default null
+	 **/
+	p._userMatrix = null;
 
 // constructor:
 	// separated so it can be easily addressed in subclasses:
@@ -466,7 +473,11 @@ var p = DisplayObject.prototype;
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 		}
 		
-		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		o._matrix.identity();
+		if (o._userMatrix) {
+			o._matrix.appendMatrix(o._userMatrix);
+		}
+		mtx = o._matrix.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
 		// TODO: should be a better way to manage this setting. For now, using dynamic access to avoid circular dependencies:
 		if (createjs["Stage"]._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
 		else { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
@@ -648,6 +659,43 @@ var p = DisplayObject.prototype;
 	}
 	
 	/**
+	 * Method to allow user to specify a matrix directly.  This matrix is a prepended to the object's
+	 * transformation properties.  
+	 * @method setUserMatrix
+	 * @param {Matrix2D} matrix
+	 * @return {DisplayObject} Returns this instance. Useful for chaining commands.
+	*/
+	p.setUserMatrix = function(matrix) {
+		if (!this._userMatrix) {
+			this._userMatrix = new createjs.Matrix2D();
+		}
+
+		this._userMatrix.appendMatrix(matrix);
+		return this;
+	}
+
+	/**
+	 * Method to acquire the user matrix.  This matrix is a prepended to the object's
+	 * transformation properties.  
+	 * @method getUserMatrix
+	 * @param {Matrix2D} matrix Optional. A Matrix2D object to populate with the calculated values. If null, a new
+	 * Matrix object is returned.
+	 * @return {Matrix2D} A matrix representing the user specified object transform.
+	*/
+	p.getUserMatrix = function(matrix) {
+		if (!matrix) {
+			matrix = new createjs.Matrix2D()
+		} else {
+			matrix.identity();
+		}
+		if (this._userMatrix) {
+			matrix.appendMatrix(this._userMatrix);
+		}
+
+		return matrix;
+	}
+
+	/**
 	 * Returns a matrix based on this object's transform.
 	 * @method getMatrix
 	 * @param {Matrix2D} matrix Optional. A Matrix2D object to populate with the calculated values. If null, a new
@@ -655,8 +703,13 @@ var p = DisplayObject.prototype;
 	 * @return {Matrix2D} A matrix representing this display object's transform.
 	 **/
 	p.getMatrix = function(matrix) {
-		var o = this;
-		return (matrix ? matrix.identity() : new createjs.Matrix2D()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
+		var o = this, resultMatrix;
+        
+		resultMatrix = o.getUserMatrix();
+		if (matrix) {
+			resultMatrix.appendMatrix(matrix);
+		}
+		return resultMatrix.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
 	}
 	
 	/**
@@ -671,14 +724,18 @@ var p = DisplayObject.prototype;
 	 * the display object and all of its parent Containers up to the highest level ancestor (usually the stage).
 	 **/
 	p.getConcatenatedMatrix = function(matrix) {
-		if (matrix) { matrix.identity(); }
-		else { matrix = new createjs.Matrix2D(); }
-		var o = this;
+		var o = this, resultMatrix;
+
+		resultMatrix = o.getUserMatrix();
+		if (matrix) {
+			resultMatrix.appendMatrix(matrix);
+		}
+
 		while (o != null) {
-			matrix.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).prependProperties(o.alpha, o.shadow, o.compositeOperation);
+			resultMatrix.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).prependProperties(o.alpha, o.shadow, o.compositeOperation);
 			o = o.parent;
 		}
-		return matrix;
+		return resultMatrix;
 	}
 
 	/**
@@ -709,7 +766,7 @@ var p = DisplayObject.prototype;
 	 * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
 	 * reverted to their defaults (for example .parent).
 	 * @method clone
-	 * @return {DisplayObject} A clone of the current DisplayObject instance.
+	 @return {DisplayObject} A clone of the current DisplayObject instance.
 	 **/
 	p.clone = function() {
 		var o = new DisplayObject();
