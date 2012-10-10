@@ -670,7 +670,7 @@ var p = DisplayObject.prototype;
 			this._userMatrix = new createjs.Matrix2D();
 		}
 
-		this._userMatrix.appendMatrix(matrix);
+		this._userMatrix.identity().appendMatrix(matrix);
 		return this;
 	}
 
