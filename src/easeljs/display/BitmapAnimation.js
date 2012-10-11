@@ -112,7 +112,6 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 */
 	p.offset = 0;
 	
-	
 	/**
 	 * Specifies the current frame index within the current playing animation. When playing normally, this will
 	 * increase successively from 0 to n-1, where n is the number of frames in the current animation.
@@ -138,6 +137,22 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * @default null
 	 **/
 	p._animation = null;
+	
+	/**
+	 * Should loop the animation?
+	 * @property loop
+	 * @type Boolean
+	 * @default true
+	 **/
+	p.loop = true;
+	
+	/**
+	 * Should automatically rewind the animation?
+	 * @property autoRewind
+	 * @type Boolean
+	 * @default true
+	 **/
+	p.autoRewind = true;
 
 // constructor:
 	/**
@@ -316,6 +331,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 		var a = this._animation;
 		if (a) {
 			if (this.currentAnimationFrame >= a.frames.length) {
+
 				if (a.next) {
 					this._goto(a.next);
 				} else {
@@ -323,14 +339,31 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 					this.currentAnimationFrame = a.frames.length-1;
 					this.currentFrame = a.frames[this.currentAnimationFrame];
 				}
-				if (this.onAnimationEnd) { this.onAnimationEnd(this,a.name); }
+				
+				if (this.onAnimationEnd) {
+					this.onAnimationEnd(this,a.name);
+				}
 			} else {
 				this.currentFrame = a.frames[this.currentAnimationFrame];
 			}
 		} else {
 			if (this.currentFrame >= this.spriteSheet.getNumFrames()) {
-				this.currentFrame = 0;
-				if (this.onAnimationEnd) { this.onAnimationEnd(this,null); }
+				
+				if(this.loop) {
+					this.currentFrame = 0;
+				} else {
+					if(this.autoRewind) {
+						this.currentFrame = 0;
+					} else {
+						this.currentFrame = this.spriteSheet.getNumFrames() - 1;
+					}
+					
+					this.stop();
+				}
+				
+				if (this.onAnimationEnd) {
+					this.onAnimationEnd(this,null);
+				}
 			}
 		}
 	}

@@ -231,6 +231,21 @@ var p = Container.prototype = new createjs.DisplayObject();
 	p.getChildAt = function(index) {
 		return this.children[index];
 	}
+	
+	/**
+	 * Returns the child with the specified name.
+	 * @method getChildByName
+	 * @param {String} name The name of the child to return.
+	 * @return {DisplayObject} The child with the specified name.
+	 **/
+	p.getChildByName = function(name) {		
+		var count = 0,
+		total = this.children.length;
+		for(; count < total; ++count) {
+			if(this.children[count]["name"] === name) return this.getChildAt(count);
+		}
+		return null;
+	}
 
 	/**
 	 * Performs an array sort operation on the child list.
