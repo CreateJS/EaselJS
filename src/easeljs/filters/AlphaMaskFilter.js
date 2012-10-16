@@ -79,7 +79,7 @@ var p = AlphaMaskFilter.prototype = new createjs.Filter();
 	 * @return {Boolean}
 	 **/
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
-		if (!mask) { return true; }
+		if (!this.mask) { return true; }
 		targetCtx = targetCtx || ctx;
 		if (targetX == null) { targetX = x; }
 		if (targetY == null) { targetY = y; }
