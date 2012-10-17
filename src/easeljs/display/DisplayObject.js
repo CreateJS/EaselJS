@@ -62,7 +62,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * @property _hitTestCanvas
-	 * @type HTMLCanvasElement
+	 * @type HTMLCanvasElement | Object
 	 * @static
 	 * @protected
 	 **/
@@ -97,7 +97,7 @@ var p = DisplayObject.prototype;
 	 * If a cache is active, this returns the canvas that holds the cached version of this display object. See cache()
 	 * for more information. READ-ONLY.
 	 * @property cacheCanvas
-	 * @type HTMLCanvasElement
+	 * @type HTMLCanvasElement | Object
 	 * @default null
 	 **/
 	p.cacheCanvas = null;

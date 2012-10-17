@@ -37,7 +37,7 @@ this.createjs = this.createjs||{};
 * @class Stage
 * @extends Container
 * @constructor
-* @param {HTMLCanvasElement} canvas The canvas the stage will render to.
+* @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id of a canvas object in the current document.
 **/
 var Stage = function(canvas) {
   this.initialize(canvas);
@@ -68,7 +68,7 @@ var p = Stage.prototype = new createjs.Container();
 	 * The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the
 	 * first stage that will be ticked (or they will clear each other's render).
 	 * @property canvas
-	 * @type HTMLCanvasElement
+	 * @type HTMLCanvasElement | Object
 	 **/
 	p.canvas = null;
 
@@ -191,12 +191,12 @@ var p = Stage.prototype = new createjs.Container();
 	/**
 	 * Initialization method.
 	 * @method initialize
-	 * @param {HTMLCanvasElement} canvas A canvas object, or the string id of a canvas object in the current document.
+	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object, or the string id of a canvas object in the current document.
 	 * @protected
 	 **/
 	p.initialize = function(canvas) {
 		this.Container_initialize();
-		this.canvas = (canvas instanceof HTMLCanvasElement) ? canvas : document.getElementById(canvas);
+		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
 		this._pointerData = {};
 		this._enableMouseEvents(true);
 	}
