@@ -47,7 +47,7 @@ var SpriteSheetUtils = function() {
 	/**
 	 * @property _workingCanvas
 	 * @static
-	 * @type HTMLCanvasElement
+	 * @type HTMLCanvasElement | Object
 	 * @protected
 	*/
 	SpriteSheetUtils._workingCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
