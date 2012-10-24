@@ -452,8 +452,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var ctx = createjs.DisplayObject._hitTestContext;
 		var canvas = createjs.DisplayObject._hitTestCanvas;
 		var mtx = this._matrix;
-		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick || this.onDoubleClick)) || (mouseEvents&2 &&
-																(this.onMouseOver || this.onMouseOut));
+		var hasHandler = this._hasMouseHandler(mouseEvents);
 
 		// if we have a cache handy & this has a handler, we can use it to do a quick check.
 		// we can't use the cache for screening children, because they might have hitArea set.
@@ -467,7 +466,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 				canvas.width = 1;
 				return this;
 			}
-		}
+		};
 
 		// draw children one at a time, and check if we get a hit:
 		var l = this.children.length;
@@ -485,7 +484,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.onPress || child.onClick || child.onDoubleClick)) || (mouseEvents&2 && (child.onMouseOver || child.onMouseOut))) {
+			} else if (!mouseEvents || hasHandler || child._hasMouseHandler(mouseEvents)) {
 				var hitArea = child.hitArea;
 				child.getConcatenatedMatrix(mtx);
 				
@@ -506,7 +505,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			}
 		}
 		return null;
-	}
+	};
 
 createjs.Container = Container;
 }());

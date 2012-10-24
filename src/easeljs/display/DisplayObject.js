@@ -43,6 +43,7 @@ this.createjs = this.createjs||{};
 * Container, Bitmap, and Shape. DisplayObject is the base class for all display classes in the EaselJS library.
 * It defines the core properties and methods that are shared between all display objects.
 * @class DisplayObject
+* @uses EventDispatcher
 * @constructor
 **/
 var DisplayObject = function() {
@@ -350,6 +351,28 @@ var p = DisplayObject.prototype;
 	 * @default null
 	 */
 	p.hitArea = null;
+	
+	/**
+	 * A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display object. You must enable
+	 * mouseover events using the stage.enableMouseOver() method to use this property. If null it will use the default cursor.
+	 * @property cursor
+	 * @type String
+	 * @default null
+	 */
+	p.cursor = null;
+	
+	
+// mix-ins:
+	// EventDispatcher methods:
+	p.addEventListener = null;
+	p.removeEventListener = null;
+	p.removeAllEventListeners = null;
+	p.dispatchEvent = null;
+	p.hasEventListener = null;
+	p._listeners = null;
+	
+	// we only use EventDispatcher if it's available:
+	createjs.EventDispatcher && createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
 	
 
 // private properties:
@@ -777,9 +800,14 @@ var p = DisplayObject.prototype;
 	 * @protected
 	 **/
 	p._tick = function(params) {
-		if (!this.onTick) { return; }
-		if (params) { this.onTick.apply(this, params); }
-		else { this.onTick(); }
+		// because onTick can be really performance sensitive, we'll inline some of the dispatchEvent work.
+		// this can probably go away at some point. It only has a noticeable impact with thousands of objects in modern browsers.
+		this.onTick&&this.onTick.apply(this, params);
+		var ls = this._listeners;
+		if (ls&&ls["tick"]) { this.dispatchEvent({type:"tick",params:params}); }
+		
+		// otherwise, we'd just do this:
+		//this.dispatchEvent("tick", this.onTick, params);
 	}
 
 	/**
@@ -812,7 +840,24 @@ var p = DisplayObject.prototype;
 		for (var i=0; i<l; i++) {
 			this.filters[i].applyFilter(ctx, 0, 0, w, h);
 		}
-	}
+	};
+	
+	/**
+	 * Indicates whether the display object has a mouse listener of the corresponding types.
+	 * @method _hasMouseHandler
+	 * @param {Number} typeMask A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress &
+	 * onClick & onDoubleClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
+	 * @return {Boolean}
+	 * @protected
+	 **/
+	p._hasMouseHandler = function(typeMask) {
+		var ls = this._listeners;
+		return (typeMask&1 && (this.onPress || this.onClick || this.onDoubleClick || 
+				 (ls && (this.hasEventListener("press") || this.hasEventListener("click") || this.hasEventListener("doubleClick")))))
+				 ||
+				 (typeMask&2 && (this.onMouseOver || this.onMouseOut || this.cursor ||
+				 (ls && (this.hasEventListener("mouseOver") || this.hasEventListener("mouseOut")))));
+	};
 	 
 
 createjs.DisplayObject = DisplayObject;
