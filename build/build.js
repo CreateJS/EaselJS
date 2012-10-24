@@ -7,6 +7,7 @@ CONFIGURATION
 var SOURCE_FILES = [
 	__dirname + "/../src/easeljs/utils/UID.js",
 	__dirname + "/../src/easeljs/utils/Ticker.js",
+	__dirname + "/../src/easeljs/events/EventDispatcher.js",
 	__dirname + "/../src/easeljs/events/MouseEvent.js",
 	__dirname + "/../src/easeljs/geom/Matrix2D.js",
 	__dirname + "/../src/easeljs/geom/Point.js",

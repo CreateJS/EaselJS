@@ -130,18 +130,19 @@ var p = Stage.prototype = new createjs.Container();
 	p.mouseInBounds = false;
 
 	/**
-	 * If false, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas.
+	 * If true, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas.
+	 * You can call 
 	 * @property tickOnUpdate
 	 * @type Boolean
-	 * @default false
+	 * @default true
 	 **/
 	p.tickOnUpdate = true;
 	
 	/**
 	 * If true, onMouseMove handlers will continue to be called when the mouse leaves the target canvas. See
 	 * mouseInBounds, and MouseEvent.x/y/rawX/rawY.
-	 * @property tickOnUpdate
-	 * @type mouseMoveOutside
+	 * @property mouseMoveOutside
+	 * @type Boolean
 	 * @default false
 	 **/
 	p.mouseMoveOutside = false;
@@ -395,13 +396,17 @@ var p = Stage.prototype = new createjs.Container();
 		var inBounds = o.inBounds;
 		this._updatePointerPosition(id, pageX, pageY);
 		if (!inBounds && !o.inBounds && !this.mouseMoveOutside) { return; }
-		var evt = new createjs.MouseEvent("onMouseMove", o.x, o.y, this, e, id, id == this._primaryPointerID, o.rawX, o.rawY);
-
-		if (this.onMouseMove) { this.onMouseMove(evt); }
-		if (o.event && o.event.onMouseMove) {
+		var evt = new createjs.MouseEvent("mouseMove", o.x, o.y, this, e, id, id == this._primaryPointerID, o.rawX, o.rawY);
+	
+		this.onMouseMove&&this.onMouseMove(evt);
+		this._listeners&&this.dispatchEvent(evt);
+		
+		var oEvt = o.event;
+		if (oEvt && (oEvt.onMouseMove || (oEvt._listeners && oEvt.hasEventListener("mouseMove")))) {
 			evt = evt.clone(); // not sure this is entirely necessary.
 			evt.target = o.event.target;
-			o.event.onMouseMove(evt);
+			oEvt.onMouseMove&&oEvt.onMouseMove(evt);
+			oEvt._listeners&&oEvt.dispatchEvent(evt);
 		}
 	}
 
@@ -484,16 +489,25 @@ var p = Stage.prototype = new createjs.Container();
 	p._handlePointerUp = function(id, e, clear) {
 		var o = this._getPointerData(id);
 		
-		var evt = new createjs.MouseEvent("onMouseUp", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
-		if (this.onMouseUp) { this.onMouseUp(evt); }
-		if (o.event && o.event.onMouseUp) {
+		var evt = new createjs.MouseEvent("mouseUp", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
+		this.onMouseUp&&this.onMouseUp(evt);
+		if (this._listeners) { this.dispatchEvent(evt); }
+		
+		var oEvt = o.event;
+		if (oEvt) {
 			evt = evt.clone(); // not sure this is entirely necessary.
-			evt.target = o.event.target;
-			o.event.onMouseUp(evt);
+			evt.target = oEvt.target;
+			oEvt.onMouseUp&&oEvt.onMouseUp(evt);
+			oEvt._listeners&&oEvt.dispatchEvent(evt);
 		}
-		if (o.target && o.target.onClick && this._getObjectsUnderPoint(o.x, o.y, null, true, (this._mouseOverIntervalID ? 3 : 1)) == o.target) {
-			o.target.onClick(new createjs.MouseEvent("onClick", o.x, o.y, o.target, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
+		
+		var oTarget = o.target;
+		if (oTarget && (o.onClick  || (o._listeners && o.hasEventListener("click"))) && this._getObjectsUnderPoint(o.x, o.y, null, true, (this._mouseOverIntervalID ? 3 : 1)) == oTarget) {
+			evt = new createjs.MouseEvent("click", o.x, o.y, oTarget, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
+			oTarget.onClick&&oTarget.onClick(evt);
+			oTarget._listeners&&o.dispatchEvent(evt);
 		}
+		
 		if (clear) {
 			if (id == this._primaryPointerID) { this._primaryPointerID = null; }
 			delete(this._pointerData[id]);
@@ -514,22 +528,27 @@ var p = Stage.prototype = new createjs.Container();
 	 * @protected
 	 * @param {Number} id
 	 * @param {Event} e
-	 * @param {Number} pageX
-	 * @param {Number} pageY
+	 * @param {Number} x
+	 * @param {Number} y
 	 **/
 	p._handlePointerDown = function(id, e, x, y) {
 		var o = this._getPointerData(id);
 		if (y != null) { this._updatePointerPosition(id, x, y); }
 		
-		if (this.onMouseDown) {
-			this.onMouseDown(new createjs.MouseEvent("onMouseDown", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
+		if (this.onMouseDown || (this._listeners && this.hasEventListener("mouseDown"))) {
+			var evt = new createjs.MouseEvent("mouseDown", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
+			this.onMouseDown&&this.onMouseDown(evt);
+			this._listeners&&this.dispatchEvent(evt);
 		}
+		
 		var target = this._getObjectsUnderPoint(o.x, o.y, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
-			if (target.onPress) {
-				var evt = new createjs.MouseEvent("onPress", o.x, o.y, target, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
-				target.onPress(evt);
-				if (evt.onMouseMove || evt.onMouseUp) { o.event = evt; }
+			if (target.onPress || (target._listeners && target.hasEventListener("press"))) {
+				evt = new createjs.MouseEvent("press", o.x, o.y, target, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
+				target.onPress&&target.onPress(evt);
+				target._listeners&&target.dispatchEvent(evt);
+				
+				if (evt.onMouseMove || evt.onMouseUp || (evt._listeners&&(evt.hasEventListener("mouseMove") || evt.hasEventListener("mouseUp")))) { o.event = evt; }
 			}
 			o.target = target;
 		}
@@ -550,14 +569,23 @@ var p = Stage.prototype = new createjs.Container();
 			this._mouseOverX = this.mouseX;
 			this._mouseOverY = this.mouseY;
 		}
-
-		if (this._mouseOverTarget != target) {
-			if (this._mouseOverTarget && this._mouseOverTarget.onMouseOut) {
-				this._mouseOverTarget.onMouseOut(new createjs.MouseEvent("onMouseOut", this.mouseX, this.mouseY, this._mouseOverTarget));
+		
+		var mouseOverTarget = this._mouseOverTarget;
+		if (mouseOverTarget != target) {
+			if (mouseOverTarget && (mouseOverTarget.onMouseOut || (mouseOverTarget._listeners && mouseOverTarget.hasEventListener("mouseOut")))) {
+				var evt = new createjs.MouseEvent("mouseOut", this.mouseX, this.mouseY, mouseOverTarget);
+				mouseOverTarget.onMouseOut&&mouseOverTarget.onMouseOut(evt);
+				mouseOverTarget._listeners&&mouseOverTarget.dispatchEvent(evt);
 			}
-			if (target && target.onMouseOver) {
-				target.onMouseOver(new createjs.MouseEvent("onMouseOver", this.mouseX, this.mouseY, target));
+			if (mouseOverTarget) { this.canvas.style.cursor = ""; }
+			
+			if (target && (target.onMouseOver || (target._listeners && target.hasEventListener("mouseOver")))) {
+				evt = new createjs.MouseEvent("mouseOver", this.mouseX, this.mouseY, target);
+				target.onMouseOver&&target.onMouseOver(evt);
+				target._listeners&&target.dispatchEvent(evt);
 			}
+			if (target) { this.canvas.style.cursor = target.cursor||""; }
+			
 			this._mouseOverTarget = target;
 		}
 	}
@@ -568,13 +596,15 @@ var p = Stage.prototype = new createjs.Container();
 	 * @param {MouseEvent} e
 	 **/
 	p._handleDoubleClick = function(e) {
-		// TODO: add Touch support for double tap.
-		if (this.onDoubleClick) {
-			this.onDoubleClick(new createjs.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, this, e, -1, true));
+		// TODO: add Touch support for double tap?
+		if (this.hasEventListener("doubleClick", this.onDoubleClick)) {
+			var evt = new createjs.MouseEvent("doubleClick", this.mouseX, this.mouseY, this, e, -1, true);
+			this.dispatchEvent(evt, this.onDoubleClick, [evt]);
 		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
-		if (target && target.onDoubleClick) {
-			target.onDoubleClick(new createjs.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, target, e, -1, true));
+		if (target && target.hasEventListener("doubleClick", target.onDoubleClick)) {
+			evt = new createjs.MouseEvent("doubleClick", this.mouseX, this.mouseY, target, e, -1, true);
+			target.dispatchEvent(evt, target.onDoubleClick, [evt]);
 		}
 	}
 

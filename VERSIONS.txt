@@ -1,3 +1,12 @@
+Version NEXT [not released]
+****************************************************************************************************
+- added new event model with EventDispatcher
+- added DisplayObject.cursor property
+- added Container.getChildByName() method
+- documentation updates
+- fixed error with AlphaMaskFilter
+
+
 Version 0.5.0 [Aug 24, 2012]
 ****************************************************************************************************
 - moved all classes into a configurable createjs namespace

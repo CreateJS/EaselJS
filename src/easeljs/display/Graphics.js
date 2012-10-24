@@ -37,6 +37,7 @@ this.createjs = this.createjs||{};
 /**
 * Inner class used by the Graphics class. Used to create the instruction lists used in Graphics:
 * @class Command
+* @protected
 * @for Graphics
 * @constructor
 **/
@@ -48,6 +49,7 @@ function Command(f, params, path) {
 
 /**
 * @method exec
+* @protected
 * @param {Object} scope
 **/
 Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
@@ -818,14 +820,14 @@ var p = Graphics.prototype;
 	 * <br/><br/>
 	 * Each command is comprised of a single "header" character followed by a variable number of alternating x and y position values.
 	 * Reading the header bits from left to right (most to least significant): bits 1 to 3 specify the type of operation
-	 * (0-moveTo, 1-lineTo, 2-quadraticCurveTo, 3-bezierCurveTo, 4-7 unused). Bit 4 indicates whether position values use 12 bits (2 characters) 
+	 * (0-moveTo, 1-lineTo, 2-quadraticCurveTo, 3-bezierCurveTo, 4-closePath, 5-7 unused). Bit 4 indicates whether position values use 12 bits (2 characters) 
 	 * or 18 bits (3 characters), with a one indicating the latter. Bits 5 and 6 are currently unused.
 	 * <br/><br/>
-	 * Following the header is a series of 2 (moveTo, lineTo), 4 (quadraticCurveTo), or 6 (bezierCurveTo) parameters.
+	 * Following the header is a series of 0 (closePath), 2 (moveTo, lineTo), 4 (quadraticCurveTo), or 6 (bezierCurveTo) parameters.
 	 * These parameters are alternating x/y positions represented by 2 or 3 characters (as indicated by the 4th bit in the command char).
 	 * These characters consist of a 1 bit sign (1 is negative, 0 is positive), followed by an 11 (2 char) or 17 (3 char) bit integer value.
 	 * All position values are in tenths of a pixel.
-	 * Except in the case of move operations, this value is a delta from the previous x or y position (as appropriate).
+	 * Except in the case of move operations which are absolute, this value is a delta from the previous x or y position (as appropriate).
 	 * <br/><br/>
 	 * For example, the string "A3cAAMAu4AAA" represents a line starting at -150,0 and ending at 150,0.
 	 * A - bits 000000. First 3 bits (000) indicate a moveTo operation. 4th bit (0) indicates 2 chars per parameter.
@@ -840,8 +842,8 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.decodePath = function(str) {
-		var instructions = [this.moveTo, this.lineTo, this.quadraticCurveTo, this.bezierCurveTo];
-		var paramCount = [2, 2, 4, 6];
+		var instructions = [this.moveTo, this.lineTo, this.quadraticCurveTo, this.bezierCurveTo, this.closePath];
+		var paramCount = [2, 2, 4, 6, 0];
 		var i=0, l=str.length;
 		var params = [];
 		var x=0, y=0;
@@ -855,7 +857,7 @@ var p = Graphics.prototype;
 			// check that we have a valid instruction & that the unused bits are empty:
 			if (!f || (n&3)) { throw("bad path data (@"+i+"): "+c); }
 			var pl = paramCount[fi];
-			if (!fi) { x=y=0; }
+			if (!fi) { x=y=0; } // move operations reset the position.
 			params.length = 0;
 			i++;
 			var charCount = (n>>2&1)+2;  // 4th header bit indicates number size for this operation.

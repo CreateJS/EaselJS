@@ -35,6 +35,7 @@ this.createjs = this.createjs||{};
  * This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, onMouseOver, onMouseOut and onClick
  * handlers on DisplayObject instances.
  * @class MouseEvent
+ * @uses EventDispatcher
  * @constructor
  * @param {String} type The event type.
  * @param {Number} stageX The normalized x position relative to the stage.
@@ -142,6 +143,18 @@ var p = MouseEvent.prototype;
 	 * @type {Boolean}
 	 */
 	p.primary = false;
+	
+// mix-ins:
+	// EventDispatcher methods:
+	p.addEventListener = null;
+	p.removeEventListener = null;
+	p.removeAllEventListeners = null;
+	p.dispatchEvent = null;
+	p.hasEventListener = null;
+	p._listeners = null;
+	
+	// we only use EventDispatcher if it's available:
+	createjs.EventDispatcher && createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
 
 // constructor:
 	/**
