@@ -142,6 +142,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.push(child);
+		if (child.getStage()) {
+			var evt = new createjs.Event("addedToStage");
+			if (child instanceof Container) { child._propagateEventToChildren(evt); }
+		 	if (child.hasEventListener("addedToStage")) { child.dispatchEvent(evt); }
+		}
 		return child;
 	}
 
@@ -168,6 +173,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.splice(index, 0, child);
+		if (child.getStage()) {
+			var evt = new createjs.Event("addedToStage");
+			if (child instanceof Container) { child._propagateEventToChildren(evt); }
+		 	if (child.hasEventListener("addedToStage")) { child.dispatchEvent(evt); }
+		}
 		return child;
 	}
 
@@ -208,7 +218,14 @@ var p = Container.prototype = new createjs.DisplayObject();
 		}
 		if (index < 0 || index > this.children.length-1) { return false; }
 		var child = this.children[index];
-		if (child) { child.parent = null; }
+		if (child) {
+			if (child.getStage()) {
+				var evt = new createjs.Event("removedFromStage");
+				if (child instanceof Container) { child._propagateEventToChildren(evt); }
+			 	if (child.hasEventListener("removedFromStage")) { child.dispatchEvent(evt); }
+			}
+			child.parent = null;
+		}
 		this.children.splice(index, 1);
 		return true;
 	}
@@ -218,8 +235,16 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @method removeAllChildren
 	 **/
 	p.removeAllChildren = function() {
-		var kids = this.children;
-		while (kids.length) { kids.pop().parent = null; }
+		var kids = this.children, kid;
+		while (kids.length) {
+			kid = kids.pop();
+			if (kid.getStage()) {
+				var evt = new createjs.Event("removedFromStage");
+				if (kid instanceof Container) { kid._propagateEventToChildren(evt); }
+			 	if (kid.hasEventListener("removedFromStage")) { kid.dispatchEvent(evt); }
+			}
+			kid.parent = null;
+		}
 	}
 
 	/**
@@ -439,6 +464,21 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 
 	/**
+	 * @method _propagateEventToChildren
+	 * @protected
+	 * @param {Event} evt
+	 **/
+	p._propagateEventToChildren = function(evt) {
+		var l = this.children.length;
+		if (l === 0) { return; }
+		
+		var children = this.children.slice(0);
+		for (var i = 0; i < l; i++) {
+			if (children[i].hasEventListener(evt.type)) { children[i].dispatchEvent(evt); }
+		}
+	}
+
+	/**
 	 * @method _getObjectsUnderPoint
 	 * @param {Number} x
 	 * @param {Number} y
@@ -452,8 +492,9 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var ctx = createjs.DisplayObject._hitTestContext;
 		var canvas = createjs.DisplayObject._hitTestCanvas;
 		var mtx = this._matrix;
-		var hasHandler = (mouseEvents&1 && (this.onPress || this.onClick || this.onDoubleClick)) || (mouseEvents&2 &&
-																(this.onMouseOver || this.onMouseOut));
+		var hasHandler = (mouseEvents&1 && !(this instanceof createjs.Stage) && (this.hasEventListener("mouseDown") || this.hasEventListener("click")
+			|| this.hasEventListener("doubleClick"))) || (mouseEvents&2 && (this.hasEventListener("rollOver")
+			|| this.hasEventListener("rollOut")));
 
 		// if we have a cache handy & this has a handler, we can use it to do a quick check.
 		// we can't use the cache for screening children, because they might have hitArea set.
@@ -485,7 +526,9 @@ var p = Container.prototype = new createjs.DisplayObject();
 					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.onPress || child.onClick || child.onDoubleClick)) || (mouseEvents&2 && (child.onMouseOver || child.onMouseOut))) {
+			} else if (!mouseEvents || hasHandler || (mouseEvents&1 && (child.hasEventListener("mouseDown") || child.hasEventListener("click")
+					|| child.hasEventListener("doubleClick"))) || (mouseEvents&2 && (child.hasEventListener("rollOver")
+					|| child.hasEventListener("rollOut")))) {
 				var hitArea = child.hitArea;
 				child.getConcatenatedMatrix(mtx);
 				

@@ -89,30 +89,6 @@ var p = Stage.prototype = new createjs.Container();
 	p.mouseY = 0;
 
 	/**
-	 * The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param
-	 * containing the corresponding MouseEvent instance.
-	 * @event onMouseMove
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
-	p.onMouseMove = null;
-
-	/**
-	 * The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler
-	 * is passed a single param containing the corresponding MouseEvent instance.
-	 * @event onMouseUp
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
-	p.onMouseUp = null;
-
-	/**
-	 * The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single
-	 * param containing the corresponding MouseEvent instance.
-	 * @event onMouseDown
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
-	p.onMouseDown = null;
-
-	/**
 	 * Indicates whether this stage should use the snapToPixel property of display objects when rendering them. See
 	 * DisplayObject.snapToPixel for more information.
 	 * @property snapToPixelEnabled
@@ -198,7 +174,8 @@ var p = Stage.prototype = new createjs.Container();
 		this.Container_initialize();
 		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
 		this._pointerData = {};
-		this._enableMouseEvents(true);
+		this._enableMouseEvents();
+		this._enableKeyboardEvents();
 	}
 
 // public methods:
@@ -218,12 +195,13 @@ var p = Stage.prototype = new createjs.Container();
 		if (!this.canvas) { return; }
 		if (this.autoClear) { this.clear(); }
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-		if (this.tickOnUpdate) { this._tick((arguments.length ? arguments : null)); }
+		if (this.hasEventListener("enterFrame")) { this.dispatchEvent(new createjs.Event("enterFrame")); }
 		var ctx = this.canvas.getContext("2d");
 		ctx.save();
 		this.updateContext(ctx);
 		this.draw(ctx, false);
 		ctx.restore();
+		if (this.hasEventListener("exitFrame")) { this.dispatchEvent(new createjs.Event("exitFrame")); }
 	}
 
 	/**
@@ -351,8 +329,21 @@ var p = Stage.prototype = new createjs.Container();
 		evtTarget.addEventListener("mouseup", function(e) { o._handleMouseUp(e); }, false);
 		evtTarget.addEventListener("mousemove", function(e) { o._handleMouseMove(e); }, false);
 		evtTarget.addEventListener("dblclick", function(e) { o._handleDoubleClick(e); }, false);
+		evtTarget.addEventListener("mousewheel", function(e) { o._handleMouseWheel(e); }, false);
+		evtTarget.addEventListener("DOMMouseScroll", function(e) { o._handleMouseWheel(e); }, false);
 		// this is to facilitate extending Stage:
 		if (this.canvas) { this.canvas.addEventListener("mousedown", function(e) { o._handleMouseDown(e); }, false); }
+	}
+
+	/**
+	 * @method _enableKeyboardEvents
+	 * @protected
+	 **/
+	p._enableKeyboardEvents = function() {
+		var o = this;
+		var evtTarget = window.addEventListener ? window : document;
+		evtTarget.addEventListener("keyup", function(e) { o._handleKeyUp(e); }, false);
+		evtTarget.addEventListener("keydown", function(e) { o._handleKeyDown(e); }, false);
 	}
 	
 	/**
@@ -368,6 +359,39 @@ var p = Stage.prototype = new createjs.Container();
 			if (this._primaryPointerID == null) { this._primaryPointerID = id; }
 		}
 		return data;
+	}
+
+	/**
+	 * @method _enableKeyboardEvents
+	 * @protected
+	 **/
+	p._enableKeyboardEvents = function() {
+		var o = this;
+		var evtTarget = window.addEventListener ? window : document;
+		evtTarget.addEventListener("keyup", function(e) { o._handleKeyUp(e); }, false);
+		evtTarget.addEventListener("keydown", function(e) { o._handleKeyDown(e); }, false);
+	}
+	
+	/**
+	 * @method _handleKeyUp
+	 * @protected
+	 * @param {KeyboardEvent} e
+	 **/
+	p._handleKeyUp = function(e) {
+		if (this.hasEventListener("keyUp")) {
+			this.dispatchEvent(new createjs.KeyboardEvent("keyUp", e.keyCode, e.charCode, e, e.ctrlKey, e.altKey, e.shiftKey));
+		}
+	}
+
+	/**
+	 * @method _handleKeyDown
+	 * @protected
+	 * @param {KeyboardEvent} e
+	 **/
+	p._handleKeyDown = function(e) {
+		if (this.hasEventListener("keyDown")) {
+			this.dispatchEvent(new createjs.KeyboardEvent("keyDown", e.keyCode, e.charCode, e, e.ctrlKey, e.altKey, e.shiftKey));
+		}
 	}
 
 	/**
@@ -395,14 +419,10 @@ var p = Stage.prototype = new createjs.Container();
 		var inBounds = o.inBounds;
 		this._updatePointerPosition(id, pageX, pageY);
 		if (!inBounds && !o.inBounds && !this.mouseMoveOutside) { return; }
-		var evt = new createjs.MouseEvent("onMouseMove", o.x, o.y, this, e, id, id == this._primaryPointerID, o.rawX, o.rawY);
+		var evt = new createjs.MouseEvent("mouseMove", o.x, o.y, e, id, id == this._primaryPointerID, o.rawX, o.rawY);
 
-		if (this.onMouseMove) { this.onMouseMove(evt); }
-		if (o.event && o.event.onMouseMove) {
-			evt = evt.clone(); // not sure this is entirely necessary.
-			evt.target = o.event.target;
-			o.event.onMouseMove(evt);
-		}
+		if (this.hasEventListener("mouseMove")) { this.dispatchEvent(evt); }
+		if (o.event && o.event.hasEventListener("mouseMove")) { o.event.dispatchEvent(evt); }
 	}
 
 	/**
@@ -484,15 +504,14 @@ var p = Stage.prototype = new createjs.Container();
 	p._handlePointerUp = function(id, e, clear) {
 		var o = this._getPointerData(id);
 		
-		var evt = new createjs.MouseEvent("onMouseUp", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
-		if (this.onMouseUp) { this.onMouseUp(evt); }
-		if (o.event && o.event.onMouseUp) {
-			evt = evt.clone(); // not sure this is entirely necessary.
-			evt.target = o.event.target;
-			o.event.onMouseUp(evt);
-		}
-		if (o.target && o.target.onClick && this._getObjectsUnderPoint(o.x, o.y, null, true, (this._mouseOverIntervalID ? 3 : 1)) == o.target) {
-			o.target.onClick(new createjs.MouseEvent("onClick", o.x, o.y, o.target, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
+		var upEvt = new createjs.MouseEvent("mouseUp", o.x, o.y, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
+		if (this.hasEventListener("mouseUp")) { this.dispatchEvent(upEvt); }
+		if (o.event && o.event.hasEventListener("mouseUp")) { o.event.dispatchEvent(upEvt); }
+
+		var clickEvt = new createjs.MouseEvent("click", o.x, o.y, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
+		if (this.hasEventListener("click")) { this.dispatchEvent(clickEvt); }
+		if (o.target && o.target.hasEventListener("click") && this._getObjectsUnderPoint(o.x, o.y, null, true, (this._mouseOverIntervalID ? 3 : 1)) == o.target) {
+			o.target.dispatchEvent(clickEvt);
 		}
 		if (clear) {
 			if (id == this._primaryPointerID) { this._primaryPointerID = null; }
@@ -521,15 +540,15 @@ var p = Stage.prototype = new createjs.Container();
 		var o = this._getPointerData(id);
 		if (y != null) { this._updatePointerPosition(id, x, y); }
 		
-		if (this.onMouseDown) {
-			this.onMouseDown(new createjs.MouseEvent("onMouseDown", o.x, o.y, this, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
+		if (this.hasEventListener("mouseDown")) {
+			this.dispatchEvent(new createjs.MouseEvent("mouseDown", o.x, o.y, e, id, id==this._primaryPointerID, o.rawX, o.rawY));
 		}
 		var target = this._getObjectsUnderPoint(o.x, o.y, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target) {
-			if (target.onPress) {
-				var evt = new createjs.MouseEvent("onPress", o.x, o.y, target, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
-				target.onPress(evt);
-				if (evt.onMouseMove || evt.onMouseUp) { o.event = evt; }
+			if (target.hasEventListener("mouseDown")) {
+				var evt = new createjs.MouseEvent("mouseDown", o.x, o.y, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
+				target.dispatchEvent(evt);
+				if (evt.hasEventListener("mouseMove") || evt.hasEventListener("mouseUp")) { o.event = evt; }
 			}
 			o.target = target;
 		}
@@ -552,11 +571,11 @@ var p = Stage.prototype = new createjs.Container();
 		}
 
 		if (this._mouseOverTarget != target) {
-			if (this._mouseOverTarget && this._mouseOverTarget.onMouseOut) {
-				this._mouseOverTarget.onMouseOut(new createjs.MouseEvent("onMouseOut", this.mouseX, this.mouseY, this._mouseOverTarget));
+			if (this._mouseOverTarget && this._mouseOverTarget.hasEventListener("rollOut")) {
+				this._mouseOverTarget.dispatchEvent(new createjs.MouseEvent("rollOut", this.mouseX, this.mouseY));
 			}
-			if (target && target.onMouseOver) {
-				target.onMouseOver(new createjs.MouseEvent("onMouseOver", this.mouseX, this.mouseY, target));
+			if (target && target.hasEventListener("rollOver")) {
+				target.dispatchEvent(new createjs.MouseEvent("rollOver", this.mouseX, this.mouseY));
 			}
 			this._mouseOverTarget = target;
 		}
@@ -569,12 +588,25 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p._handleDoubleClick = function(e) {
 		// TODO: add Touch support for double tap.
-		if (this.onDoubleClick) {
-			this.onDoubleClick(new createjs.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, this, e, -1, true));
+		if (this.hasEventListener("doubleClick")) {
+			this.dispatchEvent(new createjs.MouseEvent("doubleClick", this.mouseX, this.mouseY, e, -1, true));
 		}
 		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
-		if (target && target.onDoubleClick) {
-			target.onDoubleClick(new createjs.MouseEvent("onDoubleClick", this.mouseX, this.mouseY, target, e, -1, true));
+		if (target && target.hasEventListener("doubleClick")) {
+			target.dispatchEvent(new createjs.MouseEvent("doubleClick", this.mouseX, this.mouseY, e, -1, true));
+		}
+	}
+
+	/**
+	 * @method _handleMouseWheel
+	 * @protected
+	 * @param {MouseEvent} e
+	 **/
+	p._handleMouseWheel = function(e) {
+		var o = this._getPointerData(-1);
+		if ((o.inBounds || this.mouseMoveOutside) && this.hasEventListener("mouseWheel")) {
+			var delta = e.wheelDelta/120 || -e.detail/3;
+			this.dispatchEvent(new createjs.MouseEvent("mouseWheel", this.mouseX, this.mouseY, e, -1, true, null, null, delta));
 		}
 	}
 
