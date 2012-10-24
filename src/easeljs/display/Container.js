@@ -238,11 +238,10 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @param {String} name The name of the child to return.
 	 * @return {DisplayObject} The child with the specified name.
 	 **/
-	p.getChildByName = function(name) {		
-		var count = 0,
-		total = this.children.length;
-		for(; count < total; ++count) {
-			if(this.children[count]["name"] === name) return this.getChildAt(count);
+	p.getChildByName = function(name) {
+		var kids = this.children;
+		for (var i=0,l=kids.length;i<l;i++) {
+			if(kids[i].name == name) { return kids[i]; }
 		}
 		return null;
 	}
