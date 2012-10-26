@@ -122,9 +122,9 @@ var p = EventDispatcher.prototype;
 		scope = scope || this;
 		for (var i=0,l=arr.length; i<l; i++) {
 			var o = arr[i];
-			if (o.callback == callback && o.scope == scope) {
+			if (o.f == callback && o.scope == scope) {
 				if (l==1) { delete(listeners[type]); } // allows for faster checks.
-				else { listeners.splice(i,1); }
+				else { arr.splice(i,1); }
 				break;
 			}
 		}
