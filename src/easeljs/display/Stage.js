@@ -572,15 +572,16 @@ var p = Stage.prototype = new createjs.Container();
 		
 		var mouseOverTarget = this._mouseOverTarget;
 		if (mouseOverTarget != target) {
+			var o = this._getPointerData(-1);
 			if (mouseOverTarget && (mouseOverTarget.onMouseOut || (mouseOverTarget._listeners && mouseOverTarget.hasEventListener("mouseOut")))) {
-				var evt = new createjs.MouseEvent("mouseOut", this.mouseX, this.mouseY, mouseOverTarget);
+				var evt = new createjs.MouseEvent("mouseOut", o.x, o.y, mouseOverTarget, null, -1, o.rawX, o.rawY);
 				mouseOverTarget.onMouseOut&&mouseOverTarget.onMouseOut(evt);
 				mouseOverTarget._listeners&&mouseOverTarget.dispatchEvent(evt);
 			}
 			if (mouseOverTarget) { this.canvas.style.cursor = ""; }
 			
 			if (target && (target.onMouseOver || (target._listeners && target.hasEventListener("mouseOver")))) {
-				evt = new createjs.MouseEvent("mouseOver", this.mouseX, this.mouseY, target);
+				evt = new createjs.MouseEvent("mouseOver", o.x, o.y, target, null, -1, o.rawX, o.rawY);
 				target.onMouseOver&&target.onMouseOver(evt);
 				target._listeners&&target.dispatchEvent(evt);
 			}
@@ -596,15 +597,12 @@ var p = Stage.prototype = new createjs.Container();
 	 * @param {MouseEvent} e
 	 **/
 	p._handleDoubleClick = function(e) {
-		// TODO: add Touch support for double tap?
-		if (this.hasEventListener("doubleClick", this.onDoubleClick)) {
-			var evt = new createjs.MouseEvent("doubleClick", this.mouseX, this.mouseY, this, e, -1, true);
-			this.dispatchEvent(evt, this.onDoubleClick, [evt]);
-		}
-		var target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, (this._mouseOverIntervalID ? 3 : 1));
-		if (target && target.hasEventListener("doubleClick", target.onDoubleClick)) {
-			evt = new createjs.MouseEvent("doubleClick", this.mouseX, this.mouseY, target, e, -1, true);
-			target.dispatchEvent(evt, target.onDoubleClick, [evt]);
+		var o = this._getPointerData(-1);
+		var target = this._getObjectsUnderPoint(o.x, o.y, null, (this._mouseOverIntervalID ? 3 : 1));
+		if (target && (target.onDoubleClick || (target._listeners && target.hasEventListener("doubleClick")))) {
+			evt = new createjs.MouseEvent("doubleClick", o.x, o.y, target, e, -1, true, o.rawX, o.rawY);
+			target.onDoubleClick&&target.onDoubleClick(evt);
+			target._listeners&&target.dispatchEvent(evt);
 		}
 	}
 
