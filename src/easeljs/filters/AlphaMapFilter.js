@@ -37,7 +37,7 @@ this.createjs = this.createjs||{};
  * <br/><br/>
  * Generally, it is recommended that you use AlphaMaskFilter, because it has much better performance.
  * @class AlphaMapFilter
- * @augments Filter
+ * @extends Filter
  * @constructor
  * @param {Image} alphaMap The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
  * dimensions as the target.

@@ -266,9 +266,9 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Returns a clone of the Point instance.
+	 * Returns a clone of the BitmapAnimation instance.
 	 * @method clone
-	 * @return {Point} a clone of the Point instance.
+	 * @return {BitmapAnimation} a clone of the BitmapAnimation instance.
 	 **/
 	p.clone = function() {
 		var o = new BitmapAnimation(this.spriteSheet);

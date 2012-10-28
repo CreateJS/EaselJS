@@ -35,7 +35,7 @@ this.createjs = this.createjs||{};
 * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting.
 * @class ColorMatrixFilter
 * @constructor
-* @augments Filter
+* @extends Filter
 * @param {Array[Number]} matrix A 4x5 matrix describing the color operation to perform. See also the ColorMatrix class.
 **/
 var ColorMatrixFilter = function(matrix) {

@@ -35,7 +35,7 @@ this.createjs = this.createjs||{};
 * Applies color transforms.
 * @class ColorFilter
 * @constructor
-* @augments Filter
+* @extends Filter
 * @param {Number} redMultiplier
 * @param {Number} greenMultiplier
 * @param {Number} blueMultiplier
