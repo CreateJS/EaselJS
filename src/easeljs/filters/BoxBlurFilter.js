@@ -34,7 +34,7 @@ this.createjs = this.createjs||{};
 /**
 * BoxBlurFilter applies a box blur to DisplayObjects
 * @class BoxBlurFilter
-* @augments Filter
+* @extends Filter
 * @constructor
 * @param {Number} blurX
 * @param {Number} blurY

@@ -38,7 +38,7 @@ this.createjs = this.createjs||{};
  * result in a much smaller file size than a single PNG32 containing ARGB.
  *  IMPORTANT NOTE: This filter currently does not support the targetCtx, or targetX/Y parameters correctly.
  * @class AlphaMaskFilter
- * @augments Filter
+ * @extends Filter
  * @constructor
  * @param {Image} mask 
  **/

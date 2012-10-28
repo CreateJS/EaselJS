@@ -37,7 +37,7 @@ this.createjs = this.createjs||{};
 	 * to facilitate chained calls. Ex. myColorMatrix.adjustHue(20).adjustBrightness(50);
 	 * @class ColorMatrix
 	 * @constructor
-	 * @augments Array
+	 * @extends Array
 	 * @param {Number} brightness
 	 * @param {Number} contrast
 	 * @param {Number} saturation
