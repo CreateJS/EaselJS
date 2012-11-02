@@ -37,6 +37,7 @@ this.createjs = this.createjs||{};
 * positions or transforms. If the vector art will not change between draws, you may want to use the cache() method to reduce the rendering cost.
 * @class Shape
 * @extends DisplayObject
+* @constructor
 * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
 **/
 var Shape = function(graphics) {
