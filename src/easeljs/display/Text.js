@@ -223,9 +223,9 @@ var p = Text.prototype = new createjs.DisplayObject();
 	}
 	
 	/**
-	 * Returns a clone of the Point instance.
+	 * Returns a clone of the Text instance.
 	 * @method clone
-	 * @return {Point} a clone of the Point instance.
+	 * @return {Text} a clone of the Text instance.
 	 **/
 	p.clone = function() {
 		var o = new Text(this.text, this.font, this.color);
