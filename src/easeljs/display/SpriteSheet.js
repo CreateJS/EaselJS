@@ -331,6 +331,7 @@ var p = SpriteSheet.prototype;
 	 * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist, or the image is not fully loaded.
 	 **/
 	p.getFrame = function(frameIndex) {
+		var frame;
 		if (this.complete && this._frames && (frame=this._frames[frameIndex])) { return frame; }
 		return null;
 	}
