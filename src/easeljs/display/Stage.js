@@ -502,10 +502,10 @@ var p = Stage.prototype = new createjs.Container();
 		}
 		
 		var oTarget = o.target;
-		if (oTarget && (o.onClick  || (o._listeners && o.hasEventListener("click"))) && this._getObjectsUnderPoint(o.x, o.y, null, true, (this._mouseOverIntervalID ? 3 : 1)) == oTarget) {
+		if (oTarget && (oTarget.onClick  || (oTarget._listeners && oTarget.hasEventListener("click"))) && this._getObjectsUnderPoint(o.x, o.y, null, true, (this._mouseOverIntervalID ? 3 : 1)) == oTarget) {
 			evt = new createjs.MouseEvent("click", o.x, o.y, oTarget, e, id, id==this._primaryPointerID, o.rawX, o.rawY);
 			oTarget.onClick&&oTarget.onClick(evt);
-			oTarget._listeners&&o.dispatchEvent(evt);
+			oTarget._listeners&&oTarget.dispatchEvent(evt);
 		}
 		
 		if (clear) {
