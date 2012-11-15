@@ -40,13 +40,13 @@ EaselJS is a library to make working with the Canvas element easier. It provides
 
 ## Support and Resources
 * Find examples and more information at the [EaselJS web site](http://easeljs.com/)
-* There is a [Google Group](http://groups.google.com/group/easeljs) for discussions and support.
+* There is a [Google Group](http://groups.google.com/group/createjs-discussion) for discussions and support.
 * You can also ask questions and interact with other users at our [Community](http://community.createjs.com) site.
 * Have a look at the included [examples](https://github.com/CreateJS/EaselJS/tree/master/examples) and [API documentation](http://createjs.com/Docs/EaselJS/) for more in-depth information.
 
 It was built by [gskinner.com](http://www.gskinner.com), and is released for free under the MIT license, which means you can use it for almost any purpose (including commercial projects). We appreciate credit where possible, but it is not a requirement.
 
-EaselJS is currently in alpha. We will be making significant improvements to the library, samples, and documentation over the coming weeks. Please be aware that this may necessitate changes to the existing API.
+EaselJS is currently in beta. We will be making significant improvements to the library, samples, and documentation over the coming weeks. Please be aware that this may necessitate changes to the existing API.
 
 ## Classes
 
