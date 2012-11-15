@@ -3,6 +3,7 @@ Version NEXT [not released]
 - added new event model with EventDispatcher
 - added DisplayObject.cursor property
 - added Container.getChildByName() method
+- added ButtonHelper class
 - documentation updates
 - fixed error with AlphaMaskFilter
 
