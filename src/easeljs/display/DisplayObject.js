@@ -852,11 +852,13 @@ var p = DisplayObject.prototype;
 	 **/
 	p._hasMouseHandler = function(typeMask) {
 		var ls = this._listeners;
-		return (typeMask&1 && (this.onPress || this.onClick || this.onDoubleClick || 
+		return !!(
+				 (typeMask&1 && (this.onPress || this.onClick || this.onDoubleClick || 
 				 (ls && (this.hasEventListener("press") || this.hasEventListener("click") || this.hasEventListener("doubleClick")))))
 				 ||
 				 (typeMask&2 && (this.onMouseOver || this.onMouseOut || this.cursor ||
-				 (ls && (this.hasEventListener("mouseOver") || this.hasEventListener("mouseOut")))));
+				 (ls && (this.hasEventListener("mouseOver") || this.hasEventListener("mouseOut")))))
+				 );
 	};
 	 
 

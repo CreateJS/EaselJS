@@ -473,8 +473,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 		for (var i=l-1; i>=0; i--) {
 			var child = this.children[i];
 			if (!child.isVisible() || !child.mouseEnabled) { continue; }
-
-			if (child instanceof Container) {
+			var hitArea = child.hitArea;
+			var childHasHandler;
+			
+			// if a child container has a handler and a hitArea then we only need to check its hitArea:
+			if (child instanceof Container && !(hitArea && (childHasHandler = child._hasMouseHandler(mouseEvents)))) {
 				var result;
 				if (hasHandler) {
 					// only concerned about the first hit, because this container is going to claim it anyway:
@@ -484,8 +487,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!mouseEvents || hasHandler || child._hasMouseHandler(mouseEvents)) {
-				var hitArea = child.hitArea;
+			} else if (!mouseEvents || hasHandler || (childHasHandler || child._hasMouseHandler(mouseEvents))) {
 				child.getConcatenatedMatrix(mtx);
 				
 				if (hitArea) {
