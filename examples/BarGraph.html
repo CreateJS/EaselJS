@@ -193,7 +193,7 @@
 		// redraw the side bar (we can't just scale it because of the angles):
 		var right = bar.getChildAt(0);
 		right.graphics.clear()
-			.beginFill(createjs.Graphics.getHSL(bar.hue,90,15,0.7))
+			.beginFill(createjs.Graphics.getHSL(bar.hue,60,15,0.7))
 			.moveTo(0,0)
 			.lineTo(0,-h)
 			.lineTo(10,-h-10)
@@ -206,7 +206,6 @@
 </head>
 	
 <body onload="init();">
-
 	<header id="header" class="EaselJS">
 	    <h1><span class="text-product">Easel<strong>JS</strong></span> Bar Graph Example</h1>
 	    <p>Reload for new random data. Example of using the <strong>Graphics</strong>, <strong>Shape</strong>, <strong>Text</strong> and <strong>Container</strong> classes to draw a simple vector bar graph.
