@@ -38,14 +38,15 @@ this.createjs = this.createjs||{};
  * @class ButtonHelper
  * @constructor
  * @param {MovieClip | BitmapAnimation} target The MovieClip or BitmapAnimation to add button functionality to.
- * @param {String | Number} overLabel Optional. The label name or frame number to display when the user mouses out of the target. Defaults to "over".
  * @param {String | Number} outLabel Optional. The label name or frame number to display when the user mouses over the target. Defaults to "out".
+ * @param {String | Number} overLabel Optional. The label name or frame number to display when the user mouses out of the target. Defaults to "over".
+ * @param {String | Number} pressLabel Optional. The label name or frame number to display when the user presses (clicks and holds) on the target. Defaults to "press".
  * @param {Boolean} play Optional. If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
  * @param {DisplayObject} hitArea Optional. If specified, this sets the hitArea property on the target.
  * @param {String | Number} hitLabel Optional. If specified, this will set actionsEnabled to false and advance the hitArea to the specified label or frame number. Equivalent to calling hitArea.gotoAndStop(hitLabel).
  **/
-var ButtonHelper = function(target, overLabel, outLabel, play, hitArea, hitLabel) {
-	this.initialize(target, overLabel, outLabel, play, hitArea, hitLabel);
+var ButtonHelper = function(target, outLabel, overLabel, pressLabel, play, hitArea, hitLabel) {
+	this.initialize(target, outLabel, overLabel, pressLabel, play, hitArea, hitLabel);
 }
 var p = ButtonHelper.prototype;
 
@@ -66,17 +67,24 @@ var p = ButtonHelper.prototype;
 	
 	/**
 	 * TODO
-	 * @property play
-	 * @type Boolean
-	 **/
-	p.play = false;
-	
-	/**
-	 * TODO
 	 * @property outLabel
 	 * @type String | Number
 	 **/
 	p.outLabel = null;
+	
+	/**
+	 * TODO
+	 * @property pressLabel
+	 * @type String | Number
+	 **/
+	p.pressLabel = null;
+	
+	/**
+	 * TODO
+	 * @property play
+	 * @type Boolean
+	 **/
+	p.play = false;
 	
 // constructor:
 	/** 
@@ -84,10 +92,11 @@ var p = ButtonHelper.prototype;
 	 * @method initialize
 	 * @protected
 	 **/
-	p.initialize = function(target, overLabel, outLabel, play, hitArea, hitLabel) {
+	p.initialize = function(target, outLabel, overLabel, pressLabel, play, hitArea, hitLabel) {
 		this.target = target;
 		this.overLabel = overLabel == null ? "over" : overLabel;
 		this.outLabel = outLabel == null ? "out" : outLabel;
+		this.pressLabel = pressLabel == null ? "press" : pressLabel;
 		this.play = play;
 		target.cursor = "pointer";
 		this.setEnabled(true);
@@ -115,9 +124,13 @@ var p = ButtonHelper.prototype;
 			if (value) {
 				o.addEventListener("mouseOver", f, _this);
 				o.addEventListener("mouseOut", f, _this);
+				o.addEventListener("press", f, _this);
+				o.addEventListener("click", f, _this);
 			} else {
 				o.removeEventListener("mouseOver", f, _this);
 				o.removeEventListener("mouseOut", f, _this);
+				o.removeEventListener("press", f, _this);
+				o.removeEventListener("click", f, _this);
 			}
 		} else {
 			o.onMouseOver = o.onMouseOut = value ? function(e) { _this._handleEvt(e); } : null;
@@ -140,7 +153,9 @@ var p = ButtonHelper.prototype;
 	 * @protected
 	 **/
 	p._handleEvt = function(evt) {
-		var label = evt.type == "mouseOver" ? this.overLabel : this.outLabel;
+		var label = evt.type == "mouseOver" || evt.type == "click" ? this.overLabel :
+						evt.type == "press" ? this.pressLabel :
+						this.outLabel;
 		if (this.play) {
 			this.target.gotoAndPlay(label);
 		} else {
