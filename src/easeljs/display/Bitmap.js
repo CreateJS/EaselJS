@@ -160,6 +160,7 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	 **/
 	p.clone = function() {
 		var o = new Bitmap(this.image);
+		if (this.sourceRect) { o.sourceRect = this.sourceRect.clone(); }
 		this.cloneProps(o);
 		return o;
 	}
