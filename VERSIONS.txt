@@ -6,6 +6,7 @@ Version NEXT [not released]
 - added ButtonHelper class
 - documentation updates
 - fixed error with AlphaMaskFilter
+- hitArea position now ignores the regX/Y of the target instance
 
 
 Version 0.5.0 [Aug 24, 2012]

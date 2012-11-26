@@ -491,7 +491,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 				child.getConcatenatedMatrix(mtx);
 				
 				if (hitArea) {
-					mtx.appendTransform(hitArea.x+child.regX, hitArea.y+child.regY, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
+					mtx.appendTransform(hitArea.x, hitArea.y, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
 					mtx.alpha *= hitArea.alpha/child.alpha;
 				}
 				
