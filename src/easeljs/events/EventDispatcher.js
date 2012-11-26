@@ -161,7 +161,7 @@ var p = EventDispatcher.prototype;
 			if (!arr) { return ret; }
 			for (var i=0,l=arr.length; i<l; i++) {
 				var o = arr[i];
-				o.f.apply(o.scope, [eventObj]);
+				ret = ret||o.f.apply(o.scope, [eventObj]);
 			}
 		}
 		return !!ret;
