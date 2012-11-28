@@ -33,7 +33,7 @@ var SOURCE_FILES = [
 ];
 
 // default name for lib output:
-var JS_FILE_NAME = "easeljs-%VERSION%.min.js";
+var JS_FILE_NAME = "easeljs-%VERSION%%MIN_SUFFIX%.js";
 
 // project name:
 var PROJECT_NAME = "EaselJS";
@@ -99,9 +99,11 @@ OPTIMIST.describe("v", "Enable verbose output")
 	.default("tasks", "all")
 	.describe("s","Include specified file in compilation. Option can be specified multiple times for multiple files.")
 	.alias("s", "source")
-	.describe("o", "Name of minified JavaScript file.")
+	.describe("o", "Name of compiled JavaScript file.")
 	.alias("o", "output")
 	.default("o", JS_FILE_NAME)
+	.describe("unminified", "Build unminified version")
+	.boolean("unminified")
 	.usage("Build Task Manager for "+PROJECT_NAME+"\nUsage\n$0 [-v] [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--source=FILE] [--output=FILENAME.js]");
 
 
@@ -110,6 +112,7 @@ OPTIMIST.describe("v", "Enable verbose output")
 var js_file_name = JS_FILE_NAME;
 
 var version;
+var unminified;
 var verbose;
 
 var TASK = {
@@ -151,6 +154,8 @@ function main(argv)
 
 	verbose = argv.v != undefined;
 	version = argv.version;
+	
+	unminified = argv.unminified;
 	
 	extraSourceFiles = argv.s;
 	
@@ -237,14 +242,22 @@ function buildSourceTask(completeHandler)
 		FILE.mkdirSync(OUTPUT_DIR_NAME);
 	}
 	
-	js_file_name = js_file_name.split("%VERSION%").join(version);
-
+	js_file_name = js_file_name.split("%VERSION%").join(version)
+	                           .split("%MIN_SUFFIX%").join(unminified ? "" : ".min");
+    
+    var add_file_arg = function(file) {
+      if(!unminified)
+      {
+  		file_args.push("--js");
+      }
+      file_args.push(file);
+    };
+    
 	var file_args = [];
 	var len = SOURCE_FILES.length;
 	for(var i = 0; i < len; i++)
 	{
-		file_args.push("--js");
-		file_args.push(SOURCE_FILES[i]);
+		add_file_arg(SOURCE_FILES[i]);
 	}
 	
 	if(extraSourceFiles)
@@ -252,8 +265,7 @@ function buildSourceTask(completeHandler)
 		len = extraSourceFiles.length;
 		for(var i = 0; i < len; i++)
 		{
-			file_args.push("--js");
-			file_args.push(extraSourceFiles[i]);
+			add_file_arg(extraSourceFiles[i]);
 		}
 	}
 	
@@ -261,14 +273,18 @@ function buildSourceTask(completeHandler)
 	var tmp_file = PATH.join(OUTPUT_DIR_NAME,"tmp.js");
 	var final_file = PATH.join(OUTPUT_DIR_NAME, js_file_name);
 
-	var cmd = [
-		"java", "-jar", GOOGLE_CLOSURE_PATH
-	].concat(
-			file_args
-		).concat(
-			["--js_output_file", tmp_file]
-		);
-		
+	var cmd, cmd_suffix;
+	if(unminified)
+	{
+	    cmd = ["cat"];
+	    cmd_suffix = [">", tmp_file];
+	}
+	else
+	{
+	    cmd = ["java", "-jar", GOOGLE_CLOSURE_PATH];
+	    cmd_suffix = ["--js_output_file", tmp_file];
+	}
+	cmd = cmd.concat(file_args).concat(cmd_suffix);
 
 	CHILD_PROCESS.exec(
 		cmd.join(" "),
