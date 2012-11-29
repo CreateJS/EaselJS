@@ -39,7 +39,7 @@ this.createjs = this.createjs||{};
 * @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use. If it is a URI, a new Image object will be constructed and assigned to the .image property.
 **/
 var Bitmap = function(imageOrUri) {
-  this.initialize(imageOrUri);
+  this.initialize.apply(this, arguments);
 }
 var p = Bitmap.prototype = new createjs.DisplayObject();
 
@@ -82,12 +82,16 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	 * @protected
 	 **/
 	p.initialize = function(imageOrUri) {
-		this.DisplayObject_initialize();
-		if (typeof imageOrUri == "string") {
+		var opts = this._checkForOptsArg(arguments, ['string', Image]);
+		if (opts) { imageOrUri = null; }
+		
+		this.image = imageOrUri;
+		
+		this.DisplayObject_initialize(opts);
+		
+		if (typeof this.image == "string") {
 			this.image = new Image();
-			this.image.src = imageOrUri;
-		} else {
-			this.image = imageOrUri;
+			this.image.src = this.image;
 		}
 	}
 	

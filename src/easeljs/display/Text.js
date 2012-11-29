@@ -46,7 +46,7 @@ this.createjs = this.createjs||{};
 * is acceptable (ex. "#F00").
 **/
 var Text = function(text, font, color) {
-  this.initialize(text, font, color);
+  this.initialize.apply(this, arguments);
 }
 var p = Text.prototype = new createjs.DisplayObject();
 
@@ -143,10 +143,14 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @protected
 	*/
 	p.initialize = function(text, font, color) {
-		this.DisplayObject_initialize();
+		var opts = this._checkForOptsArg(arguments, ["string"]);
+		if (opts) { text = null; }
+		
 		this.text = text;
 		this.font = font;
 		this.color = color ? color : "#000";
+		
+		this.DisplayObject_initialize(opts);
 	}
 	
 	/**

@@ -44,7 +44,7 @@ this.createjs = this.createjs||{};
 * @constructor
 **/
 var Container = function() {
-  this.initialize();
+  this.initialize.apply(this, arguments);
 }
 var p = Container.prototype = new createjs.DisplayObject();
 
@@ -73,8 +73,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @protected
 	*/
 	p.initialize = function() {
-		this.DisplayObject_initialize();
+		var opts = this._checkForOptsArg(arguments, [createjs.SpriteSheet]);
+		
 		this.children = [];
+		
+		this.DisplayObject_initialize(opts);
 	}
 
 // public methods:
