@@ -320,8 +320,9 @@ var Ticker = function() {
 	 * @method getTime
 	 * @static
 	 * @param {Boolean} pauseable Indicates whether to include time elapsed
-	 * while Ticker was paused. If false only time elapsed while Ticker is not paused will be returned.
-	 * If true, the value returned will be total time elapsed since the first tick event listener was added.
+	 * while Ticker was paused. If true only time elapsed while Ticker is not paused will be returned.
+	 * If false, the value returned will be total time elapsed since the first tick event listener was added.
+	 * The default value is false.
 	 * @return {Number} Number of milliseconds that have elapsed since Ticker was begun.
 	 **/
 	Ticker.getTime = function(pauseable) {
@@ -333,8 +334,8 @@ var Ticker = function() {
 	 * @method getTicks
 	 * @static
 	 * @param {Boolean} pauseable Indicates whether to include ticks that would have been broadcast
-	 * while Ticker was paused. If false only tick events broadcast while Ticker is not paused will be returned.
-	 * If true, tick events that would have been broadcast while Ticker was paused will be included in the return
+	 * while Ticker was paused. If true only tick events broadcast while Ticker is not paused will be returned.
+	 * If false, tick events that would have been broadcast while Ticker was paused will be included in the return
 	 * value. The default value is false.
 	 * @return {Number} of ticks that have been broadcast.
 	 **/
