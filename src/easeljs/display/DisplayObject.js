@@ -47,7 +47,7 @@ this.createjs = this.createjs||{};
 * @constructor
 **/
 var DisplayObject = function() {
-  this.initialize();
+  this.initialize.apply(this, arguments);
 }
 var p = DisplayObject.prototype;
 
@@ -434,9 +434,21 @@ var p = DisplayObject.prototype;
 	 * @method initialize
 	 * @protected
 	*/
-	p.initialize = function() {
+	p.initialize = function(opts) {
 		this.id = createjs.UID.get();
 		this._matrix = new createjs.Matrix2D();
+		
+		if (opts) {
+            for(var opt in opts) {
+                var value = opts[opt];
+                var setter = 'set' + opt.substring(0,1).toUpperCase() + opt.substring(1);
+                if(typeof this[setter] === 'function') {
+                    this[setter](value);
+                } else if(opt in this) {
+                    this[opt] = value;
+                }
+            }
+		}
 	}
 
 // public methods:
@@ -750,7 +762,44 @@ var p = DisplayObject.prototype;
 	}
 
 // private methods:
-
+    
+    /**
+     * Determines whether the given arguments are an options object. For use in subclass constructors
+     * which accept either a list of specific arguments, e.g. "new Text(font, size, color)", or a single opts object,
+     * e.g. "new Text({ font: 'foo', size: 3 })", and need to distinguish between the two.
+     * @method _checkForOptsArg
+     * @param {Array} argument  the arguments passed to the subclass constructor.
+     * @param {Array} firstArgExpectedTypes  optional array of types (either strings or prototype objects) which signal that
+     *      the first arg is not an options hash
+     * @return {Object}  the opts object, or null if the arguments are not an opts object.
+     */
+    p._checkForOptsArg = function(args, firstArgExpectedTypes) {
+        if (args.length != 1) {
+            return null;  // zero or multiple args => not opts
+        }
+        
+        var firstArg = args[0];
+        if (!firstArg) {
+            return null;  // null or undefined => not opts
+        }
+		
+		if (firstArgExpectedTypes) {
+    		var firstArgType = typeof firstArg;
+    		for (var n=0; n < firstArgExpectedTypes.length; n++) {
+    		    var expectedType = firstArgExpectedTypes[n];
+    		    if (typeof expectedType === 'string') {
+    		        if (firstArgType === expectedType) {
+    		            return null;
+    		        }
+    		    } else if (firstArg instanceof expectedType) {
+    		        return null;
+    		    }
+    	    }
+	    }
+	    
+	    return firstArg; // It's an options object!
+    }
+    
 	// separated so it can be used more easily in subclasses:
 	/**
 	 * @method cloneProps

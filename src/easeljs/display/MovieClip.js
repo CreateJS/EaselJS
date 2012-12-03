@@ -47,7 +47,7 @@ this.createjs = this.createjs||{};
  * @param {Object} labels A hash of labels to pass to the timeline instance associated with this MovieClip.
  **/
 var MovieClip = function(mode, startPosition, loop, labels) {
-  this.initialize(mode, startPosition, loop, labels);
+  this.initialize.apply(this, arguments);
 }
 var p = MovieClip.prototype = new createjs.Container();
 
@@ -178,11 +178,19 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @protected
 	 **/
 	p.initialize = function(mode, startPosition, loop, labels) {
+	    var opts = this._checkForOptsArg(arguments, ["string", Node]);
+	    if (opts) {
+	        mode = null;
+	        startPosition = opts.startPosition;
+	        loop = opts.loop;
+	        labels = opts.labels;
+	    }
+	    
 		this.mode = mode||MovieClip.INDEPENDENT;
 		this.startPosition = startPosition || 0;
 		this.loop = loop;
 		props = {paused:true, position:startPosition, useTicks:true};
-		this.Container_initialize();
+		this.Container_initialize(opts);
 		this.timeline = new createjs.Timeline(null, labels, props);
 		this._managed = {};
 	}

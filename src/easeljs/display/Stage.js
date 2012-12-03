@@ -40,7 +40,7 @@ this.createjs = this.createjs||{};
 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id of a canvas object in the current document.
 **/
 var Stage = function(canvas) {
-  this.initialize(canvas);
+  this.initialize.apply(this, arguments);
 }
 var p = Stage.prototype = new createjs.Container();
 
@@ -196,8 +196,16 @@ var p = Stage.prototype = new createjs.Container();
 	 * @protected
 	 **/
 	p.initialize = function(canvas) {
-		this.Container_initialize();
-		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
+		var opts = this._checkForOptsArg(arguments, ["string", Node]);
+		if (opts) { canvas = null; }
+		
+		this.canvas = this.canvas || canvas;
+		
+		this.Container_initialize(opts);
+		
+		if (typeof this.canvas == "string") {
+			this.canvas = document.getElementById(this.canvas);
+		}
 		this._pointerData = {};
 		this._enableMouseEvents(true);
 	}

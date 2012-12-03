@@ -53,7 +53,7 @@ this.createjs = this.createjs||{};
 * @param {HTMLElement} htmlElement A reference or id for the DOM element to manage.
 **/
 var DOMElement = function(htmlElement) {
-  this.initialize(htmlElement);
+  this.initialize.apply(this, arguments);
 }
 var p = DOMElement.prototype = new createjs.DisplayObject();
 
@@ -86,12 +86,19 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * @protected
 	*/
 	p.initialize = function(htmlElement) {
-		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
-		this.DisplayObject_initialize();
+		var opts = this._checkForOptsArg(arguments, ["string", Node]);
+		if (opts) { htmlElement = null; }
+		
 		this.mouseEnabled = false;
 		this.htmlElement = htmlElement;
-		if (htmlElement) {
-			this._style = htmlElement.style;
+		
+		this.DisplayObject_initialize(opts);
+		
+		if (typeof(this.htmlElement) === "string") {
+			this.htmlElement = document.getElementById(this.htmlElement);
+		}
+		if (this.htmlElement) {
+			this._style = this.htmlElement.style;
 			this._style.position = "absolute";
 			this._style.transformOrigin = this._style.WebkitTransformOrigin = this._style.msTransformOrigin = this._style.MozTransformOrigin = this._style.OTransformOrigin = "0% 0%";
 		}

@@ -44,7 +44,7 @@ this.createjs = this.createjs||{};
 * dimensions, and frame data. See SpriteSheet for more information.
 **/
 var BitmapAnimation = function(spriteSheet) {
-  this.initialize(spriteSheet);
+  this.initialize.apply(this, arguments);
 }
 var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 
@@ -153,8 +153,12 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * @protected
 	*/
 	p.initialize = function(spriteSheet) {
-		this.DisplayObject_initialize();
+		var opts = this._checkForOptsArg(arguments, [createjs.SpriteSheet]);
+		if (opts) { spriteSheet = null; }
+		
 		this.spriteSheet = spriteSheet;
+		
+		this.DisplayObject_initialize(opts);
 	}
 
 	/**

@@ -35,13 +35,24 @@ this.createjs = this.createjs||{};
 * A Shape allows you to display vector art in the display list. It composites a Graphics instance which exposes all of the vector
 * drawing methods. The Graphics instance can be shared between multiple Shape instances to display the same vector graphics with different
 * positions or transforms. If the vector art will not change between draws, you may want to use the cache() method to reduce the rendering cost.
+*
+* The options-style constructor supports the special options strokeWidth, strokeCap, strokeJoin, strokeMiterLimit, fillColor, and strokeColor,
+* which modify the default graphics object. You can combine these with drawing commands specified in a callback function:
+* 
+*	  new createjs.Shape({
+*		  strokeWidth: 3,
+*		  fillColor: 'red',
+*		  graphics: function(g) { g.drawCircle(0, 0, 1); }
+*	  })
+* 
 * @class Shape
 * @extends DisplayObject
 * @constructor
 * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
+*	If null, a new Graphics instance will be created.
 **/
 var Shape = function(graphics) {
-  this.initialize(graphics);
+  this.initialize.apply(this, arguments);
 }
 var p = Shape.prototype = new createjs.DisplayObject();
 
@@ -68,8 +79,34 @@ var p = Shape.prototype = new createjs.DisplayObject();
 	 * @protected
 	 **/
 	p.initialize = function(graphics) {
-		this.DisplayObject_initialize();
+		var opts = this._checkForOptsArg(arguments, [createjs.Graphics]);
+		var graphicsCallback;
+		if (opts) {
+			graphics = null;
+			if (typeof opts.graphics === 'function') {
+				graphicsCallback = opts.graphics;
+				delete opts.graphics;
+			}
+		}
+		
 		this.graphics = graphics ? graphics : new createjs.Graphics();
+		
+		this.DisplayObject_initialize(opts);
+		
+		if (opts) {
+			if (opts.strokeWidth || opts.strokeCap || opts.strokeJoin || opts.strokeMiterLimit) {
+				this.graphics.setStrokeStyle(opts.strokeWidth, opts.strokeCap, opts.strokeJoin, opts.strokeMiterLimit);
+			}
+			if (opts.fillColor) {
+				this.graphics.beginFill(opts.fillColor);
+			}
+			if (opts.strokeColor) {
+				this.graphics.beginStroke(opts.strokeColor);
+			}
+			if (graphicsCallback) {
+				graphicsCallback(this.graphics);
+			}
+		}
 	}
 
 	/**
