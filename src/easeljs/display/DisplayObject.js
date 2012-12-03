@@ -440,6 +440,20 @@ var p = DisplayObject.prototype;
 	}
 
 // public methods:
+	
+	p.setProps = function(opts) {
+		for(var opt in opts) {
+			var value = opts[opt];
+			var setter = 'set' + opt.substring(0,1).toUpperCase() + opt.substring(1);
+			if(typeof this[setter] === 'function') {
+				this[setter](value);
+			} else if(opt in this) {
+				this[opt] = value;
+			}
+		}
+		return this;
+	}
+	
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.
