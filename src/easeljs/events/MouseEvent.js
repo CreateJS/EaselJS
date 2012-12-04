@@ -139,7 +139,7 @@ var p = MouseEvent.prototype;
 	/**
 	 * Indicates whether this is the primary pointer in a multitouch environment. This will always be true for the mouse.
 	 * For touch pointers, the first pointer in the current stack will be considered the primary pointer.
-	 * @property primaryPointer
+	 * @property primary
 	 * @type {Boolean}
 	 */
 	p.primary = false;
