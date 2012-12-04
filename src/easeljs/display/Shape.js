@@ -72,10 +72,10 @@ var p = Shape.prototype = new createjs.DisplayObject();
 		this.graphics = graphics ? graphics : new createjs.Graphics();
 	}
 	
-	p.DisplayObject_setProps = p.setProps;
+	p.DisplayObject_set = p.set;
 	
 	/*
-	 * Shape.setProps supports the special options strokeWidth, strokeCap, strokeJoin, strokeMiterLimit, fillColor, and strokeColor,
+	 * Shape.set supports the special options strokeWidth, strokeCap, strokeJoin, strokeMiterLimit, fillColor, and strokeColor,
 	 * which modify the default graphics object. You can combine these with drawing commands specified in a callback function:
 	 * 
 	 *	  new createjs.Shape({
@@ -84,7 +84,7 @@ var p = Shape.prototype = new createjs.DisplayObject();
 	 *		  graphics: function(g) { g.drawCircle(0, 0, 1); }
 	 *	  })
 	 */
-	p.setProps = function(opts) {
+	p.set = function(opts) {
 		var graphicsCallback;
 		if (opts) {
 			graphics = null;
@@ -94,7 +94,7 @@ var p = Shape.prototype = new createjs.DisplayObject();
 			}
 		}
 		
-		this.DisplayObject_setProps(opts);
+		this.DisplayObject_set(opts);
 		
 		if (opts) {
 			if (opts.strokeWidth || opts.strokeCap || opts.strokeJoin || opts.strokeMiterLimit) {

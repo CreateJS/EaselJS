@@ -441,7 +441,7 @@ var p = DisplayObject.prototype;
 
 // public methods:
 	
-	p.setProps = function(opts) {
+	p.set = function(opts) {
 		for(var opt in opts) {
 			var value = opts[opt];
 			var setter = 'set' + opt.substring(0,1).toUpperCase() + opt.substring(1);
