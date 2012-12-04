@@ -145,7 +145,7 @@ var p = EventDispatcher.prototype;
 	 * @method dispatchEvent
 	 * @param {Object | String} eventObj An object with a "type" property, or a string type. If a string is used, dispatchEvent will contstruct a generic event object with "type" and "params" properties.
 	 * @param {Function} callback Optional. If specified, dispatchEvent will call the specified function in this scope, with the parameters specified in params.
-	 * @param {Array} params Optional. An array of parameters to call the handler with specified by handlerName. This will also be added as a "params" property on the constructed event object if a string is passed to eventObj.
+	 * @param {Array} params Optional. An array of parameters to call the callback with. This will also be added as a "params" property on the constructed event object if a string is passed to eventObj.
 	 * @return {Boolean} Returns true if any listener returned true.
 	 **/
 	p.dispatchEvent = function(eventObj, callback, params) {
