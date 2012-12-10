@@ -26,6 +26,7 @@ var SOURCE_FILES = [
 	__dirname + "/../src/easeljs/utils/SpriteSheetBuilder.js",
 	__dirname + "/../src/easeljs/display/DOMElement.js",
 	__dirname + "/../src/easeljs/filters/Filter.js",
+	__dirname + "/../src/easeljs/ui/ButtonHelper.js",
 	//__dirname + "/../src/easeljs/filters/BoxBlurFilter.js",
 	//__dirname + "/../src/easeljs/filters/ColorFilter.js",
 	//__dirname + "/../src/easeljs/filters/ColorMatrixFilter.js",

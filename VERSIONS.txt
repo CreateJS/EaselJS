@@ -7,6 +7,9 @@ Version NEXT [not released]
 - documentation updates
 - fixed error with AlphaMaskFilter
 - hitArea position now ignores the regX/Y of the target instance
+- added Log class to provide verbose errors while debugging
+- simplified & updated MovieClipPlugin to work with revised TweenJS plugin model
+- added DisplayObject.set() shortcut method.
 
 
 Version 0.5.0 [Aug 24, 2012]
