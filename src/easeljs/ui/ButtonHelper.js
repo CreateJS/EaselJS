@@ -52,39 +52,48 @@ var p = ButtonHelper.prototype;
 
 // public properties:
 	/**
-	 * TODO
+	 * Read-only. The target for this button helper.
 	 * @property target
 	 * @type MovieClip | BitmapAnimation
 	 **/
 	p.target = null;
 	
 	/**
-	 * TODO
+	 * The label name or frame number to display when the user mouses out of the target. Defaults to "over".
 	 * @property overLabel
 	 * @type String | Number
 	 **/
 	p.overLabel = null;
 	
 	/**
-	 * TODO
+	 * The label name or frame number to display when the user mouses over the target. Defaults to "out".
 	 * @property outLabel
 	 * @type String | Number
 	 **/
 	p.outLabel = null;
 	
 	/**
-	 * TODO
+	 * The label name or frame number to display when the user presses (clicks and holds) on the target. Defaults to "press".
 	 * @property pressLabel
 	 * @type String | Number
 	 **/
 	p.pressLabel = null;
 	
 	/**
-	 * TODO
+	 * If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
 	 * @property play
+	 * @default false
 	 * @type Boolean
 	 **/
 	p.play = false;
+	
+//  private properties
+	/**
+	 * @property _isPressed
+	 * @type Boolean
+	 * @protected
+	 **/
+	p._isPressed = false;
 	
 // constructor:
 	/** 
@@ -153,9 +162,23 @@ var p = ButtonHelper.prototype;
 	 * @protected
 	 **/
 	p._handleEvt = function(evt) {
-		var label = evt.type == "mouseOver" || evt.type == "click" ? this.overLabel :
-						evt.type == "press" ? this.pressLabel :
+		var label = (evt.type == "mouseOver" && !this._isPressed) || evt.type == "click" ? this.overLabel :
+				  		(evt.type == "mouseOver" && this._isPressed) || evt.type == "press" ? this.pressLabel :
 						this.outLabel;
+		
+		if (evt.type == "press") {
+			var _this = this;
+			this._isPressed = true;
+			if (evt.addEventListener) {
+				evt.addEventListener("mouseUp", _this._handleEvt, _this);
+			} else {
+				evt.onMouseMove = function(e) { _this._handleEvt(e); };
+			}
+		} else if (evt.type == "mouseUp") {
+			this._isPressed = false;
+			return;
+		}
+		
 		if (this.play) {
 			this.target.gotoAndPlay(label);
 		} else {
