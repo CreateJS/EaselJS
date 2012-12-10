@@ -432,15 +432,23 @@ createjs.MovieClip = MovieClip;
 	 * @private
 	 **/
 	MovieClipPlugin.init = function(tween, prop, value) {
-		if (prop == "startPosition" || !(tween._target instanceof createjs.MovieClip)) { return value; }
+		return value;
+	}
+	
+	/**
+	 * @method step
+	 * @private
+	 **/
+	MovieClipPlugin.step = function() {
+		// unused.
 	}
 	
 	/** 
 	 * @method tween
 	 * @private
 	 **/
-	MovieClipPlugin.tween = function(tween, prop, value, startValues, endValues, ratio, position, end) {
-		if (!(tween._target instanceof createjs.MovieClip)) { return value; }
+	MovieClipPlugin.tween = function(tween, prop, value, startValues, endValues, ratio, wait, end) {
+		if (!(tween.target instanceof MovieClip)) { return value; }
 		return (ratio == 1 ? endValues[prop] : startValues[prop]);
 	}
 
