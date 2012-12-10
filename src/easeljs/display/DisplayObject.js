@@ -726,6 +726,18 @@ var p = DisplayObject.prototype;
 		canvas.width = 0;
 		canvas.width = 1;
 		return hit;
+	};
+	
+	/**
+	 * Provides a chainable shortcut method for setting a number of properties on a DisplayObject instance. Ex.<br/>
+	 * var shape = stage.addChild( new Shape() ).set({graphics:myGraphics, x:100, y:100, alpha:0.5});
+	 * @method set
+	 * @param {Object} props A generic object containing properties to copy to the DisplayObject instance.
+	 * @return {DisplayObject} Returns The DisplayObject instance the method is called on (useful for chaining calls.)
+	*/
+	p.set = function(props) {
+		for (var n in props) { this[n] = props[n]; }
+		return this;
 	}
 
 	/**
