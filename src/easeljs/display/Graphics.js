@@ -275,6 +275,15 @@ var p = Graphics.prototype;
 	};
 	
 	/**
+	 * Returns true if this Graphics instance has no drawing commands.
+	 * @method isEmpty
+	 * @return {Boolean} Returns true if this Graphics instance has no drawing commands.
+	 **/
+	p.isEmpty = function() {
+		return !(this._instructions.length || this._oldInstructions.length || this._activeInstructions.length);
+	}
+	
+	/**
 	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
@@ -892,7 +901,6 @@ var p = Graphics.prototype;
 		if (this._strokeStyleInstructions) { o._strokeStyleInstructions = this._strokeStyleInstructions.slice(); }
 		o._active = this._active;
 		o._dirty = this._dirty;
-		o.drawAsPath = this.drawAsPath;
 		return o;
 	};
 		
