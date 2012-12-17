@@ -199,7 +199,7 @@ var p = Stage.prototype = new createjs.Container();
 		this.Container_initialize();
 		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
 		this._pointerData = {};
-		this._enableMouseEvents(true);
+		this._enableMouseEvents();
 	}
 
 // public methods:
