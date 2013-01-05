@@ -144,6 +144,7 @@ var p = MouseEvent.prototype;
 	 */
 	p.primary = false;
 	
+	
 // mix-ins:
 	// EventDispatcher methods:
 	p.addEventListener = null;
@@ -152,9 +153,7 @@ var p = MouseEvent.prototype;
 	p.dispatchEvent = null;
 	p.hasEventListener = null;
 	p._listeners = null;
-	
-	// we only use EventDispatcher if it's available:
-	createjs.EventDispatcher && createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
+	createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
 
 // constructor:
 	/**

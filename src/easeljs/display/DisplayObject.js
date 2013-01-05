@@ -370,9 +370,7 @@ var p = DisplayObject.prototype;
 	p.dispatchEvent = null;
 	p.hasEventListener = null;
 	p._listeners = null;
-	
-	// we only use EventDispatcher if it's available:
-	createjs.EventDispatcher && createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
+	createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
 	
 
 // private properties:
@@ -478,7 +476,7 @@ var p = DisplayObject.prototype;
 	p.updateContext = function(ctx) {
 		var mtx, mask=this.mask, o=this;
 		
-		if (mask && mask.graphics) {
+		if (mask && mask.graphics && !mask.graphics.isEmpty()) {
 			mtx = mask.getMatrix(mask._matrix);
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 			
@@ -812,14 +810,11 @@ var p = DisplayObject.prototype;
 	 * @protected
 	 **/
 	p._tick = function(params) {
+		this.onTick&&this.onTick.apply(this, params);
 		// because onTick can be really performance sensitive, we'll inline some of the dispatchEvent work.
 		// this can probably go away at some point. It only has a noticeable impact with thousands of objects in modern browsers.
-		this.onTick&&this.onTick.apply(this, params);
 		var ls = this._listeners;
 		if (ls&&ls["tick"]) { this.dispatchEvent({type:"tick",params:params}); }
-		
-		// otherwise, we'd just do this:
-		//this.dispatchEvent("tick", this.onTick, params);
 	}
 
 	/**
