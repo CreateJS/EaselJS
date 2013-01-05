@@ -68,7 +68,7 @@ var p = EventDispatcher.prototype;
 		this.f = f;
 		this.scope = scope;
 		this.priority = priority;
-	};
+	}
 
 // private properties:
 	/**
@@ -144,19 +144,13 @@ var p = EventDispatcher.prototype;
 	 * Dispatches the specified event.
 	 * @method dispatchEvent
 	 * @param {Object | String} eventObj An object with a "type" property, or a string type. If a string is used, dispatchEvent will contstruct a generic event object with "type" and "params" properties.
-	 * @param {Function} callback Optional. If specified, dispatchEvent will call the specified function in this scope, with the parameters specified in params.
-	 * @param {Array} params Optional. An array of parameters to call the callback with. This will also be added as a "params" property on the constructed event object if a string is passed to eventObj.
 	 * @return {Boolean} Returns true if any listener returned true.
 	 **/
-	p.dispatchEvent = function(eventObj, callback, params) {
-		// NOTE: DisplayObject._tick inlines some of this logic. Update both if this changes.
-		callback&&callback.apply(this, params);
-		
-		var ret = false;
-		var listeners = this._listeners;
+	p.dispatchEvent = function(eventObj) {
+		var ret, listeners = this._listeners;
 		if (eventObj && listeners) {
 			if (typeof eventObj == "string") { eventObj = {type:eventObj, params:params}; }
-			//eventObj.target = this;
+			eventObj.target = this;
 			var arr = listeners[eventObj.type];
 			if (!arr) { return ret; }
 			for (var i=0,l=arr.length; i<l; i++) {
@@ -171,11 +165,12 @@ var p = EventDispatcher.prototype;
 	 * Indicates whether there is at least one listener for the specified event type or a defined callback.
 	 * @method hasEventListener
 	 * @param {String} type The string type of the event.
-	 * @param {Function} callback Optional. The callback function related to this event.
+	 * @param {String} callback Optional. The name of the callback function related to this event.
 	 * @return {Boolean} Returns true if there is at least one listener for the specified event.
 	 **/
-	p.hasEventListener = function(type, callback) {
-		return !!(callback || (this._listeners && this._listeners[type]));
+	p.hasEventListener = function(type) {
+		var listeners = this._listeners;
+		return !!(listeners && listeners[type]);
 	};
 
 	/**
