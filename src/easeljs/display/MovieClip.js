@@ -112,6 +112,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * instance is initialized.
 	 * @property timeline
 	 * @type Timeline
+	 * @default null
 	 */
 	p.timeline = null;
 
@@ -119,6 +120,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * If true, the MovieClip's position will not advance when ticked.
 	 * @property paused
 	 * @type Boolean
+	 * @default false
 	 */
 	p.paused = false;
 	
@@ -126,8 +128,25 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * If true, actions in this MovieClip's tweens will be run when the playhead advances.
 	 * @property actionsEnabled
 	 * @type Boolean
+	 * @default true
 	 */
 	p.actionsEnabled = true;
+	
+	/**
+	 * If true, the MovieClip will automatically be reset to its first frame whenever the timeline adds
+	 * it back onto the display list. This only applies to MovieClip instances with mode=INDEPENDENT.
+	 * <br><br>
+	 * For example, if you had a character animation with a "body" child MovieClip instance
+	 * with different costumes on each frame, you could set body.autoReset = false, so that
+	 * you can manually change the frame it is on, without worrying that it will be reset
+	 * automatically.
+	 * @property autoReset
+	 * @type Boolean
+	 * @default true
+	 */
+	p.autoReset = true;
+	
+	
 	
 // private properties:
 
@@ -334,7 +353,7 @@ var p = MovieClip.prototype = new createjs.Container();
 			// TODO: this would be far more ideal if the _synchOffset was somehow provided by the parent, so that reparenting wouldn't cause problems and we can direct draw. Ditto for _off (though less important).
 			tl.setPosition(this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset), createjs.Tween.NONE);
 		} else {
-			tl.setPosition(this._prevPosition, this.actionsEnabled ? null : createjs.Tween.NONE);
+			tl.setPosition(this._prevPos < 0 ? 0 : this._prevPosition, this.actionsEnabled ? null : createjs.Tween.NONE);
 		}
 		
 		this._prevPosition = tl._prevPosition;
@@ -393,7 +412,8 @@ var p = MovieClip.prototype = new createjs.Container();
 		
 		if (child instanceof MovieClip) {
 			child._synchOffset = offset;
-			if (child.mode == MovieClip.INDEPENDENT && (!this._managed[child.id] || this._prevPos == 0)) { child._reset(); }
+			// TODO: this does not precisely match Flash. Flash loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
+			if (child.mode == MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
 		}
 		this._managed[child.id] = 2;
 	}
