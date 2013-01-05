@@ -472,7 +472,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var l = this.children.length;
 		for (var i=l-1; i>=0; i--) {
 			var child = this.children[i];
-			if (!child.isVisible() || !child.mouseEnabled) { continue; }
+			if (!child.isVisible() || (mouseEvents && !child.mouseEnabled)) { continue; }
 			var hitArea = child.hitArea;
 			var childHasHandler;
 			
