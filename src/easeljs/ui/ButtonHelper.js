@@ -102,6 +102,7 @@ var p = ButtonHelper.prototype;
 	 * @protected
 	 **/
 	p.initialize = function(target, outLabel, overLabel, pressLabel, play, hitArea, hitLabel) {
+		if (!target.addEventListener) { return; }
 		this.target = target;
 		this.overLabel = overLabel == null ? "over" : overLabel;
 		this.outLabel = outLabel == null ? "out" : outLabel;
@@ -141,8 +142,6 @@ var p = ButtonHelper.prototype;
 				o.removeEventListener("press", f, _this);
 				o.removeEventListener("click", f, _this);
 			}
-		} else {
-			o.onMouseOver = o.onMouseOut = value ? function(e) { _this._handleEvt(e); } : null;
 		}
 	};
 		
@@ -169,11 +168,7 @@ var p = ButtonHelper.prototype;
 		if (evt.type == "press") {
 			var _this = this;
 			this._isPressed = true;
-			if (evt.addEventListener) {
-				evt.addEventListener("mouseUp", _this._handleEvt, _this);
-			} else {
-				evt.onMouseMove = function(e) { _this._handleEvt(e); };
-			}
+			evt.addEventListener("mouseUp", _this._handleEvt, _this);
 		} else if (evt.type == "mouseUp") {
 			this._isPressed = false;
 			return;
