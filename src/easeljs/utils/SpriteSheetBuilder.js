@@ -99,6 +99,26 @@ var p = SpriteSheetBuilder.prototype;
 	* @default 1
 	**/
 	p.padding = 1;
+	
+	/**
+	 * A number from 0.01 to 0.99 that indicates what percentage of time the builder can use. This can be
+	 * thought of as the number of seconds per second the builder will use. For example, with a timeSlice value of 0.3,
+	 * the builder will run 20 times per second, using approximately 15ms per build (30% of available time, or 0.3s per second).
+	 * Defaults to 0.3.
+	 * @property timeSlice
+	 * @type Number
+	 * @default 0.3
+	 **/
+	p.timeSlice = 0.3;
+	
+	/**
+	 * Read-only. A value between 0 and 1 that indicates the progress of a build, or -1 if a build has not
+	 * been initiated.
+	 * @property progress
+	 * @type Number
+	 * @default -1
+	 **/
+	p.progress = -1;
 
 // private properties:
 
@@ -143,13 +163,6 @@ var p = SpriteSheetBuilder.prototype;
 	 * @type Function
 	 **/
 	p._callback = null;
-	
-	/**
-	 * @property _timeSlice
-	 * @protected
-	 * @type Number
-	 **/
-	p._timeSlice = null;
 	
 	/**
 	 * @property _timerID
@@ -243,6 +256,7 @@ var p = SpriteSheetBuilder.prototype;
 		if (!rect&&source.getBounds) { rect = source.getBounds(); }
 		if (!rect && !rects) { return null; }
 		
+		var baseFrameIndex = this._frames.length;
 		var duration = source.timeline.duration;
 		for (var i=0; i<duration; i++) {
 			var r = (rects&&rects[i]) ? rects[i] : rect;
@@ -262,8 +276,8 @@ var p = SpriteSheetBuilder.prototype;
 			lbls.sort(function(a,b){ return a.index-b.index; });
 			for (var i=0,l=lbls.length; i<l; i++) {
 				var label = lbls[i].label;
-				var start = lbls[i].index;
-				var end = (i == l-1) ? duration : lbls[i+1].index;
+				var start = baseFrameIndex+lbls[i].index;
+				var end = baseFrameIndex+((i == l-1) ? duration : lbls[i+1].index);
 				var frames = [];
 				for (var j=start; j<end; j++) { frames.push(j); }
 				this.addAnimation(label, frames, true); // for now, this loops all animations.
@@ -291,18 +305,16 @@ var p = SpriteSheetBuilder.prototype;
 	 * @method buildAsync
 	 * @param {Function} callback Optional. The function to call when the build operation completes. It will be called
 	 * with a single parameter providing a reference back to the builder.
-	 * @param {Number} timeSlice Optional. A number from 0.01 to 1 that indicates what percentage of time the builder can use. This can be
-	 * thought of as the number of seconds per second the builder will use. For example, with a timeSlice value of 0.3,
-	 * the builder will run 20 times per second, using approximately 15ms per build (30% of available time, or 0.3s per second).
-	 * Defaults to 0.3.
+	 * @param {Number} timeSlice Optional. Sets the timeSlice property on this instance.
 	 **/
 	p.buildAsync = function(callback, timeSlice) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
 		this._callback = callback;
+		this.timeSlice = timeSlice;
 		this._startBuild();
-		this._timeSlice = Math.max(0.01, Math.min(0.99, timeSlice||0.3))*50;
+		this.progress = 0;
 		var _this = this;
-		this._timerID = setTimeout(function() { _this._run(); }, 50-this._timeSlice);
+		this._timerID = setTimeout(function() { _this._run(); }, 50-Math.max(0.01, Math.min(0.99, this.timeSlice||0.3))*50);
 	}
 	
 	/**
@@ -390,9 +402,9 @@ var p = SpriteSheetBuilder.prototype;
 	p._fillRow = function(frames, y, img, dataFrames, pad) {
 		var w = this.maxWidth;
 		var maxH = this.maxHeight;
+		y += pad;
 		var h = maxH-y;
 		var x = pad;
-		y += pad;
 		var height = 0;
 		for (var i=frames.length-1; i>=0; i--) {
 			var frame = frames[i];
@@ -422,6 +434,7 @@ var p = SpriteSheetBuilder.prototype;
 	p._endBuild = function() {
 		this.spriteSheet = new createjs.SpriteSheet(this._data);
 		this._data = null;
+		this.progress = 1;
 		if (this._callback) { this._callback(this); }
 	}
 	
@@ -430,7 +443,8 @@ var p = SpriteSheetBuilder.prototype;
 	 * @protected
 	 **/
 	p._run = function() {
-		var t = (new Date()).getTime()+this._timeSlice;
+		var ts = Math.max(0.01, Math.min(0.99, this.timeSlice||0.3))*50;
+		var t = (new Date()).getTime()+ts;
 		var complete = false;
 		while (t > (new Date()).getTime()) {
 			if (!this._drawNext()) { complete = true; break; }
@@ -439,8 +453,9 @@ var p = SpriteSheetBuilder.prototype;
 			this._endBuild();
 		} else {
 			var _this = this;
-			this._timerID = setTimeout(function() { _this._run(); }, 50-this._timeSlice);
+			this._timerID = setTimeout(function() { _this._run(); }, 50-ts);
 		}
+		this.progress = this._index/this._frames.length;
 	}
 	
 	/**
