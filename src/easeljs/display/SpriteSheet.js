@@ -257,7 +257,7 @@ var p = SpriteSheet.prototype;
 			for (name in o) {
 				var anim = {name:name};
 				var obj = o[name];
-				if (!isNaN(obj)) { // single frame
+				if (typeof obj == "number") { // single frame
 					a = anim.frames = [obj];
 				} else if (obj instanceof Array) { // simple
 					anim.frequency = obj[3];
@@ -270,7 +270,7 @@ var p = SpriteSheet.prototype;
 					anim.frequency = obj.frequency;
 					anim.next = obj.next;
 					var frames = obj.frames;
-					a = anim.frames = !isNaN(frames) ? [frames] : frames.slice(0);
+					a = anim.frames = (typeof frames == "number") ? [frames] : frames.slice(0);
 				}
 				anim.next = (a.length < 2 || anim.next == false) ? null : (anim.next == null || anim.next == true) ? name : anim.next;
 				if (!anim.frequency) { anim.frequency = 1; }
@@ -334,7 +334,19 @@ var p = SpriteSheet.prototype;
 		var frame;
 		if (this.complete && this._frames && (frame=this._frames[frameIndex])) { return frame; }
 		return null;
-	}
+	};
+	
+	/**
+	 * Returns a Rectangle instance defining the bounds of the specified frame relative to the origin. For example, a
+	 * 90 x 70 frame with a regX of 50 and a regY of 40 would return a rectangle with [x=-50, y=-40, width=90, height=70].
+	 * @method getFrameBounds
+	 * @param {Number} frameIndex The index of the frame.
+	 * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.
+	 **/
+	p.getFrameBounds = function(frameIndex) {
+		var frame = this.getFrame(frameIndex);
+		return frame ? new createjs.Rectangle(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null;
+	};
 	
 	/**
 	 * Returns a string representation of this object.

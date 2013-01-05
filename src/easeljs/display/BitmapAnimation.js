@@ -264,6 +264,17 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 		else { this.currentFrame++; }
 		this._normalizeFrame();
 	}
+	
+	/**
+	 * Returns a Rectangle instance defining the bounds of the current frame relative to the origin. For example, a
+	 * 90 x 70 frame with a regX of 50 and a regY of 40 would return a rectangle with [x=-50, y=-40, width=90, height=70].
+	 * See also: SpriteSheet.getFrameBounds().
+	 * @method getBounds
+	 * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.
+	 **/
+	p.getBounds = function() {
+		return this.spriteSheet.getFrameBounds(this.currentFrame);
+	}
 
 	/**
 	 * Returns a clone of the BitmapAnimation instance.
