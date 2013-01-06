@@ -1,6 +1,6 @@
 Version NEXT [not released]
 ****************************************************************************************************
-- added new event model with EventDispatcher
+- added new event model with EventDispatcher class
 - added DisplayObject.cursor property
 - added Container.getChildByName() method
 - added ButtonHelper class
@@ -9,12 +9,23 @@ Version NEXT [not released]
 - hitArea position now ignores the regX/Y of the target instance
 - added Log class to provide verbose errors while debugging
 - simplified & updated MovieClipPlugin to work with revised TweenJS plugin model
-- added DisplayObject.set() shortcut method.
+- added DisplayObject.set() shortcut method
+- added MovieClip.autoReset property
+- added Graphics.isEmpty() method
+- improved support for empty masks
+- added SpriteSheetBuilder.progress
+- added SpriteSheetBuilder.timeSlice
+- fixes for various MovieClip bugs
+- SpriteSheetBuilder now works correctly when adding more than one MovieClip
+- fixed an issue with SpriteSheetBuilder defining frames that exceeded the image bounds
+- added SpriteSheet.getFrameBounds()
+- added BitmapAnimation.getBounds()
+- added closePath support to Graphics.decodePath()
 
 
 Version 0.5.0 [Aug 24, 2012]
 ****************************************************************************************************
-- moved all classes into a configurable createjs namespace
+- moved all c lasses into a configurable createjs namespace
 - added support for multitouch
 - complete rewrite of drawing model to use a hybrid approach (save/restore & matrix)
 - added DisplayObject.mask
