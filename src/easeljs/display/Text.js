@@ -157,8 +157,8 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
-		// Note: this.text = "0" will evaluate to false in JS.
-		return Boolean(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.text != null && this.text !== "");
+		var hasContent = this.cacheCanvas || (this.text != null && this.text !== "");
+		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	}
 
 	/**

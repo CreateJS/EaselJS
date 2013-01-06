@@ -446,7 +446,7 @@ var p = DisplayObject.prototype;
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
-		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0;
+		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0);
 	}
 
 	/**
@@ -461,7 +461,9 @@ var p = DisplayObject.prototype;
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		var cacheCanvas = this.cacheCanvas;
+		if (this.name == "foo") { console.log("what"); }
 		if (ignoreCache || !cacheCanvas) { return false; }
+		console.log("draw cache");
 		var scale = this._cacheScale;
 		ctx.drawImage(cacheCanvas, this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
 		return true;

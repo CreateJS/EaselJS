@@ -215,7 +215,8 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
-		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0;
+		var hasContent = this.cacheCanvas || this.children.length;
+		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	}
 	
 	/**
