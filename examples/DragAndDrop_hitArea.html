@@ -8,6 +8,7 @@
 
 	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
@@ -60,6 +61,8 @@
 
 	function handleImageLoad(event) {
 		var image = event.target;
+		var imgW = image.width;
+		var imgH = image.height;
 		var bitmap;
 		var container = new createjs.Container();
 		stage.addChild(container);
@@ -67,6 +70,9 @@
 		// create a shape that represents the center of the daisy image:
 		var hitArea = new createjs.Shape();
 		hitArea.graphics.beginFill("#FFF").drawEllipse(-11,-14,24,18);
+		// position hitArea relative to the internal coordinate system of the target (bitmap instances):
+		hitArea.x = imgW/2;
+		hitArea.y = imgH/2;
 
 		// create and populate the screen with random daisies:
 		for(var i = 0; i < 100; i++){
@@ -75,8 +81,8 @@
 			bitmap.x = canvas.width * Math.random()|0;
 			bitmap.y = canvas.height * Math.random()|0;
 			bitmap.rotation = 360 * Math.random()|0;
-			bitmap.regX = bitmap.image.width/2|0;
-			bitmap.regY = bitmap.image.height/2|0;
+			bitmap.regX = imgW/2|0;
+			bitmap.regY = imgH/2|0;
 			bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random()*0.4+0.6;
 			bitmap.name = "bmp_"+i;
 			
