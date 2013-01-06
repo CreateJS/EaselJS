@@ -165,7 +165,8 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
-		return this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.spriteSheet.complete && this.currentFrame >= 0;
+		var hasContent = this.cacheCanvas || (this.spriteSheet.complete && this.currentFrame >= 0);
+		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	}
 
 	/**

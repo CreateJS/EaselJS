@@ -80,8 +80,9 @@ var p = Shape.prototype = new createjs.DisplayObject();
 	 * @return {Boolean} Boolean indicating whether the Shape would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
-		return Boolean(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && this.graphics && !this.graphics.isEmpty());
-	}
+		var hasContent = this.cacheCanvas || (this.graphics && !this.graphics.isEmpty());
+		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
+	};
 
 	/**
 	 * @property DisplayObject_draw
@@ -101,6 +102,7 @@ var p = Shape.prototype = new createjs.DisplayObject();
 	 * into itself).
 	 **/
 	p.draw = function(ctx, ignoreCache) {
+		console.log("draw "+this.name);
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this.graphics.draw(ctx);
 		return true;
