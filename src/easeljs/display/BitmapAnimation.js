@@ -341,6 +341,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 			if (this.currentAnimationFrame >= a.frames.length) {
 				if (a.next) {
 					this._goto(a.next);
+					evt = true;
 				} else {
 					this.paused = true;
 					this.currentAnimationFrame = a.frames.length-1;
