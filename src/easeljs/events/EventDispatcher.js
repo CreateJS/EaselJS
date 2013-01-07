@@ -149,7 +149,7 @@ var p = EventDispatcher.prototype;
 	p.dispatchEvent = function(eventObj) {
 		var ret, listeners = this._listeners;
 		if (eventObj && listeners) {
-			if (typeof eventObj == "string") { eventObj = {type:eventObj, params:params}; }
+			if (typeof eventObj == "string") { eventObj = {type:eventObj}; }
 			eventObj.target = this;
 			var arr = listeners[eventObj.type];
 			if (!arr) { return !!ret; }
