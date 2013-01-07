@@ -152,7 +152,7 @@ var p = EventDispatcher.prototype;
 			if (typeof eventObj == "string") { eventObj = {type:eventObj, params:params}; }
 			eventObj.target = this;
 			var arr = listeners[eventObj.type];
-			if (!arr) { return ret; }
+			if (!arr) { return !!ret; }
 			for (var i=0,l=arr.length; i<l; i++) {
 				var o = arr[i];
 				ret = ret||o.f.apply(o.scope, [eventObj]);

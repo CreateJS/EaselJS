@@ -39,6 +39,7 @@ this.createjs = this.createjs||{};
 * together. See the SpriteSheet class for more information on setting up frames and animations.
 * @class BitmapAnimation
 * @extends DisplayObject
+* @uses EventDispatcher
 * @constructor
 * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
 * dimensions, and frame data. See SpriteSheet for more information.
@@ -121,6 +122,16 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * @default 0
 	 **/
 	p.currentAnimationFrame = 0;
+	
+// mix-ins:
+	// EventDispatcher methods:
+	p.addEventListener = null;
+	p.removeEventListener = null;
+	p.removeAllEventListeners = null;
+	p.dispatchEvent = null;
+	p.hasEventListener = null;
+	p._listeners = null;
+	createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
 
 // private properties:
 	/**
@@ -325,7 +336,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * @method _normalizeCurrentFrame
 	 **/
 	p._normalizeFrame = function() { 
-		var a = this._animation;
+		var evt, a = this._animation;
 		if (a) {
 			if (this.currentAnimationFrame >= a.frames.length) {
 				if (a.next) {
@@ -335,15 +346,18 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 					this.currentAnimationFrame = a.frames.length-1;
 					this.currentFrame = a.frames[this.currentAnimationFrame];
 				}
-				if (this.onAnimationEnd) { this.onAnimationEnd(this,a.name); }
 			} else {
 				this.currentFrame = a.frames[this.currentAnimationFrame];
 			}
 		} else {
 			if (this.currentFrame >= this.spriteSheet.getNumFrames()) {
 				this.currentFrame = 0;
-				if (this.onAnimationEnd) { this.onAnimationEnd(this,null); }
+				evt = true;
 			}
+		}
+		if (evt) {
+			this.onAnimationEnd&&this.onAnimationEnd(this, a.name);
+			this.dispatchEvent({type:"animationEnd", name:a.name});
 		}
 	}
 
