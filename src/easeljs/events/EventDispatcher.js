@@ -57,19 +57,6 @@ var p = EventDispatcher.prototype;
 		target.dispatchEvent = p.dispatchEvent;
 	};
 
-	/**
-	* Inner class used by the EventDispatcher class.
-	 * @protected
-	 * @class Listener
-	 * @for EventDispatcher
-	 * @constructor
-	 **/
-	function Listener(f, scope, priority) {
-		this.f = f;
-		this.scope = scope;
-		this.priority = priority;
-	}
-
 // private properties:
 	/**
 	 * @protected
@@ -181,6 +168,19 @@ var p = EventDispatcher.prototype;
 	p.toString = function() {
 		return "[EventDispatcher]";
 	};
+	
+// inner classes:
+	/**
+	* Inner class used by the EventDispatcher class.
+	 * @protected
+	 * @class Listener
+	 * @constructor
+	 **/
+	function Listener(f, scope, priority) {
+		this.f = f;
+		this.scope = scope;
+		this.priority = priority;
+	}
 
 createjs.EventDispatcher = EventDispatcher;
 }());
