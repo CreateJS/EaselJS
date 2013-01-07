@@ -52,9 +52,9 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 // public properties:
 
 	/**
-	 * Specifies a function to call whenever any animation reaches its end. It will be called with two
+	 * Specifies a function to call whenever any animation reaches its end. It will be called with three
 	 * params: the first will be a reference to this instance, the second will be the name of the animation
-	 * that just ended.
+	 * that just ended, and the third will be the name of the next animation that will be played.
 	 * @property onAnimationEnd
 	 * @type Function
 	 **/
@@ -336,30 +336,44 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * @method _normalizeCurrentFrame
 	 **/
 	p._normalizeFrame = function() { 
-		var evt, a = this._animation;
-		if (a) {
-			if (this.currentAnimationFrame >= a.frames.length) {
-				if (a.next) {
-					this._goto(a.next);
-					evt = true;
+		var animation = this._animation;
+		var frame = this.currentFrame;
+		var paused = this.paused;
+		
+		if (animation) {
+			if (this.currentAnimationFrame >= animation.frames.length) {
+				var next = animation.next;
+				if (this._dispatchAnimationEnd(animation, frame, paused, next)) {
+					// do nothing, something changed in the event stack.
+				} else if (next) {
+					this._goto(next);
 				} else {
 					this.paused = true;
-					this.currentAnimationFrame = a.frames.length-1;
-					this.currentFrame = a.frames[this.currentAnimationFrame];
+					this.currentAnimationFrame = animation.frames.length-1;
+					this.currentFrame = animation.frames[this.currentAnimationFrame];
 				}
 			} else {
-				this.currentFrame = a.frames[this.currentAnimationFrame];
+				this.currentFrame = animation.frames[this.currentAnimationFrame];
 			}
 		} else {
-			if (this.currentFrame >= this.spriteSheet.getNumFrames()) {
-				this.currentFrame = 0;
-				evt = true;
+			if (frame >= this.spriteSheet.getNumFrames()) {
+				if (!this._dispatchAnimationEnd(animation, frame, paused)) { this.currentFrame = 0; }
 			}
 		}
-		if (evt) {
-			this.onAnimationEnd&&this.onAnimationEnd(this, a.name);
-			this.dispatchEvent({type:"animationEnd", name:a.name});
-		}
+	}
+	
+	/**
+	 * Dispatches the animationEnd event. Returns true if a handler changed the animation (ex. calling stop(),
+	 * gotoAndPlay(), etc.)
+	 * @property _dispatchAnimationEnd
+	 * @private
+	 * @type Function
+	 **/
+	p._dispatchAnimationEnd = function(animation, frame, paused, next) {
+		var name = animation ? animation.name : null;
+		this.onAnimationEnd&&this.onAnimationEnd(this, name, next);
+		this.dispatchEvent({type:"animationEnd", name:name, next:next});
+		return (this.paused != paused || this._animation != animation || this.currentFrame != frame);
 	}
 
 	/**
