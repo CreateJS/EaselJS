@@ -42,6 +42,7 @@ this.createjs = this.createjs||{};
  * Note that the "images" used in the generated sprite sheet are actually canvas elements, and that they will be sized
  * to the nearest power of 2 up to the value of maxWidth or maxHeight.
  * @class SpriteSheetBuilder
+ * @uses EventDispatcher
  * @constructor
  **/
 var SpriteSheetBuilder = function() {
@@ -119,6 +120,33 @@ var p = SpriteSheetBuilder.prototype;
 	 * @default -1
 	 **/
 	p.progress = -1;
+	
+	/**
+	 * Callback function to call when a build completes. Called with a single parameter pointing back to this instance.
+	 * @property onComplete
+	 * @type Function
+	 * @default null
+	 **/
+	p.onComplete = null;
+	
+	/**
+	 * Callback to call when an asynchronous build has progress. Called with two parameters, a reference back to this
+	 * instance, and the current progress value (0-1).
+	 * @property onProgress
+	 * @type Function
+	 * @default null
+	 **/
+	p.onProgress = null;
+	
+// mix-ins:
+	// EventDispatcher methods:
+	p.addEventListener = null;
+	p.removeEventListener = null;
+	p.removeAllEventListeners = null;
+	p.dispatchEvent = null;
+	p.hasEventListener = null;
+	p._listeners = null;
+	createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
 
 // private properties:
 
@@ -156,13 +184,6 @@ var p = SpriteSheetBuilder.prototype;
 	 * @type Number
 	 **/
 	p._index = 0;
-	
-	/**
-	 * @property _callback
-	 * @protected
-	 * @type Function
-	 **/
-	p._callback = null;
 	
 	/**
 	 * @property _timerID
@@ -292,7 +313,6 @@ var p = SpriteSheetBuilder.prototype;
 	 **/
 	p.build = function() {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
-		this._callback = null;
 		this._startBuild();
 		while (this._drawNext()) {}
 		this._endBuild();
@@ -303,16 +323,12 @@ var p = SpriteSheetBuilder.prototype;
 	 * Asynchronously builds a SpriteSheet instance based on the current frames. It will run 20 times per second, using
 	 * an amount of time defined by timeSlice. When it is complete it will call the specified callback.
 	 * @method buildAsync
-	 * @param {Function} callback Optional. The function to call when the build operation completes. It will be called
-	 * with a single parameter providing a reference back to the builder.
 	 * @param {Number} timeSlice Optional. Sets the timeSlice property on this instance.
 	 **/
-	p.buildAsync = function(callback, timeSlice) {
+	p.buildAsync = function(timeSlice) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
-		this._callback = callback;
 		this.timeSlice = timeSlice;
 		this._startBuild();
-		this.progress = 0;
 		var _this = this;
 		this._timerID = setTimeout(function() { _this._run(); }, 50-Math.max(0.01, Math.min(0.99, this.timeSlice||0.3))*50);
 	}
@@ -350,6 +366,7 @@ var p = SpriteSheetBuilder.prototype;
 	 **/
 	p._startBuild = function() {
 		var pad = this.padding||0;
+		this.progress = 0;
 		this.spriteSheet = null;
 		this._index = 0;
 		this._scale = this.scale;
@@ -435,7 +452,8 @@ var p = SpriteSheetBuilder.prototype;
 		this.spriteSheet = new createjs.SpriteSheet(this._data);
 		this._data = null;
 		this.progress = 1;
-		if (this._callback) { this._callback(this); }
+		this.onComplete&&this.onComplete(this);
+		this.dispatchEvent("complete");
 	}
 	
 	/**
@@ -455,7 +473,9 @@ var p = SpriteSheetBuilder.prototype;
 			var _this = this;
 			this._timerID = setTimeout(function() { _this._run(); }, 50-ts);
 		}
-		this.progress = this._index/this._frames.length;
+		var p = this.progress = this._index/this._frames.length;
+		this.onProgress&&this.onProgress(this, p);
+		this.dispatchEvent({type:"progress", progress:p});
 	}
 	
 	/**
