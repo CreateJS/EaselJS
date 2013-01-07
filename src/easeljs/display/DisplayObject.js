@@ -461,9 +461,7 @@ var p = DisplayObject.prototype;
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		var cacheCanvas = this.cacheCanvas;
-		if (this.name == "foo") { console.log("what"); }
 		if (ignoreCache || !cacheCanvas) { return false; }
-		console.log("draw cache");
 		var scale = this._cacheScale;
 		ctx.drawImage(cacheCanvas, this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
 		return true;

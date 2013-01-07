@@ -102,7 +102,6 @@ var p = Shape.prototype = new createjs.DisplayObject();
 	 * into itself).
 	 **/
 	p.draw = function(ctx, ignoreCache) {
-		console.log("draw "+this.name);
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this.graphics.draw(ctx);
 		return true;
