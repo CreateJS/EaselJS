@@ -53,8 +53,9 @@ var Ticker = function() {
 	 * @property useRAF
 	 * @static
 	 * @type Boolean
+	 * @default false
 	 **/
-	Ticker.useRAF = null;
+	Ticker.useRAF = false;
 	
 	/**
 	 * Event broadcast  once each tick / interval. The interval is specified via the 
