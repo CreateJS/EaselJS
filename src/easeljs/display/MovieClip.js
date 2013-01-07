@@ -215,9 +215,9 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
-		var hasContent = this.cacheCanvas || this.children.length;
-		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
-	}
+		// children are placed in draw, so we can't determine if we have content.
+		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0);
+	};
 	
 	/**
 	 * @property Container_draw
