@@ -47,7 +47,8 @@ var p = EventDispatcher.prototype;
 	 * Static initializer to mix in EventDispatcher methods.
 	 * @method initialize
 	 * @static
-	 * @param {Object} target The target object to inject EventDispatcher methods into. This can be an instance or a prototype.
+	 * @param {Object} target The target object to inject EventDispatcher methods into. This can be an instance or a
+	 * prototype.
 	 **/
 	EventDispatcher.initialize = function(target) {
 		target.addEventListener = p.addEventListener;
@@ -79,7 +80,7 @@ var p = EventDispatcher.prototype;
 	 * @method addEventListener
 	 * @param {String} type The string type of the event.
 	 * @param {Function} callback The function that will be called when this event is dispatched.
-	 * @param {Number} priority Optional. Listeners with a higher priority will be called before those with lower priority. Default is 0.
+	 * @param {Number} [priority=0] Listeners with a higher priority will be called before those with lower priority.
 	 **/
 	p.addEventListener = function(type, callback, priority) {
 		priority = priority || 0;
@@ -117,7 +118,7 @@ var p = EventDispatcher.prototype;
 	/**
 	 * Removes all listeners for the specified type, or all listeners of all types.
 	 * @method removeEventListener
-	 * @param {String} type The string type of the event. If omitted, all listeners for all types will be removed.
+	 * @param {String} [type] The string type of the event. If omitted, all listeners for all types will be removed.
 	 **/
 	p.removeAllEventListeners = function(type) {
 		if (!type) { this._listeners = null; }
@@ -127,8 +128,10 @@ var p = EventDispatcher.prototype;
 	/**
 	 * Dispatches the specified event.
 	 * @method dispatchEvent
-	 * @param {Object | String} eventObj An object with a "type" property, or a string type. If a string is used, dispatchEvent will contstruct a generic event object with "type" and "params" properties.
-	 * @param {Object} target Optional. The object to use as the target property of the event object. This will default to the dispatching object.
+	 * @param {Object | String} eventObj An object with a "type" property, or a string type. If a string is used,
+	 * dispatchEvent will contstruct a generic event object with "type" and "params" properties.
+	 * @param {Object} [target] The object to use as the target property of the event object. This will default to the
+	 * dispatching object.
 	 * @return {Boolean} Returns true if any listener returned true.
 	 **/
 	p.dispatchEvent = function(eventObj, target) {
@@ -150,7 +153,6 @@ var p = EventDispatcher.prototype;
 	 * Indicates whether there is at least one listener for the specified event type or a defined callback.
 	 * @method hasEventListener
 	 * @param {String} type The string type of the event.
-	 * @param {String} callback Optional. The name of the callback function related to this event.
 	 * @return {Boolean} Returns true if there is at least one listener for the specified event.
 	 **/
 	p.hasEventListener = function(type) {
@@ -159,7 +161,6 @@ var p = EventDispatcher.prototype;
 	};
 
 	/**
-	 * Returns a string representation of this object.
 	 * @method toString
 	 * @return {String} a string representation of the instance.
 	 **/
@@ -169,7 +170,7 @@ var p = EventDispatcher.prototype;
 	
 // inner classes:
 	/**
-	* Inner class used by the EventDispatcher class.
+	 * Inner class used by the EventDispatcher class.
 	 * @protected
 	 * @class Listener
 	 * @constructor
