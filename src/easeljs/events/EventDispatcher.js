@@ -79,17 +79,16 @@ var p = EventDispatcher.prototype;
 	 * @method addEventListener
 	 * @param {String} type The string type of the event.
 	 * @param {Function} callback The function that will be called when this event is dispatched.
-	 * @param {Object} scope Optional. The scope/context that the callback will be called in (ie. the "this").
 	 * @param {Number} priority Optional. Listeners with a higher priority will be called before those with lower priority. Default is 0.
 	 **/
-	p.addEventListener = function(type, callback, scope, priority) {
+	p.addEventListener = function(type, callback, priority) {
 		priority = priority || 0;
-		var o = new Listener(callback, scope || this, priority);
+		var o = new Listener(callback, priority);
 		var listeners = this._listeners;
 		if (!listeners) { listeners = this._listeners = {}; }
 		var arr = listeners[type];
 		if (!arr) { arr = listeners[type] = [o]; return; }
-		this.removeEventListener(type, callback, scope);
+		this.removeEventListener(type, callback);
 		for (var i=0,l=arr.length; i<l && arr[i].priority >= priority; i++) {}
 		arr.splice(i, 0, o);
 	};
@@ -99,17 +98,15 @@ var p = EventDispatcher.prototype;
 	 * @method removeEventListener
 	 * @param {String} type The string type of the event.
 	 * @param {Function} callback The listener function.
-	 * @param {Object} scope Optional. The listener scope. This must be the same as for addEventListener.
 	 **/
-	p.removeEventListener = function(type, callback, scope) {
+	p.removeEventListener = function(type, callback) {
 		var listeners = this._listeners;
 		if (!listeners) { return; }
 		var arr = listeners[type];
 		if (!arr) { return; }
-		scope = scope || this;
 		for (var i=0,l=arr.length; i<l; i++) {
 			var o = arr[i];
-			if (o.f == callback && o.scope == scope) {
+			if (o.f == callback) {
 				if (l==1) { delete(listeners[type]); } // allows for faster checks.
 				else { arr.splice(i,1); }
 				break;
@@ -131,18 +128,19 @@ var p = EventDispatcher.prototype;
 	 * Dispatches the specified event.
 	 * @method dispatchEvent
 	 * @param {Object | String} eventObj An object with a "type" property, or a string type. If a string is used, dispatchEvent will contstruct a generic event object with "type" and "params" properties.
+	 * @param {Object} target Optional. The object to use as the target property of the event object. This will default to the dispatching object.
 	 * @return {Boolean} Returns true if any listener returned true.
 	 **/
-	p.dispatchEvent = function(eventObj) {
+	p.dispatchEvent = function(eventObj, target) {
 		var ret, listeners = this._listeners;
 		if (eventObj && listeners) {
 			if (typeof eventObj == "string") { eventObj = {type:eventObj}; }
-			eventObj.target = this;
+			eventObj.target = target||this;
 			var arr = listeners[eventObj.type];
 			if (!arr) { return !!ret; }
 			for (var i=0,l=arr.length; i<l; i++) {
 				var o = arr[i];
-				ret = ret||o.f.apply(o.scope, [eventObj]);
+				ret = ret||o.f.apply(null, [eventObj]);
 			}
 		}
 		return !!ret;
@@ -176,9 +174,8 @@ var p = EventDispatcher.prototype;
 	 * @class Listener
 	 * @constructor
 	 **/
-	function Listener(f, scope, priority) {
+	function Listener(f, priority) {
 		this.f = f;
-		this.scope = scope;
 		this.priority = priority;
 	}
 
