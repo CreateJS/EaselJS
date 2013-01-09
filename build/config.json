@@ -1,0 +1,40 @@
+{
+	"config_easeljs": {
+		"SOURCE_FILES" : [
+        "/../src/easeljs/utils/UID.js",
+        "/../src/easeljs/events/EventDispatcher.js",
+        "/../src/easeljs/utils/Ticker.js",
+	    "/../src/easeljs/events/MouseEvent.js",
+		"/../src/easeljs/geom/Matrix2D.js",
+		"/../src/easeljs/geom/Point.js",
+		"/../src/easeljs/geom/Rectangle.js",
+        "/../src/easeljs/ui/ButtonHelper.js",
+	    "/../src/easeljs/display/Shadow.js",
+		"/../src/easeljs/display/SpriteSheet.js",
+		"/../src/easeljs/display/Graphics.js",
+		"/../src/easeljs/display/DisplayObject.js",
+		"/../src/easeljs/display/Container.js",
+		"/../src/easeljs/display/Stage.js",
+		"/../src/easeljs/display/Bitmap.js",
+		"/../src/easeljs/display/BitmapAnimation.js",
+		"/../src/easeljs/display/Shape.js",
+		"/../src/easeljs/display/Text.js",
+		"/../src/easeljs/utils/SpriteSheetUtils.js",
+		"/../src/easeljs/utils/SpriteSheetBuilder.js",
+		"/../src/easeljs/display/DOMElement.js",
+		"/../src/easeljs/filters/Filter.js",
+		"/../src/easeljs/ui/Touch.js",
+        "/../src/easeljs/version.js"
+        ],
+		"JS_FILE_NAME" : "easeljs-%VERSION%.min.js",
+		"PROJECT_NAME" : "EaselJS",
+		"PROJECT_URL" : "http://createjs.com/",
+		"DOCS_DIR_NAME" : "_docs-%VERSION%",
+		"DOCS_FILE_NAME": ".zip",
+		"OUTPUT_DIR_NAME" : "/output",
+		"TEMPLATE_DIR_PATH" : "/template",
+        "OUTPUT_DOCS_DIR" : "/output",    
+		"TMP_DIR_NAME" : "/tmp",
+		"GOOGLE_CLOSURE_PATH" : "/../tools/google-closure/compiler.jar"   
+	}
+}
