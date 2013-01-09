@@ -54,6 +54,25 @@ var p = SpriteSheetBuilder.prototype;
 	SpriteSheetBuilder.ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
 	SpriteSheetBuilder.ERR_RUNNING = "a build is already running";
 
+// events:
+
+	/**
+	 * Dispatched when a build completes.
+	 * @event complete
+	 * @param {Object} target The object that dispatched the event.
+	 * @param {String} type The event type.
+	 * @since 0.6.0
+	 */
+	
+	/**
+	 * Dispatched when an asynchronous build has progress.
+	 * @event complete
+	 * @param {Object} target The object that dispatched the event.
+	 * @param {String} type The event type.
+	 * @param {Number} progress The current progress value (0-1).
+	 * @since 0.6.0
+	 */
+
 // public properties:
 
 	/**
@@ -122,20 +141,27 @@ var p = SpriteSheetBuilder.prototype;
 	p.progress = -1;
 	
 	/**
-	 * Callback function to call when a build completes. Called with a single parameter pointing back to this instance.
+	 * 
 	 * @property onComplete
 	 * @type Function
 	 * @default null
 	 **/
+	 
+	/**
+	 * Callback function to call when a build completes. Called with a single parameter pointing back to this instance.
+	 * @property onComplete
+	 * @type Function
+	 * @deprecated In favour of the "complete" event. Will be removed in a future version.
+	 */
 	p.onComplete = null;
-	
+	 
 	/**
 	 * Callback to call when an asynchronous build has progress. Called with two parameters, a reference back to this
 	 * instance, and the current progress value (0-1).
 	 * @property onProgress
 	 * @type Function
-	 * @default null
-	 **/
+	 * @deprecated In favour of the "progress" event. Will be removed in a future version.
+	 */
 	p.onProgress = null;
 	
 // mix-ins:

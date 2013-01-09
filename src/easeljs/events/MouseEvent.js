@@ -40,7 +40,7 @@ this.createjs = this.createjs||{};
  * @param {String} type The event type.
  * @param {Number} stageX The normalized x position relative to the stage.
  * @param {Number} stageY The normalized y position relative to the stage.
- * @param {DisplayObject} target The display object this event relates to.
+ * @param {DisplayObject} target The display object this event relates to. Note that this will be overwritten when the event is dispatched via EventDispatcher.
  * @param {MouseEvent} nativeEvent The native DOM event related to this mouse event.
  * @param {Number} pointerID The unique id for the pointer.
  * @param {Boolean} primary Indicates whether this is the primary pointer in a multitouch environment.
@@ -51,6 +51,28 @@ var MouseEvent = function(type, stageX, stageY, target, nativeEvent, pointerID, 
   this.initialize(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY);
 }
 var p = MouseEvent.prototype;
+
+// events:
+
+	/**
+	 * For MouseEvent objects of type "press", mouseMove events will be dispatched from the event object until the user
+	 * releases the mouse.
+	 * This enables you to listen to mouse move interactions for the duration of a press, which can be very useful for
+	 * operations such as drag and drop.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event mouseMove
+	 * @since 0.6.0
+	 */
+
+	/**
+	 * For MouseEvent objects of type "press", a mouseUp event will be dispatched from the event object when the user
+	 * releases the mouse.
+	 * This enables you to listen for a corresponding mouse up from a specific press, which can be very useful for
+	 * operations such as drag and drop.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event mouseUp
+	 * @since 0.6.0
+	 */
 
 // public properties:
 
@@ -101,23 +123,25 @@ var p = MouseEvent.prototype;
 	 * @default null
 	 **/
 	p.nativeEvent = null;
-
+	 
 	/**
 	 * For events of type "onPress" only you can assign a handler to the onMouseMove
 	 * property. This handler will be called every time the mouse is moved until the mouse is released.
 	 * This is useful for operations such as drag and drop.
-	 * @event onMouseMove
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
+	 * @property onMouseMove
+	 * @type Function
+	 * @deprecated In favour of the "mouseMove" event. Will be removed in a future version.
+	 */
 	p.onMouseMove = null;
-
+	 
 	/**
 	 * For events of type "onPress" only you can assign a handler to the onMouseUp
 	 * property. This handler will be called every time the mouse is moved until the mouse is released.
 	 * This is useful for operations such as drag and drop.
-	 * @event onMouseUp
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	*/
+	 * @property onMouseUp
+	 * @type Function
+	 * @deprecated In favour of the "mouseUp" event. Will be removed in a future version.
+	 */
 	p.onMouseUp = null;
 
 	/**

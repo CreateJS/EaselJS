@@ -4,7 +4,6 @@ Version NEXT [not released]
 - added DisplayObject.cursor property
 - added Container.getChildByName() method
 - added ButtonHelper class
-- documentation updates
 - fixed error with AlphaMaskFilter
 - hitArea position now ignores the regX/Y of the target instance
 - added Log class to provide verbose errors while debugging
@@ -15,7 +14,7 @@ Version NEXT [not released]
 - improved support for empty masks
 - added SpriteSheetBuilder.progress
 - added SpriteSheetBuilder.timeSlice
-- removed the callback param on SpriteSheetBuilder.buildAsync
+- removed the callback param on SpriteSheetBuilder.buildAsync, replaced with .onComplete
 - added SpriteSheetBuilder.onComplete and .onProgress
 - fixes for various MovieClip bugs
 - SpriteSheetBuilder now works correctly when adding more than one MovieClip
@@ -25,6 +24,7 @@ Version NEXT [not released]
 - added closePath support to Graphics.decodePath()
 - changed how animationEnd events are fired, to support calling stop() in the handler
 - animationEnd events now include a "next" value with the name of the next animation
+- documentation updates
 
 
 Version 0.5.0 [Aug 24, 2012]
