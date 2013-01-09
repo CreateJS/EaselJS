@@ -457,7 +457,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 
 		// if we have a cache handy & this has a handler, we can use it to do a quick check.
 		// we can't use the cache for screening children, because they might have hitArea set.
-		if (this.cacheCanvas && hasHandler) {
+		if (!this.hitArea && this.cacheCanvas && hasHandler) {
 			this.getConcatenatedMatrix(mtx);
 			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 			ctx.globalAlpha = mtx.alpha;
@@ -473,12 +473,12 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var l = this.children.length;
 		for (var i=l-1; i>=0; i--) {
 			var child = this.children[i];
-			if (!child.isVisible() || (mouseEvents && !child.mouseEnabled)) { continue; }
 			var hitArea = child.hitArea;
-			var childHasHandler;
+			if (!hitArea && !child.isVisible() || (mouseEvents && !child.mouseEnabled)) { continue; }
+			var childHasHandler = mouseEvents && child._hasMouseHandler(mouseEvents);
 			
-			// if a child container has a handler and a hitArea then we only need to check its hitArea:
-			if (child instanceof Container && !(hitArea && (childHasHandler = child._hasMouseHandler(mouseEvents)))) {
+			// if a child container has a handler and a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
+			if (child instanceof Container && !(hitArea && childHasHandler)) {
 				var result;
 				if (hasHandler) {
 					// only concerned about the first hit, because this container is going to claim it anyway:
@@ -488,7 +488,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
 					if (!arr && result) { return result; }
 				}
-			} else if (!mouseEvents || hasHandler || (childHasHandler || child._hasMouseHandler(mouseEvents))) {
+			} else if (!mouseEvents || hasHandler || childHasHandler) {
 				child.getConcatenatedMatrix(mtx);
 				
 				if (hitArea) {
