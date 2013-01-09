@@ -164,7 +164,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @default -1
 	 * @private
 	 */
-	p._prevPos = -1;
+	p._prevPos = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
 	
 	/**
 	 * @property _prevPosition
@@ -313,7 +313,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p._tick = function(params) {
 		if (!this.paused && this.mode == MovieClip.INDEPENDENT) {
-			this._prevPosition = (this._prevPos<0) ? 0 : this._prevPosition+1;
+			this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
 		}
 		this.Container__tick(params);
 	}
@@ -325,6 +325,8 @@ var p = MovieClip.prototype = new createjs.Container();
 	p._goto = function(positionOrLabel) {
 		var pos = this.timeline.resolve(positionOrLabel);
 		if (pos == null) { return; }
+		// prevent _updateTimeline from overwriting the new position because of a reset:
+		if (this._prevPos == -1) { this._prevPos = NaN; }
 		this._prevPosition = pos;
 		this._updateTimeline();
 	}
