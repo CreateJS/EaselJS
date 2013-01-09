@@ -49,15 +49,28 @@ var BitmapAnimation = function(spriteSheet) {
 }
 var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 
-// public properties:
+// events:
+	
+	/**
+	 * Dispatched when an animation reaches its ends.
+	 * @event animationEnd
+	 * @param {Object} target The object that dispatched the event.
+	 * @param {String} type The event type.
+	 * @param {String} name The name of the animation that just ended.
+	 * @param {String} next The name of the next animation that will be played, or null. This will be the same as name if the animation is looping.
+	 * @since 0.6.0
+	 */
 
+// public properties:
+	 
 	/**
 	 * Specifies a function to call whenever any animation reaches its end. It will be called with three
 	 * params: the first will be a reference to this instance, the second will be the name of the animation
 	 * that just ended, and the third will be the name of the next animation that will be played.
 	 * @property onAnimationEnd
 	 * @type Function
-	 **/
+	 * @deprecated In favour of the "animationEnd" event. Will be removed in a future version.
+	 */
 	p.onAnimationEnd = null;
 
 	/**

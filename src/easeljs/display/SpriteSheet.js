@@ -111,11 +111,29 @@ this.createjs = this.createjs||{};
  * @class SpriteSheet
  * @constructor
  * @param data
+ * @uses EventDispatcher
  **/
 var SpriteSheet = function(data) {
   this.initialize(data);
 }
 var p = SpriteSheet.prototype;
+
+// events:
+
+	/**
+	 * Dispatched when all images are loaded.  Note that this only fires if the images
+	 * were not fully loaded when the sprite sheet was initialized. You should check the complete property 
+	 * to prior to adding a listener. Ex.
+	 * <pre><code>var sheet = new SpriteSheet(data);
+	 * if (!sheet.complete) {
+	 *  &nbsp; // not preloaded, listen for onComplete:
+	 *  &nbsp; sheet.addEventListener("complete", handler);
+	 * }</code></pre>
+	 * @event complete
+	 * @param {Object} target The object that dispatched the event.
+	 * @param {String} type The event type.
+	 * @since 0.6.0
+	 */
 
 // public properties:
 	/**
@@ -135,11 +153,22 @@ var p = SpriteSheet.prototype;
 	 *  &nbsp; // not preloaded, listen for onComplete:
 	 *  &nbsp; sheet.onComplete = handler;
 	 * }</code></pre>
-	 * 
-	 * @event onComplete
+	 * @property onComplete
+	 * @type Function
+	 * @deprecated In favour of the "complete" event. Will be removed in a future version.
 	 **/
 	p.onComplete = null;
-	
+
+// mix-ins:
+	// EventDispatcher methods:
+	p.addEventListener = null;
+	p.removeEventListener = null;
+	p.removeAllEventListeners = null;
+	p.dispatchEvent = null;
+	p.hasEventListener = null;
+	p._listeners = null;
+	createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
+
 // private properties:
 	/**
 	 * @property _animations
@@ -387,6 +416,7 @@ var p = SpriteSheet.prototype;
 			this._calculateFrames();
 			this.complete = true;
 			this.onComplete&&this.onComplete();
+			this.dispatchEvent("complete");
 		}
 	}
 	

@@ -86,6 +86,60 @@ var p = DisplayObject.prototype;
 	 **/
 	DisplayObject._nextCacheID = 1;
 
+// events:
+
+	/**
+	 * Dispatched when the user presses their left mouse button over the display object. See the 
+	 * {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event press
+	 * @since 0.6.0
+	 */
+	 
+	/**
+	 * Dispatched when the user presses their left mouse button and then releases it while over the display object.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event click
+	 * @since 0.6.0
+	 */
+	 
+	/**
+	 * Dispatched when the user double clicks their left mouse button over this display object.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event doubleClick
+	 * @since 0.6.0
+	 */
+	 
+	/**
+	 * Dispatched when the user's mouse rolls over this display object. This event must be enabled using 
+	 * {{#crossLink "Stage.enableMouseOver"}}{{/crossLink}}.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event mouseOver
+	 * @since 0.6.0
+	 */
+	 
+	
+	/**
+	 * Dispatched when the user's mouse rolls out of this display object. This event must be enabled using 
+	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event mouseOut
+	 * @since 0.6.0
+	 */
+	 
+	/**
+	 * Dispatched on each display object on a stage whenever the stage updates.
+	 * This occurs immediately before the rendering (draw) pass. When {{#crossLink "Stage/update"}}{{/crossLink}} is called, first all display objects
+	 * on the stage dispatch the tick event, then all of the display objects are drawn to stage. Children will have their
+	 * tick event dispatched in order of their depth prior to the event being dispatched on their parent.
+	 * @event tick
+	 * @param {Object} target The object that dispatched the event.
+	 * @param {String} type The event type.
+	 * @param {Array} params An array containing any arguments that were passed to the Stage.update() method.
+	 * 	For example if you called stage.update("hello"), then the params would be ["hello"].
+	 * @since 0.6.0
+	 */
+
+// public properties:
 	/**
 	 * The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque.
 	 * @property alpha
@@ -258,51 +312,56 @@ var p = DisplayObject.prototype;
 	 * @default false
 	 **/
 	p.snapToPixel = false;
-
+	 
 	/**
 	 * The onPress callback is called when the user presses down on their mouse over this display object. The handler
 	 * is passed a single param containing the corresponding MouseEvent instance. You can subscribe to the onMouseMove
 	 * and onMouseUp callbacks of the event object to receive these events until the user releases the mouse button.
 	 * If an onPress handler is set on a container, it will receive the event if any of its children are clicked.
-	 * @event onPress
-	 * @param {MouseEvent} event MouseEvent with information about the event.
-	 **/
-	p.onPress = null;
-
+	 * @property onPress
+	 * @type Function
+	 * @deprecated In favour of the "press" event. Will be removed in a future version.
+	 */
+	p.onPress = null;	 
+	 
 	/**
 	 * The onClick callback is called when the user presses down on and then releases the mouse button over this
 	 * display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an
 	 * onClick handler is set on a container, it will receive the event if any of its children are clicked.
-	 * @event onClick
-	 * @param {MouseEvent} event MouseEvent with information about the event.
-	 **/
+	 * @property onClick
+	 * @type Function
+	 * @deprecated In favour of the "click" event. Will be removed in a future version.
+	 */
 	p.onClick = null;
 
 	/**
 	 * The onDoubleClick callback is called when the user double clicks over this display object. The handler is
 	 * passed a single param containing the corresponding MouseEvent instance. If an onDoubleClick handler is set
 	 * on a container, it will receive the event if any of its children are clicked.
-	 * @event onDoubleClick
-	 * @param {MouseEvent} event MouseEvent with information about the event.
-	 **/
+	 * @property onDoubleClick
+	 * @type Function
+	 * @deprecated In favour of the "doubleClick" event. Will be removed in a future version.
+	 */
 	p.onDoubleClick = null;
 
 	/**
 	 * The onMouseOver callback is called when the user rolls over the display object. You must enable this event using
 	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
-	 * @event onMouseOver
-	 * @param {MouseEvent} event MouseEvent with information about the event.
-	 **/
+	 * @property onMouseOver
+	 * @type Function
+	 * @deprecated In favour of the "mouseOver" event. Will be removed in a future version.
+	 */
 	p.onMouseOver = null;
 
 	/**
 	 * The onMouseOut callback is called when the user rolls off of the display object. You must enable this event using
 	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
-	 * @event onMouseOut
-	 * @param {MouseEvent} event MouseEvent with information about the event.
-	 **/
+	 * @property onMouseOut
+	 * @type Function
+	 * @deprecated In favour of the "mouseOut" event. Will be removed in a future version.
+	 */
 	p.onMouseOut = null;
-
+	 
 	/**
 	 * The onTick callback is called on each display object on a stage whenever the stage updates.
 	 * This occurs immediately before the rendering (draw) pass. When stage.update() is called, first all display objects
@@ -311,8 +370,10 @@ var p = DisplayObject.prototype;
 	 * <br/><br/>
 	 * Any parameters passed in to stage.update() are passed on to the onTick() handlers. For example, if you call
 	 * stage.update("hello"), all of the display objects with a handler will have onTick("hello") called.
-	 * @event onTick
-	 **/
+	 * @property onTick
+	 * @type Function
+	 * @deprecated In favour of the "tick" event. Will be removed in a future version.
+	 */
 	p.onTick = null;
 
 	/**

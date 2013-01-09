@@ -140,7 +140,7 @@ Log.addKeys = function(keys) {
  * Outputs the specified error via the method assigned to the "out" property. If the error matches a key in any of the
  * loaded def objects, it will substitute that message.
  * @param {String} message The error message or key to output.
- * @param {String} details Any details associated with this message.
+ * @param {Object} details Any details associated with this message.
  * @param {Number} level A number between 1 and 254 specifying the severity of this message. See Log.level for details.
  * @static
  * @method error

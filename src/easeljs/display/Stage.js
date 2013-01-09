@@ -54,6 +54,29 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	Stage._snapToPixelEnabled = false; // snapToPixelEnabled is temporarily copied here during a draw to provide global access.
 
+// events:
+
+	/**
+	 * Dispatched when the user moves the mouse over the canvas.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event mouseMove
+	 * @since 0.6.0
+	 */
+
+	/**
+	 * Dispatched when the user releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event mouseUp
+	 * @since 0.6.0
+	 */
+
+	/**
+	 * Dispatched when the user the user releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event mouseDown
+	 * @since 0.6.0
+	 */
+
 // public properties:
 	/**
 	 * Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually
@@ -87,29 +110,32 @@ var p = Stage.prototype = new createjs.Container();
 	 * @type Number
 	 **/
 	p.mouseY = 0;
-
+	 
 	/**
 	 * The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param
 	 * containing the corresponding MouseEvent instance.
-	 * @event onMouseMove
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
+	 * @property onMouseMove
+	 * @type Function
+	 * @deprecated In favour of the "mouseMove" event. Will be removed in a future version.
+	 */
 	p.onMouseMove = null;
-
+	 
 	/**
 	 * The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler
 	 * is passed a single param containing the corresponding MouseEvent instance.
-	 * @event onMouseUp
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
+	 * @property onMouseUp
+	 * @type Function
+	 * @deprecated In favour of the "mouseUp" event. Will be removed in a future version.
+	 */
 	p.onMouseUp = null;
-
+	 
 	/**
 	 * The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single
 	 * param containing the corresponding MouseEvent instance.
-	 * @event onMouseDown
-	 * @param {MouseEvent} event A MouseEvent instance with information about the current mouse event.
-	 **/
+	 * @property onMouseDown
+	 * @type Function
+	 * @deprecated In favour of the "mouseDown" event. Will be removed in a future version.
+	 */
 	p.onMouseDown = null;
 
 	/**
@@ -404,9 +430,9 @@ var p = Stage.prototype = new createjs.Container();
 		var oEvt = o.event;
 		if (oEvt && (oEvt.onMouseMove || oEvt.hasEventListener("mouseMove"))) {
 			evt = evt.clone(); // not sure this is entirely necessary.
-			evt.target = o.event.target;
+			evt.target = oEvt.target;
 			oEvt.onMouseMove&&oEvt.onMouseMove(evt);
-			oEvt.dispatchEvent(evt);
+			oEvt.dispatchEvent(evt, oEvt.target);
 		}
 	}
 
@@ -498,7 +524,7 @@ var p = Stage.prototype = new createjs.Container();
 			evt = evt.clone(); // not sure this is entirely necessary.
 			evt.target = oEvt.target;
 			oEvt.onMouseUp&&oEvt.onMouseUp(evt);
-			oEvt.dispatchEvent(evt);
+			oEvt.dispatchEvent(evt, oEvt.target);
 		}
 		
 		var oTarget = o.target;
