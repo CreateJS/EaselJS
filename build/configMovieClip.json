@@ -1,0 +1,16 @@
+{
+	"config_easeljs_movieclip": {
+		"SOURCE_FILES" : [
+        "/../src/easeljs/display/MovieClip.js"
+        ],
+		"JS_FILE_NAME" : "movieclip-%VERSION%.min.js",
+		"PROJECT_NAME" : "EaselJS",
+		"PROJECT_URL" : "http://createjs.com/",
+		"DOCS_DIR_NAME" : "_docs-%VERSION%",
+		"DOCS_FILE_NAME": ".zip",
+		"OUTPUT_DIR_NAME" : "/output",
+		"TEMPLATE_DIR_PATH" : "/template",    
+		"TMP_DIR_NAME" : "/tmp",
+		"GOOGLE_CLOSURE_PATH" : "/../tools/google-closure/compiler.jar"   
+	}
+}
