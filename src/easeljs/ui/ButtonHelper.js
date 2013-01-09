@@ -109,6 +109,8 @@ var p = ButtonHelper.prototype;
 		this.pressLabel = pressLabel == null ? "press" : pressLabel;
 		this.play = play;
 		target.cursor = "pointer";
+		var _this = this;
+		this._f = function(e) { _this._handleEvt(e); };
 		this.setEnabled(true);
 		this._handleEvt({});
 		if (hitArea) {
@@ -128,20 +130,17 @@ var p = ButtonHelper.prototype;
 	 **/
 	p.setEnabled = function(value) {
 		var o = this.target;
-		var _this = this;
-		if (o.addEventListener) {
-			var f = _this._handleEvt;
-			if (value) {
-				o.addEventListener("mouseOver", f, _this);
-				o.addEventListener("mouseOut", f, _this);
-				o.addEventListener("press", f, _this);
-				o.addEventListener("click", f, _this);
-			} else {
-				o.removeEventListener("mouseOver", f, _this);
-				o.removeEventListener("mouseOut", f, _this);
-				o.removeEventListener("press", f, _this);
-				o.removeEventListener("click", f, _this);
-			}
+		var f = this._f;
+		if (value) {
+			o.addEventListener("mouseOver", f);
+			o.addEventListener("mouseOut", f);
+			o.addEventListener("press", f);
+			o.addEventListener("click", f);
+		} else {
+			o.removeEventListener("mouseOver", f);
+			o.removeEventListener("mouseOut", f);
+			o.removeEventListener("press", f);
+			o.removeEventListener("click", f);
 		}
 	};
 		
@@ -166,9 +165,8 @@ var p = ButtonHelper.prototype;
 						this.outLabel;
 		
 		if (evt.type == "press") {
-			var _this = this;
 			this._isPressed = true;
-			evt.addEventListener("mouseUp", _this._handleEvt, _this);
+			evt.addEventListener("mouseUp", this._f);
 		} else if (evt.type == "mouseUp") {
 			this._isPressed = false;
 			return;
