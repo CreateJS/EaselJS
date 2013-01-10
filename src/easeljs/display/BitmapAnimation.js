@@ -214,9 +214,8 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this._normalizeFrame();
 		var o = this.spriteSheet.getFrame(this.currentFrame);
-		if (o == null) { return; }
+		if (!o) { return; }
 		var rect = o.rect;
-		// TODO: implement snapToPixel on regX/Y?
 		ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, -o.regX, -o.regY, rect.width, rect.height);
 		return true;
 	}
@@ -352,11 +351,13 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 		var animation = this._animation;
 		var frame = this.currentFrame;
 		var paused = this.paused;
+		var l;
 		
 		if (animation) {
-			if (this.currentAnimationFrame >= animation.frames.length) {
+			l = animation.frames.length;
+			if (this.currentAnimationFrame >= l) {
 				var next = animation.next;
-				if (this._dispatchAnimationEnd(animation, frame, paused, next)) {
+				if (this._dispatchAnimationEnd(animation, frame, paused, next, l-1)) {
 					// do nothing, something changed in the event stack.
 				} else if (next) {
 					this._goto(next);
@@ -369,8 +370,9 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 				this.currentFrame = animation.frames[this.currentAnimationFrame];
 			}
 		} else {
-			if (frame >= this.spriteSheet.getNumFrames()) {
-				if (!this._dispatchAnimationEnd(animation, frame, paused)) { this.currentFrame = 0; }
+			l = this.spriteSheet.getNumFrames();
+			if (frame >= l) {
+				if (!this._dispatchAnimationEnd(animation, frame, paused, l-1)) { this.currentFrame = 0; }
 			}
 		}
 	}
@@ -382,10 +384,11 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * @private
 	 * @type Function
 	 **/
-	p._dispatchAnimationEnd = function(animation, frame, paused, next) {
+	p._dispatchAnimationEnd = function(animation, frame, paused, next, end) {
 		var name = animation ? animation.name : null;
 		this.onAnimationEnd&&this.onAnimationEnd(this, name, next);
 		this.dispatchEvent({type:"animationEnd", name:name, next:next});
+		if (!paused && this.paused) { this.currentAnimationFrame = end; }
 		return (this.paused != paused || this._animation != animation || this.currentFrame != frame);
 	}
 
