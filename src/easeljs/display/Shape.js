@@ -71,6 +71,48 @@ var p = Shape.prototype = new createjs.DisplayObject();
 		this.DisplayObject_initialize();
 		this.graphics = graphics ? graphics : new createjs.Graphics();
 	}
+	
+	p.DisplayObject_set = p.set;
+	
+	/*
+	 * Shape.set supports the special options strokeWidth, strokeCap, strokeJoin, strokeMiterLimit, fillColor, and strokeColor,
+	 * which modify the default graphics object. You can combine these with drawing commands specified in a callback function:
+	 * 
+	 *	  new createjs.Shape({
+	 *		  strokeWidth: 3,
+	 *		  fillColor: 'red',
+	 *		  graphics: function(g) { g.drawCircle(0, 0, 1); }
+	 *	  })
+	 */
+	p.set = function(opts) {
+		var graphicsCallback;
+		if (opts) {
+			graphics = null;
+			if (typeof opts.graphics === 'function') {
+				graphicsCallback = opts.graphics;
+				delete opts.graphics;
+			}
+		}
+		
+		this.DisplayObject_set(opts);
+		
+		if (opts) {
+			if (opts.strokeWidth || opts.strokeCap || opts.strokeJoin || opts.strokeMiterLimit) {
+				this.graphics.setStrokeStyle(opts.strokeWidth, opts.strokeCap, opts.strokeJoin, opts.strokeMiterLimit);
+			}
+			if (opts.fillColor) {
+				this.graphics.beginFill(opts.fillColor);
+			}
+			if (opts.strokeColor) {
+				this.graphics.beginStroke(opts.strokeColor);
+			}
+			if (graphicsCallback) {
+				graphicsCallback(this.graphics);
+			}
+		}
+		
+		return this;
+	}
 
 	/**
 	 * Returns true or false indicating whether the Shape would be visible if drawn to a canvas.
