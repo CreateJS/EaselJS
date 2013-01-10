@@ -79,35 +79,33 @@ var p = EventDispatcher.prototype;
 	 * Adds the specified event listener.
 	 * @method addEventListener
 	 * @param {String} type The string type of the event.
-	 * @param {Function} callback The function that will be called when this event is dispatched.
-	 * @param {Number} [priority=0] Listeners with a higher priority will be called before those with lower priority.
+	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
+	 * the event is dispatched.
+	 * @return {Function | Object} Returns the listener for chaining or assignment.
 	 **/
-	p.addEventListener = function(type, callback, priority) {
-		priority = priority || 0;
-		var o = new Listener(callback, priority);
+	p.addEventListener = function(type, listener) {
 		var listeners = this._listeners;
 		if (!listeners) { listeners = this._listeners = {}; }
 		var arr = listeners[type];
-		if (!arr) { arr = listeners[type] = [o]; return; }
-		this.removeEventListener(type, callback);
-		for (var i=0,l=arr.length; i<l && arr[i].priority >= priority; i++) {}
-		arr.splice(i, 0, o);
+		if (!arr) { arr = listeners[type] = []; }
+		else { this.removeEventListener(type, listener); }
+		arr.push(listener);
+		return listener;
 	};
 	
 	/**
 	 * Removes the specified event listener.
 	 * @method removeEventListener
 	 * @param {String} type The string type of the event.
-	 * @param {Function} callback The listener function.
+	 * @param {Function | Object} listener The listener function or object.
 	 **/
-	p.removeEventListener = function(type, callback) {
+	p.removeEventListener = function(type, listener) {
 		var listeners = this._listeners;
 		if (!listeners) { return; }
 		var arr = listeners[type];
 		if (!arr) { return; }
 		for (var i=0,l=arr.length; i<l; i++) {
-			var o = arr[i];
-			if (o.f == callback) {
+			if (arr[i] == listener) {
 				if (l==1) { delete(listeners[type]); } // allows for faster checks.
 				else { arr.splice(i,1); }
 				break;
@@ -135,22 +133,24 @@ var p = EventDispatcher.prototype;
 	 * @return {Boolean} Returns true if any listener returned true.
 	 **/
 	p.dispatchEvent = function(eventObj, target) {
-		var ret, listeners = this._listeners;
+		var ret=false, listeners = this._listeners;
 		if (eventObj && listeners) {
 			if (typeof eventObj == "string") { eventObj = {type:eventObj}; }
 			eventObj.target = target||this;
 			var arr = listeners[eventObj.type];
-			if (!arr) { return !!ret; }
+			if (!arr) { return ret; }
+			arr = arr.slice(); // to avoid issues with items being removed or added during the dispatch
 			for (var i=0,l=arr.length; i<l; i++) {
 				var o = arr[i];
-				ret = ret||o.f.apply(null, [eventObj]);
+				if (o instanceof Function) { ret = ret||o.apply(null, [eventObj]); }
+				else if (o.handleEvent) { ret = ret||o.handleEvent(eventObj); }
 			}
 		}
 		return !!ret;
 	};
 	
 	/**
-	 * Indicates whether there is at least one listener for the specified event type or a defined callback.
+	 * Indicates whether there is at least one listener for the specified event type.
 	 * @method hasEventListener
 	 * @param {String} type The string type of the event.
 	 * @return {Boolean} Returns true if there is at least one listener for the specified event.
@@ -168,17 +168,6 @@ var p = EventDispatcher.prototype;
 		return "[EventDispatcher]";
 	};
 	
-// inner classes:
-	/**
-	 * Inner class used by the EventDispatcher class.
-	 * @protected
-	 * @class Listener
-	 * @constructor
-	 **/
-	function Listener(f, priority) {
-		this.f = f;
-		this.priority = priority;
-	}
 
 createjs.EventDispatcher = EventDispatcher;
 }());
