@@ -474,7 +474,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		for (var i=l-1; i>=0; i--) {
 			var child = this.children[i];
 			var hitArea = child.hitArea;
-			if (!hitArea && !child.isVisible() || (mouseEvents && !child.mouseEnabled)) { continue; }
+			if (!child.visible || (!hitArea && !child.isVisible()) || (mouseEvents && !child.mouseEnabled)) { continue; }
 			var childHasHandler = mouseEvents && child._hasMouseHandler(mouseEvents);
 			
 			// if a child container has a handler and a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
@@ -493,7 +493,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 				
 				if (hitArea) {
 					mtx.appendTransform(hitArea.x, hitArea.y, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
-					mtx.alpha *= hitArea.alpha/child.alpha;
+					mtx.alpha = hitArea.alpha;
 				}
 				
 				ctx.globalAlpha = mtx.alpha;
