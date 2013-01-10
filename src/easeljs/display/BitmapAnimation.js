@@ -53,7 +53,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	
 	/**
 	 * Dispatched when an animation reaches its ends.
-	 * @event animationEnd
+	 * @event animationend
 	 * @param {Object} target The object that dispatched the event.
 	 * @param {String} type The event type.
 	 * @param {String} name The name of the animation that just ended.
@@ -69,7 +69,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * that just ended, and the third will be the name of the next animation that will be played.
 	 * @property onAnimationEnd
 	 * @type Function
-	 * @deprecated In favour of the "animationEnd" event. Will be removed in a future version.
+	 * @deprecated In favour of the "animationend" event. Will be removed in a future version.
 	 */
 	p.onAnimationEnd = null;
 
@@ -378,7 +378,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	}
 	
 	/**
-	 * Dispatches the animationEnd event. Returns true if a handler changed the animation (ex. calling stop(),
+	 * Dispatches the animationend event. Returns true if a handler changed the animation (ex. calling stop(),
 	 * gotoAndPlay(), etc.)
 	 * @property _dispatchAnimationEnd
 	 * @private
@@ -387,7 +387,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	p._dispatchAnimationEnd = function(animation, frame, paused, next, end) {
 		var name = animation ? animation.name : null;
 		this.onAnimationEnd&&this.onAnimationEnd(this, name, next);
-		this.dispatchEvent({type:"animationEnd", name:name, next:next});
+		this.dispatchEvent({type:"animationend", name:name, next:next});
 		if (!paused && this.paused) { this.currentAnimationFrame = end; }
 		return (this.paused != paused || this._animation != animation || this.currentFrame != frame);
 	}

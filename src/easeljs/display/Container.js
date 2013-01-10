@@ -444,8 +444,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Array} arr
-	 * @param {Number} mouseEvents A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress &
-	 * onClick & onDoubleClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
+	 * @param {Number} mouseEvents A bitmask indicating which event types to look for. Bit 1 specifies press &
+	 * click & double click, bit 2 specifies it should look for mouse over and mouse out. This implementation may change.
 	 * @return {Array[DisplayObject]}
 	 * @protected
 	 **/
@@ -467,7 +467,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 				canvas.width = 1;
 				return this;
 			}
-		};
+		}
 
 		// draw children one at a time, and check if we get a hit:
 		var l = this.children.length;

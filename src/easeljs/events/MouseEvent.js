@@ -55,22 +55,22 @@ var p = MouseEvent.prototype;
 // events:
 
 	/**
-	 * For MouseEvent objects of type "press", mouseMove events will be dispatched from the event object until the user
-	 * releases the mouse.
+	 * For MouseEvent objects of type "mousedown", mousemove events will be dispatched from the event object until the user
+	 * releases the mouse anywhere.
 	 * This enables you to listen to mouse move interactions for the duration of a press, which can be very useful for
 	 * operations such as drag and drop.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-	 * @event mouseMove
+	 * @event mousemove
 	 * @since 0.6.0
 	 */
 
 	/**
-	 * For MouseEvent objects of type "press", a mouseUp event will be dispatched from the event object when the user
-	 * releases the mouse.
+	 * For MouseEvent objects of type "mousedown", a mouseup event will be dispatched from the event object when the user
+	 * releases the mouse anywhere.
 	 * This enables you to listen for a corresponding mouse up from a specific press, which can be very useful for
 	 * operations such as drag and drop.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-	 * @event mouseUp
+	 * @event mouseup
 	 * @since 0.6.0
 	 */
 
@@ -130,7 +130,7 @@ var p = MouseEvent.prototype;
 	 * This is useful for operations such as drag and drop.
 	 * @property onMouseMove
 	 * @type Function
-	 * @deprecated In favour of the "mouseMove" event. Will be removed in a future version.
+	 * @deprecated In favour of the "mousemove" event. Will be removed in a future version.
 	 */
 	p.onMouseMove = null;
 	 
@@ -140,7 +140,7 @@ var p = MouseEvent.prototype;
 	 * This is useful for operations such as drag and drop.
 	 * @property onMouseUp
 	 * @type Function
-	 * @deprecated In favour of the "mouseUp" event. Will be removed in a future version.
+	 * @deprecated In favour of the "mouseup" event. Will be removed in a future version.
 	 */
 	p.onMouseUp = null;
 

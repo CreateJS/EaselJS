@@ -40,13 +40,13 @@ this.createjs = this.createjs||{};
  * @param {MovieClip | BitmapAnimation} target The MovieClip or BitmapAnimation to add button functionality to.
  * @param {String | Number} outLabel Optional. The label name or frame number to display when the user mouses over the target. Defaults to "out".
  * @param {String | Number} overLabel Optional. The label name or frame number to display when the user mouses out of the target. Defaults to "over".
- * @param {String | Number} pressLabel Optional. The label name or frame number to display when the user presses (clicks and holds) on the target. Defaults to "press".
+ * @param {String | Number} downLabel Optional. The label name or frame number to display when the user presses on the target. Defaults to "down".
  * @param {Boolean} play Optional. If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
  * @param {DisplayObject} hitArea Optional. If specified, this sets the hitArea property on the target.
  * @param {String | Number} hitLabel Optional. If specified, this will set actionsEnabled to false and advance the hitArea to the specified label or frame number. Equivalent to calling hitArea.gotoAndStop(hitLabel).
  **/
-var ButtonHelper = function(target, outLabel, overLabel, pressLabel, play, hitArea, hitLabel) {
-	this.initialize(target, outLabel, overLabel, pressLabel, play, hitArea, hitLabel);
+var ButtonHelper = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
+	this.initialize(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel);
 }
 var p = ButtonHelper.prototype;
 
@@ -73,11 +73,11 @@ var p = ButtonHelper.prototype;
 	p.outLabel = null;
 	
 	/**
-	 * The label name or frame number to display when the user presses (clicks and holds) on the target. Defaults to "press".
-	 * @property pressLabel
+	 * The label name or frame number to display when the user presses on the target. Defaults to "down".
+	 * @property downLabel
 	 * @type String | Number
 	 **/
-	p.pressLabel = null;
+	p.downLabel = null;
 	
 	/**
 	 * If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
@@ -101,12 +101,12 @@ var p = ButtonHelper.prototype;
 	 * @method initialize
 	 * @protected
 	 **/
-	p.initialize = function(target, outLabel, overLabel, pressLabel, play, hitArea, hitLabel) {
+	p.initialize = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
 		if (!target.addEventListener) { return; }
 		this.target = target;
 		this.overLabel = overLabel == null ? "over" : overLabel;
 		this.outLabel = outLabel == null ? "out" : outLabel;
-		this.pressLabel = pressLabel == null ? "press" : pressLabel;
+		this.downLabel = downLabel == null ? "down" : downLabel;
 		this.play = play;
 		target.cursor = "pointer";
 		this.setEnabled(true);
@@ -129,14 +129,14 @@ var p = ButtonHelper.prototype;
 	p.setEnabled = function(value) {
 		var o = this.target;
 		if (value) {
-			o.addEventListener("mouseOver", this);
-			o.addEventListener("mouseOut", this);
-			o.addEventListener("press", this);
+			o.addEventListener("mouseover", this);
+			o.addEventListener("mouseout", this);
+			o.addEventListener("mousedown", this);
 			o.addEventListener("click", this);
 		} else {
-			o.removeEventListener("mouseOver", this);
-			o.removeEventListener("mouseOut", this);
-			o.removeEventListener("press", this);
+			o.removeEventListener("mouseover", this);
+			o.removeEventListener("mouseout", this);
+			o.removeEventListener("mousedown", this);
 			o.removeEventListener("click", this);
 		}
 	};
@@ -157,14 +157,14 @@ var p = ButtonHelper.prototype;
 	 * @protected
 	 **/
 	p.handleEvent = function(evt) {
-		var label = (evt.type == "mouseOver" && !this._isPressed) || evt.type == "click" ? this.overLabel :
-				  		(evt.type == "mouseOver" && this._isPressed) || evt.type == "press" ? this.pressLabel :
+		var label = (evt.type == "mouseover" && !this._isPressed) || evt.type == "click" ? this.overLabel :
+				  		(evt.type == "mouseover" && this._isPressed) || evt.type == "mousedown" ? this.downLabel :
 						this.outLabel;
 		
-		if (evt.type == "press") {
+		if (evt.type == "mousedown") {
 			this._isPressed = true;
-			evt.addEventListener("mouseUp", this);
-		} else if (evt.type == "mouseUp") {
+			evt.addEventListener("mouseup", this);
+		} else if (evt.type == "mouseup") {
 			this._isPressed = false;
 			return;
 		}

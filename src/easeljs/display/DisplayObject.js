@@ -52,7 +52,7 @@ var DisplayObject = function() {
 var p = DisplayObject.prototype;
 
 	/**
-	 * Suppresses errors generated when using features like hitTest, onPress/onClick, and getObjectsUnderPoint with cross
+	 * Suppresses errors generated when using features like hitTest, mouse events, and getObjectsUnderPoint with cross
 	 * domain content
 	 * @property suppressCrossDomainErrors
 	 * @static
@@ -91,7 +91,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * Dispatched when the user presses their left mouse button over the display object. See the 
 	 * {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-	 * @event press
+	 * @event mousedown
 	 * @since 0.6.0
 	 */
 	 
@@ -105,7 +105,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * Dispatched when the user double clicks their left mouse button over this display object.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-	 * @event doubleClick
+	 * @event dblClick
 	 * @since 0.6.0
 	 */
 	 
@@ -113,7 +113,7 @@ var p = DisplayObject.prototype;
 	 * Dispatched when the user's mouse rolls over this display object. This event must be enabled using 
 	 * {{#crossLink "Stage.enableMouseOver"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-	 * @event mouseOver
+	 * @event mouseover
 	 * @since 0.6.0
 	 */
 	 
@@ -122,7 +122,7 @@ var p = DisplayObject.prototype;
 	 * Dispatched when the user's mouse rolls out of this display object. This event must be enabled using 
 	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-	 * @event mouseOut
+	 * @event mouseout
 	 * @since 0.6.0
 	 */
 	 
@@ -320,7 +320,7 @@ var p = DisplayObject.prototype;
 	 * If an onPress handler is set on a container, it will receive the event if any of its children are clicked.
 	 * @property onPress
 	 * @type Function
-	 * @deprecated In favour of the "press" event. Will be removed in a future version.
+	 * @deprecated In favour of the "mousedown" event. Will be removed in a future version.
 	 */
 	p.onPress = null;	 
 	 
@@ -340,7 +340,7 @@ var p = DisplayObject.prototype;
 	 * on a container, it will receive the event if any of its children are clicked.
 	 * @property onDoubleClick
 	 * @type Function
-	 * @deprecated In favour of the "doubleClick" event. Will be removed in a future version.
+	 * @deprecated In favour of the "dblClick" event. Will be removed in a future version.
 	 */
 	p.onDoubleClick = null;
 
@@ -349,7 +349,7 @@ var p = DisplayObject.prototype;
 	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
 	 * @property onMouseOver
 	 * @type Function
-	 * @deprecated In favour of the "mouseOver" event. Will be removed in a future version.
+	 * @deprecated In favour of the "mouseover" event. Will be removed in a future version.
 	 */
 	p.onMouseOver = null;
 
@@ -358,7 +358,7 @@ var p = DisplayObject.prototype;
 	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
 	 * @property onMouseOut
 	 * @type Function
-	 * @deprecated In favour of the "mouseOut" event. Will be removed in a future version.
+	 * @deprecated In favour of the "mouseout" event. Will be removed in a future version.
 	 */
 	p.onMouseOut = null;
 	 
@@ -912,10 +912,10 @@ var p = DisplayObject.prototype;
 	};
 	
 	/**
-	 * Indicates whether the display object has a mouse listener of the corresponding types.
+	 * Indicates whether the display object has a listener of the corresponding event types.
 	 * @method _hasMouseHandler
-	 * @param {Number} typeMask A bitmask indicating which mouseEvent types to look for. Bit 1 specifies onPress &
-	 * onClick & onDoubleClick, bit 2 specifies it should look for onMouseOver and onMouseOut. This implementation may change.
+	 * @param {Number} typeMask A bitmask indicating which event types to look for. Bit 1 specifies press &
+	 * click & double click, bit 2 specifies it should look for mouse over and mouse out. This implementation may change.
 	 * @return {Boolean}
 	 * @protected
 	 **/
@@ -923,10 +923,10 @@ var p = DisplayObject.prototype;
 		var ls = this._listeners;
 		return !!(
 				 (typeMask&1 && (this.onPress || this.onClick || this.onDoubleClick || 
-				 (ls && (this.hasEventListener("press") || this.hasEventListener("click") || this.hasEventListener("doubleClick")))))
+				 (ls && (this.hasEventListener("mousedown") || this.hasEventListener("click") || this.hasEventListener("dblclick")))))
 				 ||
 				 (typeMask&2 && (this.onMouseOver || this.onMouseOut || this.cursor ||
-				 (ls && (this.hasEventListener("mouseOver") || this.hasEventListener("mouseOut")))))
+				 (ls && (this.hasEventListener("mouseover") || this.hasEventListener("mouseout")))))
 				 );
 	};
 	 
