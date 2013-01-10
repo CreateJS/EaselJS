@@ -7,10 +7,12 @@ Google Closure requires that Java is installed on the system.
 View the "YUI Doc":http://developer.yahoo.com/yui/yuidoc/ page for more information.
 
 Google Closure is included in the repository, which makes it easier to run the build, and ensures that we don't have version mismatches between the source and the libraries. 
+*Note* For PC users, please ensure that you have java installed on your machine. If not, go to http://www.java.com/ > Click: Free Java Download > Agree and Start Free Download. 
+
 
 For compression of the documentation for Windows, we have provided 7-zip.exe found within the /tools directory.
-Run the installer and install within tools sub-directory.
-7-Zip is licensed under the GNU LGPL license, For more information please visit http://www.7-zip.org/
+*Note*Run the installer(7z920.exe) and ensure the install destination is within tools sub-directory (ie. C:\build\tools\7-Zip).
+7-Zip is licensed under the GNU LGPL license, For more information please visit http://www.7-zip.org/ 
 
 h2. Configuration
 
@@ -21,7 +23,9 @@ In order to run the script, you must have "node.js":http://nodejs.org/ installed
 * "optimist module":https://github.com/substack/node-optimist 
 * "yuidoc":https://github.com/yui/yuidoc/
 
-The easiest way to install the required modules is to first install "NPM":http://npmjs.org/ (node package manager) and then run:
+
+Once you have installed "node.js" the easiest way to install the required modules is to run the following through command line (Terminal / CMD):
+*Note* To avoid problems while running script we would recommended installing (wrench/optimist/yuidoc) to the parent directory of your project, or on your root directory.
 
 <code>npm install wrench</code>
 <code>npm install optimist</code> 
