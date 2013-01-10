@@ -79,7 +79,7 @@
 			bitmap.name = "bmp_"+i;
 			bitmap.cursor = "pointer";
 
-			bitmap.addEventListener("press", function(evt) {
+			bitmap.addEventListener("mousedown", function(evt) {
 				// bump the target in front of it's siblings:
 				var o = evt.target;
 				o.parent.addChild(o);
@@ -87,7 +87,7 @@
 
 				// add a listener to the event object's mouseMove event
 				// this will be active until the user releases the mouse button:
-				evt.addEventListener("mouseMove", function(ev) {
+				evt.addEventListener("mousemove", function(ev) {
 					o.x = ev.stageX+offset.x;
 					o.y = ev.stageY+offset.y;
 					// indicate that the stage should be updated on the next tick:
@@ -95,13 +95,13 @@
 				});
 			});
 			
-			bitmap.addEventListener("mouseOver", function(evt) {
+			bitmap.addEventListener("mouseover", function(evt) {
 				var o = evt.target;
 				o.scaleX = o.scaleY = o.scale*1.2;
 				update = true;
 			});
 			
-			bitmap.addEventListener("mouseOut", function(evt) {
+			bitmap.addEventListener("mouseout", function(evt) {
 				var o = evt.target;
 				o.scaleX = o.scaleY = o.scale;
 				update = true;
