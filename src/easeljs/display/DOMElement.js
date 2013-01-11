@@ -54,7 +54,7 @@ this.createjs = this.createjs||{};
 **/
 var DOMElement = function(htmlElement) {
   this.initialize(htmlElement);
-}
+};
 var p = DOMElement.prototype = new createjs.DisplayObject();
 
 // public properties:
@@ -67,10 +67,10 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 
 // private properties:
 	/**
-	 * @property _style
+	 * @property _oldMtx
 	 * @protected
 	 **/
-	p._style = null;
+	p._oldMtx = null;
 
 // constructor:
 	/**
@@ -90,15 +90,13 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 		this.DisplayObject_initialize();
 		this.mouseEnabled = false;
 		this.htmlElement = htmlElement;
-		if (htmlElement) {
-			this._style = htmlElement.style;
-			this._style.position = "absolute";
-			this._style.transformOrigin = this._style.WebkitTransformOrigin = this._style.msTransformOrigin = this._style.MozTransformOrigin = this._style.OTransformOrigin = "0% 0%";
-		}
+		var style = htmlElement.style;
+		// this relies on the _tick method because draw isn't called if a parent is not visible.
+		style.position = "absolute";
+		style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
 	}
 
 // public methods:
-	// TODO: fix this. Right now it's used internally to determine if it should be drawn, but DOMElement always needs to be drawn.
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.
@@ -121,71 +119,76 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * into itself).
 	 **/
 	p.draw = function(ctx, ignoreCache) {
-		// TODO: possibly save out previous matrix values, to compare against new ones (so layout doesn't need to fire if there is no change)
 		if (this.htmlElement == null) { return; }
 		var mtx = this.getConcatenatedMatrix(this._matrix);
 		
 		var o = this.htmlElement;
-		o.style.opacity = ""+mtx.alpha;
+		var style = o.style;
+		
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
-		o.style.visibility = this.visible ? "visible" : "hidden";
-		o.style.transform = o.style.WebkitTransform = o.style.OTransform =  o.style.msTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,(mtx.tx+0.5|0),(mtx.ty+0.5|0)+")"].join(",");
-		o.style.MozTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,(mtx.tx+0.5|0)+"px",(mtx.ty+0.5|0)+"px)"].join(",");
+		if (this.visible) { style.visibility = "visible"; }
+		else { return true; }
+		
+		var oMtx = this._oldMtx||{};
+		if (oMtx.alpha != mtx.alpha) { style.opacity = ""+mtx.alpha; oMtx.alpha = mtx.alpha; }
+		if (oMtx.tx != mtx.tx || oMtx.ty != mtx.ty || oMtx.a != mtx.a || oMtx.b != mtx.b || oMtx.c != mtx.c || oMtx.d != mtx.d) {
+			style.transform = style.WebkitTransform = style.OTransform =  style.msTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,(mtx.tx+0.5|0),(mtx.ty+0.5|0)+")"].join(",");
+			style.MozTransform = ["matrix("+mtx.a,mtx.b,mtx.c,mtx.d,(mtx.tx+0.5|0)+"px",(mtx.ty+0.5|0)+"px)"].join(",");
+			this._oldMtx = mtx.clone();
+		}
+		
 		return true;
-	}
+	};
 
 	/**
 	 * Not applicable to DOMElement.
 	 * @method cache
 	 */
-	p.cache = function() {}
+	p.cache = function() {};
 
 	/**
 	 * Not applicable to DOMElement.
 	 * @method uncache
 	 */
-	p.uncache = function() {}
+	p.uncache = function() {};
 
 	/**
 	 * Not applicable to DOMElement.
 	 * @method updateCache
 	 */
-	p.updateCache = function() {}
+	p.updateCache = function() {};
 
 	/**
 	 * Not applicable to DOMElement.
 	 * @method updateCache
 	 */
-	p.hitTest = function() {}
+	p.hitTest = function() {};
 
 	/**
 	 * Not applicable to DOMElement.
 	 * @method localToGlobal
 	 */
-	p.localToGlobal = function() {}
+	p.localToGlobal = function() {};
 
 	/**
 	 * Not applicable to DOMElement.
 	 * @method globalToLocal
 	 */
-	p.globalToLocal = function() {}
+	p.globalToLocal = function() {};
 
 	/**
 	 * Not applicable to DOMElement.
 	 * @method localToLocal
 	 */
-	p.localToLocal = function() {}
+	p.localToLocal = function() {};
 
 	/**
-	 * This presently clones the DOMElement instance, but not the associated HTMLElement.
+	 * DOMElement cannot be cloned. Throws an error.
 	 * @method clone
-	 * @return {DOMElement} a clone of the DOMElement instance.
 	 **/
 	p.clone = function() {
-		var o = new DOMElement();
-		this.cloneProps(o);
-		return o;
-	}
+		throw("DOMElement cannot be cloned.")
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -194,24 +197,25 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 **/
 	p.toString = function() {
 		return "[DOMElement (name="+  this.name +")]";
-	}
+	};
 
 // private methods:
-	p._tick = function(data) {
-		if (this.htmlElement == null) { return; }
-		this.htmlElement.style.visibility = "hidden";
-		if (this.onTick) { this.onTick(data); }
-	}
-
-	/* Not needed with current setup:
-	p._calculateVisible = function() {
-		var p = this;
-		while (p) {
-			if (!p.visible) { return false; }
-			p = p.parent;
-		}
-		return true;
-	}
-	*/
+	/**
+	 * @property DisplayObject__tick
+	 * @type Function
+	 * @protected
+	 **/
+	p.DisplayObject__tick = p._tick;
+	
+	/**
+	 * @method _tick
+	 * @protected
+	 **/
+	p._tick = function(params) {
+		// TODO: figure out how to get around this.
+		this.htmlElement.style.visible = "hidden";
+		this.DisplayObject__tick(params);
+	};
+	
 createjs.DOMElement = DOMElement;
 }());
