@@ -443,7 +443,7 @@ var p = Stage.prototype = new createjs.Container();
 		this._updatePointerPosition(id, pageX, pageY);
 		if (!inBounds && !o.inBounds && !this.mouseMoveOutside) { return; }
 		
-		if (this.onMouseMove || this.hasEventListener("mousemove"))  {
+		if (this.onMouseMove || this.hasEventListener("stagemousemove"))  {
 			evt = new createjs.MouseEvent("stagemousemove", o.x, o.y, this, e, id, id == this._primaryPointerID, o.rawX, o.rawY);
 			this.onMouseMove&&this.onMouseMove(evt);
 			this.dispatchEvent(evt);
