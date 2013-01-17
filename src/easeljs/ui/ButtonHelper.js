@@ -104,17 +104,17 @@ var p = ButtonHelper.prototype;
 	p.initialize = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
 		if (!target.addEventListener) { return; }
 		this.target = target;
+		target.cursor = "pointer";
 		this.overLabel = overLabel == null ? "over" : overLabel;
 		this.outLabel = outLabel == null ? "out" : outLabel;
 		this.downLabel = downLabel == null ? "down" : downLabel;
 		this.play = play;
-		target.cursor = "pointer";
 		this.setEnabled(true);
 		this.handleEvent({});
 		if (hitArea) {
 			if (hitLabel) {
 				hitArea.actionsEnabled = false;
-				hitArea.gotoAndStop(hitLabel);
+				hitArea.gotoAndStop&&hitArea.gotoAndStop(hitLabel);
 			}
 			target.hitArea = hitArea;
 		}
@@ -159,7 +159,7 @@ var p = ButtonHelper.prototype;
 	p.handleEvent = function(evt) {
 		var label = (evt.type == "mouseover" && !this._isPressed) || evt.type == "click" ? this.overLabel :
 				  		(evt.type == "mouseover" && this._isPressed) || evt.type == "mousedown" ? this.downLabel :
-						this.outLabel;
+						(this._isPressed) ? this.overLabel : this.outLabel;
 		
 		if (evt.type == "mousedown") {
 			this._isPressed = true;
@@ -169,10 +169,11 @@ var p = ButtonHelper.prototype;
 			return;
 		}
 		
+		var t = this.target;
 		if (this.play) {
-			this.target.gotoAndPlay(label);
+			t.gotoAndPlay&&t.gotoAndPlay(label);
 		} else {
-			this.target.gotoAndStop(label);
+			t.gotoAndStop&&t.gotoAndStop(label);
 		}
 	};
 
