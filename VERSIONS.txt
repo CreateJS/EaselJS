@@ -24,7 +24,12 @@ Version NEXT [not released]
 - added closePath support to Graphics.decodePath()
 - changed how animationEnd events are fired, to support calling stop() in the handler
 - animationEnd events now include a "next" value with the name of the next animation
+- event types for MouseEvents now follow DOM standards (mousedown, click, dblclick etc)
+- improved hitArea handling
+- added version.js
+- added MovieClip.currentFrame
 - documentation updates
+- new and improved build process, tools & documentation format
 
 
 Version 0.5.0 [Aug 24, 2012]

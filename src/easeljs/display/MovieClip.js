@@ -106,6 +106,13 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @default true
 	 */
 	p.loop = true;
+	
+	/**
+	 * Read-Only. The current frame of the movieclip.
+	 * @property currentFrame
+	 * @type Number
+	 */
+	p.currentFrame = 0;
 
 	/**
 	 * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
@@ -337,6 +344,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p._reset = function() {
 		this._prevPos = -1;
+		this.currentFrame = 0;
 	}
 	
 	/**
@@ -361,7 +369,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		
 		this._prevPosition = tl._prevPosition;
 		if (this._prevPos == tl._prevPos) { return; }
-		this._prevPos = tl._prevPos;
+		this.currentFrame = this._prevPos = tl._prevPos;
 		
 		for (var n in this._managed) { this._managed[n] = 1; }
 		
