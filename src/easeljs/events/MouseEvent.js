@@ -32,8 +32,8 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
- * This is passed as the parameter to onPress, onMouseMove, onMouseUp, onMouseDown, onMouseOver, onMouseOut and onClick
- * handlers on DisplayObject instances.
+ * This is passed as the parameter to mousedown, mouseup, mousemove, stagemouseup, stagemousedown, mouseover, mouseout
+ * and click events on {{#crossLink "DisplayObject"}}{{/crossLink}} instances.
  * @class MouseEvent
  * @uses EventDispatcher
  * @constructor

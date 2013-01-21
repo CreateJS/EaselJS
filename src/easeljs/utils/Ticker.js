@@ -33,15 +33,22 @@ this.createjs = this.createjs||{};
 
 // constructor:
 /**
-* The Ticker class uses a static interface (ex. Ticker.getPaused()) and should not be instantiated.
-* Provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe
-* to the tick event to be notified when a set time interval has elapsed.
-* Note that the interval that the tick event is called is a target interval, and may be broadcast
-* at a slower interval during times of high CPU load.
-* @class Ticker
-* @uses EventDispatcher
-* @static
-**/
+ * The Ticker provides  a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe to the tick
+ * event to be notified when a set time interval has elapsed.
+ *
+ * Note that the interval that the tick event is called is a target interval, and may be broadcast at a slower interval
+ * during times of high CPU load. The Ticker class uses a static interface (ex. <code>Ticker.getPaused()</code>) and should not be
+ * instantiated.
+ *
+ * <h4>Example</h4>
+ *      createjs.Ticker.addEventListener("tick", handleTick);
+ *      function handleTick(event) {
+ *          // Actions carried out each frame
+ *      }
+ * @class Ticker
+ * @uses EventDispatcher
+ * @static
+ **/
 var Ticker = function() {
 	throw "Ticker cannot be instantiated.";
 }
@@ -189,7 +196,7 @@ var Ticker = function() {
 	
 // public static methods:
 	/**
-	 * Adds a listener for the tick event. The listener must be either an object exposing a .tick() method,
+	 * Adds a listener for the tick event. The listener must be either an object exposing a <code>tick</code> method,
 	 * or a function. The listener will be called once each tick / interval. The interval is specified via the 
 	 * .setInterval(ms) method.
 	 * The tick method or function is passed two parameters: the elapsed time between the 

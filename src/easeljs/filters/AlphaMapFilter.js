@@ -34,13 +34,16 @@ this.createjs = this.createjs||{};
 /**
  * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
  * be copied from the red channel of the map, and the RGB channels will be copied from the target.
- * <br/><br/>
- * Generally, it is recommended that you use AlphaMaskFilter, because it has much better performance.
+ *
+ * Generally, it is recommended that you use {{#crossLink "AlphaMaskFilter"}}{{/crossLink}}, because it has much better
+ * performance.
+ *
+ * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters.
  * @class AlphaMapFilter
  * @extends Filter
  * @constructor
- * @param {Image} alphaMap The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
- * dimensions as the target.
+ * @param {Image} alphaMap The greyscale image (or canvas) to use as the alpha value for the result. This should be
+ * exactly the same dimensions as the target.
  **/
 var AlphaMapFilter = function(alphaMap) {
   this.initialize(alphaMap);

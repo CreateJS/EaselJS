@@ -35,10 +35,9 @@ this.createjs = this.createjs||{};
 
 
 /**
-* Inner class used by the Graphics class. Used to create the instruction lists used in Graphics:
+* Inner class used by the {{#crossLink "Graphics"}}{{/crossLink}} class. Used to create the instruction lists used in Graphics:
 * @class Command
 * @protected
-* @for Graphics
 * @constructor
 **/
 function Command(f, params, path) {
@@ -55,29 +54,35 @@ function Command(f, params, path) {
 Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
 
 /**
-* The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a specified context.
-* Note that you can use Graphics without any dependency on the Easel framework by calling draw() directly,
-* or it can be used with the Shape object to draw vector graphics within the context of an Easel display list.<br/><br/>
-* <pre><code>var g = new Graphics();
-*	g.setStrokeStyle(1);
-*	g.beginStroke(Graphics.getRGB(0,0,0));
-*	g.beginFill(Graphics.getRGB(255,0,0));
-*	g.drawCircle(0,0,3);
-*
-*	var s = new Shape(g);
-*		s.x = 100;
-*		s.y = 100;
-*
-*	stage.addChild(s);
-*	stage.update();</code></pre><br />
-* Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example, the following 
-* line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then render it to the specified 
-* context2D:<br />
-* <pre><code>myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
-* @class Graphics
-* @constructor
-* @for Graphics
-**/
+ * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a
+ * specified context. Note that you can use Graphics without any dependency on the Easel framework by calling {{#crossLink "DisplayObject/draw"}}{{/crossLink}}
+ * directly, or it can be used with the {{#crossLink "Shape"}}{{/crossLink}} object to draw vector graphics within the
+ * context of an Easel display list.
+ *
+ * <h4>Example</h4>
+ *      var g = new Graphics();
+ *	    g.setStrokeStyle(1);
+ *	    g.beginStroke(Graphics.getRGB(0,0,0));
+ *	    g.beginFill(Graphics.getRGB(255,0,0));
+ *	    g.drawCircle(0,0,3);
+ *
+ *	    var s = new Shape(g);
+ *	    	s.x = 100;
+ *	    	s.y = 100;
+ *
+ *	    stage.addChild(s);
+ *	    stage.update();
+ *
+ * Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example, the following
+ * line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then render it to the specified
+ * context2D:
+ *
+ *      myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
+ *
+ * @class Graphics
+ * @constructor
+ * @for Graphics
+ **/
 var Graphics = function() {
 	this.initialize();
 };

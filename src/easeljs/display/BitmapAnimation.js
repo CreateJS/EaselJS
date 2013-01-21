@@ -32,18 +32,24 @@ this.createjs = this.createjs||{};
 (function() {
 	
 /**
-* Displays frames or sequences of frames (ie. animations) from a sprite sheet image. A sprite sheet is a series of images
-* (usually animation frames) combined into a single image. For example, an animation
-* consisting of 8 100x100 images could be combined into a 400x200 sprite sheet (4 frames across by 2 high).
-* You can display individual frames, play frames as an animation, and even sequence animations
-* together. See the SpriteSheet class for more information on setting up frames and animations.
-* @class BitmapAnimation
-* @extends DisplayObject
-* @uses EventDispatcher
-* @constructor
-* @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
-* dimensions, and frame data. See SpriteSheet for more information.
-**/
+ * Displays frames or sequences of frames (ie. animations) from a sprite sheet image. A sprite sheet is a series of
+ * images (usually animation frames) combined into a single image. For example, an animation consisting of 8 100x100
+ * images could be combined into a 400x200 sprite sheet (4 frames across by 2 high). You can display individual frames,
+ * play frames as an animation, and even sequence animations together.
+ *
+ * See the {{#crossLink "SpriteSheet"}}{{/crossLink}} class for more information on setting up frames and animations.
+ *
+ * <h4>Example</h4>
+ *      var instance = new createjs.BitmapAnimation(spriteSheet);
+ *      instance.gotoAndStop("frameName");
+ *
+ * @class BitmapAnimation
+ * @extends DisplayObject
+ * @uses EventDispatcher
+ * @constructor
+ * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
+ * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
+ **/
 var BitmapAnimation = function(spriteSheet) {
   this.initialize(spriteSheet);
 }

@@ -27,11 +27,73 @@
 */
 
 /**
-* The EaselJS Javascript library provides a retained graphics mode for canvas
-* including a full, hierarchical display list, a core interaction model, and
-* helper classes to make working with 2D graphics in Canvas much easier.
-* @module EaselJS
-**/
+ * The EaselJS Javascript library provides a retained graphics mode for canvas including a full hierarchical display
+ * list, a core interaction model, and helper classes to make working with 2D graphics in Canvas much easier.
+ * EaselJS provides straight forward solutions for working with rich graphics and interactivity with HTML5 Canvas...
+ *
+ * <h4>Getting Started</h4>
+ * To get started with Easel, create a {{#crossLink "Stage"}}{{/crossLink}} that wraps a CANVAS element, and add
+ * {{#crossLink "DisplayObject"}}{{/crossLink}} instances as children. EaselJS supports:
+ * <ul>
+ *      <li>Images using {{#crossLink "Bitmap"}}{{/crossLink}}</li>
+ *      <li>Vector graphics using {{#crossLink "Shape"}}{{/crossLink}} and {{#crossLink "Graphics"}}{{/crossLink}}</li>
+ *      <li>Animated bitmaps using {{#crossLink "SpriteSheet"}}{{/crossLink}} and {{#crossLink "BitmapAnimation"}}{{/crossLink}}
+ *      <li>Simple text instances using {{#crossLink "Text"}}{{/crossLink}}</li>
+ *      <li>Containers that hold other DisplayObjects using {{#crossLink "Container"}}{{/crossLink}}</li>
+ *      <li>Control HTML DOM elements using {{#crossLink "DOMElement"}}{{/crossLink}}</li>
+ * </ul>
+ *
+ * All display objects can be added to the stage as children, or drawn to a canvas directly.
+ *
+ * <b>User Interactions</b><br />
+ * All display objects on stage (except DOMElement) will dispatch events when interacted with using a mouse or
+ * touch. EaselJS supports hover, press, and release events, as well as an easy-to-use drag-and-drop model. Check out
+ * {{#crossLink "MouseEvent"}}{{/crossLink}} for more information.
+ *
+ * <h4>Simple Example</h4>
+ * This example illustrates how to create and position a {{#crossLink "Shape"}}{{/crossLink}} on the {{#crossLink "Stage"}}{{/crossLink}}
+ * using EaselJS' drawing API.
+ *
+ *	    //Create a stage by getting a reference to the canvas
+ *	    stage = new createjs.Stage("demoCanvas");
+ *	    //Create a Shape DisplayObject.
+ *	    circle = new createjs.Shape();
+ *	    circle.graphics.beginFill("red").drawCircle(0, 0, 40);
+ *	    //Set position of Shape instance.
+ *	    circle.x = circle.y = 50;
+ *	    //Add Shape instance to stage display list.
+ *	    stage.addChild(circle);
+ *	    //Update stage will render next frame
+ *	    stage.update();
+ *
+ * <b>Simple Animation Example</b><br />
+ * This example moves the shape created in the previous demo across the screen.
+ *
+ *	    //Update stage will render next frame
+ *	    createjs.Ticker.addEventListener("tick", handleTick);
+ *
+ *	    function handleTick() {
+ *          //Circle will move 10 units to the right.
+ *	    	circle.x += 10;
+ *	    	//Will cause the circle to wrap back
+ * 	    	if (circle.x > stage.canvas.width) { circle.x = 0; }
+ *	    	stage.update();
+ *	    }
+ *
+ * <h4>Other Features</h4>
+ * EaselJS also has built in support for
+ * <ul><li>Canvas features such as {{#crossLink "Shadow"}}{{/crossLink}} and CompositeOperation</li>
+ *      <li>{{#crossLink "Ticker"}}{{/crossLink}}, a global heartbeat that objects can subscribe to</li>
+ *      <li>Filters, including a provided {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}, {{#crossLink "AlphaMaskFilter"}}{{/crossLink}},
+ *      {{#crossLink "AlphaMapFilter"}}{{/crossLink}}, and {{#crossLink "BoxBlurFilter"}}{{/crossLink}}. See {{#crossLink "Filter"}}{{/crossLink}}
+ *      for more information</li>
+ *      <li>A {{#crossLink "ButtonHelper"}}{{/crossLink}} utility, to easily create interactive buttons</li>
+ *      <li>{{#crossLink "SpriteSheetUtils"}}{{/crossLink}} and a {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} to
+ *      help build and manage {{#crossLink "SpriteSheet"}}{{/crossLink}} functionality at run-time.</li>
+ * </ul>
+ *
+ * @module EaselJS
+ */
 
 // namespace:
 this.createjs = this.createjs||{};
@@ -39,13 +101,15 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
-* Container, Bitmap, and Shape. DisplayObject is the base class for all display classes in the EaselJS library.
-* It defines the core properties and methods that are shared between all display objects.
-* @class DisplayObject
-* @uses EventDispatcher
-* @constructor
-**/
+ * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
+ * {{#crossLink "Container"}}{{/crossLink}}, {{#crossLink "Bitmap"}}{{/crossLink}}, and {{#crossLink "Shape"}}{{/crossLink}}.
+ * DisplayObject is the base class for all display classes in the EaselJS library. It defines the core properties and
+ * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
+ * caching, and mouse handlers.
+ * @class DisplayObject
+ * @uses EventDispatcher
+ * @constructor
+ **/
 var DisplayObject = function() {
   this.initialize();
 }
@@ -189,7 +253,7 @@ var p = DisplayObject.prototype;
 	 * one. READ-ONLY.
 	 * @property parent
 	 * @final
-	 * @type DisplayObject
+	 * @type Container
 	 * @default null
 	 **/
 	p.parent = null;

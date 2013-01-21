@@ -34,8 +34,17 @@ this.createjs = this.createjs||{};
 
 // TODO: support for double tap.
 /**
- * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API
- * (iOS & modern Android browser) and IE10.
+ * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API (iOS and
+ * modern Android browser) and IE10.
+ *
+ * Ensure that you {{#crossLink "Touch/disable"}}{{/crossLink}} touch when cleaning up your application.
+ * Note that you do not have to check if touch is supported to enable it, as it will fail gracefully if it is not
+ * supported.
+ *
+ * <h4>Example</h4>
+ *      var stage = new createjs.Stage("canvas");
+ *      createjs.Touch.enable(stage);
+ *
  * @class Touch
  * @static
  **/
@@ -47,7 +56,7 @@ var Touch = function() {
 	/**
 	 * Returns true if touch is supported in the current browser.
 	 * @method isSupported
-	 * @return {Boolean} A boolean indicating whether touch is supported in the current browser.
+	 * @return {Boolean} Indicates whether touch is supported in the current browser.
 	 * @static
 	 **/
 	Touch.isSupported = function() {
@@ -62,8 +71,9 @@ var Touch = function() {
 	 * double click or over/out events. See MouseEvent.pointerID for more information.
 	 * @method enable
 	 * @param {Stage} stage The stage to enable touch on.
-	 * @param {Boolean} singleTouch If true, only a single touch will be active at a time. Default is false.
-	 * @param {Boolean} allowDefault If true, then default gesture actions (ex. scrolling, zooming) will be allowed when the user is interacting with the target canvas. Default is false.
+	 * @param {Boolean} [singleTouch=false] If true, only a single touch will be active at a time.
+	 * @param {Boolean} [allowDefault=false] If true, then default gesture actions (ex. scrolling, zooming) will be
+	 * allowed when the user is interacting with the target canvas.
 	 * @return {Boolean} Returns true if touch was successfully enabled on the target stage.
 	 * @static
 	 **/
@@ -80,7 +90,7 @@ var Touch = function() {
 		return true;
 	};
 	
-/**
+	/**
 	 * Removes all listeners that were set up when calling Touch.enable on a stage.
 	 * @method disable
 	 * @param {Stage} stage The stage to disable touch on.

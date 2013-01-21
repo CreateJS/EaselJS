@@ -3,7 +3,6 @@
 /**
  * Static class holding library specific information such as the version and buildDate of
  * the library.
- * @class MovieClip
  **/
 var o = this.createjs = this.createjs||{};
 o = (o.MovieClip = o.MovieClip||{});
@@ -11,6 +10,7 @@ o = (o.MovieClip = o.MovieClip||{});
 /**
  * The version string for this release.
  * @property version
+ * @for MovieClip
  * @type String
  * @static
  **/
@@ -19,6 +19,7 @@ o.version = /*version*/"NEXT"; // injected by build process
 /**
  * The build date for this release in UTC format.
  * @property buildDate
+ * @for MovieClip
  * @type String
  * @static
  **/
