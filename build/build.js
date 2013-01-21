@@ -147,7 +147,7 @@ function main(argv)
 		displayUsage();
 		process.exit(0);
 	}
-
+    
 	if(shouldBuildSource)
 	{
 		buildSourceTask(function(success)
@@ -200,7 +200,7 @@ function buildSourceTask(completeHandler)
 	{
 		FILE.mkdirSync(OUTPUT_DIR_NAME);
 	}
-	
+    
 	js_file_name = js_file_name.split("%VERSION%").join(version);
 
 	var file_args = [];
@@ -273,6 +273,11 @@ function buildSourceTask(completeHandler)
 
 function buildDocsTask(version, completeHandler)
 {	
+    if(!FILE.existsSync(OUTPUT_DIR_NAME))
+	{
+		FILE.mkdirSync(OUTPUT_DIR_NAME);
+	}
+    
 	var parser_in="../src";
 	var	parser_out= PATH.join(TMP_DIR_NAME , "parser");
 
