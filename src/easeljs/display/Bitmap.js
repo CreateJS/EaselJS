@@ -119,14 +119,14 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	 * @private
 	 **/
 	p.DisplayObject_draw = p.draw;
-	
+
 	/**
 	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache. 
+	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
@@ -146,19 +146,19 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should not cache Bitmap instances as it can degrade performance.
+	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
 	 * @method cache
 	 **/
 	
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should not cache Bitmap instances as it can degrade performance.
+	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
 	 * @method updateCache
 	 **/
 	
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should not cache Bitmap instances as it can degrade performance.
+	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
 	 * @method uncache
 	 **/
 	

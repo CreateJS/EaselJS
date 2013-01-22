@@ -39,7 +39,7 @@ this.createjs = this.createjs||{};
  * @class ColorMatrixFilter
  * @constructor
  * @extends Filter
- * @param {Array[Number]} matrix A 4x5 matrix describing the color operation to perform. See also the ColorMatrix class.
+ * @param {Array} matrix A 4x5 matrix describing the color operation to perform. See also the ColorMatrix class.
  **/
 var ColorMatrixFilter = function(matrix) {
   this.initialize(matrix);
@@ -54,7 +54,7 @@ var p = ColorMatrixFilter.prototype = new createjs.Filter();
 	/** 
 	 * @method initialize
 	 * @protected
-	 * @param {Array[Number]} matrix A 4x5 matrix describing the color operation to perform.
+	 * @param {Array} matrix A 4x5 matrix describing the color operation to perform.
 	 **/
 	p.initialize = function(matrix) {
 		this.matrix = matrix;

@@ -24,8 +24,8 @@
 		"/../src/easeljs/display/DOMElement.js",
 		"/../src/easeljs/filters/Filter.js",
 		"/../src/easeljs/ui/Touch.js",
-        "/../src/easeljs/version.js",
-        "/../src/easeljs/version_movieclip.js"
+		"/../src/easeljs/display/MovieClip.js",
+        "/../src/easeljs/version.js"
         ],
 		"JS_FILE_NAME" : "easeljs-%VERSION%.min.js",
 		"PROJECT_NAME" : "EaselJS",

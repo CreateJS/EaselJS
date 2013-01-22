@@ -74,7 +74,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * params: the first will be a reference to this instance, the second will be the name of the animation
 	 * that just ended, and the third will be the name of the next animation that will be played.
 	 * @property onAnimationEnd
-	 * @type Function
+	 * @type {Function}
 	 * @deprecated In favour of the "animationend" event. Will be removed in a future version.
 	 */
 	p.onAnimationEnd = null;
@@ -83,7 +83,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * The frame that will be drawn when draw is called. Note that with some SpriteSheet data, this
 	 * will advance non-sequentially. READ-ONLY.
 	 * @property currentFrame
-	 * @type Number
+	 * @type {Number}
 	 * @default -1
 	 **/
 	p.currentFrame = -1;
@@ -91,53 +91,53 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	/**
 	 * Returns the currently playing animation. READ-ONLY.
 	 * @property currentAnimation
-	 * @type String
+	 * @type {String}
 	 * @final
 	 **/
 	p.currentAnimation = null; // READ-ONLY
 
 	/**
 	 * Prevents the animation from advancing each tick automatically. For example, you could create a sprite
-	 * sheet of icons, set paused to true, and display the appropriate icon by setting currentFrame.
+	 * sheet of icons, set paused to true, and display the appropriate icon by setting <code>currentFrame</code>.
 	 * @property paused
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @default false
 	 **/
 	p.paused = true;
 
 	/**
 	 * The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame
-	 * data. See SpriteSheet for more information.
+	 * data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
 	 * @property spriteSheet
-	 * @type SpriteSheet
+	 * @type {SpriteSheet}
 	 **/
 	p.spriteSheet = null;
 
 	/**
-	 * Whether or not the Bitmap should be draw to the canvas at whole pixel coordinates.
+	 * Whether or not the image should be draw to the canvas at whole pixel coordinates.
 	 * @property snapToPixel
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @default true
 	 **/
 	p.snapToPixel = true;
 	
 	/** 
-	 * When used in conjunction with animations having an frequency greater than 1, this lets you offset which tick the playhead will
-	 * advance on. For example, you could create two BitmapAnimations, both playing an animation with a frequency of 2, but one
-	 * having offset set to 1. Both instances would advance every second tick, but they would advance on alternating
-	 * ticks (effectively, one instance would advance on odd ticks, the other on even ticks).
+	 * When used in conjunction with animations having an frequency greater than 1, this lets you offset which tick the
+	 * playhead will advance on. For example, you could create two BitmapAnimations, both playing an animation with a
+	 * frequency of 2, but one having offset set to 1. Both instances would advance every second tick, but they would
+	 * advance on alternating ticks (effectively, one instance would advance on odd ticks, the other on even ticks).
 	 * @property offset
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 */
 	p.offset = 0;
 	
 	
 	/**
-	 * Specifies the current frame index within the current playing animation. When playing normally, this will
-	 * increase successively from 0 to n-1, where n is the number of frames in the current animation.
+	 * Specifies the current frame index within the current playing animation. When playing normally, this will increase
+	 * successively from 0 to n-1, where n is the number of frames in the current animation.
 	 * @property currentAnimationFrame
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p.currentAnimationFrame = 0;
@@ -156,7 +156,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	/**
 	 * @property _advanceCount
 	 * @protected
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p._advanceCount = 0;
@@ -164,7 +164,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	/**
 	 * @property _animation
 	 * @protected
-	 * @type Object
+	 * @type {Object}
 	 * @default null
 	 **/
 	p._animation = null;
@@ -172,7 +172,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 // constructor:
 	/**
 	 * @property DisplayObject_initialize
-	 * @type Function
+	 * @type {Function}
 	 * @private
 	 **/
 	p.DisplayObject_initialize = p.initialize;
@@ -201,12 +201,12 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 
 	/**
 	 * @property DisplayObject_draw
-	 * @type Function
+	 * @type {Function}
 	 * @private
 	 **/
 	p.DisplayObject_draw = p.draw;
 
-/**
+	/**
 	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
@@ -248,7 +248,9 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 **/
 	
 	/**
-	 * TODO: Doc.
+	 * Begin playing a paused animation. The BitmapAnimation will be paused if either {{#crossLink "BitmapAnimation/stop"}}{{/crossLink}}
+	 * or {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} is called. Single frame animations will remain
+	 * unchanged.
 	 * @method play
 	 **/
 	p.play = function() {
@@ -256,7 +258,9 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	}
 	
 	/**
-	 * TODO: Doc.
+	 * Stop playing a running animation. The BitmapAnimation will be playing if {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}}
+	 * is called. Note that calling {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}} or {{#crossLink "BitmapAnimation/play"}}{{/crossLink}}
+	 * will resume playback.
 	 * @method stop
 	 **/
 	p.stop = function() {
@@ -296,18 +300,22 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	}
 	
 	/**
-	 * Returns a Rectangle instance defining the bounds of the current frame relative to the origin. For example, a
-	 * 90 x 70 frame with a regX of 50 and a regY of 40 would return a rectangle with [x=-50, y=-40, width=90, height=70].
-	 * See also: SpriteSheet.getFrameBounds().
+	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the current frame relative to
+	 * the origin. For example, a 90 x 70 frame with <code>regX=50</code> and <code>regY=40</code> would return a
+	 * rectangle with [x=-50, y=-40, width=90, height=70].
+	 *
+	 * Also see the SpriteSheet {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}} method.
 	 * @method getBounds
-	 * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.
+	 * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully
+	 * loaded.
 	 **/
 	p.getBounds = function() {
 		return this.spriteSheet.getFrameBounds(this.currentFrame);
 	}
 
 	/**
-	 * Returns a clone of the BitmapAnimation instance.
+	 * Returns a clone of the BitmapAnimation instance. Note that the same SpriteSheet is shared between cloned
+	 * instances.
 	 * @method clone
 	 * @return {BitmapAnimation} a clone of the BitmapAnimation instance.
 	 **/
@@ -329,13 +337,14 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 // private methods:
 	/**
 	 * @property DisplayObject__tick
-	 * @type Function
+	 * @type {Function}
 	 * @private
 	 **/
 	p.DisplayObject__tick = p._tick;
 	
 	/**
-	 * Advances the currentFrame if paused is not true. This is called automatically when the Stage ticks.
+	 * Advances the <code>currentFrame</code> if paused is not true. This is called automatically when the {{#crossLink "Stage"}}{{/crossLink}}
+	 * ticks.
 	 * @protected
 	 * @method _tick
 	 **/
@@ -384,11 +393,11 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	}
 	
 	/**
-	 * Dispatches the animationend event. Returns true if a handler changed the animation (ex. calling stop(),
-	 * gotoAndPlay(), etc.)
+	 * Dispatches the "animationend" event. Returns true if a handler changed the animation (ex. calling {{#crossLink "BitmapAnimation/stop"}}{{/crossLink}},
+	 * {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}}, etc.)
 	 * @property _dispatchAnimationEnd
 	 * @private
-	 * @type Function
+	 * @type {Function}
 	 **/
 	p._dispatchAnimationEnd = function(animation, frame, paused, next, end) {
 		var name = animation ? animation.name : null;
@@ -401,7 +410,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	/**
 	 * @property DisplayObject_cloneProps
 	 * @private
-	 * @type Function
+	 * @type {Function}
 	 **/
 	p.DisplayObject_cloneProps = p.cloneProps;
 

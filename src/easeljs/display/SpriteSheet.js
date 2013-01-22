@@ -76,7 +76,7 @@ this.createjs = this.createjs||{};
  * 	        	// start, end, next, frequency
  * 	        	run: [0,8],
  * 	        	jump: [9,12,"run",2],
- * 	        	stand: [13]
+ * 	        	stand: 13
  * 	        }
  *
  *          // the complex approach which specifies every frame in the animation by index.
@@ -100,7 +100,7 @@ this.createjs = this.createjs||{};
  * 	        		next: "run",
  * 	        		frequency: 2
  * 	        	},
- * 	        	stand:7
+ * 	        	stand: 7
  * 	        }
  *      }
  *

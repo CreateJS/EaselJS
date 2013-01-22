@@ -294,7 +294,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @method clone
 	 **/
 	p.clone = function() {
-		// TODO: add support for this?? Need to clone the Timeline & retarget tweens - pretty complex.
+		// TODO: add support for this? Need to clone the Timeline & retarget tweens - pretty complex.
 		throw("MovieClip cannot be cloned.")
 	}
 	
@@ -437,7 +437,8 @@ createjs.MovieClip = MovieClip;
 
 
 	/**
-	 * This plugin works with TweenJS to prevent the startPosition property from tweening.
+	 * This plugin works with <a href="http://tweenjs.com" target="_blank">TweenJS</a> to prevent the startPosition
+	 * property from tweening.
 	 * @private
 	 * @class MovieClipPlugin
 	 * @constructor
