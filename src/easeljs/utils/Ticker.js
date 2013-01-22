@@ -75,7 +75,7 @@ var Ticker = function() {
 	 * 20, 30, 60).
 	 * @property useRAF
 	 * @static
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @default false
 	 **/
 	Ticker.useRAF = false;
@@ -95,42 +95,42 @@ var Ticker = function() {
 	
 	/** 
 	 * @property _listeners
-	 * @type Array[Object]
+	 * @type {Array}
 	 * @protected 
 	 **/
 	Ticker._listeners = null;
 	
 	/** 
 	 * @property _pauseable
-	 * @type Array[Boolean]
+	 * @type {Array}
 	 * @protected 
 	 **/
 	Ticker._pauseable = null;
 	
 	/** 
 	 * @property _paused
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @protected 
 	 **/
 	Ticker._paused = false;
 	
 	/** 
 	 * @property _inited
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @protected 
 	 **/
 	Ticker._inited = false;
 	
 	/** 
 	 * @property _startTime
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._startTime = 0;
 	
 	/** 
 	 * @property _pausedTime
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._pausedTime=0;
@@ -138,7 +138,7 @@ var Ticker = function() {
 	/** 
 	 * Number of ticks that have passed
 	 * @property _ticks
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._ticks = 0;
@@ -146,49 +146,49 @@ var Ticker = function() {
 	/**
 	 * Number of ticks that have passed while Ticker has been paused
 	 * @property _pausedTicks
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._pausedTicks = 0;
 	
 	/** 
 	 * @property _interval
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._interval = 50; // READ-ONLY
 	
 	/** 
 	 * @property _lastTime
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._lastTime = 0;
 	
 	/** 
 	 * @property _times
-	 * @type Array[Number]
+	 * @type {Array}
 	 * @protected 
 	 **/
 	Ticker._times = null;
 	
 	/** 
 	 * @property _tickTimes
-	 * @type Array[Number]
+	 * @type {Array}
 	 * @protected 
 	 **/
 	Ticker._tickTimes = null;
 	
 	/** 
 	 * @property _rafActive
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @protected 
 	 **/
 	Ticker._rafActive = false;
 	
 	/** 
 	 * @property _timeoutID
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._timeoutID = null;

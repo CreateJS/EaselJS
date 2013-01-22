@@ -58,10 +58,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 
 // public properties:
 	/**
-	 * The array of children in the display list. You should usually use the child management methods,
+	 * The array of children in the display list. You should usually use the child management methods such as {{#crossLink "Container/addChild"}}{{/crossLink}},
+	 * {{#crossLink "Container/removeChild"}}{{/crossLink}}, {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc,
 	 * rather than accessing this directly, but it is included for advanced users.
 	 * @property children
-	 * @type Array[DisplayObject]
+	 * @type Array
 	 * @default null
 	 **/
 	p.children = null;
@@ -379,7 +380,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @method getObjectsUnderPoint
 	 * @param {Number} x The x position in the container to test.
 	 * @param {Number} y The y position in the container to test.
-	 * @return {Array[DisplayObject]} An Array of DisplayObjects under the specified coordinates.
+	 * @return {Array} An Array of DisplayObjects under the specified coordinates.
 	 **/
 	p.getObjectsUnderPoint = function(x, y) {
 		var arr = [];
@@ -458,7 +459,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @param {Array} arr
 	 * @param {Number} mouseEvents A bitmask indicating which event types to look for. Bit 1 specifies press &
 	 * click & double click, bit 2 specifies it should look for mouse over and mouse out. This implementation may change.
-	 * @return {Array[DisplayObject]}
+	 * @return {Array}
 	 * @protected
 	 **/
 	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {

@@ -4,7 +4,7 @@
     "description": "EaselJS API.",
 
     "url": "http://www.createjs.com/#!/EaselJS",
-    "logo":"http://alpha.createjs.com/resources/SuiteIcons/EaselJS/docs-icon-EaselJS.png",
+    "logo":"http://createjs.com/resources/SuiteIcons/EaselJS/docs-icon-EaselJS.png",
     "options": {
         "outdir": "./output",
         "linkNatives": "true",
