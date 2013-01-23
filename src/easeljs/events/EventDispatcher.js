@@ -143,7 +143,7 @@ var p = EventDispatcher.prototype;
 	
 	/**
 	 * Removes all listeners for the specified type, or all listeners of all types.
-	 * @method removeEventListener
+	 * @method removeAllEventListeners
 	 * @param {String} [type] The string type of the event. If omitted, all listeners for all types will be removed.
 	 **/
 	p.removeAllEventListeners = function(type) {
