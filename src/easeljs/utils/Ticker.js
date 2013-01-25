@@ -431,15 +431,15 @@ var Ticker = function() {
 		Ticker._lastTime = time;
 		
 		var totalElapsed = time - Ticker._startTime;
-		var runTime = totalElapsed - Ticker._pausedTime;
+		var runTimeElapsed = totalElapsed - Ticker._pausedTime;
 		var pauseable = Ticker._pauseable;
 		var listeners = Ticker._listeners.slice();
 		var l = listeners ? listeners.length : 0;
 		for (var i=0; i<l; i++) {
 			var listener = listeners[i];
 			if (listener == null || (paused && pauseable[i])) { continue; }
-			if (listener.tick) { listener.tick(elapsedTime, paused, runTime, totalElapsed); }
-			else if (listener instanceof Function) { listener(elapsedTime, paused, runTime, totalElapsed); }
+			if (listener.tick) { listener.tick(elapsedTime, paused, runTimeElapsed, totalElapsed); }
+			else if (listener instanceof Function) { listener(elapsedTime, paused, runTimeElapsed, totalElapsed); }
 		}
 		
 		Ticker.dispatchEvent({type:"tick", paused:paused, delta:elapsedTime, time:time, runTime:time-Ticker._pausedTime})
