@@ -431,18 +431,27 @@ var Ticker = function() {
 		Ticker._lastTime = time;
 		
 		var totalElapsed = time - Ticker._startTime;
-		var runTimeElapsed = totalElapsed - Ticker._pausedTime;
+		var tickEvent = {
+			type:'tick',
+			paused: paused,
+			delta: elapsedTime,
+			time: totalElapsed,
+			runTime: totalElapsed - Ticker._pausedTime,
+			ticks: this._ticks,
+			runTicks: this._ticks - this._pausedTicks
+		};
+
 		var pauseable = Ticker._pauseable;
 		var listeners = Ticker._listeners.slice();
 		var l = listeners ? listeners.length : 0;
 		for (var i=0; i<l; i++) {
 			var listener = listeners[i];
 			if (listener == null || (paused && pauseable[i])) { continue; }
-			if (listener.tick) { listener.tick(elapsedTime, paused, runTimeElapsed, totalElapsed); }
-			else if (listener instanceof Function) { listener(elapsedTime, paused, runTimeElapsed, totalElapsed); }
+			if (listener.tick) { listener.tick(tickEvent); }
+			else if (listener instanceof Function) { listener(tickEvent); }
 		}
 		
-		Ticker.dispatchEvent({type:"tick", paused:paused, delta:elapsedTime, time:time, runTime:time-Ticker._pausedTime})
+		Ticker.dispatchEvent(tickEvent);
 		
 		Ticker._tickTimes.unshift(Ticker._getTime()-time);
 		while (Ticker._tickTimes.length > 100) { Ticker._tickTimes.pop(); }
