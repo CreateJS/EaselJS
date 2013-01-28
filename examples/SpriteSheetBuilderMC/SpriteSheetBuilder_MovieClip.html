@@ -61,14 +61,14 @@
 		builder.scale = scale;
 		builder.maxWidth = 1024;
 		builder.addMovieClip(mc);
-		builder.onComplete = buildComplete;
+		builder.addEventListener("complete" ,buildComplete);
 		builder.buildAsync();
 		
 		// append the generated spritesheet image for demo purposes:
 		document.body.appendChild(builder._data.images[0]);
 		
 		Ticker.setFPS(30);
-		Ticker.addListener(stage);
+		Ticker.addEventListener("tick", function() { stage.update(); } );
 	}
 	
 	function buildComplete(builder) {

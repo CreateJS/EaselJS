@@ -65,7 +65,7 @@
 		// we can reuse the Graphics instance in another shape if we'd like to transform it differently.
 		stage.addChild(star);
 
-		createjs.Ticker.addListener(window);
+		createjs.Ticker.addEventListener("tick", tick);
 	}
 	
 	function tick() {

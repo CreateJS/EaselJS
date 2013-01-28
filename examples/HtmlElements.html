@@ -41,6 +41,7 @@
 		content.regX = 165;
 		content.regY = 135;
 		//content.visible = false;
+
 		
 		container.addChild(frame, content);
 		container.x = 300; container.y = 200;
@@ -49,7 +50,7 @@
 		container.scaleX = 1.5;
 		//container.visible = false;
 		
-		createjs.Ticker.addListener(this);
+		createjs.Ticker.addEventListener("tick", tick);
 	}
 	
 	function tick() {
@@ -73,7 +74,8 @@
 			<b>Hello! I'm an HTML div.</b><br/><br/>
 			I am not rendered to the canvas, but I can be included in the display list for positioning and transformations.<br/><br/>
 			This means I can contain any HTML content (rich text, forms, video, etc), but I'm not a full part of the EaselJS display list.<br/><br/>
-			<a href="http://easeljs.com/">This is a link</a>
+			<button id="btn" width="100" onclick="alert('hello')">This is a button!</button>
+            <a href="http://easeljs.com/">This is a link</a>
 		</div>
 		<canvas id="testCanvas" width="960" height="300"></canvas>
 	</div>

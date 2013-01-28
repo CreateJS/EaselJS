@@ -37,7 +37,7 @@
         }
 
         function stop() {
-			createjs.Ticker.removeListener(window);
+			createjs.Ticker.removeEventListener("tick", tick);
         }
 
         function handleImageLoad() {
@@ -53,7 +53,7 @@
             stage.addChild(bmp);
             stage.update();
 
-			createjs.Ticker.addListener(window);
+			createjs.Ticker.addEventListener("tick", tick);
         }
 
         function tick() {
