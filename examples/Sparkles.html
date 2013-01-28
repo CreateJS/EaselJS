@@ -34,11 +34,11 @@ function init() {
 	// create a new stage and point it at our canvas:
 	canvas = document.getElementById("testCanvas");
 	stage = new createjs.Stage(canvas);
-	
+	stage.enableEvents(true)
 	// attach mouse handlers directly to the source canvas.
 	// better than calling from canvas tag for cross browser compatibility:
-	stage.onMouseMove = moveCanvas;
-	stage.onMouseDown = clickCanvas;
+	stage.addEventListener("stagemousemove", moveCanvas);
+	stage.addEventListener("stagemousedown", clickCanvas);
 
 	// define simple sprite sheet data specifying the image(s) to use, the size of the frames,
 	// and the registration point of the frame
@@ -59,7 +59,7 @@ function init() {
 
 	// start the tick and point it at the window so we can do some work before updating the stage:
 	createjs.Ticker.setFPS(20);
-	createjs.Ticker.addListener(window);
+	createjs.Ticker.addEventListener("tick", tick);
 }
 
 

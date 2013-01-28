@@ -56,12 +56,12 @@
 		stage.addChild(moon);
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
-		createjs.Ticker.addListener(window);
+		createjs.Ticker.addEventListener("tick", tick);
 		createjs.Ticker.setFPS(30);
 	}
 
 	function stop() {
-		createjs.Ticker.removeListener(window);
+		createjs.Ticker.removeEventListener("tick", tick);
 	}
 
 	function tick() {

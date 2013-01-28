@@ -112,11 +112,11 @@
             stage.addChild(container);
             stage.update();
 
-			createjs.Ticker.addListener(window);
+			createjs.Ticker.addEventListener("tick", tick);
         }
 
         function stop() {
-			createjs.Ticker.removeListener(window);
+			createjs.Ticker.removeEventListener("tick", tick);
         }
 
         function move(segA, segB, segC, p_rate) {

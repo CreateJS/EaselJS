@@ -57,7 +57,7 @@
 	}
 
 	function stop() {
-		Ticker.removeListener(window);
+		createjs.Ticker.removeEventListener.("tick", tick);
 	}
 
 	function handleImageLoad(event) {
@@ -110,7 +110,7 @@
 		}
 
 		document.getElementById("loader").className = "";
-		createjs.Ticker.addListener(window);
+		createjs.Ticker.addEventListener("tick", tick);
 	}
 
 	function tick() {

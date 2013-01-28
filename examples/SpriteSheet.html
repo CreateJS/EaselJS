@@ -61,8 +61,8 @@
 
 		spriteSheet ={"animations": {"run": [0, 25], "jump": [26, 63]}, "images": ["assets/runningGrant.png"], "frames": {"regX": 0, "height": 292.5, "count": 64, "regY": 0, "width": 165.75}};
 
-		var ss = new SpriteSheet(spriteSheet);
-		grant = new BitmapAnimation(ss);
+		var ss = new createjs.SpriteSheet(spriteSheet);
+		grant = new createjs.BitmapAnimation(ss);
 
 		// Set up looping
 		ss.getAnimation("run").next = "run";
@@ -102,17 +102,17 @@
 
 		function handleComplete() {
 			for(var i=0;i<assets.length;i++) {
-				var item = assets[i]; //loader.getResult(id);
+				var item = assets[i];
 				var id = item.id;
 				var result = item.result;
 
 				if (item.type == PreloadJS.IMAGE) {
-					var bmp = new Bitmap(result);
+					var bmp = new createjs.Bitmap(result);
 				}
 
 				switch (id) {
 					case "sky":
-						sky = new Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,w,h));
+						sky = new createjs.Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,w,h));
 						break;
 					case "ground":
 						ground = new Shape();
@@ -122,13 +122,13 @@
 						ground.y = h-79;
 						break;
 					case "hill":
-						hill = new Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,282,59));
+						hill = new createjs.Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,282,59));
 						hill.x = Math.random() * w;
 						hill.scaleX = hill.scaleY = 3;
 						hill.y = 144;
 						break;
 					case "hill2":
-						hill2 = new Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,212,50));
+						hill2 = new createjs.Shape(new Graphics().beginBitmapFill(result).drawRect(0,0,212,50));
 						hill2.x = Math.random() * w;
 						hill2.scaleX = hill2.scaleY = 3;
 						hill2.y = 171;
@@ -144,10 +144,10 @@
 			}
 
 			stage.addChild(sky, ground, hill, hill2, grant);
-			stage.onMouseDown = handleJumpStart;
+			stage.addEventListener("stagemousedown", handleJumpStart);
 
-			Ticker.setFPS(40);
-			Ticker.addListener(window);
+            createjs.Ticker.setFPS(40);
+			createjs.Ticker.addEventListener("tick", tick);
 		}
 
 		function handleJumpStart() {

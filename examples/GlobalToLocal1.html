@@ -47,9 +47,11 @@
 
 		// attach mouse handlers directly to the source canvas
 		// better than calling from canvas tag for cross browser
-		canvas.onmousemove = mouseMove;
-		canvas.onmousedown = mouseDown;
-		canvas.onmouseup = mouseUp;
+
+        stage.enableEvents(true);
+        stage.addEventListener("stagemousemove", mouseMove);
+        stage.addEventListener("stagemousedown", mouseDown);
+        stage.addEventListener("stagemouseup", mouseUp);
 
 		text = new createjs.Text("Click and Drag", "36px Arial", "#777777");
 		text.x = 360; text.y = 200;
@@ -76,7 +78,7 @@
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
 		createjs.Ticker.setFPS(30);
-		createjs.Ticker.addListener(window);
+		createjs.Ticker.addEventListener("tick", tick);
 	}
 
 	function tick() {
@@ -111,12 +113,12 @@
 
 	//start drawing
 	function mouseDown(e) {
-		if(!e){ e = window.event; }
+		//if(!e){ e = window.event; }
 		stage.removeChild(text);
 		_mouseIsDown = true;
 
 		// set up the first point in the new draw, and choose a random color:
-		lastPt = shape.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop);
+		lastPt = shape.globalToLocal(e.nativeEvent.pageX-canvas.offsetLeft,e.nativeEvent.pageY-canvas.offsetTop);
 		//color = "#"+(Math.random()*0xFFFFFF|0).toString(16);
 
 
@@ -134,9 +136,9 @@
 
 	//update mouse positions
 	function mouseMove(e) {
-		if(!e){ e = window.event; }
-		_mouseX = e.pageX-canvas.offsetLeft;
-		_mouseY = e.pageY-canvas.offsetTop;
+		//if(!e){ e = window.event; }
+		_mouseX = e.nativeEvent.pageX-canvas.offsetLeft;
+		_mouseY = e.nativeEvent.pageY-canvas.offsetTop;
 	}
 
 

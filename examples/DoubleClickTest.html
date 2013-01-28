@@ -41,7 +41,7 @@
 
 		stage.addChild(container);
 
-		container.onDoubleClick = function(evt) { alert("Double Clicked the container object"); }
+        container.addEventListener("dblclick", function(evt) { alert("Double Clicked the container object"); });
 
 		stage.update();
 	}

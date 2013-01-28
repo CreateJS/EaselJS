@@ -63,15 +63,19 @@ OPTIMIST
 	.describe("version", "Build version number (x.x.x) defaults 'NEXT'")
 	.string("version")
     .default("version", "NEXT")
-	.describe("tasks", "Task to run options: [ALL, BUILDDOCS, BUILDSOURCE, CLEAN]")
+    .describe("tasks", "Task to run options: [ALL, BUILDDOCS, BUILDSOURCE, CLEAN]")
 	.default("tasks", "ALL")
-	.usage("Build Task Manager for "+PROJECT_NAME+"\nUsage\n$0 [-h] [-l] --tasks=TASK [--version=DOC_VERSION]");
+    .describe("format",  "Formatting minified JS :[STANDARD, PRETTY_PRINT]")
+    .string("format")
+    .default("format", "STANDARD")
+    .usage("Build Task Manager for "+PROJECT_NAME+"\nUsage\n$0 [-h] [-l] --tasks=TASK [--version=DOC_VERSION] [--format=STANDARD]");
 
 //name of minified js file.
 var js_file_name = JS_FILE_NAME;
 
 var version;
 var verbose;
+var format;
 
 var TASK = {
 	ALL:"ALL",
@@ -102,7 +106,8 @@ function main(argv)
 	//default doesn't seem to be working for OPTIMIST right now
 	//if task is not specified, we default to ALL
 	var task = (!argv.tasks)?"ALL":argv.tasks.toUpperCase();
-
+    format = (!argv.format)? "STANDARD" : argv.format.toUpperCase() ;
+    
 	if(!taskIsRecognized(task))
 	{
 		print(setColorText("Unrecognized task : " + task, "red"));
@@ -237,17 +242,20 @@ function buildSourceTask(completeHandler)
 	var final_file = PATH.join(OUTPUT_DIR_NAME, js_file_name);
 	
 	GOOGLE_CLOSURE_PATH = '"'+GOOGLE_CLOSURE_PATH+'"';
-
-	
-	var cmd = [
-		"java", "-jar", GOOGLE_CLOSURE_PATH
-	].concat(
+    var cmd;
+	if (format == "STANDARD") {
+        cmd = [
+            "java", "-jar", GOOGLE_CLOSURE_PATH
+        ].concat(
 			file_args
-		).concat(
-			["--js_output_file", tmp_file]
-		);
-		
-	CHILD_PROCESS.exec(
+                ).concat(
+                    ["--js_output_file", tmp_file]
+                );
+    } else if (format == "PRETTY_PRINT") {
+        cmd = [ "java", "-jar", GOOGLE_CLOSURE_PATH ].concat(file_args).concat(["--js_output_file", tmp_file]).concat(["--formatting", "PRETTY_PRINT"]).concat(["--compilation_level", "WHITESPACE_ONLY"]);	
+    } 
+    
+    CHILD_PROCESS.exec(
 		cmd.join(" "),
 		function(error, stdout, stderr)
 		{
