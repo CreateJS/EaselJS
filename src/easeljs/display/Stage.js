@@ -421,7 +421,7 @@ var p = Stage.prototype = new createjs.Container();
 		if (!data) {
 			data = this._pointerData[id] = {x:0,y:0};
 			// if it's the mouse (id == NaN) or the first new touch, then make it the primary pointer id:
-			if (this._primaryPointerID == null) { this._primaryPointerID = id; }
+			if (this._primaryPointerID == null || this._primaryPointerID == -1) { this._primaryPointerID = id; }
 		}
 		return data;
 	}
