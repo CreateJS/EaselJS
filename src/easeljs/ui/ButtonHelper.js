@@ -100,6 +100,14 @@ var p = ButtonHelper.prototype;
 	
 //  private properties
 	/**
+	 * @property _isOver
+	 * @type Boolean
+	 * @protected
+	 **/
+	p._isOver = false;
+
+//  private properties
+	/**
 	 * @property _isPressed
 	 * @type Boolean
 	 * @protected
@@ -143,12 +151,12 @@ var p = ButtonHelper.prototype;
 			o.addEventListener("mouseover", this);
 			o.addEventListener("mouseout", this);
 			o.addEventListener("mousedown", this);
-			o.addEventListener("click", this);
+			o.addEventListener("mouseup", this);
 		} else {
 			o.removeEventListener("mouseover", this);
 			o.removeEventListener("mouseout", this);
 			o.removeEventListener("mousedown", this);
-			o.removeEventListener("click", this);
+			o.removeEventListener("mouseup", this);
 		}
 	};
 		
@@ -168,16 +176,24 @@ var p = ButtonHelper.prototype;
 	 * @protected
 	 **/
 	p.handleEvent = function(evt) {
-		var label = (evt.type == "mouseover" && !this._isPressed) || evt.type == "click" ? this.overLabel :
-				  		(evt.type == "mouseover" && this._isPressed) || evt.type == "mousedown" ? this.downLabel :
-						(this._isPressed) ? this.overLabel : this.outLabel;
-		
-		if (evt.type == "mousedown") {
+		var label;
+		if (evt.type == "mouseover") {
+			this._isOver = true;
+			label = this.overLabel;
+			evt.addEventListener("mouseout", this);
+
+		} else if (evt.type == "mouseout") {
+			this._isOver = false;
+			label = this._isPressed ? this.downLabel : this.outLabel;
+
+		} else if (evt.type == "mousedown") {
 			this._isPressed = true;
+			label = this.downLabel;
 			evt.addEventListener("mouseup", this);
+
 		} else if (evt.type == "mouseup") {
 			this._isPressed = false;
-			return;
+			label = this._isOver ? this.overLabel : this.outLabel;
 		}
 		
 		var t = this.target;
