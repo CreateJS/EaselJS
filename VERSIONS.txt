@@ -30,6 +30,7 @@ Version NEXT [not released]
 - added MovieClip.currentFrame
 - documentation updates
 - new and improved build process, tools & documentation format
+- added Stage.enableDOMEvents() method
 
 
 Version 0.5.0 [Aug 24, 2012]
