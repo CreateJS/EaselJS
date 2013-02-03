@@ -32,17 +32,25 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* A Container is a nestable display lists that allows you to work with compound display elements. For
-* example you could group arm, leg, torso and head Bitmaps together into a Person Container, and
-* transform them as a group, while still being able to move the individual parts relative to each
-* other. Children of containers have their transform and alpha properties concatenated with their
-* parent Container. For example, a Shape with x=100 and alpha=0.5, placed in a Container with
-* x=50 and alpha=0.7 will be rendered to the canvas at x=150 and alpha=0.35. Containers have some
-* overhead, so you generally shouldn't create a Container to hold a single child.
-* @class Container
-* @extends DisplayObject
-* @constructor
-**/
+ * A Container is a nestable display list that allows you to work with compound display elements. For  example you could
+ * group arm, leg, torso and head {{#crossLink "Bitmap"}}{{/crossLink}} instances together into a Person Container, and
+ * transform them as a group, while still being able to move the individual parts relative to each other. Children of
+ * containers have their <code>transform</code> and <code>alpha</code> properties concatenated with their parent
+ * Container.
+ *
+ * For example, a {{#crossLink "Shape"}}{{/crossLink}} with x=100 and alpha=0.5, placed in a Container with <code>x=50</code>
+ * and <code>alpha=0.7</code> will be rendered to the canvas at <code>x=150</code> and <code>alpha=0.35</code>.
+ * Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
+ *
+ * <h4>Example</h4>
+ *      var container = new createjs.Container();
+ *      container.addChild(bitmapInstance, shapeInstance);
+ *      container.x = 100;
+ *
+ * @class Container
+ * @extends DisplayObject
+ * @constructor
+ **/
 var Container = function() {
   this.initialize();
 }
@@ -50,10 +58,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 
 // public properties:
 	/**
-	 * The array of children in the display list. You should usually use the child management methods,
+	 * The array of children in the display list. You should usually use the child management methods such as {{#crossLink "Container/addChild"}}{{/crossLink}},
+	 * {{#crossLink "Container/removeChild"}}{{/crossLink}}, {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc,
 	 * rather than accessing this directly, but it is included for advanced users.
 	 * @property children
-	 * @type Array[DisplayObject]
+	 * @type Array
 	 * @default null
 	 **/
 	p.children = null;
@@ -129,6 +138,10 @@ var p = Container.prototype = new createjs.DisplayObject();
 	/**
 	 * Adds a child to the top of the display list. You can also add multiple children, such as "addChild(child1, child2, ...);".
 	 * Returns the child that was added, or the last child if multiple children were added.
+	 *
+	 * <h4>Example</h4>
+	 *      container.addChild(bitmapInstance, shapeInstance);
+	 *
 	 * @method addChild
 	 * @param {DisplayObject} child The display object to add.
 	 * @return {DisplayObject} The child that was added, or the last child if multiple children were added.
@@ -367,7 +380,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @method getObjectsUnderPoint
 	 * @param {Number} x The x position in the container to test.
 	 * @param {Number} y The y position in the container to test.
-	 * @return {Array[DisplayObject]} An Array of DisplayObjects under the specified coordinates.
+	 * @return {Array} An Array of DisplayObjects under the specified coordinates.
 	 **/
 	p.getObjectsUnderPoint = function(x, y) {
 		var arr = [];
@@ -446,7 +459,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @param {Array} arr
 	 * @param {Number} mouseEvents A bitmask indicating which event types to look for. Bit 1 specifies press &
 	 * click & double click, bit 2 specifies it should look for mouse over and mouse out. This implementation may change.
-	 * @return {Array[DisplayObject]}
+	 * @return {Array}
 	 * @protected
 	 **/
 	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {

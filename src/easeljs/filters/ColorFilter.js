@@ -32,19 +32,21 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* Applies color transforms.
-* @class ColorFilter
-* @constructor
-* @extends Filter
-* @param {Number} redMultiplier
-* @param {Number} greenMultiplier
-* @param {Number} blueMultiplier
-* @param {Number} alphaMultiplier
-* @param {Number} redOffset
-* @param {Number} greenOffset
-* @param {Number} blueOffset
-* @param {Number} alphaOffset
-**/
+ * Applies color transforms.
+ *
+ * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters.
+ * @class ColorFilter
+ * @constructor
+ * @extends Filter
+ * @param {Number} redMultiplier
+ * @param {Number} greenMultiplier
+ * @param {Number} blueMultiplier
+ * @param {Number} alphaMultiplier
+ * @param {Number} redOffset
+ * @param {Number} greenOffset
+ * @param {Number} blueOffset
+ * @param {Number} alphaOffset
+ **/
 var ColorFilter = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
   this.initialize(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset);
 }

@@ -32,14 +32,16 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* BoxBlurFilter applies a box blur to DisplayObjects
-* @class BoxBlurFilter
-* @extends Filter
-* @constructor
-* @param {Number} blurX
-* @param {Number} blurY
-* @param {Number} quality
-**/
+ * BoxBlurFilter applies a box blur to DisplayObjects
+ *
+ * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters.
+ * @class BoxBlurFilter
+ * @extends Filter
+ * @constructor
+ * @param {Number} blurX
+ * @param {Number} blurY
+ * @param {Number} quality
+ **/
 var BoxBlurFilter = function( blurX, blurY, quality ) {
   this.initialize( blurX, blurY, quality );
 }

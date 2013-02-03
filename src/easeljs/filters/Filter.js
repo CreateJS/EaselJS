@@ -32,10 +32,19 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* Base class that all filters should inherit from.
-* @class Filter
-* @constructor
-**/
+ * Base class that all filters should inherit from. Filters need to be applied to objects that have been cached using
+ * the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method. If an object changes, please cache it again, or use
+ * {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}.
+ * <h4>Example</h4>
+ *      myInstance.cache(0,0, 100, 100);
+ *      myInstance.filters = [
+ *          new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0),
+ *          new createjs.BoxBlurFilter(5, 5, 10)
+ *      ];
+ *
+ * @class Filter
+ * @constructor
+ **/
 var Filter = function() {
   this.initialize();
 }

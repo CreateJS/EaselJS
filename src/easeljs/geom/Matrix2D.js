@@ -32,16 +32,16 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
-* @class Matrix2D
-* @constructor
-* @param {Number} a Specifies the a property for the new matrix.
-* @param {Number} b Specifies the b property for the new matrix.
-* @param {Number} c Specifies the c property for the new matrix.
-* @param {Number} d Specifies the d property for the new matrix.
-* @param {Number} tx Specifies the tx property for the new matrix.
-* @param {Number} ty Specifies the ty property for the new matrix.
-**/
+ * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
+ * @class Matrix2D
+ * @constructor
+ * @param {Number} a Specifies the a property for the new matrix.
+ * @param {Number} b Specifies the b property for the new matrix.
+ * @param {Number} c Specifies the c property for the new matrix.
+ * @param {Number} d Specifies the d property for the new matrix.
+ * @param {Number} tx Specifies the tx property for the new matrix.
+ * @param {Number} ty Specifies the ty property for the new matrix.
+ **/
 var Matrix2D = function(a, b, c, d, tx, ty) {
   this.initialize(a, b, c, d, tx, ty);
 }

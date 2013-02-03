@@ -32,12 +32,15 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting.
-* @class ColorMatrixFilter
-* @constructor
-* @extends Filter
-* @param {Array[Number]} matrix A 4x5 matrix describing the color operation to perform. See also the ColorMatrix class.
-**/
+ * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
+ * {{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors.
+ *
+ * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters.
+ * @class ColorMatrixFilter
+ * @constructor
+ * @extends Filter
+ * @param {Array} matrix A 4x5 matrix describing the color operation to perform. See also the ColorMatrix class.
+ **/
 var ColorMatrixFilter = function(matrix) {
   this.initialize(matrix);
 }
@@ -51,7 +54,7 @@ var p = ColorMatrixFilter.prototype = new createjs.Filter();
 	/** 
 	 * @method initialize
 	 * @protected
-	 * @param {Array[Number]} matrix A 4x5 matrix describing the color operation to perform.
+	 * @param {Array} matrix A 4x5 matrix describing the color operation to perform.
 	 **/
 	p.initialize = function(matrix) {
 		this.matrix = matrix;

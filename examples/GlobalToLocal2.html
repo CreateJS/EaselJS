@@ -86,7 +86,7 @@
 
 		//start ticking
 		createjs.Ticker.setInterval(20);		// 20ms = 50fps
-		createjs.Ticker.addListener(window);
+		createjs.Ticker.addEventListener("tick", tick);
 
 		stage.update(); // Draw the stage once
 	}

@@ -160,12 +160,12 @@
 		createjs.Ticker.useRAF = true;
 		// if we use requestAnimationFrame, we should use a framerate that is a factor of 60:
 		createjs.Ticker.setFPS(30);
-		createjs.Ticker.addListener(window);
+		createjs.Ticker.addEventListener("tick", tick);
 	}
 
 	function tick() {
 		// if we are on the last frame of animation then remove the tick listener:
-		if (--count == 1){ createjs.Ticker.removeListener(window); }
+		if (--count == 1){ createjs.Ticker.removeEventListener("tick", tick); }
 
 		// animate the bars in one at a time:
 		var c = bars.length*10-count;

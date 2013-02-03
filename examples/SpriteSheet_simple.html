@@ -23,11 +23,11 @@
 	  http://code.createjs.com -->
 
 	<script type="text/javascript">
-
+        var stage;
 		function init() {
 
 			// create a new stage and point it at our canvas:
-			var stage = new createjs.Stage(document.getElementById("testCanvas"));
+			stage = new createjs.Stage(document.getElementById("testCanvas"));
 
 			// Define a spritesheet. Note that this data was exported by Zoë.
 			var ss = new createjs.SpriteSheet({
@@ -55,8 +55,12 @@
 			// Add Grant to the stage, and add it as a listener to Ticker to get updates each frame.
 			stage.addChild(grant);
 			createjs.Ticker.setFPS(60);
-			createjs.Ticker.addListener(stage);
+			createjs.Ticker.addEventListener("tick", tick);
 		}
+
+        function tick() {
+            stage.update();
+        }
 
 	</script>
 </head>
