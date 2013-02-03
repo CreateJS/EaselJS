@@ -239,7 +239,7 @@ var p = Stage.prototype = new createjs.Container();
 		this.Container_initialize();
 		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
 		this._pointerData = {};
-		this.enableEvents(true);
+		this.enableDOMEvents(true);
 	}
 
 // public methods:
@@ -361,10 +361,10 @@ var p = Stage.prototype = new createjs.Container();
 	 * Enables or disables the  event listeners that stage adds to DOM elements (window, document and canvas).
 	 * It is good practice to disable events when disposing of a Stage instance, otherwise the stage will
 	 * continue to receive events from the page.
-	 * @method enableEvents
+	 * @method enableDOMEvents
 	 * @param {Boolean} [enable=true] Indicates whether to enable or disable the events. Default is true.
 	 **/
-	p.enableEvents = function(enable) {
+	p.enableDOMEvents = function(enable) {
 		if (enable == null) { enable = true; }
 		var n, o, ls = this._eventListeners;
 		if (!enable && ls) {
