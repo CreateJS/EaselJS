@@ -35,12 +35,12 @@ this.createjs = this.createjs||{};
  * The SpriteSheetBuilder allows you to generate sprite sheets at run time from any display object. This can allow
  * you to maintain your assets as vector graphics (for low file size), and render them at run time as sprite sheets
  * for better performance.
- * <br/><br/>
+ *
  * Sprite sheets can be built either synchronously, or asynchronously, so that large sprite sheets can be generated
  * without locking the UI.
- * <br/><br/>
+ *
  * Note that the "images" used in the generated sprite sheet are actually canvas elements, and that they will be sized
- * to the nearest power of 2 up to the value of maxWidth or maxHeight.
+ * to the nearest power of 2 up to the value of <code>maxWidth</code> or <code>maxHeight</code>.
  * @class SpriteSheetBuilder
  * @uses EventDispatcher
  * @constructor
@@ -239,22 +239,23 @@ var p = SpriteSheetBuilder.prototype;
 // public methods:
 	
 	/**
-	 * Adds a frame to the sprite sheet. Note that the frame will not be drawn until you call build. The optional
-	 * setup params allow you to have a function run immediately before the draw occurs. For example, this allows you to
-	 * add a single source multiple times, but manipulate it or it's children to change it to generate different frames.
-	 * <br/><br/>
-	 * Note that the source's transformations (x,y,scale,rotate,alpha) will be ignored, except for regX/Y. To apply
-	 * transforms to a source object and have them captured in the sprite sheet, simply place it into a Container
+	 * Adds a frame to the {{#crossLink "SpriteSheet"}}{{/crossLink}}. Note that the frame will not be drawn until you
+	 * call {{#crossLink "SpriteSheetBuilder/build"}}{{/crossLink}} method. The optional setup params allow you to have
+	 * a function run immediately before the draw occurs. For example, this allows you to add a single source multiple
+	 * times, but manipulate it or it's children to change it to generate different frames.
+	 *
+	 * Note that the source's transformations (x, y, scale, rotate, alpha) will be ignored, except for regX/Y. To apply
+	 * transforms to a source object and have them captured in the sprite sheet, simply place it into a {{#crossLink "Container"}}{{/crossLink}}
 	 * and pass in the Container as the source.
 	 * @method addFrame
-	 * @param {DisplayObject} source The source display object to draw as the frame.
-	 * @param {Rectangle} sourceRect Optional. A rectangle defining the portion of the source to draw to the frame. If
-	 * not specified, it will look for a getBounds method, bounds property, or nominalBounds property on the source to use.
-	 * If one is not found, the frame will be skipped.
-	 * @param {Number} scale Optional. The scale to draw this frame at. Default is 1.
-	 * @param {Function} setupFunction Optional. A function to call immediately before drawing this frame.
-	 * @param {Array} setupParams Optional. Parameters to pass to the setup function.
-	 * @param {Object} setupScope Optional. The scope to call the setupFunction in.
+	 * @param {DisplayObject} source The source {{#crossLink "DisplayObject"}}{{/crossLink}}  to draw as the frame.
+	 * @param {Rectangle} [sourceRect] A {{#crossLink "Rectangle"}}{{/crossLink}} defining the portion of the
+	 * source to draw to the frame. If not specified, it will look for a <code>getBounds</code> method, bounds property,
+	 * or <code>nominalBounds</code> property on the source to use. If one is not found, the frame will be skipped.
+	 * @param {Number} [scale=1] Optional. The scale to draw this frame at. Default is 1.
+	 * @param {Function} [setupFunction] Optional. A function to call immediately before drawing this frame.
+	 * @param {Array} [setupParams] Parameters to pass to the setup function.
+	 * @param {Object} [setupScope] The scope to call the setupFunction in.
 	 * @return {Number} The index of the frame that was just added, or null if a sourceRect could not be determined.
 	 **/
 	p.addFrame = function(source, sourceRect, scale, setupFunction, setupParams, setupScope) {
@@ -268,13 +269,13 @@ var p = SpriteSheetBuilder.prototype;
 	
 	/**
 	 * Adds an animation that will be included in the created sprite sheet.
-	 * @method addFrame
+	 * @method addAnimation
 	 * @param {String} name The name for the animation.
 	 * @param {Array} frames An array of frame indexes that comprise the animation. Ex. [3,6,5] would describe an animation
 	 * that played frame indexes 3, 6, and 5 in that order.
-	 * @param {String} next Optional. Specifies the name of the animation to continue to after this animation ends. You can
+	 * @param {String} [next] Specifies the name of the animation to continue to after this animation ends. You can
 	 * also pass false to have the animation stop when it ends. By default it will loop to the start of the same animation.
-	 * @param {Number} frequency Optional. Specifies a frame advance frequency for this animation. For example, a value
+	 * @param {Number} [frequency] Specifies a frame advance frequency for this animation. For example, a value
 	 * of 2 would cause the animation to advance every second tick.
 	 **/
 	p.addAnimation = function(name, frames, next, frequency) {
@@ -287,14 +288,15 @@ var p = SpriteSheetBuilder.prototype;
 	 * running from the label index to the next label. For example, if there is a label named "foo" at frame 0 and a label
 	 * named "bar" at frame 10, in a MovieClip with 15 frames, it will add an animation named "foo" that runs from frame
 	 * index 0 to 9, and an animation named "bar" that runs from frame index 10 to 14.
-	 * <br/><br/>
+	 *
 	 * Note that this will iterate through the full MovieClip with actionsEnabled set to false, ending on the last frame.
 	 * @method addMovieClip
 	 * @param {MovieClip} source The source MovieClip to add to the sprite sheet.
-	 * @param {Rectangle} sourceRect Optional. A rectangle defining the portion of the source to draw to the frame. If
-	 * not specified, it will look for a getBounds method, frameBounds array, bounds property, or nominalBounds property
-	 * on the source to use. If one is not found, the MovieClip will be skipped.
-	 * @param {Number} scale Optional. The scale to draw the movie clip at. Default is 1.
+	 * @param {Rectangle} [sourceRect] A {{#crossLink "Rectangle"}}{{/crossLink}} defining the portion of the source to
+	 * draw to the frame. If not specified, it will look for a <code>getBounds</code> method, <code>frameBounds</code>
+	 * Array, <code>bounds</code> property, or <code>nominalBounds</code> property on the source to use. If one is not
+	 * found, the MovieClip will be skipped.
+	 * @param {Number} [scale=1] The scale to draw the movie clip at.
 	 **/
 	p.addMovieClip = function(source, sourceRect, scale) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
@@ -346,10 +348,11 @@ var p = SpriteSheetBuilder.prototype;
 	}
 	
 	/**
-	 * Asynchronously builds a SpriteSheet instance based on the current frames. It will run 20 times per second, using
-	 * an amount of time defined by timeSlice. When it is complete it will call the specified callback.
+	 * Asynchronously builds a {{#crossLink "SpriteSheet"}}{{/crossLink}} instance based on the current frames. It will
+	 * run 20 times per second, using an amount of time defined by <code>timeSlice</code>. When it is complete it will
+	 * call the specified callback.
 	 * @method buildAsync
-	 * @param {Number} timeSlice Optional. Sets the timeSlice property on this instance.
+	 * @param {Number} [timeSlice] Sets the timeSlice property on this instance.
 	 **/
 	p.buildAsync = function(timeSlice) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }

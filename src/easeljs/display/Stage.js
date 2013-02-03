@@ -32,13 +32,27 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* A stage is the root level Container for a display list. Each time its tick method is called, it will render its display
-* list to its target canvas.
-* @class Stage
-* @extends Container
-* @constructor
-* @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id of a canvas object in the current document.
-**/
+ * A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
+ * method is called, it will render its display list to its target canvas.
+ *
+ * <h4>Example</h4>
+ * This example creates a stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
+ * and redraw the stage using {{#crossLink "Stage/update"}}{{/crossLink}}.
+ *
+ *      var stage = new createjs.Stage("canvasElementId");
+ *      var image = new createjs.Bitmap("imagePath.png");
+ *      createjs.Ticker.addEventListener("tick", handleTick);
+ *      function handleTick(event) {
+ *          bitmap.x += 10;
+ *          stage.update();
+ *      }
+ *
+ * @class Stage
+ * @extends Container
+ * @constructor
+ * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
+ * of a canvas object in the current document.
+ **/
 var Stage = function(canvas) {
   this.initialize(canvas);
 }
@@ -49,7 +63,7 @@ var p = Stage.prototype = new createjs.Container();
 	 * @property _snapToPixelEnabled
 	 * @protected
 	 * @static
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @default false
 	 **/
 	Stage._snapToPixelEnabled = false; // snapToPixelEnabled is temporarily copied here during a draw to provide global access.
@@ -225,18 +239,13 @@ var p = Stage.prototype = new createjs.Container();
 		this.Container_initialize();
 		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
 		this._pointerData = {};
-		this.enableDOMEvents(true);
+		this.enableEvents(true);
 	}
 
 // public methods:
 
 	/**
-	 * @event tick
-	 * Broadcast to children when the stage is updated.
-	 **/
-
-	/**
-	 * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. BitmapAnimation)
+	 * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. {{#crossLink "BitmapAnimation"}}{{/crossLink}})
 	 * and render its entire display list to the canvas. Any parameters passed to update will be passed on to any
 	 * onTick handlers.
 	 * @method update
@@ -254,7 +263,7 @@ var p = Stage.prototype = new createjs.Container();
 	}
 
 	/**
-	 * Calls the update method. Useful for adding stage as a listener to Ticker directly.
+	 * Calls the update method. Useful for adding stage as a listener to {{#crossLink "Ticker"}}{{/crossLink}} directly.
 	 * @property tick
 	 * @private
 	 * @type Function
@@ -262,7 +271,7 @@ var p = Stage.prototype = new createjs.Container();
 	p.tick = p.update;
 
 	/**
-	 * Clears the target canvas. Useful if autoClear is set to false.
+	 * Clears the target canvas. Useful if <code>autoClear</code> is set to false.
 	 * @method clear
 	 **/
 	p.clear = function() {
@@ -273,7 +282,7 @@ var p = Stage.prototype = new createjs.Container();
 	}
 
 	/**
-	 * Returns a data url that contains a Base64 encoded image of the contents of the stage. The returned data url can be
+	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can be
 	 * specified as the src value of an image element.
 	 * @method toDataURL
 	 * @param {String} backgroundColor The background color to be used for the generated image. The value can be any value HTML color
@@ -329,12 +338,13 @@ var p = Stage.prototype = new createjs.Container();
 	}
 
 	/**
-	 * Enables or disables (by passing a frequency of 0) mouse over handlers (onMouseOver and onMouseOut) for this stage's display
+	 * Enables or disables (by passing a frequency of 0) mouse over events (mouseover and mouseout) for this stage's display
 	 * list. These events can be expensive to generate, so they are disabled by default, and the frequency of the events
-	 * can be controlled independently of mouse move events via the optional frequency parameter.
+	 * can be controlled independently of mouse move events via the optional <code>frequency</code> parameter.
 	 * @method enableMouseOver
-	 * @param {Number} frequency Optional param specifying the maximum number of times per second to broadcast mouse over/out events. Set to 0 to disable mouse
-	 * over events completely. Maximum is 50. A lower frequency is less responsive, but uses less CPU. Default is 20.
+	 * @param {Number} [frequency=20] Optional param specifying the maximum number of times per second to broadcast
+	 * mouse over/out events. Set to 0 to disable mouse over events completely. Maximum is 50. A lower frequency is less
+	 * responsive, but uses less CPU.
 	 **/
 	p.enableMouseOver = function(frequency) {
 		if (this._mouseOverIntervalID) {
@@ -351,12 +361,10 @@ var p = Stage.prototype = new createjs.Container();
 	 * Enables or disables the  event listeners that stage adds to DOM elements (window, document and canvas).
 	 * It is good practice to disable events when disposing of a Stage instance, otherwise the stage will
 	 * continue to receive events from the page.
-	 * 
-	 * The enableDOMEvents method is called by default when a Stage instance is initialized.
-	 * @method enableDOMEvents
-	 * @param {Boolean} enable Optional. Indicates whether to enable or disable the events. Default is true.
+	 * @method enableEvents
+	 * @param {Boolean} [enable=true] Indicates whether to enable or disable the events. Default is true.
 	 **/
-	p.enableDOMEvents = function(enable) {
+	p.enableEvents = function(enable) {
 		if (enable == null) { enable = true; }
 		var n, o, ls = this._eventListeners;
 		if (!enable && ls) {

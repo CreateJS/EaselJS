@@ -32,12 +32,16 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* Represents a point on a 2 dimensional x / y coordinate system.
-* @class Point
-* @constructor
-* @param {Number} x X position. Default is 0.
-* @param {Number} y Y position. Default is 0.
-**/
+ * Represents a point on a 2 dimensional x / y coordinate system.
+ *
+ * <h4>Example</h4>
+ *      var point = new Point(0, 100);
+ *
+ * @class Point
+ * @constructor
+ * @param {Number} [x=0] X position.
+ * @param {Number} [y=0] Y position.
+ **/
 var Point = function(x, y) {
   this.initialize(x, y);
 }

@@ -27,11 +27,73 @@
 */
 
 /**
-* The EaselJS Javascript library provides a retained graphics mode for canvas
-* including a full, hierarchical display list, a core interaction model, and
-* helper classes to make working with 2D graphics in Canvas much easier.
-* @module EaselJS
-**/
+ * The EaselJS Javascript library provides a retained graphics mode for canvas including a full hierarchical display
+ * list, a core interaction model, and helper classes to make working with 2D graphics in Canvas much easier.
+ * EaselJS provides straight forward solutions for working with rich graphics and interactivity with HTML5 Canvas...
+ *
+ * <h4>Getting Started</h4>
+ * To get started with Easel, create a {{#crossLink "Stage"}}{{/crossLink}} that wraps a CANVAS element, and add
+ * {{#crossLink "DisplayObject"}}{{/crossLink}} instances as children. EaselJS supports:
+ * <ul>
+ *      <li>Images using {{#crossLink "Bitmap"}}{{/crossLink}}</li>
+ *      <li>Vector graphics using {{#crossLink "Shape"}}{{/crossLink}} and {{#crossLink "Graphics"}}{{/crossLink}}</li>
+ *      <li>Animated bitmaps using {{#crossLink "SpriteSheet"}}{{/crossLink}} and {{#crossLink "BitmapAnimation"}}{{/crossLink}}
+ *      <li>Simple text instances using {{#crossLink "Text"}}{{/crossLink}}</li>
+ *      <li>Containers that hold other DisplayObjects using {{#crossLink "Container"}}{{/crossLink}}</li>
+ *      <li>Control HTML DOM elements using {{#crossLink "DOMElement"}}{{/crossLink}}</li>
+ * </ul>
+ *
+ * All display objects can be added to the stage as children, or drawn to a canvas directly.
+ *
+ * <b>User Interactions</b><br />
+ * All display objects on stage (except DOMElement) will dispatch events when interacted with using a mouse or
+ * touch. EaselJS supports hover, press, and release events, as well as an easy-to-use drag-and-drop model. Check out
+ * {{#crossLink "MouseEvent"}}{{/crossLink}} for more information.
+ *
+ * <h4>Simple Example</h4>
+ * This example illustrates how to create and position a {{#crossLink "Shape"}}{{/crossLink}} on the {{#crossLink "Stage"}}{{/crossLink}}
+ * using EaselJS' drawing API.
+ *
+ *	    //Create a stage by getting a reference to the canvas
+ *	    stage = new createjs.Stage("demoCanvas");
+ *	    //Create a Shape DisplayObject.
+ *	    circle = new createjs.Shape();
+ *	    circle.graphics.beginFill("red").drawCircle(0, 0, 40);
+ *	    //Set position of Shape instance.
+ *	    circle.x = circle.y = 50;
+ *	    //Add Shape instance to stage display list.
+ *	    stage.addChild(circle);
+ *	    //Update stage will render next frame
+ *	    stage.update();
+ *
+ * <b>Simple Animation Example</b><br />
+ * This example moves the shape created in the previous demo across the screen.
+ *
+ *	    //Update stage will render next frame
+ *	    createjs.Ticker.addEventListener("tick", handleTick);
+ *
+ *	    function handleTick() {
+ *          //Circle will move 10 units to the right.
+ *	    	circle.x += 10;
+ *	    	//Will cause the circle to wrap back
+ * 	    	if (circle.x > stage.canvas.width) { circle.x = 0; }
+ *	    	stage.update();
+ *	    }
+ *
+ * <h4>Other Features</h4>
+ * EaselJS also has built in support for
+ * <ul><li>Canvas features such as {{#crossLink "Shadow"}}{{/crossLink}} and CompositeOperation</li>
+ *      <li>{{#crossLink "Ticker"}}{{/crossLink}}, a global heartbeat that objects can subscribe to</li>
+ *      <li>Filters, including a provided {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}, {{#crossLink "AlphaMaskFilter"}}{{/crossLink}},
+ *      {{#crossLink "AlphaMapFilter"}}{{/crossLink}}, and {{#crossLink "BoxBlurFilter"}}{{/crossLink}}. See {{#crossLink "Filter"}}{{/crossLink}}
+ *      for more information</li>
+ *      <li>A {{#crossLink "ButtonHelper"}}{{/crossLink}} utility, to easily create interactive buttons</li>
+ *      <li>{{#crossLink "SpriteSheetUtils"}}{{/crossLink}} and a {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} to
+ *      help build and manage {{#crossLink "SpriteSheet"}}{{/crossLink}} functionality at run-time.</li>
+ * </ul>
+ *
+ * @module EaselJS
+ */
 
 // namespace:
 this.createjs = this.createjs||{};
@@ -39,13 +101,15 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
-* DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
-* Container, Bitmap, and Shape. DisplayObject is the base class for all display classes in the EaselJS library.
-* It defines the core properties and methods that are shared between all display objects.
-* @class DisplayObject
-* @uses EventDispatcher
-* @constructor
-**/
+ * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
+ * {{#crossLink "Container"}}{{/crossLink}}, {{#crossLink "Bitmap"}}{{/crossLink}}, and {{#crossLink "Shape"}}{{/crossLink}}.
+ * DisplayObject is the base class for all display classes in the EaselJS library. It defines the core properties and
+ * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
+ * caching, and mouse handlers.
+ * @class DisplayObject
+ * @uses EventDispatcher
+ * @constructor
+ **/
 var DisplayObject = function() {
   this.initialize();
 }
@@ -56,14 +120,14 @@ var p = DisplayObject.prototype;
 	 * domain content
 	 * @property suppressCrossDomainErrors
 	 * @static
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @default false
 	 **/
 	DisplayObject.suppressCrossDomainErrors = false;
 
 	/**
 	 * @property _hitTestCanvas
-	 * @type HTMLCanvasElement | Object
+	 * @type {HTMLCanvasElement | Object}
 	 * @static
 	 * @protected
 	 **/
@@ -72,7 +136,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * @property _hitTestContext
-	 * @type CanvasRenderingContext2D
+	 * @type {CanvasRenderingContext2D}
 	 * @static
 	 * @protected
 	 **/
@@ -80,7 +144,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * @property _nextCacheID
-	 * @type Number
+	 * @type {Number}
 	 * @static
 	 * @protected
 	 **/
@@ -143,7 +207,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque.
 	 * @property alpha
-	 * @type Number
+	 * @type {Number}
 	 * @default 1
 	 **/
 	p.alpha = 1;
@@ -152,7 +216,7 @@ var p = DisplayObject.prototype;
 	 * If a cache is active, this returns the canvas that holds the cached version of this display object. See cache()
 	 * for more information. READ-ONLY.
 	 * @property cacheCanvas
-	 * @type HTMLCanvasElement | Object
+	 * @type {HTMLCanvasElement | Object}
 	 * @default null
 	 **/
 	p.cacheCanvas = null;
@@ -160,7 +224,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * Unique ID for this display object. Makes display objects easier for some uses.
 	 * @property id
-	 * @type Number
+	 * @type {Number}
 	 * @default -1
 	 **/
 	p.id = -1;
@@ -171,7 +235,7 @@ var p = DisplayObject.prototype;
 	 * Containers will cause the Container to be returned (not its children) regardless of whether it's mouseChildren property
 	 * is true.
 	 * @property mouseEnabled
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @default true
 	 **/
 	p.mouseEnabled = true;
@@ -179,7 +243,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * An optional name for this display object. Included in toString(). Useful for debugging.
 	 * @property name
-	 * @type String
+	 * @type {String}
 	 * @default null
 	 **/
 	p.name = null;
@@ -189,7 +253,7 @@ var p = DisplayObject.prototype;
 	 * one. READ-ONLY.
 	 * @property parent
 	 * @final
-	 * @type DisplayObject
+	 * @type {Container}
 	 * @default null
 	 **/
 	p.parent = null;
@@ -198,7 +262,7 @@ var p = DisplayObject.prototype;
 	 * The x offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
 	 * it's center, you would set regX and regY to 50.
 	 * @property regX
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p.regX = 0;
@@ -207,7 +271,7 @@ var p = DisplayObject.prototype;
 	 * The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
 	 * it's center, you would set regX and regY to 50.
 	 * @property regY
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p.regY = 0;
@@ -215,7 +279,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * The rotation in degrees for this display object.
 	 * @property rotation
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p.rotation = 0;
@@ -224,7 +288,7 @@ var p = DisplayObject.prototype;
 	 * The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display
 	 * object to twice it's nominal width.
 	 * @property scaleX
-	 * @type Number
+	 * @type {Number}
 	 * @default 1
 	 **/
 	p.scaleX = 1;
@@ -233,7 +297,7 @@ var p = DisplayObject.prototype;
 	 * The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display
 	 * object to half it's nominal height.
 	 * @property scaleY
-	 * @type Number
+	 * @type {Number}
 	 * @default 1
 	 **/
 	p.scaleY = 1;
@@ -241,7 +305,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * The factor to skew this display object horizontally.
 	 * @property skewX
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p.skewX = 0;
@@ -249,7 +313,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * The factor to skew this display object vertically.
 	 * @property skewY
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p.skewY = 0;
@@ -258,7 +322,7 @@ var p = DisplayObject.prototype;
 	 * A shadow object that defines the shadow to render on this display object. Set to null to remove a shadow. If
 	 * null, this property is inherited from the parent container.
 	 * @property shadow
-	 * @type Shadow
+	 * @type {Shadow}
 	 * @default null
 	 **/
 	p.shadow = null;
@@ -267,7 +331,7 @@ var p = DisplayObject.prototype;
 	 * Indicates whether this display object should be rendered to the canvas and included when running
 	 * Stage.getObjectsUnderPoint().
 	 * @property visible
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @default true
 	 **/
 	p.visible = true;
@@ -275,14 +339,14 @@ var p = DisplayObject.prototype;
 	/**
 	 * The x (horizontal) position of the display object, relative to its parent.
 	 * @property x
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p.x = 0;
 
 	/** The y (vertical) position of the display object, relative to its parent.
 	 * @property y
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p.y = 0;
@@ -293,7 +357,7 @@ var p = DisplayObject.prototype;
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
 	 * whatwg spec on compositing</a>.
 	 * @property compositeOperation
-	 * @type String
+	 * @type {String}
 	 * @default null
 	 **/
 	p.compositeOperation = null;
@@ -308,7 +372,7 @@ var p = DisplayObject.prototype;
 	 * ensure that all of the display object's ancestors (parent containers) are also on a whole pixel. You can do this
 	 * by setting the ancestors' snapToPixel property to true.
 	 * @property snapToPixel
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @default false
 	 **/
 	p.snapToPixel = false;
@@ -319,7 +383,7 @@ var p = DisplayObject.prototype;
 	 * and onMouseUp callbacks of the event object to receive these events until the user releases the mouse button.
 	 * If an onPress handler is set on a container, it will receive the event if any of its children are clicked.
 	 * @property onPress
-	 * @type Function
+	 * @type {Function}
 	 * @deprecated In favour of the "mousedown" event. Will be removed in a future version.
 	 */
 	p.onPress = null;	 
@@ -329,7 +393,7 @@ var p = DisplayObject.prototype;
 	 * display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an
 	 * onClick handler is set on a container, it will receive the event if any of its children are clicked.
 	 * @property onClick
-	 * @type Function
+	 * @type {Function}
 	 * @deprecated In favour of the "click" event. Will be removed in a future version.
 	 */
 	p.onClick = null;
@@ -339,7 +403,7 @@ var p = DisplayObject.prototype;
 	 * passed a single param containing the corresponding MouseEvent instance. If an onDoubleClick handler is set
 	 * on a container, it will receive the event if any of its children are clicked.
 	 * @property onDoubleClick
-	 * @type Function
+	 * @type {Function}
 	 * @deprecated In favour of the "dblClick" event. Will be removed in a future version.
 	 */
 	p.onDoubleClick = null;
@@ -348,7 +412,7 @@ var p = DisplayObject.prototype;
 	 * The onMouseOver callback is called when the user rolls over the display object. You must enable this event using
 	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
 	 * @property onMouseOver
-	 * @type Function
+	 * @type {Function}
 	 * @deprecated In favour of the "mouseover" event. Will be removed in a future version.
 	 */
 	p.onMouseOver = null;
@@ -357,7 +421,7 @@ var p = DisplayObject.prototype;
 	 * The onMouseOut callback is called when the user rolls off of the display object. You must enable this event using
 	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
 	 * @property onMouseOut
-	 * @type Function
+	 * @type {Function}
 	 * @deprecated In favour of the "mouseout" event. Will be removed in a future version.
 	 */
 	p.onMouseOut = null;
@@ -371,7 +435,7 @@ var p = DisplayObject.prototype;
 	 * Any parameters passed in to stage.update() are passed on to the onTick() handlers. For example, if you call
 	 * stage.update("hello"), all of the display objects with a handler will have onTick("hello") called.
 	 * @property onTick
-	 * @type Function
+	 * @type {Function}
 	 * @deprecated In favour of the "tick" event. Will be removed in a future version.
 	 */
 	p.onTick = null;
@@ -380,7 +444,7 @@ var p = DisplayObject.prototype;
 	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when cache() or
 	 * updateCache() is called on the display object, and only apply to the area that is cached.
 	 * @property filters
-	 * @type Array[Filter]
+	 * @type {Array}
 	 * @default null
 	 **/
 	p.filters = null;
@@ -389,7 +453,7 @@ var p = DisplayObject.prototype;
 	* Returns an ID number that uniquely identifies the current cache for this display object.
 	* This can be used to determine if the cache has changed since a previous check.
 	* @property cacheID
-	* @type Number
+	* @type {Number}
 	* @default 0
 	*/
 	p.cacheID = 0;
@@ -398,7 +462,7 @@ var p = DisplayObject.prototype;
 	 * A Shape instance that defines a vector mask (clipping path) for this display object.  The shape's transformation
 	 * will be applied relative to the display object's parent coordinates (as if it were a child of the parent).
 	 * @property mask
-	 * @type Shape
+	 * @type {Shape}
 	 * @default null
 	 */
 	p.mask = null;
@@ -409,7 +473,7 @@ var p = DisplayObject.prototype;
 	 * display object and relative to its regX/Y). The hitArea will be tested using only its own alpha value regardless of the alpha value on
 	 * the target display object, or the target's ancestors (parents). hitArea is NOT currently used by the hitTest() method.
 	 * @property hitArea
-	 * @type DisplayObject
+	 * @type {DisplayObject}
 	 * @default null
 	 */
 	p.hitArea = null;
@@ -418,7 +482,7 @@ var p = DisplayObject.prototype;
 	 * A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display object. You must enable
 	 * mouseover events using the stage.enableMouseOver() method to use this property. If null it will use the default cursor.
 	 * @property cursor
-	 * @type String
+	 * @type {String}
 	 * @default null
 	 */
 	p.cursor = null;
@@ -440,7 +504,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * @property _cacheOffsetX
 	 * @protected
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p._cacheOffsetX = 0;
@@ -448,7 +512,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * @property _cacheOffsetY
 	 * @protected
-	 * @type Number
+	 * @type {Number}
 	 * @default 0
 	 **/
 	p._cacheOffsetY = 0;
@@ -456,7 +520,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * @property _cacheScale
 	 * @protected
-	 * @type Number
+	 * @type {Number}
 	 * @default 1
 	 **/
 	p._cacheScale = 1;
@@ -464,7 +528,7 @@ var p = DisplayObject.prototype;
 	/**
 	* @property _cacheDataURLID
 	* @protected
-	* @type Number
+	* @type {Number}
 	* @default 0
 	*/
 	p._cacheDataURLID = 0;
@@ -472,7 +536,7 @@ var p = DisplayObject.prototype;
 	/**
 	* @property _cacheDataURL
 	* @protected
-	* @type String
+	* @type {String}
 	* @default null
 	*/
 	p._cacheDataURL = null;
@@ -480,7 +544,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * @property _matrix
 	 * @protected
-	 * @type Matrix2D
+	 * @type {Matrix2D}
 	 * @default null
 	 **/
 	p._matrix = null;
@@ -598,7 +662,7 @@ var p = DisplayObject.prototype;
 	 * whatwg spec on compositing</a>.
 	 **/
 	p.updateCache = function(compositeOperation) {
-		var cacheCanvas = this.cacheCanvas, offX = this._cacheOffsetX, offY = this._cacheOffsetY, scale = this._cacheScale;
+		var cacheCanvas = this.cacheCanvas, scale = this._cacheScale, offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
 		var ctx = cacheCanvas.getContext("2d");
 		ctx.save();

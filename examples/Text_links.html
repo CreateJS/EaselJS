@@ -57,7 +57,7 @@
 			// update hit area so the full text area is clickable, not just the characters:
 			this.hitArea.graphics.clear().beginFill("#FFF").drawRect(0,0,this.lineWidth||this.getMeasuredWidth(), this.getMeasuredHeight());
 		}
-		
+
 		// set up the handlers for mouseover / out:
 		TextLink.prototype.onMouseOver = function() {
 			this.hover = true;
@@ -84,14 +84,19 @@
 			var link = new TextLink(links[i]+" link!", "36px Arial", links[i], "#FFF");
 			link.x = 100;
 			link.y = 50+i*50;
-			link.onClick = handleClick;
+			link.addEventListener("click", handleClick);
+            link.cursor = "pointer";
 			stage.addChild(link);
 		}
 
 		// we want to do some work before we update the canvas,
 		// otherwise we could use Ticker.addListener(stage);
-		createjs.Ticker.addListener(stage);
+		createjs.Ticker.addEventListener("tick", tick);
 	}
+
+    function tick() {
+        stage.update();
+    }
 	
 	function handleClick(evt) {
 		alert("You clicked on: "+evt.target.text);

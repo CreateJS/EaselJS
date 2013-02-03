@@ -32,19 +32,30 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
- * A Shape allows you to display vector art in the display list. It composites a Graphics instance which exposes all of the vector
- * drawing methods. The Graphics instance can be shared between multiple Shape instances to display the same vector graphics with different
- * positions or transforms. If the vector art will not change between draws, you may want to use the cache() method to reduce the rendering cost.
- * @class ButtonHelper
+ * The ButtonHelper is a helper class to create interactive buttons from {{#crossLink "MovieClip"}}{{/crossLink}} or
+ * {{#crossLink "BitmapAnimation"}}{{/crossLink}} instances. This class will intercept mouse events from an object, and
+ * automatically call {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} or {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}},
+ * to the respective animation labels, add a pointer cursor, and allows the user to define a hit state frame.
+ *
+ * The ButtonHelper instance does not need to be added to the stage, but a reference should be maintained to prevent
+ * garbage collection.
+ *
+ * @example
+ *      var helper = new createjs.ButtonHelper(myInstance, "out", "over", "down", false, myInstance, "hit");
+ *
+ * @param {BitmapAnimation|MovieClip} target The instance to manage.
+ * @param {String} [outLabel="out"] The label or animation to go to when the user rolls out of the button.
+ * @param {String} [overLabel="over"] The label or animation to go to when the user rolls over the button.
+ * @param {String} [downLabel="down"] The label or animation to go to when the user presses the button.
+ * @param {Boolean} [play=false] If the helper should call "gotoAndPlay" or "gotoAndStop" on the button when changing
+ * states.
+ * @param {DisplayObject} [hitArea] An optional item to use as the hit state for the button. If this is not defined,
+ * then the button's visible states will be used instead. Note that the same instance as the "target" argument can be
+ * used for the hitState.
+ * @param {String} [hitLabel] The label or animation on the hitArea instance that defines the hitArea bounds. If this is
+ * null, then the default state of the hitArea will be used.
  * @constructor
- * @param {MovieClip | BitmapAnimation} target The MovieClip or BitmapAnimation to add button functionality to.
- * @param {String | Number} outLabel Optional. The label name or frame number to display when the user mouses over the target. Defaults to "out".
- * @param {String | Number} overLabel Optional. The label name or frame number to display when the user mouses out of the target. Defaults to "over".
- * @param {String | Number} downLabel Optional. The label name or frame number to display when the user presses on the target. Defaults to "down".
- * @param {Boolean} play Optional. If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
- * @param {DisplayObject} hitArea Optional. If specified, this sets the hitArea property on the target.
- * @param {String | Number} hitLabel Optional. If specified, this will set actionsEnabled to false and advance the hitArea to the specified label or frame number. Equivalent to calling hitArea.gotoAndStop(hitLabel).
- **/
+ */
 var ButtonHelper = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
 	this.initialize(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel);
 }

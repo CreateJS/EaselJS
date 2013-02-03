@@ -44,8 +44,8 @@
 
 		// create a BitmapAnimation to display frames from the sprite sheet:
 		var icon1 = new createjs.BitmapAnimation(spriteSheet);
-		icon1.y = 100;
-		icon1.x = 90;
+        icon1.x = 10;
+        icon1.y = 100;
 
 		// because we didn't specify frameData, we have to reference frames by number:
 		icon1.gotoAndStop(2);
@@ -53,7 +53,7 @@
 
 		// we'll clone icon1 to save a little work:
 		var icon2 = icon1.clone();
-		icon2.x += 120;
+		icon2.x += 111;
 		icon2.gotoAndStop(5);
 		stage.addChild(icon2);
 
@@ -72,7 +72,7 @@
 	    // we'll clone icon2, to preserve the x/y, and swap out the SpriteSheet:
 	    var icon3 = icon2.clone();
 	    icon3.spriteSheet = spriteSheet;
-	    icon3.x += 120;
+	    icon3.x += 111;
 
 	    // we can reference frames by name now:
 	    icon3.gotoAndStop("male");
@@ -80,23 +80,27 @@
 
 	    var icon4 = icon3.clone();
 	    icon4.gotoAndStop("female");
-	    icon4.x += 120;
+	    icon4.x += 111;
 	    stage.addChild(icon4);
 
 	    var icon5 = icon4.clone();
 	    icon5.gotoAndStop("trash");
-	    icon5.x += 120;
+	    icon5.x += 111;
 	    stage.addChild(icon5);
 
 	    // finally, we'll add one that just plays through:
 	    var icon6 = icon1.clone();
-	    icon6.x = icon5.x + 190;
+	    icon6.x = icon5.x + 111;
 	    icon6.gotoAndPlay(0);
 	    stage.addChild(icon6);
 
 		createjs.Ticker.setFPS(3); // slow, so we can see the icons
-		createjs.Ticker.addListener(stage);
+		createjs.Ticker.addEventListener("tick", tick);
 	}
+
+    function tick() {
+        stage.update();
+    }
 
 	</script>
 	<style>

@@ -47,8 +47,8 @@
 	function handleImageLoad() {
 		// attach mouse handlers directly to the source canvas.
 		// better than calling from canvas tag for cross browser compatibility:
-		stage.onMouseMove = moveCanvas;
-		stage.onMouseDown = clickCanvas;
+		stage.addEventListener("stagemousemove", moveCanvas);
+		stage.addEventListener("stagemousedown", clickCanvas);
 
 		// create a semi-opaque black rectangle that covers the full stage.
 		// drawing this to stage each tick will cause the canvas to fade to black.
@@ -72,7 +72,7 @@
 		bmpAnim = new createjs.BitmapAnimation(new createjs.SpriteSheet(data));
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
-		createjs.Ticker.addListener(window);
+		createjs.Ticker.addEventListener("tick", tick);
 	}
 
 	function tick() {

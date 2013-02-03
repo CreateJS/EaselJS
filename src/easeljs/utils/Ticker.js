@@ -33,15 +33,22 @@ this.createjs = this.createjs||{};
 
 // constructor:
 /**
-* The Ticker class uses a static interface (ex. Ticker.getPaused()) and should not be instantiated.
-* Provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe
-* to the tick event to be notified when a set time interval has elapsed.
-* Note that the interval that the tick event is called is a target interval, and may be broadcast
-* at a slower interval during times of high CPU load.
-* @class Ticker
-* @uses EventDispatcher
-* @static
-**/
+ * The Ticker provides  a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe to the tick
+ * event to be notified when a set time interval has elapsed.
+ *
+ * Note that the interval that the tick event is called is a target interval, and may be broadcast at a slower interval
+ * during times of high CPU load. The Ticker class uses a static interface (ex. <code>Ticker.getPaused()</code>) and should not be
+ * instantiated.
+ *
+ * <h4>Example</h4>
+ *      createjs.Ticker.addEventListener("tick", handleTick);
+ *      function handleTick(event) {
+ *          // Actions carried out each frame
+ *      }
+ * @class Ticker
+ * @uses EventDispatcher
+ * @static
+ **/
 var Ticker = function() {
 	throw "Ticker cannot be instantiated.";
 }
@@ -68,7 +75,7 @@ var Ticker = function() {
 	 * 20, 30, 60).
 	 * @property useRAF
 	 * @static
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @default false
 	 **/
 	Ticker.useRAF = false;
@@ -88,42 +95,42 @@ var Ticker = function() {
 	
 	/** 
 	 * @property _listeners
-	 * @type Array[Object]
+	 * @type {Array}
 	 * @protected 
 	 **/
 	Ticker._listeners = null;
 	
 	/** 
 	 * @property _pauseable
-	 * @type Array[Boolean]
+	 * @type {Array}
 	 * @protected 
 	 **/
 	Ticker._pauseable = null;
 	
 	/** 
 	 * @property _paused
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @protected 
 	 **/
 	Ticker._paused = false;
 	
 	/** 
 	 * @property _inited
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @protected 
 	 **/
 	Ticker._inited = false;
 	
 	/** 
 	 * @property _startTime
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._startTime = 0;
 	
 	/** 
 	 * @property _pausedTime
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._pausedTime=0;
@@ -131,7 +138,7 @@ var Ticker = function() {
 	/** 
 	 * Number of ticks that have passed
 	 * @property _ticks
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._ticks = 0;
@@ -139,49 +146,49 @@ var Ticker = function() {
 	/**
 	 * Number of ticks that have passed while Ticker has been paused
 	 * @property _pausedTicks
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._pausedTicks = 0;
 	
 	/** 
 	 * @property _interval
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._interval = 50; // READ-ONLY
 	
 	/** 
 	 * @property _lastTime
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._lastTime = 0;
 	
 	/** 
 	 * @property _times
-	 * @type Array[Number]
+	 * @type {Array}
 	 * @protected 
 	 **/
 	Ticker._times = null;
 	
 	/** 
 	 * @property _tickTimes
-	 * @type Array[Number]
+	 * @type {Array}
 	 * @protected 
 	 **/
 	Ticker._tickTimes = null;
 	
 	/** 
 	 * @property _rafActive
-	 * @type Boolean
+	 * @type {Boolean}
 	 * @protected 
 	 **/
 	Ticker._rafActive = false;
 	
 	/** 
 	 * @property _timeoutID
-	 * @type Number
+	 * @type {Number}
 	 * @protected 
 	 **/
 	Ticker._timeoutID = null;
@@ -189,7 +196,7 @@ var Ticker = function() {
 	
 // public static methods:
 	/**
-	 * Adds a listener for the tick event. The listener must be either an object exposing a .tick() method,
+	 * Adds a listener for the tick event. The listener must be either an object exposing a <code>tick</code> method,
 	 * or a function. The listener will be called once each tick / interval. The interval is specified via the 
 	 * .setInterval(ms) method.
 	 * The tick method or function is passed two parameters: the elapsed time between the 

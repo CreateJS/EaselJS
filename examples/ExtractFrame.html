@@ -6,6 +6,7 @@
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 
+    <script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
 	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
@@ -39,10 +40,10 @@
 		// extract the first frame of the walkRight sequence as a new image:
 		// could alternately use the frame number.
 		img = createjs.SpriteSheetUtils.extractFrame(spriteSheet, "walkRight");
-		
+
 		// note that you could use this as the source of a Bitmap object as well, though
 		// in almost all cases you'd be better just using BitmapAnimation.
-	//	var bmp = new Bitmap(img);
+	    //var bmp = new createjs.Bitmap(img);
 
 		// add the newly created image to the bottom of this document:
 		document.getElementById("content").appendChild(img);

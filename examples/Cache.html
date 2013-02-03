@@ -65,7 +65,7 @@
 		fpsLabel.y = 20;
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
-		createjs.Ticker.addListener(window);
+		createjs.Ticker.addEventListener("tick", tick);
 		createjs.Ticker.setFPS(50);
 	}
 

@@ -32,13 +32,15 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
- * The MovieClip class associates a TweenJS Timeline with an EaselJS Container. It allows you to create objects which
- * encapsulate timeline animations, state changes, and synched actions. Due to the complexities inherent in correctly
- * setting up a MovieClip, it is largely intended for tool output and is not included in the main EaselJS library.
- * <br/><br/>
+ * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
+ * you to create objects which encapsulate timeline animations, state changes, and synched actions. Due to the
+ * complexities inherent in correctly setting up a MovieClip, it is largely intended for tool output and is not included
+ * in the main EaselJS library.
+ *
  * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
- * been made to support time based timelines in the future.
+ * been made to support time-based timelines in the future.
  * @class MovieClip
+ * @main MovieClip
  * @extends Container
  * @constructor
  * @param {String} mode Initial value for the mode property. One of MovieClip.INDEPENDENT, MovieClip.SINGLE_FRAME, or MovieClip.SYNCHED.
@@ -292,7 +294,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @method clone
 	 **/
 	p.clone = function() {
-		// TODO: add support for this?? Need to clone the Timeline & retarget tweens - pretty complex.
+		// TODO: add support for this? Need to clone the Timeline & retarget tweens - pretty complex.
 		throw("MovieClip cannot be cloned.")
 	}
 	
@@ -435,7 +437,8 @@ createjs.MovieClip = MovieClip;
 
 
 	/**
-	 * This plugin works with TweenJS to prevent the startPosition property from tweening.
+	 * This plugin works with <a href="http://tweenjs.com" target="_blank">TweenJS</a> to prevent the startPosition
+	 * property from tweening.
 	 * @private
 	 * @class MovieClipPlugin
 	 * @constructor

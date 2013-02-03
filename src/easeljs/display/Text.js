@@ -32,19 +32,31 @@ this.createjs = this.createjs||{};
 (function() {
 	
 /**
-* Allows you to display one or more lines of dynamic text (not user editable) in the display list.
-* Line wrapping support (using the lineWidth is very basic, wrapping on spaces and tabs only. Note
-* that as an alternative to Text, you can position HTML text above or below the canvas relative to 
-* items in the display list using the localToGlobal() method.
-* @class Text
-* @extends DisplayObject
-* @constructor
-* @param {String} text Optional. The text to display.
-* @param {String} font Optional. The font style to use. Any valid value for the CSS font attribute is 
-* acceptable (ex. "bold 36px Arial").
-* @param {String} color Optional. The color to draw the text in. Any valid value for the CSS color attribute
-* is acceptable (ex. "#F00").
-**/
+ * Display one or more lines of dynamic text (not user editable) in the display list. Line wrapping support (using the
+ * lineWidth) is very basic, wrapping on spaces and tabs only. Note that as an alternative to Text, you can position HTML
+ * text above or below the canvas relative to items in the display list using the {{#crossLink "DisplayObject/localToGlobal"}}{{/crossLink}}
+ * method, or using {{#crossLink "DOMElement"}}{{/crossLink}}.
+ *
+ * <b>Please note that Text does not support HTML text, and can only display one font style at a time.</b> To use
+ * multiple font styles, you will need to create multiple text instances, and position them manually.
+ *
+ * <h4>Example</h4>
+ *      var text = new createjs.Text("Hello World", "20px Arial", #ff7700");
+ *      text.x = 100;
+ *      text.textBaseline = "alphabetic";
+ *
+ * CreateJS Text supports web fonts (the same rules as Canvas). The font must be loaded and supported by the browser
+ * before it can be displayed.
+ *
+ * @class Text
+ * @extends DisplayObject
+ * @constructor
+ * @param {String} [text] The text to display.
+ * @param {String} [font] The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold
+ * 36px Arial").
+ * @param {String} [color] The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex.
+ * "#F00", "red", or "#FF0000").
+ **/
 var Text = function(text, font, color) {
   this.initialize(text, font, color);
 }
@@ -154,7 +166,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * This does not account for whether it would be visible within the boundaries of the stage.
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method isVisible
-	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+	 * @return {Boolean} Whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
 		var hasContent = this.cacheCanvas || (this.text != null && this.text !== "");
