@@ -297,11 +297,14 @@ var p = SpriteSheet.prototype;
 				if (typeof obj == "number") { // single frame
 					a = anim.frames = [obj];
 				} else if (obj instanceof Array) { // simple
-					anim.frequency = obj[3];
-					anim.next = obj[2];
-					a = anim.frames = [];
-					for (i=obj[0];i<=obj[1];i++) {
-						a.push(i);
+					if (obj.length == 1) { anim.frames = [obj[0]]; }
+					else {
+						anim.frequency = obj[3];
+						anim.next = obj[2];
+						a = anim.frames = [];
+						for (i=obj[0];i<=obj[1];i++) {
+							a.push(i);
+						}
 					}
 				} else { // complex
 					anim.frequency = obj.frequency;
