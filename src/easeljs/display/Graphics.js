@@ -603,15 +603,15 @@ var p = Graphics.prototype;
 	 *
 	 * @method setStrokeStyle
 	 * @param {Number} thickness The width of the stroke.
-	 * @param {String | Number} caps Optional. Indicates the type of caps to use at the end of lines. One of butt,
+	 * @param {String | Number} [caps=0] Indicates the type of caps to use at the end of lines. One of butt,
 	 * round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with
 	 * the tiny API.
-	 * @param {String | Number} joints Optional. Specifies the type of joints that should be used where two lines meet.
+	 * @param {String | Number} [joints=0] Specifies the type of joints that should be used where two lines meet.
 	 * One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel)
 	 * for use with the tiny API.
-	 * @param {Number} miter Optional. If joints is set to "miter", then you can specify a miter limit ratio which
+	 * @param {Number} [miterLimit=10] If joints is set to "miter", then you can specify a miter limit ratio which
 	 * controls at what point a mitered joint will be clipped.
-	 * @param {Boolean} ignoreScale Optional. If true, the stroke will be drawn at the specified thickness regardless
+	 * @param {Boolean} [ignoreScale=false] If true, the stroke will be drawn at the specified thickness regardless
 	 * of active transformations.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
