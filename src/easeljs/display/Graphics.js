@@ -229,6 +229,13 @@ var p = Graphics.prototype;
 	p._strokeStyleInstructions = null;
 	
 	/**
+	 * @property _ignoreScaleStroke
+	 * @protected
+	 * @type Boolean
+	 **/
+	p._ignoreScaleStroke = false;
+	
+	/**
 	 * @property _fillInstructions
 	 * @protected
 	 * @type {Array}
@@ -289,7 +296,7 @@ var p = Graphics.prototype;
 	 **/
 	p.isEmpty = function() {
 		return !(this._instructions.length || this._oldInstructions.length || this._activeInstructions.length);
-	}
+	};
 	
 	/**
 	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
@@ -489,7 +496,7 @@ var p = Graphics.prototype;
 	 **/
 	p.beginFill = function(color) {
 		if (this._active) { this._newPath(); }
-		this._fillInstructions = color ? [new Command(this._setProp, ["fillStyle", color], false)] : null;
+		this._fillInstructions = color ? [new Command(this._setProp, ["fillStyle", color], false), Graphics.fillCmd] : null;
 		return this;
 	};
 	
@@ -516,7 +523,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false), Graphics.fillCmd];
 		return this;
 	};
 	
@@ -545,7 +552,7 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false), Graphics.fillCmd];
 		return this;
 	};
 	
@@ -555,13 +562,27 @@ var p = Graphics.prototype;
 	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use as the pattern.
 	 * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
 	 * "repeat-y", or "no-repeat". Defaults to "repeat".
+	 * @param {Matrix2D} matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation will be applied relative to the parent transform.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
-	p.beginBitmapFill = function(image, repetition) {
+	p.beginBitmapFill = function(image, repetition, matrix) {
 		if (this._active) { this._newPath(); }
 		repetition = repetition || "";
 		var o = this._ctx.createPattern(image, repetition);
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
+		var cmd = new Command(this._setProp, ["fillStyle", o], false);
+		var arr;
+		if (matrix) {
+			arr = [
+				cmd,
+				new Command(this._ctx.save, [], false),
+				new Command(this._ctx.transform, [matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty], false),
+				Graphics.fillCmd,
+				new Command(this._ctx.restore, [], false)
+			];
+		} else {
+			arr = [cmd, Graphics.fillCmd];
+		}
+		this._fillInstructions = arr;
 		return this;
 	};
 	
@@ -590,9 +611,11 @@ var p = Graphics.prototype;
 	 * for use with the tiny API.
 	 * @param {Number} miter Optional. If joints is set to "miter", then you can specify a miter limit ratio which
 	 * controls at what point a mitered joint will be clipped.
+	 * @param {Boolean} ignoreScale Optional. If true, the stroke will be drawn at the specified thickness regardless
+	 * of active transformations.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
-	p.setStrokeStyle = function(thickness, caps, joints, miterLimit) {
+	p.setStrokeStyle = function(thickness, caps, joints, miterLimit, ignoreScale) {
 		if (this._active) { this._newPath(); }
 		this._strokeStyleInstructions = [
 			new Command(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)], false),
@@ -600,6 +623,7 @@ var p = Graphics.prototype;
 			new Command(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))], false),
 			new Command(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)], false)
 			];
+		this._ignoreScaleStroke = ignoreScale;
 		return this;
 	};
 	
@@ -678,7 +702,8 @@ var p = Graphics.prototype;
 	};
 	
 	/**
-	 * Begins a pattern fill using the specified image. This ends the current sub-path.
+	 * Begins a pattern fill using the specified image. This ends the current sub-path. Note that unlike bitmap fills, strokes
+	 * do not currently support a matrix parameter due to limitations in the canvas API.
 	 * @method beginBitmapStroke
 	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
 	 * as the pattern.
@@ -688,7 +713,8 @@ var p = Graphics.prototype;
 	 **/
 	p.beginBitmapStroke = function(image, repetition) {
 		if (this._active) { this._newPath(); }
-		var o = this._ctx.createPattern(image, repetition || "");
+		repetition = repetition || "";
+		var o = this._ctx.createPattern(image, repetition);
 		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o], false)];
 		return this;
 	};
@@ -812,7 +838,7 @@ var p = Graphics.prototype;
 	 * @param {Number} h width (vertical diameter) of ellipse. The vertical radius will be half of this number.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
-	p.drawEllipse = function(x, y, w, h, startAngle, endAngle, innerRadius) {
+	p.drawEllipse = function(x, y, w, h) {
 		this._dirty = this._active = true;
 		var k = 0.5522848;
 		var ox = (w / 2) * k;
@@ -1161,19 +1187,26 @@ var p = Graphics.prototype;
 	p._updateInstructions = function() {
 		this._instructions = this._oldInstructions.slice();
 		this._instructions.push(Graphics.beginCmd);
-		 
-		if (this._fillInstructions) { this._instructions.push.apply(this._instructions, this._fillInstructions); }
-		if (this._strokeInstructions) {
-			this._instructions.push.apply(this._instructions, this._strokeInstructions);
-			if (this._strokeStyleInstructions) {
-				this._instructions.push.apply(this._instructions, this._strokeStyleInstructions);
-			}
-		}
 		
 		this._instructions.push.apply(this._instructions, this._activeInstructions);
 		
-		if (this._fillInstructions) { this._instructions.push(Graphics.fillCmd); }
-		if (this._strokeInstructions) { this._instructions.push(Graphics.strokeCmd); }
+		if (this._fillInstructions) { this._instructions.push.apply(this._instructions, this._fillInstructions); }
+		if (this._strokeInstructions) {
+			if (this._strokeStyleInstructions) {
+				this._instructions.push.apply(this._instructions, this._strokeStyleInstructions);
+			}
+			this._instructions.push.apply(this._instructions, this._strokeInstructions);
+			if (this._ignoreScaleStroke) {
+				this._instructions.push(
+					new Command(this._ctx.save, [], false),
+					new Command(this._ctx.setTransform, [1,0,0,1,0,0], false),
+					Graphics.strokeCmd,
+					new Command(this._ctx.restore, [], false)
+				);
+			} else {
+				this._instructions.push(Graphics.strokeCmd);
+			}
+		}
 	};
 	
 	/**
