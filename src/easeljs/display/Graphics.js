@@ -70,11 +70,51 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
  *	    stage.addChild(s);
  *	    stage.update();
  *
- * Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example, the following
- * line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then render it to the specified
- * context2D:
+ * Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
+ * the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then
+ * render it to the specified context2D:
  *
  *      myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
+ *
+ * <h4>Tiny API</h4>
+ * The Graphics class also includes a "tiny API", which is one or two-letter methods that are shortcuts for all of the
+ * Graphics methods. These methods are great for creating compact instructions, and is used by the Toolkit for CreateJS
+ * to generate readable code. All tiny methods are marked as protected, so you can view them by enabling protected
+ * descriptions in the docs.
+ *
+ * <table>
+ *     <tr><td><b>Tiny</b></td><td><b>Method</b></td><td><b>Tiny</b></td><td><b>Method</b></td></tr>
+ *     <tr><td>mt</td><td>{{#crossLink "Graphics/moveTo"}}{{/crossLink}} </td>
+ *     <td>lt</td> <td>{{#crossLink "Graphics/lineTo"}}{{/crossLink}}</td></tr>
+ *     <tr><td>at</td><td>{{#crossLink "Graphics/arcTo"}}{{/crossLink}} </td>
+ *     <td>bt</td><td>{{#crossLink "Graphics/bezierCurveTo"}}{{/crossLink}} </td></tr>
+ *     <tr><td>qt</td><td>{{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} (also curveTo)</td>
+ *     <td>r</td><td>{{#crossLink "Graphics/rect"}}{{/crossLink}} </td></tr>
+ *     <tr><td>cp</td><td>{{#crossLink "Graphics/closePath"}}{{/crossLink}} </td>
+ *     <td>c</td><td>{{#crossLink "Graphics/clear"}}{{/crossLink}} </td></tr>
+ *     <tr><td>f</td><td>{{#crossLink "Graphics/beginFill"}}{{/crossLink}} </td>
+ *     <td>lf</td><td>{{#crossLink "Graphics/beginLinearGradientFill"}}{{/crossLink}} </td></tr>
+ *     <tr><td>rf</td><td>{{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} </td>
+ *     <td>bf</td><td>{{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} </td></tr>
+ *     <tr><td>ef</td><td>{{#crossLink "Graphics/endFill"}}{{/crossLink}} </td>
+ *     <td>ss</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} </td></tr>
+ *     <tr><td>s</td><td>{{#crossLink "Graphics/beginStroke"}}{{/crossLink}} </td>
+ *     <td>ls</td><td>{{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} </td></tr>
+ *     <tr><td>rs</td><td>{{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} </td>
+ *     <td>bs</td><td>{{#crossLink "Graphics/beginBitmapStroke"}}{{/crossLink}} </td></tr>
+ *     <tr><td>es</td><td>{{#crossLink "Graphics/endStroke"}}{{/crossLink}} </td>
+ *     <td>dr</td><td>{{#crossLink "Graphics/drawRect"}}{{/crossLink}} </td></tr>
+ *     <tr><td>rr</td><td>{{#crossLink "Graphics/drawRoundRect"}}{{/crossLink}} </td>
+ *     <td>rc</td><td>{{#crossLink "Graphics/drawRoundRectComplex"}}{{/crossLink}} </td></tr>
+ *     <tr><td>dc</td><td>{{#crossLink "Graphics/drawCircle"}}{{/crossLink}} </td>
+ *     <td>de</td><td>{{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} </td></tr>
+ *     <tr><td>dp</td><td>{{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} </td>
+ *     <td>p</td><td>{{#crossLink "Graphics/decodePath"}}{{/crossLink}} </td></tr>
+ * </table>
+ *
+ * Here is the above example, using the tiny API instead.
+ *
+ *      myGraphics.s("#F00").f("#00F").r(20, 20, 100, 50).draw(myContext2D);
  *
  * @class Graphics
  * @constructor
@@ -424,7 +464,7 @@ var p = Graphics.prototype;
 	 * cp2y). For detailed information, read the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-beziercurveto">
 	 * whatwg spec</a>.
-	 * method @bezierCurveTo
+	 * @method bezierCurveTo
 	 * @param {Number} cp1x
 	 * @param {Number} cp1y
 	 * @param {Number} cp2x
@@ -732,7 +772,7 @@ var p = Graphics.prototype;
 	/**
 	 * Maps the familiar ActionScript <code>curveTo()</code> method to the functionally similar {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}}
 	 * method.
-	 * @property curveTo
+	 * @method curveTo
 	 * @type {Function}
 	 **/
 	p.curveTo = p.quadraticCurveTo;
@@ -740,7 +780,7 @@ var p = Graphics.prototype;
 	/**
 	 * Maps the familiar ActionScript <code>drawRect()</code> method to the functionally similar {{#crossLink "Graphics/rect"}}{{/crossLink}}
 	 * method.
-	 * @property drawRect
+	 * @method drawRect
 	 * @type {Function}
 	 **/
 	p.drawRect = p.rect;
@@ -990,189 +1030,189 @@ var p = Graphics.prototype;
 	
 // tiny API:
 	/** Shortcut to moveTo.
-	 * @property mt
+	 * @method mt
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.mt = p.moveTo;
 	
 	/** Shortcut to lineTo.
-	 * @property lt
+	 * @method lt
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.lt = p.lineTo;
 	
 	/** Shortcut to arcTo.
-	 * @property at
+	 * @method at
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.at = p.arcTo;
 	
 	/** Shortcut to bezierCurveTo.
-	 * @property bt
+	 * @method bt
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.bt = p.bezierCurveTo;
 	
 	/** Shortcut to quadraticCurveTo / curveTo.
-	 * @property qt
+	 * @method qt
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.qt = p.quadraticCurveTo;
 	
 	/** Shortcut to arc.
-	 * @property a
+	 * @method a
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.a = p.arc;
 	
 	/** Shortcut to rect.
-	 * @property r
+	 * @method r
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.r = p.rect;
 	
 	/** Shortcut to closePath.
-	 * @property cp
+	 * @method cp
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.cp = p.closePath;
 	
 	/** Shortcut to clear.
-	 * @property c
+	 * @method c
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.c = p.clear;
 	
 	/** Shortcut to beginFill.
-	 * @property f
+	 * @method f
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.f = p.beginFill;
 	
 	/** Shortcut to beginLinearGradientFill.
-	 * @property lf
+	 * @method lf
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.lf = p.beginLinearGradientFill;
 	
 	/** Shortcut to beginRadialGradientFill.
-	 * @property rf
+	 * @method rf
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.rf = p.beginRadialGradientFill;
 	
 	/** Shortcut to beginBitmapFill.
-	 * @property bf
+	 * @method bf
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.bf = p.beginBitmapFill;
 	
 	/** Shortcut to endFill.
-	 * @property ef
+	 * @method ef
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.ef = p.endFill;
 	
 	/** Shortcut to setStrokeStyle.
-	 * @property ss
+	 * @method ss
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.ss = p.setStrokeStyle;
 	
 	/** Shortcut to beginStroke.
-	 * @property s
+	 * @method s
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.s = p.beginStroke;
 	
 	/** Shortcut to beginLinearGradientStroke.
-	 * @property ls
+	 * @method ls
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.ls = p.beginLinearGradientStroke;
 	
 	/** Shortcut to beginRadialGradientStroke.
-	 * @property rs
+	 * @method rs
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.rs = p.beginRadialGradientStroke;
 	
 	/** Shortcut to beginBitmapStroke.
-	 * @property bs
+	 * @method bs
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.bs = p.beginBitmapStroke;
 	
 	/** Shortcut to endStroke.
-	 * @property es
+	 * @method es
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.es = p.endStroke;
 	
 	/** Shortcut to drawRect.
-	 * @property dr
+	 * @method dr
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.dr = p.drawRect;
 	
 	/** Shortcut to drawRoundRect.
-	 * @property rr
+	 * @method rr
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.rr = p.drawRoundRect;
 	
 	/** Shortcut to drawRoundRectComplex.
-	 * @property rc
+	 * @method rc
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.rc = p.drawRoundRectComplex;
 	
 	/** Shortcut to drawCircle.
-	 * @property dc
+	 * @method dc
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.dc = p.drawCircle;
 	
 	/** Shortcut to drawEllipse.
-	 * @property de
+	 * @method de
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.de = p.drawEllipse;
 	
 	/** Shortcut to drawPolyStar.
-	 * @property dp
+	 * @method dp
 	 * @protected
 	 * @type {Function}
 	 **/
 	p.dp = p.drawPolyStar;
 	
 	/** Shortcut to decodePath.
-	 * @property p
+	 * @method p
 	 * @protected
 	 * t@ype Function
 	 **/
