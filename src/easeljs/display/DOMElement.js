@@ -139,7 +139,10 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 		
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
 		if (this.visible) { style.visibility = "visible"; }
-		else { return true; }
+		else {
+			style.visibility = "hidden";
+			return true;
+		}
 		
 		var oMtx = this._oldMtx||{};
 		if (oMtx.alpha != mtx.alpha) { style.opacity = ""+mtx.alpha; oMtx.alpha = mtx.alpha; }
