@@ -225,7 +225,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 **/
 	p._tick = function(params) {
 		// TODO: figure out how to get around this.
-		this.htmlElement.style.visible = "hidden";
+		this.htmlElement.style.visibility = "hidden";
 		this.DisplayObject__tick(params);
 	};
 	
