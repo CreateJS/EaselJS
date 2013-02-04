@@ -106,6 +106,13 @@ var p = ButtonHelper.prototype;
 	 **/
 	p._isPressed = false;
 	
+	/**
+	 * @property _isPressed
+	 * @type Boolean
+	 * @protected
+	 **/
+	p._isOver = false;
+	
 // constructor:
 	/** 
 	 * Initialization method.
@@ -143,12 +150,10 @@ var p = ButtonHelper.prototype;
 			o.addEventListener("mouseover", this);
 			o.addEventListener("mouseout", this);
 			o.addEventListener("mousedown", this);
-			o.addEventListener("click", this);
 		} else {
 			o.removeEventListener("mouseover", this);
 			o.removeEventListener("mouseout", this);
 			o.removeEventListener("mousedown", this);
-			o.removeEventListener("click", this);
 		}
 	};
 		
@@ -168,19 +173,22 @@ var p = ButtonHelper.prototype;
 	 * @protected
 	 **/
 	p.handleEvent = function(evt) {
-		var label = (evt.type == "mouseover" && !this._isPressed) || evt.type == "click" ? this.overLabel :
-				  		(evt.type == "mouseover" && this._isPressed) || evt.type == "mousedown" ? this.downLabel :
-						(this._isPressed) ? this.overLabel : this.outLabel;
+		var label, t = this.target, type = evt.type;
 		
-		if (evt.type == "mousedown") {
-			this._isPressed = true;
+		if (type == "mousedown") {
 			evt.addEventListener("mouseup", this);
-		} else if (evt.type == "mouseup") {
+			this._isPressed = true;
+			label = this.downLabel;
+		} else if (type == "mouseup") {
 			this._isPressed = false;
-			return;
+			label = this._isOver ? this.overLabel : this.outLabel;
+		} else if (type == "mouseover") {
+			this._isOver = true;
+			label = this._isPressed ? this.downLabel : this.overLabel;
+		} else { // mouseout and default
+			this._isOver = false;
+			label = this._isPressed ? this.overLabel : this.outLabel;
 		}
-		
-		var t = this.target;
 		if (this.play) {
 			t.gotoAndPlay&&t.gotoAndPlay(label);
 		} else {
