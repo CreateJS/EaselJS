@@ -265,10 +265,21 @@ var p = Stage.prototype = new createjs.Container();
 	/**
 	 * Calls the update method. Useful for adding stage as a listener to {{#crossLink "Ticker"}}{{/crossLink}} directly.
 	 * @property tick
-	 * @private
+	 * @deprecated In favour of using Ticker.addEventListener in conjunction with handleEvent.
 	 * @type Function
 	 **/
 	p.tick = p.update;
+	
+	/**
+	 * Default event handler that calls Stage.update() when a "tick" event is received. This allows you to register a
+	 * Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}} directly, using
+	 * <code>Ticker.addEventListener("tick", myStage");</code>
+	 * @property handleEvent
+	 * @type Function
+	 **/
+	p.handleEvent = function(evt) {
+		if (evt.type == "tick") { this.update(evt.delta); }
+	}
 
 	/**
 	 * Clears the target canvas. Useful if <code>autoClear</code> is set to false.
