@@ -32,6 +32,9 @@ Version NEXT [not released]
 - new and improved build process, tools & documentation format
 - added Stage.enableDOMEvents() method
 - added default Stage.handleEvent() for integration with Ticker and new event model
+- deprecated Stage.snapToPixel API
+- added Graphics.ignoreScale API
+- added a matrix parameter to Graphics.beginBitmapFill
 
 
 Version 0.5.0 [Aug 24, 2012]
