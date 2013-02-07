@@ -472,6 +472,8 @@ var p = DisplayObject.prototype;
 	 * will have its transformation applied relative to this display object's coordinate space (as though the hit test object were a child of this
 	 * display object and relative to its regX/Y). The hitArea will be tested using only its own alpha value regardless of the alpha value on
 	 * the target display object, or the target's ancestors (parents). hitArea is NOT currently used by the hitTest() method.
+	 * 
+	 * Note that hitArea is not supported for Stage.
 	 * @property hitArea
 	 * @type {DisplayObject}
 	 * @default null
