@@ -114,9 +114,9 @@ var p = EventDispatcher.prototype;
 	p.addEventListener = function(type, listener) {
 		var listeners = this._listeners;
 		if (!listeners) { listeners = this._listeners = {}; }
+		else { this.removeEventListener(type, listener); }
 		var arr = listeners[type];
 		if (!arr) { arr = listeners[type] = []; }
-		else { this.removeEventListener(type, listener); }
 		arr.push(listener);
 		return listener;
 	};
