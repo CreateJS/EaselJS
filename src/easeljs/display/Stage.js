@@ -186,6 +186,13 @@ var p = Stage.prototype = new createjs.Container();
 	 * @default false
 	 **/
 	p.mouseMoveOutside = false;
+	
+	/**
+	 * The hitArea property is not supported for Stage.
+	 * @property hitArea
+	 * @type {DisplayObject}
+	 * @default null
+	 */
 
 // private properties:
 
@@ -272,13 +279,17 @@ var p = Stage.prototype = new createjs.Container();
 	
 	/**
 	 * Default event handler that calls Stage.update() when a "tick" event is received. This allows you to register a
-	 * Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}} directly, using
+	 * Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}} directly, using:
+	 * 
 	 * <code>Ticker.addEventListener("tick", myStage");</code>
+	 * 
+	 * Note that if you subscribe to ticks using this pattern then the tick event object will be passed through to display
+	 * object tick handlers, instead of delta and paused parameters.
 	 * @property handleEvent
 	 * @type Function
 	 **/
 	p.handleEvent = function(evt) {
-		if (evt.type == "tick") { this.update(evt.delta); }
+		if (evt.type == "tick") { this.update(evt); }
 	}
 
 	/**
