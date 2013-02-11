@@ -283,7 +283,7 @@ var p = Stage.prototype = new createjs.Container();
 	 * Default event handler that calls Stage.update() when a "tick" event is received. This allows you to register a
 	 * Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}} directly, using:
 	 * 
-	 * <code>Ticker.addEventListener("tick", myStage");</code>
+	 *      Ticker.addEventListener("tick", myStage");
 	 * 
 	 * Note that if you subscribe to ticks using this pattern then the tick event object will be passed through to display
 	 * object tick handlers, instead of delta and paused parameters.
