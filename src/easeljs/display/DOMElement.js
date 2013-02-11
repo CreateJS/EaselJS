@@ -259,6 +259,6 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 		this.htmlElement.style.visibility = "hidden";
 		this.DisplayObject__tick(params);
 	};
-	
+
 createjs.DOMElement = DOMElement;
 }());
