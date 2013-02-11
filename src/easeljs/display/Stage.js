@@ -65,7 +65,7 @@ var p = Stage.prototype = new createjs.Container();
 	 * @static
 	 * @type {Boolean}
 	 * @default false
-	 * @deprecated Hardware acceleration makes this not beneficial
+	 * @deprecated Hardware acceleration in modern browsers makes this unnecessary.
 	 **/
 	Stage._snapToPixelEnabled = false; // snapToPixelEnabled is temporarily copied here during a draw to provide global access.
 
