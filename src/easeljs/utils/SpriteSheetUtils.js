@@ -90,7 +90,9 @@ var SpriteSheetUtils = function() {
 	}
 
 	/**
-	 * Returns a single frame of the specified sprite sheet as a new PNG image.
+	 * Returns a single frame of the specified sprite sheet as a new PNG image. Note that in almost all cases it is better
+	 * to display a single frame using a paused instance of BitmapAnimation, than it is to slice out a frame using this
+	 * method and display it with a Bitmap instance.
 	 * @method extractFrame
 	 * @static
 	 * @param {Image} spriteSheet The SpriteSheet instance to extract a frame from.

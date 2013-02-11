@@ -374,6 +374,7 @@ var p = DisplayObject.prototype;
 	 * @property snapToPixel
 	 * @type {Boolean}
 	 * @default false
+	 * @deprecated Hardware acceleration in modern browsers makes this unnecessary.
 	 **/
 	p.snapToPixel = false;
 	 
