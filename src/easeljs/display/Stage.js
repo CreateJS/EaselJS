@@ -532,7 +532,10 @@ var p = Stage.prototype = new createjs.Container();
 	 * @param {HTMLElement} e
 	 **/
 	p._getElementRect = function(e) {
-		var bounds = e.getBoundingClientRect();
+		var bounds;
+		try { bounds = e.getBoundingClientRect(); } // this can fail on disconnected DOM elements in IE9
+		catch (err) { bounds = {top: e.offsetTop, left: e.offsetLeft, width:e.offsetWidth, height:e.offsetHeight}; }
+		
 		var offX = (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || document.body.clientLeft || 0);
 		var offY = (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || document.body.clientTop  || 0);
 		
