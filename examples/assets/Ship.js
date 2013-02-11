@@ -4,7 +4,7 @@
 function Ship() {
   this.initialize();
 }
-var p = Ship.prototype = new Container();
+var p = Ship.prototype = new createjs.Container();
 
 // public properties:
 	Ship.TOGGLE = 60;
@@ -30,8 +30,8 @@ var p = Ship.prototype = new Container();
 	p.initialize = function() {
 		this.Container_initialize();
 		
-		this.shipFlame = new Shape();
-		this.shipBody = new Shape();
+		this.shipFlame = new createjs.Shape();
+		this.shipBody = new createjs.Shape();
 		
 		this.addChild(this.shipFlame);
 		this.addChild(this.shipBody);

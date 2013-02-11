@@ -28,12 +28,18 @@
 
 	<script>
 	var img, star, stage;
-
+    var scale;
+	var angle;
 	function init() {
+        if (window.top != window) {
+            document.getElementById("header").style.display = "none";
+        }
+
 		//wait for the image to load
 		img = new Image();
 		img.onload = handleImageLoad;
-		img.src = "assets/photo.jpg";
+		img.src = "assets/photo-hires.jpg";
+		angle = 0;
 	}
 
 	function handleImageLoad() {
@@ -50,7 +56,7 @@
 		star.y = img.height/2;
 		// only the drawPolyStar call is needed for the mask to work:
 		star.graphics.beginStroke("#FF0").setStrokeStyle(5).drawPolyStar(0,0,img.height/2-15,5,0.6).closePath();
-		
+
 		var bg = new createjs.Bitmap(img);
 		// blur and desaturate the background image:
 		bg.filters = [new createjs.BoxBlurFilter(2,2,2), new createjs.ColorMatrixFilter(new createjs.ColorMatrix(0,0,-100,0))];
@@ -69,8 +75,10 @@
 	}
 	
 	function tick() {
-		star.rotation += 5;
-		stage.update();
+		star.rotation += 5; 
+		star.scaleX = star.scaleY = 1.5+Math.sin(angle)*3;
+		stage.update(); 
+		angle+=0.025;
 	}
 
 	</script>

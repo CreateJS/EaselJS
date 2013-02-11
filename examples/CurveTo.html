@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
     <title>Curve To</title>
@@ -46,7 +45,7 @@
             //check to see if we are running in a browser with touch support
             stage = new createjs.Stage(canvas);
             stage.autoClear = false;
-            stage.enableEvents(true);
+            stage.enableDOMEvents(true);
 
             createjs.Touch.enable(stage);
             createjs.Ticker.setFPS(24);

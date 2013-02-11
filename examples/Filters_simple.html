@@ -47,7 +47,7 @@
             stage.addChild(bmp);
 
 			createjs.Ticker.setFPS(15);
-			createjs.Ticker.addListener(window);
+			createjs.Ticker.addEventListener("tick", tick);
         }
 
         function tick() {

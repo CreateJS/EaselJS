@@ -6,10 +6,6 @@
 
 	<link href="../assets/demoStyles.css" rel="stylesheet" type="text/css" />
 	
-	
-	<script>
-		var createjs = window;
-	</script>
 	<script type="text/javascript" src="../../src/easeljs/utils/UID.js"></script>
 	<script type="text/javascript" src="../../src/easeljs/events/EventDispatcher.js"></script>
 	<script type="text/javascript" src="../../src/easeljs/utils/Ticker.js"></script>
@@ -27,7 +23,7 @@
 	<script type="text/javascript" src="../../src/easeljs/utils/SpriteSheetBuilder.js"></script>
 	<script type="text/javascript" src="../../src/easeljs/display/Text.js"></script>
 	
-	<script src="../assets/tweenjs-0.3.0.min.js"></script> <!-- required for MovieClip -->
+	<script src="../assets/tweenjs-0.4.0.min.js"></script> <!-- required for MovieClip -->
 	<script type="text/javascript" src="../../src/easeljs/display/MovieClip.js"></script>
 	<script src="gunnertron_g.js"></script>
 
@@ -41,14 +37,14 @@
 	function init() {
 		//find canvas and load images, wait for last image to load
 		canvas = document.getElementById("testCanvas");
-		stage = new Stage(canvas);
+		stage = new createjs.Stage(canvas);
 		
 		mc = new lib.gunnertron();
 		w = mc.nominalBounds.width*scale;
 		mc.setTransform(100+w/2,100,scale,scale);
 		stage.addChild(mc);
 		
-		var label1 = stage.addChild(new Text("MovieClip (vector)", "14px Arial", "#FFF"));
+		var label1 = stage.addChild(new createjs.Text("MovieClip (vector)", "14px Arial", "#FFF"));
 		label1.textAlign = "center";
 		label1.setTransform(mc.x,30);
 		
@@ -57,7 +53,7 @@
 		label2.x += w+30;
 		
 		// create the sprite sheet builder:
-		var builder = new SpriteSheetBuilder();
+		var builder = new createjs.SpriteSheetBuilder();
 		builder.scale = scale;
 		builder.maxWidth = 1024;
 		builder.addMovieClip(mc);
@@ -67,13 +63,13 @@
 		// append the generated spritesheet image for demo purposes:
 		document.body.appendChild(builder._data.images[0]);
 		
-		Ticker.setFPS(30);
-		Ticker.addEventListener("tick", function() { stage.update(); } );
+		createjs.Ticker.setFPS(30);
+		createjs.Ticker.addEventListener("tick", function() { stage.update(); } );
 	}
 	
-	function buildComplete(builder) {
-		var spriteSheet = builder.spriteSheet;
-		var bmpAnim = new BitmapAnimation(spriteSheet);
+	function buildComplete(event) {
+		var spriteSheet = event.target.spriteSheet;
+		var bmpAnim = new createjs.BitmapAnimation(spriteSheet);
 		bmpAnim.setTransform(mc.x+w+30|0, mc.y);
 		stage.addChild(bmpAnim);
 		

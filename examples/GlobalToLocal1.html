@@ -48,7 +48,7 @@
 		// attach mouse handlers directly to the source canvas
 		// better than calling from canvas tag for cross browser
 
-        stage.enableEvents(true);
+        stage.enableDOMEvents(true);
         stage.addEventListener("stagemousemove", mouseMove);
         stage.addEventListener("stagemousedown", mouseDown);
         stage.addEventListener("stagemouseup", mouseUp);
