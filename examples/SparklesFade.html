@@ -38,7 +38,7 @@
 		// create a new stage and point it at our canvas:
 		canvas = document.getElementById("testCanvas");
 		stage = new createjs.Stage(canvas);
-
+        stage.enableDOMEvents(true)
 		// load the sprite sheet image, and wait for it to complete before proceeding:
 		imgSeq.onload = handleImageLoad;
 		imgSeq.src = "assets/sparkle_21x23.png";

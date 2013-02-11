@@ -9,10 +9,9 @@
 	<script>
 		// this sets the namespace for CreateJS to the window object, so you can instantiate objects without specifying 
 		// the namespace: "new Graphics()" instead of "new createjs.Graphics()"
-		var createjs = window;
 	</script>
 	
-    <script src="assets/preloadjs-0.2.0.min.js"></script>
+    <script src="./assets/preloadjs-0.3.0.min.js"></script>
 
 	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
@@ -54,8 +53,8 @@
 	        document.getElementById("loader").className = "loader";
 
            canvas = document.getElementById('testCanvas');
-           stage = new Stage(canvas);
-           imageContainer = new Container();
+           stage = new createjs.Stage(canvas);
+           imageContainer = new createjs.Container();
 
            images = [];
 
@@ -79,15 +78,14 @@
 
             ];
 
-            loader = new PreloadJS();
-			loader.useXHR = false;  // XHR loading is not reliable when running locally.
+            loader = new createjs.LoadQueue(false);
             loader.onProgress = handleProgress;
             loader.onComplete = handleComplete;
             loader.onFileLoad = handleFileLoad;
             loader.loadManifest(manifest);
 
             stage.addChild(imageContainer);
-            Ticker.addListener(window);
+            createjs.Ticker.addEventListener("tick", tick);
         }
 
         function stop() {
@@ -99,7 +97,7 @@
         }
 
         function handleFileLoad(event) {
-            images.push(event);
+            images.push(event.item);
         }
 
         function handleComplete() {
@@ -107,7 +105,7 @@
             var l = images.length;
             for(var i=0;i<l;i++) {
                 var id = images[i].id;
-                var bmp = new Bitmap(loader.getResult(id).result);
+                var bmp = new createjs.Bitmap(loader.getResult(id));
                 imageContainer.addChild(bmp);
             }
 
@@ -134,7 +132,6 @@
         }
 
         function handleChange() {
-            //var value = slider1.value;
             var value = $(this).slider("option", "value");
             $( "#amount" ).text("Amount:"+value);
             if (value == 0) { return; }
@@ -166,9 +163,9 @@
         }
 
         function getColorMatrixFilter(value) {
-            var cm = new ColorMatrix();
+            var cm = new createjs.ColorMatrix();
             cm.adjustBrightness(value*0.75);
-            return new ColorMatrixFilter(cm);
+            return new createjs.ColorMatrixFilter(cm);
         }
 
         function tick() {

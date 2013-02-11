@@ -5,7 +5,7 @@ function SpaceRock(size) {
 	this.initialize(size);
 }
 
-var p = SpaceRock.prototype = new Shape();
+var p = SpaceRock.prototype = new createjs.Shape();
 
 // static properties:
 	SpaceRock.LRG_ROCK = 40;

@@ -49,11 +49,12 @@ this.createjs = this.createjs||{};
  * that you want to display outside the bounds of the canvas. For example, a tooltip with rich HTML
  * content.
  *
+ * <h4>Mouse Interaction</h4>
+ *
  * DOMElement instances are not full EaselJS display objects, and do not participate in EaselJS mouse
  * events or support methods like hitTest. To get mouse events from a DOMElement, you must instead add handlers to
  * the htmlElement (note, this does not support EventDispatcher)
  *
- * <h4>Example</h4>
  *      var domElement = new createjs.DOMElement(htmlElement);
  *      domElement.htmlElement.onclick = function() {
  *          console.log("clicked");
@@ -63,7 +64,7 @@ this.createjs = this.createjs||{};
  * @extends DisplayObject
  * @constructor
  * @param {HTMLElement} htmlElement A reference or id for the DOM element to manage.
- **/
+ */
 var DOMElement = function(htmlElement) {
   this.initialize(htmlElement);
 };
@@ -74,14 +75,14 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * The DOM object to manage.
 	 * @property htmlElement
 	 * @type HTMLElement
-	 **/
+	 */
 	p.htmlElement = null;
 
 // private properties:
 	/**
 	 * @property _oldMtx
 	 * @protected
-	 **/
+	 */
 	p._oldMtx = null;
 
 // constructor:
@@ -89,7 +90,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * @property DisplayObject_initialize
 	 * @type Function
    * @private
-	 **/
+	 */
 	p.DisplayObject_initialize = p.initialize;
 
 	/**
@@ -115,7 +116,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method isVisible
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-	 **/
+	 */
 	p.isVisible = function() {
 		return this.htmlElement != null;
 	}
@@ -129,7 +130,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
-	 **/
+	 */
 	p.draw = function(ctx, ignoreCache) {
 		if (this.htmlElement == null) { return; }
 		var mtx = this.getConcatenatedMatrix(this._matrix);
@@ -172,7 +173,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 
 	/**
 	 * Not applicable to DOMElement.
-	 * @method updateCache
+	 * @method hitArea
 	 */
 	p.hitTest = function() {};
 
@@ -197,7 +198,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	/**
 	 * DOMElement cannot be cloned. Throws an error.
 	 * @method clone
-	 **/
+	 */
 	p.clone = function() {
 		throw("DOMElement cannot be cloned.")
 	};
@@ -206,23 +207,53 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * Returns a string representation of this object.
 	 * @method toString
 	 * @return {String} a string representation of the instance.
-	 **/
+	 */
 	p.toString = function() {
 		return "[DOMElement (name="+  this.name +")]";
 	};
+    
+	/**
+     * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
+	 * are not full EaselJS display objects and do not participate in EaselJS mouse events.
+	 * @event click
+	 */
+          
+     /**
+     * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
+ 	 * are not full EaselJS display objects and do not participate in EaselJS mouse events.
+	 * @event dblClick
+	 */
+     
+     /**
+      * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
+ 	  * are not full EaselJS display objects and do not participate in EaselJS mouse events.
+	  * @event mousedown
+	  */
+     
+     /**
+      * The HTMLElement can listen for the mouseover event, not the DOMElement instance.
+      * Since DOMElement instances are not full EaselJS display objects and do not participate in EaselJS mouse events.
+      * @event mouseover
+	  */ 
+     
+     /**
+      * Not applicable to DOMElement.
+	  * @event tick
+	  */
+     
 
 // private methods:
 	/**
 	 * @property DisplayObject__tick
 	 * @type Function
 	 * @protected
-	 **/
+	 */
 	p.DisplayObject__tick = p._tick;
 	
 	/**
 	 * @method _tick
 	 * @protected
-	 **/
+	 */
 	p._tick = function(params) {
 		// TODO: figure out how to get around this.
 		this.htmlElement.style.visibility = "hidden";

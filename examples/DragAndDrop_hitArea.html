@@ -120,7 +120,7 @@
 		}
 
 		document.getElementById("loader").className = "";
-		createjs.Ticker.addListener(window);
+		createjs.Ticker.addEventListener("tick", tick);
 	}
 
 	function tick() {
