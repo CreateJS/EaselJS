@@ -21,7 +21,7 @@
 			<p>
 				<strong>Synopsis:</strong> Create a simple programmatic animation, and learn about the Ticker class.<br>
 				<strong>Topics:</strong> animation, Ticker, setFPS, useRAF, getTime, setPaused, requestAnimationFrame, Stage.update, time based animation<br>
-				<strong>Target:</strong> EaselJS v0.5.0
+				<strong>Target:</strong> EaselJS v0.6.0
 			</p>
 		</header>
 		
@@ -52,12 +52,12 @@ if (circle.x > stage.canvas.width) { circle.x = 0; }
 				<h2>Ticker</h2>
 			</header>
 			<p>
-				The <code>Ticker</code> class provides a simple static interface (meaning, you don't ever create a <code>new Ticker()</code>) to propagate a tick to various objects. To use it we just add a listener with <code>addListener(listener)</code>. The listener can be a function, or an object with a <code>tick</code> function defined.
+				The <code>Ticker</code> class provides a simple static interface (meaning, you don't ever create a <code>new Ticker()</code>) to propagate a tick to various objects. To use it we just add a event listener with <code>addEventListener("tick", handler)</code>. The listener can be a function, or an object with a <code>tick</code> function defined.
 			</p>
 			<p>
 				The code below adds the window as a listener, and defines a tick function that will be called 20 times per second (<code>Ticker</code>'s default framerate):
 			<textarea class="brush: js;" readonly>
-createjs.Ticker.addListener(window);
+createjs.Ticker.addEventListener("tick", tick);
 function tick() { console.log("TICK!!!"); }
 			</textarea>
 			<p>
@@ -86,9 +86,9 @@ createjs.Ticker.setFPS(40);
 			</p>
 				You can make your animation time based by simply factoring in the elapsed time when we make our property changes.
 			<textarea class="brush: js;" readonly>
-function tick(elapsedTime) {
+function tick(event) {
 	// move 100 pixels per second (elapsedTimeInMS / 1000msPerSecond * pixelsPerSecond):
-	circle.x += elapsedTime/1000*100;
+	circle.x += event.delta/1000*100;
 	// this will log a steadily increasing value:
 	console.log("total time: "+createjs.Ticker.getTime());
 }
@@ -107,18 +107,10 @@ function tick(elapsedTime) {
 				<h2>Pausing</h2>
 			</header>
 			<p>
-				<code>Ticker</code> also provides the ability to pause all of your animations. By default, any listener you add to Ticker is "pauseable". Calling <code>Ticker.setPaused(true);</code> will stop <code>Ticker</code> from calling <code>tick</code> on all pauseable listeners.
+				<code>Ticker</code> also provides the ability to pause all of your animations. All listener you add to Ticker are "pauseable". Calling <code>Ticker.setPaused(true);</code> will stop <code>Ticker</code> from calling <code>tick</code> on all pauseable listeners.
 			</p>
 			<p>
-				You can also register a listener as not pauseable, but passing <code>false</code> as the second parameter, like so:
-			<textarea class="brush: js;" readonly>
-createjs.Ticker.addListener(myListener, false);
-			</textarea>
-			<p>
-				These listeners will continue to be ticked even when <code>Ticker</code> is paused. They will also be passed a second parameter when called, that indicates whether <code>Ticker</code> is currently paused. As an example, you could use this to keep UI animations running, even when a game is paused.
-			</p>
-			<p>
-				Finally, the <code>getTime</code> method accepts a <code>pauseable</code> parameter, and will return the appropriate time total based on it.
+				The <code>getTime</code> method accepts a <code>pauseable</code> parameter, and will return the appropriate time total based on it.
 			</p>
 			<p>
 				In the following demo, play with toggling pause, and see how the red "pauseable" circle stops, where the green "unpauseable" circle does not. You can also see how the total pauseable time stops updating when <code>Ticker</code> is paused.
@@ -128,16 +120,20 @@ createjs.Ticker.addListener(myListener, false);
 		
 		<section>
 			<header>
-				<h2>onTick</h2>
+				<h2>Tick</h2>
 			</header>
 			<p>
-				When you call <code>stage.update()</code>, it calls <code>onTick()</code> on every display object before drawing to the canvas. Any parameters passed to <code>update()</code> will be passed on to <code>onTick()</code> handlers. This lets you handle your animation in the context of your display object.
+				When you call <code>stage.update()</code>, it will tick any descendants exposing a tick method and render
+                its entire display list to the canvas. Any parameters passed to <code>update()</code> will be passed on to
+                <code>tick()</code> handlers. This lets you handle your animation in the context of your display object.
 			</p>
 			<textarea class="brush: js;" readonly>
-circle.onTick = function() { this.x += 5; }
+circle.addEventListener("tick", function() { this.x += 5; });
 			</textarea>
 			<p>
-				You can also add your stage directly as a listener to <code>Ticker</code>, because <code>Stage</code> has a <code>tick</code> method that shortcuts to <code>update</code>. It's rare that you would want to use this, but it can be handy for quick tests. See the source of <a href="onTick.html">onTick.html</a> for an example.
+				You can also add your stage directly as a listener to <code>Ticker</code>, because <code>Stage</code>
+                has a <code>handleEvent</code> method that shortcuts to <code>update</code>. It's rare that you would
+                want to use this, but it can be handy for quick tests. See the source of <a href="onTick.html">onTick.html</a> for an example.
 			</p>
 		</section>
 		

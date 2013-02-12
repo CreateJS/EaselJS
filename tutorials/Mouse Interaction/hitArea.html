@@ -3,11 +3,12 @@
 <head>
 	<title>EaselJS demo: onClick</title>
 	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="../../lib/easeljs-0.5.0.min.js"></script>
+	<script src="../../lib/easeljs-0.6.0.min.js"></script>
 	<script>
+		var stage;
 		function init() {
-			var stage = new createjs.Stage("demoCanvas");
-			stage.enableMouseOver();
+			stage = new createjs.Stage("demoCanvas");
+			stage.enableMouseOver(10);
 			
 			var label1 = new createjs.Text("text without hitArea", "48px Arial", "#F00");
 			label1.x = label1.y = 10;
@@ -23,14 +24,20 @@
 			var hit = new createjs.Shape();
 			hit.graphics.beginFill("#000").drawRect(0, 0, label2.getMeasuredWidth(), label2.getMeasuredHeight());
 			label2.hitArea = hit;
+		   
+		 	label1.addEventListener("mouseover", handleInteraction);
+			label2.addEventListener("mouseover", handleInteraction);
 			
-			label1.onMouseOver = label2.onMouseOver = function(evt) { evt.target.alpha = 1; }
-			label1.onMouseOut = label2.onMouseOut = function(evt) { evt.target.alpha = 0.5; }
+			label1.addEventListener("mouseout", handleInteraction);      
+			label2.addEventListener("mouseout", handleInteraction); 
 			
 			stage.addChild(label1, label2);
-			
-			createjs.Ticker.addListener(stage);
-			stage.update();
+			stage.update();   
+			createjs.Ticker.addEventListener("tick", stage);
+		}
+		
+		function handleInteraction(event) {
+		    event.target.alpha = (event.type == "mouseover") ? 1 : 0.5; 
 		}
 	</script>
 </head>

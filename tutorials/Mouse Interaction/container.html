@@ -3,7 +3,7 @@
 <head>
 	<title>EaselJS demo: Container events</title>
 	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="../../lib/easeljs-0.5.0.min.js"></script>
+	<script src="../../lib/easeljs-0.6.0.min.js"></script>
 	<script>
 		var stage, output;
 		
@@ -31,13 +31,14 @@
 			button.addChild(background, label);
 			stage.addChild(button);
 			
-			background.onClick = label.onClick = handleClick;
+			background.addEventListener("click", handleClick);
+			label.addEventListener("click", handleClick);
 			
 			// if we define a handler on button, then it will be called, but handlers
 			// on the children will not. You can comment out the next line to test:
-			button.onClick = handleClick;
+			button.addEventListener("click", handleClick);
 			
-			createjs.Ticker.addListener(stage);
+			createjs.Ticker.addListener("tick", stage);
 			stage.update();
 		}
 		

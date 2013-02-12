@@ -29,15 +29,18 @@ p.initialize = function(label, color) {
 	text.x = width/2;
 	text.y = 10;
 	
-	this.addChild(this.background,text);
-}
+	this.addChild(this.background,text); 
+	this.addEventListener("click", this.handleClick);  
+	this.addEventListener("tick", this.handleTick);
+} 
 
-p.onClick = function() {
-	alert("You clicked on a button: "+this.label);
-}
+p.handleClick = function (event) {    
+	var target = event.target;
+	alert("You clicked on a button: "+target.label);
+} 
 
-p.onTick = function() {
-	this.alpha = Math.cos(this.count++*0.1)*0.4+0.6;
+p.handleTick = function(event) {       
+	p.alpha = Math.cos(p.count++*0.1)*0.4+0.6;
 }
 
 window.Button = Button;

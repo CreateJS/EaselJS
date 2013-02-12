@@ -3,10 +3,11 @@
 <head>
 	<title>EaselJS demo: Ticker.setPaused()</title>
 	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="../../lib/easeljs-0.5.0.min.js"></script>
+	<script src="../../lib/easeljs-0.6.0.min.js"></script>
 	<script>
 		
 		var stage, pauseCircle, goCircle, output;
+
 		function init() {
 			stage = new createjs.Stage("demoCanvas");
 			
@@ -19,18 +20,10 @@
 			goCircle.graphics.beginFill("green").drawCircle(0, 0, 40);
 			goCircle.y = 150;
 			stage.addChild(goCircle);
-			
-			
-			// we'll register a listener to move our "pauseCircle" that is pauseable:
-			createjs.Ticker.addListener(function() {
-					pauseCircle.x += 10;
-					if (pauseCircle.x > stage.canvas.width) { pauseCircle.x = 0; }
-				}, true);
-			
-			// and register our main listener to be not pauseable:
-			createjs.Ticker.addListener(window, false);
-			
-			
+
+			// and register our main listener
+			createjs.Ticker.addEventListener("tick", tick);
+
 			// UI code:
 			output = stage.addChild(new createjs.Text("", "14px monospace", "#000"));
 			output.lineHeight = 15;
@@ -42,6 +35,11 @@
 		function tick() {
 			goCircle.x += 10;
 			if (goCircle.x > stage.canvas.width) { goCircle.x = 0; }
+
+            if (!createjs.Ticker.getPaused()) {
+                pauseCircle.x += 10;
+                if (pauseCircle.x > stage.canvas.width) { pauseCircle.x = 0; }
+            }
 			
 			output.text = "getPaused()    = "+createjs.Ticker.getPaused()+"\n"+
 				"getTime(true)  = "+createjs.Ticker.getTime(true)+"\n"+

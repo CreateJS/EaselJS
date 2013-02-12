@@ -3,7 +3,7 @@
 <head>
 	<title>EaselJS demo: Time based animation</title>
 	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="../../lib/easeljs-0.5.0.min.js"></script>
+	<script src="../../lib/easeljs-0.6.0.min.js"></script>
 	<script>
 		
 		var stage, timeCircle, tickCircle;
@@ -20,13 +20,13 @@
 			tickCircle.y = 150;
 			stage.addChild(tickCircle);
 			
-			createjs.Ticker.addListener(window);
+			createjs.Ticker.addEventListener("tick", tick);
 			createjs.Ticker.setFPS(20);
 		}
 		
-		function tick(elapsedTime) {
+		function tick(event) {
 			// time based
-			timeCircle.x = timeCircle.x + elapsedTime/1000*100;
+			timeCircle.x = timeCircle.x + (event.delta)/1000*100;
 			if (timeCircle.x > stage.canvas.width) { timeCircle.x = 0; }
 			
 			// not time based:
