@@ -75,6 +75,8 @@
 
 	var loadingInterval = 0;
 
+    var preload;
+
 	//register key functions
 	document.onkeydown = handleKeyDown;
 	document.onkeyup = handleKeyUp;
@@ -98,18 +100,6 @@
 	        return;
 		}
 
-		// begin loading content (only sounds to load)
-		var manifest = [
-			{id:"begin", src:"assets/Game-Spawn.mp3|../../assets/Game-Spawn.ogg"},
-			{id:"break", src:"assets/Game-Break.mp3|../../assets/Game-Break.ogg", data:6},
-			{id:"death", src:"assets/Game-Death.mp3|../../assets/Game-Death.ogg"},
-			{id:"laser", src:"assets/Game-Shot.mp3|../../assets/Game-Shot.ogg", data:6},
-			{id:"music", src:"assets/18-machinae_supremacy-lord_krutors_dominion.mp3|../../assets/18-machinae_supremacy-lord_krutors_dominion.ogg"}
-		];
-
-		createjs.Sound.addEventListener("loadComplete", createjs.proxy(doneLoading,this)); // add an event listener for when load is completed
-	    createjs.Sound.registerManifest(manifest);
-
 		canvas = document.getElementById("gameCanvas");
 		stage = new createjs.Stage(canvas);
 		messageField = new createjs.Text("Loading", "bold 24px Arial", "#FFFFFF");
@@ -120,7 +110,20 @@
 		stage.addChild(messageField);
 		stage.update(); 	//update the stage to show text
 
-		loadingInterval = setInterval(updateLoading, 200);
+		// begin loading content (only sounds to load)
+		var manifest = [
+			{id:"begin", src:"assets/Game-Spawn.mp3|../../assets/Game-Spawn.ogg"},
+			{id:"break", src:"assets/Game-Break.mp3|../../assets/Game-Break.ogg", data:6},
+			{id:"death", src:"assets/Game-Death.mp3|../../assets/Game-Death.ogg"},
+			{id:"laser", src:"assets/Game-Shot.mp3|../../assets/Game-Shot.ogg", data:6},
+			{id:"music", src:"assets/18-machinae_supremacy-lord_krutors_dominion.mp3|../../assets/18-machinae_supremacy-lord_krutors_dominion.ogg"}
+		];
+
+        preload = new createjs.LoadQueue();
+        preload.installPlugin(createjs.Sound);
+		preload.addEventListener("complete", doneLoading); // add an event listener for when load is completed
+        preload.addEventListener("progress", updateLoading);
+	    preload.loadManifest(manifest);
 	}
 
 	function stop() {
@@ -134,7 +137,7 @@
 	}
 
 
-	function doneLoading() {
+	function doneLoading(event) {
 		clearInterval(loadingInterval);
 		scoreField = new createjs.Text("0", "bold 12px Arial", "#FFFFFF");
 		scoreField.textAlign = "right";
@@ -142,7 +145,7 @@
 		scoreField.y = 22;
 		scoreField.maxWidth = 1000;
 
-		messageField.text = "Welcome:  Click to play";
+		messageField.text = "Welcome: Click to play";
 
 		// start the music
 		createjs.Sound.play("music", createjs.Sound.INTERRUPT_NONE, 0, 0, -1, 0.4);
