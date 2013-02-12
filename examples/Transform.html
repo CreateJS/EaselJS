@@ -89,7 +89,7 @@
         }
 
         function stop() {
-	        Ticker.removeListener(window);
+	        createjs.Ticker.removeEventListener("tick", tick);
         }
 
         function handleProgress() {
