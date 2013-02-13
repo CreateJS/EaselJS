@@ -6,14 +6,14 @@ EaselJS is a library to make working with the Canvas element easier. It provides
 
 	//Draw a square on screen.
 	var canvas = document.getElementById('canvas');
-	var stage = new Stage(canvas);
-	var shape = new Shape();
-	shape.graphics.beginFill('rgba(255,0,0,1)').drawRoundRect(0,0, 120, 120, 10);
+	var stage = new createjs.Stage(canvas);
+	var shape = new createjs.Shape();
+	shape.graphics.beginFill('rgba(255,0,0,1)').drawRoundRect(0, 0, 120, 120, 10);
 	stage.addChild(shape);
 	stage.update();
 
 ## Animation Example
-	var ss = new SpriteSheet({
+	var ss = new createjs.SpriteSheet({
 		"frames": {
 			"width": 200,
 			"numFrames": 64,
@@ -29,24 +29,26 @@ EaselJS is a library to make working with the Canvas element easier. It provides
 	ss.getAnimation("run").next = "jump";
 	ss.getAnimation("jump").next = "run";
 	
-	var bitmapAnimation = new BitmapAnimation(ss);
+	var bitmapAnimation = new createjs.BitmapAnimation(ss);
 	bitmapAnimation.scaleY = bitmapAnimation.scaleX = .4;
 	
 	bitmapAnimation.gotoAndPlay("run");
 	
-	Ticker.setFPS(60);
-	Ticker.addListener(stage);
+	createjs.Ticker.setFPS(60);
+	createjs.Ticker.addListener(stage);
 	stage.addChild(bitmapAnimation);
+
 
 ## Support and Resources
 * Find examples and more information at the [EaselJS web site](http://easeljs.com/)
+* Read the [documentation](http://createjs.com/Docs/EaselJS)
+* Post questions and interact with other users at our [Community](http://community.createjs.com) site.
 * There is a [Google Group](http://groups.google.com/group/createjs-discussion) for discussions and support.
-* You can also ask questions and interact with other users at our [Community](http://community.createjs.com) site.
 * Have a look at the included [examples](https://github.com/CreateJS/EaselJS/tree/master/examples) and [API documentation](http://createjs.com/Docs/EaselJS/) for more in-depth information.
 
-It was built by [gskinner.com](http://www.gskinner.com), and is released for free under the MIT license, which means you can use it for almost any purpose (including commercial projects). We appreciate credit where possible, but it is not a requirement.
+It was built by [gskinner.com](http://www.gskinner.com), and is released for free under the MIT license, which means you
+can use it for almost any purpose (including commercial projects). We appreciate credit where possible, but it is not a requirement.
 
-EaselJS is currently in beta. We will be making significant improvements to the library, samples, and documentation over the coming weeks. Please be aware that this may necessitate changes to the existing API.
 
 ## Classes
 
@@ -94,11 +96,15 @@ Provides a pausable centralized tick manager for ticking Stage instances or othe
 **UID**
 Very simple class that provides global, incremental unique numeric IDs.
 
+**SpriteSheet**
+Encapsulates all the data associated with a sprite sheet to be used with BitmapAnimation.
+
 **SpriteSheetUtils**
 Contains utility methods for extending existing sprite sheets with flipped frames and extracting individual frames.
 
-**SpriteSheet**
-Encapsulates all the data associated with a sprite sheet to be used with BitmapAnimation.
+**SpriteSheetBuilder**
+Build a bitmap SpriteSheet from vector graphics at run time. Get the filesize savings of vector, with the performance
+of a SpriteSheet.
 
 **Matrix2D**
 Represents a 3x3 affine transformation matrix. Used internally for calculating concatenated transformations.
