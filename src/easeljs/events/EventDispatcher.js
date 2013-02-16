@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -120,7 +120,7 @@ var p = EventDispatcher.prototype;
 		arr.push(listener);
 		return listener;
 	};
-	
+
 	/**
 	 * Removes the specified event listener.
 	 * @method removeEventListener
@@ -140,7 +140,7 @@ var p = EventDispatcher.prototype;
 			}
 		}
 	};
-	
+
 	/**
 	 * Removes all listeners for the specified type, or all listeners of all types.
 	 * @method removeAllEventListeners
@@ -150,7 +150,7 @@ var p = EventDispatcher.prototype;
 		if (!type) { this._listeners = null; }
 		else if (this._listeners) { delete(this._listeners[type]); }
 	};
-	
+
 	/**
 	 * Dispatches the specified event.
 	 * @method dispatchEvent
@@ -164,19 +164,19 @@ var p = EventDispatcher.prototype;
 		var ret=false, listeners = this._listeners;
 		if (eventObj && listeners) {
 			if (typeof eventObj == "string") { eventObj = {type:eventObj}; }
-			eventObj.target = target||this;
 			var arr = listeners[eventObj.type];
 			if (!arr) { return ret; }
+			eventObj.target = target||this;
 			arr = arr.slice(); // to avoid issues with items being removed or added during the dispatch
 			for (var i=0,l=arr.length; i<l; i++) {
 				var o = arr[i];
-				if (o instanceof Function) { ret = ret||o.apply(null, [eventObj]); }
-				else if (o.handleEvent) { ret = ret||o.handleEvent(eventObj); }
+				if (o.handleEvent) { ret = ret||o.handleEvent(eventObj); }
+				else { ret = ret||o(eventObj); }
 			}
 		}
 		return !!ret;
 	};
-	
+
 	/**
 	 * Indicates whether there is at least one listener for the specified event type.
 	 * @method hasEventListener
@@ -195,7 +195,7 @@ var p = EventDispatcher.prototype;
 	p.toString = function() {
 		return "[EventDispatcher]";
 	};
-	
+
 
 createjs.EventDispatcher = EventDispatcher;
 }());
