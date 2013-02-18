@@ -54,7 +54,8 @@ this.createjs = this.createjs||{};
  * used for the hitState.
  * @param {String} [hitLabel] The label or animation on the hitArea instance that defines the hitArea bounds. If this is
  * null, then the default state of the hitArea will be used.
- * @constructor
+ *
+ * @class ButtonHelper
  */
 var ButtonHelper = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
 	this.initialize(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel);
