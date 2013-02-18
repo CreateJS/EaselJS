@@ -40,7 +40,8 @@ this.createjs = this.createjs||{};
  * The ButtonHelper instance does not need to be added to the stage, but a reference should be maintained to prevent
  * garbage collection.
  *
- * @example
+ * <h4>Example</h4>
+ *
  *      var helper = new createjs.ButtonHelper(myInstance, "out", "over", "down", false, myInstance, "hit");
  *
  * @param {BitmapAnimation|MovieClip} target The instance to manage.
@@ -56,6 +57,7 @@ this.createjs = this.createjs||{};
  * null, then the default state of the hitArea will be used.
  *
  * @class ButtonHelper
+ * @constructor
  */
 var ButtonHelper = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
 	this.initialize(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel);
