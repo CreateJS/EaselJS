@@ -11,7 +11,7 @@ Google Closure is included in the repository, which makes it easier to run the b
 
 
 For compression of the documentation for Windows, we have provided 7-zip.exe found within the /tools directory.
-*Note*Run the installer(7z920.exe) and ensure the install destination is within tools sub-directory (ie. C:\build\tools\7-Zip).
+*Note* Run the installer(7z920.exe) and ensure the install destination is within tools sub-directory (ie. C:\build\tools\7-Zip).
 7-Zip is licensed under the GNU LGPL license, For more information please visit http://www.7-zip.org/ 
 
 h2. Configuration
@@ -35,13 +35,14 @@ h2. Building the Source
 
 <pre><code>Build Task Manager
 Usage
-node ./build.js [-h] [-l] --tasks=TASK [--version=DOC_VERSION]
+node ./build.js [-h] [-l] --tasks=TASK [--version=DOC_VERSION][--format=STANDARD]
 
 Options:
   -l, --list     List all available tasks                                                                           [boolean]
   -h, --help     Display usage                                                                                      [boolean]
   --version      Build version number (x.x.x)                                                                       [string] [default:"NEXT"]
-  --tasks        Task to run options: [ALL, CLEAN, BUILDSOURCE, BUILDDOCS]                                          [default: "ALL"]  
+  --tasks        Task to run options: [ALL, CLEAN, BUILDSOURCE, BUILDDOCS]                                          [default: "ALL"]
+  --format       Formatting minified JS :[STANDARD, PRETTY_PRINT]           									    [string]  [default: "STANDARD"]  
 </code></pre>
 
 h3. Examples
@@ -61,6 +62,10 @@ h4. Build Docs
 h4. Clean Build Directories
 
 <code>node ./build.js --tasks=CLEAN</code>
+
+h4. Build Source with Pretty printing
+
+<code>node ./build.js --format=PRETTY_PRINT</code>
 
 There is a good reference on tagging at
 

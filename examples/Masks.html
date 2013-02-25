@@ -34,6 +34,7 @@
         if (window.top != window) {
             document.getElementById("header").style.display = "none";
         }
+        document.getElementById("loader").className = "loader";
 
 		//wait for the image to load
 		img = new Image();
@@ -43,6 +44,8 @@
 	}
 
 	function handleImageLoad() {
+        document.getElementById("loader").className = "";
+        
 		//find canvas and load images, wait for last image to load
 		var canvas = document.getElementById("testCanvas");
 
@@ -85,6 +88,9 @@
 </head>
 	
 <body onload="init();">
+
+    <div id="loader"></div>
+
 	<header id="header" class="EaselJS">
 	    <h1><span class="text-product">Easel<strong>JS</strong></span> Masks</h1>
 	    <p>Demonstrates using a vector mask. Note that the mask <strong>Shape</strong> that defines the mask can also be placed on the display list (in this case the star shape is used both a mask, and the yellow border)</p>
