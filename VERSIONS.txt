@@ -39,7 +39,7 @@ Version NEXT [not released]
 
 Version 0.5.0 [Aug 24, 2012]
 ****************************************************************************************************
-- moved all c lasses into a configurable createjs namespace
+- moved all classes into a configurable createjs namespace
 - added support for multitouch
 - complete rewrite of drawing model to use a hybrid approach (save/restore & matrix)
 - added DisplayObject.mask
@@ -56,7 +56,7 @@ Version 0.5.0 [Aug 24, 2012]
 - updates to Ticker to improve support for requestAnimationFrame
 - better support for negative corner values on .drawRoundRectComplex
 - added stage.mouseMoveOutside & mouseEvent.rawX/Y
-- added "createjs.createCanvas()" to support for alternative canvases (ex. exCanvas)
+- added "createjs.createCanvas()" to support alternative canvases (ex. exCanvas)
 - added "scale" parameter to cache() and cleaned up the implementation
 - fix for DOMElement with Opera
 - various bug fixes and doc updates
