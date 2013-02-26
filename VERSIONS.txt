@@ -1,4 +1,4 @@
-Version NEXT [Feb 13, 2013]
+Version 0.6.0 [Feb 12, 2013]
 ****************************************************************************************************
 - added new event model with EventDispatcher class
 - added DisplayObject.cursor property
