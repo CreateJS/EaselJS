@@ -318,7 +318,7 @@ var p = Matrix2D.prototype;
 	/**
 	 * Applies a rotation transformation to the matrix.
 	 * @method rotate
-	 * @param {Number} angle The angle in degrees.
+	 * @param {Number} angle The angle in radians. To use degrees, multiply by <code>Math.PI/180</code>.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.rotate = function(angle) {

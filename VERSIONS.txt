@@ -1,3 +1,9 @@
+Version NEXT [unreleased]
+****************************************************************************************************
+- Fixed documentation for Matrix2D.rotate
+- Modified EventDispatcher to avoid unnecessary instanceof and apply
+
+
 Version 0.6.0 [Feb 12, 2013]
 ****************************************************************************************************
 - added new event model with EventDispatcher class
