@@ -1,7 +1,6 @@
-Version NEXT [unreleased]
+Version NEXT [Not released]
 ****************************************************************************************************
-- Fixed documentation for Matrix2D.rotate
-- Modified EventDispatcher to avoid unnecessary instanceof and apply
+- Updated demos to propagate the tick event to the stage. This is a best practice.
 
 
 Version 0.6.0 [Feb 12, 2013]
