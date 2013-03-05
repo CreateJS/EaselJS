@@ -17,10 +17,10 @@
 			createjs.Ticker.addEventListener("tick", tick);
 		}
 		
-		function tick() {
+		function tick(event) {
 			circle.alpha = 0.2;
 			if (circle.hitTest(stage.mouseX, stage.mouseY)) { circle.alpha = 1; }
-			stage.update();
+			stage.update(event);
 		}
 	</script>
 </head>

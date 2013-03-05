@@ -70,7 +70,7 @@
 		createjs.Ticker.setFPS(30);
 	}
 
-	function tick() {
+	function tick(event) {
 		var w = canvas.width;
 		var h = canvas.height;
 		var l = container.getNumChildren();
@@ -102,7 +102,7 @@
 		captureContainer.updateCache("source-over");
 
 		// draw the updates to stage:
-		stage.update();
+		stage.update(event);
 	}
 
 	</script>

@@ -93,12 +93,8 @@
 		
 		// we want to do some work before we update the canvas,
 		// otherwise we could use Ticker.addEventListener("tick", stage);
-		createjs.Ticker.addEventListener("tick", tick);
+		createjs.Ticker.addEventListener("tick", stage);
 	}
-
-    function tick() {
-        stage.update();
-    }
 
 	</script>
 </head>

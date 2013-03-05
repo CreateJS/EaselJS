@@ -110,11 +110,11 @@
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 
-	function tick() {
+	function tick(event) {
 		// this set makes it so the stage only re-renders when an event handler indicates a change has happened.
 		if (update) {
 			update = false; // only update once
-			stage.update();
+			stage.update(event);
 		}
 	}
 	</script>

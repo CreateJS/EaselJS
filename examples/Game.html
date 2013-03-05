@@ -205,7 +205,7 @@
 		}                                               
 	}
 
-	function tick() {
+	function tick(event) {
 		//handle firing
 		if(nextBullet <= 0) {
 			if(alive && shootHeld){
@@ -270,7 +270,7 @@
 			if(outOfBounds(o, o.bounds)) {
 				placeInBounds(o, o.bounds);
 			}
-			o.tick();
+			o.tick(event);
 
 
 			//handle spaceRock ship collisions
@@ -336,8 +336,8 @@
 		}
 
 		//call sub ticks
-		ship.tick();
-		stage.update();
+		ship.tick(event);
+		stage.update(event);
 	}
 
 	function outOfBounds(o, bounds) {

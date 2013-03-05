@@ -75,7 +75,7 @@
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 
-	function tick() {
+	function tick(event) {
 		var h = canvas.height;
 		var w = canvas.width;
 
@@ -108,7 +108,7 @@
 		}
 
 		// draw the updates to stage
-		stage.update();
+		stage.update(event);
 	}
 
 	// sparkle explosion

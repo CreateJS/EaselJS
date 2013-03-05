@@ -91,7 +91,7 @@
 		stage.update(); // Draw the stage once
 	}
 
-	function tick() {
+	function tick(event) {
 		//spin objects
 		spin1.rotation += 10.7;
 		spin2.rotation += -7.113;
@@ -111,7 +111,7 @@
 			graphics.lineTo(lastPt.x,lastPt.y);
 
 			// draw the new vector line to the canvas:
-			stage.update();
+			stage.update(event);
 
 			// then clear the shape's vector data so it isn't rendered again next tick:
 			graphics.clear();
@@ -119,13 +119,13 @@
 	}
 
 	//start drawing
-	function mouseDown(e) {
-		if(!e){ var e = window.event; }
+	function mouseDown(event) {
+		if(!event){ var e = window.event; }
 		stage.removeChild(text);
 		if (_mouseIsDown) { return; }
 		_mouseIsDown = true;
 		colorOffset = Math.random()*360;
-		lastPt = shape.globalToLocal(e.pageX-canvas.offsetLeft,e.pageY-canvas.offsetTop);
+		lastPt = shape.globalToLocal(event.pageX-canvas.offsetLeft,event.pageY-canvas.offsetTop);
 	}
 
 	//stop drawing

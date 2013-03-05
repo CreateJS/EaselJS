@@ -19,10 +19,10 @@
 			createjs.Ticker.setFPS(30);
 		}
 		
-		function tick() {
+		function tick(event) {
 			circle.x = circle.x + 5;
 			if (circle.x > stage.canvas.width) { circle.x = 0; }
-			stage.update(); // important!!
+			stage.update(event); // important!!
 		}
 	</script>
 </head>

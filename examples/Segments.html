@@ -1,27 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>EaselJS Example: Simple Animation</title>
 
-	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+    <link href="assets/demoStyles.css" rel="stylesheet" type="text/css"/>
 
-	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
-	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
-	<script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
-	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
-	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Shadow.js"></script>
-	<script type="text/javascript" src="../src/easeljs/geom/Point.js"></script>
+    <script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+    <script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+    <script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+    <script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
+    <script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Shadow.js"></script>
+    <script type="text/javascript" src="../src/easeljs/geom/Point.js"></script>
 
-	<!-- We also provide hosted minified versions of all CreateJS libraries.
-	  http://code.createjs.com -->
-
+    <!-- We also provide hosted minified versions of all CreateJS libraries.
+      http://code.createjs.com -->
 
 
     <script src="assets/Segment.js"></script>
@@ -40,9 +39,9 @@
         var loader;
 
         function init() {
-        	if (window.top != window) {
-        		document.getElementById("header").style.display = "none";
-			}
+            if (window.top != window) {
+                document.getElementById("header").style.display = "none";
+            }
 
             // create stage and point it to the canvas:
             canvas = document.getElementById("testCanvas");
@@ -103,7 +102,7 @@
             leftFoot.y = left.getPoint().y;
 
             container = new createjs.Container();
-            container.addChild(leftArm,leftForeArm,leftThigh,leftFoot,left,body,right,rightThigh,rightFoot,rightForeArm,rightArm);
+            container.addChild(leftArm, leftForeArm, leftThigh, leftFoot, left, body, right, rightThigh, rightFoot, rightForeArm, rightArm);
             container.x = 275;
             container.y = 137;
 
@@ -112,27 +111,27 @@
             stage.addChild(container);
             stage.update();
 
-			createjs.Ticker.addEventListener("tick", tick);
+            createjs.Ticker.addEventListener("tick", tick);
         }
 
         function stop() {
-			createjs.Ticker.removeEventListener("tick", tick);
+            createjs.Ticker.removeEventListener("tick", tick);
         }
 
         function move(segA, segB, segC, p_rate) {
-           var angleA = Math.sin(p_rate) * 45 + 90;
-           var angleB = Math.sin(p_rate + offset) * 45 + 45;
-           var angleC = Math.sin(p_rate) * 90 - 50;
+            var angleA = Math.sin(p_rate) * 45 + 90;
+            var angleB = Math.sin(p_rate + offset) * 45 + 45;
+            var angleC = Math.sin(p_rate) * 90 - 50;
 
-           segA.rotation = angleA;
-           segB.rotation = segA.rotation + angleB;
-           segC.rotation = segB.rotation + angleC;
+            segA.rotation = angleA;
+            segB.rotation = segA.rotation + angleB;
+            segC.rotation = segB.rotation + angleC;
 
-           segB.x = segA.getPoint().x;
-           segB.y = segA.getPoint().y;
+            segB.x = segA.getPoint().x;
+            segB.y = segA.getPoint().y;
 
-           segC.x = segB.getPoint().x;
-           segC.y = segB.getPoint().y;
+            segC.x = segB.getPoint().x;
+            segC.y = segB.getPoint().y;
         }
 
         function moveUpperBody(segA, segB, p_rate) {
@@ -150,16 +149,16 @@
             isAutomate = !isAutomate;
         }
 
-        function tick() {
+        function tick(event) {
             rate += 0.1;
 
-           move(rightThigh, right, rightFoot, rate);
-           move(leftThigh, left, leftFoot, rate*2);
+            move(rightThigh, right, rightFoot, rate);
+            move(leftThigh, left, leftFoot, rate * 2);
 
-           moveUpperBody(leftArm, leftForeArm, rate*2.5);
-           moveUpperBody(rightArm, rightForeArm, rate*1.5);
+            moveUpperBody(leftArm, leftForeArm, rate * 2.5);
+            moveUpperBody(rightArm, rightForeArm, rate * 1.5);
 
-           stage.update();
+            stage.update(event);
         }
 
     </script>
@@ -167,14 +166,15 @@
 
 <body onload="init();">
 
-	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Segment Animation</h1>
-	    <p>A sample of display elements joined together in the display hierarchy.</p>
-	</header>
+<header id="header" class="EaselJS">
+    <h1><span class="text-product">Easel<strong>JS</strong></span> Segment Animation</h1>
 
-	<div class="canvasHolder">
-	    <canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+    <p>A sample of display elements joined together in the display hierarchy.</p>
+</header>
+
+<div class="canvasHolder">
+    <canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 
 </body>
 </html>

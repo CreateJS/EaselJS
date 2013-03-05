@@ -81,7 +81,7 @@
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 
-	function tick() {
+	function tick(event) {
 		// update rotation:
 		spin1.rotation += 10;
 		spin2.rotation += -7;
@@ -108,19 +108,18 @@
 		}
 
 		// update the stage:
-		stage.update();
+		stage.update(event);
 	}
 
 	//start drawing
-	function mouseDown(e) {
+	function mouseDown(event) {
 		//if(!e){ e = window.event; }
 		stage.removeChild(text);
 		_mouseIsDown = true;
 
 		// set up the first point in the new draw, and choose a random color:
-		lastPt = shape.globalToLocal(e.nativeEvent.pageX-canvas.offsetLeft,e.nativeEvent.pageY-canvas.offsetTop);
+		lastPt = shape.globalToLocal(event.nativeEvent.pageX-canvas.offsetLeft,event.nativeEvent.pageY-canvas.offsetTop);
 		//color = "#"+(Math.random()*0xFFFFFF|0).toString(16);
-
 
 		// clear the cache, so the vector data is drawn each tick:
 		shape.uncache();

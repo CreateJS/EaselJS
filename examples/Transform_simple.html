@@ -56,13 +56,13 @@
 			createjs.Ticker.addEventListener("tick", tick);
         }
 
-        function tick() {
+        function tick(event) {
             angle += 0.025;
             var value = (Math.sin(angle) * 360);
 
             bmp.setTransform (bmp.x , bmp.y , bmp.scaleX , bmp.scaleY , value/2 , bmp.skewX , bmp.skewY , bmp.regX , bmp.regY );
             bmp.scaleX = bmp.scaleY = ((value)/360) + 0.25;
-            stage.update();
+            stage.update(event);
         }
 
     </script>
