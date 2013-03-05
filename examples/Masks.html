@@ -45,7 +45,7 @@
 
 	function handleImageLoad() {
         document.getElementById("loader").className = "";
-        
+
 		//find canvas and load images, wait for last image to load
 		var canvas = document.getElementById("testCanvas");
 
@@ -77,10 +77,10 @@
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 	
-	function tick() {
+	function tick(event) {
 		star.rotation += 5; 
 		star.scaleX = star.scaleY = 1.5+Math.sin(angle)*3;
-		stage.update(); 
+		stage.update(event);
 		angle+=0.025;
 	}
 

@@ -50,16 +50,13 @@
 			createjs.Ticker.addEventListener("tick", tick);
         }
 
-        function tick() {
+        function tick(event) {
             angle += speed;
-            updateImage();
-        }
 
-        function updateImage() {
             var value = Math.sin(angle)*range;
             bmp.updateCache();
             bmp.filters = [new createjs.BoxBlurFilter(value,  value, 2)];
-            stage.update();
+            stage.update(event);
         }
 
     </script>

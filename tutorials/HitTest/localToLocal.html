@@ -25,14 +25,14 @@
 			createjs.Ticker.addEventListener("tick", tick);
 		}
 		
-		function tick() {
+		function tick(event) {
 			arm.rotation += 5;
 			
 			target.alpha = 0.2;
 			var pt = arm.localToLocal(100,0,target);
 			if (target.hitTest(pt.x, pt.y)) { target.alpha = 1; }
 			
-			stage.update();
+			stage.update(event);
 		}
 	</script>
 </head>

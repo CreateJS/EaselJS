@@ -64,7 +64,7 @@
 		createjs.Ticker.removeEventListener("tick", tick);
 	}
 
-	function tick() {
+	function tick(event) {
 		// draw a vector star at a random location:
 		starfield.graphics.beginFill(createjs.Graphics.getRGB(0xFFFFFF,Math.random())).drawPolyStar(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*4+1, 5, 0.93, Math.random()*360);
 
@@ -87,7 +87,7 @@
 		moon.y = 250-Math.sin(moon.x/w*Math.PI)*150;
 
 		// draw the updates to stage:
-		stage.update();
+		stage.update(event);
 	}
 
 	</script>

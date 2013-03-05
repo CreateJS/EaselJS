@@ -64,9 +64,7 @@
             stage.update();
         }
 
-        function stop() {
-            createjs.Ticker.removeEventListener("tick", tick);
-        }
+        function stop() {}
 
         function handleMouseDown(event) {
             if (stage.contains(title)) { stage.clear(); stage.removeChild(title); }

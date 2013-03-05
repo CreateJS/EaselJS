@@ -69,8 +69,7 @@
 		createjs.Ticker.setFPS(50);
 	}
 
-	function tick() {
-
+	function tick(event) {
 		var w = canvas.width;
 		var h = canvas.height;
 		var l = stage.getNumChildren()-1;
@@ -85,7 +84,7 @@
 		fpsLabel.text = Math.round(createjs.Ticker.getMeasuredFPS())+" fps";
 
 		// draw the updates to stage:
-		stage.update();
+		stage.update(event);
 	}
 
 	function toggleCache(value) {

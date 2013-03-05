@@ -144,7 +144,7 @@
 			grant.gotoAndPlay("jump");
 		}
 
-		function tick() {
+		function tick(event) {
 			var outside = w + 20;
 			var position = grant.x+runningRate;
 			grant.x = (position >= outside) ? -200 : position;
@@ -155,7 +155,7 @@
 			hill2.x = (hill2.x - 1.2);
 			if (hill2.x + 633 <= 0) { hill2.x = outside; }
 
-			stage.update();
+			stage.update(event);
 		}
 	</script>
 </head>

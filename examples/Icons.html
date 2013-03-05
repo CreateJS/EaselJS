@@ -95,12 +95,8 @@
 	    stage.addChild(icon6);
 
 		createjs.Ticker.setFPS(3); // slow, so we can see the icons
-		createjs.Ticker.addEventListener("tick", tick);
+		createjs.Ticker.addEventListener("tick", stage);
 	}
-
-    function tick() {
-        stage.update();
-    }
 
 	</script>
 	<style>

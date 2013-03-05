@@ -53,10 +53,10 @@
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 	
-	function tick() {
+	function tick(event) {
 		container.rotation++;
 		container.alpha = 0.5*(1+Math.sin(container.rotation*0.01));
-		stage.update();
+		stage.update(event);
 	}
 
 	</script>

@@ -22,7 +22,7 @@
 			createjs.Ticker.addEventListener("tick", tick);
 		}
 		
-		function tick() {
+		function tick(event) {
 			holder.rotation += 3;
 			var l = holder.getNumChildren();
 			for (var i=0; i<l; i++) {
@@ -32,7 +32,7 @@
 				if (stage.mouseInBounds && child.hitTest(pt.x, pt.y)) { child.alpha = 1; }
 			}
 			
-			stage.update();
+			stage.update(event);
 		}
 	</script>
 </head>

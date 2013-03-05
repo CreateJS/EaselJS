@@ -64,7 +64,7 @@
 		document.body.appendChild(builder._data.images[0]);
 		
 		createjs.Ticker.setFPS(30);
-		createjs.Ticker.addEventListener("tick", function() { stage.update(); } );
+		createjs.Ticker.addEventListener("tick", stage);
 	}
 	
 	function buildComplete(event) {
