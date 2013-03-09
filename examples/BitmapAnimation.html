@@ -29,14 +29,43 @@
 
         var img = new Image();
         var bmpAnimList;
-
+        
+        var timerAnimation;
+        var animationTargetedRefreshTime = 30; //ms
+        
+        function QueueNewFrame () {
+            if (window.requestAnimationFrame)
+                window.requestAnimationFrame(drawAnimation);
+            else if (window.msRequestAnimationFrame)
+                window.msRequestAnimationFrame(drawAnimation);
+            else if (window.webkitRequestAnimationFrame)
+                window.webkitRequestAnimationFrame(drawAnimation);
+            else if (window.mozRequestAnimationFrame)
+                window.mozRequestAnimationFrame(drawAnimation);
+            else if (window.oRequestAnimationFrame)
+                window.oRequestAnimationFrame(drawAnimation);
+            else {
+                timerAnimation = window.setInterval(drawAnimation, animationTargetedRefreshTime);
+            }
+        }
+        
+        function drawAnimation (){
+            window.clearInterval(timerAnimation);
+            stage.update();
+            QueueNewFrame();
+        }
+  
         function init() {
             //find canvas and load images, wait for last image to load
             canvas = document.getElementById("testCanvas");
 
             // create a new stage and point it at our canvas:
             stage = new createjs.Stage(canvas);
-
+            
+            // make stage tick independent from drawing update
+            stage.tickOnUpdate=false;
+            stage.tick = function(){this._tick((arguments.length ? arguments : null));};
+            
             img = new Image();
             img.src = "assets/testSeq.png";
             img.onload = handleImageLoad;
@@ -106,7 +135,10 @@
 
             // we want to do some work before we update the canvas,
             // otherwise we could use createjs.Ticker.addEventListener("tick", stage);
-            createjs.Ticker.addEventListener("tick", tick);
+            createjs.Ticker.addListener(tick);
+            createjs.useRAF = false;
+            createjs.Ticker.setFPS(30);            
+            QueueNewFrame();
         }
 
         //called if there is an error loading the image (usually due to a 404)
@@ -123,8 +155,8 @@
                 bmpAnim.y += bmpAnim.vY;
             }
 
-            // update the stage:
-            stage.update(event);
+            // dispatch the tick event
+            stage.tick(event);;
         }
 
         function angleChange(bmpAnim,animation) {
