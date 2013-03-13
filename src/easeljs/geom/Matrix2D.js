@@ -98,7 +98,7 @@ var p = Matrix2D.prototype;
 
 	/**
 	 * Position (2, 0) in a 3x3 affine transformation matrix.
-	 * @property atx
+	 * @property tx
 	 * @type Number
 	 **/
 	p.tx = 0;
