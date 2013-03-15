@@ -79,9 +79,9 @@ var p = Stage.prototype = new createjs.Container();
 	 */
 
 	/**
-	 * Dispatched when the user releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
-	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-	 * @event stagemouseup
+	 * Dispatched when the user presses their left mouse button on the canvas. See the {{#crossLink "MouseEvent"}}{{/crossLink}}
+	 * class for a listing of event properties.
+	 * @event stagemousedown
 	 * @since 0.6.0
 	 */
 

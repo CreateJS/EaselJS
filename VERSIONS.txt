@@ -3,6 +3,7 @@ Version NEXT [Not released]
 - Updated demos to propagate the tick event to the stage. This is a best practice.
 - Fixed documentation for Matrix2D.rotate
 - Fixed documentation for Matrix2D.tx
+- Fixed documentation for Stage.stagemousedown event (stagemouseup was doc'd twice)
 - Modified EventDispatcher to avoid unnecessary instanceof and apply
 
 
