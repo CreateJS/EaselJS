@@ -4,6 +4,7 @@ Version NEXT [Not released]
 - Fixed documentation for Matrix2D.rotate
 - Fixed documentation for Matrix2D.tx
 - Fixed documentation for Stage.stagemousedown event (stagemouseup was doc'd twice)
+- Fixed documentation of DisplayObject.dblclick (case incorrect)
 - Modified EventDispatcher to avoid unnecessary instanceof and apply
 
 
