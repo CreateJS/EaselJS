@@ -301,6 +301,7 @@ var p = Stage.prototype = new createjs.Container();
 	p.clear = function() {
 		if (!this.canvas) { return; }
 		var ctx = this.canvas.getContext("2d");
+		this.canvas.width = this.canvas.width;
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
