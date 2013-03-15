@@ -169,7 +169,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * Dispatched when the user double clicks their left mouse button over this display object.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-	 * @event dblClick
+	 * @event dblclick
 	 * @since 0.6.0
 	 */
 	 
