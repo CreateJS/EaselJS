@@ -6,6 +6,10 @@ Version NEXT [Not released]
 - Fixed documentation for Stage.stagemousedown event (stagemouseup was doc'd twice)
 - Fixed documentation of DisplayObject.dblclick (case incorrect)
 - Modified EventDispatcher to avoid unnecessary instanceof and apply
+- Fixed example in Stage documentation (incorrect)
+- Fixed example in Text documentation (missing quote)
+- Fixed updateContext method name in docs (was incorrectly set to "setupContext")
+
 
 
 Version 0.6.0 [Feb 12, 2013]
