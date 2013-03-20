@@ -39,14 +39,41 @@ this.createjs = this.createjs||{};
  *
  * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
  * been made to support time-based timelines in the future.
+ *
+ * <h4>Example</h4>
+ *      // Animate shapes back and forth using MovieClip
+ *      var stage = new createjs.Stage("canvas");
+ *      createjs.Ticker.addEventListener("tick", stage);
+ *
+ *      var mc = new createjs.MovieClip(null, 0, true, {start:20});
+ *      stage.addChild(mc);
+ *
+ *      var state1 = new createjs.Shape(
+ *          new createjs.Graphics().beginFill("#999999")
+ *              .drawCircle(30,30,30));
+ *      var state2 = new createjs.Shape(
+ *          new createjs.Graphics().beginFill("#5a9cfb")
+ *              .drawCircle(30,30,30));
+ *
+ *      mc.timeline.addTween(
+ *          createjs.Tween.get(state1)
+ *          .to({x:0}).to({x:60}, 50));
+ *      mc.timeline.addTween(
+ *          createjs.Tween.get(state2)
+ *          .to({x:60}).to({x:0}, 50));
+ *
+ *      mc.gotoAndPlay("start");
+ *
  * @class MovieClip
  * @main MovieClip
  * @extends Container
  * @constructor
- * @param {String} mode Initial value for the mode property. One of MovieClip.INDEPENDENT, MovieClip.SINGLE_FRAME, or MovieClip.SYNCHED.
- * @param {Number} startPosition Initial value for the startPosition property.
- * @param {Boolean} loop Initial value for the loop property.
- * @param {Object} labels A hash of labels to pass to the timeline instance associated with this MovieClip.
+ * @param {String} [mode=independent] Initial value for the mode property. One of MovieClip.INDEPENDENT,
+ * MovieClip.SINGLE_FRAME, or MovieClip.SYNCHED. The default is MovieClip.INDEPENDENT.
+ * @param {Number} [startPosition=0] Initial value for the startPosition property.
+ * @param {Boolean} [loop=true] Initial value for the loop property. The default is true.
+ * @param {Object} [labels=null] A hash of labels to pass to the timeline instance associated with this MovieClip.
+ * Labels only need to be passed if they need to be used.
  **/
 var MovieClip = function(mode, startPosition, loop, labels) {
   this.initialize(mode, startPosition, loop, labels);

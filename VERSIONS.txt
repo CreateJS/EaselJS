@@ -9,7 +9,8 @@ Version NEXT [Not released]
 - Fixed example in Stage documentation (incorrect)
 - Fixed example in Text documentation (missing quote)
 - Fixed updateContext method name in docs (was incorrectly set to "setupContext")
-
+- Added sample code to MovieClip documentation, and a MovieClip example.
+- Added optional parameters to MovieClip constructor.
 
 
 Version 0.6.0 [Feb 12, 2013]
