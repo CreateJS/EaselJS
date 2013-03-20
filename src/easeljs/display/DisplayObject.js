@@ -597,9 +597,9 @@ var p = DisplayObject.prototype;
 	}
 	
 	/**
-	 * Applies this display object's transformation, alpha, globalCompositeOperation, clipping path (mask), and shadow to the specified
-	 * context. This is typically called prior to draw.
-	 * @method setupContext
+	 * Applies this display object's transformation, alpha, globalCompositeOperation, clipping path (mask), and shadow
+	 * to the specified context. This is typically called prior to draw.
+	 * @method updateContext
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D to update.
 	 **/
 	p.updateContext = function(ctx) {

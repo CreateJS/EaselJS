@@ -41,9 +41,10 @@ this.createjs = this.createjs||{};
  *
  *      var stage = new createjs.Stage("canvasElementId");
  *      var image = new createjs.Bitmap("imagePath.png");
+ *      stage.addChild(image);
  *      createjs.Ticker.addEventListener("tick", handleTick);
  *      function handleTick(event) {
- *          bitmap.x += 10;
+ *          image.x += 10;
  *          stage.update();
  *      }
  *
