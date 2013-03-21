@@ -620,6 +620,8 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p._handlePointerDown = function(id, e, x, y) {
 		var o = this._getPointerData(id);
+		if (o.inBounds == false)
+			return;
 		if (y != null) { this._updatePointerPosition(id, x, y); }
 		
 		if (this.onMouseDown || this.hasEventListener("stagemousedown")) {
@@ -686,6 +688,8 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p._handleDoubleClick = function(e) {
 		var o = this._getPointerData(-1);
+		if (o.inBounds == false)
+				return;
 		var target = this._getObjectsUnderPoint(o.x, o.y, null, (this._mouseOverIntervalID ? 3 : 1));
 		if (target && (target.onDoubleClick || target.hasEventListener("dblclick"))) {
 			evt = new createjs.MouseEvent("dblclick", o.x, o.y, target, e, -1, true, o.rawX, o.rawY);
