@@ -11,6 +11,7 @@ Version NEXT [Not released]
 - Fixed updateContext method name in docs (was incorrectly set to "setupContext")
 - Added sample code to MovieClip documentation, and a MovieClip example.
 - Added optional parameters to MovieClip constructor.
+- Added AlphaMaskFilter demo.
 
 
 Version 0.6.0 [Feb 12, 2013]
