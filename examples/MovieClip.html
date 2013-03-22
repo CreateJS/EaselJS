@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-   	<title>EaselJS Example: MovieClips</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>EaselJS Example: MovieClips</title>
 
-   	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+    <link href="assets/demoStyles.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload="init()">
 
 <header id="header" class="EaselJS">
     <h1><span class="text-product">Easel<strong>JS</strong></span> MovieClips</h1>
+
     <p>Demonstrates creating a MovieClip using JavaScript. Each shape instance tweened, and then the tweens are
-    added to the <b>MovieClip.timeline</b>. The timeline can then be controlled by JavaScript.</p>
+        added to the <b>MovieClip.timeline</b>. The timeline can then be controlled by JavaScript.</p>
 </header>
 
 <div class="canvasHolder">
-	<canvas id="testCanvas" width="960" height="400"></canvas>
+    <canvas id="testCanvas" width="960" height="400"></canvas>
 </div>
 
 <script type="text/javascript" src="assets/tweenjs-0.4.0.min.js"></script>
@@ -51,7 +52,7 @@
                         .drawCircle(100, 100, 100));
         var state2 = new createjs.Shape(
                 new createjs.Graphics().beginFill("#5a9cfb")
-                        .drawCircle(100, 100, 100));
+                    .drawCircle(100, 100, 100));
 
         // Create a tween for each shape, animating from one side to the other.
         mc.timeline.addTween(

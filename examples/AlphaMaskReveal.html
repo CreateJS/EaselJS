@@ -5,6 +5,17 @@
     <title>EaselJS: AlphaMaskFilter Reveal Demo</title>
 
     <link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+    <style>
+        BODY {
+            -webkit-user-select: none;  /* Chrome all / Safari all */
+          -moz-user-select: none;     /* Firefox all */
+          -ms-user-select: none;      /* IE 10+ */
+
+          /* No support for these yet, use at own risk */
+          -o-user-select: none;
+          user-select: none;
+        }
+    </style>
 
     <script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
     <script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
@@ -62,11 +73,11 @@
         function handleComplete() {
             document.getElementById("loader").className = "";
             createjs.Touch.enable(stage);
+            stage.enableMouseOver();
 
             stage.addEventListener("stagemousedown", handleMouseDown);
             stage.addEventListener("stagemouseup", handleMouseUp);
             stage.addEventListener("stagemousemove", handleMouseMove);
-
             drawingCanvas = new createjs.Shape();
             bitmap = new createjs.Bitmap(image);
 
@@ -81,6 +92,8 @@
             updateCacheImage(false);
 
             cursor = new createjs.Shape(new createjs.Graphics().beginFill("#FFFFFF").drawCircle(0,0,20));
+            cursor.cursor = "pointer";
+
             stage.addChild(cursor);
         }
 
@@ -103,7 +116,7 @@
             var midPoint = new createjs.Point(oldPt.x + stage.mouseX>>1, oldPt.y+stage.mouseY>>1);
 
                     drawingCanvas.graphics.setStrokeStyle(40, "round", "round")
-                        .beginStroke("#000000")
+                        .beginStroke("rgba(0,0,0,0.15)")
                         .moveTo(midPoint.x, midPoint.y)
                         .curveTo(oldPt.x, oldPt.y, oldMidPt.x, oldMidPt.y);
 
