@@ -191,15 +191,15 @@ var p = DisplayObject.prototype;
 	 */
 	 
 	/**
-	 * Dispatched on each display object on a stage whenever the stage updates.
-	 * This occurs immediately before the rendering (draw) pass. When {{#crossLink "Stage/update"}}{{/crossLink}} is called, first all display objects
-	 * on the stage dispatch the tick event, then all of the display objects are drawn to stage. Children will have their
+	 * Dispatched on each display object on a stage whenever the stage updates. This occurs immediately before the
+	 * rendering (draw) pass. When {{#crossLink "Stage/update"}}{{/crossLink}} is called, first all display objects on
+	 * the stage dispatch the tick event, then all of the display objects are drawn to stage. Children will have their
 	 * tick event dispatched in order of their depth prior to the event being dispatched on their parent.
 	 * @event tick
 	 * @param {Object} target The object that dispatched the event.
 	 * @param {String} type The event type.
-	 * @param {Array} params An array containing any arguments that were passed to the Stage.update() method.
-	 * 	For example if you called stage.update("hello"), then the params would be ["hello"].
+	 * @param {Array} params An array containing any arguments that were passed to the Stage.update() method. For
+	 *      example if you called stage.update("hello"), then the params would be ["hello"].
 	 * @since 0.6.0
 	 */
 
@@ -230,10 +230,10 @@ var p = DisplayObject.prototype;
 	p.id = -1;
 
 	/**
-	 * Indicates whether to include this object when running Stage.getObjectsUnderPoint(), and thus for mouse
-	 * interactions. Setting this to true for
-	 * Containers will cause the Container to be returned (not its children) regardless of whether it's mouseChildren property
-	 * is true.
+	 * Indicates whether to include this object when running mouse interactions. Setting this to `false` for children
+	 * of a {{#crossLink "Container"}}{{/crossLink}} will cause events on the Container to not fire when that child is
+	 * clicked. Note that setting this property to `false` does not prevent the {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}
+	 * method from returning the child.
 	 * @property mouseEnabled
 	 * @type {Boolean}
 	 * @default true
@@ -249,8 +249,8 @@ var p = DisplayObject.prototype;
 	p.name = null;
 
 	/**
-	 * A reference to the Container or Stage object that contains this display object, or null if it has not been added to
-	 * one. READ-ONLY.
+	 * A reference to the Container or Stage object that contains this display object, or null if it has not been added
+	 * to one. READ-ONLY.
 	 * @property parent
 	 * @final
 	 * @type {Container}
@@ -429,12 +429,12 @@ var p = DisplayObject.prototype;
 	 
 	/**
 	 * The onTick callback is called on each display object on a stage whenever the stage updates.
-	 * This occurs immediately before the rendering (draw) pass. When stage.update() is called, first all display objects
-	 * on the stage have onTick called, then all of the display objects are drawn to stage. Children will have their
-	 * onTick called in order of their depth prior to onTick being called on their parent.
-	 * <br/><br/>
-	 * Any parameters passed in to stage.update() are passed on to the onTick() handlers. For example, if you call
-	 * stage.update("hello"), all of the display objects with a handler will have onTick("hello") called.
+	 * This occurs immediately before the rendering (draw) pass. When stage.update() is called, first all display
+	 * objects on the stage have onTick called, then all of the display objects are drawn to stage. Children will have
+	 * their `onTick` called in order of their depth prior to onTick being called on their parent.
+	 *
+	 * Any parameters passed in to `stage.update()` are passed on to the `onTick()` handlers. For example, if you call
+	 * `stage.update("hello")`, all of the display objects with a handler will have `onTick("hello")` called.
 	 * @property onTick
 	 * @type {Function}
 	 * @deprecated In favour of the "tick" event. Will be removed in a future version.
@@ -442,8 +442,8 @@ var p = DisplayObject.prototype;
 	p.onTick = null;
 
 	/**
-	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when cache() or
-	 * updateCache() is called on the display object, and only apply to the area that is cached.
+	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when `cache()` or
+	 * `updateCache()` is called on the display object, and only apply to the area that is cached.
 	 * @property filters
 	 * @type {Array}
 	 * @default null
@@ -451,12 +451,11 @@ var p = DisplayObject.prototype;
 	p.filters = null;
 
 	/**
-	* Returns an ID number that uniquely identifies the current cache for this display object.
-	* This can be used to determine if the cache has changed since a previous check.
-	* @property cacheID
-	* @type {Number}
-	* @default 0
-	*/
+	 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to * determine if the cache has changed since a previous check.
+	 * @property cacheID
+	 * @type {Number}
+	 * @default 0
+	 */
 	p.cacheID = 0;
 	
 	/**
@@ -469,12 +468,13 @@ var p = DisplayObject.prototype;
 	p.mask = null;
 	
 	/**
-	 * A display object that will be tested when checking mouse interactions or testing getObjectsUnderPoint. The hit area
-	 * will have its transformation applied relative to this display object's coordinate space (as though the hit test object were a child of this
-	 * display object and relative to its regX/Y). The hitArea will be tested using only its own alpha value regardless of the alpha value on
-	 * the target display object, or the target's ancestors (parents). hitArea is NOT currently used by the hitTest() method.
-	 * 
-	 * Note that hitArea is not supported for Stage.
+	 * A display object that will be tested when checking mouse interactions or testing {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}.
+	 * The hit area will have its transformation applied relative to this display object's coordinate space (as though
+	 * the hit test object were a child of this display object and relative to its regX/Y). The hitArea will be tested
+	 * using only its own `alpha` value regardless of the alpha value on the target display object, or the target's
+	 * ancestors (parents).
+	 *
+	 * Note that hitArea is NOT currently used by the `hitTest()` method, nor is it supported for {{#crossLink "Stage"}}{{/crossLink}}.
 	 * @property hitArea
 	 * @type {DisplayObject}
 	 * @default null
@@ -482,8 +482,9 @@ var p = DisplayObject.prototype;
 	p.hitArea = null;
 	
 	/**
-	 * A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display object. You must enable
-	 * mouseover events using the stage.enableMouseOver() method to use this property. If null it will use the default cursor.
+	 * A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display
+	 * object. You must enable mouseover events using the {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} method to
+	 * use this property. If null it will use the default cursor.
 	 * @property cursor
 	 * @type {String}
 	 * @default null
@@ -580,13 +581,13 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
-	 * Returns true if the draw was handled (useful for overriding functionality).
+	 * Returns `true` if the draw was handled (useful for overriding functionality).
+	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
-	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	 * into itself).
+	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache. For example,
+	 * used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		var cacheCanvas = this.cacheCanvas;
@@ -598,7 +599,7 @@ var p = DisplayObject.prototype;
 	
 	/**
 	 * Applies this display object's transformation, alpha, globalCompositeOperation, clipping path (mask), and shadow
-	 * to the specified context. This is typically called prior to draw.
+	 * to the specified context. This is typically called prior to {{#crossLink "DisplayObject/draw"}}{{/crossLink}}.
 	 * @method updateContext
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D to update.
 	 **/
