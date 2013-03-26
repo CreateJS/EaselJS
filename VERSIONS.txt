@@ -12,6 +12,8 @@ Version NEXT [Not released]
 - Added sample code to MovieClip documentation, and a MovieClip example.
 - Added optional parameters to MovieClip constructor.
 - Added AlphaMaskFilter demo.
+- Fixed documentation description of DisplayObject.mouseEnabled
+- Added Safari note to the Cache example.
 
 
 Version 0.6.0 [Feb 12, 2013]
