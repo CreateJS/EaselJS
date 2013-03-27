@@ -41,28 +41,34 @@ this.createjs = this.createjs||{};
  * been made to support time-based timelines in the future.
  *
  * <h4>Example</h4>
- *      // Animate shapes back and forth using MovieClip
+ * This example animates two shapes back and forth. The grey shape starts on the left, but we jump to a mid-point in
+ * the animation using {{#crossLink "MovieClip/gotoAndPlay"}}{{/crossLink}}.
+ *
  *      var stage = new createjs.Stage("canvas");
  *      createjs.Ticker.addEventListener("tick", stage);
  *
  *      var mc = new createjs.MovieClip(null, 0, true, {start:20});
  *      stage.addChild(mc);
  *
- *      var state1 = new createjs.Shape(
+ *      var child1 = new createjs.Shape(
  *          new createjs.Graphics().beginFill("#999999")
  *              .drawCircle(30,30,30));
- *      var state2 = new createjs.Shape(
+ *      var child2 = new createjs.Shape(
  *          new createjs.Graphics().beginFill("#5a9cfb")
  *              .drawCircle(30,30,30));
  *
  *      mc.timeline.addTween(
- *          createjs.Tween.get(state1)
- *          .to({x:0}).to({x:60}, 50));
+ *          createjs.Tween.get(child1)
+ *              .to({x:0}).to({x:60}, 50).to({x:0}, 50));
  *      mc.timeline.addTween(
- *          createjs.Tween.get(state2)
- *          .to({x:60}).to({x:0}, 50));
+ *          createjs.Tween.get(child2)
+ *              .to({x:60}).to({x:0}, 50).to({x:60}, 50));
  *
  *      mc.gotoAndPlay("start");
+ *
+ * It is recommended to use <code>tween.to()</code> to animate and set properties (use no duration to have it set
+ * immediately), and the <code>tween.wait()</code> method to create delays between animations. Note that using the
+ * <code>tween.set()</code> method to affect properties will likely not provide the desired result.
  *
  * @class MovieClip
  * @main MovieClip
@@ -145,7 +151,23 @@ var p = MovieClip.prototype = new createjs.Container();
 
 	/**
 	 * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
-	 * instance is initialized.
+	 * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
+	 * instances to the timeline.
+	 *
+	 * <h4>Example</h4>
+	 *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
+	 *      var mc = new createjs.MovieClip();
+	 *      mc.timeline.addTween(tween);
+	 *
+	 * Elements can be added and removed from the timeline by toggling an "_off" property
+	 * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
+	 * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
+	 * frame 1. You can use the "visible" property to achieve the same effect.
+	 *
+	 *      var tween = createjs.Tween.get(target).to({_off:false})
+	 *          .wait(1).to({_off:true})
+	 *          .wait(1).to({_off:false});
+	 *
 	 * @property timeline
 	 * @type Timeline
 	 * @default null
