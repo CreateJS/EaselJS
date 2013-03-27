@@ -1,5 +1,5 @@
 /*
-* Scale3Bitmap
+* ScaleBitmap
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
@@ -32,49 +32,28 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
- * A Scale3Bitmap represents an Image, Canvas, or Video in the display list and is split into three separate
- * regions to allow independent scaling of each region. This display object can be used to easily display and scale
- * a "pill" shaped UI element, such as a button. A Scale3Bitmap can be instantiated using an existing HTML element,
+ * A ScaleBitmap represents an Image, Canvas, or Video in the display list and is split into nine separate regions
+ * to allow independent scaling of each region. This display object can be used to create scaling UI skins, such as
+ * buttons and backgrounds with rounded corners. A ScaleBitmap can be instantiated using an existing HTML element,
  * or a string, similar to a Bitmap.
  *
  * <h4>Example</h4>
- *      var bitmap = new createjs.Scale3Bitmap("imagePath.jpg", 14, 3, createjs.Scale3Bitmap.HORIZONTAL);
- *      bitmap.setDrawSize(100, bitmap.image.height);
+ *      var bitmap = new createjs.ScaleBitmap("imagePath.jpg", new createjs.Rectangle(14, 14, 3, 3));
+ *      bitmap.setDrawSize(100, 100);
  *
  * Note: When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
  * will be displayed.
  *
- * @class Scale3Bitmap
+ * @class ScaleBitmap
  * @extends DisplayObject
  * @constructor
  * @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use. If it is a URI, a new Image object will be constructed and assigned to the .image property.
- * @param {Number} scale3Region1 The first of the three scaling regions.
- * @param {Number} scale3Region2 The second of the three scaling regions.
- * @param {String} direction The layout direction of the regions. One of Scale3Bitmap.HORIZONTAL or Scale3Bitmap.VERTICAL.
+ * @param {Rectangle} scale9Grid The inner rectangle of the nine region grid.
  **/
-var Scale3Bitmap = function(imageOrUri, scale3Region1, scale3Region2, direction) {
-  this.initialize(imageOrUri, scale3Region1, scale3Region2, direction);
+var ScaleBitmap = function(imageOrUri, scale9Grid) {
+  this.initialize(imageOrUri, scale9Grid);
 }
-var p = Scale3Bitmap.prototype = new createjs.DisplayObject();
-
-	/**
-	 * Read-only. The layout direction of the three Scale3Bitmap regions will be horizontal, left to right.
-	 * This is the default direction.
-	 * @property HORIZONTAL
-	 * @static
-	 * @type String
-	 * @default "horizontal"
-	 **/
-	Scale3Bitmap.HORIZONTAL = "horizontal";
-
-	/**
-	 * Read-only. The layout direction of the three Scale3Bitmap regions will be vertical, top to bottom.
-	 * @property VERTICAL
-	 * @static
-	 * @type String
-	 * @default "vertical"
-	 **/
-	Scale3Bitmap.VERTICAL = "vertical";
+var p = ScaleBitmap.prototype = new createjs.DisplayObject();
 
 // public properties:
 
@@ -86,7 +65,7 @@ var p = Scale3Bitmap.prototype = new createjs.DisplayObject();
 	p.image = null;
 	
 	/**
-	 * Whether or not the Scale3Bitmap should be draw to the canvas at whole pixel coordinates.
+	 * Whether or not the ScaleBitmap should be draw to the canvas at whole pixel coordinates.
 	 * @property snapToPixel
 	 * @type Boolean
 	 * @default true
@@ -94,29 +73,14 @@ var p = Scale3Bitmap.prototype = new createjs.DisplayObject();
 	p.snapToPixel = true;
 
 	/**
-	 * The layout direction of the three scaling regions of the Scale3Bitmap.
-	 * @property direction
-	 * @type String
-	 * @default "horizontal"
+	 * Specifies the inner rectangle of the nine region scaling grid.
+	 * @property scale9Grid
+	 * @type Rectangle
 	 */
-	p.direction = Scale3Bitmap.DIRECTION_HORIZONTAL;
+	p.scale9Grid = null;
 
 	/**
-	 * Specifies the first of the three scaling regions.
-	 * @property scale3Region1
-	 * @type Number
-	 */
-	p.scale3Region1 = 0;
-
-	/**
-	 * Specifies the second of the three scaling regions.
-	 * @property scale3Region2
-	 * @type Number
-	 */
-	p.scale3Region2 = 0;
-
-	/**
-	 * Specifies the width of the drawn Scale3Bitmap.
+	 * Specifies the width of the drawn ScaleBitmap.
 	 * @property drawWidth
 	 * @type Number
 	 * @default The original width of the image.
@@ -124,7 +88,7 @@ var p = Scale3Bitmap.prototype = new createjs.DisplayObject();
 	p.drawWidth = 0;
 
 	/**
-	 * Specifies the height of the drawn Scale3Bitmap.
+	 * Specifies the height of the drawn ScaleBitmap.
 	 * @property drawHeight
 	 * @type Number
 	 * @default The original height of the image.
@@ -145,7 +109,7 @@ var p = Scale3Bitmap.prototype = new createjs.DisplayObject();
 	 * @method initialize
 	 * @protected
 	 **/
-	p.initialize = function(imageOrUri, scale3Region1, scale3Region2, direction) {
+	p.initialize = function(imageOrUri, scale9Grid) {
 		this.DisplayObject_initialize();
 		if (typeof imageOrUri == "string") {
 			this.image = new Image();
@@ -155,19 +119,17 @@ var p = Scale3Bitmap.prototype = new createjs.DisplayObject();
 		}
 		this.drawWidth = this.image.width;
 		this.drawHeight = this.image.height;
-		this.direction = direction||Scale3Bitmap.HORIZONTAL;
-		this.scale3Region1 = scale3Region1;
-		this.scale3Region2 = scale3Region2;
+		this.scale9Grid = scale9Grid;
 	}
 	
 // public methods:
 
 	/**
-	 * Changes the dimensions used the draw the Scale3Bitmap.
+	 * Changes the dimensions used the draw the ScaleBitmap.
 	 * 
 	 * @method setDrawSize
-	 * @param {Number} newWidth The new width of the drawn Scale3Bitmap.
-	 * @param {Number} newHeight The new height of the drawn Scale3Bitmap.
+	 * @param {Number} newWidth The new width of the drawn ScaleBitmap.
+	 * @param {Number} newHeight The new height of the drawn ScaleBitmap.
 	 */
 	p.setDrawSize = function(newWidth, newHeight) {
 		this.drawWidth = newWidth;
@@ -206,39 +168,72 @@ var p = Scale3Bitmap.prototype = new createjs.DisplayObject();
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 
-		if (this.direction == Scale3Bitmap.DIRECTION_VERTICAL) {
-			var scaleRegion3 = this.image.height - this.scale3Region1 - this.scale3Region2;
-			var oppositeEdgeScale = this.drawWidth / this.image.width;
-			var scaledFirstRegion = this.scale3Region1 * oppositeEdgeScale;
-			var scaledThirdRegion = scaleRegion3 * oppositeEdgeScale;
+		var centerX = this.scale9Grid.width;
+		var centerY = this.scale9Grid.height;
+		if(centerX == 0) //vertical
+		{
+			if(centerY == 0)
+			{
+				throw "One of scale9Grid width or height must be greater than zero.";
+			}
+			var imageWidth = this.image.width;
+			var scale3Region1 = this.scale9Grid.y;
+			var scale3Region3 = this.image.height - scale3Region1 - centerY;
+			var oppositeEdgeScale = this.drawWidth / imageWidth;
+			var scaledFirstRegion = scale3Region1 * oppositeEdgeScale;
+			var scaledThirdRegion = scale3Region3 * oppositeEdgeScale;
 			var scaledSecondRegion = this.drawHeight - scaledFirstRegion - scaledThirdRegion;
 
-			ctx.drawImage(this.image, 0, 0, this.image.width, this.scale3Region1, 0, 0, this.drawWidth, scaledFirstRegion);
-			ctx.drawImage(this.image, 0, this.scale3Region1, this.image.width, this.scale3Region2, 0, scaledFirstRegion, this.drawWidth, scaledSecondRegion);
-			ctx.drawImage(this.image, 0, this.scale3Region1 + this.scale3Region2, this.image.width, scaleRegion3, 0, scaledFirstRegion + scaledSecondRegion, this.drawWidth, scaledThirdRegion);
+			ctx.drawImage(this.image, 0, 0, imageWidth, scale3Region1, 0, 0, this.drawWidth, scaledFirstRegion);
+			ctx.drawImage(this.image, 0, scale3Region1, imageWidth, centerY, 0, scaledFirstRegion, this.drawWidth, scaledSecondRegion);
+			ctx.drawImage(this.image, 0, scale3Region1 + centerY, imageWidth, scale3Region3, 0, scaledFirstRegion + scaledSecondRegion, this.drawWidth, scaledThirdRegion);
 		}
-		else {
-			var scaleRegion3 = this.image.width - this.scale3Region1 - this.scale3Region2;
-			var oppositeEdgeScale = this.drawHeight / this.image.height;
-			var scaledFirstRegion = this.scale3Region1 * oppositeEdgeScale;
-			var scaledThirdRegion = scaleRegion3 * oppositeEdgeScale;
-			var scaledSecondRegion = this.drawWidth - scaledFirstRegion - scaledThirdRegion;
+		else if(centerY == 0) //horizontal
+		{
+			var imageHeight = this.image.height;
+			scale3Region1 = this.scale9Grid.x;
+			scale3Region3 = this.image.width - scale3Region1 - centerX;
+			oppositeEdgeScale = this.drawHeight / this.image.height;
+			scaledFirstRegion = scale3Region1 * oppositeEdgeScale;
+			scaledThirdRegion = scale3Region3 * oppositeEdgeScale;
+			scaledSecondRegion = this.drawWidth - scaledFirstRegion - scaledThirdRegion;
 
-			ctx.drawImage(this.image, 0, 0, this.scale3Region1, this.image.height, 0, 0, scaledFirstRegion, this.drawHeight);
-			ctx.drawImage(this.image, this.scale3Region1, 0, this.scale3Region2, this.image.height, scaledFirstRegion, 0, scaledSecondRegion, this.drawHeight);
-			ctx.drawImage(this.image, this.scale3Region1 + this.scale3Region2, 0, scaleRegion3, this.image.height, scaledFirstRegion + scaledSecondRegion, 0, scaledThirdRegion, this.drawHeight);
+			ctx.drawImage(this.image, 0, 0, scale3Region1, imageHeight, 0, 0, scaledFirstRegion, this.drawHeight);
+			ctx.drawImage(this.image, scale3Region1, 0, centerX, imageHeight, scaledFirstRegion, 0, scaledSecondRegion, this.drawHeight);
+			ctx.drawImage(this.image, scale3Region1 + centerX, 0, scale3Region3, imageHeight, scaledFirstRegion + scaledSecondRegion, 0, scaledThirdRegion, this.drawHeight);
 		}
-		
+		else
+		{
+			var left = this.scale9Grid.x;
+			var top = this.scale9Grid.y;
+			var right = this.image.width - centerX - left;
+			var bottom = this.image.height - centerY - top;
+			var scaledCenterX = this.drawWidth - left - right;
+			var scaledCenterY = this.drawHeight - top - bottom;
+
+			ctx.drawImage(this.image, 0, 0, left, top, 0, 0, left, top);
+			ctx.drawImage(this.image, left, 0, centerX, top, left, 0, scaledCenterX, top);
+			ctx.drawImage(this.image, left + centerX, 0, right, top, left + scaledCenterX, 0, right, top);
+
+			ctx.drawImage(this.image, 0, top, left, centerY, 0, top, left, scaledCenterY);
+			ctx.drawImage(this.image, left, top, centerX, centerY, left, top, scaledCenterX, scaledCenterY);
+			ctx.drawImage(this.image, left + centerX, top, right, centerY, left + scaledCenterX, top, right, scaledCenterY);
+
+			ctx.drawImage(this.image, 0, top + centerY, left, bottom, 0, top + scaledCenterY, left, bottom);
+			ctx.drawImage(this.image, left, top + centerY, centerX, bottom, left, top + scaledCenterY, scaledCenterX, bottom);
+			ctx.drawImage(this.image, left + centerX, top + centerY, right, bottom, left + scaledCenterX, top + scaledCenterY, right, bottom);
+		}
+
 		return true;
 	}
 	
 	/**
-	 * Returns a clone of the Scale3Bitmap instance.
+	 * Returns a clone of the ScaleBitmap instance.
 	 * @method clone
-	 * @return {Scale3Bitmap} a clone of the Scale3Bitmap instance.
+	 * @return {ScaleBitmap} a clone of the ScaleBitmap instance.
 	 **/
 	p.clone = function() {
-		var o = new Scale3Bitmap(this.image, this.scale9Grid.clone());
+		var o = new ScaleBitmap(this.image, this.scale9Grid.clone());
 		if (this.sourceRect) { o.sourceRect = this.sourceRect.clone(); }
 		this.cloneProps(o);
 		return o;
@@ -250,10 +245,10 @@ var p = Scale3Bitmap.prototype = new createjs.DisplayObject();
 	 * @return {String} a string representation of the instance.
 	 **/
 	p.toString = function() {
-		return "[Scale3Bitmap (name="+  this.name +")]";
+		return "[ScaleBitmap (name="+  this.name +")]";
 	}
 
 // private methods:
 
-createjs.Scale3Bitmap = Scale3Bitmap;
+createjs.ScaleBitmap = ScaleBitmap;
 }());
