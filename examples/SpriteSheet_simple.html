@@ -55,12 +55,8 @@
 			// Add Grant to the stage, and add it as a listener to Ticker to get updates each frame.
 			stage.addChild(grant);
 			createjs.Ticker.setFPS(60);
-			createjs.Ticker.addEventListener("tick", tick);
+			createjs.Ticker.addEventListener("tick", stage);
 		}
-
-        function tick() {
-            stage.update();
-        }
 
 	</script>
 </head>

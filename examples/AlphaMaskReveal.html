@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>EaselJS: AlphaMaskFilter Reveal Demo</title>
+
+    <link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+    <style>
+        BODY {
+            -webkit-user-select: none;  /* Chrome all / Safari all */
+          -moz-user-select: none;     /* Firefox all */
+          -ms-user-select: none;      /* IE 10+ */
+
+          /* No support for these yet, use at own risk */
+          -o-user-select: none;
+          user-select: none;
+        }
+    </style>
+
+    <script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
+    <script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+    <script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+    <script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
+    <script type="text/javascript" src="../src/easeljs/geom/Point.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
+    <script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
+    <script type="text/javascript" src="../src/easeljs/ui/Touch.js"></script>
+
+    <script type="text/javascript" src="../src/easeljs/filters/AlphaMaskFilter.js"></script>
+    <script type="text/javascript" src="../src/easeljs/filters/BoxBlurFilter.js"></script>
+
+    <!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+
+    <script>
+
+        var stage;
+        var isDrawing;
+        var drawingCanvas;
+        var oldPt;
+        var oldMidPt;
+        var displayCanvas;
+        var image;
+        var bitmap;
+        var maskFilter;
+        var cursor;
+        var text;
+        var blur;
+
+        function init() {
+            if (window.top != window) {
+                document.getElementById("header").style.display = "none";
+            }
+
+            document.getElementById("loader").className = "loader";
+
+            image = new Image();
+            image.onload = handleComplete;
+            image.src = "assets/AlphaMaskImage.png";
+
+            stage = new createjs.Stage("testCanvas");
+            text = new createjs.Text("Loading...", "20px Arial", "#999999");
+                    text.set({x:stage.canvas.width/2, y:stage.canvas.height-80});
+            text.textAlign = "center";
+        }
+
+        function handleComplete() {
+            document.getElementById("loader").className = "";
+            createjs.Touch.enable(stage);
+            stage.enableMouseOver();
+
+            stage.addEventListener("stagemousedown", handleMouseDown);
+            stage.addEventListener("stagemouseup", handleMouseUp);
+            stage.addEventListener("stagemousemove", handleMouseMove);
+            drawingCanvas = new createjs.Shape();
+            bitmap = new createjs.Bitmap(image);
+
+            blur = new createjs.Bitmap(image);
+            blur.filters = [new createjs.BoxBlurFilter(15,15,2)];
+            blur.cache(0,0,960,400);
+            blur.alpha = 0.9;
+
+            text.text = "Click and Drag to Reveal the Image.";
+
+            stage.addChild(blur, text, bitmap);
+            updateCacheImage(false);
+
+            cursor = new createjs.Shape(new createjs.Graphics().beginFill("#FFFFFF").drawCircle(0,0,20));
+            cursor.cursor = "pointer";
+
+            stage.addChild(cursor);
+        }
+
+        function handleMouseDown(event) {
+            oldPt = new createjs.Point(stage.mouseX, stage.mouseY);
+            oldMidPt = oldPt;
+
+            isDrawing = true;
+        }
+
+        function handleMouseMove(event) {
+            cursor.x = stage.mouseX;
+            cursor.y = stage.mouseY;
+
+            if (!isDrawing) {
+                stage.update();
+                return;
+            }
+
+            var midPoint = new createjs.Point(oldPt.x + stage.mouseX>>1, oldPt.y+stage.mouseY>>1);
+
+                    drawingCanvas.graphics.setStrokeStyle(40, "round", "round")
+                        .beginStroke("rgba(0,0,0,0.15)")
+                        .moveTo(midPoint.x, midPoint.y)
+                        .curveTo(oldPt.x, oldPt.y, oldMidPt.x, oldMidPt.y);
+
+            oldPt.x = stage.mouseX;
+            oldPt.y = stage.mouseY;
+
+            oldMidPt.x = midPoint.x;
+            oldMidPt.y = midPoint.y;
+
+            updateCacheImage(true);
+
+        }
+
+        function handleMouseUp(event) {
+            updateCacheImage(true);
+            isDrawing = false;
+        }
+
+        function updateCacheImage(update) {
+            if (update) {
+                drawingCanvas.updateCache(0, 0, image.width, image.height);
+            } else {
+                drawingCanvas.cache(0, 0, image.width, image.height);
+            }
+
+            maskFilter = new createjs.AlphaMaskFilter(drawingCanvas.cacheCanvas);
+
+            bitmap.filters = [maskFilter];
+            if (update) {
+                bitmap.updateCache(0, 0, image.width, image.height);
+            } else {
+                bitmap.cache(0, 0, image.width, image.height);
+            }
+
+            stage.update();
+        }
+    </script>
+
+</head>
+
+<body onload="init();">
+<div id="loader"></div>
+<header id="header" class="EaselJS">
+    <h1><span class="text-product">Easel<strong>JS</strong></span> AlphaMaskFilter reveal</h1>
+
+    <p>This example demonstrates revealing an image using another image as the mask. The mask is created by drawing a
+    shape, and then caching the shape to make an image with an alpha channel. It is then applied to the image as
+    an mask using the <strong>AlphaMaskFilter</strong> filter. Another copy of the image is added below with a
+    <strong>BoxBlurFilter</strong> to make the effect cooler.</p>
+</header>
+
+<canvas id="testCanvas" width="960" height="400"></canvas>
+</body>
+</html>

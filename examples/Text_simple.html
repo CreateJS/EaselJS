@@ -55,7 +55,7 @@
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 
-	function tick() {
+	function tick(event) {
 		count++;
 
 		// update the text:
@@ -65,7 +65,7 @@
 		shape.graphics.clear().beginFill("#F00").drawRect(-10, -10, txt.getMeasuredWidth()+20, 36+20);
 
 		// update the stage:
-		stage.update();
+		stage.update(event);
 	}
 
 	</script>

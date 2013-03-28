@@ -1,4 +1,22 @@
-Version NEXT [Feb 13, 2013]
+Version NEXT [Not released]
+****************************************************************************************************
+- Updated demos to propagate the tick event to the stage. This is a best practice.
+- Fixed documentation for Matrix2D.rotate
+- Fixed documentation for Matrix2D.tx
+- Fixed documentation for Stage.stagemousedown event (stagemouseup was doc'd twice)
+- Fixed documentation of DisplayObject.dblclick (case incorrect)
+- Modified EventDispatcher to avoid unnecessary instanceof and apply
+- Fixed example in Stage documentation (incorrect)
+- Fixed example in Text documentation (missing quote)
+- Fixed updateContext method name in docs (was incorrectly set to "setupContext")
+- Added sample code to MovieClip documentation, and a MovieClip example.
+- Added optional parameters to MovieClip constructor.
+- Added AlphaMaskFilter demo.
+- Fixed documentation description of DisplayObject.mouseEnabled
+- Added Safari note to the Cache example.
+
+
+Version 0.6.0 [Feb 12, 2013]
 ****************************************************************************************************
 - added new event model with EventDispatcher class
 - added DisplayObject.cursor property
