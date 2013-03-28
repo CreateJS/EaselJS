@@ -94,7 +94,7 @@
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 
-	function tick() {
+	function tick(event) {
 		// update rotation for all arms:
 		arm1.rotation += 1.9;
 		arm2.rotation += -2.7;
@@ -106,7 +106,7 @@
 		whee.style.left = Math.round(pt.x+canvas.offsetLeft-10) + "px";
 		whee.style.top = Math.round(pt.y+canvas.offsetTop-10) + "px";
 
-		stage.update();
+		stage.update(event);
 	}
 	</script>
 </head>

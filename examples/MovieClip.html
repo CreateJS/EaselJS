@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>EaselJS Example: MovieClips</title>
+
+    <link href="assets/demoStyles.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload="init()">
+
+<header id="header" class="EaselJS">
+    <h1><span class="text-product">Easel<strong>JS</strong></span> MovieClips</h1>
+
+    <p>Demonstrates creating a MovieClip using JavaScript. Each shape instance tweened, and then the tweens are
+        added to the <b>MovieClip.timeline</b>. The timeline can then be controlled by JavaScript.</p>
+</header>
+
+<div class="canvasHolder">
+    <canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
+
+<script type="text/javascript" src="assets/tweenjs-0.4.0.min.js"></script>
+
+<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+<script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
+<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
+<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
+<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+<script type="text/javascript" src="../src/easeljs/display/MovieClip.js"></script>
+
+<script type="text/javascript">
+    function init() {
+        if (window.top != window) {
+            document.getElementById("header").style.display = "none";
+        }
+
+        var stage = new createjs.Stage("testCanvas");
+        createjs.Ticker.addEventListener("tick", stage);
+
+        // Create the MovieClip
+        var mc = new createjs.MovieClip(null, 0, true, {start:0, middle:40});
+        stage.addChild(mc);
+
+        // Create the States. Each state is just a circle shape.
+        var state1 = new createjs.Shape(
+                new createjs.Graphics().beginFill("#999999")
+                        .drawCircle(100, 100, 100));
+        var state2 = new createjs.Shape(
+                new createjs.Graphics().beginFill("#5a9cfb")
+                    .drawCircle(100, 100, 100));
+
+        // Create a tween for each shape, animating from one side to the other.
+        mc.timeline.addTween(
+                createjs.Tween.get(state1)
+                        .to({x:0}).to({x:760}, 40).to({x:0}, 40));
+        mc.timeline.addTween(
+                createjs.Tween.get(state2)
+                        .to({x:760}).to({x:0}, 40).to({x:760}, 40));
+
+        // Play the animation starting from the middle. See the MovieClip constructor above where the labels are specified.
+        mc.gotoAndPlay("middle");
+    }
+</script>
+
+</body>
+</html>

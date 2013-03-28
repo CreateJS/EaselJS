@@ -114,7 +114,7 @@
             //console.log("Error Loading Image : " + e.target.src);
         }
 
-        function tick() {
+        function tick(event) {
             // move all the rats according to their vX/vY properties:
             var l = bmpAnimList.length;
             for (var i=0; i<l; i++) {
@@ -124,7 +124,7 @@
             }
 
             // update the stage:
-            stage.update();
+            stage.update(event);
         }
 
         function angleChange(bmpAnim,animation) {

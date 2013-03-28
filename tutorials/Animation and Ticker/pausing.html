@@ -32,7 +32,7 @@
 			output.y = stage.canvas.height-output.lineHeight*3-10;
 		}
 		
-		function tick() {
+		function tick(event) {
 			goCircle.x += 10;
 			if (goCircle.x > stage.canvas.width) { goCircle.x = 0; }
 
@@ -45,7 +45,7 @@
 				"getTime(true)  = "+createjs.Ticker.getTime(true)+"\n"+
 				"getTime(false) = "+createjs.Ticker.getTime(false);
 			
-			stage.update(); // important!!
+			stage.update(event); // important!!
 		}
 		
 		function togglePause() {

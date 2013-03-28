@@ -43,6 +43,9 @@ this.createjs = this.createjs||{};
  *      var instance = new createjs.BitmapAnimation(spriteSheet);
  *      instance.gotoAndStop("frameName");
  *
+ * Currently, you <strong>must</strong> call either {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} or
+ * {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}}, or nothing will display on stage.
+ *
  * @class BitmapAnimation
  * @extends DisplayObject
  * @uses EventDispatcher

@@ -39,14 +39,47 @@ this.createjs = this.createjs||{};
  *
  * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
  * been made to support time-based timelines in the future.
+ *
+ * <h4>Example</h4>
+ * This example animates two shapes back and forth. The grey shape starts on the left, but we jump to a mid-point in
+ * the animation using {{#crossLink "MovieClip/gotoAndPlay"}}{{/crossLink}}.
+ *
+ *      var stage = new createjs.Stage("canvas");
+ *      createjs.Ticker.addEventListener("tick", stage);
+ *
+ *      var mc = new createjs.MovieClip(null, 0, true, {start:20});
+ *      stage.addChild(mc);
+ *
+ *      var child1 = new createjs.Shape(
+ *          new createjs.Graphics().beginFill("#999999")
+ *              .drawCircle(30,30,30));
+ *      var child2 = new createjs.Shape(
+ *          new createjs.Graphics().beginFill("#5a9cfb")
+ *              .drawCircle(30,30,30));
+ *
+ *      mc.timeline.addTween(
+ *          createjs.Tween.get(child1)
+ *              .to({x:0}).to({x:60}, 50).to({x:0}, 50));
+ *      mc.timeline.addTween(
+ *          createjs.Tween.get(child2)
+ *              .to({x:60}).to({x:0}, 50).to({x:60}, 50));
+ *
+ *      mc.gotoAndPlay("start");
+ *
+ * It is recommended to use <code>tween.to()</code> to animate and set properties (use no duration to have it set
+ * immediately), and the <code>tween.wait()</code> method to create delays between animations. Note that using the
+ * <code>tween.set()</code> method to affect properties will likely not provide the desired result.
+ *
  * @class MovieClip
  * @main MovieClip
  * @extends Container
  * @constructor
- * @param {String} mode Initial value for the mode property. One of MovieClip.INDEPENDENT, MovieClip.SINGLE_FRAME, or MovieClip.SYNCHED.
- * @param {Number} startPosition Initial value for the startPosition property.
- * @param {Boolean} loop Initial value for the loop property.
- * @param {Object} labels A hash of labels to pass to the timeline instance associated with this MovieClip.
+ * @param {String} [mode=independent] Initial value for the mode property. One of MovieClip.INDEPENDENT,
+ * MovieClip.SINGLE_FRAME, or MovieClip.SYNCHED. The default is MovieClip.INDEPENDENT.
+ * @param {Number} [startPosition=0] Initial value for the startPosition property.
+ * @param {Boolean} [loop=true] Initial value for the loop property. The default is true.
+ * @param {Object} [labels=null] A hash of labels to pass to the timeline instance associated with this MovieClip.
+ * Labels only need to be passed if they need to be used.
  **/
 var MovieClip = function(mode, startPosition, loop, labels) {
   this.initialize(mode, startPosition, loop, labels);
@@ -118,7 +151,23 @@ var p = MovieClip.prototype = new createjs.Container();
 
 	/**
 	 * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
-	 * instance is initialized.
+	 * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
+	 * instances to the timeline.
+	 *
+	 * <h4>Example</h4>
+	 *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
+	 *      var mc = new createjs.MovieClip();
+	 *      mc.timeline.addTween(tween);
+	 *
+	 * Elements can be added and removed from the timeline by toggling an "_off" property
+	 * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
+	 * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
+	 * frame 1. You can use the "visible" property to achieve the same effect.
+	 *
+	 *      var tween = createjs.Tween.get(target).to({_off:false})
+	 *          .wait(1).to({_off:true})
+	 *          .wait(1).to({_off:false});
+	 *
 	 * @property timeline
 	 * @type Timeline
 	 * @default null

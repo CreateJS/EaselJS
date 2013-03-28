@@ -41,9 +41,10 @@ this.createjs = this.createjs||{};
  *
  *      var stage = new createjs.Stage("canvasElementId");
  *      var image = new createjs.Bitmap("imagePath.png");
+ *      stage.addChild(image);
  *      createjs.Ticker.addEventListener("tick", handleTick);
  *      function handleTick(event) {
- *          bitmap.x += 10;
+ *          image.x += 10;
  *          stage.update();
  *      }
  *
@@ -79,9 +80,9 @@ var p = Stage.prototype = new createjs.Container();
 	 */
 
 	/**
-	 * Dispatched when the user releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
-	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-	 * @event stagemouseup
+	 * Dispatched when the user presses their left mouse button on the canvas. See the {{#crossLink "MouseEvent"}}{{/crossLink}}
+	 * class for a listing of event properties.
+	 * @event stagemousedown
 	 * @since 0.6.0
 	 */
 

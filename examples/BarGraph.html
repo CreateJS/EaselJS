@@ -163,7 +163,7 @@
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 
-	function tick() {
+	function tick(event) {
 		// if we are on the last frame of animation then remove the tick listener:
 		if (--count == 1){ createjs.Ticker.removeEventListener("tick", tick); }
 
@@ -174,7 +174,7 @@
 		drawBar(bar, (c%10+1)/10*barValues[index]);
 
 		// update the stage:
-		stage.update();
+		stage.update(event);
 	}
 
 	function drawBar(bar, value) {

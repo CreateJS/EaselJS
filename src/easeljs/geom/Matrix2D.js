@@ -98,7 +98,7 @@ var p = Matrix2D.prototype;
 
 	/**
 	 * Position (2, 0) in a 3x3 affine transformation matrix.
-	 * @property atx
+	 * @property tx
 	 * @type Number
 	 **/
 	p.tx = 0;
@@ -318,7 +318,7 @@ var p = Matrix2D.prototype;
 	/**
 	 * Applies a rotation transformation to the matrix.
 	 * @method rotate
-	 * @param {Number} angle The angle in degrees.
+	 * @param {Number} angle The angle in radians. To use degrees, multiply by <code>Math.PI/180</code>.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.rotate = function(angle) {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Curve To</title>
+    <title>EaselJS: Curve To Demo</title>
 
     <link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 
@@ -64,9 +64,7 @@
             stage.update();
         }
 
-        function stop() {
-            createjs.Ticker.removeEventListener("tick", tick);
-        }
+        function stop() {}
 
         function handleMouseDown(event) {
             if (stage.contains(title)) { stage.clear(); stage.removeChild(title); }
