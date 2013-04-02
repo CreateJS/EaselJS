@@ -155,7 +155,7 @@ var p = EventDispatcher.prototype;
 	 * Dispatches the specified event.
 	 * @method dispatchEvent
 	 * @param {Object | String} eventObj An object with a "type" property, or a string type. If a string is used,
-	 * dispatchEvent will contstruct a generic event object with "type" and "params" properties.
+	 * dispatchEvent will construct a generic event object with the specified type.
 	 * @param {Object} [target] The object to use as the target property of the event object. This will default to the
 	 * dispatching object.
 	 * @return {Boolean} Returns true if any listener returned true.
