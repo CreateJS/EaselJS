@@ -14,6 +14,8 @@ Version NEXT [Not released]
 - Added AlphaMaskFilter demo.
 - Fixed documentation description of DisplayObject.mouseEnabled
 - Added Safari note to the Cache example.
+- Updated Ticker documentation. Fixed setPaused/getPaused descriptions, and added some better descriptions,
+	a few examples, and updated documentation throughout.
 
 
 Version 0.6.0 [Feb 12, 2013]

@@ -37,13 +37,16 @@ this.createjs = this.createjs||{};
  * event to be notified when a set time interval has elapsed.
  *
  * Note that the interval that the tick event is called is a target interval, and may be broadcast at a slower interval
- * during times of high CPU load. The Ticker class uses a static interface (ex. <code>Ticker.getPaused()</code>) and should not be
- * instantiated.
+ * during times of high CPU load. The Ticker class uses a static interface (ex. <code>Ticker.getPaused()</code>) and
+ * should not be instantiated.
  *
  * <h4>Example</h4>
  *      createjs.Ticker.addEventListener("tick", handleTick);
  *      function handleTick(event) {
  *          // Actions carried out each frame
+ *          if (!event.paused) {
+ *              // Actions carried out when the Ticker is not paused.
+ *          }
  *      }
  * @class Ticker
  * @uses EventDispatcher
@@ -56,7 +59,15 @@ var Ticker = function() {
 // events:
 
 	/**
-	 * Dispatched each tick.
+	 * Dispatched each tick. The event will be dispatched to each listener even when the Ticker has been paused using
+	 * {{#crossLink "Ticker/setPaused"}}{{/crossLink}}.
+	 *
+	 * <h4>Example</h4>
+	 *      createjs.Ticker.addEventListener("tick", handleTick);
+	 *      function handleTick(event) {
+	 *          console.log("Paused:", event.paused, event.delta);
+	 *      }
+	 *
 	 * @event tick
 	 * @param {Object} target The object that dispatched the event.
 	 * @param {String} type The event type.
@@ -70,9 +81,9 @@ var Ticker = function() {
 
 // public static properties:
 	/**
-	 * Indicates whether Ticker should use requestAnimationFrame if it is supported in the browser. If false, Ticker
-	 * will use setTimeout. If you use RAF, it is recommended that you set the framerate to a divisor of 60 (ex. 15,
-	 * 20, 30, 60).
+	 * Indicates whether Ticker should use <code>requestAnimationFrame</code> if it is supported in the browser.
+	 * If false, Ticker will use <code>setTimeout</code>. If you use RAF, it is recommended that you set the framerate
+	 * to a divisor of 60 (ex. 15, 20, 30, 60).
 	 * @property useRAF
 	 * @static
 	 * @type {Boolean}
@@ -136,7 +147,7 @@ var Ticker = function() {
 	Ticker._pausedTime=0;
 	
 	/** 
-	 * Number of ticks that have passed
+	 * The number of ticks that have passed
 	 * @property _ticks
 	 * @type {Number}
 	 * @protected 
@@ -144,7 +155,7 @@ var Ticker = function() {
 	Ticker._ticks = 0;
 	
 	/**
-	 * Number of ticks that have passed while Ticker has been paused
+	 * The number of ticks that have passed while Ticker has been paused
 	 * @property _pausedTicks
 	 * @type {Number}
 	 * @protected 
@@ -198,7 +209,7 @@ var Ticker = function() {
 	/**
 	 * Adds a listener for the tick event. The listener must be either an object exposing a <code>tick</code> method,
 	 * or a function. The listener will be called once each tick / interval. The interval is specified via the 
-	 * .setInterval(ms) method.
+	 * <code>.setInterval(ms)</code> method.
 	 * The tick method or function is passed two parameters: the elapsed time between the 
 	 * previous tick and the current one, and a boolean indicating whether Ticker is paused.
 	 * @method addListener
@@ -206,7 +217,8 @@ var Ticker = function() {
 	 * @param {Object} o The object or function to add as a listener.
 	 * @param {Boolean} pauseable If false, the listener will continue to have tick called 
 	 * even when Ticker is paused via Ticker.pause(). Default is true.
-	 * @deprecated In favour of the "tick" event. Will be removed in a future version.
+	 * @deprecated In favour of the "tick" event. Will be removed in a future version. User "addEventListener"
+	 * instead.
 	 **/
 	Ticker.addListener = function(o, pauseable) {
 		if (o == null) { return; }
@@ -236,7 +248,8 @@ var Ticker = function() {
 	 * @method removeListener
 	 * @static
 	 * @param {Object} o The object or function to remove from listening from the tick event.
-	 * @deprecated In favour of the "tick" event. Will be removed in a future version.
+	 * @deprecated In favour of the "tick" event. Will be removed in a future version. Use "removeEventListener"
+	 * instead.
 	 **/
 	Ticker.removeListener = function(o) {
 		var listeners = Ticker._listeners;
@@ -252,7 +265,8 @@ var Ticker = function() {
 	 * Removes all listeners.
 	 * @method removeAllListeners
 	 * @static
-	 * @deprecated In favour of the "tick" event. Will be removed in a future version.
+	 * @deprecated In favour of the "tick" event. Will be removed in a future version. Use "removeAllEventListeners"
+	 * instead.
 	 **/
 	Ticker.removeAllListeners = function() {
 		Ticker._listeners = [];
@@ -261,6 +275,7 @@ var Ticker = function() {
 	
 	/**
 	 * Sets the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
+	 *
 	 * Note actual time between ticks may be more than requested depending on CPU load.
 	 * @method setInterval
 	 * @static
@@ -273,7 +288,7 @@ var Ticker = function() {
 	}
 	
 	/**
-	 * Returns the current target time between ticks, as set with setInterval.
+	 * Returns the current target time between ticks, as set with {{#crossLink "Ticker/setInterval"}}{{/crossLink}}.
 	 * @method getInterval
 	 * @static
 	 * @return {Number} The current target interval in milliseconds between tick events.
@@ -283,8 +298,8 @@ var Ticker = function() {
 	}
 	
 	/**
-	 * Sets the target frame rate in frames per second (FPS). For example, with an interval of 40, getFPS() will 
-	 * return 25 (1000ms per second divided by 40 ms per tick = 25fps).
+	 * Sets the target frame rate in frames per second (FPS). For example, with an interval of 40, <code>getFPS()</code>
+	 * will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
 	 * @method setFPS
 	 * @static
 	 * @param {Number} value Target number of ticks broadcast per second.
@@ -294,8 +309,8 @@ var Ticker = function() {
 	}
 	
 	/**
-	 * Returns the target frame rate in frames per second (FPS). For example, with an 
-	 * interval of 40, getFPS() will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
+	 * Returns the target frame rate in frames per second (FPS). For example, with an interval of 40, <code>getFPS()</code>
+	 * will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
 	 * @method getFPS
 	 * @static
 	 * @return {Number} The current target number of frames / ticks broadcast per second.
@@ -308,8 +323,8 @@ var Ticker = function() {
 	 * Returns the actual frames / ticks per second.
 	 * @method getMeasuredFPS
 	 * @static
-	 * @param {Number} ticks Optional. The number of previous ticks over which to measure the actual 
-	 * frames / ticks per second. Defaults to the number of ticks per second.
+	 * @param {Number} [ticks] The number of previous ticks over which to measure the actual frames / ticks per second.
+	 * Defaults to the number of ticks per second.
 	 * @return {Number} The actual frames / ticks per second. Depending on performance, this may differ
 	 * from the target frames per second.
 	 **/
@@ -323,7 +338,20 @@ var Ticker = function() {
 	}
 	
 	/**
-	 * While Ticker is paused, pausable listeners are not ticked. See addListener for more information.
+	 * Changes the "paused" state of the Ticker, which can be retrieved by the {{#crossLink "Ticker/getPaused"}}{{/crossLink}}
+	 * method, and is passed as the "paused" property of the <code>tick</code> event. When the ticker is paused, all
+	 * listeners will still receive a tick event, but the <code>paused</code> property will be false.
+	 *
+	 * Note that in EaselJS v0.5.0 and earlier, "pauseable" listeners would <strong>not</strong> receive the tick
+	 * callback when Ticker was paused. This is no longer the case.
+	 *
+	 * <h4>Example</h4>
+	 *      createjs.Ticker.addEventListener("tick", handleTick);
+	 *      createjs.Ticker.setPaused(true);
+	 *      function handleTick(event) {
+	 *          console.log("Paused:", event.paused, createjs.Ticker.getPaused());
+	 *      }
+	 *
 	 * @method setPaused
 	 * @static
 	 * @param {Boolean} value Indicates whether to pause (true) or unpause (false) Ticker.
@@ -333,8 +361,19 @@ var Ticker = function() {
 	}
 	
 	/**
-	 * Returns a boolean indicating whether Ticker is currently paused, as set with setPaused.
-	 * @method getPaused
+	 * Returns a boolean indicating whether Ticker is currently paused, as set with {{#crossLink "Ticker/setPaused"}}{{/crossLink}}.
+	 * When the ticker is paused, all listeners will still receive a tick event, but this value will be false.
+	 *
+	 * Note that in EaselJS v0.5.0 and earlier, "pauseable" listeners would <strong>not</strong> receive the tick
+	 * callback when Ticker was paused. This is no longer the case.
+	 *
+	 * <h4>Example</h4>
+	 *      createjs.Ticker.addEventListener("tick", handleTick);
+	 *      createjs.Ticker.setPaused(true);
+	 *      function handleTick(event) {
+	 *          console.log("Paused:", createjs.Ticker.getPaused());
+	 *      }
+	 *
 	 * @static
 	 * @return {Boolean} Whether the Ticker is currently paused.
 	 **/
@@ -343,14 +382,12 @@ var Ticker = function() {
 	}
 	
 	/**
-	 * Returns the number of milliseconds that have elapsed since Ticker was initialized.
-	 * For example, you could use this in a time synchronized animation to determine the exact amount of 
-	 * time that has elapsed.
+	 * Returns the number of milliseconds that have elapsed since Ticker was initialized. For example, you could use
+	 * this in a time synchronized animation to determine the exact amount of time that has elapsed.
 	 * @method getTime
 	 * @static
-	 * @param {Boolean} runTime If true only time elapsed while Ticker was not paused will be returned.
+	 * @param {Boolean} [runTime=false] If true only time elapsed while Ticker was not paused will be returned.
 	 * If false, the value returned will be total time elapsed since the first tick event listener was added.
-	 * The default value is false.
 	 * @return {Number} Number of milliseconds that have elapsed since Ticker was initialized.
 	 **/
 	Ticker.getTime = function(runTime) {
