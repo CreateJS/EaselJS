@@ -16,6 +16,9 @@ Version NEXT [Not released]
 - Added Safari note to the Cache example.
 - Updated Ticker documentation. Fixed setPaused/getPaused descriptions, and added some better descriptions,
 	a few examples, and updated documentation throughout.
+- Updated SpriteSheetUtils/extractFrame documentation to mention Bitmap/sourceRect and security concerns.
+- Updated Bitmap/cache methods to clarify caching usage for Bitmaps
+- Updated optional parameter for DisplayObject/cache
 
 
 Version 0.6.0 [Feb 12, 2013]
