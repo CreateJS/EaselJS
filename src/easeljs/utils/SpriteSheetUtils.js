@@ -90,13 +90,16 @@ var SpriteSheetUtils = function() {
 	}
 
 	/**
-	 * Returns a single frame of the specified sprite sheet as a new PNG image. Note that in almost all cases it is better
-	 * to display a single frame using a paused instance of BitmapAnimation, than it is to slice out a frame using this
-	 * method and display it with a Bitmap instance.
+	 * Returns a single frame of the specified sprite sheet as a new PNG image.
+	 *
+	 * Note that in almost all cases it is better to display a single frame using a paused instance of BitmapAnimation,
+	 * than it is to slice out a frame using this method and display it with a Bitmap instance. You can also crop an
+	 * image using the <code>sourceRect</code> property of {{#crossLink "Bitmap"}}{{/crossLink}}. This method may cause
+	 * cross-domain issues since it accesses pixels directly on the canvas.
 	 * @method extractFrame
 	 * @static
 	 * @param {Image} spriteSheet The SpriteSheet instance to extract a frame from.
-	 * @param {Number} frame The frame number or animation name to extract. If an animation
+	 * @param {Number|String} frame The frame number or animation name to extract. If an animation
 	 * name is specified, only the first frame of the animation will be extracted.
 	 * @return {Image} a single frame of the specified sprite sheet as a new PNG image.
 	*/

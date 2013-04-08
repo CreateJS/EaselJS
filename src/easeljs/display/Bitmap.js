@@ -147,18 +147,27 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
+	 *
+	 * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work. To see
+	 * the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method.
 	 * @method cache
 	 **/
 	
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
+	 *
+	 * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work. To see
+	 * the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}} method.
 	 * @method updateCache
 	 **/
 	
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
+	 *
+	 * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work. To see
+	 * the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/uncache"}}{{/crossLink}} method.
 	 * @method uncache
 	 **/
 	
