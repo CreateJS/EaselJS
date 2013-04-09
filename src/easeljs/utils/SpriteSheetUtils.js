@@ -154,7 +154,8 @@ var SpriteSheetUtils = function() {
 		for (var i=0;i<il;i++) {
 			var src = imgs[i];
 			src.__tmp = i; // a bit hacky, but faster than doing indexOf below.
-			canvas.width = 0; // make sure it clears.
+			ctx.setTransform(1,0,0,1,0,0);
+			ctx.clearRect(0,0,canvas.width,canvas.height);
 			canvas.width = src.width;
 			canvas.height = src.height;
 			ctx.setTransform(h?-1:1, 0, 0, v?-1:1, h?src.width:0, v?src.height:0);
