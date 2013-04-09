@@ -464,7 +464,6 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 **/
 	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
 		var ctx = createjs.DisplayObject._hitTestContext;
-		var canvas = createjs.DisplayObject._hitTestCanvas;
 		var mtx = this._matrix;
 		var hasHandler = this._hasMouseHandler(mouseEvents);
 
@@ -476,8 +475,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 			ctx.globalAlpha = mtx.alpha;
 			this.draw(ctx);
 			if (this._testHit(ctx)) {
-				canvas.width = 0;
-				canvas.width = 1;
+				ctx.setTransform(1, 0, 0, 1, 0, 0)
+				ctx.clearRect(0,0,1,1);
 				return this;
 			}
 		}
@@ -513,8 +512,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				(hitArea||child).draw(ctx);
 				if (!this._testHit(ctx)) { continue; }
-				canvas.width = 0;
-				canvas.width = 1;
+				ctx.setTransform(1,  0, 0, 1, 0, 0);
+				ctx.clearRect(0, 0, 1, 1);
 				if (hasHandler) { return this; }
 				else if (arr) { arr.push(child); }
 				else { return child; }

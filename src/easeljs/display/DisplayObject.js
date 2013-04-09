@@ -844,15 +844,12 @@ var p = DisplayObject.prototype;
 	*/
 	p.hitTest = function(x, y) {
 		var ctx = DisplayObject._hitTestContext;
-		var canvas = DisplayObject._hitTestCanvas;
-
-		ctx.setTransform(1,  0, 0, 1, -x, -y);
+		ctx.setTransform(1, 0, 0, 1, -x, -y);
 		this.draw(ctx);
 
 		var hit = this._testHit(ctx);
-
-		canvas.width = 0;
-		canvas.width = 1;
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.clearRect(0, 0, 1, 1);
 		return hit;
 	};
 	
