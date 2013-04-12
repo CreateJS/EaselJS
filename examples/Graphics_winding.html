@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EaselJS Example: Graphics Winding</title>
+
+    <link href="assets/demoStyles.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+    <script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+    <script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+    <script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+    <script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
+
+    <script type="text/javascript">
+
+        function init() {
+            var stage = new createjs.Stage("testCanvas");
+
+            var shape = new createjs.Shape();
+            stage.addChild(shape);
+            shape.graphics.beginFill("#006699");
+
+            // Draw the initial shape
+            shape.graphics.drawRect(20, 20, 450, 360);
+
+            // Additional draw calls are made to the same shape, but using reverse winding.
+            // Change the winding to vary the results.
+            shape.graphics.arc(160, 160, 140, 0, Math.PI * 2, true).closePath(); // Subtracts from the square
+            shape.graphics.arc(330, 240, 140, 0, Math.PI * 2, true).closePath(); // Subtracts from the square, but ADDs to the first circle
+
+            // Use the same graphics to make another Shape
+            var mask = new createjs.Shape(shape.graphics);
+            // Create a bitmap, and mask it using the compound shape
+            var bmp = new createjs.Bitmap("assets/photo-hires.jpg");
+            bmp.mask = mask;
+            stage.addChild(bmp);
+
+            // Move them over so we can see them
+            bmp.x = 400;
+            mask.x = 480;
+
+            createjs.Ticker.addEventListener("tick", stage);
+        }
+    </script>
+</head>
+
+<body onload="init();">
+<header id="header" class="EaselJS">
+    <h1><span class="text-product">Easel<strong>JS</strong></span> Graphics Winding</h1>
+
+    <p>Demonstrates how to draw compound shapes using Graphics to create "holes" in the shape. This approach is
+        useful for masks.</p>
+</header>
+
+<div class="canvasHolder">
+    <canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
+</body>
+
+</html>

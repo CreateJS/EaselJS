@@ -21,6 +21,7 @@ Version NEXT [Not released]
 - Updated optional parameter for DisplayObject/cache
 - Replaced the width=0 hack (for clearing canvases) with a setTransform/clearRect in DisplayObject,
 	Container, and SpriteSheetUtils.
+- Added a "Graphics Winding" example
 
 
 Version 0.6.0 [Feb 12, 2013]
