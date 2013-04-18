@@ -143,19 +143,6 @@ var p = ColorFilter.prototype = new createjs.Filter();
 	}
 
 // public methods:
-	/**
-	 * Applies the filter to the specified context.
-	 * @method applyFilter
-	 * @param {CanvasRenderingContext2D} ctx The 2D context to use as the source.
-	 * @param {Number} x The x position to use for the source rect.
-	 * @param {Number} y The y position to use for the source rect.
-	 * @param {Number} width The width to use for the source rect.
-	 * @param {Number} height The height to use for the source rect.
-	 * @param {CanvasRenderingContext2D} targetCtx Optional. The 2D context to draw the result to. Defaults to the context passed to ctx.
-	 * @param {Number} targetX Optional. The x position to draw the result to. Defaults to the value passed to x.
-	 * @param {Number} targetY Optional. The y position to draw the result to. Defaults to the value passed to y.
-	 * @return {Boolean}
-	 **/
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
 		targetCtx = targetCtx || ctx;
 		if (targetX == null) { targetX = x; }
@@ -179,15 +166,9 @@ var p = ColorFilter.prototype = new createjs.Filter();
 		return true;
 	}
 
-	/**
-	 * Returns a string representation of this object.
-	 * @method toString
-	 * @return {String} a string representation of the instance.
-	 **/
 	p.toString = function() {
 		return "[ColorFilter]";
 	}
-
 
 	/**
 	 * Returns a clone of this ColorFilter instance.
@@ -198,5 +179,6 @@ var p = ColorFilter.prototype = new createjs.Filter();
 		return new ColorFilter(this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier, this.redOffset, this.greenOffset, this.blueOffset, this.alphaOffset);
 	}
 
-createjs.ColorFilter = ColorFilter;
+	createjs.ColorFilter = ColorFilter;
+
 }());
