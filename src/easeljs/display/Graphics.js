@@ -941,31 +941,37 @@ var p = Graphics.prototype;
 		}
 		return this;
 	};
-	
+
 	/**
 	 * Decodes a compact encoded path string into a series of draw instructions.
 	 * This format is not intended to be human readable, and is meant for use by authoring tools.
-	 * The format uses a base64 character set, with each character representing 6 bits, to define a series of draw commands.
+	 * The format uses a base64 character set, with each character representing 6 bits, to define a series of draw
+	 * commands.
 	 *
-	 * Each command is comprised of a single "header" character followed by a variable number of alternating x and y position values.
-	 * Reading the header bits from left to right (most to least significant): bits 1 to 3 specify the type of operation
-	 * (0-moveTo, 1-lineTo, 2-quadraticCurveTo, 3-bezierCurveTo, 4-closePath, 5-7 unused). Bit 4 indicates whether position values use 12 bits (2 characters) 
-	 * or 18 bits (3 characters), with a one indicating the latter. Bits 5 and 6 are currently unused.
+	 * Each command is comprised of a single "header" character followed by a variable number of alternating x and y
+	 * position values. Reading the header bits from left to right (most to least significant): bits 1 to 3 specify the
+	 * type of operation (0-moveTo, 1-lineTo, 2-quadraticCurveTo, 3-bezierCurveTo, 4-closePath, 5-7 unused). Bit 4
+	 * indicates whether position values use 12 bits (2 characters) or 18 bits (3 characters), with a one indicating the
+	 * latter. Bits 5 and 6 are currently unused.
 	 *
-	 * Following the header is a series of 0 (closePath), 2 (moveTo, lineTo), 4 (quadraticCurveTo), or 6 (bezierCurveTo) parameters.
-	 * These parameters are alternating x/y positions represented by 2 or 3 characters (as indicated by the 4th bit in the command char).
-	 * These characters consist of a 1 bit sign (1 is negative, 0 is positive), followed by an 11 (2 char) or 17 (3 char) bit integer value.
-	 * All position values are in tenths of a pixel.
-	 * Except in the case of move operations which are absolute, this value is a delta from the previous x or y position (as appropriate).
+	 * Following the header is a series of 0 (closePath), 2 (moveTo, lineTo), 4 (quadraticCurveTo), or 6 (bezierCurveTo)
+	 * parameters. These parameters are alternating x/y positions represented by 2 or 3 characters (as indicated by the
+	 * 4th bit in the command char). These characters consist of a 1 bit sign (1 is negative, 0 is positive), followed
+	 * by an 11 (2 char) or 17 (3 char) bit integer value. All position values are in tenths of a pixel. Except in the
+	 * case of move operations which are absolute, this value is a delta from the previous x or y position (as
+	 * appropriate).
 	 *
 	 * For example, the string "A3cAAMAu4AAA" represents a line starting at -150,0 and ending at 150,0.
-	 * <br />A - bits 000000. First 3 bits (000) indicate a moveTo operation. 4th bit (0) indicates 2 chars per parameter.
-	 * <br />n0 - 110111011100. Absolute x position of -150.0px. First bit indicates a negative value, remaining bits indicate 1500 tenths of a pixel.
+	 * <br />A - bits 000000. First 3 bits (000) indicate a moveTo operation. 4th bit (0) indicates 2 chars per
+	 * parameter.
+	 * <br />n0 - 110111011100. Absolute x position of -150.0px. First bit indicates a negative value, remaining bits
+	 * indicate 1500 tenths of a pixel.
 	 * <br />AA - 000000000000. Absolute y position of 0.
 	 * <br />I - 001100. First 3 bits (001) indicate a lineTo operation. 4th bit (1) indicates 3 chars per parameter.
-	 * <br />Au4 - 000000101110111000. An x delta of 300.0px, which is added to the previous x value of -150.0px to provide an absolute position of +150.0px.
+	 * <br />Au4 - 000000101110111000. An x delta of 300.0px, which is added to the previous x value of -150.0px to
+	 * provide an absolute position of +150.0px.
 	 * <br />AAA - 000000000000000000. A y delta value of 0.
-	 * 
+	 *
 	 * @method decodePath
 	 * @param {String} str The path string to decode.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
