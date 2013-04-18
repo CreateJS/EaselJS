@@ -34,14 +34,18 @@ this.createjs = this.createjs||{};
 /**
  * Base class that all filters should inherit from. Filters need to be applied to objects that have been cached using
  * the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method. If an object changes, please cache it again, or use
- * {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}.
+ * {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}. Note that the filters must be applied before caching.
  *
  * <h4>Example</h4>
- *      myInstance.cache(0,0, 100, 100);
  *      myInstance.filters = [
  *          new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0),
  *          new createjs.BoxBlurFilter(5, 5, 10)
  *      ];
+ *      myInstance.cache(0,0, 100, 100);
+ *
+ * Note that each filter can implement a {{#crossLink "Filter/getBounds"}}{{/crossLink}} method, which returns the
+ * margins that need to be applied in order to fully display the filter. For example, the {{#crossLink "BoxBlurFilter"}}{{/crossLink}}
+ * will cause an object to feather outwards, resulting in a margin around the shape.
  *
  * <h4>EaselJS Filters</h4>
  * EaselJS comes with a number of pre-built filters. Note that individual filters are not compiled into the minified

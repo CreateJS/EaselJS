@@ -32,15 +32,29 @@ this.createjs = this.createjs||{};
 (function() {
 
 /**
- * BoxBlurFilter applies a box blur to DisplayObjects
+ * Applies a box blur to DisplayObjects. Note that this filter is fairly CPU intensive, particularly if the quality is
+ * set higher than 1.
  *
- * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters.
+ * <h4>Example</h4>
+ * This example creates a red circle, and then applies a 5 pixel blur to it. It uses the {{#crossLink "Filter/getBounds"}}{{/crossLink}}
+ * method to account for the spread that the blur causes.
+ *
+ *      var shape = new createjs.Shape().set({x:100,y:100});
+ *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
+ *
+ *      var blurFilter = new createjs.BoxBlurFilter(5, 5, 1);
+ *      shape.filters = [blurFilter];
+ *      var bounds = blurFilter.getBounds();
+ *
+ *      shape.cache(-50+bounds.x, -50+bounds.y, 100+bounds.width, 100+bounds.height);
+ *
+ * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
  * @class BoxBlurFilter
  * @extends Filter
  * @constructor
- * @param {Number} blurX
- * @param {Number} blurY
- * @param {Number} quality
+ * @param {Number} [blurX=0] The horizontal blur radius in pixels.
+ * @param {Number} [blurY=0] The vertical blur radius in pixels.
+ * @param {Number} [quality=1] The number of blur iterations.
  **/
 var BoxBlurFilter = function( blurX, blurY, quality ) {
   this.initialize( blurX, blurY, quality );
@@ -61,23 +75,26 @@ var p = BoxBlurFilter.prototype = new createjs.Filter();
 // public properties:
 
 	/**
-	 * Horizontal blur radius
+	 * Horizontal blur radius in pixels
 	 * @property blurX
+	 * @default 0
 	 * @type Number
 	 **/
 	p.blurX = 0;
 
 	/**
-	 * Vertical blur radius
+	 * Vertical blur radius in pixels
 	 * @property blurY
+	 * @default 0
 	 * @type Number
 	 **/
 	p.blurY = 0;
 
 	/**
-	 * Number of blur iterations. For example, a value of 1 will produce a rough blur.
-	 * A value of 2 will produce a smoother blur, but take twice as long to run.
+	 * Number of blur iterations. For example, a value of 1 will produce a rough blur. A value of 2 will produce a
+	 * smoother blur, but take twice as long to run.
 	 * @property quality
+	 * @default 1
 	 * @type Number
 	 **/
 	p.quality = 1;
@@ -86,7 +103,8 @@ var p = BoxBlurFilter.prototype = new createjs.Filter();
 	/**
 	 * Returns a rectangle with values indicating the margins required to draw the filter.
 	 * For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
-	 * (but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0).
+	 * (but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0). Note that currently
+	 * blur qualities above 1 may not be properly accounted for.
 	 * @method getBounds
 	 * @return {Rectangle} a rectangle object indicating the margins required to draw the filter.
 	 **/
