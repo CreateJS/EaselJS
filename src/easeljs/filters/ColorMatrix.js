@@ -39,7 +39,8 @@ this.createjs = this.createjs||{};
 	 * <h4>Example</h4>
 	 *      myColorMatrix.adjustHue(20).adjustBrightness(50);
 	 *
-	 * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters.
+	 * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters, or {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}
+	 * for an example of how to use ColorMatrix to change a DisplayObject's color.
 	 * @class ColorMatrix
 	 * @constructor
 	 * @extends Array
@@ -57,6 +58,7 @@ this.createjs = this.createjs||{};
 	 * Array of delta values for contrast calculations.
 	 * @property DELTA_INDEX
 	 * @type Array
+	 * @protected
 	 * @static
 	 **/
 	ColorMatrix.DELTA_INDEX = [
@@ -77,6 +79,7 @@ this.createjs = this.createjs||{};
 	 * Identity matrix values.
 	 * @property IDENTITY_MATRIX
 	 * @type Array
+	 * @protected
 	 * @static
 	 **/
 	ColorMatrix.IDENTITY_MATRIX = [
@@ -91,6 +94,7 @@ this.createjs = this.createjs||{};
 	 * The constant length of a color matrix.
 	 * @property LENGTH
 	 * @type Number
+	 * @protected
 	 * @static
 	 **/
 	ColorMatrix.LENGTH = ColorMatrix.IDENTITY_MATRIX.length;
@@ -120,6 +124,7 @@ this.createjs = this.createjs||{};
 	 * Shortcut method to adjust brightness, contrast, saturation and hue.
 	 * Equivalent to calling adjustHue(hue), adjustContrast(contrast),
 	 * adjustBrightness(brightness), adjustSaturation(saturation), in that order.
+	 * @method adjustColor
 	 * @param {Number} brightness
 	 * @param {Number} contrast
 	 * @param {Number} saturation
@@ -136,6 +141,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Adjusts the brightness of pixel color by adding the specified value to the red, green and blue channels.
 	 * Positive values will make the image brighter, negative values will make it darker.
+	 * @method adjustBrightness
 	 * @param {Number} value A value between -255 & 255 that will be added to the RGB channels.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
@@ -155,6 +161,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Adjusts the contrast of pixel color.
 	 * Positive values will increase contrast, negative values will decrease contrast.
+	 * @method adjustContrast
 	 * @param {Number} value A value between -100 & 100.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
@@ -186,6 +193,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Adjusts the color saturation of the pixel.
 	 * Positive values will increase saturation, negative values will decrease saturation (trend towards greyscale).
+	 * @method adjustSaturation
 	 * @param {Number} value A value between -100 & 100.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
@@ -209,6 +217,7 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * Adjusts the hue of the pixel color.
+	 * @method adjustHue
 	 * @param {Number} value A value between -180 & 180.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
@@ -232,6 +241,7 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * Concatenates (multiplies) the specified matrix with this one.
+	 * @method concat
 	 * @param {Array} matrix An array or ColorMatrix instance.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
@@ -244,6 +254,7 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * Returns a clone of this ColorMatrix.
+	 * @method clone
 	 * @return {ColorMatrix} A clone of this ColorMatrix.
 	 **/
 	p.clone = function() {
@@ -252,6 +263,7 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * Return a length 25 (5x5) array instance containing this matrix's values.
+	 * @method toArray
 	 * @return {Array} An array holding this matrix's values.
 	 **/
 	p.toArray = function() {
@@ -260,6 +272,7 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * Copy the specified matrix's values to this matrix.
+	 * @method copyMatrix
 	 * @param {Array} matrix An array or ColorMatrix instance.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
 	 **/
