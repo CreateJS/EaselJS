@@ -93,10 +93,10 @@ var p = Filter.prototype;
 	 * @param {Number} y The y position to use for the source rect.
 	 * @param {Number} width The width to use for the source rect.
 	 * @param {Number} height The height to use for the source rect.
-	 * @param {CanvasRenderingContext2D} targetCtx Optional. The 2D context to draw the result to. Defaults to the context passed to ctx.
-	 * @param {Number} targetX Optional. The x position to draw the result to. Defaults to the value passed to x.
-	 * @param {Number} targetY Optional. The y position to draw the result to. Defaults to the value passed to y.
-	 * @return {Boolean}
+	 * @param {CanvasRenderingContext2D} [targetCtx] The 2D context to draw the result to. Defaults to the context passed to ctx.
+	 * @param {Number} [targetX] The x position to draw the result to. Defaults to the value passed to x.
+	 * @param {Number} [targetY] The y position to draw the result to. Defaults to the value passed to y.
+	 * @return {Boolean} If the filter was applied successfully.
 	 **/
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {}
 

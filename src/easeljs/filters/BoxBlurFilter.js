@@ -113,19 +113,6 @@ var p = BoxBlurFilter.prototype = new createjs.Filter();
 		return new createjs.Rectangle(-this.blurX,-this.blurY,2*this.blurX,2*this.blurY);
 	}
 
-	/**
-	 * Applies the filter to the specified context.
-	 * @method applyFilter
-	 * @param {CanvasRenderingContext2D} ctx The 2D context to use as the source.
-	 * @param {Number} x The x position to use for the source rect.
-	 * @param {Number} y The y position to use for the source rect.
-	 * @param {Number} width The width to use for the source rect.
-	 * @param {Number} height The height to use for the source rect.
-	 * @param {CanvasRenderingContext2D} targetCtx Optional. The 2D context to draw the result to. Defaults to the context passed to ctx.
-	 * @param {Number} targetX Optional. The x position to draw the result to. Defaults to the value passed to x.
-	 * @param {Number} targetY Optional. The y position to draw the result to. Defaults to the value passed to y.
-	 * @return {Boolean} 
-	 **/
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
 		targetCtx = targetCtx || ctx;
 		if (targetX == null) { targetX = x; }
@@ -266,17 +253,10 @@ var p = BoxBlurFilter.prototype = new createjs.Filter();
 		return new BoxBlurFilter(this.blurX, this.blurY, this.quality);
 	}
 
-	/**
-	 * Returns a string representation of this object.
-	 * @return {String}
-	 **/
 	p.toString = function() {
 		return "[BoxBlurFilter]";
 	}
 
-// private methods:
+	createjs.BoxBlurFilter = BoxBlurFilter;
 
-
-
-createjs.BoxBlurFilter = BoxBlurFilter;
 }());
