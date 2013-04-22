@@ -160,16 +160,21 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and setting
-	 * its parent to this Container. You can also add multiple children, such as "addChildAt(child1, child2, ..., index);". The
-	 * index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list, you could use:
-	 * container.addChildAt(myShape, container.getChildIndex(otherShape)). This would also bump otherShape's index up by one.
-	 * Returns the last child that was added, or the last child if multiple children were added. Fails silently if the index 
-	 * is out of range.
+	 * Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and
+	 * setting its parent to this Container. You can also add multiple children, such as:
+	 *
+	 *      addChildAt(child1, child2, ..., index);
+	 *
+	 * The index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list,
+	 * you could use:
+	 *
+	 *      container.addChildAt(myShape, container.getChildIndex(otherShape));
+	 *
+	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
 	 * @method addChildAt
 	 * @param {DisplayObject} child The display object to add.
 	 * @param {Number} index The index to add the child at.
-	 * @return {DisplayObject} The child that was added, or the last child if multiple children were added.
+	 * @return {DisplayObject} Returns the last child that was added, or the last child if multiple children were added.
 	 **/
 	p.addChildAt = function(child, index) {
 		var l = arguments.length;
