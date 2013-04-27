@@ -4,23 +4,27 @@
 	<title>EaselJS demo: Inheritance</title>
 	<link href="../shared/demo.css" rel="stylesheet" type="text/css">
 	<script src="../../lib/easeljs-0.6.0.min.js"></script>
-	<script src="Button.js"></script>
+	<script src="SimpleButton.js"></script>
 	<script>
 		var stage, holder;
 		function init() {
 			stage = new createjs.Stage("demoCanvas");
+			stage.enableMouseOver(); // so cursors works.
 			
-			var btn1 = stage.addChild(new Button("Hello!", "#F00"));
+			var btn1 = stage.addChild(new SimpleButton("Enable!", "#0F0"));
 			btn1.x = 20;
 			btn1.y = 20;
+			btn1.addEventListener("click", function() { btn2.setEnabled(true); });
 			
-			var btn2 = stage.addChild(new Button("Goodbye.", "#0F0"));
+			var btn2 = stage.addChild(new SimpleButton("Show an alert.", "#0FF"));
 			btn2.x = 20;
 			btn2.y = btn1.y + 50;
+			btn2.setEnabled(false);
+			btn2.addEventListener("click", function() { alert("Hello world!"); });
 			
-			var btn3 = stage.addChild(new Button("Hello again!!", "#0FF"));
+			var btn3 = stage.addChild(new SimpleButton("Disable!!", "#F00"));
 			btn3.y = btn2.y + 50;
-			
+			btn3.addEventListener("click", function() { btn2.setEnabled(false); });
 			
 			btn1.x = btn2.x = btn3.x = 20;
 			
