@@ -310,7 +310,7 @@ var p = Stage.prototype = new createjs.Container();
 		if (!this.canvas) { return; }
 		var ctx = this.canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
-		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		ctx.clearRect(0, 0, this.canvas.width+1, this.canvas.height+1);
 	}
 
 	/**
@@ -357,7 +357,7 @@ var p = Stage.prototype = new createjs.Container();
 
 		if(backgroundColor) {
 			//clear the canvas
-			ctx.clearRect (0, 0, w, h);
+			ctx.clearRect (0, 0, w+1, h+1);
 
 			//restore it with original settings
 			ctx.putImageData(data, 0, 0);

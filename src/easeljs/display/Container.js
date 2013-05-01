@@ -481,7 +481,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			this.draw(ctx);
 			if (this._testHit(ctx)) {
 				ctx.setTransform(1, 0, 0, 1, 0, 0)
-				ctx.clearRect(0,0,1,1);
+				ctx.clearRect(0, 0, 2, 2);
 				return this;
 			}
 		}
@@ -517,8 +517,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				(hitArea||child).draw(ctx);
 				if (!this._testHit(ctx)) { continue; }
-				ctx.setTransform(1,  0, 0, 1, 0, 0);
-				ctx.clearRect(0, 0, 1, 1);
+				ctx.setTransform(1, 0, 0, 1, 0, 0);
+				ctx.clearRect(0, 0, 2, 2);
 				if (hasHandler) { return this; }
 				else if (arr) { arr.push(child); }
 				else { return child; }
