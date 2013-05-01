@@ -670,7 +670,7 @@ var p = DisplayObject.prototype;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
 		var ctx = cacheCanvas.getContext("2d");
 		ctx.save();
-		if (!compositeOperation) { ctx.clearRect(0, 0, cacheCanvas.width, cacheCanvas.height); }
+		if (!compositeOperation) { ctx.clearRect(0, 0, cacheCanvas.width+1, cacheCanvas.height+1); }
 		ctx.globalCompositeOperation = compositeOperation;
 		ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
 		this.draw(ctx, true);
@@ -849,7 +849,7 @@ var p = DisplayObject.prototype;
 
 		var hit = this._testHit(ctx);
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
-		ctx.clearRect(0, 0, 1, 1);
+		ctx.clearRect(0, 0, 2, 2);
 		return hit;
 	};
 	
