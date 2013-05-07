@@ -26,6 +26,7 @@ Version NEXT [Not released]
 	Container, and SpriteSheetUtils.
 - Updated clearRect usages to use +1 on width and height to prevent crashes on Android (thanks mikelito)
 - Fixed Matrix2D.scale method to properly apply scale when rotated (thanks fumio)
+- Fixed bug with mouse and touch events in iOS's UIWebView (thanks cubica)
 
 
 Version 0.6.0 [Feb 12, 2013]
