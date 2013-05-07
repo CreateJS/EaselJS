@@ -204,12 +204,23 @@ var p = Text.prototype = new createjs.DisplayObject();
 	}
 	
 	/**
-	 * Returns the measured, untransformed width of the text without wrapping.
+	 * Returns the measured, untransformed width of the text with wrapping.
 	 * @method getMeasuredWidth
 	 * @return {Number} The measured, untransformed width of the text.
 	 **/
 	p.getMeasuredWidth = function() {
-		return this._getWorkingContext().measureText(this.text).width;
+		var stringsForLinesToBeDrawn = this.getStringsForLinesToBeDrawn();
+		var width = 0;
+		var i = 0;
+		var ctx = this._getWorkingContext();
+		var lineWidth;
+
+		for (; i < stringsForLinesToBeDrawn.length; i++) {
+			lineWidth = ctx.measureText(stringsForLinesToBeDrawn[i]).width;
+			width = Math.max(width,lineWidth);
+		}
+
+		return width;
 	}
 
 	/**
@@ -231,7 +242,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @return {Number} The approximate height of the drawn multiline text.
 	 **/
 	p.getMeasuredHeight = function() {
-		return this._drawText()*(this.lineHeight||this.getMeasuredLineHeight());
+		return this.getStringsForLinesToBeDrawn().length*(this.lineHeight||this.getMeasuredLineHeight());
 	}
 	
 	/**
@@ -289,24 +300,29 @@ var p = Text.prototype = new createjs.DisplayObject();
 		ctx.textBaseline = this.textBaseline||"alphabetic";
 		return ctx;
 	}
-	 
+
 	/**
-	 * Draws multiline text.
-	 * @method _getWorkingContext
-	 * @protected
-	 * @return {Number} The number of lines drawn.
+	 * Splits string into an array of strings representing the lines that will need to be drawn in order to respect lineWidth
+	 * @public
+	 * @method getStringsForLinesToBeDrawn
+	 * @return {[String]} The strings for lines to be drawn
 	 **/
-	p._drawText = function(ctx) {
-		var paint = !!ctx;
-		if (!paint) { ctx = this._getWorkingContext(); }
+	p.getStringsForLinesToBeDrawn = function () {
+		// There will be only one line since there is no wrapping
+		if (this.lineWidth === null) {
+			return [this.text];
+		}
+
+		var ctx = this._getWorkingContext();
 		var lines = String(this.text).split(/(?:\r\n|\r|\n)/);
-		var lineHeight = this.lineHeight||this.getMeasuredLineHeight();
-		var count = 0;
+		var strings = [""];
 		for (var i=0, l=lines.length; i<l; i++) {
 			var w = ctx.measureText(lines[i]).width;
-			if (this.lineWidth == null || w < this.lineWidth) {
-				if (paint) { this._drawTextLine(ctx, lines[i], count*lineHeight); }
-				count++;
+			if (w < this.lineWidth) {
+				strings[strings.length - 1] += lines[i];
+
+				// start a new line
+				strings.push("");
 				continue;
 			}
 
@@ -316,17 +332,38 @@ var p = Text.prototype = new createjs.DisplayObject();
 			for (var j=1, jl=words.length; j<jl; j+=2) {
 				// Line needs to wrap:
 				if (ctx.measureText(str + words[j] + words[j+1]).width > this.lineWidth) {
-					if (paint) { this._drawTextLine(ctx, str, count*lineHeight); }
-					count++;
+					strings[strings.length - 1] += str;
+					strings.push("");
 					str = words[j+1];
 				} else {
 					str += words[j] + words[j+1];
 				}
 			}
-			if (paint) { this._drawTextLine(ctx, str, count*lineHeight); } // Draw remaining text
-			count++;
+			strings[strings.length - 1] += str;
+			strings.push("");
 		}
-		return count;
+
+		if (strings[strings.length - 1] === "") {
+			strings.pop();
+		}
+
+		return strings;
+
+	};
+	 
+	/**
+	 * Draws multiline text.
+	 * @method _getWorkingContext
+	 * @protected
+	 * @return {Number} The number of lines drawn.
+	 **/
+	p._drawText = function(ctx) {
+		var lineHeight = this.lineHeight||this.getMeasuredLineHeight();
+		var stringsForLinesToBeDrawn = this.getStringsForLinesToBeDrawn();
+		var count = 0;
+		for (var i=0, l=stringsForLinesToBeDrawn.length; i<l; i++) {
+			this._drawTextLine(ctx, stringsForLinesToBeDrawn[i], i*lineHeight);
+		}
 	}
 	
 	/** 
