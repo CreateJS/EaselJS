@@ -355,15 +355,15 @@ var p = Matrix2D.prototype;
 	/**
 	 * Applies a scale transformation to the matrix.
 	 * @method scale
-	 * @param {Number} x
-	 * @param {Number} y
+	 * @param {Number} x The amount to scale horizontally
+	 * @param {Number} y The amount to scale vertically
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.scale = function(x, y) {
 		this.a *= x;
 		this.d *= y;
-		this.tx *= x;
-		this.ty *= y;
+		this.c *= x;
+		this.b *= y;
 		return this;
 	}
 

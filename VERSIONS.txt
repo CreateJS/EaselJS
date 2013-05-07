@@ -25,6 +25,7 @@ Version NEXT [Not released]
 - Replaced the width=0 hack (for clearing canvases) with a setTransform/clearRect in DisplayObject,
 	Container, and SpriteSheetUtils.
 - Updated clearRect usages to use +1 on width and height to prevent crashes on Android (thanks mikelito)
+- Fixed Matrix2D.scale method to properly apply scale when rotated (thanks fumio)
 
 
 Version 0.6.0 [Feb 12, 2013]
