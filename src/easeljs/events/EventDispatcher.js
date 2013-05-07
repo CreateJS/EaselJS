@@ -4,6 +4,8 @@
 *
 * Copyright (c) 2010 gskinner.com, inc.
 *
+* Modified by Mike Gieson. (www.gieson.com)
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -26,11 +28,12 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
+
 // namespace:
 this.createjs = this.createjs||{};
 
 (function() {
-
+	
 /**
  * The EventDispatcher provides methods for managing prioritized queues of event listeners and dispatching events. All
  * {{#crossLink "DisplayObject"}}{{/crossLink}} classes dispatch events, as well as some of the utilities like {{#crossLink "Ticker"}}{{/crossLink}}.
@@ -111,46 +114,65 @@ var p = EventDispatcher.prototype;
 	 * the event is dispatched.
 	 * @return {Function | Object} Returns the listener for chaining or assignment.
 	 **/
-	p.addEventListener = function(type, listener) {
+	p.addEventListener = function(type, func){
+		
 		var listeners = this._listeners;
-		if (!listeners) { listeners = this._listeners = {}; }
-		else { this.removeEventListener(type, listener); }
+		if (!listeners) {
+			listeners = this._listeners = {};
+		} else { 
+			this.removeEventListener(type, func);	
+		}
+		
+		// gieson:
+		// Grab any argument that may have been sent in.
+		var args = [].slice.call(arguments); // Shorter version of Array.prototype.slice.call(arguments);
+		// Remove the first two ("kind" and "func")
+		args.splice(0,2);
+		
 		var arr = listeners[type];
-		if (!arr) { arr = listeners[type] = []; }
-		arr.push(listener);
-		return listener;
-	};
-
-	/**
-	 * Removes the specified event listener.
-	 * @method removeEventListener
-	 * @param {String} type The string type of the event.
-	 * @param {Function | Object} listener The listener function or object.
-	 **/
-	p.removeEventListener = function(type, listener) {
+		if (!arr) {
+			arr = listeners[type] = [];
+		}
+		arr.push({fn:func, args:args}); // <- gieson: Store as object.
+		return func;
+	}
+	
+	
+	p.removeEventListener = function(type, func){
 		var listeners = this._listeners;
-		if (!listeners) { return; }
+		if (!listeners) {
+			return;
+		}
 		var arr = listeners[type];
-		if (!arr) { return; }
+		if (!arr) {
+			return;
+		}
 		for (var i=0,l=arr.length; i<l; i++) {
-			if (arr[i] == listener) {
-				if (l==1) { delete(listeners[type]); } // allows for faster checks.
-				else { arr.splice(i,1); }
+			var obj = arr[i];
+			if (obj.fn == func) { // <- gieson: Check on "fn".
+				if (l==1) {
+					delete(listeners[type]);  // allows for faster checks.
+				} else {
+					arr.splice(i,1);
+				}
 				break;
 			}
 		}
-	};
-
+	}
+	
 	/**
 	 * Removes all listeners for the specified type, or all listeners of all types.
 	 * @method removeAllEventListeners
 	 * @param {String} [type] The string type of the event. If omitted, all listeners for all types will be removed.
 	 **/
 	p.removeAllEventListeners = function(type) {
-		if (!type) { this._listeners = null; }
-		else if (this._listeners) { delete(this._listeners[type]); }
-	};
-
+		if (!type) { 
+			this._listeners = null;
+		} else if (this._listeners) {
+			delete(this._listeners[type]);
+		}
+	}
+	
 	/**
 	 * Dispatches the specified event.
 	 * @method dispatchEvent
@@ -161,22 +183,89 @@ var p = EventDispatcher.prototype;
 	 * @return {Boolean} Returns true if any listener returned true.
 	 **/
 	p.dispatchEvent = function(eventObj, target) {
-		var ret=false, listeners = this._listeners;
+		var ret=false;
+		var listeners = this._listeners;
+		
+		// gieson: Remove the first two arguments
+		var args = [].slice.call(arguments);
+		args.splice(0,2);
+		
+		
 		if (eventObj && listeners) {
-			if (typeof eventObj == "string") { eventObj = {type:eventObj}; }
+			if (typeof eventObj == "string") {
+				eventObj = {type:eventObj};
+			}
 			var arr = listeners[eventObj.type];
-			if (!arr) { return ret; }
-			eventObj.target = target||this;
+			if (!arr) {
+				return ret;
+			}
+			eventObj.target = target || this;
 			arr = arr.slice(); // to avoid issues with items being removed or added during the dispatch
 			for (var i=0,l=arr.length; i<l; i++) {
-				var o = arr[i];
-				if (o.handleEvent) { ret = ret||o.handleEvent(eventObj); }
-				else { ret = ret||o(eventObj); }
+				var obj = arr[i];
+				
+				// gieson: Only apply if needed
+				var applyArgs = [].concat(args, obj.args);
+				
+				if(applyArgs.length){
+					
+					// gieson: Shift in eventObj 
+					applyArgs.unshift(eventObj);
+					
+					// gieson: Poke the "fn"
+					if (obj.fn.handleEvent) {
+						
+						// gieson: Poke the "fn". Use apply to retain normalness on ping.
+						ret = ret || obj.fn.handleEvent.apply(null, applyArgs);
+					} else {
+						ret = ret || obj.fn.apply(null, applyArgs);
+					}
+				} else {
+					
+					// gieson: Poke the "fn".
+					if (obj.fn.handleEvent) {
+						ret = ret || obj.fn.handleEvent(eventObj);
+					} else {
+						ret = ret || obj.fn(eventObj);
+					}
+				}
+				
+				
 			}
 		}
 		return !!ret;
 	};
+	
+	
+	/*
+	// gieson: This is a simple version, whithout special object/type handling is required. FYI: It's what I'm using :)
+	p.dispatchEvent = function(type){ // arguments can be passed in to update()
+		
+		var args = [].slice.call(arguments); // Shorter than Array.prototype.slice.call(arguments);
 
+		args.splice(0, 1);
+		var arr = this._listeners[type];
+		
+		if(arr){
+			
+			for(var i=0; i<arr.length; i++){
+				var obj = arr[i];
+				
+				// only apply if needed
+				var applyArgs = [].concat(args, obj.args);
+				if(applyArgs.length){
+					obj.fn.apply(null, applyArgs);
+				} else {
+					obj.fn();
+				}
+			}
+		}
+	}
+	*/
+	
+	
+	
+	
 	/**
 	 * Indicates whether there is at least one listener for the specified event type.
 	 * @method hasEventListener
@@ -186,15 +275,15 @@ var p = EventDispatcher.prototype;
 	p.hasEventListener = function(type) {
 		var listeners = this._listeners;
 		return !!(listeners && listeners[type]);
-	};
-
+	}
+	
 	/**
 	 * @method toString
 	 * @return {String} a string representation of the instance.
 	 **/
 	p.toString = function() {
 		return "[EventDispatcher]";
-	};
+	}
 
 
 createjs.EventDispatcher = EventDispatcher;
