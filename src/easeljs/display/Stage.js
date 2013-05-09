@@ -95,8 +95,15 @@ var p = Stage.prototype = new createjs.Container();
 
 // public properties:
 	/**
-	 * Indicates whether the stage should automatically clear the canvas before each render. You can set this to false to manually
-	 * control clearing (for generative art, or when pointing multiple stages at the same canvas for example).
+	 * Indicates whether the stage should automatically clear the canvas before each render. You can set this to <code>false</code>
+	 * to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for
+	 * example).
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      var stage = new createjs.Stage("canvasId");
+	 *      stage.autoClear = false;
+	 *
 	 * @property autoClear
 	 * @type Boolean
 	 * @default true
@@ -113,6 +120,7 @@ var p = Stage.prototype = new createjs.Container();
 	 *      myStage.enableDOMEvents(false);
 	 *      myStage.canvas = anotherCanvas;
 	 *      myStage.enableDOMEvents(true);
+	 *
 	 * @property canvas
 	 * @type HTMLCanvasElement | Object
 	 **/
@@ -264,7 +272,7 @@ var p = Stage.prototype = new createjs.Container();
 	/**
 	 * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. {{#crossLink "BitmapAnimation"}}{{/crossLink}})
 	 * and render its entire display list to the canvas. Any parameters passed to update will be passed on to any
-	 * onTick handlers.
+	 * <code>tick</code> event handlers.
 	 * @method update
 	 **/
 	p.update = function() {
@@ -280,7 +288,8 @@ var p = Stage.prototype = new createjs.Container();
 	}
 
 	/**
-	 * Calls the update method. Useful for adding stage as a listener to {{#crossLink "Ticker"}}{{/crossLink}} directly.
+	 * Calls the {{#crossLink "Stage/update"}}{{/crossLink}} method. Useful for adding stage as a listener to
+	 * {{#crossLink "Ticker"}}{{/crossLink}} directly.
 	 * @property tick
 	 * @deprecated In favour of using Ticker.addEventListener in conjunction with handleEvent.
 	 * @type Function
@@ -288,13 +297,14 @@ var p = Stage.prototype = new createjs.Container();
 	p.tick = p.update;
 	
 	/**
-	 * Default event handler that calls Stage.update() when a "tick" event is received. This allows you to register a
-	 * Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}} directly, using:
+	 * Default event handler that calls the Stage {{#crossLink "Stage/update"}}{{/crossLink}} method when a "tick" event
+	 * is received. This allows you to register a Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}}
+	 * directly, using:
 	 * 
 	 *      Ticker.addEventListener("tick", myStage");
 	 * 
-	 * Note that if you subscribe to ticks using this pattern then the tick event object will be passed through to display
-	 * object tick handlers, instead of delta and paused parameters.
+	 * Note that if you subscribe to ticks using this pattern, then the tick event object will be passed through to
+	 * display object tick handlers, instead of <code>delta</code> and <code>paused</code> parameters.
 	 * @property handleEvent
 	 * @type Function
 	 **/
@@ -314,8 +324,8 @@ var p = Stage.prototype = new createjs.Container();
 	}
 
 	/**
-	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can be
-	 * specified as the src value of an image element.
+	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
+	 * be specified as the src value of an image element.
 	 * @method toDataURL
 	 * @param {String} backgroundColor The background color to be used for the generated image. The value can be any value HTML color
 	 * value, including HEX colors, rgb and rgba. The default value is a transparent background.
@@ -370,9 +380,14 @@ var p = Stage.prototype = new createjs.Container();
 	}
 
 	/**
-	 * Enables or disables (by passing a frequency of 0) mouse over events (mouseover and mouseout) for this stage's display
-	 * list. These events can be expensive to generate, so they are disabled by default, and the frequency of the events
-	 * can be controlled independently of mouse move events via the optional <code>frequency</code> parameter.
+	 * Enables or disables (by passing a frequency of 0) mouse over events (mouseover and mouseout) for this stage's
+	 * display list. These events can be expensive to generate, so they are disabled by default. The frequency of
+	 * the events can be controlled independently of mouse move events via the optional <code>frequency</code> parameter.
+	 *
+	 * <h4>Example</h4>
+	 *      var stage = new createjs.Stage("canvasId");
+	 *      stage.enableMouseOver(10);
+	 *
 	 * @method enableMouseOver
 	 * @param {Number} [frequency=20] Optional param specifying the maximum number of times per second to broadcast
 	 * mouse over/out events. Set to 0 to disable mouse over events completely. Maximum is 50. A lower frequency is less
@@ -390,7 +405,7 @@ var p = Stage.prototype = new createjs.Container();
 	}
 	
 	/**
-	 * Enables or disables the  event listeners that stage adds to DOM elements (window, document and canvas).
+	 * Enables or disables the event listeners that stage adds to DOM elements (window, document and canvas).
 	 * It is good practice to disable events when disposing of a Stage instance, otherwise the stage will
 	 * continue to receive events from the page.
 	 * 

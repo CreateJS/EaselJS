@@ -42,8 +42,13 @@ this.createjs = this.createjs||{};
  * supported.
  *
  * <h4>Example</h4>
- *      var stage = new createjs.Stage("canvas");
+ *
+ *      var stage = new createjs.Stage("canvasId");
  *      createjs.Touch.enable(stage);
+ *
+ * <strong>Note:</strong> It is important to disable Touch on a stage that you are no longer using:
+ *
+ *      createjs.Touch.disable(stage);
  *
  * @class Touch
  * @static
@@ -66,9 +71,9 @@ var Touch = function() {
 
 	/**
 	 * Enables touch interaction for the specified EaselJS stage. Currently supports iOS (and compatible browsers, such
-	 * as modern Android browsers), and IE10.
-	 * Supports both single touch and multi-touch modes. Extends the EaselJS MouseEvent model, but without support for
-	 * double click or over/out events. See MouseEvent.pointerID for more information.
+	 * as modern Android browsers), and IE10. Supports both single touch and multi-touch modes. Extends the EaselJS
+	 * MouseEvent model, but without support for double click or over/out events. See <code>MouseEvent.pointerID</code>
+	 * for more information.
 	 * @method enable
 	 * @param {Stage} stage The stage to enable touch on.
 	 * @param {Boolean} [singleTouch=false] If true, only a single touch will be active at a time.

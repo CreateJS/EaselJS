@@ -6,6 +6,7 @@ Version NEXT [Not released]
 	* Added a "Graphics Winding" demo
 	* Added Safari note to the Cache demo
 - Updated documentation:
+	* Added lots more examples.
 	* Matrix2D.rotate
 	* Matrix2D.tx named incorrectly
 	* Stage.stagemousedown event (stagemouseup was doc'd twice)

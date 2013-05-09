@@ -104,7 +104,16 @@ var p = EventDispatcher.prototype;
 
 // public methods:
 	/**
-	 * Adds the specified event listener.
+	 * Adds the specified event listener. Note that adding multiple listeners to the same function will result in
+	 * multiple callbacks getting fired.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      displayObject.addEventListener("click", handleClick);
+	 *      function handleClick(event) {
+	 *         // Click happened.
+	 *      }
+	 *
 	 * @method addEventListener
 	 * @param {String} type The string type of the event.
 	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
@@ -123,6 +132,15 @@ var p = EventDispatcher.prototype;
 
 	/**
 	 * Removes the specified event listener.
+	 *
+	 * <b>Important Note:</b> that you must pass the exact function reference used when the event was added. If a proxy
+	 * function, or function closure is used as the callback, the proxy/closure reference must be used - a new proxy or
+	 * closure will not work.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      displayObject.removeEventListener("click", handleClick);
+	 *
 	 * @method removeEventListener
 	 * @param {String} type The string type of the event.
 	 * @param {Function | Object} listener The listener function or object.
@@ -143,6 +161,15 @@ var p = EventDispatcher.prototype;
 
 	/**
 	 * Removes all listeners for the specified type, or all listeners of all types.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      // Remove all listeners
+	 *      displayObject.removeAllEvenListeners();
+	 *
+	 *      // Remove all click listeners
+	 *      displayObject.removeAllEventListeners("click");
+	 *
 	 * @method removeAllEventListeners
 	 * @param {String} [type] The string type of the event. If omitted, all listeners for all types will be removed.
 	 **/
@@ -152,7 +179,20 @@ var p = EventDispatcher.prototype;
 	};
 
 	/**
-	 * Dispatches the specified event.
+	 * Dispatches the specified event to all listeners.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      // Use a string event
+	 *      this.dispatchEvent("complete");
+	 *
+	 *      // Use an object
+	 *      var event = {
+	 *          type: "complete",
+	 *          foo: "bar"
+	 *      };
+	 *      this.dispatchEvent(event);
+	 *
 	 * @method dispatchEvent
 	 * @param {Object | String} eventObj An object with a "type" property, or a string type. If a string is used,
 	 * dispatchEvent will construct a generic event object with the specified type.

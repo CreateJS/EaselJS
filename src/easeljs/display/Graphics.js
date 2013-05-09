@@ -86,7 +86,7 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
  *     <tr><td><b>Tiny</b></td><td><b>Method</b></td><td><b>Tiny</b></td><td><b>Method</b></td></tr>
  *     <tr><td>mt</td><td>{{#crossLink "Graphics/moveTo"}}{{/crossLink}} </td>
  *     <td>lt</td> <td>{{#crossLink "Graphics/lineTo"}}{{/crossLink}}</td></tr>
- *     <tr><td>at</td><td>{{#crossLink "Graphics/arcTo"}}{{/crossLink}} </td>
+ *     <tr><td>a/at</td><td>{{#crossLink "Graphics/arc"}}{{/crossLink}} / {{#crossLink "Graphics/arcTo"}}{{/crossLink}} </td>
  *     <td>bt</td><td>{{#crossLink "Graphics/bezierCurveTo"}}{{/crossLink}} </td></tr>
  *     <tr><td>qt</td><td>{{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} (also curveTo)</td>
  *     <td>r</td><td>{{#crossLink "Graphics/rect"}}{{/crossLink}} </td></tr>
@@ -133,19 +133,20 @@ var p = Graphics.prototype;
 	 * "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)". For example,
 	 *
 	 *      Graphics.getRGB(50, 100, 150, 0.5);
+	 *      // Returns "rgba(50,100,150,0.5)"
 	 *
-	 * will return "rgba(50,100,150,0.5)". It also supports passing a single hex color value as the first param, and an
-	 * optional alpha value as the second param. For example,
+	 * It also supports passing a single hex color value as the first param, and an optional alpha value as the second
+	 * param. For example,
 	 *
 	 *      Graphics.getRGB(0xFF00FF, 0.2);
+	 *      // Returns "rgba(255,0,255,0.2)"
 	 *
-	 * will return "rgba(255,0,255,0.2)".
 	 * @method getRGB
 	 * @static
 	 * @param {Number} r The red component for the color, between 0 and 0xFF (255).
 	 * @param {Number} g The green component for the color, between 0 and 0xFF (255).
 	 * @param {Number} b The blue component for the color, between 0 and 0xFF (255).
-	 * @param {Number} alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
+	 * @param {Number} [alpha] The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
 	 * @return {String} A CSS compatible color string based on the specified RGB numeric color values in the format 
 	 * "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)".
 	 **/
@@ -165,16 +166,17 @@ var p = Graphics.prototype;
 	
 	/**
 	 * Returns a CSS compatible color string based on the specified HSL numeric color values in the format "hsla(360,100,100,1.0)", 
-	 * or if alpha is null then in the format "hsl(360,100,100)". For example, this will return "hsl(150,100,70)".
+	 * or if alpha is null then in the format "hsl(360,100,100)".
 	 *
 	 *      Graphics.getHSL(150, 100, 70);
+	 *      // Returns "hsl(150,100,70)"
 	 *
 	 * @method getHSL
 	 * @static
 	 * @param {Number} hue The hue component for the color, between 0 and 360.
 	 * @param {Number} saturation The saturation component for the color, between 0 and 100.
 	 * @param {Number} lightness The lightness component for the color, between 0 and 100.
-	 * @param {Number} alpha Optional. The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
+	 * @param {Number} [alpha] The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
 	 * @return {String} A CSS compatible color string based on the specified HSL numeric color values in the format 
 	 * "hsla(360,100,100,1.0)", or if alpha is null then in the format "hsl(360,100,100)".
 	 **/
@@ -216,6 +218,7 @@ var p = Graphics.prototype;
 	 * corresponding string values. This is primarily for use with the tiny API. The mappings are as follows: 0 to
 	 * "miter", 1 to "round", and 2 to "bevel".
 	 * For example, to set the line joints to "bevel":
+	 *
 	 *      myGraphics.ss(16, 0, 2);
 	 *
 	 * @property STROKE_JOINTS_MAP
@@ -362,7 +365,7 @@ var p = Graphics.prototype;
 	
 	/**
 	 * Draws only the path described for this Graphics instance, skipping any non-path instructions, including fill and
-	 * stroke descriptions. Used by DisplayObject.clippingPath to draw the clipping path, for example.
+	 * stroke descriptions. Used by <code>DisplayObject.clippingPath</code> to draw the clipping path, for example.
 	 * @method drawAsPath
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
 	 **/
@@ -377,11 +380,11 @@ var p = Graphics.prototype;
 	
 // public methods that map directly to context 2D calls:
 	/**
-	 * Moves the drawing point to the specified position.
+	 * Moves the drawing point to the specified position. A tiny API method "mt" also exists.
 	 * @method moveTo
 	 * @param {Number} x The x coordinate the drawing point should move to.
 	 * @param {Number} y The y coordinate the drawing point should move to.
-	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls).
 	 **/
 	p.moveTo = function(x, y) {
 		this._activeInstructions.push(new Command(this._ctx.moveTo, [x, y]));
@@ -390,7 +393,7 @@ var p = Graphics.prototype;
 	
 	/**
 	 * Draws a line from the current drawing point to the specified position, which become the new current drawing
-	 * point.
+	 * point. A tiny API method "lt" also exists.
 	 *
 	 * For detailed information, read the 
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
@@ -409,7 +412,7 @@ var p = Graphics.prototype;
 	/**
 	 * Draws an arc with the specified control points and radius.  For detailed information, read the 
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arcto">
-	 * whatwg spec</a>.
+	 * whatwg spec</a>. A tiny API method "at" also exists.
 	 * @method arcTo
 	 * @param {Number} x1
 	 * @param {Number} y1
@@ -432,6 +435,7 @@ var p = Graphics.prototype;
 	 *
 	 * For detailed information, read the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arc">whatwg spec</a>.
+	 * A tiny API method "a" also exists.
 	 * @method arc
 	 * @param {Number} x
 	 * @param {Number} y
@@ -451,7 +455,7 @@ var p = Graphics.prototype;
 	/**
 	 * Draws a quadratic curve from the current drawing point to (x, y) using the control point (cpx, cpy). For detailed
 	 * information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-quadraticcurveto">
-	 * whatwg spec</a>.
+	 * whatwg spec</a>. A tiny API method "qt" also exists.
 	 * @method quadraticCurveTo
 	 * @param {Number} cpx
 	 * @param {Number} cpy
@@ -469,7 +473,7 @@ var p = Graphics.prototype;
 	 * Draws a bezier curve from the current drawing point to (x, y) using the control points (cp1x, cp1y) and (cp2x,
 	 * cp2y). For detailed information, read the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-beziercurveto">
-	 * whatwg spec</a>.
+	 * whatwg spec</a>. A tiny API method "bt" also exists.
 	 * @method bezierCurveTo
 	 * @param {Number} cp1x
 	 * @param {Number} cp1y
@@ -489,7 +493,7 @@ var p = Graphics.prototype;
 	 * Draws a rectangle at (x, y) with the specified width and height using the current fill and/or stroke.
 	 * For detailed information, read the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-rect">
-	 * whatwg spec</a>.
+	 * whatwg spec</a>. A tiny API method "r" also exists.
 	 * @method rect
 	 * @param {Number} x
 	 * @param {Number} y
@@ -505,7 +509,7 @@ var p = Graphics.prototype;
 	
 	/**
 	 * Closes the current path, effectively drawing a line from the current drawing point to the first drawing point specified
-	 * since the fill or stroke was last set.
+	 * since the fill or stroke was last set. A tiny API method "cp" also exists.
 	 * @method closePath
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
@@ -520,7 +524,8 @@ var p = Graphics.prototype;
 	
 // public methods that roughly map to Flash graphics APIs:
 	/**
-	 * Clears all drawing instructions, effectively resetting this Graphics instance.
+	 * Clears all drawing instructions, effectively resetting this Graphics instance. Any line and fill styles will need
+	 * to be redefined to draw shapes following a clear call. A tiny API method "c" also exists.
 	 * @method clear
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
@@ -534,7 +539,7 @@ var p = Graphics.prototype;
 	};
 	
 	/**
-	 * Begins a fill with the specified color. This ends the current sub-path.
+	 * Begins a fill with the specified color. This ends the current sub-path. A tiny API method "f" also exists.
 	 * @method beginFill
 	 * @param {String} color A CSS compatible color value (ex. "red", "#FF0000", or "rgba(255,0,0,0.5)"). Setting to
 	 * null will result in no fill.
@@ -548,10 +553,12 @@ var p = Graphics.prototype;
 	
 	/**
 	 * Begins a linear gradient fill defined by the line (x0, y0) to (x1, y1). This ends the current sub-path. For
-	 * example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a square to display it:
+	 * example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a
+	 * square to display it:
 	 *
 	 *      myGraphics.beginLinearGradientFill(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
 	 *
+	 * A tiny API method "lf" also exists.
 	 * @method beginLinearGradientFill
 	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient
 	 * drawing from red to blue.
@@ -579,6 +586,7 @@ var p = Graphics.prototype;
 	 *
 	 *      myGraphics.beginRadialGradientFill(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50).drawCircle(100, 100, 50);
 	 *
+	 * A tiny API method "rf" also exists.
 	 * @method beginRadialGradientFill
 	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
 	 * a gradient drawing from red to blue.
@@ -603,7 +611,8 @@ var p = Graphics.prototype;
 	};
 	
 	/**
-	 * Begins a pattern fill using the specified image. This ends the current sub-path.
+	 * Begins a pattern fill using the specified image. This ends the current sub-path. A tiny API method "bf" also
+	 * exists.
 	 * @method beginBitmapFill
 	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use as the pattern.
 	 * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
@@ -634,6 +643,7 @@ var p = Graphics.prototype;
 	
 	/**
 	 * Ends the current sub-path, and begins a new one with no fill. Functionally identical to <code>beginFill(null)</code>.
+	 * A tiny API method "ef" also exists.
 	 * @method endFill
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
@@ -647,6 +657,7 @@ var p = Graphics.prototype;
 	 *
 	 *      myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
 	 *
+	 * A tiny API method "ss" also exists.
 	 * @method setStrokeStyle
 	 * @param {Number} thickness The width of the stroke.
 	 * @param {String | Number} [caps=0] Indicates the type of caps to use at the end of lines. One of butt,
@@ -674,7 +685,7 @@ var p = Graphics.prototype;
 	};
 	
 	/**
-	 * Begins a stroke with the specified color. This ends the current sub-path.
+	 * Begins a stroke with the specified color. This ends the current sub-path. A tiny API method "s" also exists.
 	 * @method beginStroke
 	 * @param {String} color A CSS compatible color value (ex. "#FF0000", "red", or "rgba(255,0,0,0.5)"). Setting to
 	 * null will result in no stroke.
@@ -691,8 +702,10 @@ var p = Graphics.prototype;
 	 * example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a
 	 * square to display it:
 	 *
-	 *      myGraphics.setStrokeStyle(10).beginLinearGradientStroke(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
+	 *      myGraphics.setStrokeStyle(10).
+	 *          beginLinearGradientStroke(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
 	 *
+	 * A tiny API method "ls" also exists.
 	 * @method beginLinearGradientStroke
 	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
 	 * a gradient drawing from red to blue.
@@ -723,6 +736,7 @@ var p = Graphics.prototype;
 	 *          .beginRadialGradientStroke(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50)
 	 *          .drawRect(50, 90, 150, 110);
 	 *
+	 * A tiny API method "rs" also exists.
 	 * @method beginRadialGradientStroke
 	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
 	 * a gradient drawing from red to blue.
@@ -748,13 +762,14 @@ var p = Graphics.prototype;
 	};
 	
 	/**
-	 * Begins a pattern fill using the specified image. This ends the current sub-path. Note that unlike bitmap fills, strokes
-	 * do not currently support a matrix parameter due to limitations in the canvas API.
+	 * Begins a pattern fill using the specified image. This ends the current sub-path. Note that unlike bitmap fills,
+	 * strokes do not currently support a matrix parameter due to limitations in the canvas API. A tiny API method "bs"
+	 * also exists.
 	 * @method beginBitmapStroke
 	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
 	 * as the pattern.
-	 * @param {String} [repetition=repeat] Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
-	 * "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
+	 * @param {String} [repetition=repeat] Optional. Indicates whether to repeat the image in the fill area. One of
+	 * "repeat", "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)	
 	 **/
 	p.beginBitmapStroke = function(image, repetition) {
@@ -767,6 +782,7 @@ var p = Graphics.prototype;
 
 	/**
 	 * Ends the current sub-path, and begins a new one with no stroke. Functionally identical to <code>beginStroke(null)</code>.
+	 * A tiny API method "es" also exists.
 	 * @method endStroke
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
@@ -807,12 +823,13 @@ var p = Graphics.prototype;
 	};
 	
 	/**
-	 * Draws a rounded rectangle with different corner radii. Supports positive and negative corner radii.
+	 * Draws a rounded rectangle with different corner radii. Supports positive and negative corner radii. A tiny API
+	 * method "rc" also exists.
 	 * @method drawRoundRectComplex
-	 * @param {Number} x
-	 * @param {Number} y
-	 * @param {Number} w
-	 * @param {Number} h
+	 * @param {Number} x The horizontal coordinate to draw the round rect.
+	 * @param {Number} y The vertical coordinate to draw the round rect.
+	 * @param {Number} w The width of the round rect.
+	 * @param {Number} h The height of the round rect.
 	 * @param {Number} radiusTL Top left corner radius.
 	 * @param {Number} radiusTR Top right corner radius.
 	 * @param {Number} radiusBR Bottom right corner radius.
@@ -863,6 +880,7 @@ var p = Graphics.prototype;
 	 *	    stage.addChild(s);
 	 *	    stage.update();
 	 *
+	 * A tiny API method "dc" also exists.
 	 * @method drawCircle
 	 * @param {Number} x x coordinate center point of circle.
 	 * @param {Number} y y coordinate center point of circle.
@@ -876,7 +894,7 @@ var p = Graphics.prototype;
 	
 	/**
 	 * Draws an ellipse (oval) with a specified width (w) and height (h). Similar to {{#crossLink "Graphics/drawCircle"}}{{/crossLink}},
-	 * except the width and height can be different.
+	 * except the width and height can be different. A tiny API method "de" also exists.
 	 * @method drawEllipse
 	 * @param {Number} x x coordinate center point of ellipse.
 	 * @param {Number} y y coordinate center point of ellipse.
@@ -908,8 +926,11 @@ var p = Graphics.prototype;
 	 * Draws a star if pointSize is greater than 0, or a regular polygon if pointSize is 0 with the specified number of
 	 * points. For example, the following code will draw a familiar 5 pointed star shape centered at 100, 100 and with a
 	 * radius of 50:
+	 *
 	 *      myGraphics.beginFill("#FF0").drawPolyStar(100, 100, 50, 5, 0.6, -90);
 	 *      // Note: -90 makes the first point vertical
+	 *
+	 * A tiny API method "dp" also exists.
 	 *
 	 * @method drawPolyStar
 	 * @param {Number} x Position of the center of the shape.
@@ -972,6 +993,7 @@ var p = Graphics.prototype;
 	 * provide an absolute position of +150.0px.
 	 * <br />AAA - 000000000000000000. A y delta value of 0.
 	 *
+	 * A tiny API method "p" also exists.
 	 * @method decodePath
 	 * @param {String} str The path string to decode.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)

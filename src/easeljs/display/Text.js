@@ -48,6 +48,8 @@ this.createjs = this.createjs||{};
  * CreateJS Text supports web fonts (the same rules as Canvas). The font must be loaded and supported by the browser
  * before it can be displayed.
  *
+ * <strong>Note:</strong> Text can be expensive to generate, so cache instances where possible. Be aware that not all
+ * browsers will render Text exactly the same. *
  * @class Text
  * @extends DisplayObject
  * @constructor
@@ -61,7 +63,6 @@ var Text = function(text, font, color) {
   this.initialize(text, font, color);
 }
 var p = Text.prototype = new createjs.DisplayObject();
-
 
 	/**
 	 * @property _workingContext
@@ -213,8 +214,8 @@ var p = Text.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Returns an approximate line height of the text, ignoring the lineHeight property. This is based 
-	 * on the measured width of a "M" character multiplied by 1.2, which approximates em for most fonts.
+	 * Returns an approximate line height of the text, ignoring the lineHeight property. This is based on the measured
+	 * width of a "M" character multiplied by 1.2, which approximates em for most fonts.
 	 * @method getMeasuredLineHeight
 	 * @return {Number} an approximate line height of the text, ignoring the lineHeight property. This is 
 	 * based on the measured width of a "M" character multiplied by 1.2, which approximates em for most fonts.
@@ -224,11 +225,11 @@ var p = Text.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Returns the approximate height of multiline text by multiplying the number of lines against
-	 * either the lineHeight (if specified) or getMeasuredLineHeight(). Note that this operation
-	 * requires the text flowing logic to run, which has an associated CPU cost.
+	 * Returns the approximate height of multi-line text by multiplying the number of lines against either the
+	 * <code>lineHeight</code> (if specified) or {{#crossLink "Text/getMeasuredLineHeight"}}{{/crossLink}}. Note that
+	 * this operation requires the text flowing logic to run, which has an associated CPU cost.
 	 * @method getMeasuredHeight
-	 * @return {Number} The approximate height of the drawn multiline text.
+	 * @return {Number} The approximate height of the drawn multi-line text.
 	 **/
 	p.getMeasuredHeight = function() {
 		return this._drawText()*(this.lineHeight||this.getMeasuredLineHeight());
