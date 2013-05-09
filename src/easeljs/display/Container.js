@@ -58,9 +58,10 @@ var p = Container.prototype = new createjs.DisplayObject();
 
 // public properties:
 	/**
-	 * The array of children in the display list. You should usually use the child management methods such as {{#crossLink "Container/addChild"}}{{/crossLink}},
-	 * {{#crossLink "Container/removeChild"}}{{/crossLink}}, {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc,
-	 * rather than accessing this directly, but it is included for advanced users.
+	 * The array of children in the display list. You should usually use the child management methods such as
+	 * {{#crossLink "Container/addChild"}}{{/crossLink}}, {{#crossLink "Container/removeChild"}}{{/crossLink}},
+	 * {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is
+	 * included for advanced uses.
 	 * @property children
 	 * @type Array
 	 * @default null
@@ -91,6 +92,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.
+	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method isVisible
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
@@ -110,10 +112,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 	/**
 	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
 	 * Returns true if the draw was handled (useful for overriding functionality).
+	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
@@ -136,11 +139,14 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 	
 	/**
-	 * Adds a child to the top of the display list. You can also add multiple children, such as "addChild(child1, child2, ...);".
-	 * Returns the child that was added, or the last child if multiple children were added.
+	 * Adds a child to the top of the display list.
 	 *
 	 * <h4>Example</h4>
-	 *      container.addChild(bitmapInstance, shapeInstance);
+	 *      container.addChild(bitmapInstance);
+	 *
+	 *  You can also add multiple children at once:
+	 *
+	 *      container.addChild(bitmapInstance, shapeInstance, textInstance);
 	 *
 	 * @method addChild
 	 * @param {DisplayObject} child The display object to add.
@@ -161,7 +167,12 @@ var p = Container.prototype = new createjs.DisplayObject();
 
 	/**
 	 * Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and
-	 * setting its parent to this Container. You can also add multiple children, such as:
+	 * setting its parent to this Container.
+	 *
+	 * <h4>Example</h4>
+	 *      addChildAt(child1, index);
+	 *
+	 * You can also add multiple children, such as:
 	 *
 	 *      addChildAt(child1, child2, ..., index);
 	 *
@@ -171,6 +182,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 *      container.addChildAt(myShape, container.getChildIndex(otherShape));
 	 *
 	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
+	 *
 	 * @method addChildAt
 	 * @param {DisplayObject} child The display object to add.
 	 * @param {Number} index The index to add the child at.
@@ -191,9 +203,17 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is already
-	 * known. You can also remove multiple children, such as "removeChild(child1, child2, ...);". Returns true if the child
-	 * (or children) was removed, or false if it was not in the display list.
+	 * Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is
+	 * already known.
+	 *
+	 * <h4>Example</h4>
+	 *      container.removeChild(child);
+	 *
+	 * You can also remove multiple children:
+	 *
+	 *      removeChild(child1, child2, ...);
+	 *
+	 * Returns true if the child (or children) was removed, or false if it was not in the display list.
 	 * @method removeChild
 	 * @param {DisplayObject} child The child to remove.
 	 * @return {Boolean} true if the child (or children) was removed, or false if it was not in the display list.
@@ -209,9 +229,18 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Removes the child at the specified index from the display list, and sets its parent to null. You can also remove multiple
-	 * children, such as "removeChildAt(2, 7, ...);". Returns true if the child (or children) was removed, or false if any index
-	 * was out of range.
+	 * Removes the child at the specified index from the display list, and sets its parent to null.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      container.removeChildAt(2);
+	 *
+	 * You can also remove multiple children:
+	 *
+	 *      container.removeChild(2, 7, ...)
+	 *
+	 * Returns true if the child (or children) was removed, or false if any index was out of range.
+	 * @method removeChildAt
 	 * @param {Number} index The index of the child to remove.
 	 * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
 	 **/
@@ -234,6 +263,10 @@ var p = Container.prototype = new createjs.DisplayObject();
 
 	/**
 	 * Removes all children from the display list.
+	 *
+	 * <h4>Example</h4>
+	 *      container.removeAlLChildren();
+	 *
 	 * @method removeAllChildren
 	 **/
 	p.removeAllChildren = function() {
@@ -243,9 +276,13 @@ var p = Container.prototype = new createjs.DisplayObject();
 
 	/**
 	 * Returns the child at the specified index.
+	 *
+	 * <h4>Example</h4>
+	 *      container.getChildAt(2);
+	 *
 	 * @method getChildAt
 	 * @param {Number} index The index of the child to return.
-	 * @return {DisplayObject} The child at the specified index.
+	 * @return {DisplayObject} The child at the specified index. Returns null if there is no child at the index.
 	 **/
 	p.getChildAt = function(index) {
 		return this.children[index];
@@ -267,9 +304,18 @@ var p = Container.prototype = new createjs.DisplayObject();
 
 	/**
 	 * Performs an array sort operation on the child list.
+	 *
+	 * <h4>Example</h4>
+	 *      var sortFunction = function(item1, item2, options) {
+	 *          if (item1 > item2) { return 1; }
+	 *          if (item1 < item2) { return -1; }
+	 *          return 0;
+	 *      }
+	 *      container.sortChildren(sortFunction);
+	 *
 	 * @method sortChildren
-	 * @param {Function} sortFunction the function to use to sort the child list. See javascript's Array.sort documentation
-	 * for details.
+	 * @param {Function} sortFunction the function to use to sort the child list. See JavaScript's <code>Array.sort</code>
+	 * documentation for details.
 	 **/
 	p.sortChildren = function(sortFunction) {
 		this.children.sort(sortFunction);
@@ -277,6 +323,10 @@ var p = Container.prototype = new createjs.DisplayObject();
 
 	/**
 	 * Returns the index of the specified child in the display list, or -1 if it is not in the display list.
+	 *
+	 * <h4>Example</h4>
+	 *      var index = container.getChildIndex(child);
+	 *
 	 * @method getChildIndex
 	 * @param {DisplayObject} child The child to return the index of.
 	 * @return {Number} The index of the specified child. -1 if the child is not found.
@@ -296,9 +346,9 @@ var p = Container.prototype = new createjs.DisplayObject();
 	
 	/**
 	 * Swaps the children at the specified indexes. Fails silently if either index is out of range.
+	 * @method swapChildrenAt
 	 * @param {Number} index1
 	 * @param {Number} index2
-	 * @method swapChildrenAt
 	 **/
 	p.swapChildrenAt = function(index1, index2) {
 		var kids = this.children;
@@ -310,10 +360,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 	
 	/**
-	 * Swaps the specified children's depth in the display list. Fails silently if either child is not a child of this Container.
+	 * Swaps the specified children's depth in the display list. Fails silently if either child is not a child of this
+	 * Container.
+	 * @method swapChildren
 	 * @param {DisplayObject} child1
 	 * @param {DisplayObject} child2
-	 * @method swapChildren
 	 **/
 	p.swapChildren = function(child1, child2) {
 		var kids = this.children;
@@ -347,8 +398,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Returns true if the specified display object either is this container or is a descendent.
-	 * (child, grandchild, etc) of this container.
+	 * Returns true if the specified display object either is this container or is a descendent (child, grandchild, etc)
+	 * of this container.
 	 * @method contains
 	 * @param {DisplayObject} child The DisplayObject to be checked.
 	 * @return {Boolean} true if the specified display object either is this container or is a descendent.
@@ -362,9 +413,9 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the specified
-	 * position). This ignores the alpha, shadow and compositeOperation of the display object, and all transform properties
-	 * including regX/Y.
+	 * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the
+	 * specified position). This ignores the alpha, shadow and compositeOperation of the display object, and all
+	 * transform properties including regX/Y.
 	 * @method hitTest
 	 * @param {Number} x The x position to check in the display object's local coordinates.
 	 * @param {Number} y The y position to check in the display object's local coordinates.
@@ -377,11 +428,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Returns an array of all display objects under the specified coordinates that are in this container's display list.
-	 * This routine ignores any display objects with mouseEnabled set to false. The array will be sorted in order of visual
-	 * depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an expensive operation
-	 * to run, so it is best to use it carefully. For example, if testing for objects under the mouse, test on tick (instead of on
-	 * mousemove), and only if the mouse's position has changed.
+	 * Returns an array of all display objects under the specified coordinates that are in this container's display
+	 * list. This routine ignores any display objects with mouseEnabled set to false. The array will be sorted in order
+	 * of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an
+	 * expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the
+	 * mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
 	 * @method getObjectsUnderPoint
 	 * @param {Number} x The x position in the container to test.
 	 * @param {Number} y The y position in the container to test.
@@ -395,8 +446,9 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Similar to getObjectsUnderPoint(), but returns only the top-most display object. This runs significantly faster than
-	 * getObjectsUnderPoint(), but is still an expensive operation. See getObjectsUnderPoint() for more information.
+	 * Similar to {{#crossLink "Container/getObjectsUnderPoint()"}}{{/crossLink}}, but returns only the top-most display
+	 * object. This runs significantly faster than <code>getObjectsUnderPoint()<code>, but is still an expensive
+	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	 * @method getObjectUnderPoint
 	 * @param {Number} x The x position in the container to test.
 	 * @param {Number} y The y position in the container to test.
@@ -408,8 +460,9 @@ var p = Container.prototype = new createjs.DisplayObject();
 	}
 
 	/**
-	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are reverted to
-	 * their defaults (for example .parent).
+	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are
+	 * reverted to their defaults (for example .parent).
+	 * @method clone
 	 * @param {Boolean} recursive If true, all of the descendants of this container will be cloned recursively. If false, the
 	 * properties of the container will be cloned, but the new instance will not have any children.
 	 * @return {Container} A clone of the current Container instance.

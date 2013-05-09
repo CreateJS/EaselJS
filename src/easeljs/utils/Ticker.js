@@ -210,8 +210,8 @@ var Ticker = function() {
 	 * Adds a listener for the tick event. The listener must be either an object exposing a <code>tick</code> method,
 	 * or a function. The listener will be called once each tick / interval. The interval is specified via the 
 	 * <code>.setInterval(ms)</code> method.
-	 * The tick method or function is passed two parameters: the elapsed time between the 
-	 * previous tick and the current one, and a boolean indicating whether Ticker is paused.
+	 * The tick method or function is passed two parameters: the elapsed time between the previous tick and the current
+	 * one, and a boolean indicating whether Ticker is paused.
 	 * @method addListener
 	 * @static
 	 * @param {Object} o The object or function to add as a listener.
