@@ -1,4 +1,4 @@
-Version NEXT [Not released]
+Version 0.6.1 [May 10, 2013]
 ****************************************************************************************************
 - Updated demos:
 	* propagate the tick event to the stage. This is a best practice.
