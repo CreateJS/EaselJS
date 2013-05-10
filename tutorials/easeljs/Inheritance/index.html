@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>EaselJS Tutorial: Inheritance</title>
+	<link href="../../shared/tutorial.css" rel="stylesheet" type="text/css">
+	<script src="../../shared/tutorial.js"></script>
+	
+	<!-- SyntaxHighlighter-->
+	<script src="../../shared/SyntaxHighlighter/shCore.js"></script>
+	<script src="../../shared/SyntaxHighlighter/shBrushJScript.js"></script>
+	<script src="../../shared/SyntaxHighlighter/shBrushXml.js"></script>
+	<link href="../../shared/SyntaxHighlighter/shCore.css" rel="stylesheet" type="text/css">
+	<link href="../../shared/SyntaxHighlighter/shThemeCreateJS.css" rel="stylesheet" type="text/css">
+</head>
+	
+<body onLoad="initTutorial();">
+	<article>
+		<header>
+			<h1>EaselJS: Inheritance</h1>
+			<p>
+				<strong>Synopsis:</strong> Creating custom classes that extend display objects.<br>
+				<strong>Topics:</strong> inheritance<br>
+				<strong>Target:</strong> EaselJS v0.6.0
+			</p>
+		</header>
+		<p class="highlight">
+			This tutorial is part of the <a href="https://github.com/CreateJS/EaselJS/" target="_blank">EaselJS GitHub repository</a>.<br />
+			Check out the repository for more tutorials and a handful of helpful samples.
+		</p>
+
+		<section>
+			<header>
+				<h2>Inheritance</h2>
+			</header>
+			<p>
+				Creating new class definitions that extend existing display objects provides encapsulated, easily reusable visual elements, and it's easy to do. This tutorial shows one method of extending a class, but there are many other options - use the one that's most comfortable for you, but apply the lessons you learn here.
+			</p>
+			<p>
+				We'll create a <code>Button</code> class, that extends <code>Container</code>.
+			</p>
+			<textarea class="brush: js;" readonly>
+(function() {
+
+var Button = function(label) {
+  this.initialize(label);
+}
+Button.prototype = new createjs.Container();
+
+Button.prototype.Container_initialize = p.initialize;
+Button.prototype.initialize = function(label) {
+	this.Container_initialize();
+	// add custom setup logic here.
+}
+
+window.Button = Button;
+}());
+			</textarea>
+			<p>
+				Lines 1 & 15 are creating and calling an anonymous wrapper function (to keep from polluting the global scope). On line 3 I am defining a new constructor function, then setting its prototype to a new <code>Container</code> instance on line 6. This makes my new class inherit all of the properties and methods from <code>Container</code>.
+			</p>
+		</section>
+			
+		<section>
+			<header>
+				<h2>The initialize method</h2>
+			</header>
+			
+			<p>
+				In the constructor on line 4, we call the <code>initialize</code> method, and pass through the constructor parameters. The <code>initialize</code> method handles all of the set up work for new instances, and it is vital that it gets called.
+			</p>
+			<p>
+				For this class, we are overriding <code>Container</code>'s <code>initialize</code> method so that we can do some custom set up, however, we still need to make sure that the super class's <code>initialize</code> method gets called. <strong>This is VERY important</strong>, especially for classes that inherit from <code>Container</code>.
+			</p>
+			<p>
+				To do this, we are saving off the existing <code>initialize</code> method (line 8), redefining it (line 9), and making sure that we call it <strong>first</strong> in the new method (line 10).
+		</section>
+			
+		<section>
+			<header>
+				<h2>Finishing up</h2>
+			</header>
+			<p>
+				Finally, on line 14, we assign our class back into the global (window) scope, to make it available for our application. Now the class can be instantiated, and added to the display list like any other display object.
+			</p>
+			<textarea class="brush: js;" readonly>
+var myButton = new Button("label");
+stage.addChild(myButton);
+			</textarea>
+			<p>
+				Check out demo.html and Button.js to see an example this in action.
+			</p>
+			
+			<iframe src="demo.html" class="demo" longDesc="a (simple) reusable pulsing Button class" width="100%" height="220px"></iframe>
+		</section>
+		
+	</article>
+</body>
+</html>
