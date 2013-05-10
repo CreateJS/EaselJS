@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>EaselJS Tutorial: Fonts</title>
+    <link href="../../shared/tutorial.css" rel="stylesheet" type="text/css">
+    <script src="../../shared/tutorial.js"></script>
+    <style>
+        .container {
+            position: relative;
+            left: 0px;
+            width: 800px;
+            height: 220px;
+        }
+        .box {
+            position: relative;
+            float: left;
+            width: 150px;
+            height: 250px;
+        }
+    </style>
+
+    <!-- SyntaxHighlighter-->
+    <script src="../../shared/SyntaxHighlighter/shCore.js"></script>
+    <script src="../../shared/SyntaxHighlighter/shBrushJScript.js"></script>
+    <script src="../../shared/SyntaxHighlighter/shBrushXml.js"></script>
+    <link href="../../shared/SyntaxHighlighter/shCore.css" rel="stylesheet" type="text/css">
+    <link href="../../shared/SyntaxHighlighter/shThemeCreateJS.css" rel="stylesheet" type="text/css">
+
+</head>
+<body onLoad="initTutorial();">
+
+<article>
+    <header>
+        <h1>EaselJS: Text font</h1>
+        <p>
+            <strong>Synopsis:</strong> Learn how to use google webs fonts within your CreateJS projects<br>
+            <strong>Topics:</strong> Text class, google web fonts<br>
+            <strong>Target:</strong> EaselJS v0.4.1 and above
+        </p>
+    </header>
+	<p class="highlight">
+		This tutorial is part of the <a href="https://github.com/CreateJS/EaselJS/" target="_blank">EaselJS GitHub repository</a>.<br />
+		Check out the repository for more tutorials and a handful of helpful samples.
+	</p>
+
+	<section>
+        <h2>CSS: Font Primer</h2>
+        <p>
+            When choosing a font it is important to know that browsers will only display fonts that are installed
+            on the viewers machine. Lucky for us CSS has a fallback system: if the font
+            you have selected is not installed, the browser will choose a similar font from a generic font set.
+        </p>
+        <div class="container">
+            <div class="box" style="left: 0px">
+                <p align="center">
+                    <b>SERIF</b>
+                </p>
+                <p>
+                    Serif fonts have small lines tailing on the end of the main strokes of the letters.
+                </p>
+                <p>
+                    Examples:
+                </p>
+                <p style="font-family: Georgia;font-size: 1.25em">
+                    Georgia
+                </p>
+                <p style="font-family: Times;font-size: 1.25em">
+                    Times
+                </p>
+                <p style="font-family: Times New Roman;font-size: 1.25em">
+                    Times New Roman
+                </p>
+            </div>
+            <div class="box" style="left: 1px">
+                <p align="center">
+                    <b>SANS-SERIF</b>
+                </p>
+                <p>
+                    Sans-serif fonts have straight ends to letters and therefore have a much
+                    cleaner designs.
+                </p>
+                <p>
+                    Examples:
+                </p>
+                <p style="font-family: Arial;font-size: 1.25em">
+                    Arial
+                </p>
+                <p style="font-family: Verdana;font-size: 1.25em">
+                    Verdana
+                </p>
+                <p style="font-family: Helvetica;font-size: 1.25em">
+                    Helvetica
+                </p>
+            </div>
+            <div class="box" style="left: 2px">
+                <p align="center">
+                    <b>MONOSPACE</b>
+                </p>
+                <p>
+                    Letters and characters each occupy the same amount of horizontal space
+                    (Non-monospace fonts have different widths.)
+                </p>
+                <p>
+                    Examples:
+                </p>
+                <p style="font-family: Courier;font-size: 1.25em">
+                    Courier
+                </p>
+                <p style="font-family: Courier New;font-size: 1.25em">
+                    Courier New
+                </p>
+            </div>
+            <div class="box" style="left: 3px">
+                <p align="center">
+                    <b>CURSIVE</b>
+                </p>
+                <p>
+                    Cursive fonts either have joining strokes or other cursive characteristics, such
+                    as handwriting styles.
+                </p>
+                <p>
+                    Examples:
+                </p>
+                <p style="font-family: Comic Sans MS;font-size: 1.5em">
+                    Comic Sans
+                </p>
+                <p style="font-family: Monotype Corsiva;font-size: 1.5em">
+                    Monotype Corsiva
+                </p>
+            </div>
+            <div class="box" style="left: 4px">
+                <p align="center">
+                    <b>FANTASY</b>
+                </p>
+                <p>
+                    Fantasy fonts usually decorative fonts and are often used for titles. They are
+                    not designed for long bodies of text.
+                </p>
+                <p>
+                    Examples:
+                </p>
+                <p style="font-family: Impact; font-size: 1.5em">
+                    Impact
+                </p>
+                <!--< SPAN STYLE="font-family: Comic Sans MS;" >-->
+                <p style="font-family: Haettenschweiler; font-size: 1.75em">
+                    Haettenschweiler
+                </p>
+            </div>
+        </div>
+    </section>
+    <section>
+        <br><br>
+        <header>
+            <h2>Basic Implementation</h2>
+        </header>
+        <p>
+            The <code>font</code> property allows for any valid CSS font attribute.  The font family property specifies what font
+            will be displayed. Common font names would be fonts like <b>Helvetica</b>, <b>Arial</b>, <b>Courier</b>, etc.
+            CSS provides a fallback, since all fonts might not be availble on all computers.
+            Generic families are these fallback: <b>serif</b>, <b>sans-serif</b>, <b>cursive</b>, <b>fantasy</b>, <b>monospace</b>.
+            
+            For more information common fonts on all systems click <a href="http://www.codestyle.org/css/font-family/sampler-CombinedResults.shtml" target="_blank">here</a>
+        </p>
+        <p>
+            If you run the following code you will see a basic "Hello World" message:
+        </p>
+        <textarea class="brush: js;" readonly>
+var text = new createjs.Text();
+text.text = "Hello World"
+        </textarea>
+        <p>
+            Alternatively, you can pass string, font-family and color value parameters to the constructor.
+        </p>
+        <textarea class="brush: js;" readonly>
+var text = new createjs.Text("Hello World", "bold 86px Arial", "#ff7700");
+        </textarea>
+        <iframe src="helloworld.html" class="demo" longDesc="Basic Implementation displaying text" width="100%" height="120px"></iframe>
+    </section>
+
+    <section>
+        <header>
+            <h2>Google Web Fonts</h2>
+        </header>
+            <p>
+                Google web fonts provide a developers/designers the ability to use high-quailty web fonts that they can include
+                within their HTML pages. Having over 600 fonts families to choose from you’ll be hard pressed to find one that
+                wouldn’t work for your pages. One benefit for choosing Google Web Fonts is the caching benefits and bandwidth saving,
+                since those fonts are stored on Google servers. Google has made this process of using their fonts very simple,
+                you’ll be up and running before you know it.
+            </p>
+            <h3>Getting Started</h3>
+            <p>
+                <ol>
+                    <li>What you'll need to do first is head over to <a title="googlewebfonts" href="http://www.google.com/webfonts" target="_blank">Google's font Catalog.</a></li>
+
+                    <li>Search for a font called <b>Dorsa</b> then add the font to your collection by clicking on the “Add to Collection” button found on the lower right hand side.
+                        <p style="position:relative; left:-45px">
+                            <img src="assets/DorsaPreview.png" alt="FontCollection.png" style="background:#f7f7f7; padding:5px 5px 5px 5px; border:1px solid #cccccc;"/>
+                        </p>
+                    </li>
+                    <li>Once you are ready to use the font, click on “Use” found on the bottom of page.
+                            <p style="position:relative; left:-45px"> 
+                                <img src="assets/FontCollection.png" alt="FontCollection.png" style="background:#f7f7f7; padding:5px 5px 5px 5px; border:1px solid #cccccc;"/>
+                            </p>
+                    </li>
+                    <li>Then you'll be prompted to verify your font settings and provide with stub code. Copy and paste the information below and add it to your web page. </li>
+                        <p style="position:relative; left:-45px"> 
+                            <img src="assets/Dorsa.png" alt="FontCollection.png" style="background:#f7f7f7; padding:5px 5px 5px 5px; border:1px solid #cccccc;"/>
+                        </p>
+                    <li>Now create an instance of the Text class, using the newly acquired font!</li>
+                </ol>
+            </p>
+            <textarea class="brush: js;" readonly>
+var txt = new createjs.Text();
+txt.font = "bold 96px Dorsa";
+txt.color = "#000000";
+txt.text = "Hello World!";
+            </textarea>
+        <iframe src="GoogleWebFont.html" class="demo" longDesc="Google Web Font Implementation displaying text" width="100%" height="120px" ></iframe>
+    </section>
+</article>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS demo: Basic Implementation</title>
+	<link href="../../shared/demo.css" rel="stylesheet" type="text/css">
+	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script>
+		
+		var stage;
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+
+            var text = new createjs.Text("Hello World", "bold 86px Arial", "#ff7700");
+
+            stage.addChild(text);
+            stage.update();
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="500" height="100">
+		alternate content
+	</canvas>
+</body>
+</html>

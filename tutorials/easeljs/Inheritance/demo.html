@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS demo: Inheritance</title>
+	<link href="../../shared/demo.css" rel="stylesheet" type="text/css">
+	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="Button.js"></script>
+	<script>
+		var stage, holder;
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+			
+			var btn1 = stage.addChild(new Button("Hello!", "#F00"));
+			btn1.x = 20;
+			btn1.y = 20;
+			
+			var btn2 = stage.addChild(new Button("Goodbye.", "#0F0"));
+			btn2.x = 20;
+			btn2.y = btn1.y + 50;
+			
+			var btn3 = stage.addChild(new Button("Hello again!!", "#0FF"));
+			btn3.y = btn2.y + 50;
+			
+			
+			btn1.x = btn2.x = btn3.x = 20;
+			
+			createjs.Ticker.addEventListener("tick", stage);
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="300" height="200">
+		alternate content
+	</canvas>
+</body>
+</html>

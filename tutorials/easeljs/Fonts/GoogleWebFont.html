@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="description">
+    <title>EaselJS demo: Google Web Font</title>
+    <link href="../../shared/demo.css" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Dorsa' rel='stylesheet' type='text/css'>
+    <script src="http://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+    <script type="text/javascript">
+        WebFont.load({
+            google: {
+                families: [ 'Dorsa']
+            },
+            loading: function() {
+                console.log("loading");
+            },
+            active: function () {
+                window.init();
+            },
+            inactive: function() {
+                console.log("inactive")
+            }
+        });
+    </script>
+    <script>
+
+        var stage;
+        var queue;
+        function init() {
+
+            stage = new createjs.Stage("demoCanvas");
+            var txt = new createjs.Text();
+            txt.x = txt.y = 0;
+            txt.font = "96px Dorsa";
+            txt.color = "#FF7700";
+            txt.text = "Hello World!";
+
+            stage.addChild(txt);
+            stage.update();
+            createjs.Ticker.addEventListener("tick", tick);
+        }
+
+        function tick() {
+            stage.tick();
+        }
+    </script>
+</head>
+<body >
+<canvas id="demoCanvas" width="500" height="100">
+    alternate content
+</canvas>
+</body>
+</html>
