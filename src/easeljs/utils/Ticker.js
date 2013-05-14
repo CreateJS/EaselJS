@@ -48,6 +48,12 @@ this.createjs = this.createjs||{};
  *              // Actions carried out when the Ticker is not paused.
  *          }
  *      }
+ *
+ * To update a stage every tick, the {{#crossLink "Stage"}}{{/crossLink}} instance can also be used as a listener, as
+ * it will automatically update when it receives a tick event:
+ *
+ *      createjs.Ticker.addEventListener("tick", stage);
+ *
  * @class Ticker
  * @uses EventDispatcher
  * @static
@@ -217,8 +223,7 @@ var Ticker = function() {
 	 * @param {Object} o The object or function to add as a listener.
 	 * @param {Boolean} pauseable If false, the listener will continue to have tick called 
 	 * even when Ticker is paused via Ticker.pause(). Default is true.
-	 * @deprecated In favour of the "tick" event. Will be removed in a future version. User "addEventListener"
-	 * instead.
+	 * @deprecated In favour of the "tick" event. Will be removed in a future version. Use "addEventListener" instead.
 	 **/
 	Ticker.addListener = function(o, pauseable) {
 		if (o == null) { return; }

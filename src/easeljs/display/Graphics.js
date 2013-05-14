@@ -614,10 +614,13 @@ var p = Graphics.prototype;
 	 * Begins a pattern fill using the specified image. This ends the current sub-path. A tiny API method "bf" also
 	 * exists.
 	 * @method beginBitmapFill
-	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use as the pattern.
-	 * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat", "repeat-x",
-	 * "repeat-y", or "no-repeat". Defaults to "repeat".
-	 * @param {Matrix2D} matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation will be applied relative to the parent transform.
+	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
+	 * as the pattern.
+	 * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
+	 * "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat". Note that Firefox does not support "repeat-x" or
+	 * "repeat-y" (latest tests were in FF 20.0), and will default to "repeat".
+	 * @param {Matrix2D} matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation
+	 * will be applied relative to the parent transform.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginBitmapFill = function(image, repetition, matrix) {
