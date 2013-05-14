@@ -66,6 +66,23 @@
  *	    //Update stage will render next frame
  *	    stage.update();
  *
+ * <b>Simple Interaction Example</b><br>
+ *
+ *      displayObject.addEventListener("click", handleClick);
+ *      function handleClick(event){
+ *          // Click happenened
+ *      }
+ *
+ *      displayObject.addEventListener("mousedown", handlePress);
+ *      function handlePress(event) {
+ *          // A mouse press happened.
+ *          // Listen for mouse move while the mouse is down:
+ *          event.addEventListener("mousemove", handleMove);
+ *      }
+ *      function handleMove(event) {
+ *          // Check out the DragAndDrop example in GitHub for more
+ *      }
+ *
  * <b>Simple Animation Example</b><br />
  * This example moves the shape created in the previous demo across the screen.
  *
@@ -91,6 +108,11 @@
  *      <li>{{#crossLink "SpriteSheetUtils"}}{{/crossLink}} and a {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} to
  *      help build and manage {{#crossLink "SpriteSheet"}}{{/crossLink}} functionality at run-time.</li>
  * </ul>
+ *
+ * <h4>Browser Support</h4>
+ * All modern browsers that support Canvas will support EaselJS. http://caniuse.com/canvas
+ * Browser performance may vary between platforms, for example, Android Canvas has poor hardware support, and is much
+ * slower on average than most other browsers.
  *
  * @module EaselJS
  */
@@ -286,7 +308,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display
-	 * object to twice it's nominal width.
+	 * object to twice it's nominal width. To horizontally flip an object, set the scale to a negative number.
 	 * @property scaleX
 	 * @type {Number}
 	 * @default 1
@@ -295,7 +317,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display
-	 * object to half it's nominal height.
+	 * object to half it's nominal height. To vertically flip an object, set the scale to a negative number.
 	 * @property scaleY
 	 * @type {Number}
 	 * @default 1
