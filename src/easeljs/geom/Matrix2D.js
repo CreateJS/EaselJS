@@ -364,6 +364,8 @@ var p = Matrix2D.prototype;
 		this.d *= y;
 		this.c *= x;
 		this.b *= y;
+		this.tx *= x;
+		this.ty *= y;
 		return this;
 	}
 
