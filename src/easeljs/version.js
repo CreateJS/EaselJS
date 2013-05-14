@@ -14,7 +14,7 @@ o = (o.EaselJS = o.EaselJS||{});
  * @type String
  * @static
  **/
-o.version = /*version*/"NEXT"; // injected by build process
+o.version = /*version*/"0.6.1"; // injected by build process
 
 /**
  * The build date for this release in UTC format.
@@ -22,6 +22,6 @@ o.version = /*version*/"NEXT"; // injected by build process
  * @type String
  * @static
  **/
-o.buildDate = /*date*/"Thu, 09 May 2013 18:21:47 GMT"; // injected by build process
+o.buildDate = /*date*/"Tue, 14 May 2013 21:43:02 GMT"; // injected by build process
 
 })();
