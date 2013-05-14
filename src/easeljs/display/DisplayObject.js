@@ -110,7 +110,7 @@
  * </ul>
  *
  * <h4>Browser Support</h4>
- * All modern browsers that support Canvas will support EaselJS. http://caniuse.com/canvas
+ * All modern browsers that support Canvas will support EaselJS (<a href="http://caniuse.com/canvas">http://caniuse.com/canvas</a>).
  * Browser performance may vary between platforms, for example, Android Canvas has poor hardware support, and is much
  * slower on average than most other browsers.
  *
