@@ -34,7 +34,7 @@ this.createjs = this.createjs||{};
 /**
  * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
  * {{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors. For an easier color transform,
- * consider the {{#crossLink "ColorTransform"}}{{/crossLink}} filter.
+ * consider the {{#crossLink "ColorFilter"}}{{/crossLink}}.
  *
  * <h4>Example</h4>
  * This example creates a red circle, inverts its hue, and then saturates it to brighten it up.

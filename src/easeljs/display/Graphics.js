@@ -57,10 +57,10 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
  * context of an Easel display list.
  *
  * <h4>Example</h4>
- *      var g = new Graphics();
+ *      var g = new createjs.Graphics();
  *	    g.setStrokeStyle(1);
- *	    g.beginStroke(Graphics.getRGB(0,0,0));
- *	    g.beginFill(Graphics.getRGB(255,0,0));
+ *	    g.beginStroke(createjs.Graphics.getRGB(0,0,0));
+ *	    g.beginFill(createjs.Graphics.getRGB(255,0,0));
  *	    g.drawCircle(0,0,3);
  *
  *	    var s = new Shape(g);
