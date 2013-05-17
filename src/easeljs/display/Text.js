@@ -333,7 +333,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	/** 
 	 * @method _drawTextLine
 	 * @param {CanvasRenderingContext2D} ctx
-	 * @param {Text} text
+	 * @param {String} text
 	 * @param {Number} y
 	 * @protected 
 	 **/
