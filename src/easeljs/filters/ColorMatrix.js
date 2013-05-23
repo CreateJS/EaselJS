@@ -317,9 +317,9 @@ this.createjs = this.createjs||{};
 	 * @method _cleanValue
 	 * @protected
 	 * @param {Number} value
-	 * @param {Number} value
+	 * @param {Number} limit
 	 **/
-	p._cleanValue = function(value,value) {
+	p._cleanValue = function(value,limit) {
 		return Math.min(limit,Math.max(-limit,value));
 	};
 	
