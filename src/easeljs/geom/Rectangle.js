@@ -83,6 +83,10 @@ var p = Rectangle.prototype;
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
+	 * @param {Number} [x=0] X position.
+	 * @param {Number} [y=0] Y position.
+	 * @param {Number} [width=0] The width of the Rectangle.
+	 * @param {Number} [height=0] The height of the Rectangle.
 	*/
 	p.initialize = function(x, y, width, height) {
 		this.x = (x == null ? 0 : x);

@@ -1020,6 +1020,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * @method _tick
 	 * @protected
+	 * @param params
 	 **/
 	p._tick = function(params) {
 		this.onTick&&this.onTick.apply(this, params);

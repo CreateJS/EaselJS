@@ -144,6 +144,8 @@ var Touch = function() {
 	 * @method _IOS_handleEvent
 	 * @protected
 	 * @static
+	 * @param {Stage} stage
+	 * @param e
 	 **/
 	Touch._IOS_handleEvent = function(stage, e) {
 		if (!stage) { return; }
@@ -201,6 +203,8 @@ var Touch = function() {
 	/**
 	 * @method _IE_handleEvent
 	 * @protected
+	 * @param {Stage} stage
+	 * @param e
 	 * @static
 	 **/
 	Touch._IE_handleEvent = function(stage, e) {
@@ -228,6 +232,11 @@ var Touch = function() {
 	/**
 	 * @method _handleStart
 	 * @protected
+	 * @param {Stage} stage
+	 * @param {Number} id
+	 * @param e
+	 * @param {Number} x
+	 * @param {Number} y
 	 **/
 	Touch._handleStart = function(stage, id, e, x, y) {
 		var props = stage.__touch;
@@ -242,6 +251,11 @@ var Touch = function() {
 	/**
 	 * @method _handleMove
 	 * @protected
+	 * @param {Stage} stage
+	 * @param {Number} id
+	 * @param e
+	 * @param {Number} x
+	 * @param {Number} y
 	 **/
 	Touch._handleMove = function(stage, id, e, x, y) {
 		if (!stage.__touch.pointers[id]) { return; }
@@ -251,6 +265,9 @@ var Touch = function() {
 	/**
 	 * @method _handleEnd
 	 * @protected
+	 * @param {Stage} stage
+	 * @param {Number} id
+	 * @param e
 	 **/
 	Touch._handleEnd = function(stage, id, e) {
 		// TODO: cancel should be handled differently for proper UI (ex. an up would trigger a click, a cancel would more closely resemble an out).

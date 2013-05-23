@@ -205,13 +205,6 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.mouseMoveOutside = false;
 	
-	/**
-	 * The hitArea property is not supported for Stage.
-	 * @property hitArea
-	 * @type {DisplayObject}
-	 * @default null
-	 */
-
 // private properties:
 
 	/**
@@ -233,7 +226,7 @@ var p = Stage.prototype = new createjs.Container();
 	
 	/**
 	 * Number of active pointers.
-	 * @property _pointerCount
+	 * @property _primaryPointerID
 	 * @type {Object}
 	 * @private
 	 */
@@ -248,7 +241,7 @@ var p = Stage.prototype = new createjs.Container();
 
 // constructor:
 	/**
-	 * @property DisplayObject_initialize
+	 * @property Container_initialize
 	 * @type Function
 	 * @private
 	 **/

@@ -243,7 +243,7 @@ var p = MovieClip.prototype = new createjs.Container();
 // constructor:
 
 	/**
-	 * @property DisplayObject_initialize
+	 * @property Container_initialize
 	 * @type Function
     * @private
 	 **/
@@ -253,6 +253,11 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * Initialization method called by the constructor.
 	 * @method initialize
 	 * @protected
+	 * @param {String} [mode=independent] Initial value for the mode property. One of MovieClip.INDEPENDENT,
+	 * MovieClip.SINGLE_FRAME, or MovieClip.SYNCHED. The default is MovieClip.INDEPENDENT.
+	 * @param {Number} [startPosition=0] Initial value for the startPosition property.
+	 * @param {Boolean} [loop=true] Initial value for the loop property. The default is true.
+	 * @param {Object} [labels=null] A hash of labels to pass to the timeline instance associated with this MovieClip.
 	 **/
 	p.initialize = function(mode, startPosition, loop, labels) {
 		this.mode = mode||MovieClip.INDEPENDENT;
@@ -293,6 +298,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
+	 * @param _mtx
 	 **/
 	p.draw = function(ctx, ignoreCache, _mtx) {
 		// draw to cache first:
@@ -368,6 +374,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	/**
 	 * @method _tick
 	 * @private
+	 * @param params
 	 **/
 	p._tick = function(params) {
 		if (!this.paused && this.mode == MovieClip.INDEPENDENT) {
@@ -379,6 +386,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	/**
 	 * @method _goto
 	 * @private
+	 * @param {Number|String} positionOrLabel
 	 **/
 	p._goto = function(positionOrLabel) {
 		var pos = this.timeline.resolve(positionOrLabel);
@@ -451,6 +459,8 @@ var p = MovieClip.prototype = new createjs.Container();
 	/**
 	 * @method _setState
 	 * @private
+	 * @param state
+	 * @param offset
 	 **/
 	p._setState = function(state, offset) {
 		if (!state) { return; }
@@ -467,6 +477,8 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * Adds a child to the timeline, and sets it up as a managed child.
 	 * @method _addManagedChild
 	 * @private
+	 * @param {DisplayObject} child
+	 * @param {Number} offset
 	 **/
 	p._addManagedChild = function(child, offset) {
 		if (child._off) { return; }
@@ -513,6 +525,9 @@ createjs.MovieClip = MovieClip;
 	/**
 	 * @method init
 	 * @private
+	 * @param tween
+	 * @param prop
+	 * @param value
 	 **/
 	MovieClipPlugin.init = function(tween, prop, value) {
 		return value;
@@ -529,6 +544,14 @@ createjs.MovieClip = MovieClip;
 	/** 
 	 * @method tween
 	 * @private
+	 * @param tween
+	 * @param prop
+	 * @param value
+	 * @param startValues
+	 * @param endValues
+	 * @param ratio
+	 * @param wait
+	 * @param end
 	 **/
 	MovieClipPlugin.tween = function(tween, prop, value, startValues, endValues, ratio, wait, end) {
 		if (!(tween.target instanceof MovieClip)) { return value; }

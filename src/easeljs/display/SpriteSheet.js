@@ -244,6 +244,7 @@ var p = SpriteSheet.prototype;
 	/**
 	 * @method initialize
 	 * @protected
+	 * @param data
 	 **/
 	p.initialize = function(data) {
 		var i,l,o,a;

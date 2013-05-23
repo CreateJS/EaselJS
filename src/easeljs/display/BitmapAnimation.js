@@ -184,6 +184,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
+	 * @param {SpriteSheet} spriteSheet
 	*/
 	p.initialize = function(spriteSheet) {
 		this.DisplayObject_initialize();
@@ -350,6 +351,7 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * ticks.
 	 * @protected
 	 * @method _tick
+	 * @param params
 	 **/
 	p._tick = function(params) {
 		var f = this._animation ? this._animation.frequency : 1;
