@@ -430,8 +430,10 @@ var p = SpriteSheetBuilder.prototype;
 	}
 	
 	/**
-	 * @method _fillRow
+	 * @method _getSize
 	 * @protected
+	 * @param {Number} size
+	 * @param {Number} max
 	 * @return {Number} The width & height of the row.
 	 **/
 	p._getSize = function(size,max) {
@@ -443,6 +445,11 @@ var p = SpriteSheetBuilder.prototype;
 	/**
 	 * @method _fillRow
 	 * @protected
+	 * @param {Number} frames
+	 * @param {Number} y
+	 * @param {Image} img
+	 * @param {Array} dataFrames
+	 * @param {Number} pad
 	 * @return {Number} The width & height of the row.
 	 **/
 	p._fillRow = function(frames, y, img, dataFrames, pad) {
