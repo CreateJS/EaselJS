@@ -84,6 +84,11 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * @protected
 	 */
 	p._oldMtx = null;
+	/**
+	 * @property _oldVisible
+	 * @protected
+	 */
+	p._oldVisible = null;
 
 // constructor:
 	/**
@@ -139,8 +144,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 		var style = o.style;
 		
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
-		if (this.visible) { style.visibility = "visible"; }
-		else { return true; }
+		if (!this.visible){ return true; }
 		
 		var oMtx = this._oldMtx||{};
 		if (oMtx.alpha != mtx.alpha) { style.opacity = ""+mtx.alpha; oMtx.alpha = mtx.alpha; }
@@ -255,8 +259,29 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * @protected
 	 */
 	p._tick = function(params) {
-		// TODO: figure out how to get around this.
-		this.htmlElement.style.visibility = "hidden";
+		// If visible, search in parents, if not, apply.
+		if(this.visible == true){
+			// Loops through parents and search for visible = false.
+			var o = this;
+			var visible = true;
+			while (o.parent) {
+				o = o.parent;
+				if(o.visible == false){
+					var visible = false;
+					break;
+				}
+			}
+		}else{
+			visible = false;
+		}
+		if(this._oldVisible != visible){
+			if(visible){
+				this.htmlElement.style.visibility = "visible";
+			}else{ 
+				this.htmlElement.style.visibility = "hidden";
+			}
+			this._oldVisible = visible;
+		}
 		this.DisplayObject__tick(params);
 	};
 
