@@ -187,18 +187,23 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	/**
 	 * Not applicable to DOMElement.
 	 * @method globalToLocal
+	 * @return {Point} A Point instance with x and y properties correlating to the transformed position in the
+	 * display object's coordinate space.
 	 */
 	p.globalToLocal = function() {};
 
 	/**
 	 * Not applicable to DOMElement.
 	 * @method localToLocal
+	 * @return {Point} A Point instance with x and y properties correlating to the transformed position in the
+	 * display object's coordinate space.
 	 */
 	p.localToLocal = function() {};
 
 	/**
 	 * DOMElement cannot be cloned. Throws an error.
 	 * @method clone
+	 * @return {DOMElement}
 	 */
 	p.clone = function() {
 		throw("DOMElement cannot be cloned.")

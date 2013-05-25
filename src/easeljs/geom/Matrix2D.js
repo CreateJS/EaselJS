@@ -466,7 +466,7 @@ var p = Matrix2D.prototype;
 
 	/**
 	 * Reinitializes all matrix properties to those specified.
-	 * @method appendProperties
+	 * @method reinitialize
 	 * @param {Number} a
 	 * @param {Number} b
 	 * @param {Number} c

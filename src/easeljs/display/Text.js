@@ -156,7 +156,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @protected
 	 * @param {String} text
 	 * @param {String} font
-	 * @param (String) color
+	 * @param {String} color
 	*/
 	p.initialize = function(text, font, color) {
 		this.DisplayObject_initialize();

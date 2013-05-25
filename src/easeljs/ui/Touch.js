@@ -185,7 +185,7 @@ var Touch = function() {
 	};
 	
 	/**
-	 * @method _IE_enable
+	 * @method _IE_disable
 	 * @protected
 	 * @param {Stage} stage
 	 * @static
