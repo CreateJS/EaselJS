@@ -104,6 +104,10 @@ this.createjs = this.createjs||{};
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
+	 * @param {Number} brightness
+	 * @param {Number} contrast
+	 * @param {Number} saturation
+	 * @param {Number} hue
 	 */
 	p.initialize = function(brightness,contrast,saturation,hue) {
 		this.reset();
@@ -289,6 +293,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * @method _multiplyMatrix
 	 * @protected
+	 * @param matrix
 	 **/
 	p._multiplyMatrix = function(matrix) {
 		var col = [];
@@ -311,6 +316,8 @@ this.createjs = this.createjs||{};
 	 * Make sure values are within the specified range, hue has a limit of 180, brightness is 255, others are 100.
 	 * @method _cleanValue
 	 * @protected
+	 * @param {Number} value
+	 * @param {Number} limit
 	 **/
 	p._cleanValue = function(value,limit) {
 		return Math.min(limit,Math.max(-limit,value));
@@ -321,6 +328,7 @@ this.createjs = this.createjs||{};
 	 * Makes sure matrixes are 5x5 (25 long).
 	 * @method _fixMatrix
 	 * @protected
+	 * @param matrix
 	 **/
 	p._fixMatrix = function(matrix) {
 		if (matrix instanceof ColorMatrix) { matrix = matrix.slice(0); }

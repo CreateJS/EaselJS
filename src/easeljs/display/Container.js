@@ -501,6 +501,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	/**
 	 * @method _tick
 	 * @protected
+	 * @param params
 	 **/
 	p._tick = function(params) {
 		for (var i=this.children.length-1; i>=0; i--) {

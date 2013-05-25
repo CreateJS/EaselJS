@@ -68,6 +68,8 @@ var p = Point.prototype;
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
+	 * @param {Number} [x=0] X position.
+	 * @param {Number} [y=0] Y position.
 	*/
 	p.initialize = function(x, y) {
 		this.x = (x == null ? 0 : x);

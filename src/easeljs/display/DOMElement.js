@@ -97,7 +97,8 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
-	*/
+	 * @param {HTMLElement} htmlElement
+	**/
 	p.initialize = function(htmlElement) {
 		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
 		this.DisplayObject_initialize();
@@ -186,18 +187,23 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	/**
 	 * Not applicable to DOMElement.
 	 * @method globalToLocal
+	 * @return {Point} A Point instance with x and y properties correlating to the transformed position in the
+	 * display object's coordinate space.
 	 */
 	p.globalToLocal = function() {};
 
 	/**
 	 * Not applicable to DOMElement.
 	 * @method localToLocal
+	 * @return {Point} A Point instance with x and y properties correlating to the transformed position in the
+	 * display object's coordinate space.
 	 */
 	p.localToLocal = function() {};
 
 	/**
 	 * DOMElement cannot be cloned. Throws an error.
 	 * @method clone
+	 * @return {DOMElement}
 	 */
 	p.clone = function() {
 		throw("DOMElement cannot be cloned.")
@@ -253,6 +259,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	/**
 	 * @method _tick
 	 * @protected
+	 * @param params
 	 */
 	p._tick = function(params) {
 		// TODO: figure out how to get around this.

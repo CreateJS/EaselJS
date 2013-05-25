@@ -114,7 +114,7 @@ var p = ButtonHelper.prototype;
 	p._isPressed = false;
 	
 	/**
-	 * @property _isPressed
+	 * @property _isOver
 	 * @type Boolean
 	 * @protected
 	 **/
@@ -125,6 +125,17 @@ var p = ButtonHelper.prototype;
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
+	 * @param {BitmapAnimation|MovieClip} target The instance to manage.
+	 * @param {String} [outLabel="out"] The label or animation to go to when the user rolls out of the button.
+	 * @param {String} [overLabel="over"] The label or animation to go to when the user rolls over the button.
+	 * @param {String} [downLabel="down"] The label or animation to go to when the user presses the button.
+	 * @param {Boolean} [play=false] If the helper should call "gotoAndPlay" or "gotoAndStop" on the button when changing
+	 * states.
+	 * @param {DisplayObject} [hitArea] An optional item to use as the hit state for the button. If this is not defined,
+	 * then the button's visible states will be used instead. Note that the same instance as the "target" argument can be
+	 * used for the hitState.
+	 * @param {String} [hitLabel] The label or animation on the hitArea instance that defines the hitArea bounds. If this is
+	 * null, then the default state of the hitArea will be used.
 	 **/
 	p.initialize = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
 		if (!target.addEventListener) { return; }
@@ -178,6 +189,7 @@ var p = ButtonHelper.prototype;
 	/**
 	 * @method handleEvent
 	 * @protected
+	 * @param evt
 	 **/
 	p.handleEvent = function(evt) {
 		var label, t = this.target, type = evt.type;

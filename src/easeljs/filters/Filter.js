@@ -113,7 +113,7 @@ var p = Filter.prototype;
 	/**
 	 * Returns a clone of this Filter instance.
 	 * @method clone
-	 @return {Filter} A clone of the current Filter instance.
+	 * @return {Filter} A clone of the current Filter instance.
 	 **/
 	p.clone = function() {
 		return new Filter();

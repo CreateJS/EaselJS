@@ -154,6 +154,9 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
+	 * @param {String} text
+	 * @param {String} font
+	 * @param {String} color
 	*/
 	p.initialize = function(text, font, color) {
 		this.DisplayObject_initialize();
@@ -293,8 +296,9 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 
 	/**
 	 * Draws multiline text.
-	 * @method _getWorkingContext
+	 * @method _drawText
 	 * @protected
+	 * @param {CanvasRenderingContext2D} ctx
 	 * @return {Number} The number of lines drawn.
 	 **/
 	p._drawText = function(ctx) {

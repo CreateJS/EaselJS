@@ -141,6 +141,12 @@ var p = Matrix2D.prototype;
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
+	 * @param {Number} a
+	 * @param {Number} b
+	 * @param {Number} c
+	 * @param {Number} d
+	 * @param {Number} tx
+	 * @param {Number} ty
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
 	p.initialize = function(a, b, c, d, tx, ty) {
@@ -460,7 +466,7 @@ var p = Matrix2D.prototype;
 
 	/**
 	 * Reinitializes all matrix properties to those specified.
-	 * @method appendProperties
+	 * @method reinitialize
 	 * @param {Number} a
 	 * @param {Number} b
 	 * @param {Number} c
