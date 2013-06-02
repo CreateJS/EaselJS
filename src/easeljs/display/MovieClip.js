@@ -298,7 +298,6 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
-	 * @param _mtx
 	 **/
 	p.draw = function(ctx, ignoreCache, _mtx) {
 		// draw to cache first:
