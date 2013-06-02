@@ -407,7 +407,7 @@ var p = DisplayObject.prototype;
 	 * If an onPress handler is set on a container, it will receive the event if any of its children are clicked.
 	 * @property onPress
 	 * @type {Function}
-	 * @deprecated In favour of the "mousedown" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "mousedown" event. Will be removed in a future version.
 	 */
 	p.onPress = null;	 
 	 
@@ -417,7 +417,7 @@ var p = DisplayObject.prototype;
 	 * onClick handler is set on a container, it will receive the event if any of its children are clicked.
 	 * @property onClick
 	 * @type {Function}
-	 * @deprecated In favour of the "click" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "click" event. Will be removed in a future version.
 	 */
 	p.onClick = null;
 
@@ -427,7 +427,7 @@ var p = DisplayObject.prototype;
 	 * on a container, it will receive the event if any of its children are clicked.
 	 * @property onDoubleClick
 	 * @type {Function}
-	 * @deprecated In favour of the "dblClick" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "dblClick" event. Will be removed in a future version.
 	 */
 	p.onDoubleClick = null;
 
@@ -436,7 +436,7 @@ var p = DisplayObject.prototype;
 	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
 	 * @property onMouseOver
 	 * @type {Function}
-	 * @deprecated In favour of the "mouseover" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "mouseover" event. Will be removed in a future version.
 	 */
 	p.onMouseOver = null;
 
@@ -445,7 +445,7 @@ var p = DisplayObject.prototype;
 	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
 	 * @property onMouseOut
 	 * @type {Function}
-	 * @deprecated In favour of the "mouseout" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "mouseout" event. Will be removed in a future version.
 	 */
 	p.onMouseOut = null;
 	 
@@ -459,7 +459,7 @@ var p = DisplayObject.prototype;
 	 * `stage.update("hello")`, all of the display objects with a handler will have `onTick("hello")` called.
 	 * @property onTick
 	 * @type {Function}
-	 * @deprecated In favour of the "tick" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "tick" event. Will be removed in a future version.
 	 */
 	p.onTick = null;
 
