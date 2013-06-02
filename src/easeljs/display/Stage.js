@@ -232,7 +232,6 @@ var p = Stage.prototype = new createjs.Container();
 	p._pointerCount = 0;
 	
 	/**
-	 * Number of active pointers.
 	 * @property _primaryPointerID
 	 * @type {Object}
 	 * @private
