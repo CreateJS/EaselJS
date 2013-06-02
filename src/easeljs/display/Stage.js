@@ -147,7 +147,7 @@ var p = Stage.prototype = new createjs.Container();
 	 * containing the corresponding MouseEvent instance.
 	 * @property onMouseMove
 	 * @type Function
-	 * @deprecated In favour of the "stagemousemove" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "stagemousemove" event. Will be removed in a future version.
 	 */
 	p.onMouseMove = null;
 	 
@@ -156,7 +156,7 @@ var p = Stage.prototype = new createjs.Container();
 	 * is passed a single param containing the corresponding MouseEvent instance.
 	 * @property onMouseUp
 	 * @type Function
-	 * @deprecated In favour of the "stagemouseup" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "stagemouseup" event. Will be removed in a future version.
 	 */
 	p.onMouseUp = null;
 	 
@@ -165,7 +165,7 @@ var p = Stage.prototype = new createjs.Container();
 	 * param containing the corresponding MouseEvent instance.
 	 * @property onMouseDown
 	 * @type Function
-	 * @deprecated In favour of the "stagemousedown" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "stagemousedown" event. Will be removed in a future version.
 	 */
 	p.onMouseDown = null;
 

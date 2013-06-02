@@ -223,7 +223,7 @@ var Ticker = function() {
 	 * @param {Object} o The object or function to add as a listener.
 	 * @param {Boolean} pauseable If false, the listener will continue to have tick called 
 	 * even when Ticker is paused via Ticker.pause(). Default is true.
-	 * @deprecated In favour of the "tick" event. Will be removed in a future version. Use "addEventListener" instead.
+	 * @deprecated In favour of addEventListener and the "tick" event. Will be removed in a future version.
 	 **/
 	Ticker.addListener = function(o, pauseable) {
 		if (o == null) { return; }

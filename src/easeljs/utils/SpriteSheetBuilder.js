@@ -139,19 +139,12 @@ var p = SpriteSheetBuilder.prototype;
 	 * @default -1
 	 **/
 	p.progress = -1;
-	
-	/**
-	 * 
-	 * @property onComplete
-	 * @type Function
-	 * @default null
-	 **/
 	 
 	/**
 	 * Callback function to call when a build completes. Called with a single parameter pointing back to this instance.
 	 * @property onComplete
 	 * @type Function
-	 * @deprecated In favour of the "complete" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "complete" event. Will be removed in a future version.
 	 */
 	p.onComplete = null;
 	 
@@ -160,7 +153,7 @@ var p = SpriteSheetBuilder.prototype;
 	 * instance, and the current progress value (0-1).
 	 * @property onProgress
 	 * @type Function
-	 * @deprecated In favour of the "progress" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "progress" event. Will be removed in a future version.
 	 */
 	p.onProgress = null;
 	
