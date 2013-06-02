@@ -60,7 +60,7 @@ this.createjs = this.createjs||{};
  **/
 var Ticker = function() {
 	throw "Ticker cannot be instantiated.";
-}
+};
 
 // events:
 
@@ -230,7 +230,7 @@ var Ticker = function() {
 		Ticker.removeListener(o);
 		Ticker._pauseable[Ticker._listeners.length] = (pauseable == null) ? true : pauseable;
 		Ticker._listeners.push(o);
-	}
+	};
 	
 	/**
 	 * Initializes or resets the timer, clearing all associated listeners and fps measuring data, starting the tick.
@@ -246,7 +246,7 @@ var Ticker = function() {
 		Ticker._listeners = [];
 		Ticker._times.push(Ticker._lastTime = Ticker._startTime = Ticker._getTime());
 		Ticker.setInterval(Ticker._interval);
-	}
+	};
 	
 	/**
 	 * Removes the specified listener.
@@ -264,7 +264,7 @@ var Ticker = function() {
 			listeners.splice(index, 1);
 			Ticker._pauseable.splice(index, 1);
 		}
-	}
+	};
 	
 	/**
 	 * Removes all listeners.
@@ -276,7 +276,7 @@ var Ticker = function() {
 	Ticker.removeAllListeners = function() {
 		Ticker._listeners = [];
 		Ticker._pauseable = [];
-	}
+	};
 	
 	/**
 	 * Sets the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
@@ -290,7 +290,7 @@ var Ticker = function() {
 		Ticker._interval = interval;
 		if (!Ticker._inited) { return; }
 		Ticker._setupTick();
-	}
+	};
 	
 	/**
 	 * Returns the current target time between ticks, as set with {{#crossLink "Ticker/setInterval"}}{{/crossLink}}.
@@ -300,7 +300,7 @@ var Ticker = function() {
 	 **/
 	Ticker.getInterval = function() {
 		return Ticker._interval;
-	}
+	};
 	
 	/**
 	 * Sets the target frame rate in frames per second (FPS). For example, with an interval of 40, <code>getFPS()</code>
@@ -311,7 +311,7 @@ var Ticker = function() {
 	 **/	
 	Ticker.setFPS = function(value) {
 		Ticker.setInterval(1000/value);
-	}
+	};
 	
 	/**
 	 * Returns the target frame rate in frames per second (FPS). For example, with an interval of 40, <code>getFPS()</code>
@@ -322,7 +322,34 @@ var Ticker = function() {
 	 **/
 	Ticker.getFPS = function() {
 		return 1000/Ticker._interval;
-	}
+	};
+	
+	/**
+	 * Returns the average time spent within a tick. This can vary significantly from the value provided by getMeasuredFPS
+	 * because it only measures the time spent within the tick execution stack. 
+	 * 
+	 * Example 1: With a target FPS of 20, getMeasuredFPS() returns 20fps, which indicates an average of 50ms between 
+	 * the end of one tick and the end of the next. However, getMeasuredTickTime() returns 15ms. This indicates that 
+	 * there may be up to 35ms of "idle" time between the end of one tick and the start of the next.
+	 * 
+	 * Example 2: With a target FPS of 30, getFPS() returns 10fps, which indicates an average of 100ms between the end of
+	 * one tick and the end of the next. However, getMeasuredTickTime() returns 20ms. This would indicate that something
+	 * other than the tick is using ~80ms (another script, DOM rendering, etc).
+	 * @method getMeasuredTickTime
+	 * @static
+	 * @param {Number} [ticks] The number of previous ticks over which to measure the average time spent in a tick.
+	 * Defaults to the number of ticks per second. To get only the last tick's time, pass in 1.
+	 * @return {Number} The average time spent in a tick in milliseconds.
+	 **/
+	Ticker.getMeasuredTickTime = function(ticks) {
+		var ttl=0, times=Ticker._tickTimes;
+		if (times.length < 1) { return -1; }
+		
+		// by default, calculate average for the past ~1 second:
+		ticks = Math.min(times.length, ticks||(Ticker.getFPS()|0));
+		for (var i=0; i<ticks; i++) { ttl += times[i]; }
+		return times/ticks;
+	};
 	
 	/**
 	 * Returns the actual frames / ticks per second.
@@ -334,13 +361,13 @@ var Ticker = function() {
 	 * from the target frames per second.
 	 **/
 	Ticker.getMeasuredFPS = function(ticks) {
-		if (Ticker._times.length < 2) { return -1; }
+		var times = Ticker._times;
+		if (times.length < 2) { return -1; }
 		
-		// by default, calculate fps for the past 1 second:
-		if (ticks == null) { ticks = Ticker.getFPS()|0; }
-		ticks = Math.min(Ticker._times.length-1, ticks);
-		return 1000/((Ticker._times[0]-Ticker._times[ticks])/ticks);
-	}
+		// by default, calculate fps for the past ~1 second:
+		ticks = Math.min(times.length-1, ticks||(Ticker.getFPS()|0));
+		return 1000/((times[0]-times[ticks])/ticks);
+	};
 	
 	/**
 	 * Changes the "paused" state of the Ticker, which can be retrieved by the {{#crossLink "Ticker/getPaused"}}{{/crossLink}}
@@ -363,7 +390,7 @@ var Ticker = function() {
 	 **/
 	Ticker.setPaused = function(value) {
 		Ticker._paused = value;
-	}
+	};
 	
 	/**
 	 * Returns a boolean indicating whether Ticker is currently paused, as set with {{#crossLink "Ticker/setPaused"}}{{/crossLink}}.
