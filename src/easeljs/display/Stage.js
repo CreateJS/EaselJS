@@ -474,11 +474,11 @@ var p = Stage.prototype = new createjs.Container();
 		var data = this._pointerData[id];
 		if (!data) {
 			data = this._pointerData[id] = {x:0,y:0};
-			// if it's the mouse (id == -1) or the first new touch, then make it the primary pointer id:
-			if (this._primaryPointerID == null || this._primaryPointerID == -1) { this._primaryPointerID = id; }
+			// if it's the first new touch, then make it the primary pointer id:
+			if (this._primaryPointerID == null) { this._primaryPointerID = id; }
 		}
 		return data;
-	}
+	};
 
 	/**
 	 * @method _handleMouseMove
@@ -488,7 +488,7 @@ var p = Stage.prototype = new createjs.Container();
 	p._handleMouseMove = function(e) {
 		if(!e){ e = window.event; }
 		this._handlePointerMove(-1, e, e.pageX, e.pageY);
-	}
+	};
 	
 	/**
 	 * @method _handlePointerMove
