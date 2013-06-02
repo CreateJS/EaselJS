@@ -205,6 +205,13 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.mouseMoveOutside = false;
 	
+	/**
+	* The hitArea property is not supported for Stage.
+	* @property hitArea
+	* @type {DisplayObject}
+	* @default null
+	*/
+	
 // private properties:
 
 	/**
