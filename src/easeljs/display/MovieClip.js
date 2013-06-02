@@ -294,11 +294,11 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
-	p.draw = function(ctx, ignoreCache, _mtx) {
+	p.draw = function(ctx, ignoreCache) {
 		// draw to cache first:
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this._updateTimeline();
-		this.Container_draw(ctx, ignoreCache, _mtx);
+		this.Container_draw(ctx, ignoreCache);
 	}
 	
 	
