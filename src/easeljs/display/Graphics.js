@@ -1319,11 +1319,11 @@ var p = Graphics.prototype;
 		this._appendInstructions(this._activeInstructions);
 		
 		
-		if (this._strokeInstructions) {
-			this._appendDraw(Graphics.strokeCmd, this._strokeIgnoreScale&&[1,0,0,1,0,0]);
-		}
 		if (this._fillInstructions) {
 			this._appendDraw(Graphics.fillCmd, this._fillMatrix);
+		}
+		if (this._strokeInstructions) {
+			this._appendDraw(Graphics.strokeCmd, this._strokeIgnoreScale&&[1,0,0,1,0,0]);
 		}
 		
 	};
