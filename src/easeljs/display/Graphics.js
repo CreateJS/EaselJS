@@ -48,7 +48,7 @@ function Command(f, params, path) {
 * @protected
 * @param {Object} scope
 **/
-Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); }
+Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); };
 
 /**
  * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a
@@ -278,11 +278,11 @@ var p = Graphics.prototype;
 	p._strokeStyleInstructions = null;
 	
 	/**
-	 * @property _ignoreScaleStroke
+	 * @property _strokeIgnoreScale
 	 * @protected
 	 * @type Boolean
 	 **/
-	p._ignoreScaleStroke = false;
+	p._strokeIgnoreScale = false;
 	
 	/**
 	 * @property _fillInstructions
@@ -290,6 +290,13 @@ var p = Graphics.prototype;
 	 * @type {Array}
 	 **/
 	p._fillInstructions = null;
+	
+	/**
+	 * @property _strokeMatrix
+	 * @protected
+	 * @type {Array}
+	 **/
+	p._fillMatrix = null;
 	
 	/**
 	 * @property _instructions
@@ -533,8 +540,8 @@ var p = Graphics.prototype;
 		this._instructions = [];
 		this._oldInstructions = [];
 		this._activeInstructions = [];
-		this._strokeStyleInstructions = this._strokeInstructions = this._fillInstructions = null;
-		this._active = this._dirty = false;
+		this._strokeStyleInstructions = this._strokeInstructions = this._fillInstructions = this._fillMatrix = null;
+		this._active = this._dirty = this._strokeIgnoreScale = false;
 		return this;
 	};
 	
@@ -547,7 +554,8 @@ var p = Graphics.prototype;
 	 **/
 	p.beginFill = function(color) {
 		if (this._active) { this._newPath(); }
-		this._fillInstructions = color ? [new Command(this._setProp, ["fillStyle", color], false), Graphics.fillCmd] : null;
+		this._fillInstructions = color ? [new Command(this._setProp, ["fillStyle", color], false)] : null;
+		this._fillMatrix = null;
 		return this;
 	};
 	
@@ -576,7 +584,8 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false), Graphics.fillCmd];
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
+		this._fillMatrix = null;
 		return this;
 	};
 	
@@ -606,7 +615,8 @@ var p = Graphics.prototype;
 		for (var i=0, l=colors.length; i<l; i++) {
 			o.addColorStop(ratios[i], colors[i]);
 		}
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false), Graphics.fillCmd];
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
+		this._fillMatrix = null;
 		return this;
 	};
 	
@@ -627,20 +637,8 @@ var p = Graphics.prototype;
 		if (this._active) { this._newPath(); }
 		repetition = repetition || "";
 		var o = this._ctx.createPattern(image, repetition);
-		var cmd = new Command(this._setProp, ["fillStyle", o], false);
-		var arr;
-		if (matrix) {
-			arr = [
-				cmd,
-				new Command(this._ctx.save, [], false),
-				new Command(this._ctx.transform, [matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty], false),
-				Graphics.fillCmd,
-				new Command(this._ctx.restore, [], false)
-			];
-		} else {
-			arr = [cmd, Graphics.fillCmd];
-		}
-		this._fillInstructions = arr;
+		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
+		this._fillMatrix = matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty] : null;
 		return this;
 	};
 	
@@ -683,7 +681,7 @@ var p = Graphics.prototype;
 			new Command(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))], false),
 			new Command(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)], false)
 			];
-		this._ignoreScaleStroke = ignoreScale;
+		this._strokeIgnoreScale = ignoreScale;
 		return this;
 	};
 	
@@ -926,6 +924,53 @@ var p = Graphics.prototype;
 	};
 	
 	/**
+	 * Provides a method for injecting arbitrary Context2D (aka Canvas) API calls into a Graphics queue. The specified
+	 * callback function will be called in sequence with other drawing instructions. The callback will be executed in the
+	 * scope of the target canvas's Context2D object, and will be passed the data object as a parameter.
+	 * 
+	 * This is an advanced feature. It can allow for powerful functionality, like injecting output from tools that
+	 * export Context2D instructions, executing raw canvas calls within the context of the display list, or dynamically 
+	 * modifying colors or stroke styles within a Graphics instance over time, but it is not intended for general use.
+	 * 
+	 * Within a Graphics queue, each path begins by applying the fill and stroke styles and settings, followed by
+	 * drawing instructions, followed by the fill() and/or stroke() commands. This means that within a path, inject() can
+	 * update the fill & stroke styles, but for it to be applied in a predictable manner, you must have begun a fill or
+	 * stroke (as appropriate) normally via the Graphics API. For example:
+	 * 
+	 * 	function setColor(color) {
+	 * 		this.fillStyle = color;
+	 * 	}
+	 * 	
+	 * 	// this will not draw anything - no fill was begun, so fill() is not called:
+	 * 	myGraphics.inject(setColor, "red").drawRect(0,0,100,100);
+	 * 	
+	 * 	// this will draw the rect in green:
+	 * 	myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100);
+	 * 	
+	 * 	// this will draw both rects in blue, because there is only a single path
+	 * 	// so the second inject overwrites the first:
+	 * 	myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100)
+	 * 		.inject(setColor, "blue").drawRect(100,0,100,100);
+	 * 		
+	 * 	// this will draw the first rect in green, and the second in blue:
+	 * 	myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100)
+	 * 		.beginFill("#000").inject(setColor, "blue").drawRect(100,0,100,100);
+	 * 
+	 * @method inject
+	 * @param {Function} callback The function to execute.
+	 * @param {Object} data Arbitrary data that will be passed to the callback when it is executed.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 **/
+	p.inject = function(callback, data) {
+		this._dirty = this._active = true;
+		
+		this._activeInstructions.push(
+			new Command(callback, [data])
+		);
+		return this;
+	};
+	
+	/**
 	 * Draws a star if pointSize is greater than 0, or a regular polygon if pointSize is 0 with the specified number of
 	 * points. For example, the following code will draw a familiar 5 pointed star shape centered at 100, 100 and with a
 	 * radius of 50:
@@ -1052,6 +1097,8 @@ var p = Graphics.prototype;
 		if (this._strokeStyleInstructions) { o._strokeStyleInstructions = this._strokeStyleInstructions.slice(); }
 		o._active = this._active;
 		o._dirty = this._dirty;
+		o._fillMatrix = this._fillMatrix;
+		o._strokeIgnoreScale = this._strokeIgnoreScale;
 		return o;
 	};
 		
@@ -1265,24 +1312,43 @@ var p = Graphics.prototype;
 		this._instructions = this._oldInstructions.slice();
 		this._instructions.push(Graphics.beginCmd);
 		
-		this._instructions.push.apply(this._instructions, this._activeInstructions);
+		this._appendInstructions(this._fillInstructions);
+		this._appendInstructions(this._strokeInstructions&&this._strokeStyleInstructions);
+		this._appendInstructions(this._strokeInstructions);
 		
-		if (this._fillInstructions) { this._instructions.push.apply(this._instructions, this._fillInstructions); }
+		this._appendInstructions(this._activeInstructions);
+		
+		
 		if (this._strokeInstructions) {
-			if (this._strokeStyleInstructions) {
-				this._instructions.push.apply(this._instructions, this._strokeStyleInstructions);
-			}
-			this._instructions.push.apply(this._instructions, this._strokeInstructions);
-			if (this._ignoreScaleStroke) {
-				this._instructions.push(
-					new Command(this._ctx.save, [], false),
-					new Command(this._ctx.setTransform, [1,0,0,1,0,0], false),
-					Graphics.strokeCmd,
-					new Command(this._ctx.restore, [], false)
-				);
-			} else {
-				this._instructions.push(Graphics.strokeCmd);
-			}
+			this._appendDraw(Graphics.strokeCmd, this._strokeIgnoreScale&&[1,0,0,1,0,0]);
+		}
+		if (this._fillInstructions) {
+			this._appendDraw(Graphics.fillCmd, this._fillMatrix);
+		}
+		
+	};
+	
+	/**
+	 * @method _appendInstructions
+	 * @protected
+	 **/
+	p._appendInstructions = function(instructions) {
+		if (instructions) { this._instructions.push.apply(this._instructions, instructions); }
+	};
+	
+	/**
+	 * @method _appendDraw
+	 * @protected
+	 **/
+	p._appendDraw = function(command, matrixArr) {
+		if (!matrixArr) { this._instructions.push(command); }
+		else {
+			this._instructions.push(
+				new Command(this._ctx.save, [], false),
+				new Command(this._ctx.setTransform, matrixArr, false),
+				command,
+				new Command(this._ctx.restore, [], false)
+			);
 		}
 	};
 	
