@@ -204,9 +204,43 @@ var p = MovieClip.prototype = new createjs.Container();
 	 */
 	p.autoReset = true;
 	
+// private properties:	
 	
+	/**
+	 * If true, this MovieClip will advance the timeline according to time elapsed, not frames.
+	 * @property _framerateIndependent
+	 * @type Boolean
+	 * @default false
+	 * @private
+	 */
+	p._framerateIndependent = false;
 	
-// private properties:
+	/**
+	 * When _framerateIndependent is true, this is the MovieClip's target animation rate - the rate at which the animation was created.
+	 * @property _animationFrameRate
+	 * @type Number
+	 * @default 0
+	 * @private
+	 */
+	p._animationFrameRate = 0;
+	
+	/**
+	 * When _framerateIndependent is true, this is the time elapsed from frame 0 in seconds.
+	 * @property _elapsedTime
+	 * @type Number
+	 * @default 0
+	 * @private
+	 */
+	p._elapsedTime = 0;
+	
+	/**
+	 * When _framerateIndependent is true, this is the total time for the animation.
+	 * @property _animDuration
+	 * @type Number
+	 * @default 0
+	 * @private
+	 */
+	p._animDuration = 0;
 
 	/**
 	 * @property _synchOffset
@@ -301,6 +335,31 @@ var p = MovieClip.prototype = new createjs.Container();
 		this.Container_draw(ctx, ignoreCache);
 	}
 	
+	/**
+	 * Enables framerate independence for this MovieClip. Only works if mode is "indpendent".
+	 * @method enableFramerateIndependence
+	 * @param {Number} fps The rate at which the animation should animate at.
+	 */
+	p.enableFramerateIndependence = function(fps)
+	{
+		if(!this.mode == MovieClip.INDEPENDENT)//only allowed for independent movieclips
+			return;
+		
+		this._animationFrameRate = fps;
+		this._framerateIndependent = true;
+		this._elapsedTime = 0;
+		this._duration = this.timeline.duration / fps;
+	}
+	
+	/**
+	 * Disables framerate independence for this MovieClip.
+	 * @method disableFramerateIndependence
+	 */
+	p.disableFramerateIndependence = function()
+	{
+		this._animationFrameRate = 0;
+		this._framerateIndependent = false;
+	}
 	
 	/**
 	 * Sets paused to false.
@@ -371,7 +430,15 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p._tick = function(params) {
 		if (!this.paused && this.mode == MovieClip.INDEPENDENT) {
-			this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
+			if(this._framerateIndependent)
+			{
+				this._elapsedTime += params;//elapsed
+				if(this._elapsedTime > this._duration)
+					this._elapsedTime = this.timeline.loop ? this._elapsedTime - this._duration : this._duration;
+				this._prevPosition = Math.floor(this._elapsedTime * this._animationFrameRate);
+			}
+			else
+				this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
 		}
 		this.Container__tick(params);
 	}
@@ -386,6 +453,8 @@ var p = MovieClip.prototype = new createjs.Container();
 		// prevent _updateTimeline from overwriting the new position because of a reset:
 		if (this._prevPos == -1) { this._prevPos = NaN; }
 		this._prevPosition = pos;
+		if(this._framerateIndependent)
+			this._elapsedTime = this._prevPosition / this._animationFrameRate;
 		this._updateTimeline();
 	}
 	
