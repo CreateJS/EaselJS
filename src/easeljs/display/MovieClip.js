@@ -432,7 +432,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		if (!this.paused && this.mode == MovieClip.INDEPENDENT) {
 			if(this._framerateIndependent)
 			{
-				this._elapsedTime += params;//elapsed
+				this._elapsedTime += params[0] * 0.001;//elapsed, milliseconds -> seconds
 				if(this._elapsedTime > this._duration)
 					this._elapsedTime = this.timeline.loop ? this._elapsedTime - this._duration : this._duration;
 				this._prevPosition = Math.floor(this._elapsedTime * this._animationFrameRate);
