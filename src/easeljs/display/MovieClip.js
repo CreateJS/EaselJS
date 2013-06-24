@@ -426,6 +426,8 @@ var p = MovieClip.prototype = new createjs.Container();
 				if(this._elapsedTime > this._duration)
 					this._elapsedTime = this.timeline.loop ? this._elapsedTime - this._duration : this._duration;
 				this._prevPosition = Math.floor(this._elapsedTime * this._animFrameRate);
+				if(this._prevPosition > this.timeline.duration)
+					this._prevPosition = this.timeline.duration;
 			}
 			else
 				this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
