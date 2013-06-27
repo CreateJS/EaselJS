@@ -119,7 +119,7 @@ this.createjs = this.createjs||{};
  *
  * @class SpriteSheet
  * @constructor
- * @param data
+ * @param {Object} data An object describing the SpriteSheet data.
  * @uses EventDispatcher
  **/
 var SpriteSheet = function(data) {
@@ -243,6 +243,7 @@ var p = SpriteSheet.prototype;
 // constructor:
 	/**
 	 * @method initialize
+	 * @param {Object} data An object describing the SpriteSheet data.
 	 * @protected
 	 **/
 	p.initialize = function(data) {

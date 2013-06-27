@@ -48,6 +48,7 @@ this.createjs = this.createjs||{};
  *          // Click Happened.
  *      }
  *
+ * @class ButtonHelper
  * @param {BitmapAnimation|MovieClip} target The instance to manage.
  * @param {String} [outLabel="out"] The label or animation to go to when the user rolls out of the button.
  * @param {String} [overLabel="over"] The label or animation to go to when the user rolls over the button.
@@ -58,9 +59,7 @@ this.createjs = this.createjs||{};
  * then the button's visible states will be used instead. Note that the same instance as the "target" argument can be
  * used for the hitState.
  * @param {String} [hitLabel] The label or animation on the hitArea instance that defines the hitArea bounds. If this is
- * null, then the default state of the hitArea will be used.
- *
- * @class ButtonHelper
+ * null, then the default state of the hitArea will be used. *
  * @constructor
  */
 var ButtonHelper = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
@@ -114,7 +113,7 @@ var p = ButtonHelper.prototype;
 	p._isPressed = false;
 	
 	/**
-	 * @property _isPressed
+	 * @property _isOver
 	 * @type Boolean
 	 * @protected
 	 **/
@@ -124,6 +123,17 @@ var p = ButtonHelper.prototype;
 	/** 
 	 * Initialization method.
 	 * @method initialize
+	 * @param {BitmapAnimation|MovieClip} target The instance to manage.
+	 * @param {String} [outLabel="out"] The label or animation to go to when the user rolls out of the button.
+	 * @param {String} [overLabel="over"] The label or animation to go to when the user rolls over the button.
+	 * @param {String} [downLabel="down"] The label or animation to go to when the user presses the button.
+	 * @param {Boolean} [play=false] If the helper should call "gotoAndPlay" or "gotoAndStop" on the button when changing
+	 * states.
+	 * @param {DisplayObject} [hitArea] An optional item to use as the hit state for the button. If this is not defined,
+	 * then the button's visible states will be used instead. Note that the same instance as the "target" argument can be
+	 * used for the hitState.
+	 * @param {String} [hitLabel] The label or animation on the hitArea instance that defines the hitArea bounds. If this is
+	 * null, then the default state of the hitArea will be used.
 	 * @protected
 	 **/
 	p.initialize = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
@@ -177,6 +187,7 @@ var p = ButtonHelper.prototype;
 // protected methods:
 	/**
 	 * @method handleEvent
+	 * @param {Object} evt The mouse event to handle.
 	 * @protected
 	 **/
 	p.handleEvent = function(evt) {

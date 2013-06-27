@@ -106,7 +106,7 @@ var p = SpriteSheetBuilder.prototype;
 	 * The scale to apply when drawing all frames to the sprite sheet. This is multiplied against any scale specified
 	 * in the addFrame call. This can be used, for example, to generate a sprite sheet at run time that is tailored to
 	 * the a specific device resolution (ex. tablet vs mobile).
-	 * @property defaultScale
+	 * @property scale
 	 * @type Number
 	 * @default 1
 	 **/
@@ -423,7 +423,7 @@ var p = SpriteSheetBuilder.prototype;
 	}
 	
 	/**
-	 * @method _fillRow
+	 * @method _getSize
 	 * @protected
 	 * @return {Number} The width & height of the row.
 	 **/
@@ -435,6 +435,11 @@ var p = SpriteSheetBuilder.prototype;
 	
 	/**
 	 * @method _fillRow
+	 * @param {Array} frames
+	 * @param {Number} y
+	 * @param {Image} img
+	 * @param {Object} dataFrames
+	 * @param {Number} pad
 	 * @protected
 	 * @return {Number} The width & height of the row.
 	 **/

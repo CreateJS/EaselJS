@@ -499,6 +499,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 	
 	/**
 	 * @method _tick
+	 * @param {Array} params Parameters to pass onto the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}}
+	 * function.
 	 * @protected
 	 **/
 	p._tick = function(params) {

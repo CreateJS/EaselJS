@@ -35,8 +35,6 @@ this.createjs = this.createjs||{};
  * This is passed as the parameter to mousedown, mouseup, mousemove, stagemouseup, stagemousedown, mouseover, mouseout
  * and click events on {{#crossLink "DisplayObject"}}{{/crossLink}} instances.
  * @class MouseEvent
- * @uses EventDispatcher
- * @constructor
  * @param {String} type The event type.
  * @param {Number} stageX The normalized x position relative to the stage.
  * @param {Number} stageY The normalized y position relative to the stage.
@@ -46,6 +44,8 @@ this.createjs = this.createjs||{};
  * @param {Boolean} primary Indicates whether this is the primary pointer in a multitouch environment.
  * @param {Number} rawX The raw x position relative to the stage.
  * @param {Number} rawY The raw y position relative to the stage.
+ * @uses EventDispatcher
+ * @constructor
  **/
 var MouseEvent = function(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY) {
   this.initialize(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY);
@@ -183,6 +183,15 @@ var p = MouseEvent.prototype;
 	/**
 	 * Initialization method.
 	 * @method initialize
+	 * @param {String} type The event type.
+	 * @param {Number} stageX The normalized x position relative to the stage.
+	 * @param {Number} stageY The normalized y position relative to the stage.
+	 * @param {DisplayObject} target The display object this event relates to. Note that this will be overwritten when the event is dispatched via EventDispatcher.
+	 * @param {MouseEvent} nativeEvent The native DOM event related to this mouse event.
+	 * @param {Number} pointerID The unique id for the pointer.
+	 * @param {Boolean} primary Indicates whether this is the primary pointer in a multitouch environment.
+	 * @param {Number} rawX The raw x position relative to the stage.
+	 * @param {Number} rawY The raw y position relative to the stage.
 	 * @protected
 	 **/
 	p.initialize = function(type, stageX, stageY, target, nativeEvent, pointerID, primary, rawX, rawY) {

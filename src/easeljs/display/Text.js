@@ -153,6 +153,11 @@ var p = Text.prototype = new createjs.DisplayObject();
 	/** 
 	 * Initialization method.
 	 * @method initialize
+	 * @param {String} [text] The text to display.
+	 * @param {String} [font] The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold
+	 * 36px Arial").
+	 * @param {String} [color] The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex.
+	 * "#F00", "red", or "#FF0000").
 	 * @protected
 	*/
 	p.initialize = function(text, font, color) {
@@ -293,7 +298,8 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 
 	/**
 	 * Draws multiline text.
-	 * @method _getWorkingContext
+	 * @method _drawText
+	 * @param {CanvasRenderingContext2D} ctx
 	 * @protected
 	 * @return {Number} The number of lines drawn.
 	 **/

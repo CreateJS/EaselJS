@@ -66,7 +66,8 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * @param {Object} target The object that dispatched the event.
 	 * @param {String} type The event type.
 	 * @param {String} name The name of the animation that just ended.
-	 * @param {String} next The name of the next animation that will be played, or null. This will be the same as name if the animation is looping.
+	 * @param {String} next The name of the next animation that will be played, or null. This will be the same as name
+	 * if the animation is looping.
 	 * @since 0.6.0
 	 */
 
@@ -183,6 +184,8 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	/**
 	 * Initialization method.
 	 * @method initialize
+	 * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
+	 * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
 	 * @protected
 	*/
 	p.initialize = function(spriteSheet) {
@@ -350,6 +353,8 @@ var p = BitmapAnimation.prototype = new createjs.DisplayObject();
 	 * ticks.
 	 * @protected
 	 * @method _tick
+	 * @param {Array} params Parameters to pass onto the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}}
+	 * function.
 	 **/
 	p._tick = function(params) {
 		var f = this._animation ? this._animation.frequency : 1;

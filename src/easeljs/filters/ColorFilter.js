@@ -48,8 +48,6 @@ this.createjs = this.createjs||{};
  *
  * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
  * @class ColorFilter
- * @constructor
- * @extends Filter
  * @param {Number} [redMultiplier=1] The amount to multiply against the red channel. This is a range between 0 and 1.
  * @param {Number} [greenMultiplier=1] The amount to multiply against the green channel. This is a range between 0 and 1.
  * @param {Number} [blueMultiplier=1] The amount to multiply against the blue channel. This is a range between 0 and 1.
@@ -62,6 +60,8 @@ this.createjs = this.createjs||{};
   * between -255 and 255.
  * @param {Number} [alphaOffset=0] The amount to add to the alpha channel after it has been multiplied. This is a range
   * between -255 and 255.
+ * @constructor
+ * @extends Filter
  **/
 var ColorFilter = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
   this.initialize(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset);
@@ -92,7 +92,7 @@ var p = ColorFilter.prototype = new createjs.Filter();
 	
 	/**
 	 * Alpha channel multiplier.
-	 * @property redMultiplier
+	 * @property alphaMultiplier
 	 * @type Number
 	 **/
 	p.alphaMultiplier = 1;
@@ -129,6 +129,18 @@ var p = ColorFilter.prototype = new createjs.Filter();
 	/**
 	 * Initialization method.
 	 * @method initialize
+	 * @param {Number} [redMultiplier=1] The amount to multiply against the red channel. This is a range between 0 and 1.
+	 * @param {Number} [greenMultiplier=1] The amount to multiply against the green channel. This is a range between 0 and 1.
+	 * @param {Number} [blueMultiplier=1] The amount to multiply against the blue channel. This is a range between 0 and 1.
+	 * @param {Number} [alphaMultiplier=1] The amount to multiply against the alpha channel. This is a range between 0 and 1.
+	 * @param {Number} [redOffset=0] The amount to add to the red channel after it has been multiplied. This is a range
+	 * between -255 and 255.
+	 * @param {Number} [greenOffset=0] The amount to add to the green channel after it has been multiplied. This is a range
+	 * between -255 and 255.
+	 * @param {Number} [blueOffset=0] The amount to add to the blue channel after it has been multiplied. This is a range
+	 * between -255 and 255.
+	 * @param {Number} [alphaOffset=0] The amount to add to the alpha channel after it has been multiplied. This is a range
+	 * between -255 and 255.
 	 * @protected
 	 **/
 	p.initialize = function(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {

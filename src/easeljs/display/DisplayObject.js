@@ -1019,6 +1019,9 @@ var p = DisplayObject.prototype;
 	
 	/**
 	 * @method _tick
+	 * @param {Array} params Parameters to pass on to any listeners of the tick function. This will usually include the
+	 * properties from the {{#crossLink "Ticker"}}{{/crossLink}} "tick" event, such as `delta` and `paused`, but may
+	 * be undefined or contain other values depending on the usage by the application.
 	 * @protected
 	 **/
 	p._tick = function(params) {

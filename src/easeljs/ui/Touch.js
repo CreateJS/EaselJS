@@ -142,6 +142,8 @@ var Touch = function() {
 
 	/**
 	 * @method _IOS_handleEvent
+	 * @param {Stage} stage
+	 * @param {Object} e The event to handle
 	 * @protected
 	 * @static
 	 **/
@@ -183,7 +185,7 @@ var Touch = function() {
 	};
 
 	/**
-	 * @method _IE_enable
+	 * @method _IE_disable
 	 * @protected
 	 * @param {Stage} stage
 	 * @static
@@ -200,6 +202,8 @@ var Touch = function() {
 
 	/**
 	 * @method _IE_handleEvent
+	 * @param {Stage} stage
+	 * @param {Object} e The event to handle.
 	 * @protected
 	 * @static
 	 **/
@@ -227,6 +231,11 @@ var Touch = function() {
 
 	/**
 	 * @method _handleStart
+	 * @param {Stage} stage
+	 * @param {String|Number} id
+	 * @param {Object} e
+	 * @param {Number} x
+	 * @param {Number} y
 	 * @protected
 	 **/
 	Touch._handleStart = function(stage, id, e, x, y) {
@@ -241,6 +250,11 @@ var Touch = function() {
 
 	/**
 	 * @method _handleMove
+	 * @param {Stage} stage
+	 * @param {String|Number} id
+	 * @param {Object} e
+	 * @param {Number} x
+	 * @param {Number} y
 	 * @protected
 	 **/
 	Touch._handleMove = function(stage, id, e, x, y) {
@@ -250,6 +264,9 @@ var Touch = function() {
 
 	/**
 	 * @method _handleEnd
+	 * @param {Stage} stage
+	 * @param {String|Number} id
+	 * @param {Object} e
 	 * @protected
 	 **/
 	Touch._handleEnd = function(stage, id, e) {
