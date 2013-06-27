@@ -189,7 +189,6 @@ var p = Stage.prototype = new createjs.Container();
 
 	/**
 	 * If true, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas.
-	 * You can call 
 	 * @property tickOnUpdate
 	 * @type Boolean
 	 * @default true
