@@ -49,7 +49,7 @@ this.createjs = this.createjs||{};
  * before it can be displayed.
  *
  * <strong>Note:</strong> Text can be expensive to generate, so cache instances where possible. Be aware that not all
- * browsers will render Text exactly the same. *
+ * browsers will render Text exactly the same.
  * @class Text
  * @extends DisplayObject
  * @constructor
@@ -87,7 +87,8 @@ var p = Text.prototype = new createjs.DisplayObject();
 	p.font = null;
 	
 	/**
-	 * The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). Default is "#000".
+	 * The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). Default is
+	 * "#000".
 	 * @property color
 	 * @type String
 	 **/
@@ -103,16 +104,17 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	p.textAlign = "left";
 	
-	/** The vertical alignment point on the font. Any of "top", "hanging", "middle", "alphabetic", 
-	 * "ideographic", or "bottom". For detailed information view the 
-	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles">
+	/**
+	 * The vertical alignment point on the font. Any of "top", "hanging", "middle", "alphabetic", "ideographic", or
+	 * "bottom". For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles">
 	 * whatwg spec</a>. Default is "top".
 	 * @property textBaseline
 	 * @type String
 	*/
 	p.textBaseline = "top";
 	
-	/** The maximum width to draw the text. If maxWidth is specified (not null), the text will be condensed or 
+	/**
+	 * The maximum width to draw the text. If maxWidth is specified (not null), the text will be condensed or
 	 * shrunk to make it fit in this width. For detailed information view the 
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles">
 	 * whatwg spec</a>.
@@ -121,13 +123,15 @@ var p = Text.prototype = new createjs.DisplayObject();
 	*/
 	p.maxWidth = null;
 	
-	/** If true, the text will be drawn as a stroke (outline). If false, the text will be drawn as a fill.
+	/**
+	 * If true, the text will be drawn as a stroke (outline). If false, the text will be drawn as a fill.
 	 * @property outline
 	 * @type Boolean
 	 **/
 	p.outline = false;
 	
-	/** Indicates the line height (vertical distance between baselines) for multi-line text. If null or 0, 
+	/**
+	 * Indicates the line height (vertical distance between baselines) for multi-line text. If null or 0,
 	 * the value of getMeasuredLineHeight is used.
 	 * @property lineHeight
 	 * @type Number

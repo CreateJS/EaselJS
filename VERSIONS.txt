@@ -1,6 +1,7 @@
 Version NEXT [Not Released]
 ****************************************************************************************************
 - Fixed setChildIndex when adding to an index lower than the item exists at already.
+- Merged lots of doc updates (thanks @peteshand)
 
 Version 0.6.1 [May 14, 2013]
 ****************************************************************************************************
