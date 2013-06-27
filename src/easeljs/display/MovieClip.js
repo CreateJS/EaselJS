@@ -252,6 +252,12 @@ var p = MovieClip.prototype = new createjs.Container();
 	/** 
 	 * Initialization method called by the constructor.
 	 * @method initialize
+	 * @param {String} [mode=independent] Initial value for the mode property. One of MovieClip.INDEPENDENT,
+	 * MovieClip.SINGLE_FRAME, or MovieClip.SYNCHED. The default is MovieClip.INDEPENDENT.
+	 * @param {Number} [startPosition=0] Initial value for the startPosition property.
+	 * @param {Boolean} [loop=true] Initial value for the loop property. The default is true.
+	 * @param {Object} [labels=null] A hash of labels to pass to the timeline instance associated with this MovieClip.
+	 * Labels only need to be passed if they need to be used.
 	 * @protected
 	 **/
 	p.initialize = function(mode, startPosition, loop, labels) {
@@ -321,7 +327,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	/**
 	 * Advances this movie clip to the specified position or label and sets paused to false.
 	 * @method gotoAndPlay
-	 * @param {String|Number} positionOrLabel
+	 * @param {String|Number} positionOrLabel The animation name or frame number to go to.
 	 **/
 	p.gotoAndPlay = function(positionOrLabel) {
 		this.paused = false;
@@ -331,7 +337,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	/**
 	 * Advances this movie clip to the specified position or label and sets paused to true.
 	 * @method gotoAndStop
-	 * @param {String|Number} positionOrLabel
+	 * @param {String|Number} positionOrLabel The animation or frame name to go to.
 	 **/
 	p.gotoAndStop = function(positionOrLabel) {
 		this.paused = true;
@@ -367,6 +373,8 @@ var p = MovieClip.prototype = new createjs.Container();
 	
 	/**
 	 * @method _tick
+	 * @param {Array} params Parameters to pass onto the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}}
+	 * function.
 	 * @private
 	 **/
 	p._tick = function(params) {
@@ -378,6 +386,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	
 	/**
 	 * @method _goto
+	 * @param {String|Number} positionOrLabel The animation name or frame number to go to.
 	 * @private
 	 **/
 	p._goto = function(positionOrLabel) {
@@ -450,6 +459,8 @@ var p = MovieClip.prototype = new createjs.Container();
 	
 	/**
 	 * @method _setState
+	 * @param {Array} state
+	 * @param {Number} offset
 	 * @private
 	 **/
 	p._setState = function(state, offset) {
@@ -466,6 +477,8 @@ var p = MovieClip.prototype = new createjs.Container();
 	/**
 	 * Adds a child to the timeline, and sets it up as a managed child.
 	 * @method _addManagedChild
+	 * @param {MovieClip} child The child MovieClip to manage
+	 * @param {Number} offset
 	 * @private
 	 **/
 	p._addManagedChild = function(child, offset) {
@@ -512,6 +525,9 @@ createjs.MovieClip = MovieClip;
 	
 	/**
 	 * @method init
+	 * @param {Tween} tween
+	 * @param {String} prop
+	 * @param {String|Number|Boolean} value
 	 * @private
 	 **/
 	MovieClipPlugin.init = function(tween, prop, value) {
@@ -525,11 +541,19 @@ createjs.MovieClip = MovieClip;
 	MovieClipPlugin.step = function() {
 		// unused.
 	}
-	
-	/** 
+
+	/**
 	 * @method tween
-	 * @private
-	 **/
+	 * @param {Tween} tween
+	 * @param {String} prop
+	 * @param {String | Number | Boolean} value
+	 * @param {Array} startValues
+	 * @param {Array} endValues
+	 * @param {Number} ratio
+	 * @param wait
+	 * @param end
+	 * @return {*}
+	 */
 	MovieClipPlugin.tween = function(tween, prop, value, startValues, endValues, ratio, wait, end) {
 		if (!(tween.target instanceof MovieClip)) { return value; }
 		return (ratio == 1 ? endValues[prop] : startValues[prop]);

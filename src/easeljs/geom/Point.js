@@ -38,9 +38,9 @@ this.createjs = this.createjs||{};
  *      var point = new Point(0, 100);
  *
  * @class Point
- * @constructor
  * @param {Number} [x=0] X position.
  * @param {Number} [y=0] Y position.
+ * @constructor
  **/
 var Point = function(x, y) {
   this.initialize(x, y);
@@ -67,6 +67,8 @@ var p = Point.prototype;
 	/** 
 	 * Initialization method.
 	 * @method initialize
+	 * @param {Number} [x=0] X position.
+	 * @param {Number} [y=0] Y position.
 	 * @protected
 	*/
 	p.initialize = function(x, y) {

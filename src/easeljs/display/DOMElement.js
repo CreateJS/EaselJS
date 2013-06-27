@@ -89,13 +89,14 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	/**
 	 * @property DisplayObject_initialize
 	 * @type Function
-   * @private
+	 * @private
 	 */
 	p.DisplayObject_initialize = p.initialize;
 
 	/**
 	 * Initialization method.
 	 * @method initialize
+	 * @param {HTMLElement} htmlElement A reference or id for the DOM element to manage.
 	 * @protected
 	*/
 	p.initialize = function(htmlElement) {
@@ -252,6 +253,8 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	
 	/**
 	 * @method _tick
+	 * @param {Array} params Parameters to pass onto the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}}
+	 * function.
 	 * @protected
 	 */
 	p._tick = function(params) {

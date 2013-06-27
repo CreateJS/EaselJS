@@ -34,13 +34,13 @@ this.createjs = this.createjs||{};
 /**
  * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
  * @class Matrix2D
- * @constructor
  * @param {Number} a Specifies the a property for the new matrix.
  * @param {Number} b Specifies the b property for the new matrix.
  * @param {Number} c Specifies the c property for the new matrix.
  * @param {Number} d Specifies the d property for the new matrix.
  * @param {Number} tx Specifies the tx property for the new matrix.
  * @param {Number} ty Specifies the ty property for the new matrix.
+ * @constructor
  **/
 var Matrix2D = function(a, b, c, d, tx, ty) {
   this.initialize(a, b, c, d, tx, ty);
@@ -140,6 +140,12 @@ var p = Matrix2D.prototype;
 	/**
 	 * Initialization method.
 	 * @method initialize
+	 * @param {Number} a Specifies the a property for the new matrix.
+	 * @param {Number} b Specifies the b property for the new matrix.
+	 * @param {Number} c Specifies the c property for the new matrix.
+	 * @param {Number} d Specifies the d property for the new matrix.
+	 * @param {Number} tx Specifies the tx property for the new matrix.
+	 * @param {Number} ty Specifies the ty property for the new matrix.
 	 * @protected
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
@@ -460,7 +466,7 @@ var p = Matrix2D.prototype;
 
 	/**
 	 * Reinitializes all matrix properties to those specified.
-	 * @method appendProperties
+	 * @method reinitialize
 	 * @param {Number} a
 	 * @param {Number} b
 	 * @param {Number} c

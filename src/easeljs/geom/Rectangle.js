@@ -38,11 +38,11 @@ this.createjs = this.createjs||{};
  *      var rect = new createjs.Rectangle(0, 0, 100, 100);
  *
  * @class Rectangle
- * @constructor
  * @param {Number} [x=0] X position.
  * @param {Number} [y=0] Y position.
  * @param {Number} [width=0] The width of the Rectangle.
  * @param {Number} [height=0] The height of the Rectangle.
+ * @constructor
  **/
 var Rectangle = function(x, y, width, height) {
   this.initialize(x, y, width, height);
@@ -82,6 +82,10 @@ var p = Rectangle.prototype;
 	/** 
 	 * Initialization method.
 	 * @method initialize
+	 * @param {Number} [x=0] X position.
+	 * @param {Number} [y=0] Y position.
+	 * @param {Number} [width=0] The width of the Rectangle.
+	 * @param {Number} [height=0] The height of the Rectangle.
 	 * @protected
 	*/
 	p.initialize = function(x, y, width, height) {

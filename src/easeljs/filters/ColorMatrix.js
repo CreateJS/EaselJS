@@ -42,12 +42,12 @@ this.createjs = this.createjs||{};
 	 * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters, or {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}
 	 * for an example of how to use ColorMatrix to change a DisplayObject's color.
 	 * @class ColorMatrix
-	 * @constructor
-	 * @extends Array
 	 * @param {Number} brightness
 	 * @param {Number} contrast
 	 * @param {Number} saturation
 	 * @param {Number} hue
+	 * @constructor
+	 * @extends Array
 	 **/
 	ColorMatrix = function(brightness, contrast, saturation, hue) {
 	  this.initialize(brightness, contrast, saturation, hue);
@@ -103,6 +103,10 @@ this.createjs = this.createjs||{};
 	/**
 	 * Initialization method.
 	 * @method initialize
+	 * @param {Number} brightness
+	 * @param {Number} contrast
+	 * @param {Number} saturation
+	 * @param {Number} hue
 	 * @protected
 	 */
 	p.initialize = function(brightness,contrast,saturation,hue) {
@@ -288,6 +292,7 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * @method _multiplyMatrix
+	 * @param {Array} matrix
 	 * @protected
 	 **/
 	p._multiplyMatrix = function(matrix) {
@@ -310,9 +315,11 @@ this.createjs = this.createjs||{};
 	/**
 	 * Make sure values are within the specified range, hue has a limit of 180, brightness is 255, others are 100.
 	 * @method _cleanValue
+	 * @param {Number} value The raw number
+	 * @param {Number} limit The maximum that the number can be. The minimum is the limit * -1.
 	 * @protected
 	 **/
-	p._cleanValue = function(value,limit) {
+	p._cleanValue = function(value, limit) {
 		return Math.min(limit,Math.max(-limit,value));
 	};
 	
@@ -320,6 +327,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Makes sure matrixes are 5x5 (25 long).
 	 * @method _fixMatrix
+	 * @param {Array} matrix
 	 * @protected
 	 **/
 	p._fixMatrix = function(matrix) {
