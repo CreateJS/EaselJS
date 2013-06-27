@@ -393,7 +393,6 @@ var p = Container.prototype = new createjs.DisplayObject();
 		}
 		if (i==l || i == index) { return; }
 		kids.splice(i,1);
-		if (index<i) { index--; }
 		kids.splice(index,0,child);
 	}
 
