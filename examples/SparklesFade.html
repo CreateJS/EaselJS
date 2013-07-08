@@ -28,7 +28,7 @@
 	var canvas, stage, oldX=0;
 
 	var imgSeq = new Image();		// The image for the sparkle animation
-	var bmpAnim;						// The animated sparkle template to clone
+	var sprite;						// The animated sparkle template to clone
 
 	function init() {
 		if (window.top != window) {
@@ -68,7 +68,7 @@
 		}
 
 		// set up an animation instance, which we will clone
-		bmpAnim = new createjs.Sprite(new createjs.SpriteSheet(data));
+		sprite = new createjs.Sprite(new createjs.SpriteSheet(data));
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
 		createjs.Ticker.addEventListener("tick", tick);
@@ -125,7 +125,7 @@
 		//create the specified number of sparkles
 		for (var i=0; i<count; i++) {
 			// clone the original sparkle, so we don't need to set shared properties:
-			var sparkle = bmpAnim.clone();
+			var sparkle = sprite.clone();
 
 			// set display properties:
 			sparkle.x = x;

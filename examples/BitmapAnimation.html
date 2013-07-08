@@ -28,7 +28,7 @@
         var stage;
 
         var img = new Image();
-        var bmpAnimList;
+        var spriteList;
 
         function init() {
             //find canvas and load images, wait for last image to load
@@ -74,34 +74,34 @@
              */
 
             // create a Sprite instance to display and play back the sprite sheet:
-            var bmpAnim = new createjs.Sprite(spriteSheet);
+            var sprite = new createjs.Sprite(spriteSheet);
 
             // start playing the first sequence:
-            bmpAnim.gotoAndPlay("walkRt");		//animate
+            sprite.gotoAndPlay("walkRt");		//animate
 
             // the callback is called each time a sequence completes:
-            bmpAnim.onAnimationEnd = angleChange;
+            sprite.onAnimationEnd = angleChange;
 
             // create a bunch of rats based on the first one, and place them on stage, and in our collection.
             var l = 50;
-            bmpAnimList = [];
+            spriteList = [];
             for (var i=0; i<l; i++) {
-                bmpAnim.name = "rat"+i;
-                bmpAnim.speed = Math.random()*6+2;
-                bmpAnim.direction = 90;
-                bmpAnim.vX = bmpAnim.speed;
-                bmpAnim.vY = 0;
-                bmpAnim.x = Math.random()*(w-220)+60|0;
-                bmpAnim.y = Math.random()*(h-220)+0|0;
+                sprite.name = "rat"+i;
+                sprite.speed = Math.random()*6+2;
+                sprite.direction = 90;
+                sprite.vX = sprite.speed;
+                sprite.vY = 0;
+                sprite.x = Math.random()*(w-220)+60|0;
+                sprite.y = Math.random()*(h-220)+0|0;
 
                 // have each rat start on a random frame in the "walkRt" animation:
-                bmpAnim.currentAnimationFrame = Math.random()*spriteSheet.getNumFrames("walkRt");
-                stage.addChild(bmpAnim);
-                bmpAnimList.push(bmpAnim);
+                sprite.currentAnimationFrame = Math.random()*spriteSheet.getNumFrames("walkRt");
+                stage.addChild(sprite);
+                spriteList.push(sprite);
 
                 // rather than creating a brand new instance each time, and setting every property, we
                 // can just clone the current one and overwrite the properties we want to change:
-                if (i < l-1) { bmpAnim = bmpAnim.clone(); }
+                if (i < l-1) { sprite = sprite.clone(); }
             }
 
             // we want to do some work before we update the canvas,
@@ -116,25 +116,25 @@
 
         function tick(event) {
             // move all the rats according to their vX/vY properties:
-            var l = bmpAnimList.length;
+            var l = spriteList.length;
             for (var i=0; i<l; i++) {
-                var bmpAnim = bmpAnimList[i];
-                bmpAnim.x += bmpAnim.vX;
-                bmpAnim.y += bmpAnim.vY;
+                var sprite = spriteList[i];
+                sprite.x += sprite.vX;
+                sprite.y += sprite.vY;
             }
 
             // update the stage:
             stage.update(event);
         }
 
-        function angleChange(bmpAnim,animation) {
+        function angleChange(sprite,animation) {
             //after each sequence ends update the rat's heading and adjust velocities to match
-            bmpAnim.direction -= 60;
-            var angle = bmpAnim.direction * (Math.PI/180);
-            bmpAnim.vX = Math.sin(angle) * bmpAnim.speed;
-            bmpAnim.vY = Math.cos(angle) * bmpAnim.speed;
+            sprite.direction -= 60;
+            var angle = sprite.direction * (Math.PI/180);
+            sprite.vX = Math.sin(angle) * sprite.speed;
+            sprite.vY = Math.cos(angle) * sprite.speed;
             var nextMap = {walkRt:"walkDnRt",walkDnRt:"walkDnRt_h",walkDnRt_h:"walkRt_h",walkRt_h:"walkUpRt_h",walkUpRt_h:"walkUpRt",walkUpRt:"walkRt"};
-            bmpAnim.gotoAndPlay(nextMap[animation]);
+            sprite.gotoAndPlay(nextMap[animation]);
         }
     </script>
 </head>

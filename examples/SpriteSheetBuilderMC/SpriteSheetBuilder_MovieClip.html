@@ -69,12 +69,12 @@
 	
 	function buildComplete(event) {
 		var spriteSheet = event.target.spriteSheet;
-		var bmpAnim = new createjs.Sprite(spriteSheet);
-		bmpAnim.setTransform(mc.x+w+30|0, mc.y);
-		stage.addChild(bmpAnim);
+		var sprite = new createjs.Sprite(spriteSheet);
+        sprite.setTransform(mc.x+w+30|0, mc.y);
+		stage.addChild(sprite);
 		
 		mc.gotoAndPlay(0);
-		bmpAnim.gotoAndPlay(0);
+        sprite.gotoAndPlay(0);
 	}
 
 	</script>
