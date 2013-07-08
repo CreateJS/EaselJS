@@ -84,8 +84,8 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	p.onAnimationEnd = null;
 
 	/**
-	 * The frame that will be drawn when draw is called. Note that with some SpriteSheet data, this
-	 * will advance non-sequentially.
+	 * The frame index that will be drawn when draw is called. Note that with some SpriteSheet definitions, this
+	 * will advance non-sequentially. This will always be an integer value.
 	 * @property currentFrame
 	 * @type {Number}
 	 * @default 0
@@ -132,17 +132,20 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * @property offset
 	 * @type {Number}
 	 * @default 0
-	 * @deprecated Not applicable to new timing model in v0.7.0 and higher.
+	 * @deprecated Not applicable to the new timing model in v0.7.0 and higher.
 	 */
 	p.offset = 0;
 	
 	/**
 	 * Specifies the current frame index within the currently playing animation. When playing normally, this will increase
 	 * from 0 to n-1, where n is the number of frames in the current animation.
+	 * 
+	 * This could be a non-integer value if
+	 * using time-based playback (see {{#crossLink "Sprite/framerate"}}{{/crossLink}}, or if the animation's speed is
+	 * not an integer.
 	 * @property currentAnimationFrame
 	 * @type {Number}
 	 * @default 0
-	 * @readonly
 	 **/
 	p.currentAnimationFrame = 0;
 	
@@ -197,14 +200,6 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * @default null
 	 **/
 	p._currentFrame = null;
-	
-	/**
-	 * @property _animation
-	 * @protected
-	 * @type {Object}
-	 * @default null
-	 **/
-	p._currentAnimationFrame = null;
 
 // constructor:
 	/**
@@ -337,7 +332,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 		var speed = (this._animation&&this._animation.speed)||1;
 		var fps = this.framerate || this.spriteSheet.framerate;
 		var t = (fps && time != null) ? time/(1000/fps) : 1;
-		if (this._animation) { this._currentAnimationFrame+=t*speed; }
+		if (this._animation) { this.currentAnimationFrame+=t*speed; }
 		else { this._currentFrame+=t*speed; }
 		this._normalizeFrame();
 	};
@@ -408,7 +403,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 		var animation = this._animation;
 		var paused = this.paused;
 		var frame = this._currentFrame;
-		var animFrame = this._currentAnimationFrame;
+		var animFrame = this.currentAnimationFrame;
 		var l;
 		
 		if (animation) {
@@ -423,7 +418,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 				} else {
 					// end.
 					this.paused = true;
-					animFrame = this._currentAnimationFrame = animation.frames.length-1;
+					animFrame = this.currentAnimationFrame = animation.frames.length-1;
 					this._currentFrame = animation.frames[animFrame];
 				}
 			} else {
@@ -439,7 +434,6 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 			}
 		}
 		this.currentFrame = this._currentFrame|0;
-		this.currentAnimationFrame = animFrame|0;
 	};
 	
 	/**
@@ -454,7 +448,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 		this.onAnimationEnd&&this.onAnimationEnd(this, name, next);
 		this.dispatchEvent({type:"animationend", name:name, next:next});
 		// TODO: is this right?
-		if (!paused && this.paused) { this._currentAnimationFrame = this.currentAnimationFrame = end; }
+		if (!paused && this.paused) { this.currentAnimationFrame = end; }
 		return (this.paused != paused || this._animation != animation || this._currentFrame != frame);
 	};
 
@@ -479,7 +473,6 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 		o.paused = this.paused;
 		o._animation = this._animation;
 		o.currentAnimationFrame = this.currentAnimationFrame;
-		o._currentAnimationFrame = this._currentAnimationFrame;
 	};
 
 	/**
@@ -493,7 +486,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 		if (isNaN(frameOrAnimation)) {
 			var data = this.spriteSheet.getAnimation(frameOrAnimation);
 			if (data) {
-				this._currentAnimationFrame = frame||0;
+				this.currentAnimationFrame = frame||0;
 				this._animation = data;
 				this.currentAnimation = frameOrAnimation;
 				this._normalizeFrame();
