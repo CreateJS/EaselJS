@@ -188,11 +188,23 @@ var p = Graphics.prototype;
 		}
 	};
 	
+// static properties:
+	
+	/**
+	 * Exposes the Command class used internally by Graphics. Useful for extending the Graphics class or injecting
+	 * functionality.
+	 * @property Command
+	 * @static
+	 * @type {Function}
+	 **/
+	Graphics.Command = Command;
+	
 	/**
 	 * Map of Base64 characters to values. Used by {{#crossLink "Graphics/decodePath"}}{{/crossLink}}.
 	 * @property BASE_64
 	 * @static
 	 * @final
+	 * @readonly
 	 * @type {Object}
 	 **/
 	Graphics.BASE_64 = {"A":0,"B":1,"C":2,"D":3,"E":4,"F":5,"G":6,"H":7,"I":8,"J":9,"K":10,"L":11,"M":12,"N":13,"O":14,"P":15,"Q":16,"R":17,"S":18,"T":19,"U":20,"V":21,"W":22,"X":23,"Y":24,"Z":25,"a":26,"b":27,"c":28,"d":29,"e":30,"f":31,"g":32,"h":33,"i":34,"j":35,"k":36,"l":37,"m":38,"n":39,"o":40,"p":41,"q":42,"r":43,"s":44,"t":45,"u":46,"v":47,"w":48,"x":49,"y":50,"z":51,"0":52,"1":53,"2":54,"3":55,"4":56,"5":57,"6":58,"7":59,"8":60,"9":61,"+":62,"/":63};
@@ -209,6 +221,7 @@ var p = Graphics.prototype;
 	 * @property STROKE_CAPS_MAP
 	 * @static
 	 * @final
+	 * @readonly
 	 * @type {Array}
 	 **/
 	Graphics.STROKE_CAPS_MAP = ["butt", "round", "square"];
@@ -224,6 +237,7 @@ var p = Graphics.prototype;
 	 * @property STROKE_JOINTS_MAP
 	 * @static
 	 * @final
+	 * @readonly
 	 * @type {Array}
 	 **/
 	Graphics.STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
@@ -774,6 +788,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)	
 	 **/
 	p.beginBitmapStroke = function(image, repetition) {
+		// NOTE: matrix is not supported for stroke because transforms on strokes also affect the drawn stroke width.
 		if (this._active) { this._newPath(); }
 		repetition = repetition || "";
 		var o = this._ctx.createPattern(image, repetition);
@@ -1313,11 +1328,10 @@ var p = Graphics.prototype;
 		this._instructions.push(Graphics.beginCmd);
 		
 		this._appendInstructions(this._fillInstructions);
-		this._appendInstructions(this._strokeInstructions&&this._strokeStyleInstructions);
 		this._appendInstructions(this._strokeInstructions);
+		this._appendInstructions(this._strokeInstructions&&this._strokeStyleInstructions);
 		
 		this._appendInstructions(this._activeInstructions);
-		
 		
 		if (this._fillInstructions) {
 			this._appendDraw(Graphics.fillCmd, this._fillMatrix);
@@ -1325,7 +1339,6 @@ var p = Graphics.prototype;
 		if (this._strokeInstructions) {
 			this._appendDraw(Graphics.strokeCmd, this._strokeIgnoreScale&&[1,0,0,1,0,0]);
 		}
-		
 	};
 	
 	/**
