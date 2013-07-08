@@ -87,12 +87,12 @@ var p = Text.prototype = new createjs.DisplayObject();
 	p.font = null;
 	
 	/**
-	 * The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). Default is
-	 * "#000".
+	 * The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). Default is "#000".
+	 * It will also accept valid canvas fillStyle values.
 	 * @property color
 	 * @type String
 	 **/
-	p.color = "#000";
+	p.color = null;
 	
 	/**
 	 * The horizontal text alignment. Any of "start", "end", "left", "right", and "center". For detailed 
@@ -124,11 +124,11 @@ var p = Text.prototype = new createjs.DisplayObject();
 	p.maxWidth = null;
 	
 	/**
-	 * If true, the text will be drawn as a stroke (outline). If false, the text will be drawn as a fill.
+	 * If greater than 0, the text will be drawn as a stroke (outline) of the specified width.
 	 * @property outline
-	 * @type Boolean
+	 * @type Number
 	 **/
-	p.outline = false;
+	p.outline = 0;
 	
 	/**
 	 * Indicates the line height (vertical distance between baselines) for multi-line text. If null or 0,
@@ -145,6 +145,8 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @type Number
 	 **/
 	p.lineWidth = null;
+	
+// private properties:
 	
 // constructor:
 	/**
@@ -168,8 +170,8 @@ var p = Text.prototype = new createjs.DisplayObject();
 		this.DisplayObject_initialize();
 		this.text = text;
 		this.font = font;
-		this.color = color ? color : "#000";
-	}
+		this.color = color;
+	};
 	
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
@@ -181,7 +183,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	p.isVisible = function() {
 		var hasContent = this.cacheCanvas || (this.text != null && this.text !== "");
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
-	}
+	};
 
 	/**
 	 * @property DisplayObject_draw
@@ -203,15 +205,17 @@ var p = Text.prototype = new createjs.DisplayObject();
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		
-		if (this.outline) { ctx.strokeStyle = this.color; }
-		else { ctx.fillStyle = this.color; }
+		var col = this.color || "#000";
+		if (this.outline) { ctx.strokeStyle = col; ctx.lineWidth = this.outline*1; }
+		else { ctx.fillStyle = col; }
+		
 		ctx.font = this.font;
 		ctx.textAlign = this.textAlign||"start";
 		ctx.textBaseline = this.textBaseline||"alphabetic";
 
 		this._drawText(ctx);
 		return true;
-	}
+	};
 	
 	/**
 	 * Returns the measured, untransformed width of the text without wrapping.
@@ -220,7 +224,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	p.getMeasuredWidth = function() {
 		return this._getWorkingContext().measureText(this.text).width;
-	}
+	};
 
 	/**
 	 * Returns an approximate line height of the text, ignoring the lineHeight property. This is based on the measured
@@ -231,7 +235,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	p.getMeasuredLineHeight = function() {
 		return this._getWorkingContext().measureText("M").width*1.2;
-	}
+	};
 
 	/**
 	 * Returns the approximate height of multi-line text by multiplying the number of lines against either the
@@ -242,7 +246,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	p.getMeasuredHeight = function() {
 		return this._drawText()*(this.lineHeight||this.getMeasuredLineHeight());
-	}
+	};
 	
 	/**
 	 * Returns a clone of the Text instance.
@@ -253,7 +257,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 		var o = new Text(this.text, this.font, this.color);
 		this.cloneProps(o);
 		return o;
-	}
+	};
 		
 	/**
 	 * Returns a string representation of this object.
@@ -262,7 +266,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	p.toString = function() {
 		return "[Text (text="+  (this.text.length > 20 ? this.text.substr(0, 17)+"..." : this.text) +")]";
-	}
+	};
 	
 // private methods:
 	
@@ -286,7 +290,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 		o.outline = this.outline;
 		o.lineHeight = this.lineHeight;
 		o.lineWidth = this.lineWidth;
-	}
+	};
 
 	/** 
 	 * @method _getWorkingContext
@@ -298,7 +302,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 		ctx.textAlign = this.textAlign||"start";
 		ctx.textBaseline = this.textBaseline||"alphabetic";
 		return ctx;
-	}
+	};
 	 
 	/**
 	 * Draws multiline text.
@@ -338,7 +342,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 			count++;
 		}
 		return count;
-	}
+	};
 	
 	/** 
 	 * @method _drawTextLine
@@ -352,7 +356,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 			if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth||0xFFFF); }
 			else { ctx.fillText(text, 0, y, this.maxWidth||0xFFFF); }
 		
-	}
+	};
 
 createjs.Text = Text;
 }());
