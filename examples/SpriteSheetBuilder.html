@@ -13,7 +13,7 @@
 	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/BitmapAnimation.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
 	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
@@ -78,13 +78,11 @@
 		var spriteSheet = builder.build();
 		
 		// create our bitmap animations using the generated sprite sheet, and put them on stage:
-		var circle2 = new createjs.BitmapAnimation(spriteSheet);
-		circle2.gotoAndPlay("circle");
+		var circle2 = new createjs.Sprite(spriteSheet, "circle");
 		circle2.setTransform(100,90+100);
 		stage.addChild(circle2);
 		
-		var square2 = new createjs.BitmapAnimation(spriteSheet);
-		square2.gotoAndPlay("square");
+		var square2 = new createjs.Sprite(spriteSheet, "square");
 		square2.setTransform(150,50+100);
 		stage.addChild(square2);
 		

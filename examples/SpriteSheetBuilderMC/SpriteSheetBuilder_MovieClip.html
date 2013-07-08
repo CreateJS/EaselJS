@@ -14,7 +14,7 @@
 	<script type="text/javascript" src="../../src/easeljs/display/DisplayObject.js"></script>
 	<script type="text/javascript" src="../../src/easeljs/display/Container.js"></script>
 	<script type="text/javascript" src="../../src/easeljs/display/SpriteSheet.js"></script>
-	<script type="text/javascript" src="../../src/easeljs/display/BitmapAnimation.js"></script>
+	<script type="text/javascript" src="../../src/easeljs/display/Sprite.js"></script>
 	<script type="text/javascript" src="../../src/easeljs/display/Stage.js"></script>
 	<script type="text/javascript" src="../../src/easeljs/events/MouseEvent.js"></script>
 	<script type="text/javascript" src="../../src/easeljs/display/Graphics.js"></script>
@@ -49,7 +49,7 @@
 		label1.setTransform(mc.x,30);
 		
 		var label2 = stage.addChild(label1.clone());
-		label2.text = "BitmapAnimation";
+		label2.text = "Sprite (raster)";
 		label2.x += w+30;
 		
 		// create the sprite sheet builder:
@@ -69,7 +69,7 @@
 	
 	function buildComplete(event) {
 		var spriteSheet = event.target.spriteSheet;
-		var bmpAnim = new createjs.BitmapAnimation(spriteSheet);
+		var bmpAnim = new createjs.Sprite(spriteSheet);
 		bmpAnim.setTransform(mc.x+w+30|0, mc.y);
 		stage.addChild(bmpAnim);
 		
