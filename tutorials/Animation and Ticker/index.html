@@ -20,8 +20,8 @@
 			<h1>EaselJS: Animation and Ticker</h1>
 			<p>
 				<strong>Synopsis:</strong> Create a simple programmatic animation, and learn about the Ticker class.<br>
-				<strong>Topics:</strong> animation, Ticker, setFPS, useRAF, getTime, setPaused, requestAnimationFrame, Stage.update, time based animation<br>
-				<strong>Target:</strong> EaselJS v0.6.0
+				<strong>Topics:</strong> animation, Ticker, setFPS, timingMode, getTime, setPaused, requestAnimationFrame, Stage.update, time based animation<br>
+				<strong>Target:</strong> EaselJS v0.7.0
 			</p>
 		</header>
 		<p class="highlight">
@@ -105,6 +105,31 @@ function tick(event) {
 			<p>
 				Notice in the above demo how when you change the FPS, the red circle still moves at the same velocity, whereas the blue circle's velocity is relative to the framerate. Also note how at 20fps, the red circle moves very slightly faster than the blue circle, because it accounts for frames that take slightly longer than the expected 50ms.
 			</p>
+			<p>
+				It's also worth noting that sprite sheet animations in EaselJS also support time-based playback via the <code>Sprite.framerate</code> and <code>SpriteSheet.framerate</code> properties. See the API docs for more information.
+			</p>
+		</section>
+		
+		<section>
+			<header>
+				<h2>Timing Modes</h2>
+			</header>
+			<p>
+				Most modern browsers support a new animation related API called <code>requestAnimationFrame</code>. It provides the benefit of synching programmatic changes with screen redraws which can result in smoother looking content. It will also throttle the framerate of background content (such as an unfocused tab) to reduce CPU and battery use.
+			</p>
+			<p>
+				The <code>Ticker.timingMode</code> allows you to choose what API to use to drive the heartbeat. By default, it uses <code>Ticker.TIMEOUT</code> and the setTimeout API. This is supported in all browsers, and provides a predictable, elastic framerate but without the benefits of requestAnimationFrame. It also allows you to reduce CPU/GPU load by reducing framerate.
+			</p>
+			<p>
+				There are two modes for using requestAnimationFrame, which will automatically fall back to using setTimeout if the browser does not support the API. <code>Ticker.RAF</code> simply passes through the RAF heartbeat, ignoring the specified framerate completely. Because RAF frequency is indeterminate, your content should be time based when using this mode.
+			</p>
+			<p>
+				The <code>Ticker.RAF_SYNCHED</code> mode attempts to match up the requestAnimationFrame heartbeat to your specified framerate. This mode provides many of the benefits of the <code>TIMEOUT</code> and <code>RAF</code> modes, but will generally have the highest variance in frame times. It typically works best when the framerate is set to a divisor of 60 (ex. 10, 12, 15, 20, 30).
+			</p>
+			<textarea class="brush: js;" readonly>
+createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+createjs.Ticker.setFPS(30);
+			</textarea>
 		</section>
 			
 		<section>
@@ -138,20 +163,11 @@ circle.addEventListener("tick", function() { this.x += 5; });
 			<p>
 				You can also add your stage directly as a listener to <code>Ticker</code>, because <code>Stage</code>
                 has a <code>handleEvent</code> method that shortcuts to <code>update</code>. It's rare that you would
-                want to use this, but it can be handy for quick tests. See the source of <a href="onTick.html">onTick.html</a> for an example.
+                want to use this, but it can be handy for quick tests.
 			</p>
-		</section>
-		
-		<section>
-			<header>
-				<h2>requestAnimationFrame</h2>
-			</header>
-			<p>
-				Most modern browsers support a new animation related API called <code>requestAnimationFrame</code>. It provides the benefit of synching programmatic changes with screen redraws, and will also throttle the framerate of background content (such as an unfocused tab) to reduce CPU and battery use.
-			</p>
-			<p>
-				If you set <code>Ticker.useRAF = true</code>, then <code>Ticker</code> will use requestAnimationFrame if it is supported in the current browser, or fall back to setTimeout if not. If you do this, it is recommended that you set your framerate to a divisor of 60 (ex. 15, 20, 30, 60) in order to get the most consistent results.
-			</p>
+			<textarea class="brush: js;" readonly>
+createjs.Ticker.addEventListener("tick", myStage);
+			</textarea>
 		</section>
 		
 		<section>
@@ -162,7 +178,7 @@ circle.addEventListener("tick", function() { this.x += 5; });
 				Remember that a higher framerate doesn't always result in smoother animation. A lower framerate uses less CPU, and can provide more consistent performance. Try to find the right balance for your project.
 			</p>
 			<p>
-				If you'd like to check what your real framerate is, you can call <code>Ticker.getMeasuredFPS()</code> to get the average real framerate for the past 1 second.
+				If you'd like to check what your real framerate is, you can call <code>Ticker.getMeasuredFPS()</code> to get the average real framerate for the past 1 second. You can also use <code>Ticker.getMeasuredTickTime()</code> to get the average time spent within the entire tick event stack.
 			</p>
 		</section>
 		

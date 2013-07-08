@@ -19,7 +19,7 @@
 	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/BitmapAnimation.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
@@ -44,16 +44,16 @@
             var canvas = document.getElementById("testCanvas")
 			stage = new createjs.Stage(canvas);
 
-			runningRate = 2.5;
+			runningRate = 150;
 			isInWarp = false;
 			isStationary = false;
 			stationaryPosition = 300;
 			isPassed = false;
 
-		    spriteSheet ={"animations": {"run": [0, 25], "jump": [26, 63]}, "images": ["assets/runningGrant.png"], "frames": {"regX": 0, "height": 292.5, "count": 64, "regY": 0, "width": 165.75}};
+		    spriteSheet = {"animations": {"run": [0, 25], "jump": [26, 63]}, "images": ["assets/runningGrant.png"], "frames": {"regX": 0, "height": 292.5, "count": 64, "regY": 0, "width": 165.75}};
 
             var ss = new createjs.SpriteSheet(spriteSheet);
-            grant = new createjs.BitmapAnimation(ss);
+            grant = new createjs.Sprite(ss);
 
             // Set up looping
             ss.getAnimation("run").next = "run";
@@ -64,6 +64,7 @@
             grant.x = -200;
             grant.y = 90;
             grant.scaleX = grant.scaleY = 0.8;
+            grant.framerate = 30;
 
             // grab canvas width and height for later calculations:
             w = canvas.width;
@@ -108,17 +109,17 @@
 						ground = new createjs.Shape();
 						var g = ground.graphics;
 						g.beginBitmapFill(result);
-						g.drawRect(0, 0, w+330, 79);
+						g.drawRect(0, 0, w+81, 79);
 						ground.y = h-79;
 						break;
 					case "hill":
-						hill = new createjs.Shape(new createjs.Graphics().beginBitmapFill(result).drawRect(0,0,282,59));
+						hill = new createjs.Bitmap(result);
 						hill.x = Math.random() * w;
 						hill.scaleX = hill.scaleY = 3;
 						hill.y = 144;
 						break;
 					case "hill2":
-						hill2 = new createjs.Shape(new createjs.Graphics().beginBitmapFill(result).drawRect(0,0,212,50));
+						hill2 = new createjs.Bitmap(result);
 						hill2.x = Math.random() * w;
 						hill2.scaleX = hill2.scaleY = 3;
 						hill2.y = 171;
@@ -136,7 +137,8 @@
 			stage.addChild(sky, ground, hill, hill2, grant);
 			stage.addEventListener("stagemousedown", handleJumpStart);
 
-            createjs.Ticker.setFPS(40);
+            createjs.Ticker.setFPS(30);
+           	createjs.Ticker.timingMode = createjs.Ticker.RAF;
 			createjs.Ticker.addEventListener("tick", tick);
 		}
 
@@ -145,16 +147,17 @@
 		}
 
 		function tick(event) {
-			var outside = w + 20;
-			var position = grant.x+runningRate;
-			grant.x = (position >= outside) ? -200 : position;
+			var deltaS = event.delta/1000;
+			var position = grant.x+runningRate*deltaS;
+			
+			var grantW = grant.getBounds().width*grant.scaleX;
+			grant.x = (position >= w) ? -grantW : position;
 
-			ground.x = (ground.x-15) % 330;
-			hill.x = (hill.x - 0.8);
-			if (hill.x + 838 <= 0) { hill.x = outside; }
-			hill2.x = (hill2.x - 1.2);
-			if (hill2.x + 633 <= 0) { hill2.x = outside; }
-
+			ground.x = (ground.x-deltaS*400) % 81;
+			hill.x = (hill.x - deltaS*30);
+			if (hill.x + hill.image.width*hill.scaleX <= 0) { hill.x = w; }
+			hill2.x = (hill2.x - deltaS*45);
+			if (hill2.x + hill2.image.width*hill2.scaleX <= 0) { hill2.x = w; }
 			stage.update(event);
 		}
 	</script>
@@ -165,7 +168,7 @@
 
 	<header id="header" class="EaselJS">
 		<h1><span class="text-product">Easel<strong>JS</strong></span> Sprite Sheets</h1>
-		<p>An example of a sprite sheet using <strong>BitmapAnimation</strong>. This demos also shows playing named
+		<p>An example of a sprite sheet using <strong>Sprite</strong>. This demos also shows playing named
 			animations (jump and run), and animation chaining using <strong>getAnimation("name").next</strong>.
 			Click the stage to initialize a jump, which will continue back into the run when it is complete.</p>
 		<p>Some browsers can not load images or access pixel data when running local files, and may throw a security error or not
