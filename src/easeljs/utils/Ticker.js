@@ -62,6 +62,53 @@ var Ticker = function() {
 	throw "Ticker cannot be instantiated.";
 };
 
+// constants:
+	/**
+	 * In this mode, Ticker uses the requestAnimationFrame API, but attempts to synch the ticks to target framerate. It
+	 * uses a simple heuristic that compares the time of the RAF return to the target time for the current frame and
+	 * dispatches the tick when the time is within a certain threshold.
+	 * 
+	 * This mode has a higher variance for time between frames than TIMEOUT, but does not require that content be time
+	 * based as with RAF while gaining the benefits of that API (screen synch, background throttling).
+	 * 
+	 * Variance is usually lowest for framerates that are a divisor of the RAF frequency. This is usually 60, so
+	 * framerates of 10, 12, 15, 20, and 30 work well.
+	 * 
+	 * Falls back on TIMEOUT if the requestAnimationFrame API is not supported.
+	 * @property RAF_SYNCHED
+	 * @static
+	 * @type {String}
+	 * @default "synched"
+	 * @readonly
+	 **/
+	Ticker.RAF_SYNCHED = "synched";
+	
+	/**
+	 * In this mode, Ticker passes through the requestAnimationFrame heartbeat, ignoring the target framerate completely.
+	 * Because requestAnimationFrame frequency is not deterministic, any content using this mode should be time based.
+	 * You can leverage {{#crossLink "Ticker/getTime"}}{{/crossLink}} and the tick event object's "delta" properties
+	 * to make this easier.
+	 * 
+	 * Falls back on TIMEOUT if the requestAnimationFrame API is not supported.
+	 * @property RAF
+	 * @static
+	 * @type {String}
+	 * @default "raf"
+	 * @readonly
+	 **/
+	Ticker.RAF = "raf";
+	
+	/**
+	 * In this mode, Ticker uses the setTimeout API. This provides predictable, adaptive frame timing, but does not
+	 * provide the benefits of requestAnimationFrame (screen synch, background throttling).
+	 * @property RAF
+	 * @static
+	 * @type {String}
+	 * @default "timer"
+	 * @readonly
+	 **/
+	Ticker.TIMEOUT = "timeout";
+
 // events:
 
 	/**
@@ -87,15 +134,26 @@ var Ticker = function() {
 
 // public static properties:
 	/**
-	 * Indicates whether Ticker should use <code>requestAnimationFrame</code> if it is supported in the browser.
-	 * If false, Ticker will use <code>setTimeout</code>. If you use RAF, it is recommended that you set the framerate
-	 * to a divisor of 60 (ex. 15, 20, 30, 60).
+	 * Deprecated in favour of {{#crossLink "Ticker/timingMode"}}{{/crossLink}}, and will be removed in a future version. If true, timingMode will
+	 * use {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} by default.
+	 * @deprecated Deprecated in favour of {{#crossLink "Ticker/timingMode"}}{{/crossLink}}.
 	 * @property useRAF
 	 * @static
 	 * @type {Boolean}
 	 * @default false
 	 **/
 	Ticker.useRAF = false;
+	
+	/**
+	 * Specifies the timing api (setTimeout or requestAnimationFrame) and mode to use. See
+	 * {{#crossLink "Ticker/TIMEOUT"}}{{/crossLink}}, {{#crossLink "Ticker/RAF"}}{{/crossLink}}, and
+	 * {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} for mode details.
+	 * @property timingMode
+	 * @static
+	 * @type {String}
+	 * @default Ticker.TIMEOUT
+	 **/
+	Ticker.timingMode = null;
 	
 // mix-ins:
 	// EventDispatcher methods:
@@ -411,7 +469,7 @@ var Ticker = function() {
 	 **/
 	Ticker.getPaused = function() {
 		return Ticker._paused;
-	}
+	};
 	
 	/**
 	 * Returns the number of milliseconds that have elapsed since Ticker was initialized. For example, you could use
@@ -424,7 +482,7 @@ var Ticker = function() {
 	 **/
 	Ticker.getTime = function(runTime) {
 		return Ticker._getTime() - Ticker._startTime - (runTime ? Ticker._pausedTime : 0);
-	}
+	};
 	
 	/**
 	 * Returns the number of ticks that have been broadcast by Ticker.
@@ -438,51 +496,69 @@ var Ticker = function() {
 	 **/
 	Ticker.getTicks = function(pauseable) {
 		return  Ticker._ticks - (pauseable ?Ticker._pausedTicks : 0);
-	}
+	};
 	
 // private static methods:
 	/**
-	 * @method _handleAF
+	 * @method _handleSynch
+	 * @static
 	 * @protected
 	 **/
-	Ticker._handleAF = function() {
+	Ticker._handleSynch = function() {
 		Ticker._rafActive = false;
 		Ticker._setupTick();
+		
 		// run if enough time has elapsed, with a little bit of flexibility to be early, because RAF seems to run a little faster than 60hz:
 		if (Ticker._getTime() - Ticker._lastTime >= (Ticker._interval-1)*0.97) {
 			Ticker._tick();
 		}
-	}
+	};
+	
+	/**
+	 * @method _handleRAF
+	 * @static
+	 * @protected
+	 **/
+	Ticker._handleRAF = function() {
+		Ticker._rafActive = false;
+		Ticker._setupTick();
+		Ticker._tick();
+	};
 	
 	/**
 	 * @method _handleTimeout
+	 * @static
 	 * @protected
 	 **/
 	Ticker._handleTimeout = function() {
 		Ticker.timeoutID = null;
 		Ticker._setupTick();
 		Ticker._tick();
-	}
+	};
 	
 	/**
 	 * @method _setupTick
+	 * @static
 	 * @protected
 	 **/
 	Ticker._setupTick = function() {
 		if (Ticker._rafActive || Ticker.timeoutID != null) { return; } // avoid duplicates
-		if (Ticker.useRAF) {
+		
+		var mode = Ticker.timingMode||(Ticker.useRAF&&Ticker.RAF_SYNCHED);
+		if (mode == Ticker.RAF_SYNCHED || mode == Ticker.RAF) {
 			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
 			if (f) {
-				f(Ticker._handleAF);
+				f(mode == Ticker.RAF ? Ticker._handleRAF : Ticker._handleSynch);
 				Ticker._rafActive = true;
 				return;
 			}
 		}
 		Ticker.timeoutID = setTimeout(Ticker._handleTimeout, Ticker._interval);
-	}
+	};
 	
 	/**
 	 * @method _tick
+	 * @static
 	 * @protected
 	 **/
 	Ticker._tick = function() {
@@ -516,16 +592,17 @@ var Ticker = function() {
 		
 		Ticker._times.unshift(time);
 		while (Ticker._times.length > 100) { Ticker._times.pop(); }
-	}
+	};
 	
 	/**
 	 * @method _getTime
+	 * @static
 	 * @protected
 	 **/
 	var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
 	Ticker._getTime = function() {
 		return (now&&now.call(performance))||(new Date().getTime());
-	}
+	};
 	
 	
 	Ticker.init();
