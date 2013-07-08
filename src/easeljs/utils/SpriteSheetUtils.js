@@ -92,9 +92,9 @@ var SpriteSheetUtils = function() {
 	/**
 	 * Returns a single frame of the specified sprite sheet as a new PNG image.
 	 *
-	 * <strong>WARNING:</strong> In almost all cases it is better to display a single frame using a {{#crossLink "BitmapAnimation"}}{{/crossLink}}
-	 * with a {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} call than it is to slice out a frame using this
-	 * method and display it with a Bitmap instance. You can also crop an image using the <code>sourceRect</code>
+	 * <strong>WARNING:</strong> In almost all cases it is better to display a single frame using a {{#crossLink "Sprite"}}{{/crossLink}}
+	 * with a {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} call than it is to slice out a frame using this
+	 * method and display it with a Bitmap instance. You can also crop an image using the {{#crossLink "Bitmap/sourceRect"}}{{/crossLink}}
 	 * property of {{#crossLink "Bitmap"}}{{/crossLink}}.
 	 *
 	 * The extractFrame method may cause cross-domain warnings since it accesses pixels directly on the canvas.

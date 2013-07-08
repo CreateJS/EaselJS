@@ -33,8 +33,8 @@ this.createjs = this.createjs||{};
 
 /**
  * The ButtonHelper is a helper class to create interactive buttons from {{#crossLink "MovieClip"}}{{/crossLink}} or
- * {{#crossLink "BitmapAnimation"}}{{/crossLink}} instances. This class will intercept mouse events from an object, and
- * automatically call {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} or {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}},
+ * {{#crossLink "Sprite"}}{{/crossLink}} instances. This class will intercept mouse events from an object, and
+ * automatically call {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} or {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}},
  * to the respective animation labels, add a pointer cursor, and allows the user to define a hit state frame.
  *
  * The ButtonHelper instance does not need to be added to the stage, but a reference should be maintained to prevent
@@ -49,7 +49,7 @@ this.createjs = this.createjs||{};
  *      }
  *
  * @class ButtonHelper
- * @param {BitmapAnimation|MovieClip} target The instance to manage.
+ * @param {Sprite|MovieClip} target The instance to manage.
  * @param {String} [outLabel="out"] The label or animation to go to when the user rolls out of the button.
  * @param {String} [overLabel="over"] The label or animation to go to when the user rolls over the button.
  * @param {String} [downLabel="down"] The label or animation to go to when the user presses the button.
@@ -71,7 +71,7 @@ var p = ButtonHelper.prototype;
 	/**
 	 * Read-only. The target for this button helper.
 	 * @property target
-	 * @type MovieClip | BitmapAnimation
+	 * @type MovieClip | Sprite
 	 **/
 	p.target = null;
 	
@@ -123,7 +123,7 @@ var p = ButtonHelper.prototype;
 	/** 
 	 * Initialization method.
 	 * @method initialize
-	 * @param {BitmapAnimation|MovieClip} target The instance to manage.
+	 * @param {Sprite|MovieClip} target The instance to manage.
 	 * @param {String} [outLabel="out"] The label or animation to go to when the user rolls out of the button.
 	 * @param {String} [overLabel="over"] The label or animation to go to when the user rolls over the button.
 	 * @param {String} [downLabel="down"] The label or animation to go to when the user presses the button.

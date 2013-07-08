@@ -116,8 +116,7 @@ this.createjs = this.createjs||{};
  *          animations: {run:[0,4], jump:[5,8,"run"]}
  *      };
  *      var spriteSheet = new createjs.SpriteSheet(data);
- *      var animation = new createjs.BitmapAnimation(spriteSheet);
- *      animation.gotoAndPlay("run");
+ *      var animation = new createjs.Sprite(spriteSheet, "run");
  *
  * @class SpriteSheet
  * @constructor
