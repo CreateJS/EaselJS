@@ -47,7 +47,11 @@ this.createjs = this.createjs||{};
  * <h4>SpriteSheet Format</h4>
  *
  *      data = {
- *
+ *          // DEFINING FRAMERATE:
+ *          // this specifies the framerate that will be set on the SpriteSheet. See Spritesheet.framerate
+ *          // for more information.
+ *          framerate: 20,
+ *          
  *          // DEFINING IMAGES:
  *          // list of images or image URIs to use. SpriteSheet can handle preloading.
  *          // the order dictates their index value for frame definition.
@@ -69,14 +73,12 @@ this.createjs = this.createjs||{};
  *
  *          // DEFINING ANIMATIONS:
  *
- * 	        // simple animation definitions. Define a consecutive range of frames.
- * 	        // also optionally define a "next" animation name for sequencing.
- * 	        // setting next to false makes it pause when it reaches the end.
+ * 	        // simple animation definitions. Define a consecutive range of frames (begin to end inclusive).
+ * 	        // optionally define a "next" animation to sequence to (or false to stop) and a playback "speed"
  * 	        animations: {
- * 	        	// start, end, next, frequency
+ * 	        	// start, end, next, speed
  * 	        	run: [0,8],
- * 	        	jump: [9,12,"run",2],
- * 	        	stand: 13
+ * 	        	jump: [9,12,"run",2]
  * 	        }
  *
  *          // the complex approach which specifies every frame in the animation by index.
@@ -87,7 +89,7 @@ this.createjs = this.createjs||{};
  *          	jump: {
  *          		frames: [1,4,5,6,1],
  *          		next: "run",
- *          		frequency: 2
+ *          		speed: 2
  *          	},
  *          	stand: { frames: [7] }
  *          }
@@ -98,7 +100,7 @@ this.createjs = this.createjs||{};
  * 	        	jump: {
  * 	        		frames: [8,9,10,9,8],
  * 	        		next: "run",
- * 	        		frequency: 2
+ * 	        		speed: 2
  * 	        	},
  * 	        	stand: 7
  * 	        }
@@ -152,6 +154,14 @@ var p = SpriteSheet.prototype;
 	 **/
 	p.complete = true;
 	
+	
+	/**
+	 * Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See
+	 * Sprite.framerate for more information.
+	 * @property framerate
+	 * @type Number
+	 **/
+	p.framerate = 0;
 	
 	/**
 	 * The onComplete callback is called when all images are loaded. Note that this only fires if the images
@@ -250,9 +260,11 @@ var p = SpriteSheet.prototype;
 		var i,l,o,a;
 		if (data == null) { return; }
 		
+		this.framerate = data.framerate||0;
+		
 		// parse images:
+		a = this._images = [];
 		if (data.images && (l=data.images.length) > 0) {
-			a = this._images = [];
 			for (i=0; i<l; i++) {
 				var img = data.images[i];
 				if (typeof img == "string") {
@@ -270,9 +282,9 @@ var p = SpriteSheet.prototype;
 		}
 		
 		// parse frames:
+		this._frames = [];
 		if (data.frames == null) { // nothing
 		} else if (data.frames instanceof Array) {
-			this._frames = [];
 			a = data.frames;
 			for (i=0,l=a.length;i<l;i++) {
 				var arr = a[i];
@@ -289,8 +301,8 @@ var p = SpriteSheet.prototype;
 		}
 		
 		// parse animations:
+		this._animations = [];
 		if ((o=data.animations) != null) {
-			this._animations = [];
 			this._data = {};
 			var name;
 			for (name in o) {
@@ -301,7 +313,7 @@ var p = SpriteSheet.prototype;
 				} else if (obj instanceof Array) { // simple
 					if (obj.length == 1) { anim.frames = [obj[0]]; }
 					else {
-						anim.frequency = obj[3];
+						anim.speed = obj[3];
 						anim.next = obj[2];
 						a = anim.frames = [];
 						for (i=obj[0];i<=obj[1];i++) {
@@ -309,19 +321,19 @@ var p = SpriteSheet.prototype;
 						}
 					}
 				} else { // complex
-					anim.frequency = obj.frequency;
+					anim.speed = obj.speed;
 					anim.next = obj.next;
 					var frames = obj.frames;
 					a = anim.frames = (typeof frames == "number") ? [frames] : frames.slice(0);
 				}
 				anim.next = (a.length < 2 || anim.next == false) ? null : (anim.next == null || anim.next == true) ? name : anim.next;
-				if (!anim.frequency) { anim.frequency = 1; }
+				if (!anim.speed) { anim.speed = 1; }
 				this._animations.push(name);
 				this._data[name] = anim;
 			}
 		}
 		
-	}
+	};
 
 // public methods:
 	/**
@@ -339,7 +351,7 @@ var p = SpriteSheet.prototype;
 			if (data == null) { return 0; }
 			else { return data.frames.length; }
 		}
-	}
+	};
 	
 	/**
 	 * Returns an array of all available animation names as strings.
@@ -348,21 +360,21 @@ var p = SpriteSheet.prototype;
 	 **/
 	p.getAnimations = function() {
 		return this._animations.slice(0);
-	}
+	};
 	
 	/**
 	 * Returns an object defining the specified animation. The returned object has a
-	 * frames property containing an array of the frame id's in the animation, a frequency
-	 * property indicating the advance frequency for this animation, a name property, 
+	 * frames property containing an array of the frame id's in the animation, a speed
+	 * property indicating the playback speed for this animation, a name property, 
 	 * and a next property, which specifies the default next animation. If the animation
 	 * loops, the name and next property will be the same.
 	 * @method getAnimation
 	 * @param {String} name The name of the animation to get.
-	 * @return {Object} a generic object with frames, frequency, name, and next properties.
+	 * @return {Object} a generic object with frames, speed, name, and next properties.
 	 **/
 	p.getAnimation = function(name) {
 		return this._data[name];
-	}
+	};
 	
 	/**
 	 * Returns an object specifying the image and source rect of the specified frame. The returned object
@@ -371,11 +383,11 @@ var p = SpriteSheet.prototype;
 	 * frame within that image.
 	 * @method getFrame
 	 * @param {Number} frameIndex The index of the frame.
-	 * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist, or the image is not fully loaded.
+	 * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist.
 	 **/
 	p.getFrame = function(frameIndex) {
 		var frame;
-		if (this.complete && this._frames && (frame=this._frames[frameIndex])) { return frame; }
+		if (this._frames && (frame=this._frames[frameIndex])) { return frame; }
 		return null;
 	};
 	
@@ -398,7 +410,7 @@ var p = SpriteSheet.prototype;
 	 **/
 	p.toString = function() {
 		return "[SpriteSheet]";
-	}
+	};
 
 	/**
 	 * Returns a clone of the SpriteSheet instance.
@@ -418,7 +430,7 @@ var p = SpriteSheet.prototype;
 		o._numFrames = this._numFrames;
 		o._loadCount = this._loadCount;
 		return o;
-	}
+	};
 	
 // private methods:
 	/**
@@ -432,7 +444,7 @@ var p = SpriteSheet.prototype;
 			this.onComplete&&this.onComplete();
 			this.dispatchEvent("complete");
 		}
-	}
+	};
 	
 	/**
 	 * @method _calculateFrames
@@ -440,7 +452,6 @@ var p = SpriteSheet.prototype;
 	 **/
 	p._calculateFrames = function() {
 		if (this._frames || this._frameWidth == 0) { return; }
-		this._frames = [];
 		var ttlFrames = 0;
 		var fw = this._frameWidth;
 		var fh = this._frameHeight;
@@ -455,7 +466,7 @@ var p = SpriteSheet.prototype;
 			ttlFrames += ttl;
 		}
 		this._numFrames = ttlFrames;
-	}
+	};
 
 createjs.SpriteSheet = SpriteSheet;
 }());

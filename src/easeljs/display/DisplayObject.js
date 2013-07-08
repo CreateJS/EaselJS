@@ -121,7 +121,6 @@
 this.createjs = this.createjs||{};
 
 (function() {
-
 /**
  * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
  * {{#crossLink "Container"}}{{/crossLink}}, {{#crossLink "Bitmap"}}{{/crossLink}}, and {{#crossLink "Shape"}}{{/crossLink}}.
@@ -134,7 +133,7 @@ this.createjs = this.createjs||{};
  **/
 var DisplayObject = function() {
   this.initialize();
-}
+};
 var p = DisplayObject.prototype;
 
 	/**
@@ -587,7 +586,7 @@ var p = DisplayObject.prototype;
 	p.initialize = function() {
 		this.id = createjs.UID.get();
 		this._matrix = new createjs.Matrix2D();
-	}
+	};
 
 // public methods:
 	/**
@@ -600,7 +599,7 @@ var p = DisplayObject.prototype;
 	 **/
 	p.isVisible = function() {
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0);
-	}
+	};
 
 	/**
 	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
@@ -618,7 +617,7 @@ var p = DisplayObject.prototype;
 		var scale = this._cacheScale;
 		ctx.drawImage(cacheCanvas, this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
 		return true;
-	}
+	};
 	
 	/**
 	 * Applies this display object's transformation, alpha, globalCompositeOperation, clipping path (mask), and shadow
@@ -647,7 +646,7 @@ var p = DisplayObject.prototype;
 		ctx.globalAlpha *= o.alpha;
 		if (o.compositeOperation) { ctx.globalCompositeOperation = o.compositeOperation; }
 		if (o.shadow) { this._applyShadow(ctx, o.shadow); }
-	}
+	};
 
 	/**
 	 * Draws the display object into a new canvas, which is then used for subsequent draws. For complex content
@@ -687,7 +686,7 @@ var p = DisplayObject.prototype;
 		this._cacheOffsetY = y;
 		this._cacheScale = scale||1;
 		this.updateCache();
-	}
+	};
 
 	/**
 	 * Redraws the display object to its cache. Calling updateCache without an active cache will throw an error.
@@ -720,7 +719,7 @@ var p = DisplayObject.prototype;
 		this._applyFilters();
 		ctx.restore();
 		this.cacheID = DisplayObject._nextCacheID++;
-	}
+	};
 
 	/**
 	 * Clears the current cache. See {{#crossLink "DisplayObject/cache"}}{{/crossLink}} for more information.
@@ -730,7 +729,7 @@ var p = DisplayObject.prototype;
 		this._cacheDataURL = this.cacheCanvas = null;
 		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = 0;
 		this._cacheScale = 1;
-	}
+	};
 	
 	/**
 	* Returns a data URL for the cache, or null if this display object is not cached.
@@ -741,7 +740,7 @@ var p = DisplayObject.prototype;
 		if (!this.cacheCanvas) { return null; }
 		if (this.cacheID != this._cacheDataURLID) { this._cacheDataURL = this.cacheCanvas.toDataURL(); }
 		return this._cacheDataURL;
-	}
+	};
 
 	/**
 	 * Returns the stage that this display object will be rendered on, or null if it has not been added to one.
@@ -757,7 +756,7 @@ var p = DisplayObject.prototype;
 		// using dynamic access to avoid circular dependencies;
 		if (o instanceof createjs["Stage"]) { return o; }
 		return null;
-	}
+	};
 
 	/**
 	 * Transforms the specified x and y position from the coordinate space of the display object
@@ -784,7 +783,7 @@ var p = DisplayObject.prototype;
 		if (mtx == null) { return null; }
 		mtx.append(1, 0, 0, 1, x, y);
 		return new createjs.Point(mtx.tx, mtx.ty);
-	}
+	};
 
 	/**
 	 * Transforms the specified x and y position from the global (stage) coordinate space to the
@@ -812,7 +811,7 @@ var p = DisplayObject.prototype;
 		mtx.invert();
 		mtx.append(1, 0, 0, 1, x, y);
 		return new createjs.Point(mtx.tx, mtx.ty);
-	}
+	};
 
 	/**
 	 * Transforms the specified x and y position from the coordinate space of this display object to the coordinate
@@ -825,7 +824,7 @@ var p = DisplayObject.prototype;
 	 *
 	 * @method localToLocal
 	 * @param {Number} x The x position in the source display object to transform.
-	 * @param {Number} y The y position on the stage to transform.
+	 * @param {Number} y The y position on the source display object to transform.
 	 * @param {DisplayObject} target The target display object to which the coordinates will be transformed.
 	 * @return {Point} Returns a Point instance with x and y properties correlating to the transformed position
 	 * in the target's coordinate space.
@@ -833,7 +832,7 @@ var p = DisplayObject.prototype;
 	p.localToLocal = function(x, y, target) {
 		var pt = this.localToGlobal(x, y);
 		return target.globalToLocal(pt.x, pt.y);
-	}
+	};
 
 	/**
 	 * Shortcut method to quickly set the transform properties on the display object. All parameters are optional.
@@ -866,7 +865,7 @@ var p = DisplayObject.prototype;
 		this.regX = regX || 0;
 		this.regY = regY || 0;
 		return this;
-	}
+	};
 	
 	/**
 	 * Returns a matrix based on this object's transform.
@@ -878,7 +877,7 @@ var p = DisplayObject.prototype;
 	p.getMatrix = function(matrix) {
 		var o = this;
 		return (matrix ? matrix.identity() : new createjs.Matrix2D()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
-	}
+	};
 	
 	/**
 	 * Generates a concatenated Matrix2D object representing the combined transform of the display object and all of its
@@ -900,7 +899,7 @@ var p = DisplayObject.prototype;
 			o = o.parent;
 		}
 		return matrix;
-	}
+	};
 
 	/**
 	 * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at
@@ -948,7 +947,7 @@ var p = DisplayObject.prototype;
 	p.set = function(props) {
 		for (var n in props) { this[n] = props[n]; }
 		return this;
-	}
+	};
 
 	/**
 	 * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
@@ -960,7 +959,7 @@ var p = DisplayObject.prototype;
 		var o = new DisplayObject();
 		this.cloneProps(o);
 		return o;
-	}
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -969,7 +968,7 @@ var p = DisplayObject.prototype;
 	 **/
 	p.toString = function() {
 		return "[DisplayObject (name="+  this.name +")]";
-	}
+	};
 
 // private methods:
 
@@ -1000,7 +999,7 @@ var p = DisplayObject.prototype;
 			o.cacheCanvas = this.cacheCanvas.cloneNode(true);
 			o.cacheCanvas.getContext("2d").putImageData(this.cacheCanvas.getContext("2d").getImageData(0,0,this.cacheCanvas.width,this.cacheCanvas.height),0,0);
 		}
-	}
+	};
 
 	/**
 	 * @method _applyShadow
@@ -1014,7 +1013,7 @@ var p = DisplayObject.prototype;
 		ctx.shadowOffsetX = shadow.offsetX;
 		ctx.shadowOffsetY = shadow.offsetY;
 		ctx.shadowBlur = shadow.blur;
-	}
+	};
 	
 	
 	/**
@@ -1030,7 +1029,7 @@ var p = DisplayObject.prototype;
 		// this can probably go away at some point. It only has a noticeable impact with thousands of objects in modern browsers.
 		var ls = this._listeners;
 		if (ls&&ls["tick"]) { this.dispatchEvent({type:"tick",params:params}); }
-	}
+	};
 
 	/**
 	 * @method _testHit
@@ -1047,7 +1046,7 @@ var p = DisplayObject.prototype;
 			}
 		}
 		return hit;
-	}
+	};
 
 	/**
 	 * @method _applyFilters
