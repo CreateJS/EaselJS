@@ -16,7 +16,7 @@
     <script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
     <script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
     <script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
-    <script type="text/javascript" src="../src/easeljs/display/BitmapAnimation.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
     <script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
     <script type="text/javascript" src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 
@@ -73,8 +73,8 @@
              spriteSheet.getAnimation("walkUpRt_h").next = "walkUpRt";
              */
 
-            // create a BitmapAnimation instance to display and play back the sprite sheet:
-            var bmpAnim = new createjs.BitmapAnimation(spriteSheet);
+            // create a Sprite instance to display and play back the sprite sheet:
+            var bmpAnim = new createjs.Sprite(spriteSheet);
 
             // start playing the first sequence:
             bmpAnim.gotoAndPlay("walkRt");		//animate
@@ -95,7 +95,7 @@
                 bmpAnim.y = Math.random()*(h-220)+0|0;
 
                 // have each rat start on a random frame in the "walkRt" animation:
-                bmpAnim.currentAnimationFrame = Math.random()*spriteSheet.getNumFrames("walkRt")|0;
+                bmpAnim.currentAnimationFrame = Math.random()*spriteSheet.getNumFrames("walkRt");
                 stage.addChild(bmpAnim);
                 bmpAnimList.push(bmpAnim);
 
@@ -142,8 +142,8 @@
 <body onload="init();">
 
 <header id="header" class="EaselJS">
-    <h1><span class="text-product">Easel<strong>JS</strong></span> Bitmap Animation</h1>
-    <p>Dev sample showing how to use <strong>SpriteSheet</strong>, <strong>BitmapAnimation</strong>,
+    <h1><span class="text-product">Easel<strong>JS</strong></span> Sprite</h1>
+    <p>Dev sample showing how to use <strong>SpriteSheet</strong>, <strong>Sprite</strong>,
         and <strong>SpriteSheetUtils.addFlippedFrames()</strong>.</p>
     <p>Some browsers can not load images or access pixel data when running local files, and may throw a security error or not
         work unless the content is running on a server.</p>
