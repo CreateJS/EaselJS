@@ -16,6 +16,7 @@
 		"/../src/easeljs/display/Container.js",
 		"/../src/easeljs/display/Stage.js",
 		"/../src/easeljs/display/Bitmap.js",
+		"/../src/easeljs/display/Sprite.js",
 		"/../src/easeljs/display/BitmapAnimation.js",
 		"/../src/easeljs/display/Shape.js",
 		"/../src/easeljs/display/Text.js",
