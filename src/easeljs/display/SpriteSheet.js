@@ -263,8 +263,8 @@ var p = SpriteSheet.prototype;
 		this.framerate = data.framerate||0;
 		
 		// parse images:
-		a = this._images = [];
 		if (data.images && (l=data.images.length) > 0) {
+			a = this._images = [];
 			for (i=0; i<l; i++) {
 				var img = data.images[i];
 				if (typeof img == "string") {
@@ -282,9 +282,9 @@ var p = SpriteSheet.prototype;
 		}
 		
 		// parse frames:
-		this._frames = [];
 		if (data.frames == null) { // nothing
 		} else if (data.frames instanceof Array) {
+			this._frames = [];
 			a = data.frames;
 			for (i=0,l=a.length;i<l;i++) {
 				var arr = a[i];
@@ -452,6 +452,7 @@ var p = SpriteSheet.prototype;
 	 **/
 	p._calculateFrames = function() {
 		if (this._frames || this._frameWidth == 0) { return; }
+		this._frames = [];
 		var ttlFrames = 0;
 		var fw = this._frameWidth;
 		var fh = this._frameHeight;
