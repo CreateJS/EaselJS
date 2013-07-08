@@ -5,7 +5,7 @@ Version NEXT [Not Released]
 	* support for non-integer values
 	* inverted results vs frequency. Ex. a "speed" value of 2 doubles playback speed, 0.5 halves it
 - added Sprite.framerate and SpriteSheet.framerate
-- deprecated Sprite.offset
+- deprecated Sprite.offset (no longer functional)
 - added Ticker.timingMode and deprecated Ticker.useRAF
 	* added Ticker.TIMEOUT, Ticker.RAF, Ticker.RAF_SYNCHED timing mode constants
 - added Ticker.getMeasuredTickTime()
