@@ -37,7 +37,7 @@
  * <ul>
  *      <li>Images using {{#crossLink "Bitmap"}}{{/crossLink}}</li>
  *      <li>Vector graphics using {{#crossLink "Shape"}}{{/crossLink}} and {{#crossLink "Graphics"}}{{/crossLink}}</li>
- *      <li>Animated bitmaps using {{#crossLink "SpriteSheet"}}{{/crossLink}} and {{#crossLink "BitmapAnimation"}}{{/crossLink}}
+ *      <li>Animated bitmaps using {{#crossLink "SpriteSheet"}}{{/crossLink}} and {{#crossLink "Sprite"}}{{/crossLink}}
  *      <li>Simple text instances using {{#crossLink "Text"}}{{/crossLink}}</li>
  *      <li>Containers that hold other DisplayObjects using {{#crossLink "Container"}}{{/crossLink}}</li>
  *      <li>Control HTML DOM elements using {{#crossLink "DOMElement"}}{{/crossLink}}</li>
@@ -387,7 +387,7 @@ var p = DisplayObject.prototype;
 	 * Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage.
 	 * Snapping to whole pixels can result in a sharper and faster draw for images (ex. Bitmap & cached objects).
 	 * This only applies if the enclosing stage has snapPixelsEnabled set to true. The snapToPixel property is true
-	 * by default for Bitmap and BitmapAnimation instances, and false for all other display objects.
+	 * by default for Bitmap and Sprite instances, and false for all other display objects.
 	 * <br/><br/>
 	 * Note that this applies only rounds the display object's local position. You should
 	 * ensure that all of the display object's ancestors (parent containers) are also on a whole pixel. You can do this
