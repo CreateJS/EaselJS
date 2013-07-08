@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>EaselJS Example: Using BitmapAnimation Objects</title>
+    <title>EaselJS Example: Using Sprite</title>
 
     <link href="assets/demoStyles.css" rel="stylesheet" type="text/css"/>
 
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
     <script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
     <script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
-    <script type="text/javascript" src="../src/easeljs/display/BitmapAnimation.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
     <script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
     <script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
 
@@ -27,7 +27,7 @@
         var stage;
 
         var imgSeq = new Image();        // The image for the sparkle animation
-        var bmpAnim;                        // The animated sparkle template to clone
+        var sprite;                        // The animated sparkle template to clone
         var fpsLabel;
 
         function init() {
@@ -49,7 +49,7 @@
             }
 
             // set up an animation instance, which we will clone
-            bmpAnim = new createjs.BitmapAnimation(new createjs.SpriteSheet(data));
+            sprite = new createjs.Sprite(new createjs.SpriteSheet(data));
 
             // add a text object to output the current FPS:
             fpsLabel = new createjs.Text("-- fps", "bold 14px Arial", "#FFF");
@@ -105,7 +105,7 @@
             //create the specified number of sparkles
             for(var i = 0; i < count; i++) {
                 // clone the original sparkle, so we don't need to set shared properties:
-                var sparkle = bmpAnim.clone();
+                var sparkle = sprite.clone();
 
                 // set display properties:
                 sparkle.x = x;
@@ -123,7 +123,7 @@
                 sparkle.vA = -Math.random() * 0.05 - 0.01; // alpha
 
                 // start the animation on a random frame:
-                sparkle.gotoAndPlay(Math.random() * sparkle.spriteSheet.getNumFrames() | 0);
+                sparkle.gotoAndPlay(Math.random() * sparkle.spriteSheet.getNumFrames());
 
                 // add to the display list:
                 stage.addChild(sparkle);
@@ -138,7 +138,7 @@
 <header id="header" class="EaselJS">
     <h1><span class="text-product">Easel<strong>JS</strong></span> Sparkles Demo</h1>
 
-    <p>Example showing how to use simple animated <strong>BitmapAnimation</strong> elements. Move your mouse and click
+    <p>Example showing how to use simple animated <strong>Sprite</strong> elements. Move your mouse and click
         on the canvas. It also demonstrates displaying the current measured framerate with <strong>Ticker.getMeasuredFramerate()</strong>
         and <strong>Text</strong>. Click repeatedly to generate lots of sparkles and slow down the framerate.<br/>
     </p>

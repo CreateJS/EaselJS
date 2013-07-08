@@ -16,7 +16,7 @@
 	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
 	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/BitmapAnimation.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
@@ -46,11 +46,9 @@
 						}
 				});
 
-			var grant = new createjs.BitmapAnimation(ss);
+			var grant = new createjs.Sprite(ss, "run");
 			grant.x = 360;
 			grant.y = 22;
-
-			grant.gotoAndPlay("run");
 
 			// Add Grant to the stage, and add it as a listener to Ticker to get updates each frame.
 			stage.addChild(grant);
@@ -64,7 +62,7 @@
 
 	<header id="header" class="EaselJS">
 		<h1><span class="text-product">Easel<strong>JS</strong></span> Simple SpriteSheet Example</h1>
-		<p>A simple example of a sprite sheet using <strong>BitmapAnimation</strong>. This demos also shows playing named
+		<p>A simple example of a sprite sheet using <strong>Sprite</strong>. This demos also shows playing named
 			animations (jump and run), and animation chaining using <strong>getAnimation("name").next</strong>.</p>
 	</header>
 

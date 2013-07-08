@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>EaselJS Example: Displaying icons using BitmapAnimation and SpriteSheet</title>
+	<title>EaselJS Example: Displaying icons using Sprite and SpriteSheet</title>
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 
@@ -16,7 +16,7 @@
 	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/BitmapAnimation.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
@@ -42,8 +42,8 @@
 		var data = {images:[iconSheet], frames:{width:80, height:80}};
 		var spriteSheet  = new createjs.SpriteSheet(data);
 
-		// create a BitmapAnimation to display frames from the sprite sheet:
-		var icon1 = new createjs.BitmapAnimation(spriteSheet);
+		// create a Sprite to display frames from the sprite sheet:
+		var icon1 = new createjs.Sprite(spriteSheet);
         icon1.x = 10;
         icon1.y = 100;
 
@@ -110,7 +110,7 @@
 
 	<header id="header" class="EaselJS">
 	    <h1><span class="text-product">Easel<strong>JS</strong></span> Spritesheet Icons</h1>
-	    <p>Shows two approaches to use <strong>BitmapAnimation</strong> to display individual icons or graphics from a <strong>SpriteSheet</strong>.</p>
+	    <p>Shows two approaches to use <strong>Sprite</strong> to display individual icons or graphics from a <strong>SpriteSheet</strong>.</p>
 	</header>
 
 	<div class="canvasHolder">

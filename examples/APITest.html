@@ -26,7 +26,7 @@
 <script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
 <script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
 <script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
-<script type="text/javascript" src="../src/easeljs/display/BitmapAnimation.js"></script>
+<script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
 <script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
 <script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
 <script type="text/javascript" src="../src/easeljs/filters/BoxBlurFilter.js"></script>
@@ -106,7 +106,7 @@ function init() {
             return new Graphics().beginStroke(STROKE_COLOR).beginBitmapFill(img).drawCircle(30, 30, 30).endStroke();
         }},
         {label:'Text', code:textDemo },
-        {label:'BitmapAnimation', code:bitmapAnimationDemo },
+        {label:'Sprite', code:spriteDemo },
         {label:'Blur Filter', code:blurFilter },
         {label:'Remove Red Color Filter', code:colorFilter },
         {label:'ColorMatrixFilter', code:colorMatrixFilter },
@@ -175,7 +175,7 @@ function textDemo(stage) {
     stage.addChild(txt);
 }
 
-function bitmapAnimationDemo(stage) {
+function spriteDemo(stage) {
     var ss = new createjs.SpriteSheet({ "animations":{
         "run":[0, 25],
         "jump":[26, 63]},
@@ -189,18 +189,16 @@ function bitmapAnimationDemo(stage) {
         }
     });
 
-    ss.getAnimation("run").frequency = 2;
+    ss.getAnimation("run").speed = 2;
     ss.getAnimation("run").next = "jump";
     ss.getAnimation("jump").next = "run";
 
-    var bitmapAnimation = new createjs.BitmapAnimation(ss);
-    bitmapAnimation.scaleY = bitmapAnimation.scaleX = .4;
-
-    bitmapAnimation.gotoAndPlay("run");
+    var sprite = new createjs.Sprite(ss, "run");
+    sprite.scaleY = sprite.scaleX = 0.4;
 
     createjs.Ticker.setFPS(60);
     createjs.Ticker.addEventListener("tick", stage);
-    stage.addChild(bitmapAnimation);
+    stage.addChild(sprite);
 }
 
 function layout() {
