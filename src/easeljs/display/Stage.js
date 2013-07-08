@@ -264,15 +264,25 @@ var p = Stage.prototype = new createjs.Container();
 		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
 		this._pointerData = {};
 		this.enableDOMEvents(true);
-	}
+	};
 
 // public methods:
 
 	/**
-	 * Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. {{#crossLink "BitmapAnimation"}}{{/crossLink}})
-	 * and render its entire display list to the canvas. Any parameters passed to update will be passed on to any
+	 * Each time the update method is called, the stage will tick all descendants
+	 * (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}}) and then 
+	 * render the display list to the canvas. Any parameters passed to update() will be passed on to any
 	 * <code>tick</code> event handlers.
+	 * 
+	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
+	 * a tick event object (or equivalent) be passed as the first parameter to update(). For example:
+	 * 	Ticker.addEventListener("tick", handleTick);
+	 * 	function handleTick(evtObj) {
+	 * 	 	// do some work here, then update the stage, passing through the event object:
+	 * 		myStage.update(evtObj);
+	 * 	}	
 	 * @method update
+	 * @param {*} [params]* Params to include when ticking descendants. The first param should usually be a tick event.
 	 **/
 	p.update = function() {
 		if (!this.canvas) { return; }
@@ -284,7 +294,7 @@ var p = Stage.prototype = new createjs.Container();
 		this.updateContext(ctx);
 		this.draw(ctx, false);
 		ctx.restore();
-	}
+	};
 
 	/**
 	 * Calls the {{#crossLink "Stage/update"}}{{/crossLink}} method. Useful for adding stage as a listener to
@@ -309,7 +319,7 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.handleEvent = function(evt) {
 		if (evt.type == "tick") { this.update(evt); }
-	}
+	};
 
 	/**
 	 * Clears the target canvas. Useful if <code>autoClear</code> is set to false.
@@ -320,7 +330,7 @@ var p = Stage.prototype = new createjs.Container();
 		var ctx = this.canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, this.canvas.width+1, this.canvas.height+1);
-	}
+	};
 
 	/**
 	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
@@ -376,7 +386,7 @@ var p = Stage.prototype = new createjs.Container();
 		}
 
 		return dataURL;
-	}
+	};
 
 	/**
 	 * Enables or disables (by passing a frequency of 0) mouse over events (mouseover and mouseout) for this stage's
@@ -401,7 +411,7 @@ var p = Stage.prototype = new createjs.Container();
 		else if (frequency <= 0) { return; }
 		var o = this;
 		this._mouseOverIntervalID = setInterval(function(){ o._testMouseOver(); }, 1000/Math.min(50,frequency));
-	}
+	};
 	
 	/**
 	 * Enables or disables the event listeners that stage adds to DOM elements (window, document and canvas).
@@ -441,7 +451,7 @@ var p = Stage.prototype = new createjs.Container();
 				o.t.addEventListener(n, o.f);
 			}
 		}
-	}
+	};
 
 	/**
 	 * Returns a clone of this Stage.
@@ -451,7 +461,7 @@ var p = Stage.prototype = new createjs.Container();
 		var o = new Stage(null);
 		this.cloneProps(o);
 		return o;
-	}
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -460,7 +470,7 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.toString = function() {
 		return "[Stage (name="+  this.name +")]";
-	}
+	};
 
 	// private methods:
 	
@@ -518,7 +528,7 @@ var p = Stage.prototype = new createjs.Container();
 			oEvt.onMouseMove&&oEvt.onMouseMove(evt);
 			oEvt.dispatchEvent(evt, oEvt.target);
 		}
-	}
+	};
 
 	/**
 	 * @method _updatePointerPosition
@@ -553,7 +563,7 @@ var p = Stage.prototype = new createjs.Container();
 			this.mouseY = o.y;
 			this.mouseInBounds = o.inBounds;
 		}
-	}
+	};
 	
 	/**
 	 * @method _getElementRect
@@ -581,7 +591,7 @@ var p = Stage.prototype = new createjs.Container();
 			top: bounds.top+offY+padT,
 			bottom: bounds.bottom+offY-padB
 		}
-	}
+	};
 
 	/**
 	 * @method _handleMouseUp
@@ -590,7 +600,7 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p._handleMouseUp = function(e) {
 		this._handlePointerUp(-1, e, false);
-	}
+	};
 	
 	/**
 	 * @method _handlePointerUp
@@ -627,7 +637,7 @@ var p = Stage.prototype = new createjs.Container();
 			if (id == this._primaryPointerID) { this._primaryPointerID = null; }
 			delete(this._pointerData[id]);
 		} else { o.event = o.target = null; }
-	}
+	};
 
 	/**
 	 * @method _handleMouseDown
@@ -636,7 +646,7 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p._handleMouseDown = function(e) {
 		this._handlePointerDown(-1, e, false);
-	}
+	};
 	
 	/**
 	 * @method _handlePointerDown
@@ -667,7 +677,7 @@ var p = Stage.prototype = new createjs.Container();
 				if (evt.onMouseMove || evt.onMouseUp || evt.hasEventListener("mousemove") || evt.hasEventListener("mouseup")) { o.event = evt; }
 			}
 		}
-	}
+	};
 
 	/**
 	 * @method _testMouseOver
@@ -705,7 +715,7 @@ var p = Stage.prototype = new createjs.Container();
 			
 			this._mouseOverTarget = target;
 		}
-	}
+	};
 
 	/**
 	 * @method _handleDoubleClick
@@ -720,7 +730,7 @@ var p = Stage.prototype = new createjs.Container();
 			target.onDoubleClick&&target.onDoubleClick(evt);
 			target.dispatchEvent(evt);
 		}
-	}
+	};
 
 createjs.Stage = Stage;
 }());
