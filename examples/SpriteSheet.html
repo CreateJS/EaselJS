@@ -23,19 +23,17 @@
 	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
-	  http://code.createjs.com -->
+		http://code.createjs.com -->
 
 	<script type="text/javascript">
 
-	var stage, w, h;
+	var stage, w, h, loader;
 	var sky, grant, ground, hill, hill2;
 
 	function init() {
 		if (window.top != window) {
 			document.getElementById("header").style.display = "none";
 		}
-
-		document.getElementById("loader").className = "loader";
 
 		stage = new createjs.Stage("testCanvas");
 		
@@ -57,31 +55,34 @@
 	}
 
 	function handleComplete() {
+		document.getElementById("loader").className = "";
+		
 		sky = new createjs.Shape();
 		sky.graphics.beginBitmapFill(loader.getResult("sky")).drawRect(0,0,w,h);
 		
+		var groundImg = loader.getResult("ground");
 		ground = new createjs.Shape();
-		ground.graphics.beginBitmapFill(loader.getResult("ground")).drawRect(0, 0, w+81, 79);
-		ground.y = h-79;
+		ground.graphics.beginBitmapFill(groundImg).drawRect(0, 0, w+groundImg.width, groundImg.height);
+		ground.tileW = groundImg.width;
+		ground.y = h-groundImg.height;
 		
 		hill = new createjs.Bitmap(loader.getResult("hill"));
-		hill.setTransform(Math.random() * w, 144, 3, 3);
+		hill.setTransform(Math.random() * w, h-hill.image.height*3-groundImg.height, 3, 3);
 		     
 		hill2 = new createjs.Bitmap(loader.getResult("hill2"));
-		hill2.setTransform(Math.random() * w, 171, 3, 3);
-		
-		var ss = new createjs.SpriteSheet({
+		hill2.setTransform(Math.random() * w, h-hill2.image.height*3-groundImg.height, 3, 3);
+	
+		var data = new createjs.SpriteSheet({
 			"images": [loader.getResult("grant")],
 			"frames": {"regX": 0, "height": 293, "count": 64, "regY": 0, "width": 166},
+			// define two animations, run (loops, 1.5x speed) and jump (returns to run):
 			"animations": {"run": [0, 25, "run", 1.5], "jump": [26, 63, "run"]}
 		});
-		grant = new createjs.Sprite(ss, "run");
+		grant = new createjs.Sprite(data, "run");
 		grant.setTransform(-200, 90, 0.8, 0.8);
 		grant.framerate = 30;
-		
-		document.getElementById("loader").className = "";
 
-		stage.addChild(sky, ground, hill, hill2, grant);
+		stage.addChild(sky, hill, hill2, ground, grant);
 		stage.addEventListener("stagemousedown", handleJumpStart);
 
 		createjs.Ticker.timingMode = createjs.Ticker.RAF;
@@ -95,22 +96,23 @@
 	function tick(event) {
 		var deltaS = event.delta/1000;
 		var position = grant.x+150*deltaS;
-					                    
+		
 		var grantW = grant.getBounds().width*grant.scaleX;
 		grant.x = (position >= w) ? -grantW : position;
 
-		ground.x = (ground.x-deltaS*200) % 81;
+		ground.x = (ground.x-deltaS*200) % ground.tileW;
 		hill.x = (hill.x - deltaS*30);
 		if (hill.x + hill.image.width*hill.scaleX <= 0) { hill.x = w; }
 		hill2.x = (hill2.x - deltaS*45);
 		if (hill2.x + hill2.image.width*hill2.scaleX <= 0) { hill2.x = w; }
+		
 		stage.update(event);
 	}
 	</script>
 </head>
 <body onload="init();">
 
-	<div id="loader"></div>
+	<div id="loader" class="loader"></div>
 
 	<header id="header" class="EaselJS">
 		<h1><span class="text-product">Easel<strong>JS</strong></span> Sprite Sheets</h1>
