@@ -50,15 +50,14 @@
 			stationaryPosition = 300;
 			isPassed = false;
 
-		    spriteSheet = {"animations": {"run": [0, 25], "jump": [26, 63]}, "images": ["assets/runningGrant.png"], "frames": {"regX": 0, "height": 292.5, "count": 64, "regY": 0, "width": 165.75}};
+		    spriteSheet = {
+                "images": ["assets/runningGrant.png"],
+                "frames": {"regX": 0, "height": 292.5, "count": 64, "regY": 0, "width": 165.75},
+		        "animations": {"run": [0, 25, "run", 2], "jump": [26, 63, "run"]}
+		        };
 
             var ss = new createjs.SpriteSheet(spriteSheet);
-            grant = new createjs.Sprite(ss);
-
-            // Set up looping
-            ss.getAnimation("run").next = "run";
-            ss.getAnimation("jump").next = "run";
-            grant.gotoAndPlay("run");
+            grant = new createjs.Sprite(ss, "run");
 
             // Position the Grant sprite
             grant.x = -200;
@@ -137,7 +136,6 @@
 			stage.addChild(sky, ground, hill, hill2, grant);
 			stage.addEventListener("stagemousedown", handleJumpStart);
 
-            createjs.Ticker.setFPS(30);
            	createjs.Ticker.timingMode = createjs.Ticker.RAF;
 			createjs.Ticker.addEventListener("tick", tick);
 		}
