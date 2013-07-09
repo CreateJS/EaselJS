@@ -27,137 +27,85 @@
 
 	<script type="text/javascript">
 
-	var assets;
-	var stage;
-	var w, h;
+	var stage, w, h;
 	var sky, grant, ground, hill, hill2;
-	var runningRate, isInWarp, isStationary;
-	var stationaryPosition, isPassed;
 
-		function init() {
-			if (window.top != window) {
-				document.getElementById("header").style.display = "none";
-			}
-
-			document.getElementById("loader").className = "loader";
-
-            var canvas = document.getElementById("testCanvas")
-			stage = new createjs.Stage(canvas);
-
-			runningRate = 150;
-			isInWarp = false;
-			isStationary = false;
-			stationaryPosition = 300;
-			isPassed = false;
-
-		    spriteSheet = {
-                "images": ["assets/runningGrant.png"],
-                "frames": {"regX": 0, "height": 293, "count": 64, "regY": 0, "width": 166},
-		        "animations": {"run": [0, 25, "run", 1.5], "jump": [26, 63, "run"]}
-		        };
-
-            var ss = new createjs.SpriteSheet(spriteSheet);
-            grant = new createjs.Sprite(ss, "run");
-
-            // Position the Grant sprite
-            grant.x = -200;
-            grant.y = 90;
-            grant.scaleX = grant.scaleY = 0.8;
-            grant.framerate = 30;
-
-            // grab canvas width and height for later calculations:
-            w = canvas.width;
-            h = canvas.height;
-
-			assets = [];
-
-            manifest = [
-                {src:"assets/runningGrant.png", id:"grant"},
-                {src:"assets/sky.png", id:"sky"},
-                {src:"assets/ground.png", id:"ground"},
-                {src:"assets/parallaxHill1.png", id:"hill"},
-                {src:"assets/parallaxHill2.png", id:"hill2"}
-            ];
-
-            loader = new createjs.LoadQueue(false);
-            loader.onFileLoad = handleFileLoad;
-            loader.onComplete = handleComplete;
-            loader.loadManifest(manifest);
-            stage.autoClear = false;
-        }
-
-		function handleFileLoad(event) {
-			assets.push(event.item);
+	function init() {
+		if (window.top != window) {
+			document.getElementById("header").style.display = "none";
 		}
 
-		function handleComplete() {
-			for(var i=0;i<assets.length;i++) {
-				var item = assets[i];
-				var id = item.id;
-				var result = loader.getResult(id);
+		document.getElementById("loader").className = "loader";
 
-				if (item.type == createjs.LoadQueue.IMAGE) {
-					var bmp = new createjs.Bitmap(result);
-				}
+		stage = new createjs.Stage("testCanvas");
+		
+		// grab canvas width and height for later calculations:
+		w = stage.canvas.width;
+		h = stage.canvas.height;
 
-				switch (id) {
-					case "sky":
-						sky = new createjs.Shape(new createjs.Graphics().beginBitmapFill(result).drawRect(0,0,w,h));
-						break;
-					case "ground":
-						ground = new createjs.Shape();
-						var g = ground.graphics;
-						g.beginBitmapFill(result);
-						g.drawRect(0, 0, w+81, 79);
-						ground.y = h-79;
-						break;
-					case "hill":
-						hill = new createjs.Bitmap(result);
-						hill.x = Math.random() * w;
-						hill.scaleX = hill.scaleY = 3;
-						hill.y = 144;
-						break;
-					case "hill2":
-						hill2 = new createjs.Bitmap(result);
-						hill2.x = Math.random() * w;
-						hill2.scaleX = hill2.scaleY = 3;
-						hill2.y = 171;
-						break;
-				}
-			}
+		manifest = [
+			{src:"assets/runningGrant.png", id:"grant"},
+			{src:"assets/sky.png", id:"sky"},
+			{src:"assets/ground.png", id:"ground"},
+			{src:"assets/parallaxHill1.png", id:"hill"},
+			{src:"assets/parallaxHill2.png", id:"hill2"}
+		];
 
-			document.getElementById("loader").className = "";
+		loader = new createjs.LoadQueue(false);
+		loader.addEventListener("complete", handleComplete);
+		loader.loadManifest(manifest);
+	}
 
-			if (grant == null) {
-				//console.log("Can not play. Grant sprite was not loaded.");
-				return;
-			}
+	function handleComplete() {
+		sky = new createjs.Shape();
+		sky.graphics.beginBitmapFill(loader.getResult("sky")).drawRect(0,0,w,h);
+		
+		ground = new createjs.Shape();
+		ground.graphics.beginBitmapFill(loader.getResult("ground")).drawRect(0, 0, w+81, 79);
+		ground.y = h-79;
+		
+		hill = new createjs.Bitmap(loader.getResult("hill"));
+		hill.setTransform(Math.random() * w, 144, 3, 3);
+		     
+		hill2 = new createjs.Bitmap(loader.getResult("hill2"));
+		hill2.setTransform(Math.random() * w, 171, 3, 3);
+		
+		var ss = new createjs.SpriteSheet({
+			"images": [loader.getResult("grant")],
+			"frames": {"regX": 0, "height": 293, "count": 64, "regY": 0, "width": 166},
+			"animations": {"run": [0, 25, "run", 1.5], "jump": [26, 63, "run"]}
+		});
+		grant = new createjs.Sprite(ss, "run");
+		grant.setTransform(-200, 90, 0.8, 0.8);
+		grant.framerate = 30;
+		
+		document.getElementById("loader").className = "";
 
-			stage.addChild(sky, ground, hill, hill2, grant);
-			stage.addEventListener("stagemousedown", handleJumpStart);
+		stage.addChild(sky, ground, hill, hill2, grant);
+		stage.addEventListener("stagemousedown", handleJumpStart);
 
-           	createjs.Ticker.timingMode = createjs.Ticker.RAF;
-			createjs.Ticker.addEventListener("tick", tick);
-		}
+		createjs.Ticker.timingMode = createjs.Ticker.RAF;
+		createjs.Ticker.addEventListener("tick", tick);
+	}
 
-		function handleJumpStart() {
-			grant.gotoAndPlay("jump");
-		}
+	function handleJumpStart() {
+		grant.gotoAndPlay("jump");
+	}
 
-		function tick(event) {
-			var deltaS = event.delta/1000;
-			var position = grant.x+runningRate*deltaS;
-			
-			var grantW = grant.getBounds().width*grant.scaleX;
-			grant.x = (position >= w) ? -grantW : position;
+	function tick(event) {
+		var deltaS = event.delta/1000;
+		var position = grant.x+150*deltaS;
+					                    
+		var grantW = grant.getBounds().width*grant.scaleX;
+		grant.x = (position >= w) ? -grantW : position;
 
-			ground.x = (ground.x-deltaS*200) % 81;
-			hill.x = (hill.x - deltaS*30);
-			if (hill.x + hill.image.width*hill.scaleX <= 0) { hill.x = w; }
-			hill2.x = (hill2.x - deltaS*45);
-			if (hill2.x + hill2.image.width*hill2.scaleX <= 0) { hill2.x = w; }
-			stage.update(event);
-		}
+		ground.x = (ground.x-deltaS*200) % 81;
+		hill.x = (hill.x - deltaS*30);
+		if (hill.x + hill.image.width*hill.scaleX <= 0) { hill.x = w; }
+		hill2.x = (hill2.x - deltaS*45);
+		if (hill2.x + hill2.image.width*hill2.scaleX <= 0) { hill2.x = w; }
+		stage.update(event);
+	}
 	</script>
 </head>
 <body onload="init();">
@@ -170,7 +118,7 @@
 			animations (jump and run), and animation chaining using <strong>getAnimation("name").next</strong>.
 			Click the stage to initialize a jump, which will continue back into the run when it is complete.</p>
 		<p>Some browsers can not load images or access pixel data when running local files, and may throw a security error or not
-	    			work unless the content is running on a server.</p>
+					work unless the content is running on a server.</p>
 	</header>
 
 	<div class="canvasHolder">
