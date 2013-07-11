@@ -281,7 +281,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * The x offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
-	 * it's center, you would set regX and regY to 50.
+	 * its center, you would set regX and regY to 50.
 	 * @property regX
 	 * @type {Number}
 	 * @default 0
@@ -290,7 +290,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
-	 * it's center, you would set regX and regY to 50.
+	 * its center, you would set regX and regY to 50.
 	 * @property regY
 	 * @type {Number}
 	 * @default 0
@@ -307,7 +307,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display
-	 * object to twice it's nominal width. To horizontally flip an object, set the scale to a negative number.
+	 * object to twice its nominal width. To horizontally flip an object, set the scale to a negative number.
 	 * @property scaleX
 	 * @type {Number}
 	 * @default 1
@@ -316,7 +316,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display
-	 * object to half it's nominal height. To vertically flip an object, set the scale to a negative number.
+	 * object to half its nominal height. To vertically flip an object, set the scale to a negative number.
 	 * @property scaleY
 	 * @type {Number}
 	 * @default 1
@@ -384,7 +384,7 @@ var p = DisplayObject.prototype;
 	p.compositeOperation = null;
 
 	/**
-	 * Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage.
+	 * Indicates whether the display object should have its x & y position rounded prior to drawing it to stage.
 	 * Snapping to whole pixels can result in a sharper and faster draw for images (ex. Bitmap & cached objects).
 	 * This only applies if the enclosing stage has snapPixelsEnabled set to true. The snapToPixel property is true
 	 * by default for Bitmap and Sprite instances, and false for all other display objects.
@@ -602,7 +602,7 @@ var p = DisplayObject.prototype;
 	};
 
 	/**
-	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	 * Returns <code>true</code> if the draw was handled (useful for overriding functionality).
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
@@ -652,7 +652,7 @@ var p = DisplayObject.prototype;
 	 * Draws the display object into a new canvas, which is then used for subsequent draws. For complex content
 	 * that does not change frequently (ex. a Container with many children that do not move, or a complex vector Shape),
 	 * this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
-	 * cached display object can be moved, rotated, faded, etc freely, however if it's content changes, you must
+	 * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must
 	 * manually update the cache by calling <code>updateCache()</code> or <code>cache()</code> again. You must specify
 	 * the cache area via the x, y, w, and h parameters. This defines the rectangle that will be rendered and cached
 	 * using this display object's coordinates.

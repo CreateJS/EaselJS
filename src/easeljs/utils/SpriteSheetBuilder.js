@@ -235,7 +235,7 @@ var p = SpriteSheetBuilder.prototype;
 	 * Adds a frame to the {{#crossLink "SpriteSheet"}}{{/crossLink}}. Note that the frame will not be drawn until you
 	 * call {{#crossLink "SpriteSheetBuilder/build"}}{{/crossLink}} method. The optional setup params allow you to have
 	 * a function run immediately before the draw occurs. For example, this allows you to add a single source multiple
-	 * times, but manipulate it or it's children to change it to generate different frames.
+	 * times, but manipulate it or its children to change it to generate different frames.
 	 *
 	 * Note that the source's transformations (x, y, scale, rotate, alpha) will be ignored, except for regX/Y. To apply
 	 * transforms to a source object and have them captured in the sprite sheet, simply place it into a {{#crossLink "Container"}}{{/crossLink}}
