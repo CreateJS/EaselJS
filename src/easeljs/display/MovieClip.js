@@ -106,7 +106,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	MovieClip.SINGLE_FRAME = "single";
 	
 	/**
-	 * Read-only. The MovieClip will be advanced only when it's parent advances and will be synched to the position of
+	 * Read-only. The MovieClip will be advanced only when its parent advances and will be synched to the position of
 	 * the parent MovieClip.
 	 * @property SYNCHED
 	 * @static
@@ -291,7 +291,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	p.Container_draw = p.draw;
 	
 	/**
-	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw

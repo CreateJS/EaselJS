@@ -80,7 +80,7 @@
 			bitmap.cursor = "pointer";
 
 			bitmap.addEventListener("mousedown", function(evt) {
-				// bump the target in front of it's siblings:
+				// bump the target in front of its siblings:
 				var o = evt.target;
 				o.parent.addChild(o);
 				var offset = {x:o.x-evt.stageX, y:o.y-evt.stageY};

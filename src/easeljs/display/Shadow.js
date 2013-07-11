@@ -33,7 +33,7 @@ this.createjs = this.createjs||{};
 
 /**
  * This class encapsulates the properties required to define a shadow to apply to a {{#crossLink "DisplayObject"}}{{/crossLink}}
- * via it's <code>shadow</code> property.
+ * via its <code>shadow</code> property.
  *
  * <h4>Example</h4>
  *      myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
