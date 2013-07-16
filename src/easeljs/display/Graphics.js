@@ -63,7 +63,7 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); };
  *	    g.beginFill(createjs.Graphics.getRGB(255,0,0));
  *	    g.drawCircle(0,0,3);
  *
- *	    var s = new Shape(g);
+ *	    var s = new createjs.Shape(g);
  *	    	s.x = 100;
  *	    	s.y = 100;
  *
@@ -132,13 +132,13 @@ var p = Graphics.prototype;
 	 * Returns a CSS compatible color string based on the specified RGB numeric color values in the format 
 	 * "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)". For example,
 	 *
-	 *      Graphics.getRGB(50, 100, 150, 0.5);
+	 *      createjs.Graphics.getRGB(50, 100, 150, 0.5);
 	 *      // Returns "rgba(50,100,150,0.5)"
 	 *
 	 * It also supports passing a single hex color value as the first param, and an optional alpha value as the second
 	 * param. For example,
 	 *
-	 *      Graphics.getRGB(0xFF00FF, 0.2);
+	 *      createjs.Graphics.getRGB(0xFF00FF, 0.2);
 	 *      // Returns "rgba(255,0,255,0.2)"
 	 *
 	 * @method getRGB
@@ -168,7 +168,7 @@ var p = Graphics.prototype;
 	 * Returns a CSS compatible color string based on the specified HSL numeric color values in the format "hsla(360,100,100,1.0)", 
 	 * or if alpha is null then in the format "hsl(360,100,100)".
 	 *
-	 *      Graphics.getHSL(150, 100, 70);
+	 *      createjs.Graphics.getHSL(150, 100, 70);
 	 *      // Returns "hsl(150,100,70)"
 	 *
 	 * @method getHSL
@@ -883,13 +883,13 @@ var p = Graphics.prototype;
 	/**
 	 * Draws a circle with the specified radius at (x, y).
 	 *
-	 *      var g = new Graphics();
+	 *      var g = new createjs.Graphics();
 	 *	    g.setStrokeStyle(1);
-	 *	    g.beginStroke(Graphics.getRGB(0,0,0));
-	 *	    g.beginFill(Graphics.getRGB(255,0,0));
+	 *	    g.beginStroke(createjs.Graphics.getRGB(0,0,0));
+	 *	    g.beginFill(createjs.Graphics.getRGB(255,0,0));
 	 *	    g.drawCircle(0,0,3);
 	 *
-	 *	    var s = new Shape(g);
+	 *	    var s = new createjs.Shape(g);
 	 *		s.x = 100;
 	 *		s.y = 100;
 	 *
