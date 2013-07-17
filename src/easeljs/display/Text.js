@@ -193,7 +193,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	p.DisplayObject_draw = p.draw;
 	
 	/**
-	 * Draws the Text into the specified context ignoring it's visible, alpha, shadow, and transform.
+	 * Draws the Text into the specified context ignoring its visible, alpha, shadow, and transform.
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
