@@ -95,7 +95,7 @@
 			// wrapper function to provide scope for the event handlers:
 			(function(target) {
 				bitmap.onPress = function(evt) {
-					// bump the target in front of it's siblings:
+					// bump the target in front of its siblings:
 					container.addChild(target);
 					var offset = {x:target.x-evt.stageX, y:target.y-evt.stageY};
 
