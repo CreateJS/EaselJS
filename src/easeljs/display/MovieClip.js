@@ -83,7 +83,7 @@ this.createjs = this.createjs||{};
  **/
 var MovieClip = function(mode, startPosition, loop, labels) {
   this.initialize(mode, startPosition, loop, labels);
-}
+};
 var p = MovieClip.prototype = new createjs.Container();
 
 	/**
@@ -436,7 +436,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		for (var i=tweens.length-1;i>=0;i--) {
 			var tween = tweens[i];
 			var target = tween._target;
-			if (target == this) { continue; } // TODO: this assumes this is the actions tween. Valid?
+			if (target == this || tween.passive) { continue; } // TODO: this assumes this is the actions tween. Valid?
 			var offset = tween._stepPosition;
 			
 			if (target instanceof createjs.DisplayObject) {
@@ -455,7 +455,7 @@ var p = MovieClip.prototype = new createjs.Container();
 				delete(this._managed[id]);
 			}
 		}
-	}
+	};
 	
 	/**
 	 * @method _setState
@@ -472,7 +472,7 @@ var p = MovieClip.prototype = new createjs.Container();
 			for (var n in props) { target[n] = props[n]; }
 			this._addManagedChild(target, offset);
 		}
-	}
+	};
 	
 	/**
 	 * Adds a child to the timeline, and sets it up as a managed child.
@@ -491,7 +491,7 @@ var p = MovieClip.prototype = new createjs.Container();
 			if (child.mode == MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
 		}
 		this._managed[child.id] = 2;
-	}
+	};
 	
 
 createjs.MovieClip = MovieClip;
