@@ -53,7 +53,7 @@ this.createjs = this.createjs||{};
  **/
 var Container = function() {
   this.initialize();
-}
+};
 var p = Container.prototype = new createjs.DisplayObject();
 
 // public properties:
@@ -67,6 +67,16 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @default null
 	 **/
 	p.children = null;
+	
+	/**
+	 * Indicates whether the children of this container are independently enabled for mouse/pointer interaction.
+	 * If false, the children will be aggregated under the container - for example, a click on a child shape would
+	 * trigger a click event on the container.
+	 * @property mouseChildren
+	 * @type Boolean
+	 * @default true
+	 **/
+	p.mouseChildren = true;
 
 // constructor:
 
@@ -85,7 +95,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	p.initialize = function() {
 		this.DisplayObject_initialize();
 		this.children = [];
-	}
+	};
 
 // public methods:
 
@@ -100,7 +110,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	p.isVisible = function() {
 		var hasContent = this.cacheCanvas || this.children.length;
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
-	}
+	};
 
 	/**
 	 * @property DisplayObject_draw
@@ -136,7 +146,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			ctx.restore();
 		}
 		return true;
-	}
+	};
 	
 	/**
 	 * Adds a child to the top of the display list.
@@ -163,7 +173,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		child.parent = this;
 		this.children.push(child);
 		return child;
-	}
+	};
 
 	/**
 	 * Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and
@@ -200,7 +210,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		child.parent = this;
 		this.children.splice(index, 0, child);
 		return child;
-	}
+	};
 
 	/**
 	 * Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is
@@ -226,7 +236,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			return good;
 		}
 		return this.removeChildAt(this.children.indexOf(child));
-	}
+	};
 
 	/**
 	 * Removes the child at the specified index from the display list, and sets its parent to null.
@@ -259,7 +269,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		if (child) { child.parent = null; }
 		this.children.splice(index, 1);
 		return true;
-	}
+	};
 
 	/**
 	 * Removes all children from the display list.
@@ -272,7 +282,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	p.removeAllChildren = function() {
 		var kids = this.children;
 		while (kids.length) { kids.pop().parent = null; }
-	}
+	};
 
 	/**
 	 * Returns the child at the specified index.
@@ -286,7 +296,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 **/
 	p.getChildAt = function(index) {
 		return this.children[index];
-	}
+	};
 	
 	/**
 	 * Returns the child with the specified name.
@@ -300,7 +310,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			if(kids[i].name == name) { return kids[i]; }
 		}
 		return null;
-	}
+	};
 
 	/**
 	 * Performs an array sort operation on the child list.
@@ -319,7 +329,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 **/
 	p.sortChildren = function(sortFunction) {
 		this.children.sort(sortFunction);
-	}
+	};
 
 	/**
 	 * Returns the index of the specified child in the display list, or -1 if it is not in the display list.
@@ -333,7 +343,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 **/
 	p.getChildIndex = function(child) {
 		return this.children.indexOf(child);
-	}
+	};
 
 	/**
 	 * Returns the number of children in the display list.
@@ -342,7 +352,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 **/
 	p.getNumChildren = function() {
 		return this.children.length;
-	}
+	};
 	
 	/**
 	 * Swaps the children at the specified indexes. Fails silently if either index is out of range.
@@ -357,7 +367,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		if (!o1 || !o2) { return; }
 		kids[index1] = o2;
 		kids[index2] = o1;
-	}
+	};
 	
 	/**
 	 * Swaps the specified children's depth in the display list. Fails silently if either child is not a child of this
@@ -377,7 +387,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		if (i==l) { return; } // TODO: throw error?
 		kids[index1] = child2;
 		kids[index2] = child1;
-	}
+	};
 	
 	/**
 	 * Changes the depth of the specified child. Fails silently if the child is not a child of this container, or the index is out of range.
@@ -394,7 +404,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		if (i==l || i == index) { return; }
 		kids.splice(i,1);
 		kids.splice(index,0,child);
-	}
+	};
 
 	/**
 	 * Returns true if the specified display object either is this container or is a descendent (child, grandchild, etc)
@@ -409,7 +419,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			child = child.parent;
 		}
 		return false;
-	}
+	};
 
 	/**
 	 * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the
@@ -424,7 +434,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	p.hitTest = function(x, y) {
 		// TODO: optimize to use the fast cache check where possible.
 		return (this.getObjectUnderPoint(x, y) != null);
-	}
+	};
 
 	/**
 	 * Returns an array of all display objects under the specified coordinates that are in this container's display
@@ -442,7 +452,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var pt = this.localToGlobal(x, y);
 		this._getObjectsUnderPoint(pt.x, pt.y, arr);
 		return arr;
-	}
+	};
 
 	/**
 	 * Similar to {{#crossLink "Container/getObjectsUnderPoint()"}}{{/crossLink}}, but returns only the top-most display
@@ -456,7 +466,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	p.getObjectUnderPoint = function(x, y) {
 		var pt = this.localToGlobal(x, y);
 		return this._getObjectsUnderPoint(pt.x, pt.y);
-	}
+	};
 
 	/**
 	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are
@@ -478,7 +488,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			}
 		}
 		return o;
-	}
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -487,7 +497,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 **/
 	p.toString = function() {
 		return "[Container (name="+  this.name +")]";
-	}
+	};
 
 // private properties:
 	/**
@@ -509,57 +519,32 @@ var p = Container.prototype = new createjs.DisplayObject();
 			if (child._tick) { child._tick(params); }
 		}
 		this.DisplayObject__tick(params);
-	}
+	};
 
 	/**
 	 * @method _getObjectsUnderPoint
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Array} arr
-	 * @param {Number} mouseEvents A bitmask indicating which event types to look for. Bit 1 specifies press &
-	 * click & double click, bit 2 specifies it should look for mouse over and mouse out. This implementation may change.
+	 * @param {Boolean} mouse If true, it will respect mouse interaction properties like mouseEnabled, mouseChildren, and hitArea.
 	 * @return {Array}
 	 * @protected
 	 **/
-	p._getObjectsUnderPoint = function(x, y, arr, mouseEvents) {
+	p._getObjectsUnderPoint = function(x, y, arr, mouse) {
 		var ctx = createjs.DisplayObject._hitTestContext;
 		var mtx = this._matrix;
-		var hasHandler = this._hasMouseHandler(mouseEvents);
-
-		// if we have a cache handy & this has a handler, we can use it to do a quick check.
-		// we can't use the cache for screening children, because they might have hitArea set.
-		if (!this.hitArea && this.cacheCanvas && hasHandler) {
-			this.getConcatenatedMatrix(mtx);
-			ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
-			ctx.globalAlpha = mtx.alpha;
-			this.draw(ctx);
-			if (this._testHit(ctx)) {
-				ctx.setTransform(1, 0, 0, 1, 0, 0)
-				ctx.clearRect(0, 0, 2, 2);
-				return this;
-			}
-		}
 
 		// draw children one at a time, and check if we get a hit:
 		var l = this.children.length;
 		for (var i=l-1; i>=0; i--) {
 			var child = this.children[i];
-			var hitArea = child.hitArea;
-			if (!child.visible || (!hitArea && !child.isVisible()) || (mouseEvents && !child.mouseEnabled)) { continue; }
-			var childHasHandler = mouseEvents && child._hasMouseHandler(mouseEvents);
-			
-			// if a child container has a handler and a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
-			if (child instanceof Container && !(hitArea && childHasHandler)) {
-				var result;
-				if (hasHandler) {
-					// only concerned about the first hit, because this container is going to claim it anyway:
-					result = child._getObjectsUnderPoint(x, y);
-					if (result) { return this; }
-				} else {
-					result = child._getObjectsUnderPoint(x, y, arr, mouseEvents);
-					if (!arr && result) { return result; }
-				}
-			} else if (!mouseEvents || hasHandler || childHasHandler) {
+			var hitArea = mouse&&child.hitArea;
+			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
+			// if a child container has a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
+			if (!hitArea && child instanceof Container) {
+				var result = child._getObjectsUnderPoint(x, y, arr, mouse);
+				if (!arr && result) { return result; }
+			} else {
 				child.getConcatenatedMatrix(mtx);
 				
 				if (hitArea) {
@@ -573,9 +558,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 				if (!this._testHit(ctx)) { continue; }
 				ctx.setTransform(1, 0, 0, 1, 0, 0);
 				ctx.clearRect(0, 0, 2, 2);
-				if (hasHandler) { return this; }
-				else if (arr) { arr.push(child); }
-				else { return child; }
+				if (arr) { arr.push(child); }
+				else { return (mouse && !this.mouseChildren) ? this : child; }
 			}
 		}
 		return null;
