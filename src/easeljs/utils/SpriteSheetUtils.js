@@ -41,7 +41,7 @@ this.createjs = this.createjs||{};
  **/
 var SpriteSheetUtils = function() {
 	throw "SpriteSheetUtils cannot be instantiated";
-}
+};
 
 	/**
 	 * @property _workingCanvas
@@ -79,6 +79,7 @@ var SpriteSheetUtils = function() {
 	 * @param {Boolean} horizontal If true, horizontally flipped frames will be added.
 	 * @param {Boolean} vertical If true, vertically flipped frames will be added.
 	 * @param {Boolean} both If true, frames that are flipped both horizontally and vertically will be added.
+	 * @deprecated Modern browsers perform better when flipping via a transform (ex. scaleX=-1) rendering this obsolete.
 	 **/
 	SpriteSheetUtils.addFlippedFrames = function(spriteSheet, horizontal, vertical, both) {
 		if (!horizontal && !vertical && !both) { return; }
@@ -87,10 +88,11 @@ var SpriteSheetUtils = function() {
 		if (horizontal) { SpriteSheetUtils._flip(spriteSheet,++count,true,false); }
 		if (vertical) { SpriteSheetUtils._flip(spriteSheet,++count,false,true); }
 		if (both) { SpriteSheetUtils._flip(spriteSheet,++count,true,true); }
-	}
+	};
 
 	/**
-	 * Returns a single frame of the specified sprite sheet as a new PNG image.
+	 * Returns a single frame of the specified sprite sheet as a new PNG image. An example of when this may be useful is
+	 * to use a spritesheet frame as the source for a bitmap fill.
 	 *
 	 * <strong>WARNING:</strong> In almost all cases it is better to display a single frame using a {{#crossLink "Sprite"}}{{/crossLink}}
 	 * with a {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} call than it is to slice out a frame using this
@@ -101,15 +103,15 @@ var SpriteSheetUtils = function() {
 	 * @method extractFrame
 	 * @static
 	 * @param {Image} spriteSheet The SpriteSheet instance to extract a frame from.
-	 * @param {Number|String} frame The frame number or animation name to extract. If an animation
+	 * @param {Number|String} frameOrAnimation The frame number or animation name to extract. If an animation
 	 * name is specified, only the first frame of the animation will be extracted.
 	 * @return {Image} a single frame of the specified sprite sheet as a new PNG image.
 	*/
-	SpriteSheetUtils.extractFrame = function(spriteSheet, frame) {
-		if (isNaN(frame)) {
-			frame = spriteSheet.getAnimation(frame).frames[0];
+	SpriteSheetUtils.extractFrame = function(spriteSheet, frameOrAnimation) {
+		if (isNaN(frameOrAnimation)) {
+			frameOrAnimation = spriteSheet.getAnimation(frameOrAnimation).frames[0];
 		}
-		var data = spriteSheet.getFrame(frame);
+		var data = spriteSheet.getFrame(frameOrAnimation);
 		if (!data) { return null; }
 		var r = data.rect;
 		var canvas = SpriteSheetUtils._workingCanvas;
@@ -119,7 +121,7 @@ var SpriteSheetUtils = function() {
 		var img = new Image();
 		img.src = canvas.toDataURL("image/png");
 		return img;
-	}
+	};
 
 	/**
 	 * Merges the rgb channels of one image with the alpha channel of another. This can be used to combine a compressed
@@ -132,6 +134,7 @@ var SpriteSheetUtils = function() {
 	 * @param {Image} alphaImage The image (or canvas) containing the alpha channel to use.
 	 * @param {Canvas} canvas Optional. If specified, this canvas will be used and returned. If not, a new canvas will be created.
 	 * @return {Canvas} A canvas with the combined image data. This can be used as a source for Bitmap or SpriteSheet.
+	 * @deprecated Tools such as ImageAlpha generally provide better results. This will be moved to sandbox in the future.
 	*/
 	SpriteSheetUtils.mergeAlpha = function(rgbImage, alphaImage, canvas) {
 		if (!canvas) { canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
@@ -144,7 +147,7 @@ var SpriteSheetUtils = function() {
 		ctx.drawImage(alphaImage,0,0);
 		ctx.restore();
 		return canvas;
-	}
+	};
 
 	
 // private static methods:
@@ -205,7 +208,7 @@ var SpriteSheetUtils = function() {
 			data[anim.name] = anim;
 			names.push(anim.name);
 		}
-	}
+	};
 	
 
 createjs.SpriteSheetUtils = SpriteSheetUtils;
