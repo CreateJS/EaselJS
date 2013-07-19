@@ -340,7 +340,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	/**
 	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the current frame relative to
 	 * the origin. For example, a 90 x 70 frame with <code>regX=50</code> and <code>regY=40</code> would return a
-	 * rectangle with [x=-50, y=-40, width=90, height=70].
+	 * rectangle with [x=-50, y=-40, width=90, height=70]. This ignores transformations on the display object.
 	 *
 	 * Also see the SpriteSheet {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}} method.
 	 * @method getBounds
