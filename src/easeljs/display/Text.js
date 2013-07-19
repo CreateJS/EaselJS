@@ -242,10 +242,10 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * <code>lineHeight</code> (if specified) or {{#crossLink "Text/getMeasuredLineHeight"}}{{/crossLink}}. Note that
 	 * this operation requires the text flowing logic to run, which has an associated CPU cost.
 	 * @method getMeasuredHeight
-	 * @return {Number} The approximate height of the drawn multi-line text.
+	 * @return {Number} The approximate height of the untransformed multi-line text.
 	 **/
 	p.getMeasuredHeight = function() {
-		return this._drawText()*(this.lineHeight||this.getMeasuredLineHeight());
+		return this._drawText(null,{}).height;
 	};
 	
 	/**
@@ -308,17 +308,19 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * Draws multiline text.
 	 * @method _drawText
 	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {Object} o
 	 * @protected
-	 * @return {Number} The number of lines drawn.
 	 **/
-	p._drawText = function(ctx) {
+	p._drawText = function(ctx, o) {
 		var paint = !!ctx;
 		if (!paint) { ctx = this._getWorkingContext(); }
 		var lines = String(this.text).split(/(?:\r\n|\r|\n)/);
 		var lineHeight = this.lineHeight||this.getMeasuredLineHeight();
 		var count = 0;
+		var maxW = 0;
 		for (var i=0, l=lines.length; i<l; i++) {
 			var w = ctx.measureText(lines[i]).width;
+			if (w > maxW) { maxW = w; }
 			if (this.lineWidth == null || w < this.lineWidth) {
 				if (paint) { this._drawTextLine(ctx, lines[i], count*lineHeight); }
 				count++;
@@ -341,7 +343,12 @@ var p = Text.prototype = new createjs.DisplayObject();
 			if (paint) { this._drawTextLine(ctx, str, count*lineHeight); } // Draw remaining text
 			count++;
 		}
-		return count;
+		if (o) {
+			o.count = count;
+			o.width = maxW;
+			o.height = count*lineHeight;
+		}
+		return o;
 	};
 	
 	/** 
