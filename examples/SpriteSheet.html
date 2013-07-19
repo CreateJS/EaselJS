@@ -74,7 +74,7 @@
 	
 		var data = new createjs.SpriteSheet({
 			"images": [loader.getResult("grant")],
-			"frames": {"regX": 0, "height": 293, "count": 64, "regY": 0, "width": 166},
+			"frames": {"regX": 0, "height": 292, "count": 64, "regY": 0, "width": 165},
 			// define two animations, run (loops, 1.5x speed) and jump (returns to run):
 			"animations": {"run": [0, 25, "run", 1.5], "jump": [26, 63, "run"]}
 		});
@@ -116,11 +116,15 @@
 
 	<header id="header" class="EaselJS">
 		<h1><span class="text-product">Easel<strong>JS</strong></span> Sprite Sheets</h1>
-		<p>An example of a sprite sheet using <strong>Sprite</strong>. This demos also shows playing named
+		<p>
+			An example of a sprite sheet using <strong>Sprite</strong>. This demos also shows playing named
 			animations (jump and run), and animation chaining using <strong>getAnimation("name").next</strong>.
-			Click the stage to initialize a jump, which will continue back into the run when it is complete.</p>
-		<p>Some browsers can not load images or access pixel data when running local files, and may throw a security error or not
-					work unless the content is running on a server.</p>
+			Click the stage to initialize a jump, which will continue back into the run when it is complete.
+		</p>
+		<p>
+			Some browsers can not load images or access pixel data when running local files, and may throw a security error or not
+			work unless the content is running on a server.
+		</p>
 	</header>
 
 	<div class="canvasHolder">
