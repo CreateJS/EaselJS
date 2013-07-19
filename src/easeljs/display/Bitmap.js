@@ -187,6 +187,20 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	 * method.
 	 * @method uncache
 	 **/
+	 
+	/**
+	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of display object.
+	 * This ignores transformations on the display object.
+	 * 
+	 * @method getBounds
+	 * @return {Rectangle} A Rectangle instance. Returns null if the image is not fully
+	 * loaded.
+	 **/
+	p.getBounds = function() {
+		var o = this.sourceRect || this.image;
+		var hasContent = (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
+		return hasContent ? new createjs.Rectangle(0, 0, o.width, o.height) : null;
+	};
 	
 	/**
 	 * Returns a clone of the Bitmap instance.
