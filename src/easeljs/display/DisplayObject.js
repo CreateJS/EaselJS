@@ -195,8 +195,9 @@ var p = DisplayObject.prototype;
 	 */
 	 
 	/**
-	 * Dispatched when the user's mouse rolls over this display object. This event must be enabled using 
-	 * {{#crossLink "Stage.enableMouseOver"}}{{/crossLink}}.
+	 * Dispatched when the user's mouse enters this display object. This event must be enabled using 
+	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
+	 * See also {{#crossLink "DisplayObject/rollover"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event mouseover
 	 * @since 0.6.0
@@ -204,11 +205,68 @@ var p = DisplayObject.prototype;
 	 
 	
 	/**
-	 * Dispatched when the user's mouse rolls out of this display object. This event must be enabled using 
+	 * Dispatched when the user's mouse leaves this display object. This event must be enabled using 
 	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
+	 * See also {{#crossLink "DisplayObject/rollout"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event mouseout
 	 * @since 0.6.0
+	 */
+	 
+	/**
+	 * This event is similar to {{#crossLink "DisplayObject/mouseover"}}{{/crossLink}}, with the following differences:
+	 * it does not bubble, and it considers
+	 * {{#crossLink "Container"}}{{/crossLink}} instances as an aggregate of their content.
+	 * 
+	 * For example, myContainer contains two overlapping children: shapeA and shapeB. The user moves their mouse over
+	 * shapeA and then directly on to shapeB. With a listener for mouseover on myContainer, two events would be
+	 * received, each targeting a child element:<OL>
+	 * <LI>when the mouse enters shapeA (target=shapeA)</LI>
+	 * <LI>when the mouse enters shapeB (target=shapeB)</LI>
+	 * </OL>
+	 * However, with a listener for "rollover" instead, only a single event is received when the mouse first enters
+	 * the aggregate myContainer content (target=myContainer).
+	 * 
+	 * This event must be enabled using {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event rollover
+	 * @since 0.7.0
+	 */
+	 
+	/**
+	 * This event is similar to {{#crossLink "DisplayObject/mouseout"}}{{/crossLink}}, with the following differences:
+	 * it does not bubble, and it considers
+	 * {{#crossLink "Container"}}{{/crossLink}} instances as an aggregate of their content.
+	 * 
+	 * For example, myContainer contains two overlapping children: shapeA and shapeB. The user moves their mouse over
+	 * shapeA, then directly on to shapeB, then off both. With a listener for mouseout on myContainer, two events would
+	 * be received, each targeting a child element:<OL>
+	 * <LI>when the mouse leaves shapeA (target=shapeA)</LI>
+	 * <LI>when the mouse leaves shapeB (target=shapeB)</LI>
+	 * </OL>
+	 * However, with a listener for "rollout" instead, only a single event is received when the mouse leaves
+	 * the aggregate myContainer content (target=myContainer).
+	 * 
+	 * This event must be enabled using {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event rollout
+	 * @since 0.7.0
+	 */
+	 
+	/**
+	 * After a {{#crossLink "DisplayObject/mousedown"}}{{/crossLink}} occurs on a display object, a pressmove event will
+	 * be generated on that object whenever the mouse moves until the mouse press is released.
+	 * This can be useful for dragging and similar operations.
+	 * @event pressmove
+	 * @since 0.7.0
+	 */
+	 
+	/**
+	 * After a {{#crossLink "DisplayObject/mousedown"}}{{/crossLink}} occurs on a display object, a pressup event will
+	 * be generated on that object when that mouse press is released.
+	 * This can be useful for dragging and similar operations.
+	 * @event pressup
+	 * @since 0.7.0
 	 */
 	 
 	/**
@@ -398,69 +456,44 @@ var p = DisplayObject.prototype;
 	 * @deprecated Hardware acceleration in modern browsers makes this unnecessary.
 	 **/
 	p.snapToPixel = false;
-	 
+	
+	// TODO: remove handler docs in future:
 	/**
-	 * The onPress callback is called when the user presses down on their mouse over this display object. The handler
-	 * is passed a single param containing the corresponding MouseEvent instance. You can subscribe to the onMouseMove
-	 * and onMouseUp callbacks of the event object to receive these events until the user releases the mouse button.
-	 * If an onPress handler is set on a container, it will receive the event if any of its children are clicked.
+	 * REMOVED.
 	 * @property onPress
 	 * @type {Function}
 	 * @deprecated In favour of addEventListener and the "mousedown" event. Will be removed in a future version.
 	 */
-	p.onPress = null;	 
-	 
 	/**
-	 * The onClick callback is called when the user presses down on and then releases the mouse button over this
-	 * display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an
-	 * onClick handler is set on a container, it will receive the event if any of its children are clicked.
+	 * REMOVED.
 	 * @property onClick
 	 * @type {Function}
 	 * @deprecated In favour of addEventListener and the "click" event. Will be removed in a future version.
 	 */
-	p.onClick = null;
-
 	/**
-	 * The onDoubleClick callback is called when the user double clicks over this display object. The handler is
-	 * passed a single param containing the corresponding MouseEvent instance. If an onDoubleClick handler is set
-	 * on a container, it will receive the event if any of its children are clicked.
+	 * REMOVED.
 	 * @property onDoubleClick
 	 * @type {Function}
 	 * @deprecated In favour of addEventListener and the "dblClick" event. Will be removed in a future version.
 	 */
-	p.onDoubleClick = null;
-
 	/**
-	 * The onMouseOver callback is called when the user rolls over the display object. You must enable this event using
-	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
+	 * REMOVED.
 	 * @property onMouseOver
 	 * @type {Function}
 	 * @deprecated In favour of addEventListener and the "mouseover" event. Will be removed in a future version.
 	 */
-	p.onMouseOver = null;
-
 	/**
-	 * The onMouseOut callback is called when the user rolls off of the display object. You must enable this event using
-	 * stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
+	 * REMOVED.
 	 * @property onMouseOut
 	 * @type {Function}
 	 * @deprecated In favour of addEventListener and the "mouseout" event. Will be removed in a future version.
 	 */
-	p.onMouseOut = null;
-	 
 	/**
-	 * The onTick callback is called on each display object on a stage whenever the stage updates.
-	 * This occurs immediately before the rendering (draw) pass. When stage.update() is called, first all display
-	 * objects on the stage have onTick called, then all of the display objects are drawn to stage. Children will have
-	 * their `onTick` called in order of their depth prior to onTick being called on their parent.
-	 *
-	 * Any parameters passed in to `stage.update()` are passed on to the `onTick()` handlers. For example, if you call
-	 * `stage.update("hello")`, all of the display objects with a handler will have `onTick("hello")` called.
+	 * REMOVED.
 	 * @property onTick
 	 * @type {Function}
 	 * @deprecated In favour of addEventListener and the "tick" event. Will be removed in a future version.
 	 */
-	p.onTick = null;
 
 	/**
 	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when `cache()` or
@@ -494,6 +527,9 @@ var p = DisplayObject.prototype;
 	 * the hit test object were a child of this display object and relative to its regX/Y). The hitArea will be tested
 	 * using only its own `alpha` value regardless of the alpha value on the target display object, or the target's
 	 * ancestors (parents).
+	 * 
+	 * If set on a {{#crossLink "Container"}}{{/crossLink}}, children of the Container will not receive mouse events.
+	 * This is similar to setting {{#crossLink "mouseChildren"}}{{/crossLink}} to false.
 	 *
 	 * Note that hitArea is NOT currently used by the `hitTest()` method, nor is it supported for {{#crossLink "Stage"}}{{/crossLink}}.
 	 * @property hitArea
@@ -921,6 +957,7 @@ var p = DisplayObject.prototype;
 	 * local Point.
 	*/
 	p.hitTest = function(x, y) {
+		// TODO: update with support for .hitArea and update hitArea docs?
 		var ctx = DisplayObject._hitTestContext;
 		ctx.setTransform(1, 0, 0, 1, -x, -y);
 		this.draw(ctx);
@@ -1024,11 +1061,14 @@ var p = DisplayObject.prototype;
 	 * @protected
 	 **/
 	p._tick = function(params) {
-		this.onTick&&this.onTick.apply(this, params);
-		// because onTick can be really performance sensitive, we'll inline some of the dispatchEvent work.
+		// because tick can be really performance sensitive, we'll inline some of the dispatchEvent work.
 		// this can probably go away at some point. It only has a noticeable impact with thousands of objects in modern browsers.
 		var ls = this._listeners;
-		if (ls&&ls["tick"]) { this.dispatchEvent({type:"tick",params:params}); }
+		if (ls&&ls["tick"]) {
+			var evt = new createjs.Event("tick");
+			evt.params = params;
+			this._dispatchEvent(evt, this, 2);
+		}
 	};
 
 	/**
@@ -1061,25 +1101,6 @@ var p = DisplayObject.prototype;
 		for (var i=0; i<l; i++) {
 			this.filters[i].applyFilter(ctx, 0, 0, w, h);
 		}
-	};
-	
-	/**
-	 * Indicates whether the display object has a listener of the corresponding event types.
-	 * @method _hasMouseHandler
-	 * @param {Number} typeMask A bitmask indicating which event types to look for. Bit 1 specifies press &
-	 * click & double click, bit 2 specifies it should look for mouse over and mouse out. This implementation may change.
-	 * @return {Boolean}
-	 * @protected
-	 **/
-	p._hasMouseHandler = function(typeMask) {
-		var ls = this._listeners;
-		return !!(
-				 (typeMask&1 && (this.onPress || this.onClick || this.onDoubleClick || 
-				 (ls && (this.hasEventListener("mousedown") || this.hasEventListener("click") || this.hasEventListener("dblclick")))))
-				 ||
-				 (typeMask&2 && (this.onMouseOver || this.onMouseOut || this.cursor ||
-				 (ls && (this.hasEventListener("mouseover") || this.hasEventListener("mouseout")))))
-				 );
 	};
 	 
 
