@@ -84,6 +84,7 @@ var p = EventDispatcher.prototype;
 		target.removeAllEventListeners = p.removeAllEventListeners;
 		target.hasEventListener = p.hasEventListener;
 		target.dispatchEvent = p.dispatchEvent;
+		target._dispatchEvent = p._dispatchEvent;
 	};
 
 // private properties:
@@ -93,6 +94,13 @@ var p = EventDispatcher.prototype;
 	 * @type Object
 	 **/
 	p._listeners = null;
+	
+	/**
+	 * @protected
+	 * @property _captureListeners
+	 * @type Object
+	 **/
+	p._captureListeners = null;
 
 // constructor:
 	/**
@@ -120,13 +128,16 @@ var p = EventDispatcher.prototype;
 	 * the event is dispatched.
 	 * @return {Function | Object} Returns the listener for chaining or assignment.
 	 **/
-	p.addEventListener = function(type, listener) {
-		var listeners = this._listeners;
-		if (!listeners) { listeners = this._listeners = {}; }
-		else { this.removeEventListener(type, listener); }
+	p.addEventListener = function(type, listener, useCapture) {
+		var listeners;
+		if (useCapture) {
+			listeners = this._captureListeners = this._captureListeners||{};
+		} else {
+			listeners = this._listeners = this._listeners||{};
+		}
 		var arr = listeners[type];
-		if (!arr) { arr = listeners[type] = []; }
-		arr.push(listener);
+		if (!arr) { listeners[type] = [listener];  }
+		else { this.removeEventListener(type, listener, useCapture); arr.push(listener); }
 		return listener;
 	};
 
@@ -145,8 +156,8 @@ var p = EventDispatcher.prototype;
 	 * @param {String} type The string type of the event.
 	 * @param {Function | Object} listener The listener function or object.
 	 **/
-	p.removeEventListener = function(type, listener) {
-		var listeners = this._listeners;
+	p.removeEventListener = function(type, listener, useCapture) {
+		var listeners = useCapture ? this._captureListeners : this._listeners;
 		if (!listeners) { return; }
 		var arr = listeners[type];
 		if (!arr) { return; }
@@ -174,8 +185,11 @@ var p = EventDispatcher.prototype;
 	 * @param {String} [type] The string type of the event. If omitted, all listeners for all types will be removed.
 	 **/
 	p.removeAllEventListeners = function(type) {
-		if (!type) { this._listeners = null; }
-		else if (this._listeners) { delete(this._listeners[type]); }
+		if (!type) { this._listeners = this._captureListeners = null; }
+		else {
+			if (this._listeners) { delete(this._listeners[type]); }
+			if (this._captureListeners) { delete(this._captureListeners[type]); }
+		}
 	};
 
 	/**
@@ -186,46 +200,54 @@ var p = EventDispatcher.prototype;
 	 *      // Use a string event
 	 *      this.dispatchEvent("complete");
 	 *
-	 *      // Use an object
-	 *      var event = {
-	 *          type: "complete",
-	 *          foo: "bar"
-	 *      };
+	 *      // Use an Event instance
+	 *      var event = new createjs.Event("progress");
 	 *      this.dispatchEvent(event);
 	 *
 	 * @method dispatchEvent
-	 * @param {Object | String} eventObj An object with a "type" property, or a string type. If a string is used,
-	 * dispatchEvent will construct a generic event object with the specified type.
+	 * @param {Object | String | Event} eventObj An object with a "type" property, or a string type.
+	 * While a generic object will work, it is recommended to use a CreateJS Event instance. If a string is used,
+	 * dispatchEvent will construct an Event instance with the specified type.
 	 * @param {Object} [target] The object to use as the target property of the event object. This will default to the
-	 * dispatching object.
-	 * @return {Boolean} Returns true if any listener returned true.
+	 * dispatching object. <b>This parameter is deprecated and will be removed.</b>
+	 * @return {Boolean} Returns the value of eventObj.defaultPrevented.
 	 **/
 	p.dispatchEvent = function(eventObj, target) {
-		var ret=false, listeners = this._listeners;
-		if (eventObj && listeners) {
-			if (typeof eventObj == "string") { eventObj = {type:eventObj}; }
-			var arr = listeners[eventObj.type];
-			if (!arr) { return ret; }
-			eventObj.target = target||this;
-			arr = arr.slice(); // to avoid issues with items being removed or added during the dispatch
-			for (var i=0,l=arr.length; i<l; i++) {
-				var o = arr[i];
-				if (o.handleEvent) { ret = ret||o.handleEvent(eventObj); }
-				else { ret = ret||o(eventObj); }
-			}
+		if (typeof eventObj == "string") {
+			// won't bubble, so skip everything if there's no listeners:
+			var listeners = this._listeners;
+			if (!listeners || !listeners[eventObj]) { return; }
+			eventObj = new createjs.Event(eventObj);
 		}
-		return !!ret;
+		// TODO: target param is deprecated, only use case is MouseEvent/mousemove, remove.
+		eventObj.target = target||this;
+		
+		if (!eventObj.bubbles || !this.parent) { this._dispatchEvent(eventObj, this, 2); return; }
+		var top=this, list=[top];
+		while (top.parent) { list.push(top = top.parent); }
+		var i, l=list.length;
+		// TODO: how do we deal with reparenting during all this? Seems fine, currently the same as Flash.
+		// capture & atTarget
+		for (i=l-1; i>=0 && !eventObj.propagationStopped; i--) {
+			list[i]._dispatchEvent(eventObj, list[i], 1+(i==0));
+		}
+		// bubbling
+		for (i=1; i<l && !eventObj.propagationStopped; i++) {
+			list[i]._dispatchEvent(eventObj, list[i], 3);
+		}
+		return eventObj.defaultPrevented;
 	};
 
 	/**
-	 * Indicates whether there is at least one listener for the specified event type.
+	 * Indicates whether there is at least one listener for the specified event type and useCapture value.
 	 * @method hasEventListener
 	 * @param {String} type The string type of the event.
 	 * @return {Boolean} Returns true if there is at least one listener for the specified event.
 	 **/
 	p.hasEventListener = function(type) {
-		var listeners = this._listeners;
-		return !!(listeners && listeners[type]);
+		// TODO: is this correct - both normal and capture? Seems fine, same as Flash.
+		var listeners = this._listeners, captureListeners = this._captureListeners;
+		return !!((listeners && listeners[type]) || (captureListeners && captureListeners[type]));
 	};
 
 	/**
@@ -234,6 +256,30 @@ var p = EventDispatcher.prototype;
 	 **/
 	p.toString = function() {
 		return "[EventDispatcher]";
+	};
+
+// private methods:
+	/**
+	 * @method _dispatchEvent
+	 * @param {Object | String | Event} eventObj
+	 * @param {Object} currentTarget
+	 * @param {Object} eventPhase
+	 * @protected
+	 **/
+	p._dispatchEvent = function(eventObj, currentTarget, eventPhase) {
+		var l, ret=false, listeners = (eventPhase==1) ? this._captureListeners : this._listeners;
+		if (eventObj && listeners) {
+			var arr = listeners[eventObj.type];
+			if (!arr||!(l=arr.length)) { return; }
+			eventObj.currentTarget = currentTarget;
+			eventObj.eventPhase = eventPhase;
+			arr = arr.slice(); // to avoid issues with items being removed or added during the dispatch
+			for (var i=0; i<l && !eventObj.immediatePropagationStopped; i++) {
+				var o = arr[i];
+				if (o.handleEvent) { ret = ret||o.handleEvent(eventObj); }
+				else { ret = ret||o(eventObj); }
+			}
+		}
 	};
 
 
