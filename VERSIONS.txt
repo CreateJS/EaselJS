@@ -1,5 +1,20 @@
 Version NEXT [Not Released]
 ****************************************************************************************************
+CRITICAL (may break existing content):
+- removed all onEvent handlers (ex. onClick, onTick, etc)
+- BitmapAnimation renamed to Sprite
+- sprite sheet data's animation .frequency property removed in favour of .speed
+- removed "target" from MouseEvent's param list
+- returning false from an event handler no longer causes dispatchEvent to return false, see Event.preventDefault
+
+*****
+DEPRECATED (may be removed in future version):
+- MouseEvent mousemove/mouseup events, see DisplayObject pressmove/pressup
+- SpriteSheetUtils.flip()
+- SpriteSheetUtils.mergeAlpha()
+
+*****
+All changes:
 - BitmapAnimation renamed to Sprite
 - renamed the "frequency" property in sprite sheet data to "speed" and changed functionality:
 	* support for non-integer values
@@ -11,6 +26,7 @@ Version NEXT [Not Released]
 	* added Ticker.TIMEOUT, Ticker.RAF, Ticker.RAF_SYNCHED timing mode constants
 - added Ticker.getMeasuredTickTime()
 - added Graphics.inject()
+- added Text.getMeasuredHeight()
 - fixes and improvements to Touch support
 - fixed setChildIndex when adding to an index lower than the item exists at already.
 - added Graphics.Command
