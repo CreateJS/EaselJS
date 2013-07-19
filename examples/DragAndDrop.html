@@ -12,6 +12,7 @@
 	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/Event.js"></script>
 	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
@@ -83,16 +84,15 @@
 				// bump the target in front of its siblings:
 				var o = evt.target;
 				o.parent.addChild(o);
-				var offset = {x:o.x-evt.stageX, y:o.y-evt.stageY};
-
-				// add a listener to the event object's mouseMove event
-				// this will be active until the user releases the mouse button:
-				evt.addEventListener("mousemove", function(ev) {
-					o.x = ev.stageX+offset.x;
-					o.y = ev.stageY+offset.y;
-					// indicate that the stage should be updated on the next tick:
-					update = true;
-				});
+				o.offset = {x:o.x-evt.stageX, y:o.y-evt.stageY};
+			});
+			
+			bitmap.addEventListener("pressmove", function(evt) {
+				var o = evt.target;
+				o.x = evt.stageX+ o.offset.x;
+				o.y = evt.stageY+ o.offset.y;
+				// indicate that the stage should be updated on the next tick:
+				update = true;
 			});
 			
 			bitmap.addEventListener("mouseover", function(evt) {
