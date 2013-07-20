@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>EaselJS Example: Text</title>
+	<title>EaselJS Example: Event bubbling</title>
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 
@@ -49,7 +49,7 @@
 		shape.addEventListener("click", handleClick);
 		// the "target" phase is a non-capture phase, so this listener on shape will trigger.
 		
-		container.mouseChildren = false;
+		//container.mouseChildren = false;
 		stage.addEventListener("pressmove", function(evt) { console.log("move!"); });
 		stage.addEventListener("pressup", function(evt) { console.log("up!", evt); });
 		
@@ -79,11 +79,16 @@
 <body onload="init();">
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Hello World!</h1>
-	    <p>This example demonstrates event bubbling phases. The red square is a child of a container, which is a child
-	    of the stage. Event listeners have been added for the capture and bubble phase of the click event for all three
-	    objects. Clicking on the square outputs the event details, and demonstrates how the <strong>target</strong>, <strong>eventPhase</strong>, and
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Event bubbling</h1>
+	    <p>This example demonstrates event bubbling phases. The red Shape is a child of a Container, which is a child
+	    of the Stage. Event listeners have been added for the capture and bubble phase of the click event for all three
+	    objects. Clicking on the Shape outputs the event details, and demonstrates how the <strong>target</strong>, <strong>eventPhase</strong>, and
 		<strong>currentTarget</strong> properties work.</p>
+		<p>Note how in the initial capture phase (eventPhase=1), the event moves from the stage down to the target,
+		is dispatched from the target in the target phase (eventPhase=2), and then bubbles back up to the stage in
+		the bubble phase (eventPhase=3).</p>
+		<p>Also note how the target property is always the Shape that was clicked on, while the currentTarget points to
+		the object that is currently dispatching the event.</p>
 	</header>
 
 	<div class="canvasHolder">

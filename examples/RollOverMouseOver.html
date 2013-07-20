@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>EaselJS Example: Text</title>
+	<title>EaselJS Example: rollover and mouseover</title>
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 
@@ -60,22 +60,21 @@
 		while (log.length > 12) { log.shift(); }
 		text.text = log.join("\n");
 	}
-	
-	var lastPhase = 0;
-	function handleClick(evt) {
-		
-	}
 	</script>
 </head>
 	
 <body onload="init();">
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Hello World!</h1>
-	    <p>This example demonstrates event bubbling phases. The red square is a child of a container, which is a child
-	    of the stage. Event listeners have been added for the capture and bubble phase of the click event for all three
-	    objects. Clicking on the square outputs the event details, and demonstrates how the <strong>target</strong>, <strong>eventPhase</strong>, and
-		<strong>currentTarget</strong> properties work.</p>
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> rollover and mouseover</h1>
+	    <p>This example demonstrates the difference between rollover/out and mouseover/out events. The red and blue squares
+	    are separate Shape instances within a parent Container. The Container has both rollover/rollout and
+	    mouseover/mouseout events.</p>
+	    <p>
+		Note how the mouseover/mouseout events are triggered whenever you move between different display objects
+		(ex. moving from the blue to red shape), but the rollover/rollout events are only triggered when you leave the
+		Container's aggregate contents.
+	    </p>
 	</header>
 
 	<div class="canvasHolder">
