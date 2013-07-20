@@ -541,7 +541,7 @@ var p = DisplayObject.prototype;
 	/**
 	 * A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display
 	 * object. You must enable mouseover events using the {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} method to
-	 * use this property. If null it will use the default cursor.
+	 * use this property. Setting a non-null cursor on a Container will override the cursor set on its descendants.
 	 * @property cursor
 	 * @type {String}
 	 * @default null
