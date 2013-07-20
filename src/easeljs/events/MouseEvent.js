@@ -120,16 +120,16 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 
 	// TODO: deprecated:
 	/**
-	 * REMOVED.
+	 * REMOVED. Use the DisplayObject "pressmove" event.
 	 * @property onMouseMove
 	 * @type Function
-	 * @deprecated In favour of the DisplayObject "pressmove" event.
+	 * @deprecated Use the DisplayObject "pressmove" event.
 	 */
 	/**
-	 * REMOVED.
+	 * REMOVED. Use the DisplayObject "pressup" event.
 	 * @property onMouseUp
 	 * @type Function
-	 * @deprecated In favour of the DisplayObject "pressup" event.
+	 * @deprecated Use the DisplayObject "pressup" event.
 	 */
 
 	/**
