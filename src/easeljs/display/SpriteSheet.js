@@ -147,9 +147,10 @@ var p = SpriteSheet.prototype;
 
 // public properties:
 	/**
-	 * Read-only property indicating whether all images are finished loading.
+	 * Indicates whether all images are finished loading.
 	 * @property complete
 	 * @type Boolean
+	 * @readonly
 	 **/
 	p.complete = true;
 	

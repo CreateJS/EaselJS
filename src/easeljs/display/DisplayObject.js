@@ -293,10 +293,11 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * If a cache is active, this returns the canvas that holds the cached version of this display object. See cache()
-	 * for more information. READ-ONLY.
+	 * for more information.
 	 * @property cacheCanvas
 	 * @type {HTMLCanvasElement | Object}
 	 * @default null
+	 * @readonly
 	 **/
 	p.cacheCanvas = null;
 
@@ -329,11 +330,12 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * A reference to the Container or Stage object that contains this display object, or null if it has not been added
-	 * to one. READ-ONLY.
+	 * to one.
 	 * @property parent
 	 * @final
 	 * @type {Container}
 	 * @default null
+	 * @readonly
 	 **/
 	p.parent = null;
 

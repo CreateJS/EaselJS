@@ -52,11 +52,12 @@ var p = Shadow.prototype;
 	
 // static public properties:
 	/**
-	 * An identity shadow object (all properties are set to 0). Read-only.
+	 * An identity shadow object (all properties are set to 0).
 	 * @property identity
 	 * @type Shadow
 	 * @static
 	 * @final
+	 * @readonly
 	 **/
 	Shadow.identity = null; // set at bottom of class definition.
 	

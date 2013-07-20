@@ -132,11 +132,12 @@ var p = SpriteSheetBuilder.prototype;
 	p.timeSlice = 0.3;
 	
 	/**
-	 * Read-only. A value between 0 and 1 that indicates the progress of a build, or -1 if a build has not
+	 * A value between 0 and 1 that indicates the progress of a build, or -1 if a build has not
 	 * been initiated.
 	 * @property progress
 	 * @type Number
 	 * @default -1
+	 * @readonly
 	 **/
 	p.progress = -1;
 	 
