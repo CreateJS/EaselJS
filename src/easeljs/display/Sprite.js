@@ -74,10 +74,10 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 // public properties:
 	// TODO: deprecated.
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "animationend" event.
 	 * @property onAnimationEnd
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "animationend" event.
+	 * @deprecated Use addEventListener and the "animationend" event.
 	 */
 	 
 	/**

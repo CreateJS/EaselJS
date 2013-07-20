@@ -142,16 +142,16 @@ var p = SpriteSheetBuilder.prototype;
 	 
 	// TODO: deprecated.
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "complete" event.
 	 * @property onComplete
 	 * @type Function
-	 * @deprecated In favour of addEventListener and the "complete" event.
+	 * @deprecated Use addEventListener and the "complete" event.
 	 */
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "progress" event.
 	 * @property onProgress
 	 * @type Function
-	 * @deprecated In favour of addEventListener and the "progress" event.
+	 * @deprecated Use addEventListener and the "progress" event.
 	 */
 	
 // mix-ins:

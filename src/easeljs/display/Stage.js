@@ -144,22 +144,22 @@ var p = Stage.prototype = new createjs.Container();
 	 
 	// TODO: deprecated.
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "stagemousemove" event.
 	 * @property onMouseMove
 	 * @type Function
-	 * @deprecated In favour of addEventListener and the "stagemousemove" event.
+	 * @deprecated Use addEventListener and the "stagemousemove" event.
 	 */
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "stagemouseup" event.
 	 * @property onMouseUp
 	 * @type Function
-	 * @deprecated In favour of addEventListener and the "stagemouseup" event.
+	 * @deprecated Use addEventListener and the "stagemouseup" event.
 	 */
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "stagemousedown" event.
 	 * @property onMouseDown
 	 * @type Function
-	 * @deprecated In favour of addEventListener and the "stagemousedown" event.
+	 * @deprecated Use addEventListener and the "stagemousedown" event.
 	 */
 
 	/**

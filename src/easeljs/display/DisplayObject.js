@@ -459,40 +459,40 @@ var p = DisplayObject.prototype;
 	
 	// TODO: remove handler docs in future:
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "mousedown" event.
 	 * @property onPress
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "mousedown" event.
+	 * @deprecated Use addEventListener and the "mousedown" event.
 	 */
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "click" event.
 	 * @property onClick
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "click" event.
+	 * @deprecated Use addEventListener and the "click" event.
 	 */
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "dblClick" event.
 	 * @property onDoubleClick
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "dblClick" event.
+	 * @deprecated Use addEventListener and the "dblClick" event.
 	 */
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "mouseover" event.
 	 * @property onMouseOver
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "mouseover" event.
+	 * @deprecated Use addEventListener and the "mouseover" event.
 	 */
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "mouseout" event.
 	 * @property onMouseOut
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "mouseout" event.
+	 * @deprecated Use addEventListener and the "mouseout" event.
 	 */
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "tick" event.
 	 * @property onTick
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "tick" event.
+	 * @deprecatedtick
 	 */
 
 	/**

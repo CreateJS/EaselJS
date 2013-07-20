@@ -164,10 +164,10 @@ var p = SpriteSheet.prototype;
 	
 	// TODO: deprecated.
 	/**
-	 * REMOVED.
+	 * REMOVED. Use addEventListener and the "complete" event.
 	 * @property onComplete
 	 * @type Function
-	 * @deprecated In favour of the "complete" event.
+	 * @deprecated Use addEventListener and the "complete" event.
 	 **/
 
 // mix-ins:
