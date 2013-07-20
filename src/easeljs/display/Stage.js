@@ -728,7 +728,7 @@ var p = Stage.prototype = new createjs.Container();
 	p._dispatchMouseEvent = function(target, type, bubbles, pointerId, o, nativeEvent) {
 		// TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
 		if (!target || (!bubbles && !target.hasEventListener(type))) { return; }
-		var evt = new createjs.MouseEvent(type, bubbles, o.x, o.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
+		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
 		target.dispatchEvent(evt);
 	};
 
