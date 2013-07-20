@@ -165,13 +165,15 @@ var p = ButtonHelper.prototype;
 	p.setEnabled = function(value) {
 		var o = this.target;
 		if (value) {
-			o.addEventListener("mouseover", this);
-			o.addEventListener("mouseout", this);
+			o.addEventListener("rollover", this);
+			o.addEventListener("rollout", this);
 			o.addEventListener("mousedown", this);
+			o.addEventListener("pressup", this);
 		} else {
-			o.removeEventListener("mouseover", this);
-			o.removeEventListener("mouseout", this);
+			o.removeEventListener("rollover", this);
+			o.removeEventListener("rollout", this);
 			o.removeEventListener("mousedown", this);
+			o.removeEventListener("pressup", this);
 		}
 	};
 		
@@ -195,16 +197,15 @@ var p = ButtonHelper.prototype;
 		var label, t = this.target, type = evt.type;
 		
 		if (type == "mousedown") {
-			evt.addEventListener("mouseup", this);
 			this._isPressed = true;
 			label = this.downLabel;
-		} else if (type == "mouseup") {
+		} else if (type == "pressup") {
 			this._isPressed = false;
 			label = this._isOver ? this.overLabel : this.outLabel;
-		} else if (type == "mouseover") {
+		} else if (type == "rollover") {
 			this._isOver = true;
 			label = this._isPressed ? this.downLabel : this.overLabel;
-		} else { // mouseout and default
+		} else { // rollout and default
 			this._isOver = false;
 			label = this._isPressed ? this.overLabel : this.outLabel;
 		}
