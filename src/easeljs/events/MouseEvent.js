@@ -35,6 +35,8 @@ this.createjs = this.createjs||{};
  * This is passed as the parameter to all mouse/pointer/touch related events on {{#crossLink "DisplayObject"}}{{/crossLink}} instances.
  * @class MouseEvent
  * @param {String} type The event type.
+ * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
+ * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
  * @param {Number} stageX The normalized x position relative to the stage.
  * @param {Number} stageY The normalized y position relative to the stage.
  * @param {MouseEvent} nativeEvent The native DOM event related to this mouse event.
@@ -45,8 +47,8 @@ this.createjs = this.createjs||{};
  * @extends Event
  * @constructor
  **/
-var MouseEvent = function(type, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY) {
-  this.initialize(type, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY);
+var MouseEvent = function(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY) {
+  this.initialize(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY);
 };
 var p = MouseEvent.prototype = new createjs.Event();
 
@@ -169,6 +171,8 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * Initialization method.
 	 * @method initialize
 	 * @param {String} type The event type.
+	 * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
+	 * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
 	 * @param {Number} stageX The normalized x position relative to the stage.
 	 * @param {Number} stageY The normalized y position relative to the stage.
 	 * @param {MouseEvent} nativeEvent The native DOM event related to this mouse event.
@@ -178,8 +182,8 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * @param {Number} rawY The raw y position relative to the stage.
 	 * @protected
 	 **/
-	p.initialize = function(type, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY) {
-		this.Event_initialize(type, true);
+	p.initialize = function(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY) {
+		this.Event_initialize(type, bubbles, cancelable);
 		this.stageX = stageX;
 		this.stageY = stageY;
 		this.nativeEvent = nativeEvent;
@@ -196,7 +200,7 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * @return {MouseEvent} a clone of the MouseEvent instance.
 	 **/
 	p.clone = function() {
-		return new MouseEvent(this.type, this.stageX, this.stageY, this.target, this.nativeEvent, this.pointerID, this.primary, this.rawX, this.rawY);
+		return new MouseEvent(this.type, this.bubbles, this.cancelable, this.stageX, this.stageY, this.target, this.nativeEvent, this.pointerID, this.primary, this.rawX, this.rawY);
 	};
 
 	/**
