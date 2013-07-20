@@ -48,7 +48,7 @@ this.createjs = this.createjs||{};
  * @constructor
  **/
 var MouseEvent = function(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY) {
-  this.initialize(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY);
+	this.initialize(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY);
 };
 var p = MouseEvent.prototype = new createjs.Event();
 
