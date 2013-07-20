@@ -2,7 +2,7 @@
 
 	var SimpleScroller = function(width, height, displayLabel) {
 		this.initialize(width, height, displayLabel);
-	}
+	};
 	var p = SimpleScroller.prototype = new createjs.Container(); // inherit from Container
 	p.bar;
 	p.track;
@@ -40,37 +40,30 @@
 			this.label.y = this.height;
 			this.addChild(this.label);
 		}
-		var _this = this;
 
-		this.addEventListener("click", function(event) {
-			_this.updatePosition(event);
-		})
-		this.addEventListener("mousedown", function(event) {
-            event.addEventListener("mousemove", function(event) {
-				_this.updatePosition(event);
-			});
-		})
+		this.addEventListener("click", this.updatePosition);
+		this.addEventListener("pressmove", this.updatePosition);
 
 		this.bar.x = this.width - this.height >> 1;
-	}
+	};
 
 	p.updateLabel = function () {
 
 		this.label.text = this.displayLabel + ":" + this.value;
-	}
+	};
 
-	p.updatePosition = function (param) {
-		var event = param;
-        var pt = this.globalToLocal(event.rawX, event.rawY);
-		this.bar.x = Math.max(0, Math.min(pt.x - this.height / 2, (this.track.x+(this.width)) - this.height));
-		this.value = (this.bar.x) / ((this.track.x+this.width)-this.height)*(this.max-this.min)+this.min | 0;
+	p.updatePosition = function (evt) {
+		var target = (evt&&evt.currentTarget)||this;
+        var pt = target.globalToLocal(evt.rawX, evt.rawY);
+		target.bar.x = Math.max(0, Math.min(pt.x - target.height / 2, (target.track.x+(target.width)) - target.height));
+		target.value = (target.bar.x) / ((target.track.x+target.width)-target.height)*(target.max-target.min)+target.min | 0;
 
-		if (this.label != null) {
-			this.updateLabel();
+		if (target.label != null) {
+			target.updateLabel();
 		}
 
-		this.dispatchEvent("change");
-	}
+		target.dispatchEvent("change");
+	};
 
 	window.SimpleScroller = SimpleScroller;
 }());

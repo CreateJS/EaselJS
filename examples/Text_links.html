@@ -12,6 +12,7 @@
 	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/Event.js"></script>
 	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
@@ -39,6 +40,9 @@
 			this.hover = false;
 			this.hitArea = new createjs.Shape();
 			this.textBaseline = "top";
+			
+			this.addEventListener("rollover", this);
+			this.addEventListener("rollout", this);
 		}
 		
 		// use the same approach with draw:
@@ -55,15 +59,12 @@
 			this.color = color;
 			
 			// update hit area so the full text area is clickable, not just the characters:
-			this.hitArea.graphics.clear().beginFill("#FFF").drawRect(0,0,this.lineWidth||this.getMeasuredWidth(), this.getMeasuredHeight());
+			this.hitArea.graphics.clear().beginFill("#FFF").drawRect(0,0,this.getMeasuredWidth(), this.getMeasuredHeight());
 		}
 
 		// set up the handlers for mouseover / out:
-		TextLink.prototype.onMouseOver = function() {
-			this.hover = true;
-		}
-		TextLink.prototype.onMouseOut = function() {
-			this.hover = false;
+		TextLink.prototype.handleEvent = function(evt) {
+			this.hover = (evt.type == "rollover");
 		}
 	</script>
 

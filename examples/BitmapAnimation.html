@@ -1,156 +1,160 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>EaselJS Example: Animation sequences & sprite sheets</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>EaselJS Example: Animation sequences & sprite sheets</title>
 
-    <link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css"/>
 
-    <script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
-    <script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
-    <script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
-    <script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
-    <script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
-    <script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
-    <script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
-    <script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
-    <script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
-    <script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
-    <script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
-    <script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
-    <script type="text/javascript" src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/EventDispatcher.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/Event.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 
-    <!-- We also provide hosted minified versions of all CreateJS libraries.
-       http://code.createjs.com -->
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	   http://code.createjs.com -->
 
-    <script>
-        var canvas;
-        var stage;
+	<script>
+		var canvas;
+		var stage;
 
-        var img = new Image();
-        var spriteList;
+		var img = new Image();
+		var spriteList;
 
-        function init() {
-            //find canvas and load images, wait for last image to load
-            canvas = document.getElementById("testCanvas");
+		function init() {
+			//find canvas and load images, wait for last image to load
+			canvas = document.getElementById("testCanvas");
 
-            // create a new stage and point it at our canvas:
-            stage = new createjs.Stage(canvas);
+			// create a new stage and point it at our canvas:
+			stage = new createjs.Stage(canvas);
 
-            img = new Image();
-            img.src = "assets/testSeq.png";
-            img.onload = handleImageLoad;
-        }
+			img = new Image();
+			img.src = "assets/testSeq.png";
+			img.onload = handleImageLoad;
+		}
 
-        function handleImageLoad(event) {
-            // grab canvas width and height for later calculations:
-            var w = canvas.width;
-            var h = canvas.height;
+		function handleImageLoad(event) {
+			// grab canvas width and height for later calculations:
+			var w = canvas.width;
+			var h = canvas.height;
 
-            // create spritesheet and assign the associated data.
-            var spriteSheet  = new createjs.SpriteSheet({
-                images: [img],
-                frames: {width:64, height:68, regX:32, regY:34},
-                animations: {
-                    walkUpRt:[0,19,"walkRt"],
-                    walkDnRt:[20,39,"walkUpRt"],
-                    walkRt:[41,59,"walkDnRt"]
-                }
-            });
+			// create spritesheet and assign the associated data.
+			var spriteSheet = new createjs.SpriteSheet({
+														   images: [img],
+														   frames: {width: 64, height: 68, regX: 32, regY: 34},
+														   animations: {
+															   walkUpRt: [0, 19, "walkRt"],
+															   walkDnRt: [20, 39, "walkUpRt"],
+															   walkRt: [41, 59, "walkDnRt"]
+														   }
+													   });
 
-            // to save file size, the loaded sprite sheet only includes right facing animations
-            // we could flip the display objects with scaleX=-1, but this is expensive in some browsers
-            // instead, we append flipped versions of the frames to our sprite sheet
-            // this adds only horizontally flipped frames:
-            createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
+			// to save file size, the loaded sprite sheet only includes right facing animations
+			// we could flip the display objects with scaleX=-1, but this is expensive in some browsers
+			// instead, we append flipped versions of the frames to our sprite sheet
+			// this adds only horizontally flipped frames:
+			createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
 
-            // we could rewire the "next" sequences to make them work like so:
-            // but instead we will use code in the angleChange function.
-            /*
-             spriteSheet.getAnimation("walkDnRt").next = "walkDnRt_h";
-             spriteSheet.getAnimation("walkDnRt_h").next = "walkRt_h";
-             spriteSheet.getAnimation("walkRt_h").next = "walkUpRt_h";
-             spriteSheet.getAnimation("walkUpRt_h").next = "walkUpRt";
-             */
+			// we could rewire the "next" sequences to make them work like so:
+			// but instead we will use code in the angleChange function.
+			/*
+			 spriteSheet.getAnimation("walkDnRt").next = "walkDnRt_h";
+			 spriteSheet.getAnimation("walkDnRt_h").next = "walkRt_h";
+			 spriteSheet.getAnimation("walkRt_h").next = "walkUpRt_h";
+			 spriteSheet.getAnimation("walkUpRt_h").next = "walkUpRt";
+			 */
 
-            // create a Sprite instance to display and play back the sprite sheet:
-            var sprite = new createjs.Sprite(spriteSheet);
+			// create a Sprite instance to display and play back the sprite sheet:
+			var sprite = new createjs.Sprite(spriteSheet);
 
-            // start playing the first sequence:
-            sprite.gotoAndPlay("walkRt");		//animate
+			// start playing the first sequence:
+			sprite.gotoAndPlay("walkRt");		//animate
 
-            // the callback is called each time a sequence completes:
-            sprite.onAnimationEnd = angleChange;
+			// create a bunch of rats based on the first one, and place them on stage, and in our collection.
+			var l = 50;
+			spriteList = [];
+			for (var i = 0; i < l; i++) {
+				sprite.name = "rat" + i;
+				sprite.speed = Math.random() * 6 + 2;
+				sprite.direction = 90;
+				sprite.vX = sprite.speed;
+				sprite.vY = 0;
+				sprite.x = Math.random() * (w - 220) + 60 | 0;
+				sprite.y = Math.random() * (h - 220) + 0 | 0;
 
-            // create a bunch of rats based on the first one, and place them on stage, and in our collection.
-            var l = 50;
-            spriteList = [];
-            for (var i=0; i<l; i++) {
-                sprite.name = "rat"+i;
-                sprite.speed = Math.random()*6+2;
-                sprite.direction = 90;
-                sprite.vX = sprite.speed;
-                sprite.vY = 0;
-                sprite.x = Math.random()*(w-220)+60|0;
-                sprite.y = Math.random()*(h-220)+0|0;
+				// have each rat start on a random frame in the "walkRt" animation:
+				sprite.currentAnimationFrame = Math.random() * spriteSheet.getNumFrames("walkRt");
+				stage.addChild(sprite);
+				spriteList.push(sprite);
 
-                // have each rat start on a random frame in the "walkRt" animation:
-                sprite.currentAnimationFrame = Math.random()*spriteSheet.getNumFrames("walkRt");
-                stage.addChild(sprite);
-                spriteList.push(sprite);
+				// the callback is called each time a sequence completes:
+				sprite.addEventListener("animationend", angleChange);
 
-                // rather than creating a brand new instance each time, and setting every property, we
-                // can just clone the current one and overwrite the properties we want to change:
-                if (i < l-1) { sprite = sprite.clone(); }
-            }
+				// rather than creating a brand new instance each time, and setting every property, we
+				// can just clone the current one and overwrite the properties we want to change:
+				if (i < l - 1) { sprite = sprite.clone(); }
+			}
 
-            // we want to do some work before we update the canvas,
-            // otherwise we could use createjs.Ticker.addEventListener("tick", stage);
-            createjs.Ticker.addEventListener("tick", tick);
-        }
+			// we want to do some work before we update the canvas,
+			// otherwise we could use createjs.Ticker.addEventListener("tick", stage);
+			createjs.Ticker.addEventListener("tick", tick);
+		}
 
-        //called if there is an error loading the image (usually due to a 404)
-        function handleImageError(e) {
-            //console.log("Error Loading Image : " + e.target.src);
-        }
+		//called if there is an error loading the image (usually due to a 404)
+		function handleImageError(e) {
+			//console.log("Error Loading Image : " + e.target.src);
+		}
 
-        function tick(event) {
-            // move all the rats according to their vX/vY properties:
-            var l = spriteList.length;
-            for (var i=0; i<l; i++) {
-                var sprite = spriteList[i];
-                sprite.x += sprite.vX;
-                sprite.y += sprite.vY;
-            }
+		function tick(event) {
+			// move all the rats according to their vX/vY properties:
+			var l = spriteList.length;
+			for (var i = 0; i < l; i++) {
+				var sprite = spriteList[i];
+				sprite.x += sprite.vX;
+				sprite.y += sprite.vY;
+			}
 
-            // update the stage:
-            stage.update(event);
-        }
+			// update the stage:
+			stage.update(event);
+		}
 
-        function angleChange(sprite,animation) {
-            //after each sequence ends update the rat's heading and adjust velocities to match
-            sprite.direction -= 60;
-            var angle = sprite.direction * (Math.PI/180);
-            sprite.vX = Math.sin(angle) * sprite.speed;
-            sprite.vY = Math.cos(angle) * sprite.speed;
-            var nextMap = {walkRt:"walkDnRt",walkDnRt:"walkDnRt_h",walkDnRt_h:"walkRt_h",walkRt_h:"walkUpRt_h",walkUpRt_h:"walkUpRt",walkUpRt:"walkRt"};
-            sprite.gotoAndPlay(nextMap[animation]);
-        }
-    </script>
+		function angleChange(evt) {
+			var sprite = evt.target;
+			//after each sequence ends update the rat's heading and adjust velocities to match
+			sprite.direction -= 60;
+			var angle = sprite.direction * (Math.PI / 180);
+			sprite.vX = Math.sin(angle) * sprite.speed;
+			sprite.vY = Math.cos(angle) * sprite.speed;
+			var nextMap = {walkRt: "walkDnRt", walkDnRt: "walkDnRt_h", walkDnRt_h: "walkRt_h", walkRt_h: "walkUpRt_h", walkUpRt_h: "walkUpRt", walkUpRt: "walkRt"};
+			sprite.gotoAndPlay(nextMap[evt.name]);
+		}
+	</script>
 </head>
 
 <body onload="init();">
 
 <header id="header" class="EaselJS">
-    <h1><span class="text-product">Easel<strong>JS</strong></span> Sprite</h1>
-    <p>Dev sample showing how to use <strong>SpriteSheet</strong>, <strong>Sprite</strong>,
-        and <strong>SpriteSheetUtils.addFlippedFrames()</strong>.</p>
-    <p>Some browsers can not load images or access pixel data when running local files, and may throw a security error or not
-        work unless the content is running on a server.</p>
+	<h1><span class="text-product">Easel<strong>JS</strong></span> Sprite</h1>
+
+	<p>Dev sample showing how to use <strong>SpriteSheet</strong>, <strong>Sprite</strong>,
+		and <strong>SpriteSheetUtils.addFlippedFrames()</strong>.</p>
+
+	<p>Some browsers can not load images or access pixel data when running local files, and may throw a security error
+		or not
+		work unless the content is running on a server.</p>
 </header>
 
 <div class="canvasHolder">
-    <canvas id="testCanvas" width="960" height="400"></canvas>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
 </div>
 </body>
 </html>
