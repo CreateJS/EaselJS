@@ -72,17 +72,14 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 */
 
 // public properties:
-	 
+	// TODO: deprecated.
 	/**
-	 * Specifies a function to call whenever any animation reaches its end. It will be called with three
-	 * params: the first will be a reference to this instance, the second will be the name of the animation
-	 * that just ended, and the third will be the name of the next animation that will be played.
+	 * REMOVED.
 	 * @property onAnimationEnd
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "animationend" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "animationend" event.
 	 */
-	p.onAnimationEnd = null;
-
+	 
 	/**
 	 * The frame index that will be drawn when draw is called. Note that with some SpriteSheet definitions, this
 	 * will advance non-sequentially. This will always be an integer value.
@@ -445,7 +442,6 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 **/
 	p._dispatchAnimationEnd = function(animation, frame, paused, next, end) {
 		var name = animation ? animation.name : null;
-		this.onAnimationEnd&&this.onAnimationEnd(this, name, next);
 		this.dispatchEvent({type:"animationend", name:name, next:next});
 		// TODO: is this right?
 		if (!paused && this.paused) { this.currentAnimationFrame = end; }
@@ -466,7 +462,6 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 **/
 	p.cloneProps = function(o) {
 		this.DisplayObject_cloneProps(o);
-		o.onAnimationEnd = this.onAnimationEnd;
 		o.currentFrame = this.currentFrame;
 		o._currentFrame = this._currentFrame;
 		o.currentAnimation = this.currentAnimation;

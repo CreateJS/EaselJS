@@ -1,7 +1,7 @@
 Version NEXT [Not Released]
 ****************************************************************************************************
 CRITICAL (may break existing content):
-- removed all onEvent handlers (ex. onClick, onTick, etc)
+- removed all onEvent handlers (ex. onClick, onTick, onAnimationEnd, etc)
 - BitmapAnimation renamed to Sprite
 - sprite sheet data's animation .frequency property removed in favour of .speed
 - removed "target" from MouseEvent's param list
