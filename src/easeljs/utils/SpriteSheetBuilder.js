@@ -497,7 +497,11 @@ var p = SpriteSheetBuilder.prototype;
 			this._timerID = setTimeout(function() { _this._run(); }, 50-ts);
 		}
 		var p = this.progress = this._index/this._frames.length;
-		this.dispatchEvent({type:"progress", progress:p});
+		if (this.hasEventListener("progress")) {
+			var evt = new createjs.Event("progress");
+			evt.progress = p;
+			this.dispatchEvent(evt);
+		}
 	};
 	
 	/**

@@ -219,14 +219,14 @@ var p = EventDispatcher.prototype;
 			if (!listeners || !listeners[eventObj]) { return; }
 			eventObj = new createjs.Event(eventObj);
 		}
-		// TODO: target param is deprecated, only use case is MouseEvent/mousemove, remove.
+		// TODO: deprecated. Target param is deprecated, only use case is MouseEvent/mousemove, remove.
 		eventObj.target = target||this;
 		
 		if (!eventObj.bubbles || !this.parent) { this._dispatchEvent(eventObj, this, 2); return; }
 		var top=this, list=[top];
 		while (top.parent) { list.push(top = top.parent); }
 		var i, l=list.length;
-		// TODO: how do we deal with reparenting during all this? Seems fine, currently the same as Flash.
+		
 		// capture & atTarget
 		for (i=l-1; i>=0 && !eventObj.propagationStopped; i--) {
 			list[i]._dispatchEvent(eventObj, list[i], 1+(i==0));
@@ -245,7 +245,6 @@ var p = EventDispatcher.prototype;
 	 * @return {Boolean} Returns true if there is at least one listener for the specified event.
 	 **/
 	p.hasEventListener = function(type) {
-		// TODO: is this correct - both normal and capture? Seems fine, same as Flash.
 		var listeners = this._listeners, captureListeners = this._captureListeners;
 		return !!((listeners && listeners[type]) || (captureListeners && captureListeners[type]));
 	};
