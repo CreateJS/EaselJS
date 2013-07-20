@@ -681,7 +681,7 @@ var p = Stage.prototype = new createjs.Container();
 		
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
 		if (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds) { return; }
-		var target, common = -1, cursor, t, i, l, evt, o = this._getPointerData(-1);
+		var target, common = -1, cursor="", t, i, l, evt, o = this._getPointerData(-1);
 		
 		if (this.mouseInBounds) {
 			target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
@@ -690,17 +690,17 @@ var p = Stage.prototype = new createjs.Container();
 		}
 		
 		var oldList = this._mouseOverTarget||[];
-		var mouseOverTarget = oldList&&oldList[oldList.length-1];
+		var mouseOverTarget = oldList[oldList.length-1];
 		var list = this._mouseOverTarget = [];
 		
-		// generate ancestor list an:
+		// generate ancestor list and check for cursor:
 		t = target;
 		while (t) {
 			list.unshift(t);
-			if (cursor == null && t.cursor != null) { cursor = t.cursor; }
+			if (t.cursor != null) { cursor = t.cursor; }
 			t = t.parent;
 		}
-		this.canvas.style.cursor = cursor||"";
+		this.canvas.style.cursor = cursor;
 		
 		// find common ancestor:
 		for (i=0,l=list.length; i<l; i++) {
