@@ -87,31 +87,34 @@ var MovieClip = function(mode, startPosition, loop, labels) {
 var p = MovieClip.prototype = new createjs.Container();
 
 	/**
-	 * Read-only. The MovieClip will advance independently of its parent, even if its parent is paused.
+	 * The MovieClip will advance independently of its parent, even if its parent is paused.
 	 * This is the default mode.
 	 * @property INDEPENDENT
 	 * @static
 	 * @type String
 	 * @default "independent"
+	 * @readonly
 	 **/
 	MovieClip.INDEPENDENT = "independent";
 	
 	/**
-	 * Read-only. The MovieClip will only display a single frame (as determined by the startPosition property).
+	 * The MovieClip will only display a single frame (as determined by the startPosition property).
 	 * @property SINGLE_FRAME
 	 * @static
 	 * @type String
 	 * @default "single"
+	 * @readonly
 	 **/
 	MovieClip.SINGLE_FRAME = "single";
 	
 	/**
-	 * Read-only. The MovieClip will be advanced only when its parent advances and will be synched to the position of
+	 * The MovieClip will be advanced only when its parent advances and will be synched to the position of
 	 * the parent MovieClip.
 	 * @property SYNCHED
 	 * @static
 	 * @type String
 	 * @default "synched"
+	 * @readonly
 	 **/
 	MovieClip.SYNCHED = "synched";
 
@@ -143,9 +146,11 @@ var p = MovieClip.prototype = new createjs.Container();
 	p.loop = true;
 	
 	/**
-	 * Read-Only. The current frame of the movieclip.
+	 * The current frame of the movieclip.
 	 * @property currentFrame
 	 * @type Number
+	 * @default 0
+	 * @readonly
 	 */
 	p.currentFrame = 0;
 

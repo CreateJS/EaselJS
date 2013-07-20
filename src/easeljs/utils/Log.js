@@ -40,47 +40,52 @@ this.createjs = this.createjs||{};
 var Log = {};
 
 /**
- * Read-only. Output no messages.
+ * Output no messages.
  * @type Number
  * @property NONE
  * @default 0
  * @static
+ * @readonly
  **/
 Log.NONE = 0;
 
 /**
- * Read-only. Error messages.
+ * Error messages.
  * @type Number
  * @property ERROR
  * @default 1
  * @static
+ * @readonly
  **/
 Log.ERROR = 1;
 
 /**
- * Read-only. Warning messages.
+ * Warning messages.
  * @type Number
  * @property WARNING
  * @default 2
  * @static
+ * @readonly
  **/
 Log.WARNING = 2;
 
 /**
- * Read-only. Trace messages.
+ * Trace messages.
  * @type Number
  * @property TRACE
  * @default 3
  * @static
+ * @readonly
  **/
 Log.TRACE = 3;
 
 /**
- * Read-only. Output all messages.
+ * Output all messages.
  * @type Number
  * @property ALL
  * @default 255
  * @static
+ * @readonly
  **/
 Log.ALL = 255;
 

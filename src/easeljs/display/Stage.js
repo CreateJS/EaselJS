@@ -127,18 +127,20 @@ var p = Stage.prototype = new createjs.Container();
 	p.canvas = null;
 
 	/**
-	 * READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
+	 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
 	 * position over the canvas, and mouseInBounds will be set to false.
 	 * @property mouseX
 	 * @type Number
+	 * @readonly
 	 **/
 	p.mouseX = 0;
 
 	/**
-	 * READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
+	 * The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
 	 * position over the canvas, and mouseInBounds will be set to false.
 	 * @property mouseY
 	 * @type Number
+	 * @readonly
 	 **/
 	p.mouseY = 0;
 	 

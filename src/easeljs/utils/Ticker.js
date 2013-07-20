@@ -231,7 +231,7 @@ var Ticker = function() {
 	 * @type {Number}
 	 * @protected 
 	 **/
-	Ticker._interval = 50; // READ-ONLY
+	Ticker._interval = 50;
 	
 	/** 
 	 * @property _lastTime

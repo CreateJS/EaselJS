@@ -64,14 +64,15 @@ this.createjs = this.createjs||{};
  */
 var ButtonHelper = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
 	this.initialize(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel);
-}
+};
 var p = ButtonHelper.prototype;
 
 // public properties:
 	/**
-	 * Read-only. The target for this button helper.
+	 * The target for this button helper.
 	 * @property target
 	 * @type MovieClip | Sprite
+	 * @readonly
 	 **/
 	p.target = null;
 	
