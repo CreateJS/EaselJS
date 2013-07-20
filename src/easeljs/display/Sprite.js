@@ -250,7 +250,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this._normalizeFrame();
 		var o = this.spriteSheet.getFrame(this._currentFrame|0);
-		if (!o) { return; }
+		if (!o) { return false; }
 		var rect = o.rect;
 		ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, -o.regX, -o.regY, rect.width, rect.height);
 		return true;
@@ -442,7 +442,12 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 **/
 	p._dispatchAnimationEnd = function(animation, frame, paused, next, end) {
 		var name = animation ? animation.name : null;
-		this.dispatchEvent({type:"animationend", name:name, next:next});
+		if (this.hasEventListener("animationend")) {
+			var evt = new createjs.Event("animationend");
+			evt.name = name;
+			evt.next = next;
+			this.dispatchEvent(evt);
+		}
 		// TODO: is this right?
 		if (!paused && this.paused) { this.currentAnimationFrame = end; }
 		return (this.paused != paused || this._animation != animation || this._currentFrame != frame);

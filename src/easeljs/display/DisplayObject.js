@@ -1062,9 +1062,8 @@ var p = DisplayObject.prototype;
 	 **/
 	p._tick = function(params) {
 		// because tick can be really performance sensitive, we'll inline some of the dispatchEvent work.
-		// this can probably go away at some point. It only has a noticeable impact with thousands of objects in modern browsers.
 		var ls = this._listeners;
-		if (ls&&ls["tick"]) {
+		if (ls && ls["tick"]) {
 			var evt = new createjs.Event("tick");
 			evt.params = params;
 			this._dispatchEvent(evt, this, 2);
