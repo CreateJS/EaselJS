@@ -142,32 +142,25 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.mouseY = 0;
 	 
+	// TODO: deprecated.
 	/**
-	 * The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param
-	 * containing the corresponding MouseEvent instance.
+	 * REMOVED.
 	 * @property onMouseMove
 	 * @type Function
-	 * @deprecated In favour of addEventListener and the "stagemousemove" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "stagemousemove" event.
 	 */
-	p.onMouseMove = null;
-	 
 	/**
-	 * The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler
-	 * is passed a single param containing the corresponding MouseEvent instance.
+	 * REMOVED.
 	 * @property onMouseUp
 	 * @type Function
-	 * @deprecated In favour of addEventListener and the "stagemouseup" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "stagemouseup" event.
 	 */
-	p.onMouseUp = null;
-	 
 	/**
-	 * The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single
-	 * param containing the corresponding MouseEvent instance.
+	 * REMOVED.
 	 * @property onMouseDown
 	 * @type Function
-	 * @deprecated In favour of addEventListener and the "stagemousedown" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "stagemousedown" event.
 	 */
-	p.onMouseDown = null;
 
 	/**
 	 * Indicates whether this stage should use the snapToPixel property of display objects when rendering them. See

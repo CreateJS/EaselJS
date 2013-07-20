@@ -462,37 +462,37 @@ var p = DisplayObject.prototype;
 	 * REMOVED.
 	 * @property onPress
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "mousedown" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "mousedown" event.
 	 */
 	/**
 	 * REMOVED.
 	 * @property onClick
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "click" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "click" event.
 	 */
 	/**
 	 * REMOVED.
 	 * @property onDoubleClick
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "dblClick" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "dblClick" event.
 	 */
 	/**
 	 * REMOVED.
 	 * @property onMouseOver
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "mouseover" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "mouseover" event.
 	 */
 	/**
 	 * REMOVED.
 	 * @property onMouseOut
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "mouseout" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "mouseout" event.
 	 */
 	/**
 	 * REMOVED.
 	 * @property onTick
 	 * @type {Function}
-	 * @deprecated In favour of addEventListener and the "tick" event. Will be removed in a future version.
+	 * @deprecated In favour of addEventListener and the "tick" event.
 	 */
 
 	/**

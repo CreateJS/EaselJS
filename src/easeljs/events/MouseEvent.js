@@ -118,13 +118,13 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 **/
 	p.nativeEvent = null;
 	 
+	// TODO: deprecated:
 	/**
 	 * REMOVED.
 	 * @property onMouseMove
 	 * @type Function
 	 * @deprecated In favour of the DisplayObject "pressmove" event.
 	 */
-	 
 	/**
 	 * REMOVED.
 	 * @property onMouseUp
@@ -150,7 +150,7 @@ var p = MouseEvent.prototype = new createjs.Event();
 	
 // mix-ins:
 	// EventDispatcher methods:
-	// TODO: deprecated, remove:
+	// TODO: deprecated:
 	p.addEventListener = null;
 	p.removeEventListener = null;
 	p.removeAllEventListeners = null;

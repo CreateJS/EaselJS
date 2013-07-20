@@ -136,7 +136,7 @@ var p = SpriteSheet.prototype;
 	 * to prior to adding a listener. Ex.
 	 * <pre><code>var sheet = new SpriteSheet(data);
 	 * if (!sheet.complete) {
-	 *  &nbsp; // not preloaded, listen for onComplete:
+	 *  &nbsp; // not preloaded, listen for the complete event:
 	 *  &nbsp; sheet.addEventListener("complete", handler);
 	 * }</code></pre>
 	 * @event complete
@@ -162,20 +162,13 @@ var p = SpriteSheet.prototype;
 	 **/
 	p.framerate = 0;
 	
+	// TODO: deprecated.
 	/**
-	 * The onComplete callback is called when all images are loaded. Note that this only fires if the images
-	 * were not fully loaded when the sprite sheet was initialized. You should check the complete property 
-	 * to prior to adding an onComplete handler. Ex.
-	 * <pre><code>var sheet = new SpriteSheet(data);
-	 * if (!sheet.complete) {
-	 *  &nbsp; // not preloaded, listen for onComplete:
-	 *  &nbsp; sheet.onComplete = handler;
-	 * }</code></pre>
+	 * REMOVED.
 	 * @property onComplete
 	 * @type Function
-	 * @deprecated In favour of the "complete" event. Will be removed in a future version.
+	 * @deprecated In favour of the "complete" event.
 	 **/
-	p.onComplete = null;
 
 // mix-ins:
 	// EventDispatcher methods:
@@ -440,7 +433,6 @@ var p = SpriteSheet.prototype;
 		if (--this._loadCount == 0) {
 			this._calculateFrames();
 			this.complete = true;
-			this.onComplete&&this.onComplete();
 			this.dispatchEvent("complete");
 		}
 	};
