@@ -87,6 +87,7 @@
 				o.offset = {x:o.x-evt.stageX, y:o.y-evt.stageY};
 			});
 			
+			// the pressmove event is dispatched when the mouse moves after a mousedown on the target until the mouse is released.
 			bitmap.addEventListener("pressmove", function(evt) {
 				var o = evt.target;
 				o.x = evt.stageX+ o.offset.x;
@@ -95,13 +96,13 @@
 				update = true;
 			});
 			
-			bitmap.addEventListener("mouseover", function(evt) {
+			bitmap.addEventListener("rollover", function(evt) {
 				var o = evt.target;
 				o.scaleX = o.scaleY = o.scale*1.2;
 				update = true;
 			});
 			
-			bitmap.addEventListener("mouseout", function(evt) {
+			bitmap.addEventListener("rollout", function(evt) {
 				var o = evt.target;
 				o.scaleX = o.scaleY = o.scale;
 				update = true;
@@ -130,7 +131,7 @@
 
 	<header id="header" class="EaselJS">
 	    <h1><span class="text-product">Easel<strong>JS</strong></span> Drag &amp; Drop Example</h1>
-	    <p>Example of implementing drag &amp; drop using mouse events such as <strong>onPress</strong>, <strong>onMouseUp</strong>, and <strong>onMouseMove</strong>. Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.</p>
+	    <p>Example of implementing drag &amp; drop using mouse events such as <strong>mousedown</strong>, <strong>mouseup</strong>, and <strong>pressmove</strong>. Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.</p>
 	</header>
 
 	<div class="canvasHolder">

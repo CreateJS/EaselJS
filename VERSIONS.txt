@@ -3,6 +3,7 @@ Version NEXT [Not Released]
 CRITICAL (may break existing content):
 - removed all onEvent handlers (ex. onClick, onTick, onAnimationEnd, etc)
 - BitmapAnimation renamed to Sprite
+- MouseEvent now inherits from new Event class
 - sprite sheet data's animation .frequency property removed in favour of .speed
 - removed "target" from MouseEvent's param list
 - returning false from an event handler no longer causes dispatchEvent to return false, see Event.preventDefault

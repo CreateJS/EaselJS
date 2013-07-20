@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>EaselJS Example: Rollovers and Drag & Drop</title>
@@ -12,6 +12,7 @@
 	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/Event.js"></script>
 	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
@@ -46,9 +47,9 @@
 		// enable touch interactions if supported on the current device:
 		createjs.Touch.enable(stage);
 
-        stage.mouseMoveOutside = true; // keep tracking the mouse even when it leaves the canvas
 		// enabled mouse over / out events
 		stage.enableMouseOver(10);
+		stage.mouseMoveOutside = true; // keep tracking the mouse even when it leaves the canvas
 
 		// load the source image:
 		var image = new Image();
@@ -62,8 +63,6 @@
 
 	function handleImageLoad(event) {
 		var image = event.target;
-		var imgW = image.width;
-		var imgH = image.height;
 		var bitmap;
 		var container = new createjs.Container();
 		stage.addChild(container);
@@ -71,9 +70,9 @@
 		// create a shape that represents the center of the daisy image:
 		var hitArea = new createjs.Shape();
 		hitArea.graphics.beginFill("#FFF").drawEllipse(-11,-14,24,18);
-		// position hitArea relative to the internal coordinate system of the target (bitmap instances):
-		hitArea.x = imgW/2;
-		hitArea.y = imgH/2;
+		// position hitArea relative to the internal coordinate system of the target bitmap instances:
+		hitArea.x = image.width/2;
+		hitArea.y = image.height/2;
 
 		// create and populate the screen with random daisies:
 		for(var i = 0; i < 100; i++){
@@ -82,41 +81,43 @@
 			bitmap.x = canvas.width * Math.random()|0;
 			bitmap.y = canvas.height * Math.random()|0;
 			bitmap.rotation = 360 * Math.random()|0;
-			bitmap.regX = imgW/2|0;
-			bitmap.regY = imgH/2|0;
+			bitmap.regX = bitmap.image.width/2|0;
+			bitmap.regY = bitmap.image.height/2|0;
 			bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random()*0.4+0.6;
 			bitmap.name = "bmp_"+i;
-
-            bitmap.cursor = "pointer";
+			bitmap.cursor = "pointer";
 			
-			// assign the hitArea to each bitmap to use it for hit tests:
+			// assign the hit area:
 			bitmap.hitArea = hitArea;
 
-			// wrapper function to provide scope for the event handlers:
-			(function(target) {
-				bitmap.onPress = function(evt) {
-					// bump the target in front of its siblings:
-					container.addChild(target);
-					var offset = {x:target.x-evt.stageX, y:target.y-evt.stageY};
+			bitmap.addEventListener("mousedown", function(evt) {
+				// bump the target in front of its siblings:
+				var o = evt.target;
+				o.parent.addChild(o);
+				o.offset = {x:o.x-evt.stageX, y:o.y-evt.stageY};
+			});
+			
+			// the pressmove event is dispatched when the mouse moves after a mousedown on the target until the mouse is released.
+			bitmap.addEventListener("pressmove", function(evt) {
+				var o = evt.target;
+				o.x = evt.stageX+ o.offset.x;
+				o.y = evt.stageY+ o.offset.y;
+				// indicate that the stage should be updated on the next tick:
+				update = true;
+			});
+			
+			bitmap.addEventListener("rollover", function(evt) {
+				var o = evt.target;
+				o.scaleX = o.scaleY = o.scale*1.2;
+				update = true;
+			});
+			
+			bitmap.addEventListener("rollout", function(evt) {
+				var o = evt.target;
+				o.scaleX = o.scaleY = o.scale;
+				update = true;
+			});
 
-					// add a handler to the event object's onMouseMove callback
-					// this will be active until the user releases the mouse button:
-					evt.onMouseMove = function(ev) {
-						target.x = ev.stageX+offset.x;
-						target.y = ev.stageY+offset.y;
-						// indicate that the stage should be updated on the next tick:
-						update = true;
-					}
-				}
-				bitmap.onMouseOver = function() {
-					target.scaleX = target.scaleY = target.scale*1.2;
-					update = true;
-				}
-				bitmap.onMouseOut = function() {
-					target.scaleX = target.scaleY = target.scale;
-					update = true;
-				}
-			})(bitmap);
 		}
 
 		document.getElementById("loader").className = "";

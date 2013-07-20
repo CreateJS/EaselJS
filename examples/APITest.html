@@ -18,6 +18,7 @@
 <script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
 <script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
 <script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+<script type="text/javascript" src="../src/easeljs/events/Event.js"></script>
 <script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
 <script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
 <script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
@@ -119,9 +120,9 @@ function mouseDemo(stage) {
     //Click one of the shapes.
     var sprite = new createjs.Shape();
     sprite.graphics.beginFill(FILL_COLOR).drawCircle(30, 30, 20).moveTo(50, 50).drawRect(50, 50, 25, 25);
-    sprite.onClick = function (event) {
+    sprite.addEventListener("click", function (event) {
         alert('Click!');
-    };
+    });
 
     stage.addChild(sprite);
 }

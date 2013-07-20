@@ -22,6 +22,7 @@
     <script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
     <script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/Event.js"></script>
 	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
 	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
@@ -81,9 +82,8 @@
             ];
 
             loader = new createjs.LoadQueue(false);
-            loader.onProgress = handleProgress;
-            loader.onComplete = handleComplete;
-            loader.onFileLoad = handleFileLoad;
+            loader.addEventListener("fileload", handleFileLoad);
+			loader.addEventListener("complete", handleComplete);
             loader.loadManifest(manifest);
 
             stage.addChild(imageContainer);
@@ -93,10 +93,6 @@
 
         function stop() {
 	        createjs.Ticker.removeEventListener("tick", tick);
-        }
-
-        function handleProgress() {
-            //console.log('enter')
         }
 
         function handleFileLoad(event) {
