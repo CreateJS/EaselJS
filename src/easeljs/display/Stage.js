@@ -475,6 +475,34 @@ var p = Stage.prototype = new createjs.Container();
 	// private methods:
 	
 	/**
+	 * @method _getElementRect
+	 * @protected
+	 * @param {HTMLElement} e
+	 **/
+	p._getElementRect = function(e) {
+		var bounds;
+		try { bounds = e.getBoundingClientRect(); } // this can fail on disconnected DOM elements in IE9
+		catch (err) { bounds = {top: e.offsetTop, left: e.offsetLeft, width:e.offsetWidth, height:e.offsetHeight}; }
+		
+		var offX = (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || document.body.clientLeft || 0);
+		var offY = (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || document.body.clientTop  || 0);
+		
+		var styles = window.getComputedStyle ? getComputedStyle(e) : e.currentStyle; // IE <9 compatibility.
+		var padL = parseInt(styles.paddingLeft)+parseInt(styles.borderLeftWidth);
+		var padT = parseInt(styles.paddingTop)+parseInt(styles.borderTopWidth);
+		var padR = parseInt(styles.paddingRight)+parseInt(styles.borderRightWidth);
+		var padB = parseInt(styles.paddingBottom)+parseInt(styles.borderBottomWidth);
+		
+		// note: in some browsers bounds properties are read only.
+		return {
+			left: bounds.left+offX+padL,
+			right: bounds.right+offX-padR,
+			top: bounds.top+offY+padT,
+			bottom: bounds.bottom+offY-padB
+		}
+	};
+	
+	/**
 	 * @method _getPointerData
 	 * @protected
 	 * @param {Number} id
@@ -510,25 +538,19 @@ var p = Stage.prototype = new createjs.Container();
 	p._handlePointerMove = function(id, e, pageX, pageY) {
 		if (!this.canvas) { return; }
 		var o = this._getPointerData(id);
-		var primary = (id == this._primaryPointerID);
 
 		var inBounds = o.inBounds;
 		this._updatePointerPosition(id, pageX, pageY);
 		if (!inBounds && !o.inBounds && !this.mouseMoveOutside) { return; }
 		
-		if (this.hasEventListener("stagemousemove"))  {
-			this.dispatchEvent(new createjs.MouseEvent("stagemousemove", o.x, o.y, e, id, primary, o.rawX, o.rawY));
-		}
+		this._dispatchMouseEvent(this, "stagemousemove", false, id, o, e);
+		this._dispatchMouseEvent(o.target, "pressmove", true, id, o, e);
 		
-		var oTarget = o.target;
-		if (oTarget) {
-			oTarget.dispatchEvent(new createjs.MouseEvent("pressmove", o.x, o.y, e, id, primary, o.rawX, o.rawY));
-		}
-		
-		// TODO: deprecated, remove:
+		// TODO: deprecated:
 		var oEvent = o.event;
 		if (oEvent && oEvent.hasEventListener("mousemove")) {
-			oEvent.dispatchEvent(new createjs.MouseEvent("mousemove", o.x, o.y, e, id, primary, o.rawX, o.rawY), oTarget);
+			// this doesn't use _dispatchMouseEvent because it requires re-targeting.
+			oEvent.dispatchEvent(new createjs.MouseEvent("mousemove", false, false, o.x, o.y, e, id, (id == this._primaryPointerID), o.rawX, o.rawY), oTarget);
 		}
 	};
 
@@ -566,34 +588,6 @@ var p = Stage.prototype = new createjs.Container();
 			this.mouseInBounds = o.inBounds;
 		}
 	};
-	
-	/**
-	 * @method _getElementRect
-	 * @protected
-	 * @param {HTMLElement} e
-	 **/
-	p._getElementRect = function(e) {
-		var bounds;
-		try { bounds = e.getBoundingClientRect(); } // this can fail on disconnected DOM elements in IE9
-		catch (err) { bounds = {top: e.offsetTop, left: e.offsetLeft, width:e.offsetWidth, height:e.offsetHeight}; }
-		
-		var offX = (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || document.body.clientLeft || 0);
-		var offY = (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || document.body.clientTop  || 0);
-		
-		var styles = window.getComputedStyle ? getComputedStyle(e) : e.currentStyle; // IE <9 compatibility.
-		var padL = parseInt(styles.paddingLeft)+parseInt(styles.borderLeftWidth);
-		var padT = parseInt(styles.paddingTop)+parseInt(styles.borderTopWidth);
-		var padR = parseInt(styles.paddingRight)+parseInt(styles.borderRightWidth);
-		var padB = parseInt(styles.paddingBottom)+parseInt(styles.borderBottomWidth);
-		
-		// note: in some browsers bounds properties are read only.
-		return {
-			left: bounds.left+offX+padL,
-			right: bounds.right+offX-padR,
-			top: bounds.top+offY+padT,
-			bottom: bounds.bottom+offY-padB
-		}
-	};
 
 	/**
 	 * @method _handleMouseUp
@@ -613,28 +607,26 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p._handlePointerUp = function(id, e, clear) {
 		var o = this._getPointerData(id);
-		var primary = (id==this._primaryPointerID);
 		
-		if (this.hasEventListener("stagemouseup")) {
-			this.dispatchEvent(new createjs.MouseEvent("stagemouseup", o.x, o.y, e, id, primary, o.rawX, o.rawY));
-		}
+		this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e);
 		
 		var oTarget = o.target;
 		if (oTarget) {
 			if (this._getObjectsUnderPoint(o.x, o.y, null, true) == oTarget) {
-				oTarget.dispatchEvent(new createjs.MouseEvent("click", o.x, o.y, e, id, primary, o.rawX, o.rawY));
+				this._dispatchMouseEvent(oTarget, "click", true, id, o, e);
 			}
-			oTarget.dispatchEvent(new createjs.MouseEvent("pressup", o.x, o.y, e, id, primary, o.rawX, o.rawY));
+			this._dispatchMouseEvent(oTarget, "pressup", true, id, o, e);
 		}
 		
-		// TODO: deprecated, remove:
+		// TODO: deprecated:
 		var oEvent = o.event;
 		if (oEvent && oEvent.hasEventListener("mouseup")) {
-			oEvent.dispatchEvent(new createjs.MouseEvent("mouseup", o.x, o.y, e, id, primary, o.rawX, o.rawY), oTarget);
+			// this doesn't use _dispatchMouseEvent because it requires re-targeting.
+			oEvent.dispatchEvent(new createjs.MouseEvent("mouseup", false, false, o.x, o.y, e, id, (id==this._primaryPointerID), o.rawX, o.rawY), oTarget);
 		}
 		
 		if (clear) {
-			if (primary) { this._primaryPointerID = null; }
+			if (id==this._primaryPointerID) { this._primaryPointerID = null; }
 			delete(this._pointerData[id]);
 		} else { o.event = o.target = null; }
 	};
@@ -657,18 +649,13 @@ var p = Stage.prototype = new createjs.Container();
 	 * @param {Number} y
 	 **/
 	p._handlePointerDown = function(id, e, x, y) {
-		var o = this._getPointerData(id);
 		if (y != null) { this._updatePointerPosition(id, x, y); }
-		var primary = (id==this._primaryPointerID);
+		var o = this._getPointerData(id);
 		
-		if (this.hasEventListener("stagemousedown")) {
-			this.dispatchEvent(new createjs.MouseEvent("stagemousedown", o.x, o.y, e, id, primary, o.rawX, o.rawY));
-		}
+		this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e);
 		
-		if (o.target = this._getObjectsUnderPoint(o.x, o.y, null, true)) {
-			// TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
-			o.target.dispatchEvent(o.event = new createjs.MouseEvent("mousedown", o.x, o.y, e, id, primary, o.rawX, o.rawY));
-		}
+		o.target = this._getObjectsUnderPoint(o.x, o.y, null, true);
+		this._dispatchMouseEvent(o.target, "mousedown", true, id, o, e);
 	};
 
 	/**
@@ -676,12 +663,10 @@ var p = Stage.prototype = new createjs.Container();
 	 * @protected
 	 **/
 	p._testMouseOver = function() {
-		// for now, this only tests the mouse.
-		if (this._primaryPointerID != -1) { return; }
-		
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
-		if (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds) { return; }
-		var target, common = -1, cursor="", t, i, l, evt, o = this._getPointerData(-1);
+		if (this._primaryPointerID != -1 || (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
+		var o = this._getPointerData(-1);
+		var target, common = -1, cursor="", t, i, l;
 		
 		if (this.mouseInBounds) {
 			target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
@@ -690,7 +675,7 @@ var p = Stage.prototype = new createjs.Container();
 		}
 		
 		var oldList = this._mouseOverTarget||[];
-		var mouseOverTarget = oldList[oldList.length-1];
+		var oldTarget = oldList[oldList.length-1];
 		var list = this._mouseOverTarget = [];
 		
 		// generate ancestor list and check for cursor:
@@ -708,32 +693,20 @@ var p = Stage.prototype = new createjs.Container();
 			common = i;
 		}
 		
-		if (mouseOverTarget && mouseOverTarget != target) {
-			mouseOverTarget.dispatchEvent(new createjs.MouseEvent("mouseout", o.x, o.y, null, -1, true, o.rawX, o.rawY));
+		if (oldTarget != target) {
+			this._dispatchMouseEvent(oldTarget, "mouseout", true, -1, o);
 		}
 		
-		// roll out:
 		for (i=oldList.length-1; i>common; i--) {
-			t = oldList[i];
-			if (t.hasEventListener("rollout")) {
-				evt = new createjs.MouseEvent("rollout", o.x, o.y, null, -1, true, o.rawX, o.rawY);
-				evt.bubbles = false;
-				t.dispatchEvent(evt);
-			}
+			this._dispatchMouseEvent(oldList[i], "rollout", false, -1, o);
 		}
 		
-		// roll over:
 		for (i=list.length-1; i>common; i--) {
-			t = list[i];
-			if (t.hasEventListener("rollover")) {
-				evt = new createjs.MouseEvent("rollover", o.x, o.y, null, -1, true, o.rawX, o.rawY);
-				evt.bubbles = false;
-				t.dispatchEvent(evt);
-			}
+			this._dispatchMouseEvent(list[i], "rollover", false, -1, o);
 		}
 		
-		if (target && mouseOverTarget != target) {
-			target.dispatchEvent(new createjs.MouseEvent("mouseover", o.x, o.y, null, -1, true, o.rawX, o.rawY));
+		if (oldTarget != target) {
+			this._dispatchMouseEvent(target, "mouseover", true, -1, o);
 		}
 		
 	};
@@ -746,9 +719,24 @@ var p = Stage.prototype = new createjs.Container();
 	p._handleDoubleClick = function(e) {
 		var o = this._getPointerData(-1);
 		var target = this._getObjectsUnderPoint(o.x, o.y, null, true);
-		if (target) {
-			target.dispatchEvent(new createjs.MouseEvent("dblclick", o.x, o.y, e, -1, true, o.rawX, o.rawY));
-		}
+		this._dispatchMouseEvent(target, "dblclick", true, -1, o, e);
+	};
+	
+	/**
+	 * @method _dispatchMouseEvent
+	 * @protected
+	 * @param {DisplayObject} target
+	 * @param {String} type
+	 * @param {Boolean} bubbles
+	 * @param {Number} pointerId
+	 * @param {Object} o
+	 * @param {MouseEvent} [nativeEvent]
+	 **/
+	p._dispatchMouseEvent = function(target, type, bubbles, pointerId, o, nativeEvent) {
+		// TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
+		if (!target || (!bubbles && !target.hasEventListener(type))) { return; }
+		var evt = new createjs.MouseEvent(type, bubbles, o.x, o.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
+		target.dispatchEvent(evt);
 	};
 
 createjs.Stage = Stage;
