@@ -2,6 +2,7 @@ Version NEXT [Not Released]
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - removed all onEvent handlers (ex. onClick, onTick, onAnimationEnd, etc)
+- most mouse events now bubble
 - BitmapAnimation renamed to Sprite
 - MouseEvent now inherits from new Event class
 - sprite sheet data's animation .frequency property removed in favour of .speed
@@ -9,7 +10,7 @@ CRITICAL (may break existing content):
 - returning false from an event handler no longer causes dispatchEvent to return false, see Event.preventDefault
 
 *****
-DEPRECATED (may be removed in future version):
+DEPRECATED (will be removed in a future version):
 - MouseEvent mousemove/mouseup events, see DisplayObject pressmove/pressup
 - SpriteSheetUtils.flip()
 - SpriteSheetUtils.mergeAlpha()
@@ -19,13 +20,14 @@ All changes:
 - BitmapAnimation renamed to Sprite
 - renamed the "frequency" property in sprite sheet data to "speed" and changed functionality:
 	* support for non-integer values
-	* inverted results vs frequency. Ex. a "speed" value of 2 doubles playback speed, 0.5 halves it
+	* inverted outcome vs frequency. Ex. a "speed" value of 2 doubles playback speed, 0.5 halves it
 - added Sprite.framerate and SpriteSheet.framerate
 - added frameOrAnimation param to Sprite constructor
 - deprecated Sprite.offset (no longer functional)
 - added Ticker.timingMode and deprecated Ticker.useRAF
 	* added Ticker.TIMEOUT, Ticker.RAF, Ticker.RAF_SYNCHED timing mode constants
 - added Ticker.getMeasuredTickTime()
+- added Stage.nextStage to relay interaction events
 - added Graphics.inject()
 - added Text.getMeasuredHeight()
 - fixes and improvements to Touch support
@@ -33,6 +35,10 @@ All changes:
 - added Graphics.Command
 - merged lots of doc updates (thanks @peteshand)
 - lots of doc, example, & tutorial updates
+- included MouseEvent.nativeEvent for rollover/out events
+- prevented rollover/out events from triggering if the mouse is not over the canvas
+	* ex. within a scrolling div or DOM element layered over top
+- added Matrix2D.transformPoint() method
 
 
 Version 0.6.1 [May 14, 2013]

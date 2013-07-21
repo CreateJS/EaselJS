@@ -232,7 +232,7 @@ var p = Stage.prototype = new createjs.Container();
 
 	/**
 	 * Holds objects with data for each active pointer id. Each object has the following properties:
-	 * x, y, event, target, overTarget, overX, overY, inBounds
+	 * x, y, event, target, overTarget, overX, overY, inBounds, posEvtObj (native event that last updated position)
 	 * @property _pointerData
 	 * @type {Object}
 	 * @private
@@ -557,7 +557,7 @@ var p = Stage.prototype = new createjs.Container();
 		var o = this._getPointerData(id);
 
 		var inBounds = o.inBounds;
-		this._updatePointerPosition(id, pageX, pageY);
+		this._updatePointerPosition(id, e, pageX, pageY);
 		if (!inBounds && !o.inBounds && !this.mouseMoveOutside) { return; }
 		
 		this._dispatchMouseEvent(this, "stagemousemove", false, id, o, e);
@@ -577,10 +577,11 @@ var p = Stage.prototype = new createjs.Container();
 	 * @method _updatePointerPosition
 	 * @protected
 	 * @param {Number} id
+	 * @param {Event} e
 	 * @param {Number} pageX
 	 * @param {Number} pageY
 	 **/
-	p._updatePointerPosition = function(id, pageX, pageY) {
+	p._updatePointerPosition = function(id, e, pageX, pageY) {
 		var rect = this._getElementRect(this.canvas);
 		pageX -= rect.left;
 		pageY -= rect.top;
@@ -598,6 +599,7 @@ var p = Stage.prototype = new createjs.Container();
 			o.y = pageY < 0 ? 0 : (pageY > h-1 ? h-1 : pageY);
 		}
 		
+		o.posEvtObj = e;
 		o.rawX = pageX;
 		o.rawY = pageY;
 		
@@ -670,7 +672,7 @@ var p = Stage.prototype = new createjs.Container();
 	 * @param {Number} pageY
 	 **/
 	p._handlePointerDown = function(id, e, pageX, pageY) {
-		if (pageY != null) { this._updatePointerPosition(id, pageX, pageY); }
+		if (pageY != null) { this._updatePointerPosition(id, e, pageX, pageY); }
 		var o = this._getPointerData(id);
 		
 		this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e);
@@ -689,9 +691,10 @@ var p = Stage.prototype = new createjs.Container();
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
 		if (this._primaryPointerID != -1 || (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
 		var o = this._getPointerData(-1);
+		var e = o.posEvtObj;
 		var target, common = -1, cursor="", t, i, l;
 		
-		if (this.mouseInBounds) {
+		if (this.mouseInBounds && e && e.target == this.canvas) {
 			target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
 			this._mouseOverX = this.mouseX;
 			this._mouseOverY = this.mouseY;
@@ -717,19 +720,19 @@ var p = Stage.prototype = new createjs.Container();
 		}
 		
 		if (oldTarget != target) {
-			this._dispatchMouseEvent(oldTarget, "mouseout", true, -1, o);
+			this._dispatchMouseEvent(oldTarget, "mouseout", true, -1, o, e);
 		}
 		
 		for (i=oldList.length-1; i>common; i--) {
-			this._dispatchMouseEvent(oldList[i], "rollout", false, -1, o);
+			this._dispatchMouseEvent(oldList[i], "rollout", false, -1, o, e);
 		}
 		
 		for (i=list.length-1; i>common; i--) {
-			this._dispatchMouseEvent(list[i], "rollover", false, -1, o);
+			this._dispatchMouseEvent(list[i], "rollover", false, -1, o, e);
 		}
 		
 		if (oldTarget != target) {
-			this._dispatchMouseEvent(target, "mouseover", true, -1, o);
+			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e);
 		}
 		
 	};
@@ -760,6 +763,12 @@ var p = Stage.prototype = new createjs.Container();
 	p._dispatchMouseEvent = function(target, type, bubbles, pointerId, o, nativeEvent) {
 		// TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
 		if (!target || (!bubbles && !target.hasEventListener(type))) { return; }
+		/*
+		// TODO: account for stage transformations:
+		this._mtx = this.getConcatenatedMatrix(this._mtx).invert();
+		var pt = this._mtx.transformPoint(o.x, o.y);
+		var evt = new createjs.MouseEvent(type, bubbles, false, pt.x, pt.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
+		*/
 		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
 		target.dispatchEvent(evt);
 	};
