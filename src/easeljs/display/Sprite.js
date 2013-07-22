@@ -474,6 +474,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 		o.paused = this.paused;
 		o._animation = this._animation;
 		o.currentAnimationFrame = this.currentAnimationFrame;
+		o.framerate = this.framerate;
 	};
 
 	/**
