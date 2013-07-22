@@ -165,7 +165,8 @@ var p = SpriteSheet.prototype;
 	
 	// TODO: deprecated.
 	/**
-	 * REMOVED. Use addEventListener and the "complete" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "SpriteSheet/complete:event"}}{{/crossLink}}
+	 * event.
 	 * @property onComplete
 	 * @type Function
 	 * @deprecated Use addEventListener and the "complete" event.
@@ -356,11 +357,13 @@ var p = SpriteSheet.prototype;
 	};
 	
 	/**
-	 * Returns an object defining the specified animation. The returned object has a
-	 * frames property containing an array of the frame id's in the animation, a speed
-	 * property indicating the playback speed for this animation, a name property, 
-	 * and a next property, which specifies the default next animation. If the animation
-	 * loops, the name and next property will be the same.
+	 * Returns an object defining the specified animation. The returned object contains:<UL>
+	 *     <LI>frames: an array of the frame ids in the animation</LI>
+	 *     <LI>speed: the playback speed for this animation</LI>
+	 *     <LI>name: the name of the animation</LI>
+	 *     <LI>next: the default animation to play next. If the animation loops, the name and next property will be the
+	 *     same.</LI>
+	 * </UL>
 	 * @method getAnimation
 	 * @param {String} name The name of the animation to get.
 	 * @return {Object} a generic object with frames, speed, name, and next properties.
@@ -370,10 +373,11 @@ var p = SpriteSheet.prototype;
 	};
 	
 	/**
-	 * Returns an object specifying the image and source rect of the specified frame. The returned object
-	 * has an image property holding a reference to the image object in which the frame is found,
-	 * and a rect property containing a Rectangle instance which defines the boundaries for the
-	 * frame within that image.
+	 * Returns an object specifying the image and source rect of the specified frame. The returned object has:<UL>
+	 *     <LI>an image property holding a reference to the image object in which the frame is found</LI>
+	 *     <LI>a rect property containing a Rectangle instance which defines the boundaries for the frame within that
+	 *     image.</LI>
+	 * </UL>
 	 * @method getFrame
 	 * @param {Number} frameIndex The index of the frame.
 	 * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist.
@@ -385,8 +389,11 @@ var p = SpriteSheet.prototype;
 	};
 	
 	/**
-	 * Returns a Rectangle instance defining the bounds of the specified frame relative to the origin. For example, a
-	 * 90 x 70 frame with a regX of 50 and a regY of 40 would return a rectangle with [x=-50, y=-40, width=90, height=70].
+	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative
+	 * to the origin. For example, a 90 x 70 frame with a regX of 50 and a regY of 40 would return:
+	 *
+	 *      [x=-50, y=-40, width=90, height=70]
+	 *
 	 * @method getFrameBounds
 	 * @param {Number} frameIndex The index of the frame.
 	 * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.

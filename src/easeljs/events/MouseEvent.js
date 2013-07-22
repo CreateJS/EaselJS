@@ -33,7 +33,8 @@ this.createjs = this.createjs||{};
 
 // TODO: deprecated. @uses EventDispatcher
 /**
- * This is passed as the parameter to all mouse/pointer/touch related events on {{#crossLink "DisplayObject"}}{{/crossLink}} instances.
+ * This is passed as the parameter to all mouse/pointer/touch related events on {{#crossLink "DisplayObject"}}{{/crossLink}}
+ * instances.
  * @class MouseEvent
  * @param {String} type The event type.
  * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
@@ -57,10 +58,10 @@ var p = MouseEvent.prototype = new createjs.Event();
 // events:
 
 	/**
-	 * For MouseEvent objects of type "mousedown", mousemove events will be dispatched from the event object until the user
-	 * releases the mouse anywhere.
-	 * This enables you to listen to mouse move interactions for the duration of a press, which can be very useful for
-	 * operations such as drag and drop.
+	 * For MouseEvent objects of type "mousedown", mousemove events will be dispatched from the event object until the
+	 * user releases the mouse anywhere. This enables you to listen to mouse move interactions for the duration of a
+	 * press, which can be very useful for operations such as drag and drop.
+	 *
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event mousemove
 	 * @since 0.6.0
@@ -68,10 +69,10 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 */
 
 	/**
-	 * For MouseEvent objects of type "mousedown", a mouseup event will be dispatched from the event object when the user
-	 * releases the mouse anywhere.
-	 * This enables you to listen for a corresponding mouse up from a specific press, which can be very useful for
-	 * operations such as drag and drop.
+	 * For MouseEvent objects of type "mousedown", a mouseup event will be dispatched from the event object when the
+	 * user releases the mouse anywhere. This enables you to listen for a corresponding mouse up from a specific press,
+	 * which can be very useful for operations such as drag and drop.
+	 *
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event mouseup
 	 * @since 0.6.0
@@ -122,13 +123,15 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 
 	// TODO: deprecated:
 	/**
-	 * REMOVED. Use the DisplayObject "pressmove" event.
+	 * REMOVED. Use the {{#crossLink "DisplayObject"}}{{/crossLink}} {{#crossLink "DisplayObject/pressmove:event"}}{{/crossLink}}
+	 * event.
 	 * @property onMouseMove
 	 * @type Function
 	 * @deprecated Use the DisplayObject "pressmove" event.
 	 */
 	/**
-	 * REMOVED. Use the DisplayObject "pressup" event.
+	 * REMOVED. Use the {{#crossLink "DisplayObject"}}{{/crossLink}} {{#crossLink "DisplayObject/pressup:event"}}{{/crossLink}}
+	 * event.
 	 * @property onMouseUp
 	 * @type Function
 	 * @deprecated Use the DisplayObject "pressup" event.

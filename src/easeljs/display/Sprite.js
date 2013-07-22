@@ -74,15 +74,16 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 // public properties:
 	// TODO: deprecated.
 	/**
-	 * REMOVED. Use addEventListener and the "animationend" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "Sprite/animationend:event"}}{{/crossLink}}
+	 * event.
 	 * @property onAnimationEnd
 	 * @type {Function}
 	 * @deprecated Use addEventListener and the "animationend" event.
 	 */
 	 
 	/**
-	 * The frame index that will be drawn when draw is called. Note that with some SpriteSheet definitions, this
-	 * will advance non-sequentially. This will always be an integer value.
+	 * The frame index that will be drawn when draw is called. Note that with some {{#crossLink "SpriteSheet"}}{{/crossLink}}
+	 * definitions, this will advance non-sequentially. This will always be an integer value.
 	 * @property currentFrame
 	 * @type {Number}
 	 * @default 0
