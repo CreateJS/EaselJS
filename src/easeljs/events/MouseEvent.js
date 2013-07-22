@@ -31,6 +31,7 @@ this.createjs = this.createjs||{};
 
 (function() {
 
+// TODO: deprecated. @uses EventDispatcher
 /**
  * This is passed as the parameter to all mouse/pointer/touch related events on {{#crossLink "DisplayObject"}}{{/crossLink}} instances.
  * @class MouseEvent
@@ -45,6 +46,7 @@ this.createjs = this.createjs||{};
  * @param {Number} rawX The raw x position relative to the stage.
  * @param {Number} rawY The raw y position relative to the stage.
  * @extends Event
+ * @uses EventDispatcher
  * @constructor
  **/
 var MouseEvent = function(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY) {
