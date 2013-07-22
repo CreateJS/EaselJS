@@ -137,8 +137,8 @@ var DisplayObject = function() {
 var p = DisplayObject.prototype;
 
 	/**
-	 * Suppresses errors generated when using features like hitTest, mouse events, and getObjectsUnderPoint with cross
-	 * domain content
+	 * Suppresses errors generated when using features like hitTest, mouse events, and {{#crossLink "getObjectsUnderPoint"}}{{/crossLink}}
+	 * with cross domain content.
 	 * @property suppressCrossDomainErrors
 	 * @static
 	 * @type {Boolean}
@@ -196,31 +196,28 @@ var p = DisplayObject.prototype;
 	 
 	/**
 	 * Dispatched when the user's mouse enters this display object. This event must be enabled using 
-	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
-	 * See also {{#crossLink "DisplayObject/rollover"}}{{/crossLink}}.
+	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}. See also {{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event mouseover
 	 * @since 0.6.0
 	 */
-	 
-	
+
 	/**
 	 * Dispatched when the user's mouse leaves this display object. This event must be enabled using 
-	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
-	 * See also {{#crossLink "DisplayObject/rollout"}}{{/crossLink}}.
+	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}. See also {{#crossLink "DisplayObject/rollout:event"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event mouseout
 	 * @since 0.6.0
 	 */
 	 
 	/**
-	 * This event is similar to {{#crossLink "DisplayObject/mouseover"}}{{/crossLink}}, with the following differences:
-	 * it does not bubble, and it considers
-	 * {{#crossLink "Container"}}{{/crossLink}} instances as an aggregate of their content.
+	 * This event is similar to {{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}, with the following
+	 * differences: it does not bubble, and it considers {{#crossLink "Container"}}{{/crossLink}} instances as an
+	 * aggregate of their content.
 	 * 
 	 * For example, myContainer contains two overlapping children: shapeA and shapeB. The user moves their mouse over
-	 * shapeA and then directly on to shapeB. With a listener for mouseover on myContainer, two events would be
-	 * received, each targeting a child element:<OL>
+	 * shapeA and then directly on to shapeB. With a listener for {{#crossLink "mouseover:event"}}{{/crossLink}} on
+	 * myContainer, two events would be received, each targeting a child element:<OL>
 	 * <LI>when the mouse enters shapeA (target=shapeA)</LI>
 	 * <LI>when the mouse enters shapeB (target=shapeB)</LI>
 	 * </OL>
@@ -234,13 +231,13 @@ var p = DisplayObject.prototype;
 	 */
 	 
 	/**
-	 * This event is similar to {{#crossLink "DisplayObject/mouseout"}}{{/crossLink}}, with the following differences:
-	 * it does not bubble, and it considers
-	 * {{#crossLink "Container"}}{{/crossLink}} instances as an aggregate of their content.
+	 * This event is similar to {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}, with the following
+	 * differences: it does not bubble, and it considers {{#crossLink "Container"}}{{/crossLink}} instances as an
+	 * aggregate of their content.
 	 * 
 	 * For example, myContainer contains two overlapping children: shapeA and shapeB. The user moves their mouse over
-	 * shapeA, then directly on to shapeB, then off both. With a listener for mouseout on myContainer, two events would
-	 * be received, each targeting a child element:<OL>
+	 * shapeA, then directly on to shapeB, then off both. With a listener for {{#crossLink "mouseout:event"}}{{/crossLink}}
+	 * on myContainer, two events would be received, each targeting a child element:<OL>
 	 * <LI>when the mouse leaves shapeA (target=shapeA)</LI>
 	 * <LI>when the mouse leaves shapeB (target=shapeB)</LI>
 	 * </OL>
@@ -254,17 +251,17 @@ var p = DisplayObject.prototype;
 	 */
 	 
 	/**
-	 * After a {{#crossLink "DisplayObject/mousedown"}}{{/crossLink}} occurs on a display object, a pressmove event will
-	 * be generated on that object whenever the mouse moves until the mouse press is released.
-	 * This can be useful for dragging and similar operations.
+	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressmove
+	 * event will be generated on that object whenever the mouse moves until the mouse press is released. This can be
+	 * useful for dragging and similar operations.
 	 * @event pressmove
 	 * @since 0.7.0
 	 */
 	 
 	/**
-	 * After a {{#crossLink "DisplayObject/mousedown"}}{{/crossLink}} occurs on a display object, a pressup event will
-	 * be generated on that object when that mouse press is released.
-	 * This can be useful for dragging and similar operations.
+	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressup event
+	 * will be generated on that object when that mouse press is released. This can be useful for dragging and similar
+	 * operations.
 	 * @event pressup
 	 * @since 0.7.0
 	 */
@@ -273,7 +270,8 @@ var p = DisplayObject.prototype;
 	 * Dispatched on each display object on a stage whenever the stage updates. This occurs immediately before the
 	 * rendering (draw) pass. When {{#crossLink "Stage/update"}}{{/crossLink}} is called, first all display objects on
 	 * the stage dispatch the tick event, then all of the display objects are drawn to stage. Children will have their
-	 * tick event dispatched in order of their depth prior to the event being dispatched on their parent.
+	 * {{#crossLink "tick:event"}}{{/crossLink}} event dispatched in order of their depth prior to the event being
+	 * dispatched on their parent.
 	 * @event tick
 	 * @param {Object} target The object that dispatched the event.
 	 * @param {String} type The event type.
@@ -292,7 +290,7 @@ var p = DisplayObject.prototype;
 	p.alpha = 1;
 
 	/**
-	 * If a cache is active, this returns the canvas that holds the cached version of this display object. See cache()
+	 * If a cache is active, this returns the canvas that holds the cached version of this display object. See {{#crossLink "cache"}}{{/crossLink}}
 	 * for more information.
 	 * @property cacheCanvas
 	 * @type {HTMLCanvasElement | Object}
@@ -321,7 +319,8 @@ var p = DisplayObject.prototype;
 	p.mouseEnabled = true;
 
 	/**
-	 * An optional name for this display object. Included in toString(). Useful for debugging.
+	 * An optional name for this display object. Included in {{#crossLink "DisplayObject/toString"}}{{/crossLink}} . Useful for
+	 * debugging.
 	 * @property name
 	 * @type {String}
 	 * @default null
@@ -329,7 +328,8 @@ var p = DisplayObject.prototype;
 	p.name = null;
 
 	/**
-	 * A reference to the Container or Stage object that contains this display object, or null if it has not been added
+	 * A reference to the {{#crossLink "Container"}}{{/crossLink}} or {{#crossLink "Stage"}}{{/crossLink}} object that
+	 * contains this display object, or null if it has not been added
 	 * to one.
 	 * @property parent
 	 * @final
@@ -340,8 +340,8 @@ var p = DisplayObject.prototype;
 	p.parent = null;
 
 	/**
-	 * The x offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
-	 * its center, you would set regX and regY to 50.
+	 * The left offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate
+	 * around its center, you would set regX and {{#crossLink "DisplayObject/regY:property"}}{{/crossLink}} to 50.
 	 * @property regX
 	 * @type {Number}
 	 * @default 0
@@ -350,7 +350,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
-	 * its center, you would set regX and regY to 50.
+	 * its center, you would set {{#crossLink "DisplayObject/regX:property"}}{{/crossLink}} and regY to 50.
 	 * @property regY
 	 * @type {Number}
 	 * @default 0
@@ -400,7 +400,7 @@ var p = DisplayObject.prototype;
 	p.skewY = 0;
 
 	/**
-	 * A shadow object that defines the shadow to render on this display object. Set to null to remove a shadow. If
+	 * A shadow object that defines the shadow to render on this display object. Set to `null` to remove a shadow. If
 	 * null, this property is inherited from the parent container.
 	 * @property shadow
 	 * @type {Shadow}
@@ -409,8 +409,8 @@ var p = DisplayObject.prototype;
 	p.shadow = null;
 
 	/**
-	 * Indicates whether this display object should be rendered to the canvas and included when running
-	 * Stage.getObjectsUnderPoint().
+	 * Indicates whether this display object should be rendered to the canvas and included when running the Stage
+	 * {{#crossLink "Stage/getObjectsUnderPoint"}}{{/crossLink}} method.
 	 * @property visible
 	 * @type {Boolean}
 	 * @default true
@@ -434,7 +434,7 @@ var p = DisplayObject.prototype;
 
 	/**
 	 * The composite operation indicates how the pixels of this display object will be composited with the elements
-	 * behind it. If null, this property is inherited from the parent container. For more information, read the
+	 * behind it. If `null`, this property is inherited from the parent container. For more information, read the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
 	 * whatwg spec on compositing</a>.
 	 * @property compositeOperation
@@ -446,12 +446,13 @@ var p = DisplayObject.prototype;
 	/**
 	 * Indicates whether the display object should have its x & y position rounded prior to drawing it to stage.
 	 * Snapping to whole pixels can result in a sharper and faster draw for images (ex. Bitmap & cached objects).
-	 * This only applies if the enclosing stage has snapPixelsEnabled set to true. The snapToPixel property is true
-	 * by default for Bitmap and Sprite instances, and false for all other display objects.
-	 * <br/><br/>
-	 * Note that this applies only rounds the display object's local position. You should
-	 * ensure that all of the display object's ancestors (parent containers) are also on a whole pixel. You can do this
-	 * by setting the ancestors' snapToPixel property to true.
+	 * This only applies if the enclosing stage has {{#crossLink "Stage/snapPixelsEnabled:property"}}{{/crossLink}} set
+	 * to `true`. The snapToPixel property is `true` by default for {{#crossLink "Bitmap"}}{{/crossLink}} and {{#crossLink "Sprite"}}{{/crossLink}}
+	 * instances, and `false` for all other display objects.
+	 *
+	 * Note that this applies only rounds the display object's local position. You should ensure that all of the display
+	 * object's ancestors (parent containers) are also on a whole pixel. You can do this by setting the ancestors'
+	 * snapToPixel property to `true`.
 	 * @property snapToPixel
 	 * @type {Boolean}
 	 * @default false
@@ -461,45 +462,52 @@ var p = DisplayObject.prototype;
 	
 	// TODO: remove handler docs in future:
 	/**
-	 * REMOVED. Use addEventListener and the "mousedown" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}}
+	 * event.
 	 * @property onPress
 	 * @type {Function}
 	 * @deprecated Use addEventListener and the "mousedown" event.
 	 */
 	/**
-	 * REMOVED. Use addEventListener and the "click" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/click:event"}}{{/crossLink}}
+	 * event.
 	 * @property onClick
 	 * @type {Function}
 	 * @deprecated Use addEventListener and the "click" event.
 	 */
 	/**
-	 * REMOVED. Use addEventListener and the "dblClick" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/dblclick:event"}}{{/crossLink}}
+	 * event.
 	 * @property onDoubleClick
 	 * @type {Function}
-	 * @deprecated Use addEventListener and the "dblClick" event.
+	 * @deprecated Use addEventListener and the "dblclick" event.
 	 */
 	/**
-	 * REMOVED. Use addEventListener and the "mouseover" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
+	 * event.
 	 * @property onMouseOver
 	 * @type {Function}
 	 * @deprecated Use addEventListener and the "mouseover" event.
 	 */
 	/**
-	 * REMOVED. Use addEventListener and the "mouseout" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}
+	 * event.
 	 * @property onMouseOut
 	 * @type {Function}
 	 * @deprecated Use addEventListener and the "mouseout" event.
 	 */
 	/**
-	 * REMOVED. Use addEventListener and the "tick" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}}
+	 * event.
 	 * @property onTick
 	 * @type {Function}
 	 * @deprecatedtick
 	 */
 
 	/**
-	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when `cache()` or
-	 * `updateCache()` is called on the display object, and only apply to the area that is cached.
+	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when {{#crossLink "cache"}}{{/crossLink}}
+	 * or {{#crossLink "updateCache"}}{{/crossLink}} is called on the display object, and only apply to the area that is
+	 * cached.
 	 * @property filters
 	 * @type {Array}
 	 * @default null
@@ -507,7 +515,8 @@ var p = DisplayObject.prototype;
 	p.filters = null;
 
 	/**
-	 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to * determine if the cache has changed since a previous check.
+	 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
+	 * determine if the cache has changed since a previous check.
 	 * @property cacheID
 	 * @type {Number}
 	 * @default 0

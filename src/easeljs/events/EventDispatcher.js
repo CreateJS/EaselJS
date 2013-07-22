@@ -239,7 +239,7 @@ var p = EventDispatcher.prototype;
 	};
 
 	/**
-	 * Indicates whether there is at least one listener for the specified event type and useCapture value.
+	 * Indicates whether there is at least one listener for the specified event type and `useCapture` value.
 	 * @method hasEventListener
 	 * @param {String} type The string type of the event.
 	 * @return {Boolean} Returns true if there is at least one listener for the specified event.

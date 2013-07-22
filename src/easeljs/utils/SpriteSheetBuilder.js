@@ -143,13 +143,15 @@ var p = SpriteSheetBuilder.prototype;
 	 
 	// TODO: deprecated.
 	/**
-	 * REMOVED. Use addEventListener and the "complete" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "SpriteSheetBuilder/complete:event"}}{{/crossLink}}
+	 * event.
 	 * @property onComplete
 	 * @type Function
 	 * @deprecated Use addEventListener and the "complete" event.
 	 */
 	/**
-	 * REMOVED. Use addEventListener and the "progress" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "SpriteSheetBuilder/progress:event"}}{{/crossLink}}
+	 * event.
 	 * @property onProgress
 	 * @type Function
 	 * @deprecated Use addEventListener and the "progress" event.

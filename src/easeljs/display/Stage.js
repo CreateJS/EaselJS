@@ -146,19 +146,22 @@ var p = Stage.prototype = new createjs.Container();
 	 
 	// TODO: deprecated.
 	/**
-	 * REMOVED. Use addEventListener and the "stagemousemove" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the "{{#crossLink "Stage/stagemousemove:event"}}{{/crossLink}}
+	 * event.
 	 * @property onMouseMove
 	 * @type Function
 	 * @deprecated Use addEventListener and the "stagemousemove" event.
 	 */
 	/**
-	 * REMOVED. Use addEventListener and the "stagemouseup" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "Stage/stagemouseup:event"}}{{/crossLink}}
+	 * event.
 	 * @property onMouseUp
 	 * @type Function
 	 * @deprecated Use addEventListener and the "stagemouseup" event.
 	 */
 	/**
-	 * REMOVED. Use addEventListener and the "stagemousedown" event.
+	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "Stage/stagemousedown:event"}}{{/crossLink}}
+	 * event.
 	 * @property onMouseDown
 	 * @type Function
 	 * @deprecated Use addEventListener and the "stagemousedown" event.
@@ -166,8 +169,8 @@ var p = Stage.prototype = new createjs.Container();
 	
 	// TODO: deprecated.
 	/**
-	 * Indicates whether this stage should use the snapToPixel property of display objects when rendering them. See
-	 * DisplayObject.snapToPixel for more information.
+	 * Indicates whether this stage should use the {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of
+	 * display objects when rendering them.
 	 * @property snapToPixelEnabled
 	 * @type Boolean
 	 * @default false
@@ -193,7 +196,8 @@ var p = Stage.prototype = new createjs.Container();
 	
 	/**
 	 * If true, mouse move events will continue to be called when the mouse leaves the target canvas. See
-	 * mouseInBounds, and MouseEvent.x/y/rawX/rawY.
+	 * {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}}, and {{#crossLink "MouseEvent"}}{{/crossLink}}
+	 * x/y/rawX/rawY.
 	 * @property mouseMoveOutside
 	 * @type Boolean
 	 * @default false
@@ -204,14 +208,15 @@ var p = Stage.prototype = new createjs.Container();
 	/**
 	 * NOTE: this name is not final. Feedback is appreciated.
 	 * 
-	 * The stage assigned to this property will have mouse interactions relayed to it after this stage handles them. This can
-	 * be useful in cases where you have multiple canvases layered on top of one another and want your mouse events to
-	 * pass through. For example, this would relay mouse events from topStage to bottomStage:
-	 * topStage.nextStage = bottomStage;
+	 * The stage assigned to this property will have mouse interactions relayed to it after this stage handles them.
+	 * This can be useful in cases where you have multiple canvases layered on top of one another and want your mouse
+	 * events to pass through. For example, this would relay mouse events from topStage to bottomStage:
+	 *
+	 *      topStage.nextStage = bottomStage;
 	 * 
-	 * Note that each stage handles the interactions independently. As such, you could have a click register on an object
-	 * in the top stage, and another click register in the bottom stage. Consider using a single canvas with cached
-	 * Container instances instead of multiple canvases.
+	 * Note that each stage handles the interactions independently. As such, you could have a click register on an
+	 * object in the top stage, and another click register in the bottom stage. Consider using a single canvas with
+	 * cached {{#crossLink "Container"}}{{/crossLink}} instances instead of multiple canvases.
 	 * 
 	 * MouseOver, MouseOut, RollOver, and RollOut interactions will not be passed through. They must be enabled using 
 	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} for each stage individually.
@@ -286,18 +291,19 @@ var p = Stage.prototype = new createjs.Container();
 // public methods:
 
 	/**
-	 * Each time the update method is called, the stage will tick all descendants
-	 * (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}}) and then 
-	 * render the display list to the canvas. Any parameters passed to update() will be passed on to any
-	 * <code>tick</code> event handlers.
+	 * Each time the update method is called, the stage will tick all descendants (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}})
+	 * and then render the display list to the canvas. Any parameters passed to `update()` will be passed on to any
+	 * {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers.
 	 * 
 	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
 	 * a tick event object (or equivalent) be passed as the first parameter to update(). For example:
-	 * 	Ticker.addEventListener("tick", handleTick);
-	 * 	function handleTick(evtObj) {
-	 * 	 	// do some work here, then update the stage, passing through the event object:
-	 * 		myStage.update(evtObj);
-	 * 	}	
+	 *
+	 *      Ticker.addEventListener("tick", handleTick);
+	 * 	    function handleTick(evtObj) {
+	 * 	     	// do some work here, then update the stage, passing through the event object:
+	 * 	    	myStage.update(evtObj);
+	 * 	    }
+	 *
 	 * @method update
 	 * @param {*} [params]* Params to include when ticking descendants. The first param should usually be a tick event.
 	 **/
@@ -323,8 +329,8 @@ var p = Stage.prototype = new createjs.Container();
 	p.tick = p.update;
 	
 	/**
-	 * Default event handler that calls the Stage {{#crossLink "Stage/update"}}{{/crossLink}} method when a "tick" event
-	 * is received. This allows you to register a Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}}
+	 * Default event handler that calls the Stage {{#crossLink "Stage/update"}}{{/crossLink}} method when a {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}}
+	 * event is received. This allows you to register a Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}}
 	 * directly, using:
 	 * 
 	 *      Ticker.addEventListener("tick", myStage");
@@ -339,7 +345,7 @@ var p = Stage.prototype = new createjs.Container();
 	};
 
 	/**
-	 * Clears the target canvas. Useful if <code>autoClear</code> is set to false.
+	 * Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
 	 * @method clear
 	 **/
 	p.clear = function() {
@@ -406,13 +412,14 @@ var p = Stage.prototype = new createjs.Container();
 	};
 
 	/**
-	 * Enables or disables (by passing a frequency of 0) mouse over events (mouseover and mouseout) for this stage's
-	 * display list. These events can be expensive to generate, so they are disabled by default. The frequency of
-	 * the events can be controlled independently of mouse move events via the optional <code>frequency</code> parameter.
+	 * Enables or disables (by passing a frequency of 0) mouse over events ({{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
+	 * and {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}) for this stage's display list. These events can
+	 * be expensive to generate, so they are disabled by default. The frequency of the events can be controlled
+	 * independently of mouse move events via the optional `frequency` parameter.
 	 *
 	 * <h4>Example</h4>
 	 *      var stage = new createjs.Stage("canvasId");
-	 *      stage.enableMouseOver(10);
+	 *      stage.enableMouseOver(10); // 10 updates per second
 	 *
 	 * @method enableMouseOver
 	 * @param {Number} [frequency=20] Optional param specifying the maximum number of times per second to broadcast
@@ -431,9 +438,9 @@ var p = Stage.prototype = new createjs.Container();
 	};
 	
 	/**
-	 * Enables or disables the event listeners that stage adds to DOM elements (window, document and canvas).
-	 * It is good practice to disable events when disposing of a Stage instance, otherwise the stage will
-	 * continue to receive events from the page.
+	 * Enables or disables the event listeners that stage adds to DOM elements (window, document and canvas). It is good
+	 * practice to disable events when disposing of a Stage instance, otherwise the stage will continue to receive
+	 * events from the page.
 	 * 
 	 * When changing the canvas property you must disable the events on the old canvas, and enable events on the
 	 * new canvas or mouse events will not work as expected. For example:
