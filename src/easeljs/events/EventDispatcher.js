@@ -59,9 +59,6 @@ this.createjs = this.createjs||{};
  *          console.log("Method called in scope: " + this);
  *      }
  *
- * Please note that currently, EventDispatcher does not support event priority or bubbling. Future versions may add
- * support for one or both of these features.
- *
  * @class EventDispatcher
  * @constructor
  **/
