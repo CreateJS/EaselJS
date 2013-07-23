@@ -39,6 +39,8 @@ this.createjs = this.createjs||{};
  *
  * The ButtonHelper instance does not need to be added to the stage, but a reference should be maintained to prevent
  * garbage collection.
+ * 
+ * Note that over states will not work unless you call {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
  *
  * <h4>Example</h4>
  *

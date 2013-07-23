@@ -39,6 +39,7 @@ All changes:
 - prevented rollover/out events from triggering if the mouse is not over the canvas
 	* ex. within a scrolling div or DOM element layered over top
 - added Matrix2D.transformPoint() method
+- fixed an issue when adding the same listener to an event twice
 
 
 Version 0.6.1 [May 14, 2013]
