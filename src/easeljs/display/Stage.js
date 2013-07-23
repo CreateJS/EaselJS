@@ -430,6 +430,9 @@ var p = Stage.prototype = new createjs.Container();
 		if (this._mouseOverIntervalID) {
 			clearInterval(this._mouseOverIntervalID);
 			this._mouseOverIntervalID = null;
+			if (frequency == 0) {
+				this._testMouseOver(true);
+			}
 		}
 		if (frequency == null) { frequency = 20; }
 		else if (frequency <= 0) { return; }
@@ -692,16 +695,17 @@ var p = Stage.prototype = new createjs.Container();
 
 	/**
 	 * @method _testMouseOver
+	 * @param {Boolean} clear If true, clears the mouseover / rollover (ie. no target)
 	 * @protected
 	 **/
-	p._testMouseOver = function() {
+	p._testMouseOver = function(clear) {
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
-		if (this._primaryPointerID != -1 || (this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
+		if (this._primaryPointerID != -1 || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
 		var o = this._getPointerData(-1);
 		var e = o.posEvtObj;
 		var target, common = -1, cursor="", t, i, l;
 		
-		if (this.mouseInBounds && e && e.target == this.canvas) {
+		if (clear || this.mouseInBounds && e && e.target == this.canvas) {
 			target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
 			this._mouseOverX = this.mouseX;
 			this._mouseOverY = this.mouseY;
