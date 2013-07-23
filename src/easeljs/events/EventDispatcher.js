@@ -133,8 +133,10 @@ var p = EventDispatcher.prototype;
 			listeners = this._listeners = this._listeners||{};
 		}
 		var arr = listeners[type];
+		if (arr) { this.removeEventListener(type, listener, useCapture); }
+		arr = listeners[type]; // remove may have deleted the array
 		if (!arr) { listeners[type] = [listener];  }
-		else { this.removeEventListener(type, listener, useCapture); arr.push(listener); }
+		else { arr.push(listener); }
 		return listener;
 	};
 
