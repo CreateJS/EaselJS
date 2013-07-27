@@ -48,7 +48,6 @@ this.createjs = this.createjs||{};
  *
  * @class Sprite
  * @extends DisplayObject
- * @uses EventDispatcher
  * @constructor
  * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
  * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
@@ -163,16 +162,6 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * @default 0
 	 **/
 	p.framerate = 0;
-	
-// mix-ins:
-	// EventDispatcher methods:
-	p.addEventListener = null;
-	p.removeEventListener = null;
-	p.removeAllEventListeners = null;
-	p.dispatchEvent = null;
-	p.hasEventListener = null;
-	p._listeners = null;
-	createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
 
 // private properties:
 	/**

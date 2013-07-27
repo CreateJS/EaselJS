@@ -42,13 +42,13 @@ this.createjs = this.createjs||{};
  * Note that the "images" used in the generated sprite sheet are actually canvas elements, and that they will be sized
  * to the nearest power of 2 up to the value of <code>maxWidth</code> or <code>maxHeight</code>.
  * @class SpriteSheetBuilder
- * @uses EventDispatcher
+ * @extends EventDispatcher
  * @constructor
  **/
 var SpriteSheetBuilder = function() {
   this.initialize();
 };
-var p = SpriteSheetBuilder.prototype;
+var p = SpriteSheetBuilder.prototype = new createjs.EventDispatcher;
 
 // constants:
 	SpriteSheetBuilder.ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
@@ -156,16 +156,6 @@ var p = SpriteSheetBuilder.prototype;
 	 * @type Function
 	 * @deprecated Use addEventListener and the "progress" event.
 	 */
-	
-// mix-ins:
-	// EventDispatcher methods:
-	p.addEventListener = null;
-	p.removeEventListener = null;
-	p.removeAllEventListeners = null;
-	p.dispatchEvent = null;
-	p.hasEventListener = null;
-	p._listeners = null;
-	createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
 
 // private properties:
 

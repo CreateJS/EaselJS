@@ -128,13 +128,13 @@ this.createjs = this.createjs||{};
  * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
  * caching, and mouse handlers.
  * @class DisplayObject
- * @uses EventDispatcher
+ * @extends EventDispatcher
  * @constructor
  **/
 var DisplayObject = function() {
   this.initialize();
 };
-var p = DisplayObject.prototype;
+var p = DisplayObject.prototype = new createjs.EventDispatcher();
 
 	/**
 	 * Suppresses errors generated when using features like hitTest, mouse events, and {{#crossLink "getObjectsUnderPoint"}}{{/crossLink}}
@@ -558,18 +558,6 @@ var p = DisplayObject.prototype;
 	 * @default null
 	 */
 	p.cursor = null;
-	
-	
-// mix-ins:
-	// EventDispatcher methods:
-	p.addEventListener = null;
-	p.removeEventListener = null;
-	p.removeAllEventListeners = null;
-	p.dispatchEvent = null;
-	p.hasEventListener = null;
-	p._listeners = null;
-	createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
-	
 
 // private properties:
 

@@ -4,7 +4,6 @@ CRITICAL (may break existing content):
 - removed all onEvent handlers (ex. onClick, onTick, onAnimationEnd, etc)
 - most mouse events now bubble
 - BitmapAnimation renamed to Sprite
-- MouseEvent now inherits from new Event class
 - sprite sheet data's animation .frequency property removed in favour of .speed
 - removed "target" from MouseEvent's param list
 - returning false from an event handler no longer causes dispatchEvent to return false, see Event.preventDefault
@@ -40,6 +39,11 @@ All changes:
 	* ex. within a scrolling div or DOM element layered over top
 - added Matrix2D.transformPoint() method
 - fixed an issue when adding the same listener to an event twice
+- added Event class, used by all events
+- MouseEvent inherits from new Event class
+- added .on and .off methods to EventDispatcher
+- fixed an issue with extending EventDispatcher
+- DisplayObject, SpriteSheet, and SpriteSheetBuilder now inherit from EventDispatcher
 
 
 Version 0.6.1 [May 14, 2013]
