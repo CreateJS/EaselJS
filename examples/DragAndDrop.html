@@ -79,32 +79,29 @@
 			bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random()*0.4+0.6;
 			bitmap.name = "bmp_"+i;
 			bitmap.cursor = "pointer";
-
-			bitmap.addEventListener("mousedown", function(evt) {
-				// bump the target in front of its siblings:
-				var o = evt.target;
-				o.parent.addChild(o);
-				o.offset = {x:o.x-evt.stageX, y:o.y-evt.stageY};
+			
+			// using "on" binds the listener to the scope of the currentTarget by default
+			// in this case that means it executes in the scope of the button.
+			bitmap.on("mousedown", function(evt) {
+				this.parent.addChild(this);
+				this.offset = {x:this.x-evt.stageX, y:this.y-evt.stageY};
 			});
 			
 			// the pressmove event is dispatched when the mouse moves after a mousedown on the target until the mouse is released.
-			bitmap.addEventListener("pressmove", function(evt) {
-				var o = evt.target;
-				o.x = evt.stageX+ o.offset.x;
-				o.y = evt.stageY+ o.offset.y;
+			bitmap.on("pressmove", function(evt) {
+				this.x = evt.stageX+ this.offset.x;
+				this.y = evt.stageY+ this.offset.y;
 				// indicate that the stage should be updated on the next tick:
 				update = true;
 			});
 			
-			bitmap.addEventListener("rollover", function(evt) {
-				var o = evt.target;
-				o.scaleX = o.scaleY = o.scale*1.2;
+			bitmap.on("rollover", function(evt) {
+				this.scaleX = this.scaleY = this.scale*1.2;
 				update = true;
 			});
 			
-			bitmap.addEventListener("rollout", function(evt) {
-				var o = evt.target;
-				o.scaleX = o.scaleY = o.scale;
+			bitmap.on("rollout", function(evt) {
+				this.scaleX = this.scaleY = this.scale;
 				update = true;
 			});
 
