@@ -2,6 +2,7 @@ Version NEXT [Not Released]
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - removed all onEvent handlers (ex. onClick, onTick, onAnimationEnd, etc)
+- removed Ticker.addListener and .removeListener
 - most mouse events now bubble
 - BitmapAnimation renamed to Sprite
 - sprite sheet data's animation .frequency property removed in favour of .speed
@@ -45,6 +46,8 @@ All changes:
 - fixed an issue with extending EventDispatcher
 - DisplayObject, SpriteSheet, and SpriteSheetBuilder now inherit from EventDispatcher
 - added Stage mouseleave and mouseenter events
+- fixed an issue with the tick event's time value being epoch time instead of Timer time
+- added Ticker.getEventTime()
 
 
 Version 0.6.1 [May 14, 2013]

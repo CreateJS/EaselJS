@@ -33,7 +33,7 @@ EaselJS is a library to make working with the Canvas element easier. It provides
 	sprite.scaleY = sprite.scaleX = 0.4;
 	
 	createjs.Ticker.setFPS(60);
-	createjs.Ticker.addListener(stage);
+	createjs.Ticker.addEventListener("tick", stage);
 	stage.addChild(sprite);
 
 

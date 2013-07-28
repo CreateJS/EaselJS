@@ -166,21 +166,6 @@ var Ticker = function() {
 	createjs.EventDispatcher.initialize(Ticker); // inject EventDispatcher methods.
 	
 // private static properties:
-
-	
-	/** 
-	 * @property _listeners
-	 * @type {Array}
-	 * @protected 
-	 **/
-	Ticker._listeners = null;
-	
-	/** 
-	 * @property _pauseable
-	 * @type {Array}
-	 * @protected 
-	 **/
-	Ticker._pauseable = null;
 	
 	/** 
 	 * @property _paused
@@ -270,25 +255,6 @@ var Ticker = function() {
 	
 	
 // public static methods:
-	/**
-	 * Adds a listener for the tick event. The listener must be either an object exposing a <code>tick</code> method,
-	 * or a function. The listener will be called once each tick / interval. The interval is specified via the 
-	 * <code>.setInterval(ms)</code> method.
-	 * The tick method or function is passed two parameters: the elapsed time between the previous tick and the current
-	 * one, and a boolean indicating whether Ticker is paused.
-	 * @method addListener
-	 * @static
-	 * @param {Object} o The object or function to add as a listener.
-	 * @param {Boolean} pauseable If false, the listener will continue to have tick called 
-	 * even when Ticker is paused via Ticker.pause(). Default is true.
-	 * @deprecated In favour of addEventListener and the "tick" event. Will be removed in a future version.
-	 **/
-	Ticker.addListener = function(o, pauseable) {
-		if (o == null) { return; }
-		Ticker.removeListener(o);
-		Ticker._pauseable[Ticker._listeners.length] = (pauseable == null) ? true : pauseable;
-		Ticker._listeners.push(o);
-	};
 	
 	/**
 	 * Initializes or resets the timer, clearing all associated listeners and fps measuring data, starting the tick.
@@ -300,40 +266,8 @@ var Ticker = function() {
 		Ticker._inited = true;
 		Ticker._times = [];
 		Ticker._tickTimes = [];
-		Ticker._pauseable = [];
-		Ticker._listeners = [];
 		Ticker._times.push(Ticker._lastTime = Ticker._startTime = Ticker._getTime());
 		Ticker.setInterval(Ticker._interval);
-	};
-	
-	/**
-	 * Removes the specified listener.
-	 * @method removeListener
-	 * @static
-	 * @param {Object} o The object or function to remove from listening from the tick event.
-	 * @deprecated In favour of the "tick" event. Will be removed in a future version. Use "removeEventListener"
-	 * instead.
-	 **/
-	Ticker.removeListener = function(o) {
-		var listeners = Ticker._listeners;
-		if (!listeners) { return; }
-		var index = listeners.indexOf(o);
-		if (index != -1) {
-			listeners.splice(index, 1);
-			Ticker._pauseable.splice(index, 1);
-		}
-	};
-	
-	/**
-	 * Removes all listeners.
-	 * @method removeAllListeners
-	 * @static
-	 * @deprecated In favour of the "tick" event. Will be removed in a future version. Use "removeAllEventListeners"
-	 * instead.
-	 **/
-	Ticker.removeAllListeners = function() {
-		Ticker._listeners = [];
-		Ticker._pauseable = [];
 	};
 	
 	/**
@@ -483,6 +417,16 @@ var Ticker = function() {
 	Ticker.getTime = function(runTime) {
 		return Ticker._getTime() - Ticker._startTime - (runTime ? Ticker._pausedTime : 0);
 	};
+
+	/**
+	 * Similar to getTime(), but returns the time included with the current (or most recent) tick event object.
+	 * @method getEventTime
+	 * @param runTime {Boolean} [runTime=false] If true, the runTime property will be returned instead of time.
+	 * @returns {number} The time or runTime property from the most recent tick event.
+	 */
+	Ticker.getEventTime = function(runTime) {
+		return (Ticker._lastTime || Ticker._startTime) - (runTime ? Ticker._pausedTime : 0);
+	};
 	
 	/**
 	 * Returns the number of ticks that have been broadcast by Ticker.
@@ -562,7 +506,7 @@ var Ticker = function() {
 	 * @protected
 	 **/
 	Ticker._tick = function() {
-		var time = Ticker._getTime();
+		var time = Ticker._getTime()-Ticker._startTime;
 		Ticker._ticks++;
 		
 		var elapsedTime = time-Ticker._lastTime;
@@ -574,16 +518,6 @@ var Ticker = function() {
 			Ticker._pausedTime += elapsedTime;
 		}
 		Ticker._lastTime = time;
-		
-		var pauseable = Ticker._pauseable;
-		var listeners = Ticker._listeners.slice();
-		var l = listeners ? listeners.length : 0;
-		for (var i=0; i<l; i++) {
-			var listener = listeners[i];
-			if (listener == null || (paused && pauseable[i])) { continue; }
-			if (listener.tick) { listener.tick(elapsedTime, paused); }
-			else if (listener instanceof Function) { listener(elapsedTime, paused); }
-		}
 		
 		if (Ticker.hasEventListener("tick")) {
 			var event = new createjs.Event("tick");
