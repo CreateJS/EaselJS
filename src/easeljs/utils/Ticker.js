@@ -585,7 +585,14 @@ var Ticker = function() {
 			else if (listener instanceof Function) { listener(elapsedTime, paused); }
 		}
 		
-		Ticker.dispatchEvent({type:"tick", paused:paused, delta:elapsedTime, time:time, runTime:time-Ticker._pausedTime})
+		if (Ticker.hasEventListener("tick")) {
+			var event = new createjs.Event("tick");
+			event.paused = paused;
+			event.delta = elapsedTime;
+			event.time = time;
+			event.runTime = time-Ticker._pausedTime;
+			Ticker.dispatchEvent(event);
+		}
 		
 		Ticker._tickTimes.unshift(Ticker._getTime()-time);
 		while (Ticker._tickTimes.length > 100) { Ticker._tickTimes.pop(); }
