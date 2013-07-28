@@ -44,6 +44,7 @@ All changes:
 - added .on and .off methods to EventDispatcher
 - fixed an issue with extending EventDispatcher
 - DisplayObject, SpriteSheet, and SpriteSheetBuilder now inherit from EventDispatcher
+- added Stage mouseleave and mouseenter events
 
 
 Version 0.6.1 [May 14, 2013]

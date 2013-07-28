@@ -93,6 +93,22 @@ var p = Stage.prototype = new createjs.Container();
 	 * @since 0.6.0
 	 */
 
+	/**
+	 * Dispatched when the mouse moves from within the canvas area (mouseInBounds == true) to outside it (mouseInBounds == false).
+	 * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
+	 * class for a listing of event properties.
+	 * @event mouseleave
+	 * @since 0.7.0
+	 */
+
+	/**
+	 * Dispatched when the mouse moves into the canvas area (mouseInBounds == false) from outside it (mouseInBounds == true).
+	 * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
+	 * class for a listing of event properties.
+	 * @event mouseenter
+	 * @since 0.7.0
+	 */
+
 // public properties:
 	/**
 	 * Indicates whether the stage should automatically clear the canvas before each render. You can set this to <code>false</code>
@@ -569,6 +585,9 @@ var p = Stage.prototype = new createjs.Container();
 		var inBounds = o.inBounds;
 		this._updatePointerPosition(id, e, pageX, pageY);
 		if (!inBounds && !o.inBounds && !this.mouseMoveOutside) { return; }
+		if (id == -1 && o.inBounds == !inBounds) {
+			this._dispatchMouseEvent(this, (inBounds ? "mouseleave" : "mouseenter"), false, id, o, e);
+		}
 		
 		this._dispatchMouseEvent(this, "stagemousemove", false, id, o, e);
 		this._dispatchMouseEvent(o.target, "pressmove", true, id, o, e);
