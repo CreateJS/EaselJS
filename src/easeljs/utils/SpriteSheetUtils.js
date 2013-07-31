@@ -49,15 +49,21 @@ var SpriteSheetUtils = function() {
 	 * @type HTMLCanvasElement | Object
 	 * @protected
 	*/
-	SpriteSheetUtils._workingCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
-
+	
 	/**
 	 * @property _workingContext
 	 * @static
 	 * @type CanvasRenderingContext2D
 	 * @protected
 	*/
-	SpriteSheetUtils._workingContext = SpriteSheetUtils._workingCanvas.getContext("2d");
+	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	if (canvas.getContext) {
+		SpriteSheetUtils._workingCanvas = canvas;
+		SpriteSheetUtils._workingContext = canvas.getContext("2d");
+		canvas.width = canvas.height = 1;
+	}
+
+	
 
 // public static methods:
 	/**

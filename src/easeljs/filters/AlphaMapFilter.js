@@ -62,14 +62,14 @@ this.createjs = this.createjs || {};
 	 **/
 	var AlphaMapFilter = function (alphaMap) {
 		this.initialize(alphaMap);
-	}
+	};
 	var p = AlphaMapFilter.prototype = new createjs.Filter();
 
 // constructor:
 	/** @ignore */
 	p.initialize = function (alphaMap) {
 		this.alphaMap = alphaMap;
-	}
+	};
 
 // public properties:
 
@@ -117,7 +117,7 @@ this.createjs = this.createjs || {};
 		imageData.data = data;
 		targetCtx.putImageData(imageData, targetX, targetY);
 		return true;
-	}
+	};
 
 	/**
 	 * Returns a clone of this object.
@@ -125,11 +125,11 @@ this.createjs = this.createjs || {};
 	 **/
 	p.clone = function () {
 		return new AlphaMapFilter(this.mask);
-	}
+	};
 
 	p.toString = function () {
 		return "[AlphaMapFilter]";
-	}
+	};
 
 // private methods:
 	p._prepAlphaMap = function () {
@@ -161,7 +161,7 @@ this.createjs = this.createjs || {};
 		}
 		this._mapData = imgData.data;
 		return true;
-	}
+	};
 
 	createjs.AlphaMapFilter = AlphaMapFilter;
 

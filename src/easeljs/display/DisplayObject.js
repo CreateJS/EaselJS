@@ -152,16 +152,19 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @static
 	 * @protected
 	 **/
-	DisplayObject._hitTestCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
-	DisplayObject._hitTestCanvas.width = DisplayObject._hitTestCanvas.height = 1;
-
+	 
 	/**
 	 * @property _hitTestContext
 	 * @type {CanvasRenderingContext2D}
 	 * @static
 	 * @protected
 	 **/
-	DisplayObject._hitTestContext = DisplayObject._hitTestCanvas.getContext("2d");
+	var canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); // prevent errors on load in browsers without canvas.
+	if (canvas.getContext) {
+		DisplayObject._hitTestCanvas = canvas;
+		DisplayObject._hitTestContext = canvas.getContext("2d");
+		canvas.width = canvas.height = 1;
+	}
 
 	/**
 	 * @property _nextCacheID

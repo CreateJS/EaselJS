@@ -61,7 +61,7 @@ this.createjs = this.createjs||{};
  **/
 var Text = function(text, font, color) {
   this.initialize(text, font, color);
-}
+};
 var p = Text.prototype = new createjs.DisplayObject();
 
 	/**
@@ -69,7 +69,8 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @type CanvasRenderingContext2D
 	 * @private
 	 **/
-	Text._workingContext = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas")).getContext("2d");
+	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	if (canvas.getContext) { Text._workingContext = canvas.getContext("2d"); canvas.width = canvas.height = 1; }
 
 // public properties:
 	/**
