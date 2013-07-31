@@ -719,7 +719,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		this.cacheCanvas.height = Math.ceil(height*scale);
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
-		this._cacheScale = scale||1;
+		this._cacheScale = scale;
 		this.updateCache();
 	};
 
