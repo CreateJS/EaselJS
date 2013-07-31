@@ -209,6 +209,13 @@ var p = MovieClip.prototype = new createjs.Container();
 	 */
 	p.autoReset = true;
 	
+	/**
+	 * An array of bounds for each frame in the MovieClip. This is mainly intended for tool output.
+	 * @property frameBounds
+	 * @type Array
+	 * @default null
+	 */
+	p.frameBounds = null;
 	
 	
 // private properties:
