@@ -44,7 +44,7 @@ this.createjs = this.createjs||{};
  **/
 var Point = function(x, y) {
   this.initialize(x, y);
-}
+};
 var p = Point.prototype;
 	
 // public properties:
@@ -65,16 +65,17 @@ var p = Point.prototype;
 	
 // constructor:
 	/** 
-	 * Initialization method.
+	 * Initialization method. Can also be used to reinitialize the instance.
 	 * @method initialize
 	 * @param {Number} [x=0] X position.
 	 * @param {Number} [y=0] Y position.
-	 * @protected
+	 * @return {Point} This instance. Useful for chaining method calls.
 	*/
 	p.initialize = function(x, y) {
 		this.x = (x == null ? 0 : x);
 		this.y = (y == null ? 0 : y);
-	}
+		return this;
+	};
 	
 // public methods:
 	/**
@@ -84,7 +85,7 @@ var p = Point.prototype;
 	 **/
 	p.clone = function() {
 		return new Point(this.x, this.y);
-	}
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -93,7 +94,7 @@ var p = Point.prototype;
 	 **/
 	p.toString = function() {
 		return "[Point (x="+this.x+" y="+this.y+")]";
-	}
+	};
 	
 createjs.Point = Point;
 }());

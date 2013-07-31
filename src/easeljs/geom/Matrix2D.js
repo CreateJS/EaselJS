@@ -34,12 +34,12 @@ this.createjs = this.createjs||{};
 /**
  * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
  * @class Matrix2D
- * @param {Number} a Specifies the a property for the new matrix.
- * @param {Number} b Specifies the b property for the new matrix.
- * @param {Number} c Specifies the c property for the new matrix.
- * @param {Number} d Specifies the d property for the new matrix.
- * @param {Number} tx Specifies the tx property for the new matrix.
- * @param {Number} ty Specifies the ty property for the new matrix.
+ * @param {Number} [a=1] Specifies the a property for the new matrix.
+ * @param {Number} [b=0] Specifies the b property for the new matrix.
+ * @param {Number} [c=0] Specifies the c property for the new matrix.
+ * @param {Number} [d=1] Specifies the d property for the new matrix.
+ * @param {Number} [tx=0] Specifies the tx property for the new matrix.
+ * @param {Number} [ty=0] Specifies the ty property for the new matrix.
  * @constructor
  **/
 var Matrix2D = function(a, b, c, d, tx, ty) {
@@ -140,22 +140,21 @@ var p = Matrix2D.prototype;
 
 // constructor:
 	/**
-	 * Initialization method.
+	 * Initialization method. Can also be used to reinitialize the instance.
 	 * @method initialize
-	 * @param {Number} a Specifies the a property for the new matrix.
-	 * @param {Number} b Specifies the b property for the new matrix.
-	 * @param {Number} c Specifies the c property for the new matrix.
-	 * @param {Number} d Specifies the d property for the new matrix.
-	 * @param {Number} tx Specifies the tx property for the new matrix.
-	 * @param {Number} ty Specifies the ty property for the new matrix.
-	 * @protected
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @param {Number} [a=1] Specifies the a property for the new matrix.
+	 * @param {Number} [b=0] Specifies the b property for the new matrix.
+	 * @param {Number} [c=0] Specifies the c property for the new matrix.
+	 * @param {Number} [d=1] Specifies the d property for the new matrix.
+	 * @param {Number} [tx=0] Specifies the tx property for the new matrix.
+	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
+	 * @return {Matrix2D} This instance. Useful for chaining method calls.
 	*/
 	p.initialize = function(a, b, c, d, tx, ty) {
-		if (a != null) { this.a = a; }
+		this.a = (a == null) ? 1 : a;
 		this.b = b || 0;
 		this.c = c || 0;
-		if (d != null) { this.d = d; }
+		this.d = (d == null) ? 1 : d;
 		this.tx = tx || 0;
 		this.ty = ty || 0;
 		return this;
@@ -483,20 +482,20 @@ var p = Matrix2D.prototype;
 	/**
 	 * Reinitializes all matrix properties to those specified.
 	 * @method reinitialize
-	 * @param {Number} a
-	 * @param {Number} b
-	 * @param {Number} c
-	 * @param {Number} d
-	 * @param {Number} tx
-	 * @param {Number} ty
-	 * @param {Number} alpha desired alpha value
-	 * @param {Shadow} shadow desired shadow value
-	 * @param {String} compositeOperation desired composite operation value
+	 * @param {Number} [a=1] Specifies the a property for the new matrix.
+	 * @param {Number} [b=0] Specifies the b property for the new matrix.
+	 * @param {Number} [c=0] Specifies the c property for the new matrix.
+	 * @param {Number} [d=1] Specifies the d property for the new matrix.
+	 * @param {Number} [tx=0] Specifies the tx property for the new matrix.
+	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
+	 * @param {Number} [alpha=1] desired alpha value
+	 * @param {Shadow} [shadow=null] desired shadow value
+	 * @param {String} [compositeOperation=null] desired composite operation value
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
-	p.reinitialize = function(a,b,c,d,tx,ty,alpha,shadow,compositeOperation) {
+	p.reinitialize = function(a, b, c, d, tx, ty, alpha, shadow, compositeOperation) {
 		this.initialize(a,b,c,d,tx,ty);
-		this.alpha = alpha || 1;
+		this.alpha = alpha == null ? 1 : alpha;
 		this.shadow = shadow;
 		this.compositeOperation = compositeOperation;
 		return this;
