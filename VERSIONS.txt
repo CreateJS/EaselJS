@@ -51,6 +51,7 @@ All changes:
 - the initialize method for Point, Rectangle, and Matrix2D is now public
 - fixed an issue that could occur when reinitializing Matrix2D
 - added MovieClip.frameBounds
+- fixed errors when the lib was loaded in a browser with no canvas support
 
 
 Version 0.6.1 [May 14, 2013]

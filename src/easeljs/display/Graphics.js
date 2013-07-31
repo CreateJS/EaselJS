@@ -248,31 +248,35 @@ var p = Graphics.prototype;
 	 * @protected
 	 * @type {CanvasRenderingContext2D}
 	 **/
-	Graphics._ctx = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas")).getContext("2d");
-	
+	 
 	/**
 	 * @property beginCmd
 	 * @static
 	 * @protected
 	 * @type {Command}
 	 **/
-	Graphics.beginCmd = new Command(Graphics._ctx.beginPath, [], false);
-	
+	 
 	/**
 	 * @property fillCmd
 	 * @static
 	 * @protected
 	 * @type {Command}
 	 **/
-	Graphics.fillCmd = new Command(Graphics._ctx.fill, [], false);
-	
+	 
 	/**
 	 * @property strokeCmd
 	 * @static
 	 * @protected
 	 * @type {Command}
 	 **/
-	Graphics.strokeCmd = new Command(Graphics._ctx.stroke, [], false);
+	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	if (canvas.getContext) {
+		var ctx = Graphics._ctx = canvas.getContext("2d");
+		Graphics.beginCmd = new Command(ctx.beginPath, [], false);
+		Graphics.fillCmd = new Command(ctx.fill, [], false);
+		Graphics.strokeCmd = new Command(ctx.stroke, [], false);
+		canvas.width = canvas.height = 1;
+	}
 	
 // public properties
 
