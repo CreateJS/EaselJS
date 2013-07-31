@@ -608,6 +608,14 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default null
 	 **/
 	p._matrix = null;
+
+	/**
+	 * @property _bounds
+	 * @protected
+	 * @type {Rectangle}
+	 * @default null
+	 **/
+	p._bounds = null;
 	
 
 // constructor:
@@ -984,6 +992,62 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		for (var n in props) { this[n] = props[n]; }
 		return this;
 	};
+	
+	/**
+	 * Returns a rectangle representing this object's bounds in its local coordinate system (ie. with no transformation).
+	 * Objects that have been cached will return the bounds of the cache.
+	 * 
+	 * Not all display objects can calculate their own bounds (ex. Shape & Text). For these objects, you can use 
+	 * {{#crossLink "DisplayObject/setBounds"}}{{/crossLink}} so that they are included when calculating Container
+	 * bounds.
+	 * 
+	 * Container instances calculate aggregate bounds for all children that return bounds via getBounds.
+	 * @method getBounds
+	 * @return {Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this object.
+	 **/
+	p.getBounds = function() {
+		if (this._bounds) { return this._bounds; }
+		var cacheCanvas = this.cacheCanvas;
+		if (cacheCanvas) {
+			var scale = this._cacheScale;
+			return new createjs.Rectangle(this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
+		}
+		return null;
+	};
+	
+	/**
+	 * Returns a rectangle representing this object's bounds in its parent's coordinate system (ie. with transformations applied).
+	 * Objects that have been cached will return the transformed bounds of the cache.
+	 * 
+	 * Not all display objects can calculate their own bounds (ex. Shape & Text). For these objects, you can use 
+	 * {{#crossLink "DisplayObject/setBounds"}}{{/crossLink}} so that they are included when calculating Container
+	 * bounds.
+	 * 
+	 * Container instances calculate aggregate bounds for all children that return bounds via getBounds.
+	 * @method getTransformedBounds
+	 * @return {Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this object.
+	 **/
+	p.getTransformedBounds = function() {
+		return this._getBounds();
+	};
+	
+	/**
+	 * Allows you to manually specify the bounds of an object that either cannot calculate their own bounds (ex. Shape &
+	 * Text) for future reference, or so the object can be included in Container bounds. Manually set bounds will always
+	 * override calculated bounds.
+	 * 
+	 * The bounds should be specified in the object's local (untransformed) coordinates. For example, a Shape instance
+	 * with a 25px radius circle centered at 0,0 would have bounds of (-25, -25, 50, 50).
+	 * @method setBounds
+	 * @param {Number} x The x origin of the bounds. Pass null to remove the manual bounds.
+	 * @param {Number} y The y origin of the bounds.
+	 * @param {Number} width The width of the bounds.
+	 * @param {Number} height The height of the bounds.
+	 **/
+	p.setBounds = function(x, y, width, height) {
+		if (x == null) { this._bounds = x; }
+		this._bounds = new createjs.Rectangle(x, y, width, height);
+	};
 
 	/**
 	 * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
@@ -1100,7 +1164,50 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 			this.filters[i].applyFilter(ctx, 0, 0, w, h);
 		}
 	};
-	 
+	
+	/**
+	 * @method _getBounds
+	 * @param {Matrix2D} matrix
+	 * @param {Boolean} ignoreTransform If true, does not apply this object's transform.
+	 * @return {Rectangle}
+	 * @protected
+	 **/
+	p._getBounds = function(matrix, ignoreTransform){
+		return this._transformBounds(this.getBounds(), matrix, ignoreTransform);
+	};
+	
+	/**
+	 * @method _transformBounds
+	 * @param {Rectangle} bounds
+	 * @param {Matrix2D} matrix
+	 * @param {Boolean} ignoreTransform
+	 * @return {Rectangle}
+	 * @protected
+	 **/
+	p._transformBounds = function(bounds, matrix, ignoreTransform) {
+		if (!bounds) { return bounds; }
+		var x = bounds.x, y = bounds.y, width = bounds.width, height = bounds.height;
+		var mtx = ignoreTransform ? this._matrix.identity() : this.getMatrix(this._matrix);
+		
+		if (x || y) { mtx.appendTransform(0,0,1,1,0,0,0,-x,-y); }
+		if (matrix) { mtx.prependMatrix(matrix); }
+		
+		var x_a = width*mtx.a, x_b = width*mtx.b;
+		var y_c = height*mtx.c, y_d = height*mtx.d;
+		var tx = mtx.tx, ty = mtx.ty;
+		
+		var minX = tx, maxX = tx, minY = ty, maxY = ty;
+
+		if ((x = x_a + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
+		if ((x = x_a + y_c + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
+		if ((x = y_c + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
+		
+		if ((y = x_b + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
+		if ((y = x_b + y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
+		if ((y = y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
+		
+		return new createjs.Rectangle(minX, minY, maxX-minX, maxY-minY);
+	};
 
 createjs.DisplayObject = DisplayObject;
 }());

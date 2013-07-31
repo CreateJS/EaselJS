@@ -467,6 +467,29 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var pt = this.localToGlobal(x, y);
 		return this._getObjectsUnderPoint(pt.x, pt.y);
 	};
+	
+	/**
+	 * @property DisplayObject_getBounds
+	 * @type Function
+	 * @protected
+	 **/
+	p.DisplayObject_getBounds = p.getBounds; 
+	
+	
+	/**
+	 * Docced in superclass.
+	 */
+	p.getBounds = function() {
+		return this._getBounds(null, true);
+	};
+	
+	
+	/**
+	 * Docced in superclass.
+	 */
+	p.getTransformedBounds = function() {
+		return this._getBounds();
+	};
 
 	/**
 	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are
@@ -563,6 +586,36 @@ var p = Container.prototype = new createjs.DisplayObject();
 			}
 		}
 		return null;
+	};
+	
+	/**
+	 * @method _getBounds
+	 * @param {Matrix2D} matrix
+	 * @param {Boolean} ignoreTransform If true, does not apply this object's transform.
+	 * @return {Rectangle}
+	 * @protected
+	 **/
+	p._getBounds = function(matrix, ignoreTransform) {
+		var bounds = this.DisplayObject_getBounds();
+		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
+		
+		var minX, maxX, minY, maxY;
+		var mtx = ignoreTransform ? this._matrix.identity() : this.getMatrix(this._matrix);
+		if (matrix) { mtx.prependMatrix(matrix); }
+		
+		var l = this.children.length;
+		for (var i=0; i<l; i++) {
+			var child = this.children[i];
+			if (!child.visible || !(bounds = child._getBounds(mtx))) { continue; }
+			var x1=bounds.x, y1=bounds.y, x2=x1+bounds.width, y2=y1+bounds.height;
+			if (x1 < minX || minX == null) { minX = x1; }
+			if (x2 > maxX || maxX == null) { maxX = x2; }
+			if (y1 < minY || minY == null) { minY = y1; }
+			if (y2 > maxY || maxY == null) { maxY = y2; }
+		}
+		
+		// TODO: avoid instantiation:
+		return (maxX == null) ? null : new createjs.Rectangle(minX, minY, maxX-minX, maxY-minY);
 	};
 
 createjs.Container = Container;

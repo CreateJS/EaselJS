@@ -219,7 +219,6 @@ var p = MovieClip.prototype = new createjs.Container();
 	
 	
 // private properties:
-
 	/**
 	 * @property _synchOffset
 	 * @type Number
@@ -280,7 +279,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		this.Container_initialize();
 		this.timeline = new createjs.Timeline(null, labels, props);
 		this._managed = {};
-	}
+	};
 	
 // public methods:
 	/**
@@ -317,7 +316,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this._updateTimeline();
 		this.Container_draw(ctx, ignoreCache);
-	}
+	};
 	
 	
 	/**
@@ -326,7 +325,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p.play = function() {
 		this.paused = false;
-	}
+	};
 	
 	/**
 	 * Sets paused to true.
@@ -334,7 +333,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p.stop = function() {
 		this.paused = true;
-	}
+	};
 	
 	/**
 	 * Advances this movie clip to the specified position or label and sets paused to false.
@@ -344,7 +343,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	p.gotoAndPlay = function(positionOrLabel) {
 		this.paused = false;
 		this._goto(positionOrLabel);
-	}
+	};
 	
 	/**
 	 * Advances this movie clip to the specified position or label and sets paused to true.
@@ -354,7 +353,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	p.gotoAndStop = function(positionOrLabel) {
 		this.paused = true;
 		this._goto(positionOrLabel);
-	}
+	};
 	
 	/**
 	 * MovieClip instances cannot be cloned.
@@ -363,7 +362,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	p.clone = function() {
 		// TODO: add support for this? Need to clone the Timeline & retarget tweens - pretty complex.
 		throw("MovieClip cannot be cloned.")
-	}
+	};
 	
 	/**
 	 * Returns a string representation of this object.
@@ -372,14 +371,14 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p.toString = function() {
 		return "[MovieClip (name="+  this.name +")]";
-	}
+	};
 	
 // private methods:
 	
 	/**
 	 * @property Container__tick
 	 * @type Function
-	 * @private
+	 * @protected
 	 **/
 	p.Container__tick = p._tick;
 	
@@ -387,19 +386,19 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @method _tick
 	 * @param {Array} params Parameters to pass onto the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}}
 	 * function.
-	 * @private
+	 * @protected
 	 **/
 	p._tick = function(params) {
 		if (!this.paused && this.mode == MovieClip.INDEPENDENT) {
 			this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
 		}
 		this.Container__tick(params);
-	}
+	};
 	
 	/**
 	 * @method _goto
 	 * @param {String|Number} positionOrLabel The animation name or frame number to go to.
-	 * @private
+	 * @protected
 	 **/
 	p._goto = function(positionOrLabel) {
 		var pos = this.timeline.resolve(positionOrLabel);
@@ -408,7 +407,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		if (this._prevPos == -1) { this._prevPos = NaN; }
 		this._prevPosition = pos;
 		this._updateTimeline();
-	}
+	};
 	
 	/**
 	 * @method _reset
@@ -417,11 +416,11 @@ var p = MovieClip.prototype = new createjs.Container();
 	p._reset = function() {
 		this._prevPos = -1;
 		this.currentFrame = 0;
-	}
+	};
 	
 	/**
 	 * @method _updateTimeline
-	 * @private
+	 * @protected
 	 **/
 	p._updateTimeline = function() {
 		var tl = this.timeline;
@@ -448,7 +447,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		for (var i=tweens.length-1;i>=0;i--) {
 			var tween = tweens[i];
 			var target = tween._target;
-			if (target == this || tween.passive) { continue; } // TODO: this assumes this is the actions tween. Valid?
+			if (target == this || tween.passive) { continue; } // TODO: this assumes actions tween has this as the target. Valid?
 			var offset = tween._stepPosition;
 			
 			if (target instanceof createjs.DisplayObject) {
@@ -473,7 +472,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @method _setState
 	 * @param {Array} state
 	 * @param {Number} offset
-	 * @private
+	 * @protected
 	 **/
 	p._setState = function(state, offset) {
 		if (!state) { return; }
@@ -505,6 +504,28 @@ var p = MovieClip.prototype = new createjs.Container();
 		this._managed[child.id] = 2;
 	};
 	
+	/**
+	 * @method Container__getBounds
+	 * @param {Matrix2D} matrix
+	 * @param {Boolean} ignoreTransform
+	 * @return {Rectangle}
+	 * @protected
+	 **/
+	p.Container__getBounds = p._getBounds;
+	
+	/**
+	 * @method _getBounds
+	 * @param {Matrix2D} matrix
+	 * @param {Boolean} ignoreTransform
+	 * @return {Rectangle}
+	 * @protected
+	 **/
+	p._getBounds = function(matrix, ignoreTransform) {
+		var bounds = this.DisplayObject_getBounds();
+		if (!bounds && this.frameBounds) { bounds = this.frameBounds[this.currentFrame]; }
+		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
+		return this.Container__getBounds(matrix, ignoreTransform);
+	};
 
 createjs.MovieClip = MovieClip;
 
@@ -519,7 +540,7 @@ createjs.MovieClip = MovieClip;
 	 **/
 	var MovieClipPlugin = function() {
 	  throw("MovieClipPlugin cannot be instantiated.")
-	}
+	};
 	
 	/**
 	 * @method priority
@@ -533,7 +554,7 @@ createjs.MovieClip = MovieClip;
 	 **/
 	MovieClipPlugin.install = function() {
 		createjs.Tween.installPlugin(MovieClipPlugin, ["startPosition"]);
-	}
+	};
 	
 	/**
 	 * @method init
@@ -544,7 +565,7 @@ createjs.MovieClip = MovieClip;
 	 **/
 	MovieClipPlugin.init = function(tween, prop, value) {
 		return value;
-	}
+	};
 	
 	/**
 	 * @method step
@@ -552,7 +573,7 @@ createjs.MovieClip = MovieClip;
 	 **/
 	MovieClipPlugin.step = function() {
 		// unused.
-	}
+	};
 
 	/**
 	 * @method tween
@@ -569,7 +590,7 @@ createjs.MovieClip = MovieClip;
 	MovieClipPlugin.tween = function(tween, prop, value, startValues, endValues, ratio, wait, end) {
 		if (!(tween.target instanceof MovieClip)) { return value; }
 		return (ratio == 1 ? endValues[prop] : startValues[prop]);
-	}
+	};
 
 	MovieClipPlugin.install();
 

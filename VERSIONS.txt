@@ -48,6 +48,9 @@ All changes:
 - added Stage mouseleave and mouseenter events
 - fixed an issue with the tick event's time value being epoch time instead of Timer time
 - added Ticker.getEventTime()
+- the initialize method for Point, Rectangle, and Matrix2D is now public
+- fixed an issue that could occur when reinitializing Matrix2D
+- added MovieClip.frameBounds
 
 
 Version 0.6.1 [May 14, 2013]

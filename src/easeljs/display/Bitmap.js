@@ -57,7 +57,7 @@ this.createjs = this.createjs||{};
  **/
 var Bitmap = function(imageOrUri) {
   this.initialize(imageOrUri);
-}
+};
 var p = Bitmap.prototype = new createjs.DisplayObject();
 
 // public properties:
@@ -109,7 +109,7 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 		} else {
 			this.image = imageOrUri;
 		}
-	}
+	};
 	
 // public methods:
 
@@ -124,12 +124,12 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	p.isVisible = function() {
 		var hasContent = this.cacheCanvas || (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
-	}
+	};
 
 	/**
 	 * @property DisplayObject_draw
 	 * @type Function
-	 * @private
+	 * @protected
 	 **/
 	p.DisplayObject_draw = p.draw;
 
@@ -153,7 +153,7 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 			ctx.drawImage(this.image, 0, 0);
 		}
 		return true;
-	}
+	};
 	
 	//Note, the doc sections below document using the specified APIs (from DisplayObject)  from
 	//Bitmap. This is why they have no method implementations.
@@ -187,16 +187,20 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	 * method.
 	 * @method uncache
 	 **/
-	 
+	
 	/**
-	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of display object.
-	 * This ignores transformations on the display object.
-	 * 
-	 * @method getBounds
-	 * @return {Rectangle} A Rectangle instance. Returns null if the image is not fully
-	 * loaded.
+	 * @property DisplayObject_getBounds
+	 * @type Function
+	 * @protected
 	 **/
+	p.DisplayObject_getBounds = p.getBounds;
+
+	/**
+	 * Docced in superclass.
+	 */
 	p.getBounds = function() {
+		var rect = this.DisplayObject_getBounds();
+		if (rect) { return rect; }
 		var o = this.sourceRect || this.image;
 		var hasContent = (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
 		return hasContent ? new createjs.Rectangle(0, 0, o.width, o.height) : null;
@@ -212,7 +216,7 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 		if (this.sourceRect) { o.sourceRect = this.sourceRect.clone(); }
 		this.cloneProps(o);
 		return o;
-	}
+	};
 	
 	/**
 	 * Returns a string representation of this object.
@@ -221,7 +225,7 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	 **/
 	p.toString = function() {
 		return "[Bitmap (name="+  this.name +")]";
-	}
+	};
 
 // private methods:
 
