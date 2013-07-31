@@ -325,6 +325,13 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	};
 	
 	/**
+	 * @property DisplayObject_getBounds
+	 * @type Function
+	 * @protected
+	 **/
+	p.DisplayObject_getBounds = p.getBounds; 
+	
+	/**
 	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the current frame relative to
 	 * the origin. For example, a 90 x 70 frame with <code>regX=50</code> and <code>regY=40</code> would return a
 	 * rectangle with [x=-50, y=-40, width=90, height=70]. This ignores transformations on the display object.
@@ -335,7 +342,8 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * loaded.
 	 **/
 	p.getBounds = function() {
-		return this.spriteSheet.getFrameBounds(this.currentFrame);
+		// TODO: should this normalizeFrame?
+		return this.DisplayObject_getBounds() || this.spriteSheet.getFrameBounds(this.currentFrame);
 	};
 
 	/**
