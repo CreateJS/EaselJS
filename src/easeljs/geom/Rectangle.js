@@ -46,7 +46,7 @@ this.createjs = this.createjs||{};
  **/
 var Rectangle = function(x, y, width, height) {
   this.initialize(x, y, width, height);
-}
+};
 var p = Rectangle.prototype;
 	
 // public properties:
@@ -80,20 +80,21 @@ var p = Rectangle.prototype;
 	
 // constructor:
 	/** 
-	 * Initialization method.
+	 * Initialization method. Can also be used to reinitialize the instance.
 	 * @method initialize
 	 * @param {Number} [x=0] X position.
 	 * @param {Number} [y=0] Y position.
 	 * @param {Number} [width=0] The width of the Rectangle.
 	 * @param {Number} [height=0] The height of the Rectangle.
-	 * @protected
+	 * @return {Rectangle} This instance. Useful for chaining method calls.
 	*/
 	p.initialize = function(x, y, width, height) {
 		this.x = (x == null ? 0 : x);
 		this.y = (y == null ? 0 : y);
 		this.width = (width == null ? 0 : width);
 		this.height = (height == null ? 0 : height);
-	}
+		return this;
+	};
 	
 // public methods:
 	/**
@@ -103,7 +104,7 @@ var p = Rectangle.prototype;
 	 **/
 	p.clone = function() {
 		return new Rectangle(this.x, this.y, this.width, this.height);
-	}
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -112,7 +113,7 @@ var p = Rectangle.prototype;
 	 **/
 	p.toString = function() {
 		return "[Rectangle (x="+this.x+" y="+this.y+" width="+this.width+" height="+this.height+")]";
-	}
+	};
 	
 createjs.Rectangle = Rectangle;
 }());
