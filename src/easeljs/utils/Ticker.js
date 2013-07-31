@@ -266,7 +266,8 @@ var Ticker = function() {
 		Ticker._inited = true;
 		Ticker._times = [];
 		Ticker._tickTimes = [];
-		Ticker._times.push(Ticker._lastTime = Ticker._startTime = Ticker._getTime());
+		Ticker._startTime = Ticker._getTime();
+		Ticker._times.push(Ticker._lastTime = 0);
 		Ticker.setInterval(Ticker._interval);
 	};
 	
