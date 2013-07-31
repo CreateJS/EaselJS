@@ -220,7 +220,7 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.mouseMoveOutside = false;
 	
-	// TODO: confirm naming.
+	// TODO: confirm naming and inclusion.
 	/**
 	 * NOTE: this name is not final. Feedback is appreciated.
 	 * 
@@ -236,6 +236,9 @@ var p = Stage.prototype = new createjs.Container();
 	 * 
 	 * MouseOver, MouseOut, RollOver, and RollOut interactions will not be passed through. They must be enabled using 
 	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} for each stage individually.
+	 * 
+	 * In most instances, you will also want to disable DOM events for the next stage to avoid duplicate interactions.
+	 * myNextStage.enableDOMEvents(false);
 	 * 
 	 * @property nextStage
 	 * @type Stage
@@ -764,7 +767,6 @@ var p = Stage.prototype = new createjs.Container();
 		if (oldTarget != target) {
 			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e);
 		}
-		
 	};
 
 	/**
