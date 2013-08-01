@@ -310,7 +310,8 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 					var frames = obj.frames;
 					a = anim.frames = (typeof frames == "number") ? [frames] : frames.slice(0);
 				}
-				anim.next = (a.length < 2 || anim.next == false) ? null : (anim.next == null || anim.next == true) ? name : anim.next;
+				if (anim.next === true || anim.next === undefined) { anim.next = name; } // loop
+				if (anim.next === false || (a.length < 2 && anim.next == name)) { anim.next = null; } // stop
 				if (!anim.speed) { anim.speed = 1; }
 				this._animations.push(name);
 				this._data[name] = anim;
