@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
 /**
  * The ButtonHelper is a helper class to create interactive buttons from {{#crossLink "MovieClip"}}{{/crossLink}} or
@@ -77,28 +78,28 @@ var p = ButtonHelper.prototype;
 	 * @readonly
 	 **/
 	p.target = null;
-	
+
 	/**
 	 * The label name or frame number to display when the user mouses out of the target. Defaults to "over".
 	 * @property overLabel
 	 * @type String | Number
 	 **/
 	p.overLabel = null;
-	
+
 	/**
 	 * The label name or frame number to display when the user mouses over the target. Defaults to "out".
 	 * @property outLabel
 	 * @type String | Number
 	 **/
 	p.outLabel = null;
-	
+
 	/**
 	 * The label name or frame number to display when the user presses on the target. Defaults to "down".
 	 * @property downLabel
 	 * @type String | Number
 	 **/
 	p.downLabel = null;
-	
+
 	/**
 	 * If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
 	 * @property play
@@ -106,7 +107,7 @@ var p = ButtonHelper.prototype;
 	 * @type Boolean
 	 **/
 	p.play = false;
-	
+
 //  private properties
 	/**
 	 * @property _isPressed
@@ -114,16 +115,16 @@ var p = ButtonHelper.prototype;
 	 * @protected
 	 **/
 	p._isPressed = false;
-	
+
 	/**
 	 * @property _isOver
 	 * @type Boolean
 	 * @protected
 	 **/
 	p._isOver = false;
-	
+
 // constructor:
-	/** 
+	/**
 	 * Initialization method.
 	 * @method initialize
 	 * @param {Sprite|MovieClip} target The instance to manage.
@@ -157,9 +158,9 @@ var p = ButtonHelper.prototype;
 			target.hitArea = hitArea;
 		}
 	};
-	
+
 // public methods:
-	/** 
+	/**
 	 * Enables or disables the button functionality on the target.
 	 * @method setEnabled
 	 * @param {Boolean} value
@@ -178,7 +179,7 @@ var p = ButtonHelper.prototype;
 			o.removeEventListener("pressup", this);
 		}
 	};
-		
+
 	/**
 	 * Returns a string representation of this object.
 	 * @method toString
@@ -187,8 +188,8 @@ var p = ButtonHelper.prototype;
 	p.toString = function() {
 		return "[ButtonHelper]";
 	};
-	
-	
+
+
 // protected methods:
 	/**
 	 * @method handleEvent
@@ -197,7 +198,7 @@ var p = ButtonHelper.prototype;
 	 **/
 	p.handleEvent = function(evt) {
 		var label, t = this.target, type = evt.type;
-		
+
 		if (type == "mousedown") {
 			this._isPressed = true;
 			label = this.downLabel;

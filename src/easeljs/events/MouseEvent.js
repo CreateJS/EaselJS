@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
 // TODO: deprecated. @uses EventDispatcher
 /**
@@ -94,7 +95,7 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * @type Number
 	 **/
 	p.stageY = 0;
-	
+
 	/**
 	 * The raw x position relative to the stage. Normally this will be the same as the stageX value, unless
 	 * stage.mouseMoveOutside is true and the pointer is outside of the stage bounds.
@@ -120,7 +121,7 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * @default null
 	 **/
 	p.nativeEvent = null;
-	 
+
 	// TODO: deprecated:
 	/**
 	 * REMOVED. Use the {{#crossLink "DisplayObject"}}{{/crossLink}} {{#crossLink "DisplayObject/pressmove:event"}}{{/crossLink}}
@@ -152,7 +153,7 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * @type {Boolean}
 	 */
 	p.primary = false;
-	
+
 // mix-ins:
 	// EventDispatcher methods:
 	// TODO: deprecated:
@@ -171,7 +172,7 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * @type Function
 	 **/
 	p.Event_initialize = p.initialize;
-	
+
 	/**
 	 * Initialization method.
 	 * @method initialize

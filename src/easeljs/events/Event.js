@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
 /**
  * Contains properties and methods shared by all events for use with
@@ -80,7 +81,7 @@ var p = Event.prototype;
 	 * @readonly
 	*/
 	p.currentTarget = null;
-	
+
 	/**
 	 * For bubbling events, this indicates the current event phase:<OL>
 	 * 	<LI> capture phase: starting from the top parent to the target</LI>
@@ -93,7 +94,7 @@ var p = Event.prototype;
 	 * @readonly
 	*/
 	p.eventPhase = 0;
-	
+
 	/**
 	 * Indicates whether the event will bubble through the display list.
 	 * @property bubbles
@@ -102,7 +103,7 @@ var p = Event.prototype;
 	 * @readonly
 	*/
 	p.bubbles = false;
-	
+
 	/**
 	 * Indicates whether the default behaviour of this event can be cancelled via
 	 * {{#crossLink "Event/preventDefault"}}{{/crossLink}}. This is set via the Event constructor.
@@ -112,7 +113,7 @@ var p = Event.prototype;
 	 * @readonly
 	*/
 	p.cancelable = false;
-	
+
 	/**
 	 * The epoch time at which this event was created.
 	 * @property timeStamp
@@ -121,7 +122,7 @@ var p = Event.prototype;
 	 * @readonly
 	*/
 	p.timeStamp = 0;
-	
+
 	/**
 	 * Indicates if {{#crossLink "Event/preventDefault"}}{{/crossLink}} has been called
 	 * on this event.
@@ -131,9 +132,9 @@ var p = Event.prototype;
 	 * @readonly
 	*/
 	p.defaultPrevented = false;
-	
+
 	/**
-	 * Indicates if {{#crossLink "Event/stopPropagation"}}{{/crossLink}} or 
+	 * Indicates if {{#crossLink "Event/stopPropagation"}}{{/crossLink}} or
 	 * {{#crossLink "Event/stopImmediatePropagation"}}{{/crossLink}} has been called on this event.
 	 * @property propagationStopped
 	 * @type Boolean
@@ -141,7 +142,7 @@ var p = Event.prototype;
 	 * @readonly
 	*/
 	p.propagationStopped = false;
-	
+
 	/**
 	 * Indicates if {{#crossLink "Event/stopImmediatePropagation"}}{{/crossLink}} has been called
 	 * on this event.
@@ -178,7 +179,7 @@ var p = Event.prototype;
 	};
 
 // public methods:
-	
+
 	/**
 	 * Sets {{#crossLink "Event/defaultPrevented"}}{{/crossLink}} to true.
 	 * Mirrors the DOM event standard.
@@ -187,7 +188,7 @@ var p = Event.prototype;
 	p.preventDefault = function() {
 		this.defaultPrevented = true;
 	};
-	
+
 	/**
 	 * Sets {{#crossLink "Event/propagationStopped"}}{{/crossLink}} to true.
 	 * Mirrors the DOM event standard.
@@ -196,7 +197,7 @@ var p = Event.prototype;
 	p.stopPropagation = function() {
 		this.propagationStopped = true;
 	};
-	
+
 	/**
 	 * Sets {{#crossLink "Event/propagationStopped"}}{{/crossLink}} and
 	 * {{#crossLink "Event/immediatePropagationStopped"}}{{/crossLink}} to true.

@@ -5,9 +5,12 @@ CRITICAL (may break existing content):
 - removed Ticker.addListener and .removeListener
 - most mouse events now bubble
 - BitmapAnimation renamed to Sprite
+- MouseEvent now inherits from new Event class
 - sprite sheet data's animation .frequency property removed in favour of .speed
 - removed "target" from MouseEvent's param list
 - returning false from an event handler no longer causes dispatchEvent to return false, see Event.preventDefault
+- Added "use strict"; to everything.
+- Fixed clone on AlphaMapFilter (thanks
 
 *****
 DEPRECATED (will be removed in a future version):
@@ -163,7 +166,7 @@ Version 0.5.0 [Aug 24, 2012]
 - added Touch.disable(stage)
 
 
-Version 0.4.2 [Apr 18, 2012] 
+Version 0.4.2 [Apr 18, 2012]
 ****************************************************************************************************
 - hot fix for issues with Ticker that caused reduced frame rates.
 - NO API CHANGES
@@ -193,7 +196,7 @@ Version 0.4.1 [Apr 14, 2012]
 - updateCache now clears the cacheCanvas correctly
 
 
-Version 0.4 [Nov 30, 2011] 
+Version 0.4 [Nov 30, 2011]
 ****************************************************************************************************
 - completely rewrote BitmapSequence (now BitmapAnimation) & SpriteSheet including data format
 	- BitmapSequence was renamed BitmapAnimation

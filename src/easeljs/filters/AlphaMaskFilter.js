@@ -30,6 +30,7 @@
 this.createjs = this.createjs || {};
 
 (function () {
+	"use strict";
 
 	/**
 	 * Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
