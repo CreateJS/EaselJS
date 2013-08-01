@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
 /**
  * Log provides a centralized system for outputting errors. By default it will attempt to use console.log
@@ -110,7 +111,7 @@ Log.out = function(message, details, level) {
 };
 
 /**
- * Specifies the level of messages to output. For example, if you set <code>Log.level = Log.WARNING</code>, then any 
+ * Specifies the level of messages to output. For example, if you set <code>Log.level = Log.WARNING</code>, then any
  * messages with a level of 2 (Log.WARNING) or less (ex. Log.ERROR) will be output. Defaults to Log.ALL.
  * @type Function
  * @property out
@@ -128,7 +129,7 @@ Log.level = 255;
 Log._keys = [];
 
 /**
- * Adds a definition object that associates one or more keys with longer messages. 
+ * Adds a definition object that associates one or more keys with longer messages.
  * These messages can optionally include "%DETAILS%" which will be replaced by any details passed
  * with the error. For example:<br/>
  * Log.addKeys( {MY_ERROR:"This is a description of my error [%DETAILS%]"} );
@@ -155,14 +156,14 @@ Log.log = function(message, details, level) {
 	if (!out) { return; }
 	var keys = Log._keys;
 	if (level == null) { level = 3; }
-	
+
 	for (var i=0; i<keys.length; i++) {
 		if (keys[i][message]) {
 			message = keys[i][message];
 			break;
 		}
 	}
-	
+
 	out(message, details, level);
 }
 

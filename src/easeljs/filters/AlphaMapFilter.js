@@ -30,7 +30,7 @@
 this.createjs = this.createjs || {};
 
 (function () {
-
+	"use strict";
 	/**
 	 * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
 	 * be copied from the red channel of the map, and the RGB channels will be copied from the target.
@@ -143,6 +143,7 @@ this.createjs = this.createjs || {};
 		this._mapData = null;
 		var map = this._alphaMap = this.alphaMap;
 		var canvas = map;
+		var ctx;
 		if (map instanceof HTMLCanvasElement) {
 			ctx = canvas.getContext("2d");
 		} else {

@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,7 +30,8 @@
 this.createjs = this.createjs||{};
 
 (function() {
-	
+	"use strict";
+
 /**
  * Displays a frame or sequence of frames (ie. an animation) from a SpriteSheet instance. A sprite sheet is a series of
  * images (usually animation frames) combined into a single image. For example, an animation consisting of 8 100x100
@@ -59,7 +60,7 @@ var Sprite = function(spriteSheet, frameOrAnimation) {
 var p = Sprite.prototype = new createjs.DisplayObject();
 
 // events:
-	
+
 	/**
 	 * Dispatched when an animation reaches its ends.
 	 * @event animationend
@@ -79,7 +80,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * @type {Function}
 	 * @deprecated Use addEventListener and the "animationend" event.
 	 */
-	 
+
 	/**
 	 * The frame index that will be drawn when draw is called. Note that with some {{#crossLink "SpriteSheet"}}{{/crossLink}}
 	 * definitions, this will advance non-sequentially. This will always be an integer value.
@@ -124,19 +125,19 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * @default true
 	 **/
 	p.snapToPixel = true;
-	
-	/** 
+
+	/**
 	 * @property offset
 	 * @type {Number}
 	 * @default 0
 	 * @deprecated Not applicable to the new timing model in v0.7.0 and higher.
 	 */
 	p.offset = 0;
-	
+
 	/**
 	 * Specifies the current frame index within the currently playing animation. When playing normally, this will increase
 	 * from 0 to n-1, where n is the number of frames in the current animation.
-	 * 
+	 *
 	 * This could be a non-integer value if
 	 * using time-based playback (see {{#crossLink "Sprite/framerate"}}{{/crossLink}}, or if the animation's speed is
 	 * not an integer.
@@ -145,16 +146,16 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * @default 0
 	 **/
 	p.currentAnimationFrame = 0;
-	
+
 	/**
 	 * By default Sprite instances advance one frame per tick. Specifying a framerate for the Sprite (or its related
 	 * SpriteSheet) will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
 	 * framerate.
-	 * 
+	 *
 	 * For example, if a Sprite with a framerate of 10 is placed on a Stage being updated at 40fps, then the Sprite will
 	 * advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will
 	 * vary slightly between frames.
-	 * 
+	 *
 	 * This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being
 	 * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
 	 * @property framerate
@@ -171,7 +172,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * @default 0
 	 **/
 	p._advanceCount = 0;
-	
+
 	/**
 	 * @property _animation
 	 * @protected
@@ -179,7 +180,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * @default null
 	 **/
 	p._animation = null;
-	
+
 	/**
 	 * @property _animation
 	 * @protected
@@ -266,7 +267,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * You should not cache Bitmap instances as it can degrade performance.
 	 * @method uncache
 	 **/
-	
+
 	/**
 	 * Play (unpause) the current animation. The Sprite will be paused if either {{#crossLink "Sprite/stop"}}{{/crossLink}}
 	 * or {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} is called. Single frame animations will remain
@@ -276,7 +277,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	p.play = function() {
 		this.paused = false;
 	};
-	
+
 	/**
 	 * Stop playing a running animation. The Sprite will be playing if {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}}
 	 * is called. Note that calling {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}} or {{#crossLink "Sprite/play"}}{{/crossLink}}
@@ -374,7 +375,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * @private
 	 **/
 	p.DisplayObject__tick = p._tick;
-	
+
 	/**
 	 * Advances the <code>currentFrame</code> if paused is not true. This is called automatically when the {{#crossLink "Stage"}}{{/crossLink}}
 	 * ticks.
@@ -387,20 +388,20 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 		}
 		this.DisplayObject__tick(params);
 	};
-	
-	
+
+
 	/**
 	 * Normalizes the current frame, advancing animations and dispatching callbacks as appropriate.
 	 * @protected
 	 * @method _normalizeFrame
 	 **/
-	p._normalizeFrame = function() { 
+	p._normalizeFrame = function() {
 		var animation = this._animation;
 		var paused = this.paused;
 		var frame = this._currentFrame;
 		var animFrame = this.currentAnimationFrame;
 		var l;
-		
+
 		if (animation) {
 			l = animation.frames.length;
 			if ((animFrame|0) >= l) {
@@ -430,7 +431,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 		}
 		this.currentFrame = this._currentFrame|0;
 	};
-	
+
 	/**
 	 * Dispatches the "animationend" event. Returns true if a handler changed the animation (ex. calling {{#crossLink "Sprite/stop"}}{{/crossLink}},
 	 * {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}}, etc.)
@@ -478,7 +479,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 * Moves the playhead to the specified frame number or animation.
 	 * @method _goto
 	 * @param {String|Number} frameOrAnimation The frame number or animation that the playhead should move to.
-	 * @param {Boolean} [frame] The frame of the animation to go to. Defaults to 0. 
+	 * @param {Boolean} [frame] The frame of the animation to go to. Defaults to 0.
 	 * @protected
 	 **/
 	p._goto = function(frameOrAnimation, frame) {
