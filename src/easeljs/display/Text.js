@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,7 +30,8 @@
 this.createjs = this.createjs||{};
 
 (function() {
-	
+	"use strict";
+
 /**
  * Display one or more lines of dynamic text (not user editable) in the display list. Line wrapping support (using the
  * lineWidth) is very basic, wrapping on spaces and tabs only. Note that as an alternative to Text, you can position HTML
@@ -79,14 +80,14 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @type String
 	 **/
 	p.text = "";
-	
+
 	/**
-	 * The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold 36px Arial"). 
+	 * The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold 36px Arial").
 	 * @property font
 	 * @type String
 	 **/
 	p.font = null;
-	
+
 	/**
 	 * The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). Default is "#000".
 	 * It will also accept valid canvas fillStyle values.
@@ -94,17 +95,17 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @type String
 	 **/
 	p.color = null;
-	
+
 	/**
-	 * The horizontal text alignment. Any of "start", "end", "left", "right", and "center". For detailed 
-	 * information view the 
+	 * The horizontal text alignment. Any of "start", "end", "left", "right", and "center". For detailed
+	 * information view the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles">
 	 * whatwg spec</a>. Default is "left".
 	 * @property textAlign
 	 * @type String
 	 **/
 	p.textAlign = "left";
-	
+
 	/**
 	 * The vertical alignment point on the font. Any of "top", "hanging", "middle", "alphabetic", "ideographic", or
 	 * "bottom". For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles">
@@ -113,24 +114,24 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @type String
 	*/
 	p.textBaseline = "top";
-	
+
 	/**
 	 * The maximum width to draw the text. If maxWidth is specified (not null), the text will be condensed or
-	 * shrunk to make it fit in this width. For detailed information view the 
+	 * shrunk to make it fit in this width. For detailed information view the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles">
 	 * whatwg spec</a>.
 	 * @property maxWidth
 	 * @type Number
 	*/
 	p.maxWidth = null;
-	
+
 	/**
 	 * If greater than 0, the text will be drawn as a stroke (outline) of the specified width.
 	 * @property outline
 	 * @type Number
 	 **/
 	p.outline = 0;
-	
+
 	/**
 	 * Indicates the line height (vertical distance between baselines) for multi-line text. If null or 0,
 	 * the value of getMeasuredLineHeight is used.
@@ -138,17 +139,17 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @type Number
 	 **/
 	p.lineHeight = 0;
-	
+
 	/**
-	 * Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null, 
+	 * Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null,
 	 * the text will not be wrapped.
 	 * @property lineWidth
 	 * @type Number
 	 **/
 	p.lineWidth = null;
-	
+
 // private properties:
-	
+
 // constructor:
 	/**
 	 * @property DisplayObject_initialize
@@ -156,8 +157,8 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @type Function
 	 **/
 	p.DisplayObject_initialize = p.initialize;
-	
-	/** 
+
+	/**
 	 * Initialization method.
 	 * @method initialize
 	 * @param {String} [text] The text to display.
@@ -173,7 +174,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 		this.font = font;
 		this.color = color;
 	};
-	
+
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.
@@ -192,24 +193,24 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @type Function
 	 **/
 	p.DisplayObject_draw = p.draw;
-	
+
 	/**
 	 * Draws the Text into the specified context ignoring its visible, alpha, shadow, and transform.
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache. 
+	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		
+
 		var col = this.color || "#000";
 		if (this.outline) { ctx.strokeStyle = col; ctx.lineWidth = this.outline*1; }
 		else { ctx.fillStyle = col; }
-		
+
 		ctx.font = this.font;
 		ctx.textAlign = this.textAlign||"start";
 		ctx.textBaseline = this.textBaseline||"alphabetic";
@@ -217,7 +218,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 		this._drawText(ctx);
 		return true;
 	};
-	
+
 	/**
 	 * Returns the measured, untransformed width of the text without wrapping.
 	 * @method getMeasuredWidth
@@ -231,7 +232,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * Returns an approximate line height of the text, ignoring the lineHeight property. This is based on the measured
 	 * width of a "M" character multiplied by 1.2, which approximates em for most fonts.
 	 * @method getMeasuredLineHeight
-	 * @return {Number} an approximate line height of the text, ignoring the lineHeight property. This is 
+	 * @return {Number} an approximate line height of the text, ignoring the lineHeight property. This is
 	 * based on the measured width of a "M" character multiplied by 1.2, which approximates em for most fonts.
 	 **/
 	p.getMeasuredLineHeight = function() {
@@ -248,7 +249,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	p.getMeasuredHeight = function() {
 		return this._drawText(null,{}).height;
 	};
-	
+
 	/**
 	 * Returns a clone of the Text instance.
 	 * @method clone
@@ -259,7 +260,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 		this.cloneProps(o);
 		return o;
 	};
-		
+
 	/**
 	 * Returns a string representation of this object.
 	 * @method toString
@@ -268,9 +269,9 @@ var p = Text.prototype = new createjs.DisplayObject();
 	p.toString = function() {
 		return "[Text (text="+  (this.text.length > 20 ? this.text.substr(0, 17)+"..." : this.text) +")]";
 	};
-	
+
 // private methods:
-	
+
 	/**
 	 * @property DisplayObject_cloneProps
 	 * @private
@@ -278,10 +279,10 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	p.DisplayObject_cloneProps = p.cloneProps;
 
-	/** 
+	/**
 	 * @method cloneProps
 	 * @param {Text} o
-	 * @protected 
+	 * @protected
 	 **/
 	p.cloneProps = function(o) {
 		this.DisplayObject_cloneProps(o);
@@ -293,9 +294,9 @@ var p = Text.prototype = new createjs.DisplayObject();
 		o.lineWidth = this.lineWidth;
 	};
 
-	/** 
+	/**
 	 * @method _getWorkingContext
-	 * @protected 
+	 * @protected
 	 **/
 	p._getWorkingContext = function() {
 		var ctx = Text._workingContext;
@@ -304,7 +305,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 		ctx.textBaseline = this.textBaseline||"alphabetic";
 		return ctx;
 	};
-	 
+
 	/**
 	 * Draws multiline text.
 	 * @method _drawText
@@ -351,19 +352,19 @@ var p = Text.prototype = new createjs.DisplayObject();
 		}
 		return o;
 	};
-	
-	/** 
+
+	/**
 	 * @method _drawTextLine
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @param {String} text
 	 * @param {Number} y
-	 * @protected 
+	 * @protected
 	 **/
 	p._drawTextLine = function(ctx, text, y) {
 		// Chrome 17 will fail to draw the text if the last param is included but null, so we feed it a large value instead:
 			if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth||0xFFFF); }
 			else { ctx.fillText(text, 0, y, this.maxWidth||0xFFFF); }
-		
+
 	};
 
 createjs.Text = Text;

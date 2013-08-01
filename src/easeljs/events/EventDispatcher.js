@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
 /**
  * EventDispatcher provides methods for managing queues of event listeners and dispatching events.
@@ -116,7 +117,7 @@ var p = EventDispatcher.prototype;
 	 * @type Object
 	 **/
 	p._listeners = null;
-	
+
 	/**
 	 * @protected
 	 * @property _captureListeners
@@ -300,14 +301,14 @@ var p = EventDispatcher.prototype;
 		}
 		// TODO: deprecated. Target param is deprecated, only use case is MouseEvent/mousemove, remove.
 		eventObj.target = target||this;
-		
+
 		if (!eventObj.bubbles || !this.parent) {
 			this._dispatchEvent(eventObj, 2);
 		} else {
 			var top=this, list=[top];
 			while (top.parent) { list.push(top = top.parent); }
 			var i, l=list.length;
-			
+
 			// capture & atTarget
 			for (i=l-1; i>=0 && !eventObj.propagationStopped; i--) {
 				list[i]._dispatchEvent(eventObj, 1+(i==0));

@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 // constructor:
 /**
  * The SpriteSheetUtils class is a collection of static methods for working with {{#crossLink "SpriteSheet"}}{{/crossLink}}s.
@@ -78,10 +79,10 @@ var SpriteSheetUtils = function() {
 	 * <br/><br/>
 	 * Note that you can also flip any display object by setting its scaleX or scaleY to a negative value. On some
 	 * browsers (especially those without hardware accelerated canvas) this can result in slightly degraded performance,
-	 * which is why addFlippedFrames is available. 
+	 * which is why addFlippedFrames is available.
 	 * @method addFlippedFrames
 	 * @static
-	 * @param {SpriteSheet} spriteSheet 
+	 * @param {SpriteSheet} spriteSheet
 	 * @param {Boolean} horizontal If true, horizontally flipped frames will be added.
 	 * @param {Boolean} vertical If true, vertically flipped frames will be added.
 	 * @param {Boolean} both If true, frames that are flipped both horizontally and vertically will be added.
@@ -89,7 +90,7 @@ var SpriteSheetUtils = function() {
 	 **/
 	SpriteSheetUtils.addFlippedFrames = function(spriteSheet, horizontal, vertical, both) {
 		if (!horizontal && !vertical && !both) { return; }
-		
+
 		var count = 0;
 		if (horizontal) { SpriteSheetUtils._flip(spriteSheet,++count,true,false); }
 		if (vertical) { SpriteSheetUtils._flip(spriteSheet,++count,false,true); }
@@ -155,7 +156,7 @@ var SpriteSheetUtils = function() {
 		return canvas;
 	};
 
-	
+
 // private static methods:
 	SpriteSheetUtils._flip = function(spriteSheet, count, h, v) {
 		var imgs = spriteSheet._images;
@@ -178,14 +179,14 @@ var SpriteSheetUtils = function() {
 			img.height = src.height;
 			imgs.push(img);
 		}
-		
+
 		var frames = spriteSheet._frames;
 		var fl = frames.length/count;
 		for (i=0;i<fl;i++) {
 			src = frames[i];
 			var rect = src.rect.clone();
 			img = imgs[src.image.__tmp+il*count];
-			
+
 			var frame = {image:img,rect:rect,regX:src.regX,regY:src.regY};
 			if (h) {
 				rect.x = img.width-rect.x-rect.width; // update rect
@@ -197,7 +198,7 @@ var SpriteSheetUtils = function() {
 			}
 			frames.push(frame);
 		}
-		
+
 		var sfx = "_"+(h?"h":"")+(v?"v":"");
 		var names = spriteSheet._animations;
 		var data = spriteSheet._data;
@@ -215,7 +216,7 @@ var SpriteSheetUtils = function() {
 			names.push(anim.name);
 		}
 	};
-	
+
 
 createjs.SpriteSheetUtils = SpriteSheetUtils;
 }());

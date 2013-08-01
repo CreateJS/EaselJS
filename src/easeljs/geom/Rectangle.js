@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
 /**
  * Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
@@ -48,36 +49,36 @@ var Rectangle = function(x, y, width, height) {
   this.initialize(x, y, width, height);
 };
 var p = Rectangle.prototype;
-	
+
 // public properties:
-	/** 
-	 * X position. 
+	/**
+	 * X position.
 	 * @property x
 	 * @type Number
 	 **/
 	p.x = 0;
-	
-	/** 
-	 * Y position. 
+
+	/**
+	 * Y position.
 	 * @property y
 	 * @type Number
 	 **/
 	p.y = 0;
-	
-	/** 
+
+	/**
 	 * Width.
 	 * @property width
 	 * @type Number
 	 **/
 	p.width = 0;
-	
-	/** 
+
+	/**
 	 * Height.
 	 * @property height
 	 * @type Number
 	 **/
 	p.height = 0;
-	
+
 // constructor:
 	/** 
 	 * Initialization method. Can also be used to reinitialize the instance.

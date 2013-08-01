@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
 /**
  * Base class that all filters should inherit from. Filters need to be applied to objects that have been cached using
@@ -64,15 +65,15 @@ var Filter = function() {
   this.initialize();
 }
 var p = Filter.prototype;
-	
+
 // constructor:
-	/** 
+	/**
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
 	 **/
 	p.initialize = function() {}
-	
+
 // public methods:
 	/**
 	 * Returns a rectangle with values indicating the margins required to draw the filter.
@@ -84,7 +85,7 @@ var p = Filter.prototype;
 	p.getBounds = function() {
 		return new createjs.Rectangle(0,0,0,0);
 	}
-	
+
 	/**
 	 * Applies the filter to the specified context.
 	 * @method applyFilter
@@ -108,7 +109,7 @@ var p = Filter.prototype;
 	p.toString = function() {
 		return "[Filter]";
 	}
-	
+
 	/**
 	 * Returns a clone of this Filter instance.
 	 * @method clone
@@ -117,6 +118,6 @@ var p = Filter.prototype;
 	p.clone = function() {
 		return new Filter();
 	}
-	
+
 createjs.Filter = Filter;
 }());
