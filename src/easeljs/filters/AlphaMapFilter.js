@@ -124,7 +124,7 @@ this.createjs = this.createjs || {};
 	 * @return {AlphaMapFilter} A clone of the current AlphaMapFilter instance.
 	 **/
 	p.clone = function () {
-		return new AlphaMapFilter(this.mask);
+		return new AlphaMapFilter(this.alphaMap);
 	};
 
 	p.toString = function () {
