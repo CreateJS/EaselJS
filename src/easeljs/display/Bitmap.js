@@ -187,7 +187,7 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	 * method.
 	 * @method uncache
 	 **/
-	
+	 
 	/**
 	 * @property DisplayObject_getBounds
 	 * @type Function

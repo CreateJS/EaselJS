@@ -31,6 +31,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
 // TODO: support for double tap.
 /**

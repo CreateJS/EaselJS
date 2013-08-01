@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 // TODO: fix problems with rotation.
 // TODO: exclude from getObjectsUnderPoint
 
@@ -135,14 +136,14 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	p.draw = function(ctx, ignoreCache) {
 		if (this.htmlElement == null) { return; }
 		var mtx = this.getConcatenatedMatrix(this._matrix);
-		
+
 		var o = this.htmlElement;
 		var style = o.style;
-		
+
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
 		if (this.visible) { style.visibility = "visible"; }
 		else { return true; }
-		
+
 		var oMtx = this._oldMtx||{};
 		if (oMtx.alpha != mtx.alpha) { style.opacity = ""+mtx.alpha; oMtx.alpha = mtx.alpha; }
 		if (oMtx.tx != mtx.tx || oMtx.ty != mtx.ty || oMtx.a != mtx.a || oMtx.b != mtx.b || oMtx.c != mtx.c || oMtx.d != mtx.d) {
@@ -150,7 +151,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 			style.MozTransform = ["matrix("+mtx.a.toFixed(3),mtx.b.toFixed(3),mtx.c.toFixed(3),mtx.d.toFixed(3),(mtx.tx+0.5|0)+"px",(mtx.ty+0.5|0)+"px)"].join(",");
 			this._oldMtx = mtx.clone();
 		}
-		
+
 		return true;
 	};
 
@@ -212,36 +213,36 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	p.toString = function() {
 		return "[DOMElement (name="+  this.name +")]";
 	};
-    
+
 	/**
      * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
 	 * are not full EaselJS display objects and do not participate in EaselJS mouse events.
 	 * @event click
 	 */
-          
+
      /**
      * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
  	 * are not full EaselJS display objects and do not participate in EaselJS mouse events.
 	 * @event dblClick
 	 */
-     
+
      /**
       * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
  	  * are not full EaselJS display objects and do not participate in EaselJS mouse events.
 	  * @event mousedown
 	  */
-     
+
      /**
       * The HTMLElement can listen for the mouseover event, not the DOMElement instance.
       * Since DOMElement instances are not full EaselJS display objects and do not participate in EaselJS mouse events.
       * @event mouseover
-	  */ 
-     
+	  */
+
      /**
       * Not applicable to DOMElement.
 	  * @event tick
 	  */
-     
+
 
 // private methods:
 	/**
@@ -250,7 +251,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * @protected
 	 */
 	p.DisplayObject__tick = p._tick;
-	
+
 	/**
 	 * @method _tick
 	 * @param {Array} params Parameters to pass onto the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}}

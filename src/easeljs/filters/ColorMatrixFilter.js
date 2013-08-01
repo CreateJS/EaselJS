@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
 /**
  * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
@@ -63,10 +64,10 @@ var p = ColorMatrixFilter.prototype = new createjs.Filter();
 
 // public properties:
 	p.matrix = null;
-	
+
 // constructor:
 	// TODO: detailed docs.
-	/** 
+	/**
 	 * @method initialize
 	 * @protected
 	 * @param {Array} matrix A 4x5 matrix describing the color operation to perform.
@@ -94,7 +95,7 @@ var p = ColorMatrixFilter.prototype = new createjs.Filter();
 		var m5 =  mtx[5],  m6 =  mtx[6],  m7 =  mtx[7],  m8 =  mtx[8],  m9 =  mtx[9];
 		var m10 = mtx[10], m11 = mtx[11], m12 = mtx[12], m13 = mtx[13], m14 = mtx[14];
 		var m15 = mtx[15], m16 = mtx[16], m17 = mtx[17], m18 = mtx[18], m19 = mtx[19];
-		
+
 		for (var i=0; i<l; i+=4) {
 			r = data[i];
 			g = data[i+1];
@@ -113,7 +114,7 @@ var p = ColorMatrixFilter.prototype = new createjs.Filter();
 	p.toString = function() {
 		return "[ColorMatrixFilter]";
 	}
-	
+
 	/**
 	 * Returns a clone of this ColorMatrixFilter instance.
 	 * @method clone

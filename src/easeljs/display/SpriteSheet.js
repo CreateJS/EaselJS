@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,6 +30,7 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 /**
  * Encapsulates the properties and methods associated with a sprite sheet. A sprite sheet is a series of images (usually
  * animation frames) combined into a larger image (or images). For example, an animation consisting of eight 100x100
@@ -51,7 +52,7 @@ this.createjs = this.createjs||{};
  *          // this specifies the framerate that will be set on the SpriteSheet. See Spritesheet.framerate
  *          // for more information.
  *          framerate: 20,
- *          
+ *
  *          // DEFINING IMAGES:
  *          // list of images or image URIs to use. SpriteSheet can handle preloading.
  *          // the order dictates their index value for frame definition.
@@ -132,7 +133,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 
 	/**
 	 * Dispatched when all images are loaded.  Note that this only fires if the images
-	 * were not fully loaded when the sprite sheet was initialized. You should check the complete property 
+	 * were not fully loaded when the sprite sheet was initialized. You should check the complete property
 	 * to prior to adding a listener. Ex.
 	 * <pre><code>var sheet = new SpriteSheet(data);
 	 * if (!sheet.complete) {
@@ -153,8 +154,8 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 	 * @readonly
 	 **/
 	p.complete = true;
-	
-	
+
+
 	/**
 	 * Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See
 	 * Sprite.framerate for more information.
@@ -162,7 +163,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 	 * @type Number
 	 **/
 	p.framerate = 0;
-	
+
 	// TODO: deprecated.
 	/**
 	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "SpriteSheet/complete:event"}}{{/crossLink}}
@@ -178,56 +179,56 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 	 * @protected
 	 **/
 	p._animations = null;
-	
+
 	/**
 	 * @property _frames
 	 * @protected
 	 **/
 	p._frames = null;
-	
+
 	/**
 	 * @property _images
 	 * @protected
 	 **/
 	p._images = null;
-	
+
 	/**
 	 * @property _data
 	 * @protected
 	 **/
 	p._data = null;
-	
+
 	/**
 	 * @property _loadCount
 	 * @protected
 	 **/
 	p._loadCount = 0;
-	
+
 	// only used for simple frame defs:
 	/**
 	 * @property _frameHeight
 	 * @protected
 	 **/
 	p._frameHeight = 0;
-	
+
 	/**
 	 * @property _frameWidth
 	 * @protected
 	 **/
 	p._frameWidth = 0;
-	
+
 	/**
 	 * @property _numFrames
 	 * @protected
 	 **/
 	p._numFrames = 0;
-	
+
 	/**
 	 * @property _regX
 	 * @protected
 	 **/
 	p._regX = 0;
-	
+
 	/**
 	 * @property _regY
 	 * @protected
@@ -243,9 +244,9 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 	p.initialize = function(data) {
 		var i,l,o,a;
 		if (data == null) { return; }
-		
+
 		this.framerate = data.framerate||0;
-		
+
 		// parse images:
 		if (data.images && (l=data.images.length) > 0) {
 			a = this._images = [];
@@ -264,7 +265,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 				}
 			}
 		}
-		
+
 		// parse frames:
 		if (data.frames == null) { // nothing
 		} else if (data.frames instanceof Array) {
@@ -317,7 +318,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 				this._data[name] = anim;
 			}
 		}
-		
+
 	};
 
 // public methods:
@@ -337,7 +338,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 			else { return data.frames.length; }
 		}
 	};
-	
+
 	/**
 	 * Returns an array of all available animation names as strings.
 	 * @method getAnimations
@@ -346,7 +347,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 	p.getAnimations = function() {
 		return this._animations.slice(0);
 	};
-	
+
 	/**
 	 * Returns an object defining the specified animation. The returned object contains:<UL>
 	 *     <LI>frames: an array of the frame ids in the animation</LI>
@@ -362,7 +363,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 	p.getAnimation = function(name) {
 		return this._data[name];
 	};
-	
+
 	/**
 	 * Returns an object specifying the image and source rect of the specified frame. The returned object has:<UL>
 	 *     <LI>an image property holding a reference to the image object in which the frame is found</LI>
@@ -378,7 +379,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 		if (this._frames && (frame=this._frames[frameIndex])) { return frame; }
 		return null;
 	};
-	
+
 	/**
 	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative
 	 * to the origin. For example, a 90 x 70 frame with a regX of 50 and a regY of 40 would return:
@@ -393,7 +394,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 		var frame = this.getFrame(frameIndex);
 		return frame ? new createjs.Rectangle(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null;
 	};
-	
+
 	/**
 	 * Returns a string representation of this object.
 	 * @method toString
@@ -422,7 +423,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 		o._loadCount = this._loadCount;
 		return o;
 	};
-	
+
 // private methods:
 	/**
 	 * @method _handleImageLoad
@@ -435,7 +436,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 			this.dispatchEvent("complete");
 		}
 	};
-	
+
 	/**
 	 * @method _calculateFrames
 	 * @protected
