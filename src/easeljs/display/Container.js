@@ -475,7 +475,6 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 **/
 	p.DisplayObject_getBounds = p.getBounds; 
 	
-	
 	/**
 	 * Docced in superclass.
 	 */

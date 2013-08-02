@@ -1054,7 +1054,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 
 	/**
 	 * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
-	 * reverted to their defaults (for example .parent).
+	 * reverted to their defaults (for example .parent). Also note that caches are not maintained across clones.
 	 * @method clone
 	 * @return {DisplayObject} A clone of the current DisplayObject instance.
 	 **/
@@ -1096,12 +1096,9 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		o.visible = this.visible;
 		o.x  = this.x;
 		o.y = this.y;
+		o._bounds = this._bounds;
 		o.mouseEnabled = this.mouseEnabled;
 		o.compositeOperation = this.compositeOperation;
-		if (this.cacheCanvas) {
-			o.cacheCanvas = this.cacheCanvas.cloneNode(true);
-			o.cacheCanvas.getContext("2d").putImageData(this.cacheCanvas.getContext("2d").getImageData(0,0,this.cacheCanvas.width,this.cacheCanvas.height),0,0);
-		}
 	};
 
 	/**
