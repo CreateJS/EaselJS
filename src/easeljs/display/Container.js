@@ -235,7 +235,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			for (var i=0; i<l; i++) { good = good && this.removeChild(arguments[i]); }
 			return good;
 		}
-		return this.removeChildAt(this.children.indexOf(child));
+		return this.removeChildAt(createjs.indexOf(this.children, child));
 	};
 
 	/**
@@ -342,7 +342,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @return {Number} The index of the specified child. -1 if the child is not found.
 	 **/
 	p.getChildIndex = function(child) {
-		return this.children.indexOf(child);
+		return createjs.indexOf(this.children, child);
 	};
 
 	/**
