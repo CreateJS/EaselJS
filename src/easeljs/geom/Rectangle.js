@@ -90,10 +90,10 @@ var p = Rectangle.prototype;
 	 * @return {Rectangle} This instance. Useful for chaining method calls.
 	*/
 	p.initialize = function(x, y, width, height) {
-		this.x = (x == null ? 0 : x);
-		this.y = (y == null ? 0 : y);
-		this.width = (width == null ? 0 : width);
-		this.height = (height == null ? 0 : height);
+		this.x = x||0;
+		this.y = y||0;
+		this.width = width||0;
+		this.height = height||0;
 		return this;
 	};
 	
