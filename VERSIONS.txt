@@ -20,6 +20,8 @@ DEPRECATED (will be removed in a future version):
 
 *****
 All changes:
+- implemented createjs Utils
+- implemented "use strict" mode
 - BitmapAnimation renamed to Sprite
 - renamed the "frequency" property in sprite sheet data to "speed" and changed functionality:
 	* support for non-integer values
