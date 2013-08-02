@@ -26,6 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * @module EaselJS
+ */
+
 // namespace:
 this.createjs = this.createjs||{};
 

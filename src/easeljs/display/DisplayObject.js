@@ -115,6 +115,7 @@
  * slower on average than most other browsers.
  *
  * @module EaselJS
+ * @main EaselJS
  */
 
 // namespace:
