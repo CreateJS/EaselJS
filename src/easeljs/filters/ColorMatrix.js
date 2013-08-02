@@ -54,7 +54,7 @@ this.createjs = this.createjs||{};
 	 * @constructor
 	 * @extends Array
 	 **/
-	ColorMatrix = function(brightness, contrast, saturation, hue) {
+	var ColorMatrix = function(brightness, contrast, saturation, hue) {
 	  this.initialize(brightness, contrast, saturation, hue);
 	};
 	var p = ColorMatrix.prototype = [];
