@@ -174,7 +174,6 @@ var p = ColorFilter.prototype = new createjs.Filter();
 			data[i+2] = data[i+2]*this.blueMultiplier+this.blueOffset;
 			data[i+3] = data[i+3]*this.alphaMultiplier+this.alphaOffset;
 		}
-		imageData.data = data;
 		targetCtx.putImageData(imageData, targetX, targetY);
 		return true;
 	}

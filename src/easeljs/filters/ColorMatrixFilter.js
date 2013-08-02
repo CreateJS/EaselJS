@@ -106,7 +106,6 @@ var p = ColorMatrixFilter.prototype = new createjs.Filter();
 			data[i+2] = r*m10+g*m11+b*m12+a*m13+m14; // blue
 			data[i+3] = r*m15+g*m16+b*m17+a*m18+m19; // alpha
 		}
-		imageData.data = data;
 		targetCtx.putImageData(imageData, targetX, targetY);
 		return true;
 	}
