@@ -113,6 +113,32 @@ var p = Stage.prototype = new createjs.Container();
 	 * @event mouseenter
 	 * @since 0.7.0
 	 */
+	 
+	/**
+	 * Dispatched each update immediately before the tick event is propagated through the display list. Does not fire if
+	 * tickOnUpdate is false.
+	 * @event tickstart
+	 * @since 0.7.0
+	 */
+	 
+	/**
+	 * Dispatched each update immediately after the tick event is propagated through the display list. Does not fire if
+	 * tickOnUpdate is false. Precedes the "drawstart" event.
+	 * @event tickend
+	 * @since 0.7.0
+	 */
+	 
+	/**
+	 * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
+	 * @event drawstart
+	 * @since 0.7.0
+	 */
+	 
+	/**
+	 * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
+	 * @event drawend
+	 * @since 0.7.0
+	 */
 
 // public properties:
 	/**
@@ -333,24 +359,21 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.update = function(params) {
 		if (!this.canvas) { return; }
-		if (this.autoClear) { this.clear(); }
+		if (this.tickOnUpdate) {
+			this.dispatchEvent("tickstart");  // TODO: make cancellable?
+			this._tick((arguments.length ? arguments : null));
+			this.dispatchEvent("tickend");
+		}
+		this.dispatchEvent("drawstart"); // TODO: make cancellable?
 		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
-		if (this.tickOnUpdate) { this._tick((arguments.length ? arguments : null)); }
+		if (this.autoClear) { this.clear(); }
 		var ctx = this.canvas.getContext("2d");
 		ctx.save();
 		this.updateContext(ctx);
 		this.draw(ctx, false);
 		ctx.restore();
+		this.dispatchEvent("drawend");
 	};
-
-	/**
-	 * Calls the {{#crossLink "Stage/update"}}{{/crossLink}} method. Useful for adding stage as a listener to
-	 * {{#crossLink "Ticker"}}{{/crossLink}} directly.
-	 * @property tick
-	 * @deprecated In favour of using Ticker.addEventListener in conjunction with handleEvent.
-	 * @type Function
-	 **/
-	p.tick = p.update;
 
 	/**
 	 * Default event handler that calls the Stage {{#crossLink "Stage/update"}}{{/crossLink}} method when a {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}}
