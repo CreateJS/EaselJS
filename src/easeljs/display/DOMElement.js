@@ -86,9 +86,17 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 // private properties:
 	/**
 	 * @property _oldMtx
+	 * @type Matrix2D
 	 * @protected
 	 */
 	p._oldMtx = null;
+	
+	/**
+	 * @property _visible
+	 * @type Boolean
+	 * @protected
+	 */
+	p._visible = false;
 
 // constructor:
 	/**
@@ -113,7 +121,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
 		style.position = "absolute";
 		style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
-	}
+	};
 
 // public methods:
 	/**
@@ -125,7 +133,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 */
 	p.isVisible = function() {
 		return this.htmlElement != null;
-	}
+	};
 
 	/**
 	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
@@ -138,24 +146,9 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * into itself).
 	 */
 	p.draw = function(ctx, ignoreCache) {
-		if (this.htmlElement == null) { return; }
-		var mtx = this.getConcatenatedMatrix(this._matrix);
-
-		var o = this.htmlElement;
-		var style = o.style;
-
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
-		if (this.visible) { style.visibility = "visible"; }
-		else { return true; }
-
-		var oMtx = this._oldMtx||{};
-		if (oMtx.alpha != mtx.alpha) { style.opacity = ""+mtx.alpha; oMtx.alpha = mtx.alpha; }
-		if (oMtx.tx != mtx.tx || oMtx.ty != mtx.ty || oMtx.a != mtx.a || oMtx.b != mtx.b || oMtx.c != mtx.c || oMtx.d != mtx.d) {
-			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = ["matrix("+mtx.a.toFixed(3),mtx.b.toFixed(3),mtx.c.toFixed(3),mtx.d.toFixed(3),(mtx.tx+0.5|0),(mtx.ty+0.5|0)+")"].join(",");
-			style.MozTransform = ["matrix("+mtx.a.toFixed(3),mtx.b.toFixed(3),mtx.c.toFixed(3),mtx.d.toFixed(3),(mtx.tx+0.5|0)+"px",(mtx.ty+0.5|0)+"px)"].join(",");
-			this._oldMtx = mtx.clone();
-		}
-
+		if (this.visible) { this._visible = true; }
+		// the actual update happens in _handleDrawEnd
 		return true;
 	};
 
@@ -263,9 +256,37 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * @protected
 	 */
 	p._tick = function(params) {
-		// TODO: figure out how to get around this.
-		this.htmlElement.style.visibility = "hidden";
+		var stage = this.getStage();
+		this._visible = false;
+		stage&&stage.on("drawend", this._handleDrawEnd, this, true);
 		this.DisplayObject__tick(params);
+	};
+	
+	/**
+	 * @method _handleDrawEnd
+	 * @param {Event} evt
+	 * @protected
+	 */
+	p._handleDrawEnd = function(evt) {
+		var o = this.htmlElement;
+		if (!o) { return; }
+		var style = o.style;
+		
+		var visibility = this._visible ? "visible" : "hidden";
+		if (visibility != style.visibility) { style.visibility = visibility; }
+		if (!this._visible) { return; }
+		
+		var mtx = this.getConcatenatedMatrix(this._matrix);
+		var oMtx = this._oldMtx;
+		if (!oMtx || oMtx.alpha != mtx.alpha) {
+			style.opacity = ""+mtx.alpha;
+			if (oMtx) { oMtx.alpha = mtx.alpha; }
+		}
+		if (!oMtx || oMtx.tx != mtx.tx || oMtx.ty != mtx.ty || oMtx.a != mtx.a || oMtx.b != mtx.b || oMtx.c != mtx.c || oMtx.d != mtx.d) {
+			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = ["matrix("+mtx.a.toFixed(3),mtx.b.toFixed(3),mtx.c.toFixed(3),mtx.d.toFixed(3),(mtx.tx+0.5|0),(mtx.ty+0.5|0)+")"].join(",");
+			style.MozTransform = ["matrix("+mtx.a.toFixed(3),mtx.b.toFixed(3),mtx.c.toFixed(3),mtx.d.toFixed(3),(mtx.tx+0.5|0)+"px",(mtx.ty+0.5|0)+"px)"].join(",");
+			this._oldMtx = oMtx ? oMtx.copy(mtx) : mtx.clone();
+		}
 	};
 
 createjs.DOMElement = DOMElement;
