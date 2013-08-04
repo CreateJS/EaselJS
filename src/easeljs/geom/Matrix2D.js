@@ -505,6 +505,16 @@ var p = Matrix2D.prototype;
 		this.compositeOperation = compositeOperation;
 		return this;
 	};
+	
+	/**
+	 * Copies all properties from the specified matrix to this matrix.
+	 * @method copy
+	 * @param {Matrix2D} matrix The matrix to copy properties from.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	*/
+	p.copy = function(matrix) {
+		return this.reinitialize(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty, matrix.alpha, matrix.shadow, matrix.compositeOperation);
+	};
 
 	/**
 	 * Appends the specified visual properties to the current matrix.
@@ -542,11 +552,7 @@ var p = Matrix2D.prototype;
 	 * @return {Matrix2D} a clone of the Matrix2D instance.
 	 **/
 	p.clone = function() {
-		var mtx = new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
-		mtx.shadow = this.shadow;
-		mtx.alpha = this.alpha;
-		mtx.compositeOperation = this.compositeOperation;
-		return mtx;
+		return (new Matrix2D()).copy(this);
 	};
 
 	/**
@@ -559,7 +565,7 @@ var p = Matrix2D.prototype;
 	};
 
 	// this has to be populated after the class is defined:
-	Matrix2D.identity = new Matrix2D(1, 0, 0, 1, 0, 0);
+	Matrix2D.identity = new Matrix2D();
 
 createjs.Matrix2D = Matrix2D;
 }());
