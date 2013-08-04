@@ -103,6 +103,16 @@ var p = Rectangle.prototype;
 	
 // public methods:
 	/**
+	 * Copies all properties from the specified rectangle to this rectangle.
+	 * @method copy
+	 * @param {Rectangle} rectangle The rectangle to copy properties from.
+	 * @return {Rectangle} This rectangle. Useful for chaining method calls.
+	*/
+	p.copy = function(rectangle) {
+		return this.initialize(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+	};
+	
+	/**
 	 * Returns a clone of the Rectangle instance.
 	 * @method clone
 	 * @return {Rectangle} a clone of the Rectangle instance.

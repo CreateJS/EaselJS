@@ -84,6 +84,16 @@ var p = Point.prototype;
 	
 // public methods:
 	/**
+	 * Copies all properties from the specified point to this point.
+	 * @method copy
+	 * @param {Point} point The point to copy properties from.
+	 * @return {Point} This point. Useful for chaining method calls.
+	*/
+	p.copy = function(point) {
+		return this.initialize(point.x, point.y);
+	};
+	
+	/**
 	 * Returns a clone of the Point instance.
 	 * @method clone
 	 * @return {Point} a clone of the Point instance.
