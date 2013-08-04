@@ -278,13 +278,15 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 		
 		var mtx = this.getConcatenatedMatrix(this._matrix);
 		var oMtx = this._oldMtx;
+		var n = 10000; // precision
 		if (!oMtx || oMtx.alpha != mtx.alpha) {
-			style.opacity = ""+mtx.alpha;
+			style.opacity = ""+(mtx.alpha*n|0)/n;
 			if (oMtx) { oMtx.alpha = mtx.alpha; }
 		}
 		if (!oMtx || oMtx.tx != mtx.tx || oMtx.ty != mtx.ty || oMtx.a != mtx.a || oMtx.b != mtx.b || oMtx.c != mtx.c || oMtx.d != mtx.d) {
-			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = ["matrix("+mtx.a.toFixed(3),mtx.b.toFixed(3),mtx.c.toFixed(3),mtx.d.toFixed(3),(mtx.tx+0.5|0),(mtx.ty+0.5|0)+")"].join(",");
-			style.MozTransform = ["matrix("+mtx.a.toFixed(3),mtx.b.toFixed(3),mtx.c.toFixed(3),mtx.d.toFixed(3),(mtx.tx+0.5|0)+"px",(mtx.ty+0.5|0)+"px)"].join(",");
+			var str = "matrix(" + (mtx.a*n|0)/n +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n +","+ (mtx.tx+0.5|0);
+			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty+0.5|0) +")";
+			style.MozTransform = str +"px,"+ (mtx.ty+0.5|0) +"px)";
 			this._oldMtx = oMtx ? oMtx.copy(mtx) : mtx.clone();
 		}
 	};
