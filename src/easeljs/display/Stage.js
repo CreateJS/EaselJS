@@ -61,7 +61,7 @@ this.createjs = this.createjs||{};
  **/
 var Stage = function(canvas) {
   this.initialize(canvas);
-}
+};
 var p = Stage.prototype = new createjs.Container();
 
 // static properties:

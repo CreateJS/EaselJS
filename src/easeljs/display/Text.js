@@ -76,6 +76,25 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
 	if (canvas.getContext) { Text._workingContext = canvas.getContext("2d"); canvas.width = canvas.height = 1; }
+	
+// static properties:
+	/**
+	 * Lookup table for the ratio to offset bounds x calculations based on the textAlign property.
+	 * @property H_OFFSETS
+	 * @type Object
+	 * @protected
+	 * @static
+	 **/
+	Text.H_OFFSETS = {start: 0, left: 0, center: -0.5, end: -1, right: -1};
+	
+	/**
+	 * Lookup table for the ratio to offset bounds y calculations based on the textBaseline property.
+	 * @property H_OFFSETS
+	 * @type Object
+	 * @protected
+	 * @static
+	 **/
+	Text.V_OFFSETS = {top: 0, hanging: -0.01, middle: -0.4, alphabetic: -0.8, ideographic: -0.85, bottom: -1};
 
 // public properties:
 	/**
@@ -214,33 +233,29 @@ var p = Text.prototype = new createjs.DisplayObject();
 		var col = this.color || "#000";
 		if (this.outline) { ctx.strokeStyle = col; ctx.lineWidth = this.outline*1; }
 		else { ctx.fillStyle = col; }
-
-		ctx.font = this.font;
-		ctx.textAlign = this.textAlign||"start";
-		ctx.textBaseline = this.textBaseline||"alphabetic";
-
-		this._drawText(ctx);
+		
+		this._drawText(this._prepContext(ctx));
 		return true;
 	};
 
 	/**
-	 * Returns the measured, untransformed width of the text without wrapping.
+	 * Returns the measured, untransformed width of the text without wrapping. Use getBounds for a more robust value.
 	 * @method getMeasuredWidth
 	 * @return {Number} The measured, untransformed width of the text.
 	 **/
 	p.getMeasuredWidth = function() {
-		return this._getWorkingContext().measureText(this.text).width;
+		return this._prepContext(Text._workingContext).measureText(this.text).width;
 	};
 
 	/**
 	 * Returns an approximate line height of the text, ignoring the lineHeight property. This is based on the measured
-	 * width of a "M" character multiplied by 1.2, which approximates em for most fonts.
+	 * width of a "M" character multiplied by 1.2, which provides an approximate line height for most fonts.
 	 * @method getMeasuredLineHeight
 	 * @return {Number} an approximate line height of the text, ignoring the lineHeight property. This is
 	 * based on the measured width of a "M" character multiplied by 1.2, which approximates em for most fonts.
 	 **/
 	p.getMeasuredLineHeight = function() {
-		return this._getWorkingContext().measureText("M").width*1.2;
+		return this._prepContext(Text._workingContext).measureText("M").width*1.2;
 	};
 
 	/**
@@ -252,6 +267,28 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	p.getMeasuredHeight = function() {
 		return this._drawText(null,{}).height;
+	};
+	
+	/**
+	 * @property DisplayObject_getBounds
+	 * @type Function
+	 * @protected
+	 **/
+	p.DisplayObject_getBounds = p.getBounds;
+
+	/**
+	 * Docced in superclass.
+	 */
+	p.getBounds = function() {
+		var rect = this.DisplayObject_getBounds();
+		if (rect) { return rect; }
+		if (this.text == null || this.text == "") { return null; }
+		var o = this._drawText(null, {});
+		var w = (this.maxWidth && this.maxWidth < o.width) ? this.maxWidth : o.width;
+		var x = w * Text.H_OFFSETS[this.textAlign||"left"];
+		var lineHeight = this.lineHeight||this.getMeasuredLineHeight();
+		var y = lineHeight * Text.V_OFFSETS[this.textBaseline||"top"];
+		return new createjs.Rectangle(x, y, w, o.height);
 	};
 
 	/**
@@ -300,13 +337,14 @@ var p = Text.prototype = new createjs.DisplayObject();
 
 	/**
 	 * @method _getWorkingContext
+	 * @param {CanvasRenderingContext2D} ctx
+	 * @return {CanvasRenderingContext2D}
 	 * @protected
 	 **/
-	p._getWorkingContext = function() {
-		var ctx = Text._workingContext;
+	p._prepContext = function(ctx) {
 		ctx.font = this.font;
-		ctx.textAlign = this.textAlign||"start";
-		ctx.textBaseline = this.textBaseline||"alphabetic";
+		ctx.textAlign = this.textAlign||"left";
+		ctx.textBaseline = this.textBaseline||"top";
 		return ctx;
 	};
 
@@ -315,40 +353,48 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @method _drawText
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @param {Object} o
+	 * @return {Object}
 	 * @protected
 	 **/
 	p._drawText = function(ctx, o) {
 		var paint = !!ctx;
-		if (!paint) { ctx = this._getWorkingContext(); }
-		var lines = String(this.text).split(/(?:\r\n|\r|\n)/);
+		if (!paint) { ctx = this._prepContext(Text._workingContext); }
 		var lineHeight = this.lineHeight||this.getMeasuredLineHeight();
-		var count = 0;
-		var maxW = 0;
+		
+		var maxW = 0, count = 0;
+		var lines = String(this.text).split(/(?:\r\n|\r|\n)/);
 		for (var i=0, l=lines.length; i<l; i++) {
-			var w = ctx.measureText(lines[i]).width;
-			if (w > maxW) { maxW = w; }
-			if (this.lineWidth == null || w < this.lineWidth) {
-				if (paint) { this._drawTextLine(ctx, lines[i], count*lineHeight); }
-				count++;
-				continue;
-			}
-
-			// split up the line
-			var words = lines[i].split(/(\s)/);
-			var str = words[0];
-			for (var j=1, jl=words.length; j<jl; j+=2) {
-				// Line needs to wrap:
-				if (ctx.measureText(str + words[j] + words[j+1]).width > this.lineWidth) {
-					if (paint) { this._drawTextLine(ctx, str, count*lineHeight); }
-					count++;
-					str = words[j+1];
-				} else {
-					str += words[j] + words[j+1];
+			var str = lines[i];
+			var w = null;
+			
+			if (this.lineWidth != null && (w = ctx.measureText(str).width) > this.lineWidth) {
+				// text wrapping:
+				var words = str.split(/(\s)/);
+				str = words[0];
+				w = ctx.measureText(str).width;
+				
+				for (var j=1, jl=words.length; j<jl; j+=2) {
+					// Line needs to wrap:
+					var wordW = ctx.measureText(words[j] + words[j+1]).width;
+					if (w + wordW > this.lineWidth) {
+						if (paint) { this._drawTextLine(ctx, str, count*lineHeight); }
+						if (w > maxW) { maxW = w; }
+						str = words[j+1];
+						w = ctx.measureText(str).width;
+						count++;
+					} else {
+						str += words[j] + words[j+1];
+						w += wordW;
+					}
 				}
 			}
-			if (paint) { this._drawTextLine(ctx, str, count*lineHeight); } // Draw remaining text
+			
+			if (paint) { this._drawTextLine(ctx, str, count*lineHeight); }
+			if (o && w == null) { w = ctx.measureText(str).width; }
+			if (w > maxW) { maxW = w; }
 			count++;
 		}
+		
 		if (o) {
 			o.count = count;
 			o.width = maxW;

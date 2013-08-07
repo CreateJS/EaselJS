@@ -50,7 +50,6 @@ All changes:
 - added .on and .off methods to EventDispatcher
 - fixed an issue with extending EventDispatcher
 - DisplayObject, SpriteSheet, and SpriteSheetBuilder now inherit from EventDispatcher
-- added Stage mouseleave and mouseenter events
 - fixed an issue with the tick event's time value being epoch time instead of Timer time
 - added Ticker.getEventTime()
 - the initialize methods for Point, Rectangle, and Matrix2D are now public
@@ -61,7 +60,9 @@ All changes:
 - added support for .next on single frame spritesheet animations
 - added the BitmapText class
 - improved DOMElement redraw handling to avoid flicker and layout costs
+- added Stage mouseleave and mouseenter events
 - added tickstart, tickend, drawstart, and drawend events to Stage
+- added getBounds() functionality for all display objects
 
 
 Version 0.6.1 [May 14, 2013]

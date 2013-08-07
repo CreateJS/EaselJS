@@ -1005,7 +1005,38 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * {{#crossLink "DisplayObject/setBounds"}}{{/crossLink}} so that they are included when calculating Container
 	 * bounds.
 	 * 
-	 * Container instances calculate aggregate bounds for all children that return bounds via getBounds.
+	 * <table>
+	 * 	<tr><td><b>All</b></td><td>
+	 * 		All display objects support setting bounds manually using setBounds(). Likewise, display objects that
+	 * 		have been cached using cache() will return the bounds of their cache. Manual and cache bounds will override
+	 * 		the automatic calculations listed below.
+	 * 	</td></tr>
+	 * 	<tr><td><b>Bitmap</b></td><td>
+	 * 		Returns the width and height of the sourceRect (if specified) or image, extending from (x=0,y=0).
+	 * 	</td></tr>
+	 * 	<tr><td><b>Sprite</b></td><td>
+	 * 		Returns the bounds of the current frame. May have non-zero x/y if a frame registration point was specified
+	 * 		in the spritesheet data. See also {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}}
+	 * 	</td></tr>
+	 * 	<tr><td><b>Container</b></td><td>
+	 * 		Returns the aggregate (combined) bounds of all children that return a non-null value from getBounds().
+	 * 	</td></tr>
+	 * 	<tr><td><b>Shape</b></td><td>
+	 * 		Does not currently support automatic bounds calculations. Use setBounds() to manually define bounds.
+	 * 	</td></tr>
+	 * 	<tr><td><b>Text</b></td><td>
+	 * 		Returns approximate bounds. Horizontal values (x/width) are quite accurate, but vertical values (y/height) are
+	 * 		not, especially when using textBaseline values other than "top".
+	 * 	</td></tr>
+	 * 	<tr><td><b>BitmapText</b></td><td>
+	 * 		Returns approximate bounds. Values will be more accurate if spritesheet frame registration points are close
+	 * 		to (x=0,y=0).
+	 * 	</td></tr>
+	* </table>
+	 * 
+	 * Note that bounds can be expensive to calculate for some objects (ex. text, or containers with many children), and
+	 * are recalculated each time you call getBounds().
+	 * 
 	 * @method getBounds
 	 * @return {Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this object.
 	 **/
