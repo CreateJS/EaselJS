@@ -321,6 +321,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		this._updateTimeline();
 		this.Container_draw(ctx, ignoreCache);
+		return true;
 	};
 	
 	
@@ -396,6 +397,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	p._tick = function(params) {
 		if (!this.paused && this.mode == MovieClip.INDEPENDENT) {
 			this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
+			this._updateTimeline();
 		}
 		this.Container__tick(params);
 	};
@@ -429,15 +431,11 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p._updateTimeline = function() {
 		var tl = this.timeline;
-		var tweens = tl._tweens;
-		var kids = this.children;
-
 		var synched = this.mode != MovieClip.INDEPENDENT;
-		tl.loop = this.loop==null?true:this.loop;
+		tl.loop = (this.loop==null) ? true : this.loop;
 
 		// update timeline position, ignoring actions if this is a graphic.
 		if (synched) {
-			// TODO: this would be far more ideal if the _synchOffset was somehow provided by the parent, so that reparenting wouldn't cause problems and we can direct draw. Ditto for _off (though less important).
 			tl.setPosition(this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset), createjs.Tween.NONE);
 		} else {
 			tl.setPosition(this._prevPos < 0 ? 0 : this._prevPosition, this.actionsEnabled ? null : createjs.Tween.NONE);
@@ -449,6 +447,7 @@ var p = MovieClip.prototype = new createjs.Container();
 
 		for (var n in this._managed) { this._managed[n] = 1; }
 
+		var tweens = tl._tweens;
 		for (var i=tweens.length-1;i>=0;i--) {
 			var tween = tweens[i];
 			var target = tween._target;
@@ -464,6 +463,7 @@ var p = MovieClip.prototype = new createjs.Container();
 			}
 		}
 
+		var kids = this.children;
 		for (i=kids.length-1; i>=0; i--) {
 			var id = kids[i].id;
 			if (this._managed[id] == 1) {
@@ -527,7 +527,10 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p._getBounds = function(matrix, ignoreTransform) {
 		var bounds = this.DisplayObject_getBounds();
-		if (!bounds && this.frameBounds) { bounds = this.frameBounds[this.currentFrame]; }
+		if (!bounds) {
+			this._updateTimeline();
+			if (this.frameBounds) { bounds = this.frameBounds[this.currentFrame].clone(); }
+		}
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
 		return this.Container__getBounds(matrix, ignoreTransform);
 	};
