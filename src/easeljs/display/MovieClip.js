@@ -193,6 +193,16 @@ var p = MovieClip.prototype = new createjs.Container();
 	p.paused = false;
 
 	/**
+	 * Returns the name of the currently playing animation.
+	 * @property currentAnimation
+	 * @type {String}
+	 * @final
+	 * @readonly
+	 **/
+	p.currentAnimation = null;
+
+
+	/**
 	 * If true, actions in this MovieClip's tweens will be run when the playhead advances.
 	 * @property actionsEnabled
 	 * @type Boolean
@@ -413,6 +423,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		// prevent _updateTimeline from overwriting the new position because of a reset:
 		if (this._prevPos == -1) { this._prevPos = NaN; }
 		this._prevPosition = pos;
+		this.currentAnimation = positionOrLabel;
 		this._updateTimeline();
 	};
 	
