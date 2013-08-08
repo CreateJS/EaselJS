@@ -19,7 +19,7 @@ DEPRECATED (will be removed in a future version):
 - SpriteSheetUtils.mergeAlpha()
 
 *****
-All changes:
+Other changes:
 - implemented createjs Utils
 - implemented "use strict" mode
 - BitmapAnimation renamed to Sprite

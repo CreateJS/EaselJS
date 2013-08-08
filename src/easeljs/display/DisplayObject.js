@@ -779,10 +779,11 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	};
 	
 	/**
-	* Returns a data URL for the cache, or null if this display object is not cached.
-	* Uses cacheID to ensure a new data URL is not generated if the cache has not changed.
-	* @method getCacheDataURL.
-	**/
+	 * Returns a data URL for the cache, or null if this display object is not cached.
+	 * Uses cacheID to ensure a new data URL is not generated if the cache has not changed.
+	 * @method getCacheDataURL
+	 * @return {String} The image data url for the cache.
+	 **/
 	p.getCacheDataURL = function() {
 		if (!this.cacheCanvas) { return null; }
 		if (this.cacheID != this._cacheDataURLID) { this._cacheDataURL = this.cacheCanvas.toDataURL(); }
@@ -1034,11 +1035,17 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * 	</td></tr>
 	* </table>
 	 * 
-	 * Note that bounds can be expensive to calculate for some objects (ex. text, or containers with many children), and
+	 * Bounds can be expensive to calculate for some objects (ex. text, or containers with many children), and
 	 * are recalculated each time you call getBounds().
 	 * 
+	 * To reduce memory impact, the returned Rectangle instance may be reused internally; clone the instance if you
+	  * need to retain it.
+	 * 
+	 * 	var myBounds = obj.getBounds().clone();
+	 * 
 	 * @method getBounds
-	 * @return {Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this object.
+	 * @return {Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this
+	 * object.
 	 **/
 	p.getBounds = function() {
 		if (this._bounds) { return this._bounds; }
