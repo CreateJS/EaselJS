@@ -80,7 +80,7 @@ Renders a single line of text to the stage.
 An experimental display object that allows you to manage an HTML element as a part of the display list.
 
 **Filter**
-The base filter class that other filters (ex. BoxBlurFilter, ColorMatrixFilter, etc) extend.
+The base filter class that other filters (ex. BlurFilter, ColorMatrixFilter, etc) extend.
 
 
 There are also a few helper classes included:
