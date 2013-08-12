@@ -18,7 +18,7 @@
 	<script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
 	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
 	<script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
-	<script type="text/javascript" src="../src/easeljs/filters/BoxBlurFilter.js"></script>
+	<script type="text/javascript" src="../src/easeljs/filters/BlurFilter.js"></script>
 	<script type="text/javascript" src="../src/easeljs/filters/ColorFilter.js"></script>
 	<script type="text/javascript" src="../src/easeljs/filters/ColorMatrixFilter.js"></script>
 
@@ -48,7 +48,7 @@
 		stage.addChild(bmp);
 
 
-		var blurFilter = new createjs.BoxBlurFilter(32, 2, 2);
+		var blurFilter = new createjs.BlurFilter(32, 2, 2);
 		var margins = blurFilter.getBounds();
 		bmp = bmp.clone();
 		bmp.filters = [blurFilter];
@@ -89,7 +89,7 @@
 <body onload="init();">
 	<header id="header" class="EaselJS">
 	    <h1><span class="text-product">Easel<strong>JS</strong></span> Filters</h1>
-	    <p>Demonstrates using filters. Top-left: original. Top-right: <strong>BoxBlurFilter</strong>. Bottom-left: <strong>ColorFilter</strong>. Bottom-right: <strong>ColorMatrixFilter</strong>.</p>
+	    <p>Demonstrates using filters. Top-left: original. Top-right: <strong>BlurFilter</strong>. Bottom-left: <strong>ColorFilter</strong>. Bottom-right: <strong>ColorMatrixFilter</strong>.</p>
 	</header>
 
 	<div class="canvasHolder">

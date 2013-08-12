@@ -17,7 +17,7 @@
 	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
 	<script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
-	<script type="text/javascript" src="../src/easeljs/filters/BoxBlurFilter.js"></script>
+	<script type="text/javascript" src="../src/easeljs/filters/BlurFilter.js"></script>
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
@@ -57,7 +57,7 @@
 
             var value = Math.sin(angle)*range;
             bmp.updateCache();
-            bmp.filters = [new createjs.BoxBlurFilter(value,  value, 2)];
+            bmp.filters = [new createjs.BlurFilter(value,  value, 2)];
             stage.update(event);
         }
 

@@ -21,7 +21,7 @@
 	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
 	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
 	<script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
-	<script type="text/javascript" src="../src/easeljs/filters/BoxBlurFilter.js"></script>
+	<script type="text/javascript" src="../src/easeljs/filters/BlurFilter.js"></script>
 	<script type="text/javascript" src="../src/easeljs/filters/ColorMatrixFilter.js"></script>
 	<script type="text/javascript" src="../src/easeljs/filters/ColorMatrix.js"></script>
 
@@ -64,7 +64,7 @@
 
 		var bg = new createjs.Bitmap(img);
 		// blur and desaturate the background image:
-		bg.filters = [new createjs.BoxBlurFilter(2,2,2), new createjs.ColorMatrixFilter(new createjs.ColorMatrix(0,0,-100,0))];
+		bg.filters = [new createjs.BlurFilter(2,2,2), new createjs.ColorMatrixFilter(new createjs.ColorMatrix(0,0,-100,0))];
 		bg.cache(0,0,img.width,img.height);
 		stage.addChild(bg);
 		

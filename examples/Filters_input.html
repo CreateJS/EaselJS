@@ -20,7 +20,7 @@
     <script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
    	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
    	<script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
-   	<script type="text/javascript" src="../src/easeljs/filters/BoxBlurFilter.js"></script>
+   	<script type="text/javascript" src="../src/easeljs/filters/BlurFilter.js"></script>
    	<script type="text/javascript" src="../src/easeljs/filters/ColorFilter.js"></script>
     <script type="text/javascript" src="../src/easeljs/filters/ColorMatrix.js"></script>
    	<script type="text/javascript" src="../src/easeljs/filters/ColorMatrixFilter.js"></script>
@@ -179,7 +179,7 @@
             cm.adjustColor(brightnessValue, contrastValue, saturationValue, hueValue);
 
             colorFilter = new createjs.ColorMatrixFilter(cm);
-            blurFilter = new createjs.BoxBlurFilter(blurXValue,  blurYValue, 2);
+            blurFilter = new createjs.BlurFilter(blurXValue,  blurYValue, 2);
             redChannelFilter = new createjs.ColorFilter(redChannelvalue/255,1,1,1);
             greenChannelFilter = new createjs.ColorFilter(1,greenChannelValue/255,1,1);
             blueChannelFilter = new createjs.ColorFilter(1,1,blueChannelValue/255,1);

@@ -1,5 +1,5 @@
 /*
-* BoxBlurFilter
+* BlurFilter
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
@@ -47,24 +47,24 @@ this.createjs = this.createjs||{};
  *      var shape = new createjs.Shape().set({x:100,y:100});
  *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
  *
- *      var blurFilter = new createjs.BoxBlurFilter(5, 5, 1);
+ *      var blurFilter = new createjs.BlurFilter(5, 5, 1);
  *      shape.filters = [blurFilter];
  *      var bounds = blurFilter.getBounds();
  *
  *      shape.cache(-50+bounds.x, -50+bounds.y, 100+bounds.width, 100+bounds.height);
  *
  * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
- * @class BoxBlurFilter
+ * @class BlurFilter
  * @extends Filter
  * @constructor
  * @param {Number} [blurX=0] The horizontal blur radius in pixels.
  * @param {Number} [blurY=0] The vertical blur radius in pixels.
  * @param {Number} [quality=1] The number of blur iterations.
  **/
-var BoxBlurFilter = function( blurX, blurY, quality ) {
+var BlurFilter = function( blurX, blurY, quality ) {
   this.initialize( blurX, blurY, quality );
-}
-var p = BoxBlurFilter.prototype = new createjs.Filter();
+};
+var p = BlurFilter.prototype = new createjs.Filter();
 
 // constructor:
 	/** @ignore */
@@ -116,7 +116,7 @@ var p = BoxBlurFilter.prototype = new createjs.Filter();
 	p.getBounds = function() {
 		// TODO: this doesn't properly account for blur quality.
 		return new createjs.Rectangle(-this.blurX,-this.blurY,2*this.blurX,2*this.blurY);
-	}
+	};
 
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
 		targetCtx = targetCtx || ctx;
@@ -248,20 +248,20 @@ var p = BoxBlurFilter.prototype = new createjs.Filter();
 
 		targetCtx.putImageData(imageData, targetX, targetY);
 		return true;
-	}
+	};
 
 	/**
 	 * Returns a clone of this object.
-	 * @return {BoxBlurFilter}
+	 * @return {BlurFilter}
 	 **/
 	p.clone = function() {
-		return new BoxBlurFilter(this.blurX, this.blurY, this.quality);
-	}
+		return new BlurFilter(this.blurX, this.blurY, this.quality);
+	};
 
 	p.toString = function() {
-		return "[BoxBlurFilter]";
-	}
+		return "[BlurFilter]";
+	};
 
-	createjs.BoxBlurFilter = BoxBlurFilter;
+	createjs.BlurFilter = BlurFilter;
 
 }());

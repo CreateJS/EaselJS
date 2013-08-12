@@ -32,9 +32,8 @@
 	<script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
 	<script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
 	<script type="text/javascript" src="../src/easeljs/ui/Touch.js"></script>
-
+	<script type="text/javascript" src="../src/easeljs/filters/BlurFilter.js"></script>
 	<script type="text/javascript" src="../src/easeljs/filters/AlphaMaskFilter.js"></script>
-	<script type="text/javascript" src="../src/easeljs/filters/BoxBlurFilter.js"></script>
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
@@ -83,7 +82,7 @@
 			bitmap = new createjs.Bitmap(image);
 
 			blur = new createjs.Bitmap(image);
-			blur.filters = [new createjs.BoxBlurFilter(15, 15, 2)];
+			blur.filters = [new createjs.BlurFilter(15, 15, 2)];
 			blur.cache(0, 0, 960, 400);
 			blur.alpha = 0.9;
 
@@ -165,7 +164,7 @@
 	<p>This example demonstrates revealing an image using another image as the mask. The mask is created by drawing a
 		shape, and then caching the shape to make an image with an alpha channel. It is then applied to the image as
 		an mask using the <strong>AlphaMaskFilter</strong> filter. Another copy of the image is added below with a
-		<strong>BoxBlurFilter</strong> to make the effect cooler.</p>
+		<strong>BlurFilter</strong> to make the effect cooler.</p>
 </header>
 
 <canvas id="testCanvas" width="960" height="400"></canvas>
