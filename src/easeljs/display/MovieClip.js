@@ -361,6 +361,27 @@ var p = MovieClip.prototype = new createjs.Container();
 		this._goto(positionOrLabel);
 	};
 	
+	
+	/**
+	 * Returns a sorted list of the labels defined on this MovieClip. Shortcut to TweenJS: Timeline.getLabels();
+	 * @method getLabels
+	 * @return {Array[Object]} A sorted array of objects with label and position (aka frame) properties.
+	 **/
+	p.getLabels = function() {
+		return this.timeline.getLabels();
+	};
+	
+	/**
+	 * Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
+	 * for more information.
+	 * @method getCurrentLabel
+	 * @return {String} The name of the current label or null if there is no label.
+	 **/
+	p.getCurrentLabel = function() {
+		this._updateTimeline();
+		return this.timeline.getCurrentLabel();
+	};
+	
 	/**
 	 * MovieClip instances cannot be cloned.
 	 * @method clone
