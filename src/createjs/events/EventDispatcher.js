@@ -86,7 +86,7 @@ this.createjs = this.createjs||{};
  * @constructor
  **/
 var EventDispatcher = function() {
-  this.initialize();
+/*	this.initialize(); */ // not needed.
 };
 var p = EventDispatcher.prototype;
 
