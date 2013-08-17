@@ -455,11 +455,12 @@ var Ticker = function() {
 	 * @protected
 	 **/
 	Ticker._handleSynch = function() {
+		var time = Ticker._getTime() - Ticker._startTime;
 		Ticker._rafActive = false;
 		Ticker._setupTick();
 
-		// run if enough time has elapsed, with a little bit of flexibility to be early, because RAF seems to run a little faster than 60hz:
-		if (Ticker._getTime() - Ticker._lastTime >= (Ticker._interval-1)*0.97) {
+		// run if enough time has elapsed, with a little bit of flexibility to be early:
+		if (time - Ticker._lastTime >= (Ticker._interval-1)*0.97) {
 			Ticker._tick();
 		}
 	};
@@ -513,12 +514,10 @@ var Ticker = function() {
 	 **/
 	Ticker._tick = function() {
 		var time = Ticker._getTime()-Ticker._startTime;
-		Ticker._ticks++;
-
 		var elapsedTime = time-Ticker._lastTime;
-
 		var paused = Ticker._paused;
-
+		
+		Ticker._ticks++;
 		if (paused) {
 			Ticker._pausedTicks++;
 			Ticker._pausedTime += elapsedTime;
