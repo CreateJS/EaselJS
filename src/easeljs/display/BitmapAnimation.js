@@ -36,7 +36,6 @@ this.createjs = this.createjs||{};
  *
  * @class BitmapAnimation
  * @extends DisplayObject
- * @uses EventDispatcher
  * @constructor
  * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
  * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
