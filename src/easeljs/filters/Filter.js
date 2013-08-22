@@ -67,7 +67,7 @@ this.createjs = this.createjs||{};
  **/
 var Filter = function() {
   this.initialize();
-}
+};
 var p = Filter.prototype;
 
 // constructor:
@@ -80,15 +80,15 @@ var p = Filter.prototype;
 
 // public methods:
 	/**
-	 * Returns a rectangle with values indicating the margins required to draw the filter.
+	 * Returns a rectangle with values indicating the margins required to draw the filter or null.
 	 * For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
 	 * (but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0).
 	 * @method getBounds
-	 * @return {Rectangle} a rectangle object indicating the margins required to draw the filter.
+	 * @return {Rectangle} a rectangle object indicating the margins required to draw the filter or null if the filter does not effect bounds.
 	 **/
 	p.getBounds = function() {
-		return new createjs.Rectangle(0,0,0,0);
-	}
+		return null;
+	};
 
 	/**
 	 * Applies the filter to the specified context.
@@ -112,7 +112,7 @@ var p = Filter.prototype;
 	 **/
 	p.toString = function() {
 		return "[Filter]";
-	}
+	};
 
 	/**
 	 * Returns a clone of this Filter instance.
@@ -121,7 +121,7 @@ var p = Filter.prototype;
 	 **/
 	p.clone = function() {
 		return new Filter();
-	}
+	};
 
 createjs.Filter = Filter;
 }());
