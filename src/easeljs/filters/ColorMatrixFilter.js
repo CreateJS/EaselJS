@@ -63,7 +63,7 @@ this.createjs = this.createjs||{};
  **/
 var ColorMatrixFilter = function(matrix) {
   this.initialize(matrix);
-}
+};
 var p = ColorMatrixFilter.prototype = new createjs.Filter();
 
 // public properties:
@@ -78,7 +78,7 @@ var p = ColorMatrixFilter.prototype = new createjs.Filter();
 	 **/
 	p.initialize = function(matrix) {
 		this.matrix = matrix;
-	}
+	};
 
 // public methods:
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
@@ -112,11 +112,11 @@ var p = ColorMatrixFilter.prototype = new createjs.Filter();
 		}
 		targetCtx.putImageData(imageData, targetX, targetY);
 		return true;
-	}
+	};
 
 	p.toString = function() {
 		return "[ColorMatrixFilter]";
-	}
+	};
 
 	/**
 	 * Returns a clone of this ColorMatrixFilter instance.
@@ -125,7 +125,7 @@ var p = ColorMatrixFilter.prototype = new createjs.Filter();
 	 **/
 	p.clone = function() {
 		return new ColorMatrixFilter(this.matrix);
-	}
+	};
 
 	createjs.ColorMatrixFilter = ColorMatrixFilter;
 

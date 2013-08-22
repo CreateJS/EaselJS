@@ -75,7 +75,7 @@ var p = BlurFilter.prototype = new createjs.Filter();
 		this.blurY = blurY | 0;
 		if ( isNaN(quality) || quality < 1  ) quality = 1;
 		this.quality = quality | 0;
-	}
+	};
 
 // public properties:
 
@@ -105,17 +105,11 @@ var p = BlurFilter.prototype = new createjs.Filter();
 	p.quality = 1;
 
 // public methods:
-	/**
-	 * Returns a rectangle with values indicating the margins required to draw the filter.
-	 * For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
-	 * (but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0). Note that currently
-	 * blur qualities above 1 may not be properly accounted for.
-	 * @method getBounds
-	 * @return {Rectangle} a rectangle object indicating the margins required to draw the filter.
-	 **/
+	/** docced in super class **/
 	p.getBounds = function() {
-		// TODO: this doesn't properly account for blur quality.
-		return new createjs.Rectangle(-this.blurX,-this.blurY,2*this.blurX,2*this.blurY);
+		// TODO: not sure this properly accounts for blur quality.
+		var q = Math.pow(this.quality, 0.75);
+		return new createjs.Rectangle(-this.blurX*q,-this.blurY*q,2*this.blurX*q,2*this.blurY*q);
 	};
 
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
