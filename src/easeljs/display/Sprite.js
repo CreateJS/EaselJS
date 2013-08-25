@@ -348,7 +348,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	 **/
 	p.getBounds = function() {
 		// TODO: should this normalizeFrame?
-		return this.DisplayObject_getBounds() || this.spriteSheet.getFrameBounds(this.currentFrame);
+		return this.DisplayObject_getBounds() || this.spriteSheet.getFrameBounds(this.currentFrame, this._rectangle);
 	};
 
 	/**

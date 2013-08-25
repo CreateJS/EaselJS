@@ -613,8 +613,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			if (y2 > maxY || maxY == null) { maxY = y2; }
 		}
 		
-		// TODO: avoid instantiation:
-		return (maxX == null) ? null : new createjs.Rectangle(minX, minY, maxX-minX, maxY-minY);
+		return (maxX == null) ? null : this._rectangle.initialize(minX, minY, maxX-minX, maxY-minY);
 	};
 
 createjs.Container = Container;
