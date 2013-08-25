@@ -48,13 +48,12 @@
 		stage.addChild(bmp);
 
 
-		var blurFilter = new createjs.BlurFilter(32, 2, 2);
-		var margins = blurFilter.getBounds();
+		var blurFilter = new createjs.BlurFilter(32, 16, 2);
 		bmp = bmp.clone();
 		bmp.filters = [blurFilter];
 		// filters are only displayed when the display object is cached
 		// later, you can call updateCache() to update changes to your filters
-		bmp.cache(margins.x,margins.y,img.width+margins.width,img.height+margins.height);
+		bmp.cache(0,0,img.width,img.height);
 		bmp.x += bmp.x+img.width;
 		stage.addChild(bmp);
 
