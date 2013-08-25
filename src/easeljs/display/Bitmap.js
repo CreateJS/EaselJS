@@ -207,7 +207,7 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 		if (rect) { return rect; }
 		var o = this.sourceRect || this.image;
 		var hasContent = (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
-		return hasContent ? new createjs.Rectangle(0, 0, o.width, o.height) : null;
+		return hasContent ? this._rectangle.initialize(0, 0, o.width, o.height) : null;
 	};
 	
 	/**

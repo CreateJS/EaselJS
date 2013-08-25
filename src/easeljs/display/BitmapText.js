@@ -176,8 +176,7 @@ var p = BitmapText.prototype = new createjs.DisplayObject();
 	 * Docced in superclass.
 	 */
 	p.getBounds = function() {
-		// TODO: avoid instantiation:
-		var bounds = new createjs.Rectangle();
+		var bounds = this._rectangle;
 		this._drawText(null, bounds);
 		return bounds.width ? bounds : null;
 	};

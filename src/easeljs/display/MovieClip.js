@@ -550,7 +550,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		var bounds = this.DisplayObject_getBounds();
 		if (!bounds) {
 			this._updateTimeline();
-			if (this.frameBounds) { bounds = this.frameBounds[this.currentFrame].clone(); }
+			if (this.frameBounds) { bounds = this._rectangle.copy(this.frameBounds[this.currentFrame]); }
 		}
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
 		return this.Container__getBounds(matrix, ignoreTransform);

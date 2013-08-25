@@ -614,6 +614,14 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p._matrix = null;
 
 	/**
+	 * @property _rectangle
+	 * @protected
+	 * @type {Rectangle}
+	 * @default null
+	 **/
+	p._rectangle = null;
+
+	/**
 	 * @property _bounds
 	 * @protected
 	 * @type {Rectangle}
@@ -633,6 +641,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p.initialize = function() {
 		this.id = createjs.UID.get();
 		this._matrix = new createjs.Matrix2D();
+		this._rectangle = new createjs.Rectangle();
 	};
 
 // public methods:
@@ -1029,7 +1038,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * Returns a rectangle representing this object's bounds in its local coordinate system (ie. with no transformation).
 	 * Objects that have been cached will return the bounds of the cache.
 	 * 
-	 * Not all display objects can calculate their own bounds (ex. Shape & Text). For these objects, you can use 
+	 * Not all display objects can calculate their own bounds (ex. Shape). For these objects, you can use 
 	 * {{#crossLink "DisplayObject/setBounds"}}{{/crossLink}} so that they are included when calculating Container
 	 * bounds.
 	 * 
@@ -1063,23 +1072,30 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	* </table>
 	 * 
 	 * Bounds can be expensive to calculate for some objects (ex. text, or containers with many children), and
-	 * are recalculated each time you call getBounds().
+	 * are recalculated each time you call getBounds(). You can prevent recalculation on static objects by setting the
+	 * bounds explicitly:
 	 * 
-	 * To reduce memory impact, the returned Rectangle instance may be reused internally; clone the instance if you
-	  * need to retain it.
+	 * 	var bounds = obj.getBounds();
+	 * 	obj.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+	 * 	// getBounds will now use the set values, instead of recalculating
+	 * 
+	 * To reduce memory impact, the returned Rectangle instance may be reused internally; clone the instance or copy its
+	 * values if you need to retain it.
 	 * 
 	 * 	var myBounds = obj.getBounds().clone();
+	 * 	// OR:
+	 * 	myRect.copy(obj.getBounds());
 	 * 
 	 * @method getBounds
 	 * @return {Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this
 	 * object.
 	 **/
 	p.getBounds = function() {
-		if (this._bounds) { return this._bounds; }
+		if (this._bounds) { return this._rectangle.copy(this._bounds); }
 		var cacheCanvas = this.cacheCanvas;
 		if (cacheCanvas) {
 			var scale = this._cacheScale;
-			return new createjs.Rectangle(this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
+			return this._rectangle.initialize(this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
 		}
 		return null;
 	};
@@ -1088,9 +1104,12 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * Returns a rectangle representing this object's bounds in its parent's coordinate system (ie. with transformations applied).
 	 * Objects that have been cached will return the transformed bounds of the cache.
 	 * 
-	 * Not all display objects can calculate their own bounds (ex. Shape & Text). For these objects, you can use 
+	 * Not all display objects can calculate their own bounds (ex. Shape). For these objects, you can use 
 	 * {{#crossLink "DisplayObject/setBounds"}}{{/crossLink}} so that they are included when calculating Container
 	 * bounds.
+	 * 
+	 * To reduce memory impact, the returned Rectangle instance may be reused internally; clone the instance or copy its
+	 * values if you need to retain it.
 	 * 
 	 * Container instances calculate aggregate bounds for all children that return bounds via getBounds.
 	 * @method getTransformedBounds
@@ -1115,7 +1134,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 **/
 	p.setBounds = function(x, y, width, height) {
 		if (x == null) { this._bounds = x; }
-		this._bounds = new createjs.Rectangle(x, y, width, height);
+		this._bounds = (this._bounds || new createjs.Rectangle()).initialize(x, y, width, height);
 	};
 
 	/**
@@ -1248,7 +1267,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 			var f = this.filters[i];
 			var fBounds = f.getBounds&&f.getBounds();
 			if (!fBounds) { continue; }
-			if (!bounds) { bounds = new createjs.Rectangle(x,y,width,height); }
+			if (!bounds) { bounds = this._rectangle.initialize(x,y,width,height); }
 			bounds.x += fBounds.x;
 			bounds.y += fBounds.y;
 			bounds.width += fBounds.width;
@@ -1298,7 +1317,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		if ((y = x_b + y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 		if ((y = y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 		
-		return new createjs.Rectangle(minX, minY, maxX-minX, maxY-minY);
+		return bounds.initialize(minX, minY, maxX-minX, maxY-minY);
 	};
 
 createjs.DisplayObject = DisplayObject;

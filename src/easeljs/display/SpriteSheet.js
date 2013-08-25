@@ -392,11 +392,12 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 	 *
 	 * @method getFrameBounds
 	 * @param {Number} frameIndex The index of the frame.
+	 * @param {Rectangle} [rectangle] A Rectangle instance to copy the values into. By default a new instance is created.
 	 * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.
 	 **/
-	p.getFrameBounds = function(frameIndex) {
+	p.getFrameBounds = function(frameIndex, rectangle) {
 		var frame = this.getFrame(frameIndex);
-		return frame ? new createjs.Rectangle(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null;
+		return frame ? (rectangle||new createjs.Rectangle()).initialize(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null;
 	};
 
 	/**
