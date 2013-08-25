@@ -661,8 +661,12 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p.draw = function(ctx, ignoreCache) {
 		var cacheCanvas = this.cacheCanvas;
 		if (ignoreCache || !cacheCanvas) { return false; }
-		var scale = this._cacheScale;
-		ctx.drawImage(cacheCanvas, this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
+		var scale = this._cacheScale, offX = this._cacheOffsetX, offY = this._cacheOffsetY, fBounds;
+		if (fBounds = this._applyFilterBounds(offX, offY, 0, 0)) {
+			offX = fBounds.x;
+			offY = fBounds.y;
+		}
+		ctx.drawImage(cacheCanvas, offX, offY, cacheCanvas.width/scale, cacheCanvas.height/scale);
 		return true;
 	};
 	
@@ -712,7 +716,10 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 *      myShape.cache(-25, -25, 50, 50);
 	 *
 	 * Note that filters need to be defined <em>before</em> the cache is applied. Check out the {{#crossLink "Filter"}}{{/crossLink}}
-	 * class for more information.
+	 * class for more information. Some filters (ex. BlurFilter) will not work as expected in conjunction with the scale param.
+	 * 
+	 * Usually, the resulting cacheCanvas will have the dimensions width*scale by height*scale, however some filters (ex. BlurFilter)
+	 * will add padding to the canvas dimensions.
 	 *
 	 * @method cache
 	 * @param {Number} x The x coordinate origin for the cache region.
@@ -727,8 +734,8 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		// draw to canvas.
 		scale = scale||1;
 		if (!this.cacheCanvas) { this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
-		this.cacheCanvas.width = Math.ceil(width*scale);
-		this.cacheCanvas.height = Math.ceil(height*scale);
+		this._cacheWidth = width;
+		this._cacheHeight = height;
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
 		this._cacheScale = scale;
@@ -756,13 +763,33 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 **/
 	p.updateCache = function(compositeOperation) {
 		var cacheCanvas = this.cacheCanvas, scale = this._cacheScale, offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
+		var w = this._cacheWidth, h = this._cacheHeight, fBounds;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
 		var ctx = cacheCanvas.getContext("2d");
+		
+		// update bounds based on filters:
+		if (fBounds = this._applyFilterBounds(offX, offY, w, h)) {
+			offX = fBounds.x;
+			offY = fBounds.y;
+			w = fBounds.width;
+			h = fBounds.height;
+		}
+		
+		w = Math.ceil(w*scale);
+		h = Math.ceil(h*scale);
+		if (w != cacheCanvas.width || h != cacheCanvas.height) {
+			// TODO: it would be nice to preserve the content if there is a compositeOperation.
+			cacheCanvas.width = w;
+			cacheCanvas.height = h;
+		} else if (!compositeOperation) {
+			ctx.clearRect(0, 0, w+1, h+1);
+		}
+		
 		ctx.save();
-		if (!compositeOperation) { ctx.clearRect(0, 0, cacheCanvas.width+1, cacheCanvas.height+1); }
 		ctx.globalCompositeOperation = compositeOperation;
 		ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
 		this.draw(ctx, true);
+		// TODO: filters and cache scale don't play well together at present.
 		this._applyFilters();
 		ctx.restore();
 		this.cacheID = DisplayObject._nextCacheID++;
@@ -1202,6 +1229,32 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		for (var i=0; i<l; i++) {
 			this.filters[i].applyFilter(ctx, 0, 0, w, h);
 		}
+	};
+	
+	/**
+	 * @method _applyFilterBounds
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} width
+	 * @param {Number} height
+	 * @return {Rectangle}
+	 * @protected
+	 **/
+	p._applyFilterBounds = function(x, y, width, height) {
+		var bounds, l, filters = this.filters;
+		if (!filters || !(l=filters.length)) { return; }
+		
+		for (var i=0; i<l; i++) {
+			var f = this.filters[i];
+			var fBounds = f.getBounds&&f.getBounds();
+			if (!fBounds) { continue; }
+			if (!bounds) { bounds = new createjs.Rectangle(x,y,width,height); }
+			bounds.x += fBounds.x;
+			bounds.y += fBounds.y;
+			bounds.width += fBounds.width;
+			bounds.height += fBounds.height;
+		}
+		return bounds;
 	};
 	
 	/**

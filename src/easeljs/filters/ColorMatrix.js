@@ -165,7 +165,7 @@ this.createjs = this.createjs||{};
 			0,0,0,0,1
 		]);
 		return this;
-	},
+	};
 
 	/**
 	 * Adjusts the contrast of pixel color.

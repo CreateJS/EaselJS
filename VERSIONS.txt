@@ -65,6 +65,9 @@ Other changes:
 - added tickstart, tickend, drawstart, and drawend events to Stage
 - added getBounds() functionality for all display objects
 - added MovieClip.getLabels() & getCurrentLabel()
+- Filter.getBounds() now returns null as its default value
+- bounds for cache() are now automatically adjusted for filters
+- improved BlurFilter performance and results (thanks to Mario Klingemann)
 
 
 Version 0.6.1 [May 14, 2013]
