@@ -34,6 +34,7 @@ Other changes:
 	* added Ticker.TIMEOUT, Ticker.RAF, Ticker.RAF_SYNCHED timing mode constants
 - added Ticker.getMeasuredTickTime()
 - Ticker now does not automatically init until a listener is added to it
+- added Ticker.reset()
 - added Stage.nextStage to relay interaction events
 - added Graphics.inject()
 - added Text.getMeasuredHeight()

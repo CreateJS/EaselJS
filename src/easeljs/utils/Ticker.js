@@ -249,36 +249,51 @@ var Ticker = function() {
 	Ticker._tickTimes = null;
 
 	/**
-	 * @property _rafActive
-	 * @type {Boolean}
-	 * @protected
-	 **/
-	Ticker._rafActive = false;
-
-	/**
-	 * @property _timeoutID
+	 * Stores the timeout or requestAnimationFrame id.
+	 * @property _timerId
 	 * @type {Number}
 	 * @protected
 	 **/
-	Ticker._timeoutID = null;
-
+	Ticker._timerId = null;
+	
+	/**
+	 * True if currently using requestAnimationFrame, false if using setTimeout.
+	 * @property _raf
+	 * @type {Boolean}
+	 * @protected
+	 **/
+	Ticker._raf = true;
 
 // public static methods:
 	
 	/**
-	 * Initializes or resets the timer, clearing all associated listeners and fps measuring data, starting the tick.
-	 * This is called automatically when the first listener is added.
+	 * Starts the tick. This is called automatically when the first listener is added.
 	 * @method init
 	 * @static
 	 **/
 	Ticker.init = function() {
+		if (Ticker._inited) { return; }
 		Ticker._inited = true;
 		Ticker._times = [];
 		Ticker._tickTimes = [];
 		Ticker._startTime = Ticker._getTime();
 		Ticker._times.push(Ticker._lastTime = 0);
-		Ticker.removeAllEventListeners();
 		Ticker.setInterval(Ticker._interval);
+	};
+	
+	/**
+	 * Stops the Ticker and removes all listeners. Use init() to restart the Ticker.
+	 * @method reset
+	 * @static
+	 **/
+	Ticker.reset = function() {
+		if (Ticker._raf) {
+			var f = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.oCancelAnimationFrame || window.msCancelAnimationFrame;
+			f&&f(Ticker._timerId);
+		} else {
+			clearTimeout(Ticker._timerId);
+		}
+		Ticker.removeAllEventListeners("tick");
 	};
 	
 	/**
@@ -461,7 +476,7 @@ var Ticker = function() {
 	 **/
 	Ticker._handleSynch = function() {
 		var time = Ticker._getTime() - Ticker._startTime;
-		Ticker._rafActive = false;
+		Ticker._timerId = null;
 		Ticker._setupTick();
 
 		// run if enough time has elapsed, with a little bit of flexibility to be early:
@@ -476,7 +491,7 @@ var Ticker = function() {
 	 * @protected
 	 **/
 	Ticker._handleRAF = function() {
-		Ticker._rafActive = false;
+		Ticker._timerId = null;
 		Ticker._setupTick();
 		Ticker._tick();
 	};
@@ -487,7 +502,7 @@ var Ticker = function() {
 	 * @protected
 	 **/
 	Ticker._handleTimeout = function() {
-		Ticker.timeoutID = null;
+		Ticker._timerId = null;
 		Ticker._setupTick();
 		Ticker._tick();
 	};
@@ -498,18 +513,19 @@ var Ticker = function() {
 	 * @protected
 	 **/
 	Ticker._setupTick = function() {
-		if (Ticker._rafActive || Ticker.timeoutID != null) { return; } // avoid duplicates
+		if (Ticker._timerId != null) { return; } // avoid duplicates
 
 		var mode = Ticker.timingMode||(Ticker.useRAF&&Ticker.RAF_SYNCHED);
 		if (mode == Ticker.RAF_SYNCHED || mode == Ticker.RAF) {
 			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
 			if (f) {
-				f(mode == Ticker.RAF ? Ticker._handleRAF : Ticker._handleSynch);
-				Ticker._rafActive = true;
+				Ticker._timerId = f(mode == Ticker.RAF ? Ticker._handleRAF : Ticker._handleSynch);
+				Ticker._raf = true;
 				return;
 			}
 		}
-		Ticker.timeoutID = setTimeout(Ticker._handleTimeout, Ticker._interval);
+		Ticker._raf = false;
+		Ticker._timerId = setTimeout(Ticker._handleTimeout, Ticker._interval);
 	};
 
 	/**
