@@ -162,13 +162,17 @@ var Ticker = function() {
 
 // mix-ins:
 	// EventDispatcher methods:
-	Ticker.addEventListener = null;
 	Ticker.removeEventListener = null;
 	Ticker.removeAllEventListeners = null;
 	Ticker.dispatchEvent = null;
 	Ticker.hasEventListener = null;
 	Ticker._listeners = null;
 	createjs.EventDispatcher.initialize(Ticker); // inject EventDispatcher methods.
+	Ticker._addEventListener = Ticker.addEventListener;
+	Ticker.addEventListener = function() {
+		!Ticker._inited&&Ticker.init();
+		Ticker._addEventListener.apply(Ticker, arguments);
+	};
 
 // private static properties:
 	
@@ -273,6 +277,7 @@ var Ticker = function() {
 		Ticker._tickTimes = [];
 		Ticker._startTime = Ticker._getTime();
 		Ticker._times.push(Ticker._lastTime = 0);
+		Ticker.removeAllEventListeners();
 		Ticker.setInterval(Ticker._interval);
 	};
 	
@@ -549,9 +554,6 @@ var Ticker = function() {
 	Ticker._getTime = function() {
 		return (now&&now.call(performance))||(new Date().getTime());
 	};
-
-
-	Ticker.init();
 
 createjs.Ticker = Ticker;
 }());
