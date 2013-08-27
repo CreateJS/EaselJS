@@ -52,7 +52,7 @@ this.createjs = this.createjs||{};
  **/
 var Shadow = function(color, offsetX, offsetY, blur) {
   this.initialize(color, offsetX, offsetY, blur);
-}
+};
 var p = Shadow.prototype;
 
 // static public properties:
@@ -110,7 +110,7 @@ var p = Shadow.prototype;
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
 		this.blur = blur;
-	}
+	};
 
 // public methods:
 	/**
@@ -120,7 +120,7 @@ var p = Shadow.prototype;
 	 **/
 	p.toString = function() {
 		return "[Shadow]";
-	}
+	};
 
 
 	/**
@@ -130,7 +130,7 @@ var p = Shadow.prototype;
 	 **/
 	p.clone = function() {
 		return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);
-	}
+	};
 
 	// this has to be populated after the class is defined:
 	Shadow.identity = new Shadow("transparent", 0, 0, 0);
