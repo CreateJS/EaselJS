@@ -51,7 +51,7 @@ this.createjs = this.createjs||{};
  * {{#crossLink "EventDispatcher/off"}}{{/crossLink}} method is merely an alias to
  * {{#crossLink "EventDispatcher/removeEventListener"}}{{/crossLink}}.
  * 
- * Another addition to the DOM Level 2 model is the {{#crossLink "EventDispatcher/removeAllListeners"}}{{/crossLink}}
+ * Another addition to the DOM Level 2 model is the {{#crossLink "EventDispatcher/removeAllEventListeners"}}{{/crossLink}}
  * method, which can be used to listeners for all events, or listeners for a specific event. The Event object also 
  * includes a {{#crossLink "Event/remove"}}{{/crossLink}} method which removes the active listener.
  *
