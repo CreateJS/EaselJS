@@ -1367,7 +1367,7 @@ var p = Graphics.prototype;
 		else {
 			this._instructions.push(
 				new Command(this._ctx.save, [], false),
-				new Command(this._ctx.setTransform, matrixArr, false),
+				new Command(this._ctx.transform, matrixArr, false),
 				command,
 				new Command(this._ctx.restore, [], false)
 			);
