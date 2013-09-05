@@ -70,6 +70,7 @@ Other changes:
 - Filter.getBounds() now returns null as its default value
 - bounds for cache() are now automatically adjusted for filters
 - improved BlurFilter performance and results (thanks to Mario Klingemann)
+- objects added to a MovieClip via addChild will now display over objects managed by the MovieClip
 
 
 Version 0.6.1 [May 14, 2013]
