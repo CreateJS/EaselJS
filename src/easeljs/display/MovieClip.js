@@ -469,7 +469,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		for (var n in this._managed) { this._managed[n] = 1; }
 
 		var tweens = tl._tweens;
-		for (var i=tweens.length-1;i>=0;i--) {
+		for (var i=0, l=tweens.length; i<l; i++) {
 			var tween = tweens[i];
 			var target = tween._target;
 			if (target == this || tween.passive) { continue; } // TODO: this assumes actions tween has this as the target. Valid?
@@ -502,7 +502,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p._setState = function(state, offset) {
 		if (!state) { return; }
-		for (var i=0,l=state.length;i<l;i++) {
+		for (var i=state.length-1;i>=0;i--) {
 			var o = state[i];
 			var target = o.t;
 			var props = o.p;
@@ -520,7 +520,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p._addManagedChild = function(child, offset) {
 		if (child._off) { return; }
-		this.addChild(child);
+		this.addChildAt(child,0);
 
 		if (child instanceof MovieClip) {
 			child._synchOffset = offset;
