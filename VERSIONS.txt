@@ -12,6 +12,7 @@ CRITICAL (may break existing content):
 - Added "use strict"; to everything.
 - Fixed clone on AlphaMapFilter
 - renamed BoxBlurFilter to BlurFilter
+- Updated the build process to use NodeJS & Grunt.js. Please refer to the readme in the build folder.
 
 *****
 DEPRECATED (will be removed in a future version):
