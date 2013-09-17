@@ -160,6 +160,23 @@ var Ticker = function() {
 	 **/
 	Ticker.timingMode = null;
 
+	/**
+	 * Specifies a maximum value for the delta property in the tick event object. This is useful when building time
+	 * based animations and systems to prevent issues caused by large time gaps caused by background tabs, system sleep,
+	 * alert dialogs, or other blocking routines. Double the expected frame duration is often an effective value
+	 * (ex. maxDelta=50 when running at 40fps).
+	 * 
+	 * This does not impact any other values (ex. time, runTime, etc), so you may experience issues if you enable maxDelta
+	 * when using both delta and other values.
+	 * 
+	 * If 0, there is no maximum.
+	 * @property maxDelta
+	 * @static
+	 * @type {number}
+	 * @default 0
+	 */
+	Ticker.maxDelta = 0;
+
 // mix-ins:
 	// EventDispatcher methods:
 	Ticker.removeEventListener = null;
@@ -547,8 +564,9 @@ var Ticker = function() {
 		
 		if (Ticker.hasEventListener("tick")) {
 			var event = new createjs.Event("tick");
+			var maxDelta = Ticker.maxDelta;
+			event.delta = (maxDelta && elapsedTime > maxDelta) ? maxDelta : elapsedTime;
 			event.paused = paused;
-			event.delta = elapsedTime;
 			event.time = time;
 			event.runTime = time-Ticker._pausedTime;
 			Ticker.dispatchEvent(event);
