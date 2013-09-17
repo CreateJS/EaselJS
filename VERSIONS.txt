@@ -21,7 +21,7 @@ DEPRECATED (will be removed in a future version):
 - SpriteSheetUtils.mergeAlpha()
 
 *****
-Other changes:
+OTHER:
 - implemented createjs Utils
 - implemented "use strict" mode
 - BitmapAnimation renamed to Sprite
@@ -56,6 +56,7 @@ Other changes:
 - DisplayObject, SpriteSheet, and SpriteSheetBuilder now inherit from EventDispatcher
 - fixed an issue with the tick event's time value being epoch time instead of Timer time
 - added Ticker.getEventTime()
+- added Ticker.maxDelta
 - the initialize methods for Point, Rectangle, and Matrix2D are now public
 - added .copy() to Point, Rectangle, and Matrix2D
 - fixed an issue that could occur when reinitializing Matrix2D
