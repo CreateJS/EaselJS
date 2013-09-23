@@ -6,6 +6,7 @@
   "logo": "http://createjs.com/resources/SuiteIcons/EaselJS/docs-icon-EaselJS.png",
   "devDependencies": {
     "grunt": "~0.4.1",
+	"grunt-contrib-concat":"~0.3.0",
     "grunt-contrib-uglify": "~0.2.1",
     "grunt-contrib-yuidoc": "~0.4.0",
     "grunt-contrib-compress": "~0.5.0",
