@@ -66,14 +66,14 @@ this.createjs = this.createjs || {};
 	 **/
 	var AlphaMaskFilter = function (mask) {
 		this.initialize(mask);
-	}
+	};
 	var p = AlphaMaskFilter.prototype = new createjs.Filter();
 
 // constructor:
 	/** @ignore */
 	p.initialize = function (mask) {
 		this.mask = mask;
-	}
+	};
 
 // public properties:
 
@@ -124,7 +124,7 @@ this.createjs = this.createjs || {};
 		targetCtx.drawImage(this.mask, targetX, targetY);
 		targetCtx.restore();
 		return true;
-	}
+	};
 
 	/**
 	 * Returns a clone of this object.
@@ -132,11 +132,11 @@ this.createjs = this.createjs || {};
 	 **/
 	p.clone = function () {
 		return new AlphaMaskFilter(this.mask);
-	}
+	};
 
 	p.toString = function () {
 		return "[AlphaMaskFilter]";
-	}
+	};
 
 // private methods:
 

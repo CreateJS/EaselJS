@@ -459,8 +459,9 @@ var p = Stage.prototype = new createjs.Container();
 	};
 
 	/**
-	 * Enables or disables (by passing a frequency of 0) mouse over events ({{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
-	 * and {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}) for this stage's display list. These events can
+	 * Enables or disables (by passing a frequency of 0) mouse over ({{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
+	 * and {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}) and roll over events ({{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}
+	 * and {{#crossLink "DisplayObject/rollout:event"}}{{/crossLink}}) for this stage's display list. These events can
 	 * be expensive to generate, so they are disabled by default. The frequency of the events can be controlled
 	 * independently of mouse move events via the optional `frequency` parameter.
 	 *

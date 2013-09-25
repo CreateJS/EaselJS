@@ -19,7 +19,7 @@ DEPRECATED (will be removed in a future version):
 - SpriteSheetUtils.mergeAlpha()
 
 *****
-Other changes:
+OTHER:
 - implemented createjs Utils
 - implemented "use strict" mode
 - BitmapAnimation renamed to Sprite
@@ -42,9 +42,11 @@ Other changes:
 - added Graphics.Command
 - merged lots of doc updates (thanks @peteshand)
 - lots of doc, example, & tutorial updates
-- included MouseEvent.nativeEvent for rollover/out events
-- prevented rollover/out events from triggering if the mouse is not over the canvas
+- included MouseEvent.nativeEvent for mouseover/out events
+- added rollover / rollout events to DisplayObject
+- prevented mouseover/out and rollover/out events from triggering if the mouse is not over the canvas
 	* ex. within a scrolling div or DOM element layered over top
+- added pressmove / pressup events to DisplayObject
 - added Matrix2D.transformPoint() method
 - fixed an issue when adding the same listener to an event twice
 - added Event class, used by all events
@@ -54,6 +56,7 @@ Other changes:
 - DisplayObject, SpriteSheet, and SpriteSheetBuilder now inherit from EventDispatcher
 - fixed an issue with the tick event's time value being epoch time instead of Timer time
 - added Ticker.getEventTime()
+- added Ticker.maxDelta
 - the initialize methods for Point, Rectangle, and Matrix2D are now public
 - added .copy() to Point, Rectangle, and Matrix2D
 - fixed an issue that could occur when reinitializing Matrix2D
