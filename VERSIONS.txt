@@ -1,4 +1,4 @@
-Version NEXT [Not Released]
+Version 0.7.0 [September 25, 2013]
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - removed all onEvent handlers (ex. onClick, onTick, onAnimationEnd, etc)
@@ -10,9 +10,7 @@ CRITICAL (may break existing content):
 - removed "target" from MouseEvent's param list
 - returning false from an event handler no longer causes dispatchEvent to return false, see Event.preventDefault
 - Added "use strict"; to everything.
-- Fixed clone on AlphaMapFilter
 - renamed BoxBlurFilter to BlurFilter
-- Updated the build process to use NodeJS & Grunt.js. Please refer to the readme in the build folder.
 
 *****
 DEPRECATED (will be removed in a future version):
@@ -21,7 +19,7 @@ DEPRECATED (will be removed in a future version):
 - SpriteSheetUtils.mergeAlpha()
 
 *****
-OTHER:
+Other changes:
 - implemented createjs Utils
 - implemented "use strict" mode
 - BitmapAnimation renamed to Sprite
@@ -56,7 +54,6 @@ OTHER:
 - DisplayObject, SpriteSheet, and SpriteSheetBuilder now inherit from EventDispatcher
 - fixed an issue with the tick event's time value being epoch time instead of Timer time
 - added Ticker.getEventTime()
-- added Ticker.maxDelta
 - the initialize methods for Point, Rectangle, and Matrix2D are now public
 - added .copy() to Point, Rectangle, and Matrix2D
 - fixed an issue that could occur when reinitializing Matrix2D
@@ -73,6 +70,8 @@ OTHER:
 - bounds for cache() are now automatically adjusted for filters
 - improved BlurFilter performance and results (thanks to Mario Klingemann)
 - objects added to a MovieClip via addChild will now display over objects managed by the MovieClip
+- Fixed clone on AlphaMapFilter
+- Updated the build process to use NodeJS & Grunt.js. Please refer to the readme in the build folder.
 
 
 Version 0.6.1 [May 14, 2013]
