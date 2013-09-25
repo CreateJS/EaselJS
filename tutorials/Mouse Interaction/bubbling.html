@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS demo: bubbling events</title>
+	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
+	<script>
+		var stage, output, lastPhase;
+		
+		function init() {
+			stage = new createjs.Stage("demoCanvas");
+			stage.name = "stage";
+			
+			output = new createjs.Text("try clicking on the background vs the label text\n\nthe background & label are both inside of a Container named 'button'", "13px courier");
+			output.lineWidth = 280;
+			output.lineHeight = 13;
+			output.x = 190;
+			output.y = 10;
+			
+			
+			var background = new createjs.Shape();
+			background.name = "background";
+			background.graphics.beginFill("red").drawRoundRect(0, 0, 150, 60, 10);
+			
+			var label = new createjs.Text("click me!", "bold 24px Arial", "#FFFFFF");
+			label.name = "label";
+			label.textAlign = "center";
+			label.textBaseline = "middle";
+			label.x = 150/2;
+			label.y = 60/2;
+			
+			var button = new createjs.Container();
+			button.name = "button";
+			button.x = 20;
+			button.y = 20;
+			button.addChild(background, label);
+			// setting mouseChildren to false will cause events to be dispatched directly from the button instead of its children.
+			// button.mouseChildren = false;
+			
+			stage.addChild(button, output);
+			
+			// set up listeners for all display objects, for both the non-capture (bubble / target) and capture phases:
+			var targets = [stage,button,label,background];
+			for (var i=0; i<targets.length; i++) {
+				var target = targets[i];
+				target.addEventListener("click", handleClick, false);
+				target.addEventListener("click", handleClick, true);
+			}
+			
+			stage.update();
+		}
+		
+		function handleClick(evt) {
+			if (evt.currentTarget == stage && evt.eventPhase == 1) {
+				// this is the first dispatch in the event life cycle, clear the output.
+				output.text = "target : eventPhase : currentTarget\n";
+			}
+			
+			output.text += evt.target.name+" : "+evt.eventPhase+" : "+evt.currentTarget.name+"\n";
+			
+			if (evt.currentTarget == stage && evt.eventPhase == 3) {
+				// this is the last dispatch in the event life cycle, render the stage.
+				stage.update();
+			}
+		}
+	</script>
+</head>
+<body onLoad="init();">
+	<canvas id="demoCanvas" width="500" height="100">
+		alternate content
+	</canvas>
+</body>
+</html>

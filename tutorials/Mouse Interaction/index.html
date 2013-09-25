@@ -20,8 +20,8 @@
 			<h1>EaselJS: Mouse Interaction</h1>
 			<p>
 				<strong>Synopsis:</strong> Learn about mouse events on display objects and the stage.<br>
-				<strong>Topics:</strong> MouseEvent, click, dblclick, mouseover, mouseout, mousemove, mousedown, mouseup, enableMouseOver, drag and drop, mouseMoveOutside<br>
-				<strong>Target:</strong> EaselJS v0.6.0
+				<strong>Topics:</strong> MouseEvent, addEventListener, on, click, dblclick, mouseover, mouseout, mousemove, mousedown, mouseup, enableMouseOver, drag and drop, mouseMoveOutside<br>
+				<strong>Target:</strong> EaselJS v0.7.0
 			</p>
 		</header>
 		<p class="highlight">
@@ -34,17 +34,23 @@
 				<h2>The Basics</h2>
 			</header>
 			<p>
-				At its core, the EaselJS mouse interaction model is very simple to use - just assign a function handler for one of the mouse events on a display object:
-			<textarea class="brush: js;" readonly>
+				At its core, the EaselJS mouse interaction model is very simple to use - just assign a listener to a mouse events via the <code>addEventListener</code> method on a display object:
+				<textarea class="brush: js;" readonly>
 circle.addEventListener("click", function(event) { alert("clicked"); })
-			</textarea>
+				</textarea>
 			</p>
 			<iframe src="basic.html" class="demo" longDesc="the onClick handler" width="100%" height="220px"></iframe>
 			<p>
-				There are a number of events you can listen for on display objects: <code>click</code>, <code>mousedown</code>, <code>mouseup</code>, </code><code>dblclick</code>, <code>mouseover</code>, and <code>mouseout</code>.
+				There are a number of events you can listen for on display objects: <code>click</code>, <code>mousedown</code>, <code>mouseup</code>, <code>dblclick</code>, <code>pressmove</code>, <code>pressup</code>, <code>mouseover</code> / <code>mouseout</code>, and <code>rollover</code> / <code>rollout</code>.
 			</p>
 			<p>
-				The latter two events have some overhead associated with them, so you need to enable them with <code>stage.enableMouseOver(frequency)</code>. The <code>frequency</code> parameter indicates how many times per second EaselJS should calculate what is currently under the pointer. A higher number is more responsive, but also more computationally expensive. It defaults to 20 times per second.
+				The latter four events have some overhead associated with them, so you need to enable them with <code>stage.enableMouseOver(frequency)</code>. The <code>frequency</code> parameter indicates how many times per second EaselJS should calculate what is currently under the pointer. A higher number is more responsive, but also more computationally expensive. It defaults to 20 times per second.
+			</p>
+			<p>
+				The <code>on</code> method provides a shortcut to <code>addEventListener</code>, and adds additional functionality. See the API docs for more details.
+				<textarea class="brush: js;" readonly>
+circle.on(type, listener, scope, once, data, useCapture);
+							</textarea>
 			</p>
 		</section>
 		
@@ -65,27 +71,44 @@ circle.addEventListener("click", function(evt) {
 		
 		<section>
 			<header>
-				<h2>Containers</h2>
+				<h2>Bubbling</h2>
 			</header>
 			<p>
-				When you assign a mouse event handler on a <code>Container</code> instance, it will block all mouse events to its children, even if they have their own listeners.
+				When a mouse event is triggered on a target, the event flows through three phases: the capture phase, the target phase, and the bubbling phase.
+			</p>
+			<p>
+				In the first phase (capture), the event is dispatched starting with the stage, and progressing through the ancestors of the target to its immediate parent.
+				Only listeners that were added using the useCapture parameter are triggered in this phase.
+			</p>
+			<p>
+				In the second phase (target), the event is dispatched on the target object (ex. the element that was clicked).
+			</p>
+			<p>
+				In the final phase (bubbling), the event is dispatched from the immediate parent of the target through the ancestors (in the reverse order of the capture phase) to the stage.
 			</p>
 			<p>
 				The example below has a "button", which is a <code>Container</code> instance containing two children: a background shape, and a text label.
-                All three of these display objects have <code>click</code> handlers, but if you click the button, only its handler is called.
+				All three display objects and the stage have listeners for the "click" event both with and without the useCapture param.
 			</p>
-			<iframe src="container.html" class="demo" longDesc="mouse event handlers on containers" width="100%" height="120px"></iframe>
+			<iframe src="bubbling.html" class="demo" longDesc="event bubbling" width="100%" height="120px"></iframe>
+		</section>
+		
+		<section>
+			<header>
+				<h2>mouseChildren & mouseEnabled</h2>
+			</header>
 			<p>
-				If you edit the code for container.html to remove the <code>click</code> handler on button, the handlers on background and label will be active.
-			</p>
-			<p>
-				You can also block mouse events to children without assigning a handler by setting <code>mouseChildren</code> to <code>false</code>.
+				You can prevent the children of a <code>Container</code> from dispatching mouse events setting <code>mouseChildren</code> to <code>false</code>.
 			<textarea class="brush: js;" readonly>
 myContainer.mouseChildren = false;
 			</textarea>
 			</p>
 			<p>
-				Similarly, you can disable mouse events on any display object without removing its handlers by setting <code>mouseEnabled</code> to <code>false</code>.
+				This causes the container to be treated as an aggregate element for mouse interactions. For example, in the bubbling example above setting <code>button.mouseChildren = false;</code>
+				would make it so that clicking children of the button (background & label) dispatches the click event with the button as the target instead of the child that was clicked.
+			</p>
+			<p>
+				Similarly, you can completely disable mouse events on any display object without removing its handlers by setting <code>mouseEnabled</code> to <code>false</code>.
 			<textarea class="brush: js;" readonly>
 circle.addEventListener("click", function() { alert("Clicked!"); });
 circle.mouseEnabled = false;
@@ -116,10 +139,10 @@ circle.mouseEnabled = false;
 				<h2>Stage mouse events</h2>
 			</header>
 			<p>
-				If you assign a normal mouse event handler to the stage, it will block mouse events to all of its children. Also, just like every other display object, you will only get events when the mouse is over a non-transparent pixel.
+				For the stage, just like every other display object, you will only get events when the mouse is over a non-transparent pixel.
 			</p>
 			<p>
-				Stage has a few special mouse events that come in handy for responding to general mouse interactions anywhere within your canvas. <code>stagemousedown</code>, <code>stagemouseup</code> and <code>stagemousemove</code> are called any time a relevant mouse interaction happens anywhere on the canvas.
+				Stage has a few special mouse events that come in handy for responding to general mouse interactions anywhere within your canvas. <code>stagemousedown</code>, <code>stagemouseup</code>, and <code>stagemousemove</code> are called any time a relevant mouse interaction happens anywhere on the canvas.
 			<textarea class="brush: js;" readonly>
 stage.addEventListener("stagemousedown", function(evt) {
 	alert("the canvas was clicked at "+evt.stageX+","+evt.stageY);
@@ -130,7 +153,7 @@ stage.addEventListener("stagemousedown", function(evt) {
 			</p>
 			<iframe src="stage.html" class="demo" longDesc="using stagemousedown, stagemouseup & stagemousemove." width="100%" height="220px"></iframe>
 			<p>
-				By default, you will stop getting <code>stagemousemove</code> events whenever the pointer is outside of the canvas. You can check of this has happened with <code>stage.mouseInBounds</code>.
+				By default, you will stop getting <code>stagemousemove</code> events whenever the pointer is outside of the canvas.
 			</p>
 			<p>
 				If you'd like to keep getting <code>stagemousemove</code> events when the pointer leaves the canvas, just set <code>mouseMoveOutside</code> to <code>true</code>. The <code>stageX</code> & <code>stageY</code> properties of <code>MouseEvent</code> will always return a value normalized to within your stage bounds, but you can use <code>rawX</code> and <code>rawY</code> to get values that haven't been normalized (this can cause errors if you aren't careful).
@@ -142,6 +165,9 @@ stage.onMouseMove = function(evt) {
 }
 			</textarea>
 			</p>
+			<p>
+				You can monitor whether the pointer is over the canvas by using <code>stage.mouseInBounds</code> and the <code>mouseleave</code> / <code>mouseenter</code> events.
+			</p>
 		</section>
 		
 		<section>
@@ -149,23 +175,16 @@ stage.onMouseMove = function(evt) {
 				<h2>Drag and drop</h2>
 			</header>
 			<p>
-				EaselJS makes drag and drop functionality very easy to implement. When an <code>click</code> handler is
-                called, the <code>MouseEvent</code> that is passed to it has two special mouse handlers of its own,
-                <code>mousemove</code> and <code>mouseup</code>.
-			</p>
-			<p>
-				These handlers work exactly the same as their equivalents on <code>Stage</code> with one major difference -
-                they are only active until the user releases the pointer. It sounds a little strange, but it's really simple to use.
+				EaselJS makes drag and drop functionality very easy to implement. After the mouse is pressed over a display object, that
+				object will generate <code>pressmove</code> events until the mouse is released, at which point a <code>pressup</code>
+				event will be dispatched.
 			</p>
 			<textarea class="brush: js;" readonly>
-circle.addEventListener("mousedown", function(evt) {
-	// add handlers directly to the event object:
-	evt.addEventListener("mousemove", function(evt) {
-		evt.target.x = evt.stageX;
-		evt.target.y = evt.stageY;
-	});
-	evt.addEventListener("mouseup", function(evt) { console.log("up"); })
-})
+circle.addEventListener("pressmove", function(evt) {
+	evt.target.x = evt.stageX;
+	evt.target.y = evt.stageY;
+});
+circle.addEventListener("pressup", function(evt) { console.log("up"); })
 			</textarea>
 			<p>
 				Check out the source for the demo below for a simple example of this in action. It's also a great place

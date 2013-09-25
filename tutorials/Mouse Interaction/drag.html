@@ -3,7 +3,7 @@
 <head>
 	<title>EaselJS demo: Dragging</title>
 	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script>
 		var stage, output;
 		
@@ -26,16 +26,12 @@
 			dragger.addChild(circle, label);
 			stage.addChild(dragger);
 			
-			dragger.addEventListener("mousedown", function(evt) {
-				var offset = {x:evt.target.x-evt.stageX, y:evt.target.y-evt.stageY};
-                 
-				// add a handler to the event object's onMouseMove callback
-				// this will be active until the user releases the mouse button:
-				evt.addEventListener("mousemove",function(ev) {
-				    ev.target.x = ev.stageX+offset.x;
-					ev.target.y = ev.stageY+offset.y;
-					stage.update();   
-				});
+			dragger.addEventListener("pressmove",function(evt) {
+				// currentTarget will be the container that the event listener was added to:
+				evt.currentTarget.x = evt.stageX;
+				evt.currentTarget.y = evt.stageY;
+				// make sure to redraw the stage to show the change:
+				stage.update();   
 			});
 			
 			stage.update();
