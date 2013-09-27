@@ -106,7 +106,7 @@ var Ticker = function() {
 	/**
 	 * In this mode, Ticker uses the setTimeout API. This provides predictable, adaptive frame timing, but does not
 	 * provide the benefits of requestAnimationFrame (screen synch, background throttling).
-	 * @property RAF
+	 * @property TIMEOUT
 	 * @static
 	 * @type {String}
 	 * @default "timer"
