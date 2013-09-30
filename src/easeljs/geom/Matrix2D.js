@@ -222,6 +222,7 @@ var p = Matrix2D.prototype;
 	 * Prepends the specified matrix with this matrix.
 	 * @method prependMatrix
 	 * @param {Matrix2D} matrix
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.prependMatrix = function(matrix) {
 		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
@@ -443,6 +444,7 @@ var p = Matrix2D.prototype;
 	 * @param {Number} x The x component of the point to transform.
 	 * @param {Number} y The y component of the point to transform.
 	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
+	 * @return {Point} This matrix. Useful for chaining method calls.
 	 **/
 	p.transformPoint = function(x, y, pt) {
 		pt = pt||{};

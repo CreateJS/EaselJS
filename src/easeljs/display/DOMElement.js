@@ -144,6 +144,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
+	 * @return {Boolean}
 	 */
 	p.draw = function(ctx, ignoreCache) {
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
@@ -172,7 +173,7 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 
 	/**
 	 * Not applicable to DOMElement.
-	 * @method hitArea
+	 * @method hitTest
 	 */
 	p.hitTest = function() {};
 

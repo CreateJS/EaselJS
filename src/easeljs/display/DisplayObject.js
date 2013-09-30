@@ -666,6 +666,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
 	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache. For example,
 	 * used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
+	 * @return {Boolean}
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		var cacheCanvas = this.cacheCanvas;

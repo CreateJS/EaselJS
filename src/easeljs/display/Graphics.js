@@ -1322,7 +1322,7 @@ var p = Graphics.prototype;
 	/** Shortcut to decodePath.
 	 * @method p
 	 * @protected
-	 * t@ype Function
+	 * @type Function
 	 **/
 	p.p = p.decodePath;
 
