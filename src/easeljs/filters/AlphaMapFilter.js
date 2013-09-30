@@ -125,6 +125,7 @@ this.createjs = this.createjs || {};
 
 	/**
 	 * Returns a clone of this object.
+	 * @method clone
 	 * @return {AlphaMapFilter} A clone of the current AlphaMapFilter instance.
 	 **/
 	p.clone = function () {

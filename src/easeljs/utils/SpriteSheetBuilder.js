@@ -325,7 +325,7 @@ var p = SpriteSheetBuilder.prototype = new createjs.EventDispatcher;
 	/**
 	 * Builds a SpriteSheet instance based on the current frames.
 	 * @method build
-	 * @return SpriteSheet The created SpriteSheet instance, or null if a build is already running or an error occurred.
+	 * @return {SpriteSheet} The created SpriteSheet instance, or null if a build is already running or an error occurred.
 	 **/
 	p.build = function() {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }

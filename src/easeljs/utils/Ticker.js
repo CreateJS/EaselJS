@@ -441,6 +441,7 @@ var Ticker = function() {
 	 *          console.log("Paused:", createjs.Ticker.getPaused());
 	 *      }
 	 *
+	 * @method getPaused
 	 * @static
 	 * @return {Boolean} Whether the Ticker is currently paused.
 	 **/
