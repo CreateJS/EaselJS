@@ -128,6 +128,7 @@ this.createjs = this.createjs || {};
 
 	/**
 	 * Returns a clone of this object.
+	 * @method clone
 	 * @return {AlphaMaskFilter}
 	 **/
 	p.clone = function () {

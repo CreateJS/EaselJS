@@ -612,8 +612,8 @@ createjs.MovieClip = MovieClip;
 	 * @param {Array} startValues
 	 * @param {Array} endValues
 	 * @param {Number} ratio
-	 * @param wait
-	 * @param end
+	 * @param {Object} wait
+	 * @param {Object} end
 	 * @return {*}
 	 */
 	MovieClipPlugin.tween = function(tween, prop, value, startValues, endValues, ratio, wait, end) {
