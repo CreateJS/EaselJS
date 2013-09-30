@@ -129,7 +129,7 @@ var SpriteSheetUtils = function() {
 		canvas.width = r.width;
 		canvas.height = r.height;
 		SpriteSheetUtils._workingContext.drawImage(data.image, r.x, r.y, r.width, r.height, 0, 0, r.width, r.height);
-		var img = new Image();
+		var img = document.createElement("img");
 		img.src = canvas.toDataURL("image/png");
 		return img;
 	};
@@ -176,7 +176,7 @@ var SpriteSheetUtils = function() {
 			canvas.height = src.height;
 			ctx.setTransform(h?-1:1, 0, 0, v?-1:1, h?src.width:0, v?src.height:0);
 			ctx.drawImage(src,0,0);
-			var img = new Image();
+			var img = document.createElement("img");
 			img.src = canvas.toDataURL("image/png");
 			// work around a strange bug in Safari:
 			img.width = src.width;

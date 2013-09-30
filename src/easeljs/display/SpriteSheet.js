@@ -258,7 +258,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 				var img = data.images[i];
 				if (typeof img == "string") {
 					var src = img;
-					img = new Image();
+					img = document.createElement("img");
 					img.src = src;
 				}
 				a.push(img);
