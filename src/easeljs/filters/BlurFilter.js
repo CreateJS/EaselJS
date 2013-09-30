@@ -339,6 +339,7 @@ var p = BlurFilter.prototype = new createjs.Filter();
 
 	/**
 	 * Returns a clone of this object.
+	 * @method clone
 	 * @return {BlurFilter}
 	 **/
 	p.clone = function() {

@@ -121,7 +121,7 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * event may differ between browsers. This property will be null if the
 	 * EaselJS property was not directly generated from a native MouseEvent.
 	 * @property nativeEvent
-	 * @type MouseEvent
+	 * @type HtmlMouseEvent
 	 * @default null
 	 **/
 	p.nativeEvent = null;

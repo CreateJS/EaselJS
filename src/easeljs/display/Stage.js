@@ -530,6 +530,7 @@ var p = Stage.prototype = new createjs.Container();
 
 	/**
 	 * Returns a clone of this Stage.
+	 * @method clone
 	 * @return {Stage} A clone of the current Container instance.
 	 **/
 	p.clone = function() {
