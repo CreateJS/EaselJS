@@ -45,7 +45,7 @@
 var Button = function(label) {
   this.initialize(label);
 }
-Button.prototype = new createjs.Container();
+var p = Button.prototype = new createjs.Container();
 
 Button.prototype.Container_initialize = p.initialize;
 Button.prototype.initialize = function(label) {
