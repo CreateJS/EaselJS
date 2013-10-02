@@ -1,3 +1,8 @@
+Version NEXT [NOT RELEASED]
+****************************************************************************************************
+- fixed issue with mouseChildren not working with nested Containers
+
+
 Version 0.7.0 [September 25, 2013]
 ****************************************************************************************************
 CRITICAL (may break existing content):

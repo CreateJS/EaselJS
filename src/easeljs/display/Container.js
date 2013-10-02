@@ -565,7 +565,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			// if a child container has a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
 			if (!hitArea && child instanceof Container) {
 				var result = child._getObjectsUnderPoint(x, y, arr, mouse);
-				if (!arr && result) { return result; }
+				if (!arr && result) { return (mouse && !this.mouseChildren) ? this : result; }
 			} else {
 				child.getConcatenatedMatrix(mtx);
 				
