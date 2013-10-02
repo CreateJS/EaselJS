@@ -21,6 +21,7 @@
 		"../src/easeljs/display/BitmapAnimation.js",
 		"../src/easeljs/display/Shape.js",
 		"../src/easeljs/display/Text.js",
+		"../src/easeljs/display/BitmapText.js",
 		"../src/easeljs/utils/SpriteSheetUtils.js",
 		"../src/easeljs/utils/SpriteSheetBuilder.js",
 		"../src/easeljs/display/DOMElement.js",
