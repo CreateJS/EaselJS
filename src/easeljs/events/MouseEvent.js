@@ -38,7 +38,8 @@ this.createjs = this.createjs||{};
 
 // TODO: deprecated. @uses EventDispatcher
 /**
- * This is passed as the parameter to all mouse/pointer/touch related events on {{#crossLink "DisplayObject"}}{{/crossLink}}
+ * This is passed as the parameter to all mouse/pointer/touch related events. For a listing of mouse events, see
+ * {{#crossLink "DisplayObject"}}{{/crossLink}} and {{#crossLink "Stage"}}{{/crossLink}}.
  * instances.
  * @class MouseEvent
  * @param {String} type The event type.
