@@ -188,7 +188,7 @@ var Ticker = function() {
 	Ticker._addEventListener = Ticker.addEventListener;
 	Ticker.addEventListener = function() {
 		!Ticker._inited&&Ticker.init();
-		Ticker._addEventListener.apply(Ticker, arguments);
+		return Ticker._addEventListener.apply(Ticker, arguments);
 	};
 
 // private static properties:
