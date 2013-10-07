@@ -1262,7 +1262,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 **/
 	p._applyFilterBounds = function(x, y, width, height) {
 		var bounds, l, filters = this.filters;
-		if (!filters || !(l=filters.length)) { return; }
+		if (!filters || !(l=filters.length)) { return null; }
 		
 		for (var i=0; i<l; i++) {
 			var f = this.filters[i];
