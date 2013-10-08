@@ -10,3 +10,4 @@ build/output/
 build/tmp/
 /.idea/
 *TMP*
+/node_modules/
