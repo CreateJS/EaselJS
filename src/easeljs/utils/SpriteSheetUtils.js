@@ -210,7 +210,7 @@ var SpriteSheetUtils = function() {
 		for (i=0;i<al;i++) {
 			var name = names[i];
 			src = data[name];
-			var anim = {name:name+sfx,frequency:src.frequency,next:src.next,frames:[]};
+			var anim = {name:name+sfx,speed:src.speed,next:src.next,frames:[]};
 			if (src.next) { anim.next += sfx; }
 			frames = src.frames;
 			for (var j=0,l=frames.length;j<l;j++) {
