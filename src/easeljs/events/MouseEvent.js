@@ -38,25 +38,8 @@ this.createjs = this.createjs||{};
 
 // TODO: deprecated. @uses EventDispatcher
 /**
- * This is passed as the parameter to all mouse/pointer/touch related events. For a listing of mouse events, see
- * {{#crossLink "DisplayObject"}}{{/crossLink}} and {{#crossLink "Stage"}}{{/crossLink}}.
- * instances.
- *
- * Currently, DisplayObjects support:
- * <ul>
- *     <li>{{#crossLink "DisplayObject/click:event"}}{{/crossLink}}: The user presses and releases the mouse</li>
- *     <li>{{#crossLink "DisplayObject/dblclick:event"}}{{/crossLink}}: The user double clicks</li>
- *     <li>{{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}}: The user presses the mouse</li>
- *     <li>{{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}: The user moves the mouse out of an object</li>
- *     <li>{{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}: The user moves the mouse over and object</li>
- *     <li>{{#crossLink "DisplayObject/pressmove:event"}}{{/crossLink}}: The user presses the mouse, then moves it</li>
- *     <li>{{#crossLink "DisplayObject/pressup:event"}}{{/crossLink}}: The user releases the mouse, either over, or outside of the object</li>
- *     <li>{{#crossLink "DisplayObject/rollout:event"}}{{/crossLink}}: The user rolls out of a child element</li>
- *     <li>{{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}: The user rolls over a child element</li>
- * </ul>
- *
- * For a full overview of the mouse events, and their properties, please check out the {{#crossLink "DisplayObject"}}{{/crossLink}}
- * event listing.
+ * Passed as the parameter to all mouse/pointer/touch related events. For a listing of mouse events and their properties,
+ * see the {{#crossLink "DisplayObject"}}{{/crossLink}} and {{#crossLink "Stage"}}{{/crossLink}} event listings.
  * @class MouseEvent
  * @param {String} type The event type.
  * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
@@ -84,7 +67,7 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * user releases the mouse anywhere. This enables you to listen to mouse move interactions for the duration of a
 	 * press, which can be very useful for operations such as drag and drop.
 	 *
-	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class description for a listing of event properties.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class description for more information on mouse events.
 	 * @event mousemove
 	 * @since 0.6.0
 	 * @deprecated In favour of the DisplayObject "pressmove" event.
@@ -95,7 +78,7 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * user releases the mouse anywhere. This enables you to listen for a corresponding mouse up from a specific press,
 	 * which can be very useful for operations such as drag and drop.
 	 *
-	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class description for a listing of event properties.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class description for more information on mouse events.
 	 * @event mouseup
 	 * @since 0.6.0
 	 * @deprecated In favour of the DisplayObject "pressup" event.
