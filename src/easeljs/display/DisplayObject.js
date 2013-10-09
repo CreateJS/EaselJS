@@ -314,8 +314,12 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	/**
 	 * Indicates whether to include this object when running mouse interactions. Setting this to `false` for children
 	 * of a {{#crossLink "Container"}}{{/crossLink}} will cause events on the Container to not fire when that child is
-	 * clicked. Note that setting this property to `false` does not prevent the {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}
+	 * clicked. Setting this property to `false` does not prevent the {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}
 	 * method from returning the child.
+	 *
+	 * <strong>Note:</strong> In EaselJS 0.7.0, the mouseEnabled property will not work properly with nested Containers. Please
+	 * check out the latest NEXT version in <a href="https://github.com/CreateJS/EaselJS/tree/master/lib">GitHub</a> for an updated version with this issue resolved. The fix will be
+	 * provided in the next release of EaselJS.
 	 * @property mouseEnabled
 	 * @type {Boolean}
 	 * @default true
@@ -1262,7 +1266,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 **/
 	p._applyFilterBounds = function(x, y, width, height) {
 		var bounds, l, filters = this.filters;
-		if (!filters || !(l=filters.length)) { return; }
+		if (!filters || !(l=filters.length)) { return null; }
 		
 		for (var i=0; i<l; i++) {
 			var f = this.filters[i];
