@@ -361,7 +361,7 @@ var p = Stage.prototype = new createjs.Container();
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) {
 			this.dispatchEvent("tickstart");  // TODO: make cancellable?
-			this._tick((arguments.length ? arguments : null));
+			this.tickEnabled&&this._tick((arguments.length ? arguments : null));
 			this.dispatchEvent("tickend");
 		}
 		this.dispatchEvent("drawstart"); // TODO: make cancellable?

@@ -325,6 +325,16 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default true
 	 **/
 	p.mouseEnabled = true;
+	
+	/**
+	 * If false, the tick will not run on this display object (or its children). This can provide some performance benefits.
+	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
+	 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+	 * @property tickEnabled
+	 * @type Boolean
+	 * @default true
+	 **/
+	p.tickEnabled = true;
 
 	/**
 	 * An optional name for this display object. Included in {{#crossLink "DisplayObject/toString"}}{{/crossLink}} . Useful for
