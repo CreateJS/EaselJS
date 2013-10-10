@@ -722,7 +722,7 @@ var p = Stage.prototype = new createjs.Container();
 	 * @param {MouseEvent} e
 	 **/
 	p._handleMouseDown = function(e) {
-		this._handlePointerDown(-1, e);
+		this._handlePointerDown(-1, e, e.pageX, e.pageY);
 	};
 
 	/**
