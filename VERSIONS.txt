@@ -3,6 +3,7 @@ Version NEXT [NOT RELEASED]
 - fixed issue with mouseChildren not working with nested Containers
 - fixed issue where first call to Ticker.addEventListener did not return the listener
 - added DisplayObject.tickEnabled & Container.tickChildren
+- fixed an issue related to modal dialogs and pointer position for mouse down
 
 
 Version 0.7.0 [September 25, 2013]
