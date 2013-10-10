@@ -77,6 +77,16 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @default true
 	 **/
 	p.mouseChildren = true;
+	
+	/**
+	 * If false, the tick will not be propagated to children of this Container. This can provide some performance benefits.
+	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
+	 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+	 * @property tickChildren
+	 * @type Boolean
+	 * @default true
+	 **/
+	p.tickChildren = true;
 
 // constructor:
 
@@ -536,9 +546,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @protected
 	 **/
 	p._tick = function(params) {
-		for (var i=this.children.length-1; i>=0; i--) {
-			var child = this.children[i];
-			if (child._tick) { child._tick(params); }
+		if (this.tickChildren) {
+			for (var i=this.children.length-1; i>=0; i--) {
+				var child = this.children[i];
+				if (child.tickEnabled && child._tick) { child._tick(params); }
+			}
 		}
 		this.DisplayObject__tick(params);
 	};
