@@ -451,9 +451,11 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 			evt.next = next;
 			this.dispatchEvent(evt);
 		}
-		// TODO: is this right?
-		if (!paused && this.paused) { this.currentAnimationFrame = end; }
-		return (this.paused != paused || this._animation != animation || this._currentFrame != frame);
+		// did the animation get changed in the event stack?:
+		var changed = (this._animation != animation || this._currentFrame != frame);
+		// if the animation hasn't changed, but the sprite was paused, then we want to stick to the last frame:
+		if (!changed && !paused && this.paused) { this.currentAnimationFrame = end; changed = true; }
+		return changed;
 	};
 
 	/**
