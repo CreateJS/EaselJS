@@ -383,7 +383,7 @@ var Ticker = function() {
 		// by default, calculate average for the past ~1 second:
 		ticks = Math.min(times.length, ticks||(Ticker.getFPS()|0));
 		for (var i=0; i<ticks; i++) { ttl += times[i]; }
-		return times/ticks;
+		return ttl/ticks;
 	};
 
 	/**
