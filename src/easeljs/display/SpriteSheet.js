@@ -53,7 +53,7 @@ this.createjs = this.createjs||{};
  *
  *      data = {
  *          // DEFINING FRAMERATE:
- *          // this specifies the framerate that will be set on the SpriteSheet. See Spritesheet.framerate
+ *          // this specifies the framerate that will be set on the SpriteSheet. See {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}}
  *          // for more information.
  *          framerate: 20,
  *
@@ -79,7 +79,7 @@ this.createjs = this.createjs||{};
  *          // DEFINING ANIMATIONS:
  *
  * 	        // simple animation definitions. Define a consecutive range of frames (begin to end inclusive).
- * 	        // optionally define a "next" animation to sequence to (or false to stop) and a playback "speed"
+ * 	        // optionally define a "next" animation to sequence to (or false to stop) and a playback "speed".
  * 	        animations: {
  * 	        	// start, end, next, speed
  * 	        	run: [0,8],
@@ -110,6 +110,10 @@ this.createjs = this.createjs||{};
  * 	        	stand: 7
  * 	        }
  *      }
+ *
+ * <strong>Note that the <code>speed</code> property was added in EaselJS 0.7.0. Earlier versions had a <code>frequency</code>
+ * property instead, which was the inverse of speed. For example, a value of "4" would be 1/4 normal speed in earlier
+ * versions, but us 4x normal speed in 0.7.0+.</strong>
  *
  * <h4>Example</h4>
  * To define a simple sprite sheet, with a single image "sprites.jpg" arranged in a regular 50x50 grid with two
