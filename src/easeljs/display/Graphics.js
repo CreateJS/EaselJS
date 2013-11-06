@@ -921,10 +921,13 @@ var p = Graphics.prototype;
 	 * Draws an ellipse (oval) with a specified width (w) and height (h). Similar to {{#crossLink "Graphics/drawCircle"}}{{/crossLink}},
 	 * except the width and height can be different. A tiny API method "de" also exists.
 	 * @method drawEllipse
-	 * @param {Number} x x coordinate center point of ellipse.
-	 * @param {Number} y y coordinate center point of ellipse.
-	 * @param {Number} w height (horizontal diameter) of ellipse. The horizontal radius will be half of this number.
-	 * @param {Number} h width (vertical diameter) of ellipse. The vertical radius will be half of this number.
+	 * @param {Number} x The left coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+	 * which draws from center.
+	 * @param {Number} y The top coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+	 * which draws from the center.
+	 * @param {Number} w The height (horizontal diameter) of the ellipse. The horizontal radius will be half of this
+	 * number.
+	 * @param {Number} h The width (vertical diameter) of the ellipse. The vertical radius will be half of this number.
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.drawEllipse = function(x, y, w, h) {
