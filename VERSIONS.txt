@@ -5,6 +5,8 @@ Version NEXT [NOT RELEASED]
 - added DisplayObject.tickEnabled & Container.tickChildren
 - fixed an issue related to modal dialogs and pointer position for mouse down
 - fixed an issue when calling gotoAndStop(animation) in the animationend event stack for the same animation
+- ColorMatrix no longer extends Array
+- fixed ColorMatrix.toArray() and .clone()
 
 
 Version 0.7.0 [September 25, 2013]
