@@ -629,7 +629,7 @@ var p = Stage.prototype = new createjs.Container();
 		var oEvent = o.event;
 		if (oEvent && oEvent.hasEventListener("mousemove")) {
 			// this doesn't use _dispatchMouseEvent because it requires re-targeting.
-			oEvent.dispatchEvent(new createjs.MouseEvent("mousemove", false, false, o.x, o.y, e, id, (id == this._primaryPointerID), o.rawX, o.rawY), oTarget);
+			oEvent.dispatchEvent(new createjs.MouseEvent("mousemove", false, false, o.x, o.y, e, id, (id == this._primaryPointerID), o.rawX, o.rawY), o.target);
 		}
 
 		this.nextStage&&this.nextStage._handlePointerMove(id, e, pageX, pageY);
@@ -740,7 +740,8 @@ var p = Stage.prototype = new createjs.Container();
 		this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e);
 
 		o.target = this._getObjectsUnderPoint(o.x, o.y, null, true);
-		this._dispatchMouseEvent(o.target, "mousedown", true, id, o, e);
+		// TODO: holding onto the event is deprecated:
+		o.event =  this._dispatchMouseEvent(o.target, "mousedown", true, id, o, e);
 
 		this.nextStage&&this.nextStage._handlePointerDown(id, e, pageX, pageY);
 	};
@@ -834,6 +835,8 @@ var p = Stage.prototype = new createjs.Container();
 		*/
 		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
 		target.dispatchEvent(evt);
+		// TODO: returning evt is deprecated:
+		return evt;
 	};
 
 createjs.Stage = Stage;
