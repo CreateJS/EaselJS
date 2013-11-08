@@ -325,10 +325,10 @@ var p = Container.prototype = new createjs.DisplayObject();
 	/**
 	 * Performs an array sort operation on the child list.
 	 *
-	 * <h4>Example</h4>
-	 *      var sortFunction = function(item1, item2, options) {
-	 *          if (item1 > item2) { return 1; }
-	 *          if (item1 < item2) { return -1; }
+	 * <h4>Example: Display children with a higher y in front.</h4>
+	 *      var sortFunction = function(obj1, obj2, options) {
+	 *          if (obj1.y > obj2.y) { return 1; }
+	 *          if (obj1.y < obj2.y) { return -1; }
 	 *          return 0;
 	 *      }
 	 *      container.sortChildren(sortFunction);
