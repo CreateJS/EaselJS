@@ -52,12 +52,11 @@ this.createjs = this.createjs||{};
 	 * @param {Number} saturation
 	 * @param {Number} hue
 	 * @constructor
-	 * @extends Array
 	 **/
 	var ColorMatrix = function(brightness, contrast, saturation, hue) {
 	  this.initialize(brightness, contrast, saturation, hue);
 	};
-	var p = ColorMatrix.prototype = [];
+	var p = ColorMatrix.prototype;
 
 	/**
 	 * Array of delta values for contrast calculations.
@@ -267,7 +266,7 @@ this.createjs = this.createjs||{};
 	 * @return {ColorMatrix} A clone of this ColorMatrix.
 	 **/
 	p.clone = function() {
-		return new ColorMatrix(this);
+		return (new ColorMatrix()).copyMatrix(this);
 	};
 
 	/**
@@ -276,7 +275,11 @@ this.createjs = this.createjs||{};
 	 * @return {Array} An array holding this matrix's values.
 	 **/
 	p.toArray = function() {
-		return this.slice(0,ColorMatrix.LENGTH);
+		var arr = [];
+		for (var i= 0, l=ColorMatrix.LENGTH; i<l; i++) {
+			arr[i] = this[i];
+		}
+		return arr;
 	};
 
 	/**
