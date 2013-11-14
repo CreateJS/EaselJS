@@ -39,11 +39,10 @@ this.createjs = this.createjs||{};
 // TODO: support for double tap.
 /**
  * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API (iOS and
- * modern Android browser) and the Pointer API (IE).
+ * modern Android browser) and the Pointer API (IE), including ms-prefixed events in IE10, and unprefixed in IE11.
  *
- * Ensure that you {{#crossLink "Touch/disable"}}{{/crossLink}} touch when cleaning up your application.
- * Note that you do not have to check if touch is supported to enable it, as it will fail gracefully if it is not
- * supported.
+ * Ensure that you {{#crossLink "Touch/disable"}}{{/crossLink}} touch when cleaning up your application. You do not have
+ * to check if touch is supported to enable it, as it will fail gracefully if it is not supported.
  *
  * <h4>Example</h4>
  *
@@ -63,7 +62,7 @@ var Touch = function() {
 
 // Public static methods:
 	/**
-	 * Returns true if touch is supported in the current browser.
+	 * Returns `true` if touch is supported in the current browser.
 	 * @method isSupported
 	 * @return {Boolean} Indicates whether touch is supported in the current browser.
 	 * @static
@@ -74,16 +73,17 @@ var Touch = function() {
 	};
 
 	/**
-	 * Enables touch interaction for the specified EaselJS stage. Currently supports iOS (and compatible browsers, such
-	 * as modern Android browsers), and IE10. Supports both single touch and multi-touch modes. Extends the EaselJS
-	 * MouseEvent model, but without support for double click or over/out events. See <code>MouseEvent.pointerID</code>
+	 * Enables touch interaction for the specified EaselJS {{#crossLink "Stage"}}{{/crossLink}}. Currently supports iOS
+	 * (and compatible browsers, such as modern Android browsers), and IE10/11. Supports both single touch and
+	 * multi-touch modes. Extends the EaselJS {{#crossLink "MouseEvent"}}{{/crossLink}} model, but without support for
+	 * double click or over/out events. See the MouseEvent {{#crossLink "MouseEvent/pointerId:property"}}{{/crossLink}}
 	 * for more information.
 	 * @method enable
-	 * @param {Stage} stage The stage to enable touch on.
-	 * @param {Boolean} [singleTouch=false] If true, only a single touch will be active at a time.
-	 * @param {Boolean} [allowDefault=false] If true, then default gesture actions (ex. scrolling, zooming) will be
+	 * @param {Stage} stage The {{#crossLink "Stage"}}{{/crossLink}} to enable touch on.
+	 * @param {Boolean} [singleTouch=false] If `true`, only a single touch will be active at a time.
+	 * @param {Boolean} [allowDefault=false] If `true`, then default gesture actions (ex. scrolling, zooming) will be
 	 * allowed when the user is interacting with the target canvas.
-	 * @return {Boolean} Returns true if touch was successfully enabled on the target stage.
+	 * @return {Boolean} Returns `true` if touch was successfully enabled on the target stage.
 	 * @static
 	 **/
 	Touch.enable = function(stage, singleTouch, allowDefault) {
@@ -100,9 +100,9 @@ var Touch = function() {
 	};
 
 	/**
-	 * Removes all listeners that were set up when calling Touch.enable on a stage.
+	 * Removes all listeners that were set up when calling `Touch.enable()` on a stage.
 	 * @method disable
-	 * @param {Stage} stage The stage to disable touch on.
+	 * @param {Stage} stage The {{#crossLink "Stage"}}{{/crossLink}} to disable touch on.
 	 * @static
 	 **/
 	Touch.disable = function(stage) {
