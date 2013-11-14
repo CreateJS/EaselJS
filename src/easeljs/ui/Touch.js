@@ -95,7 +95,7 @@ var Touch = function() {
 		// note that in the future we may need to disable the standard mouse event model before adding
 		// these to prevent duplicate calls. It doesn't seem to be an issue with iOS devices though.
 		if ('ontouchstart' in window) { Touch._IOS_enable(stage); }
-		else if (window.navigator['msPointerEnabled']) { Touch._IE_enable(stage); }
+		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { Touch._IE_enable(stage); }
 		return true;
 	};
 
@@ -108,7 +108,7 @@ var Touch = function() {
 	Touch.disable = function(stage) {
 		if (!stage) { return; }
 		if ('ontouchstart' in window) { Touch._IOS_disable(stage); }
-		else if (window.navigator['msPointerEnabled']) { Touch._IE_disable(stage); }
+		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { Touch._IE_disable(stage); }
 	};
 
 // Private static methods:
@@ -180,11 +180,22 @@ var Touch = function() {
 	Touch._IE_enable = function(stage) {
 		var canvas = stage.canvas;
 		var f = stage.__touch.f = function(e) { Touch._IE_handleEvent(stage,e); };
-		canvas.addEventListener("MSPointerDown", f, false);
-		window.addEventListener("MSPointerMove", f, false);
-		window.addEventListener("MSPointerUp", f, false);
-		window.addEventListener("MSPointerCancel", f, false);
-		if (stage.__touch.preventDefault) { canvas.style.msTouchAction = "none"; }
+
+		var prefixed = (window.navigator["pointerEnabled"] === undefined);
+		if (prefixed) {
+			canvas.addEventListener("MSPointerDown", f, false);
+			window.addEventListener("MSPointerMove", f, false);
+			window.addEventListener("MSPointerUp", f, false);
+			window.addEventListener("MSPointerCancel", f, false);
+			if (stage.__touch.preventDefault) { canvas.style.msTouchAction = "none"; }
+		} else {
+			canvas.addEventListener("pointerdown", f, false);
+			window.addEventListener("pointermove", f, false);
+			window.addEventListener("pointerup", f, false);
+			window.addEventListener("pointercancel", f, false);
+			if (stage.__touch.preventDefault) { canvas.style.touchAction = "none"; }
+
+		}
 		stage.__touch.activeIDs = {};
 	};
 
@@ -196,11 +207,22 @@ var Touch = function() {
 	 **/
 	Touch._IE_disable = function(stage) {
 		var f = stage.__touch.f;
-		window.removeEventListener("MSPointerMove", f, false);
-		window.removeEventListener("MSPointerUp", f, false);
-		window.removeEventListener("MSPointerCancel", f, false);
-		if (stage.canvas) {
-			stage.canvas.removeEventListener("MSPointerDown", f, false);
+
+		var prefixed = (window.navigator["pointerEnabled"] === undefined);
+		if (prefixed) {
+			window.removeEventListener("MSPointerMove", f, false);
+			window.removeEventListener("MSPointerUp", f, false);
+			window.removeEventListener("MSPointerCancel", f, false);
+			if (stage.canvas) {
+				stage.canvas.removeEventListener("MSPointerDown", f, false);
+			}
+		} else {
+			window.removeEventListener("pointermove", f, false);
+			window.removeEventListener("pointerup", f, false);
+			window.removeEventListener("pointercancel", f, false);
+			if (stage.canvas) {
+				stage.canvas.removeEventListener("pointerdown", f, false);
+			}
 		}
 	};
 
@@ -213,19 +235,20 @@ var Touch = function() {
 	 **/
 	Touch._IE_handleEvent = function(stage, e) {
 		if (!stage) { return; }
-		if (stage.__touch.preventDefault) { e.preventDefault&&e.preventDefault(); }
+		if (stage.__touch.preventDefault) { e.preventDefault && e.preventDefault(); }
 		var type = e.type;
 		var id = e.pointerId;
 		var ids = stage.__touch.activeIDs;
 
-		if (type == "MSPointerDown") {
+		if (type == "MSPointerDown" || type == "pointerdown") {
 			if (e.srcElement != stage.canvas) { return; }
 			ids[id] = true;
 			this._handleStart(stage, id, e, e.pageX, e.pageY);
 		} else if (ids[id]) { // it's an id we're watching
-			if (type == "MSPointerMove") {
+			if (type == "MSPointerMove" || type == "pointermove") {
 				this._handleMove(stage, id, e, e.pageX, e.pageY);
-			} else if (type == "MSPointerUp" || type == "MSPointerCancel") {
+			} else if (type == "MSPointerUp" || type == "MSPointerCancel"
+					|| type == "pointerup" || type == "pointercancel") {
 				delete(ids[id]);
 				this._handleEnd(stage, id, e);
 			}
