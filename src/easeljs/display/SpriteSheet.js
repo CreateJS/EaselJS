@@ -458,8 +458,8 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 		var fh = this._frameHeight;
 		for (var i=0,imgs = this._images; i<imgs.length; i++) {
 			var img = imgs[i];
-			var cols = (img.width+1)/fw|0;
-			var rows = (img.height+1)/fh|0;
+			var cols = img.width/fw|0;
+			var rows = img.height/fh|0;
 			var ttl = this._numFrames>0 ? Math.min(this._numFrames-ttlFrames,cols*rows) : cols*rows;
 			for (var j=0;j<ttl;j++) {
 				this._frames.push({image:img, rect:new createjs.Rectangle(j%cols*fw,(j/cols|0)*fh,fw,fh), regX:this._regX, regY:this._regY });
