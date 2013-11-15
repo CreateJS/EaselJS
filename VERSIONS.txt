@@ -7,6 +7,7 @@ Version NEXT [NOT RELEASED]
 - fixed an issue when calling gotoAndStop(animation) in the animationend event stack for the same animation
 - ColorMatrix no longer extends Array
 - fixed ColorMatrix.toArray() and .clone()
+- fixed touch/multitouch in IE11
 
 
 Version 0.7.0 [September 25, 2013]
