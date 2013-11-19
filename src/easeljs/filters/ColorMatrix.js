@@ -295,6 +295,15 @@ this.createjs = this.createjs||{};
 		}
 		return this;
 	};
+	
+	/**
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
+	p.toString = function() {
+		return "[ColorMatrix]";
+	};
 
 // private methods:
 
@@ -339,22 +348,13 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._fixMatrix = function(matrix) {
-		if (matrix instanceof ColorMatrix) { matrix = matrix.slice(0); }
+		if (matrix instanceof ColorMatrix) { matrix = matrix.toArray(); }
 		if (matrix.length < ColorMatrix.LENGTH) {
 			matrix = matrix.slice(0,matrix.length).concat(ColorMatrix.IDENTITY_MATRIX.slice(matrix.length,ColorMatrix.LENGTH));
 		} else if (matrix.length > ColorMatrix.LENGTH) {
 			matrix = matrix.slice(0,ColorMatrix.LENGTH);
 		}
 		return matrix;
-	};
-
-	/**
-	 * Returns a string representation of this object.
-	 * @method toString
-	 * @return {String} a string representation of the instance.
-	 **/
-	p.toString = function () {
-		return "[ColorMatrix]";
 	};
 
 	createjs.ColorMatrix = ColorMatrix;
