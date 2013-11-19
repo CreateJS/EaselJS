@@ -168,6 +168,34 @@ var p = MouseEvent.prototype = new createjs.Event();
 	p.hasEventListener = null;
 	p._listeners = null;
 	createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
+	
+// getter / setters:
+	/**
+	 * Returns the x position of the mouse in the local coordinate system of the current target (ie. the dispatcher).
+	 * @property localX
+	 * @type {Number}
+	 * @readonly
+	 */
+	p._get_localX = function() {
+		return this.currentTarget.globalToLocal(this.rawX, this.rawY).x;
+	};
+	
+	/**
+	 * Returns the y position of the mouse in the local coordinate system of the current target (ie. the dispatcher).
+	 * @property localY
+	 * @type {Number}
+	 * @readonly
+	 */
+	p._get_localY = function() {
+		return this.currentTarget.globalToLocal(this.rawX, this.rawY).y;
+	};
+	
+	try {
+		Object.defineProperties(p, {
+			localX: { get: p._get_localX },
+			localY: { get: p._get_localY }
+		});
+	} catch (e) {} // TODO: use Log
 
 // constructor:
 	/**
