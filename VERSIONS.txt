@@ -6,8 +6,9 @@ Version NEXT [NOT RELEASED]
 - fixed an issue related to modal dialogs and pointer position for mouse down
 - fixed an issue when calling gotoAndStop(animation) in the animationend event stack for the same animation
 - ColorMatrix no longer extends Array
-- fixed ColorMatrix.toArray() and .clone()
+- fixed ColorMatrix.toArray(), .concat(), and .clone()
 - fixed touch/multitouch in IE11
+- changed dblclick to use a canvas listener instead of global listener
 
 
 Version 0.7.0 [September 25, 2013]
