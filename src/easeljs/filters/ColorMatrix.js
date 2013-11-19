@@ -348,6 +348,15 @@ this.createjs = this.createjs||{};
 		return matrix;
 	};
 
+	/**
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
+	p.toString = function () {
+		return "[ColorMatrix]";
+	};
+
 	createjs.ColorMatrix = ColorMatrix;
 
 }());
