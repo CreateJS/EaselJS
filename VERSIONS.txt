@@ -9,6 +9,7 @@ Version NEXT [NOT RELEASED]
 - fixed ColorMatrix.toArray(), .concat(), and .clone()
 - fixed touch/multitouch in IE11
 - changed dblclick to use a canvas listener instead of global listener
+- added MouseEvent.localX/Y
 
 
 Version 0.7.0 [September 25, 2013]
