@@ -518,7 +518,7 @@ var p = Stage.prototype = new createjs.Container();
 			ls = this._eventListeners = {};
 			ls["mouseup"] = {t:t, f:function(e) { _this._handleMouseUp(e)} };
 			ls["mousemove"] = {t:t, f:function(e) { _this._handleMouseMove(e)} };
-			ls["dblclick"] = {t:t, f:function(e) { _this._handleDoubleClick(e)} };
+			ls["dblclick"] = {t:this.canvas, f:function(e) { _this._handleDoubleClick(e)} };
 			ls["mousedown"] = {t:this.canvas, f:function(e) { _this._handleMouseDown(e)} };
 
 			for (n in ls) {
