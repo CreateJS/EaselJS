@@ -3,10 +3,11 @@
 <head>
 	<title>EaselJS demo: DisplayObject.onTick</title>
 	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script>
 		
 		var stage, circle;
+
 		function init() {
 			stage = new createjs.Stage("demoCanvas");
 			
@@ -17,19 +18,20 @@
 			
 			// Stage will pass delta when it calls stage.update(arg)
 			// which will pass them to tick event handlers for us in time based animation.
-			circle.addEventListener("tick", function(event) {
+			circle.on("tick", function(event) {
                 var tickerEvent = event.params[0];
                 var delta = tickerEvent.delta;
                 circle.x += delta/1000*100;
                 if (circle.x > stage.canvas.width) { circle.x = 0; }
-            })
+            });
 			
-			createjs.Ticker.addEventListener("tick", tick);
+			createjs.Ticker.on("tick", tick);
 		}
 
         function tick(event) {
             stage.update(event);
         }
+
 	</script>
 </head>
 <body onLoad="init();">

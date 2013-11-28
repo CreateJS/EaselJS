@@ -3,10 +3,11 @@
 <head>
 	<title>EaselJS demo: Simple animation</title>
 	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script>
 		
 		var stage, circle;
+
 		function init() {
 			stage = new createjs.Stage("demoCanvas");
 			
@@ -15,7 +16,7 @@
 			circle.y = 50;
 			stage.addChild(circle);
 			
-			createjs.Ticker.addEventListener("tick", tick);
+			createjs.Ticker.on("tick", tick);
 			createjs.Ticker.setFPS(30);
 		}
 		

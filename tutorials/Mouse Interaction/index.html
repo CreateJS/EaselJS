@@ -110,7 +110,7 @@ myContainer.mouseChildren = false;
 			<p>
 				Similarly, you can completely disable mouse events on any display object without removing its handlers by setting <code>mouseEnabled</code> to <code>false</code>.
 			<textarea class="brush: js;" readonly>
-circle.addEventListener("click", function() { alert("Clicked!"); });
+circle.on("click", function() { alert("Clicked!"); });
 circle.mouseEnabled = false;
 			</textarea>
 		</section>
@@ -159,10 +159,10 @@ stage.addEventListener("stagemousedown", function(evt) {
 				If you'd like to keep getting <code>stagemousemove</code> events when the pointer leaves the canvas, just set <code>mouseMoveOutside</code> to <code>true</code>. The <code>stageX</code> & <code>stageY</code> properties of <code>MouseEvent</code> will always return a value normalized to within your stage bounds, but you can use <code>rawX</code> and <code>rawY</code> to get values that haven't been normalized (this can cause errors if you aren't careful).
 			<textarea class="brush: js;" readonly>
 stage.mouseMoveOutside = true;
-stage.onMouseMove = function(evt) {
+stage.on("stagemousemove", function(evt) {
 	console.log("stageX/Y: "+evt.stageX+","+evt.stageY); // always in bounds
 	console.log("rawX/Y: "+evt.rawX+","+evt.rawY); // could be < 0, or > width/height
-}
+});
 			</textarea>
 			</p>
 			<p>
@@ -180,11 +180,11 @@ stage.onMouseMove = function(evt) {
 				event will be dispatched.
 			</p>
 			<textarea class="brush: js;" readonly>
-circle.addEventListener("pressmove", function(evt) {
+circle.on("pressmove", function(evt) {
 	evt.target.x = evt.stageX;
 	evt.target.y = evt.stageY;
 });
-circle.addEventListener("pressup", function(evt) { console.log("up"); })
+circle.on("pressup", function(evt) { console.log("up"); })
 			</textarea>
 			<p>
 				Check out the source for the demo below for a simple example of this in action. It's also a great place

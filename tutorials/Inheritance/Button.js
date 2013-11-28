@@ -30,13 +30,15 @@ p.initialize = function(label, color) {
 	text.y = 10;
 	
 	this.addChild(this.background,text); 
-	this.addEventListener("click", this.handleClick);  
-	this.addEventListener("tick", this.handleTick);
+	this.on("click", this.handleClick);
+	this.on("tick", this.handleTick);
+
+	this.mouseChildren = false;
 } 
 
 p.handleClick = function (event) {    
 	var target = event.target;
-	alert("You clicked on a button: "+target.label);
+	alert("You clicked on a button: "+ target.label);
 } 
 
 p.handleTick = function(event) {       

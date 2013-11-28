@@ -3,7 +3,7 @@
 <head>
 	<title>EaselJS demo: Inheritance</title>
 	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script src="Button.js"></script>
 	<script>
 		var stage, holder;
@@ -24,7 +24,7 @@
 			
 			btn1.x = btn2.x = btn3.x = 20;
 			
-			createjs.Ticker.addEventListener("tick", stage);
+			createjs.Ticker.on("tick", stage);
 		}
 	</script>
 </head>

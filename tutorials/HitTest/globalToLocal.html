@@ -3,7 +3,7 @@
 <head>
 	<title>EaselJS demo: globalToLocal</title>
 	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script>
 		var stage, holder;
 		function init() {
@@ -19,7 +19,7 @@
 				holder.addChild(shape); 
 			}
 			
-			createjs.Ticker.addEventListener("tick", tick);
+			createjs.Ticker.on("tick", tick);
 		}
 		
 		function tick(event) {
