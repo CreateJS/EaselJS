@@ -3,7 +3,7 @@
 <head>
 	<title>EaselJS demo: Mouse Events</title>
 	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script>
 		var stage, output;
 		
@@ -31,15 +31,15 @@
 			stage.addChild(square);
 			
 			// add a handler for all the events we're interested in:
-			circle.addEventListener("click", handleMouseEvent); 
-			circle.addEventListener("dblclick", handleMouseEvent);
-			circle.addEventListener("mouseover", handleMouseEvent); 
-			circle.addEventListener("mouseout", handleMouseEvent);
+			circle.on("click", handleMouseEvent);
+			circle.on("dblclick", handleMouseEvent);
+			circle.on("mouseover", handleMouseEvent);
+			circle.on("mouseout", handleMouseEvent);
 			                                                                                                                   
-			square.addEventListener("click", handleMouseEvent); 
-			square.addEventListener("dblclick", handleMouseEvent);
-			square.addEventListener("mouseover", handleMouseEvent); 
-			square.addEventListener("mouseout", handleMouseEvent);
+			square.on("click", handleMouseEvent);
+			square.on("dblclick", handleMouseEvent);
+			square.on("mouseover", handleMouseEvent);
+			square.on("mouseout", handleMouseEvent);
 			
 			stage.update();
 		}

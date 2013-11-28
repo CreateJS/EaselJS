@@ -43,8 +43,8 @@
 			var targets = [stage,button,label,background];
 			for (var i=0; i<targets.length; i++) {
 				var target = targets[i];
-				target.addEventListener("click", handleClick, false);
-				target.addEventListener("click", handleClick, true);
+				target.on("click", handleClick, false);
+				target.on("click", handleClick, true);
 			}
 			
 			stage.update();

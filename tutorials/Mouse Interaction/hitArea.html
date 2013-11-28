@@ -3,7 +3,7 @@
 <head>
 	<title>EaselJS demo: onClick</title>
 	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script>
 		var stage;
 		function init() {
@@ -25,11 +25,11 @@
 			hit.graphics.beginFill("#000").drawRect(0, 0, label2.getMeasuredWidth(), label2.getMeasuredHeight());
 			label2.hitArea = hit;
 		   
-		 	label1.addEventListener("mouseover", handleInteraction);
-			label2.addEventListener("mouseover", handleInteraction);
+		 	label1.on("mouseover", handleInteraction);
+			label2.on("mouseover", handleInteraction);
 			
-			label1.addEventListener("mouseout", handleInteraction);      
-			label2.addEventListener("mouseout", handleInteraction); 
+			label1.on("mouseout", handleInteraction);
+			label2.on("mouseout", handleInteraction);
 			
 			stage.addChild(label1, label2);
 			stage.update();   

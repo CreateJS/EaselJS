@@ -3,10 +3,11 @@
 <head>
 	<title>EaselJS demo: Time based animation</title>
 	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script>
 		
 		var stage, timeCircle, tickCircle;
+
 		function init() {
 			stage = new createjs.Stage("demoCanvas");
 			
@@ -20,7 +21,7 @@
 			tickCircle.y = 150;
 			stage.addChild(tickCircle);
 			
-			createjs.Ticker.addEventListener("tick", tick);
+			createjs.Ticker.on("tick", tick);
 			createjs.Ticker.setFPS(20);
 		}
 		

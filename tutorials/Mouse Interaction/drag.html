@@ -26,7 +26,7 @@
 			dragger.addChild(circle, label);
 			stage.addChild(dragger);
 			
-			dragger.addEventListener("pressmove",function(evt) {
+			dragger.on("pressmove",function(evt) {
 				// currentTarget will be the container that the event listener was added to:
 				evt.currentTarget.x = evt.stageX;
 				evt.currentTarget.y = evt.stageY;

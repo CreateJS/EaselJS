@@ -3,7 +3,7 @@
 <head>
 	<title>EaselJS demo: hitTest</title>
 	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script>
 		var stage, circle;
 		function init() {
@@ -14,7 +14,7 @@
 			circle.x = 0;
 			circle.y = 0;
 			
-			createjs.Ticker.addEventListener("tick", tick);
+			createjs.Ticker.on("tick", tick);
 		}
 		
 		function tick(event) {

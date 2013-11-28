@@ -3,7 +3,7 @@
 <head>
 	<title>EaselJS demo: Mouse Events on Stage</title>
 	<link href="../_shared/demo.css" rel="stylesheet" type="text/css">
-	<script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
+	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script>
 		var stage, label, shape, oldX, oldY, size, color;
 		
@@ -21,17 +21,17 @@
 			size = 2;
 			
 			// add handler for stage mouse events:
-			stage.addEventListener("stagemousedown", function(event) {
+			stage.on("stagemousedown", function(event) {
 				size = 10;
 			})                
 			
-			stage.addEventListener("stagemouseup", function(event) {
+			stage.on("stagemouseup", function(event) {
 				color = createjs.Graphics.getHSL(Math.random()*360, 100, 50);
 				size = 2;
 			})
 			 
 			
-		    stage.addEventListener("stagemousemove",function(evt) {
+		    stage.on("stagemousemove",function(evt) {
 				if (oldX) {
 					shape.graphics.beginStroke(color)
 								  .setStrokeStyle(size, "round")
