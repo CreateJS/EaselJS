@@ -587,6 +587,9 @@ var p = Container.prototype = new createjs.DisplayObject();
 					mtx.alpha = hitArea.alpha;
 				}
 				
+				// if avoidBitmapHitAreaCalculation is true, doesen't calculate hitArea for bitmaps istances avoiding cross domain errors and unecessary processing.
+				if (createjs.DisplayObject.avoidBitmapHitAreaCalculation == true && child instanceof createjs.Bitmap && !hitArea) return null;
+
 				ctx.globalAlpha = mtx.alpha;
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				(hitArea||child).draw(ctx);

@@ -148,6 +148,16 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	DisplayObject.suppressCrossDomainErrors = false;
 
 	/**
+	 * Avoid hitArea calculations for Bitmap instances avoiding cross domain errors and unecessary expensive calculations.
+	 * If is true, all bitmap instances shall have defined hitArea for mouse/touch interacions.
+	 * @property avoidBitmapHitAreaCalculation
+	 * @static
+	 * @type {Boolean}
+	 * @default false
+	 **/
+	DisplayObject.avoidBitmapHitAreaCalculation = false;
+	
+	/**
 	 * @property _hitTestCanvas
 	 * @type {HTMLCanvasElement | Object}
 	 * @static
