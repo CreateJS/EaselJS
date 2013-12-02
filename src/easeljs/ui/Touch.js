@@ -68,8 +68,9 @@ var Touch = function() {
 	 * @static
 	 **/
 	Touch.isSupported = function() {
-		return	('ontouchstart' in window) || // iOS
-					(window.navigator['msPointerEnabled'] && window.navigator['msMaxTouchPoints'] > 0); // IE10
+		return	('ontouchstart' in window) // iOS
+			|| (window.navigator['msPointerEnabled'] && window.navigator['msMaxTouchPoints'] > 0) // IE10
+			|| (window.navigator['pointerEnabled'] && window.navigator['maxTouchPoints'] > 0); // IE11+
 	};
 
 	/**
@@ -181,8 +182,7 @@ var Touch = function() {
 		var canvas = stage.canvas;
 		var f = stage.__touch.f = function(e) { Touch._IE_handleEvent(stage,e); };
 
-		var prefixed = (window.navigator["pointerEnabled"] === undefined);
-		if (prefixed) {
+		if (window.navigator["pointerEnabled"] === undefined) {
 			canvas.addEventListener("MSPointerDown", f, false);
 			window.addEventListener("MSPointerMove", f, false);
 			window.addEventListener("MSPointerUp", f, false);
@@ -208,8 +208,7 @@ var Touch = function() {
 	Touch._IE_disable = function(stage) {
 		var f = stage.__touch.f;
 
-		var prefixed = (window.navigator["pointerEnabled"] === undefined);
-		if (prefixed) {
+		if (window.navigator["pointerEnabled"] === undefined) {
 			window.removeEventListener("MSPointerMove", f, false);
 			window.removeEventListener("MSPointerUp", f, false);
 			window.removeEventListener("MSPointerCancel", f, false);
