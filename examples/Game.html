@@ -105,13 +105,15 @@
 	       document.getElementById("header").style.display = "none";
 	   	}
 
+        document.getElementById("mobile").style.display = "none";
+
 	    if (!createjs.Sound.initializeDefaultPlugins()) {
 	         document.getElementById("error").style.display = "block";
 	         document.getElementById("content").style.display = "none";
 	         return;
 	    }
 
- 		if (createjs.Sound.BrowserDetect.isIOS || createjs.Sound.BrowserDetect.isAndroid) {  // || createjs.Sound.BrowserDetect.isBlackberry  OJR blackberry has not been tested yet
+ 		if (createjs.Sound.BrowserDetect.isIOS || createjs.Sound.BrowserDetect.isAndroid || createjs.Sound.BrowserDetect.isBlackberry) {
 			document.getElementById("mobile").style.display = "block";
 	        document.getElementById("content").style.display = "none";
 	        return;
@@ -196,8 +198,8 @@
 		stage.addChild(scoreField);
 
 		//new arrays to dump old data
-		rockBelt = new Array();
-		bulletStream = new Array();
+		rockBelt = [];
+		bulletStream = [];
 
 		//create the player
 		alive = true;
@@ -510,6 +512,11 @@
 		<p>We are currently working on support for iOS. Please <a href="http://github.com/CreateJS/SoundJS/issues" target="_blank">log a bug</a>
 			if you see this in any other browsers.</p>
 	</div>
+
+    <div id="mobile">
+        <h1>Sorry!</h1>
+        <p>This demo is currenly not supported on mobile devices.</p>
+    </div>
 
 </body>
 </html>
