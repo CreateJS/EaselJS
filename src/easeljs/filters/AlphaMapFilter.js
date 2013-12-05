@@ -118,7 +118,6 @@ this.createjs = this.createjs || {};
 		for(var i = 0; i < l; i += 4) {
 			data[i + 3] = map[i] || 0;
 		}
-		imageData.data = data;
 		targetCtx.putImageData(imageData, targetX, targetY);
 		return true;
 	};
