@@ -11,6 +11,7 @@ Version NEXT [NOT RELEASED]
 - added MouseEvent.localX/Y
 - fixed touch/multitouch in IE11
 - fixed issue with -1 mouse pointers (thanks cubica)
+- fixed issue with AlphaMapFilter (thanks Dave)
 
 
 Version 0.7.0 [September 25, 2013]
