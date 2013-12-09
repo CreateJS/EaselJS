@@ -109,6 +109,7 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 		this.DisplayObject_initialize();
 		if (typeof imageOrUri == "string") {
 			this.image = document.createElement("img");
+			if (!this._isLocal(imageOrUri)) { this.image.crossOrigin = "Anonymous"; }
 			this.image.src = imageOrUri;
 		} else {
 			this.image = imageOrUri;
@@ -209,6 +210,18 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 		var o = this.sourceRect || this.image;
 		var hasContent = (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
 		return hasContent ? this._rectangle.initialize(0, 0, o.width, o.height) : null;
+	};
+
+	/**
+	 * @method _isLocal
+	 * @param {String} path
+	 * @return {Boolean}
+	 * @protected
+	 */
+	p._isLocal = function(path) {
+		var target = document.createElement("a");
+		target.href = path;
+		return target.hostname == "" && target.protocol == "file:";
 	};
 	
 	/**
