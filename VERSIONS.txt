@@ -12,8 +12,6 @@ Version NEXT [NOT RELEASED]
 - fixed touch/multitouch in IE11
 - fixed issue with -1 mouse pointers (thanks cubica)
 - fixed issue with AlphaMapFilter (thanks Dave)
-- added cross-origin (CORS) support for generated images.
-- included a sample htaccess file in /extras that can be used to serve CORS-safe images.
 
 
 Version 0.7.0 [September 25, 2013]
