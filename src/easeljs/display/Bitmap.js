@@ -50,6 +50,9 @@ this.createjs = this.createjs||{};
  *     the Bitmap can be cached.</li>
  *     <li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
  *     happens in all browsers except recent Firefox builds.</li>
+ *     <li>Images loaded cross-origin will throw cross-origin security errors when interacted with using a mouse, using
+ *     methods such as `getObjectUnderPoint`, or using filters, or caching. You can get around this by setting
+ *     `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`</li>
  * </ol>
  *
  * @class Bitmap
