@@ -263,6 +263,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 				if (typeof img == "string") {
 					var src = img;
 					img = document.createElement("img");
+					if (!this._isLocal(src) && img.crossOrigin === "") { img.crossOrigin = "Anonymous"; }
 					img.src = src;
 				}
 				a.push(img);
@@ -467,6 +468,18 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 			ttlFrames += ttl;
 		}
 		this._numFrames = ttlFrames;
+	};
+
+	/**
+	 * @method _isLocal
+	 * @param {String} path
+	 * @return {Boolean}
+	 * @protected
+	 */
+	p._isLocal = function(path) {
+		var target = document.createElement("a");
+		target.href = path;
+		return target.hostname == "" && target.protocol == "file:";
 	};
 
 createjs.SpriteSheet = SpriteSheet;

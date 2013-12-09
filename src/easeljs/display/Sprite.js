@@ -66,7 +66,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 // events:
 
 	/**
-	 * Dispatched when an animation reaches its ends.
+	 * Dispatched when an animation reaches its end.
 	 * @event animationend
 	 * @param {Object} target The object that dispatched the event.
 	 * @param {String} type The event type.
