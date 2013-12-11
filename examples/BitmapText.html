@@ -43,10 +43,20 @@
 			stage = new createjs.Stage("testCanvas");
 
 			var img = new Image();
-			img.src = "assets/BitmapFont.png";
 			img.onload = function() {
+				var ss = new createjs.SpriteSheet(data);
+
+				text = new createjs.BitmapText("Hello World,\nWhat's Happening?", ss);
+
+				// Center the text
+				var bounds = text.getBounds();
+				text.x = stage.canvas.width - bounds.width >> 1;
+				text.y = stage.canvas.height - bounds.height >> 1;
+
+				stage.addChild(text);
 				stage.update();
 			};
+			img.src = "assets/BitmapFont.png";
 
 			// Embedded SpriteSheet data.
 			var data = {
@@ -116,17 +126,6 @@
 					[966, 2, 9, 10, 0, -17, -31]
 				]
 			};
-			var ss = new createjs.SpriteSheet(data);
-
-			text = new createjs.BitmapText("Hello World,\nWhat's Happening?", ss);
-
-			// Center the text
-			var bounds = text.getBounds();
-			text.x = stage.canvas.width - bounds.width >> 1;
-			text.y = stage.canvas.height - bounds.height >> 1;
-
-			stage.addChild(text);
-			stage.update();
 		}
 
 	</script>
