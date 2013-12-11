@@ -1,9 +1,9 @@
 {
   "name": "EaselJS",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "EaselJS Docs",
   "url": "http://www.createjs.com/#!/EaselJS",
-  "logo": "http://createjs.com/resources/SuiteIcons/EaselJS/docs-icon-EaselJS.png",
+  "logo": "assets/docs-icon-EaselJS.png",
   "devDependencies": {
     "grunt": "~0.4.1",
 	"grunt-contrib-concat":"~0.3.0",
@@ -13,5 +13,5 @@
 	"grunt-contrib-copy": "~0.4.1",
 	"lodash": "~0.9.0"
   },
-  "engine": "node >= 0.10.2"
+  "engine": "node >= 0.10.22"
 }
