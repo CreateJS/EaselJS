@@ -1,4 +1,4 @@
-Version NEXT [NOT RELEASED]
+Version 0.7.1 [December 12, 2013]
 ****************************************************************************************************
 - fixed issue with mouseChildren not working with nested Containers
 - fixed issue where first call to Ticker.addEventListener() did not return the listener
