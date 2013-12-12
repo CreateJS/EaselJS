@@ -38,14 +38,30 @@ this.createjs = this.createjs||{};
  * containers have their <code>transform</code> and <code>alpha</code> properties concatenated with their parent
  * Container.
  *
- * For example, a {{#crossLink "Shape"}}{{/crossLink}} with x=100 and alpha=0.5, placed in a Container with <code>x=50</code>
- * and <code>alpha=0.7</code> will be rendered to the canvas at <code>x=150</code> and <code>alpha=0.35</code>.
- * Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
+ * For example, a {{#crossLink "Shape"}}{{/crossLink}} with x=100 and alpha=0.5, placed in a Container with `x=50`
+ * and `alpha=0.7` will be rendered to the canvas at `x=150` and `alpha=0.35`. Containers have some overhead, so you
+ * generally shouldn't create a Container to hold a single child.
  *
  * <h4>Example</h4>
+ *
  *      var container = new createjs.Container();
  *      container.addChild(bitmapInstance, shapeInstance);
  *      container.x = 100;
+ *
+ * Containers also provide a fairly easy solution for managing depth sorting. Multiple containers can be set up to
+ * represent different depths in a game or application, and children of each container will be visually sorted in each
+ * depth.
+ *
+ * <h4>Example</h4>
+ *
+ *      // Add all background elements to this container
+ *      var background = new createjs.Container();
+ *
+ *      // Add all game sprites to this container
+ *      var sprites = new createjs.Container();
+ *
+ *      // Add all foreground UI to this container
+ *      var ui = new createjs.Container();
  *
  * @class Container
  * @extends DisplayObject
