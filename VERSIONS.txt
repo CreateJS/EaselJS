@@ -12,6 +12,10 @@ Version NEXT [NOT RELEASED]
 - fixed touch/multitouch in IE11
 - fixed issue with -1 mouse pointers (thanks cubica)
 - fixed issue with AlphaMapFilter (thanks Dave)
+- added willTrigger to EventDispatcher
+- modified mouse event flow so items with no listeners are not checked for a hitTest. This avoids unnecessary cross-
+	domain issues introduced in EaselJS 0.7.0, when loaded images don't have any mouse listeners on them.
+- modified public getObjectsUnderPoint to account for hitAreas
 
 
 Version 0.7.0 [September 25, 2013]
