@@ -136,6 +136,15 @@ var DisplayObject = function() {
   this.initialize();
 };
 var p = DisplayObject.prototype = new createjs.EventDispatcher();
+	
+	/**
+	 * Listing of mouse event names. Used in _hasMouseEventListener.
+	 * @property _MOUSE_EVENTS
+	 * @protected
+	 * @static
+	 * @type {Array}
+	 **/
+	DisplayObject._MOUSE_EVENTS = ["click","dblclick","mousedown","mouseout","mouseover","pressmove","pressup","rollout","rollover"];
 
 	/**
 	 * Suppresses errors generated when using features like hitTest, mouse events, and {{#crossLink "getObjectsUnderPoint"}}{{/crossLink}}
@@ -1333,6 +1342,20 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		if ((y = y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 		
 		return bounds.initialize(minX, minY, maxX-minX, maxY-minY);
+	};
+	
+	/**
+	 * Indicates whether the display object has any mouse event listeners or a cursor.
+	 * @method _isMouseOpaque
+	 * @return {Boolean}
+	 * @protected
+	 **/
+	p._hasMouseEventListener = function() {
+		var evts = DisplayObject._MOUSE_EVENTS;
+		for (var i= 0, l=evts.length; i<l; i++) {
+			if (this.hasEventListener(evts[i])) { return true; }
+		}
+		return !!this.cursor;
 	};
 
 createjs.DisplayObject = DisplayObject;
