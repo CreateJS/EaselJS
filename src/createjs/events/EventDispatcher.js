@@ -342,10 +342,11 @@ var p = EventDispatcher.prototype;
 	 * ancestors (parent, parent's parent, etc). A return value of true indicates that if a bubbling event of the
 	 * specified type is dispatched from this object, it will trigger at least one listener.
 	 * 
-	 * This is similar to hasEventListener, but it searches the entire event flow for a listener, not just this object.
+	 * This is similar to {{#crossLink "EventDispatcher/hasEventListener"}}{{/crossLink}}, but it searches the entire
+	 * event flow for a listener, not just this object.
 	 * @method willTrigger
 	 * @param {String} type The string type of the event.
-	 * @return {Boolean} Returns true if there is at least one listener for the specified event.
+	 * @return {Boolean} Returns `true` if there is at least one listener for the specified event.
 	 **/
 	p.willTrigger = function(type) {
 		var o = this;
