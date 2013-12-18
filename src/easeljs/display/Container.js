@@ -467,7 +467,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 
 	/**
 	 * Similar to {{#crossLink "Container/getObjectsUnderPoint()"}}{{/crossLink}}, but returns only the top-most display
-	 * object. This runs significantly faster than <code>getObjectsUnderPoint()<code>, but is still an expensive
+	 * object. This runs significantly faster than <code>getObjectsUnderPoint()</code>, but is still an expensive
 	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	 * @method getObjectUnderPoint
 	 * @param {Number} x The x position in the container to test.
