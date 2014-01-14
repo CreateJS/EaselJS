@@ -67,6 +67,8 @@ this.createjs = this.createjs||{};
  *          stage.update();
  *      }
  *
+ * <strong>Note:</strong> SpriteStage is not included in the minified version of EaselJS.
+ *
  * @class SpriteStage
  * @extends Stage
  * @constructor
