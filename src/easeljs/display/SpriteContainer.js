@@ -51,10 +51,12 @@ this.createjs = this.createjs||{};
  *      container.addChild(spriteInstance, spriteInstance2);
  *      container.x = 100;
  *
+ * <strong>Note:</strong> SpriteContainer is not included in the minified version of EaselJS.
+ *
  * @class SpriteContainer
  * @extends Container
  * @constructor
- * @param {spriteSheet} spriteSheet Optional. The spriteSheet to use for this SpriteContainer and its children.
+ * @param {SpriteSheet} [spriteSheet] The spriteSheet to use for this SpriteContainer and its children.
  **/
 var SpriteContainer = function(spriteSheet) {
   this.initialize(spriteSheet);
