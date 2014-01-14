@@ -142,6 +142,14 @@ var p = Matrix2D.prototype;
 	 * @type String
 	 **/
 	p.compositeOperation = null;
+	
+	/**
+	 * Property representing the value for visible that will be applied to a display object. This is not part of matrix
+	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated visible values.
+	 * @property visible
+	 * @type Boolean
+	 **/
+	p.visible = true;
 
 // constructor:
 	/**
@@ -226,7 +234,7 @@ var p = Matrix2D.prototype;
 	 **/
 	p.prependMatrix = function(matrix) {
 		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-		this.prependProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
+		this.prependProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation, matrix.visible);
 		return this;
 	};
 
@@ -238,7 +246,7 @@ var p = Matrix2D.prototype;
 	 **/
 	p.appendMatrix = function(matrix) {
 		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-		this.appendProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation);
+		this.appendProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation, matrix.visible);
 		return this;
 	};
 
@@ -404,6 +412,7 @@ var p = Matrix2D.prototype;
 		this.alpha = this.a = this.d = 1;
 		this.b = this.c = this.tx = this.ty = 0;
 		this.shadow = this.compositeOperation = null;
+		this.visible = true;
 		return this;
 	};
 
@@ -498,13 +507,15 @@ var p = Matrix2D.prototype;
 	 * @param {Number} [alpha=1] desired alpha value
 	 * @param {Shadow} [shadow=null] desired shadow value
 	 * @param {String} [compositeOperation=null] desired composite operation value
+	 * @param {Boolean} [visible=true] desired visible value
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
-	p.reinitialize = function(a, b, c, d, tx, ty, alpha, shadow, compositeOperation) {
+	p.reinitialize = function(a, b, c, d, tx, ty, alpha, shadow, compositeOperation, visible) {
 		this.initialize(a,b,c,d,tx,ty);
 		this.alpha = alpha == null ? 1 : alpha;
 		this.shadow = shadow;
 		this.compositeOperation = compositeOperation;
+		this.visible = visible == null ? true : visible;
 		return this;
 	};
 	
@@ -515,7 +526,7 @@ var p = Matrix2D.prototype;
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
 	p.copy = function(matrix) {
-		return this.reinitialize(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty, matrix.alpha, matrix.shadow, matrix.compositeOperation);
+		return this.reinitialize(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty, matrix.alpha, matrix.shadow, matrix.compositeOperation, matrix.visible);
 	};
 
 	/**
@@ -524,12 +535,14 @@ var p = Matrix2D.prototype;
 	 * @param {Number} alpha desired alpha value
 	 * @param {Shadow} shadow desired shadow value
 	 * @param {String} compositeOperation desired composite operation value
+	 * @param {Boolean} visible desired visible value
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
-	p.appendProperties = function(alpha, shadow, compositeOperation) {
+	p.appendProperties = function(alpha, shadow, compositeOperation, visible) {
 		this.alpha *= alpha;
 		this.shadow = shadow || this.shadow;
 		this.compositeOperation = compositeOperation || this.compositeOperation;
+		this.visible = this.visible && visible;
 		return this;
 	};
 
@@ -539,12 +552,14 @@ var p = Matrix2D.prototype;
 	 * @param {Number} alpha desired alpha value
 	 * @param {Shadow} shadow desired shadow value
 	 * @param {String} compositeOperation desired composite operation value
+	 * @param {Boolean} visible desired visible value
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
-	p.prependProperties = function(alpha, shadow, compositeOperation) {
+	p.prependProperties = function(alpha, shadow, compositeOperation, visible) {
 		this.alpha *= alpha;
 		this.shadow = this.shadow || shadow;
 		this.compositeOperation = this.compositeOperation || compositeOperation;
+		this.visible = this.visible && visible;
 		return this;
 	};
 

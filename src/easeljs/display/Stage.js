@@ -64,17 +64,6 @@ var Stage = function(canvas) {
 };
 var p = Stage.prototype = new createjs.Container();
 
-// static properties:
-	/**
-	 * @property _snapToPixelEnabled
-	 * @protected
-	 * @static
-	 * @type {Boolean}
-	 * @default false
-	 * @deprecated Hardware acceleration in modern browsers makes this unnecessary.
-	 **/
-	Stage._snapToPixelEnabled = false; // snapToPixelEnabled is temporarily copied here during a draw to provide global access.
-
 // events:
 
 	/**
@@ -214,14 +203,13 @@ var p = Stage.prototype = new createjs.Container();
 	 * @deprecated Use addEventListener and the "stagemousedown" event.
 	 */
 
-	// TODO: deprecated.
 	/**
-	 * Indicates whether this stage should use the {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of
-	 * display objects when rendering them.
+	 * Indicates whether display objects should be rendered on whole pixels. You can set the
+	 * {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of
+	 * display objects to false to enable/disable this behaviour on a per instance basis.
 	 * @property snapToPixelEnabled
 	 * @type Boolean
 	 * @default false
-	 * @deprecated Hardware acceleration makes this not beneficial
 	 **/
 	p.snapToPixelEnabled = false;
 
@@ -251,30 +239,13 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.mouseMoveOutside = false;
 	
-	// TODO: confirm naming and inclusion.
+	// TODO: deprecated.
 	/**
-	 * NOTE: this name is not final. Feedback is appreciated.
-	 *
-	 * The stage assigned to this property will have mouse interactions relayed to it after this stage handles them.
-	 * This can be useful in cases where you have multiple canvases layered on top of one another and want your mouse
-	 * events to pass through. For example, this would relay mouse events from topStage to bottomStage:
-	 *
-	 *      topStage.nextStage = bottomStage;
-	 *
-	 * Note that each stage handles the interactions independently. As such, you could have a click register on an
-	 * object in the top stage, and another click register in the bottom stage. Consider using a single canvas with
-	 * cached {{#crossLink "Container"}}{{/crossLink}} instances instead of multiple canvases.
-	 *
-	 * MouseOver, MouseOut, RollOver, and RollOut interactions will not be passed through. They must be enabled using
-	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} for each stage individually.
-	 * 
-	 * In most instances, you will also want to disable DOM events for the next stage to avoid duplicate interactions.
-	 * myNextStage.enableDOMEvents(false);
-	 * 
+	 * Replaced by {{#crossLink "Stage/relayEventsTo"}}{{/crossLink}}.
 	 * @property nextStage
 	 * @type Stage
+	 * @deprecated Use relayEventsTo instead.
 	 **/
-	p.nextStage = null;
 
 	/**
 	 * The hitArea property is not supported for Stage.
@@ -282,6 +253,59 @@ var p = Stage.prototype = new createjs.Container();
 	 * @type {DisplayObject}
 	 * @default null
 	 */
+	 
+// getter / setters:
+	/**
+	 * Specifies a target stage that will have mouse / touch interactions relayed to it after this stage handles them.
+	 * This can be useful in cases where you have multiple layered canvases and want user interactions
+	 * events to pass through. For example, this would relay mouse events from topStage to bottomStage:
+	 *
+	 *      topStage.nextStage = bottomStage;
+	 *
+	 * To disable relaying, set nextStage to null.
+	 * 
+	 * MouseOver, MouseOut, RollOver, and RollOut interactions are also passed through using the mouse over settings
+	 * of the top-most stage, but are only processed if the target stage has mouse over interactions enabled.
+	 * Considerations when using roll over in relay targets:<OL>
+	 * <LI> The top-most (first) stage must have mouse over interactions enabled (via enableMouseOver)</LI>
+	 * <LI> All stages that wish to participate in mouse over interaction must enable them via enableMouseOver</LI>
+	 * <LI> All relay targets will share the frequency value of the top-most stage</LI>
+	 * </OL>
+	 * To illustrate, in this example the targetStage would process mouse over interactions at 10hz (despite passing
+	 * 30 as it's desired frequency):
+	 * 	topStage.nextStage = targetStage;
+	 * 	topStage.enableMouseOver(10);
+	 * 	targetStage.enableMouseOver(30);
+	 * 
+	 * If the target stage's canvas is completely covered by this stage's canvas, you may also want to disable its
+	 * DOM events using:
+	 * 
+	 *	targetStage.enableDOMEvents(false);
+	 * 
+	 * @property nextStage
+	 * @param {Stage} targetStage The stage to relay mouse interactions to.
+	 **/
+	p._get_nextStage = function() {
+		return this._nextStage;
+	};
+	
+	/**
+	 * Returns the y position of the mouse in the local coordinate system of the current target (ie. the dispatcher).
+	 * @property localY
+	 * @type {Number}
+	 * @readonly
+	 */
+	p._set_nextStage = function(value) {
+		if (this._nextStage) { this._nextStage._prevStage = null; }
+		if (value) { value._prevStage = this; }
+		this._nextStage = value;
+	};
+	
+	try {
+		Object.defineProperties(p, {
+			nextStage: { get: p._get_nextStage, set: p._set_nextStage }
+		});
+	} catch (e) {} // TODO: use Log
 
 // private properties:
 
@@ -316,6 +340,20 @@ var p = Stage.prototype = new createjs.Container();
 	 * @type Number
 	 **/
 	p._mouseOverIntervalID = null;
+	
+	/**
+	 * @property _nextStage
+	 * @protected
+	 * @type Stage
+	 **/
+	p._nextStage = null;
+	
+	/**
+	 * @property _prevStage
+	 * @protected
+	 * @type Stage
+	 **/
+	p._prevStage = null;
 
 // constructor:
 	/**
@@ -365,7 +403,7 @@ var p = Stage.prototype = new createjs.Container();
 			this.dispatchEvent("tickend");
 		}
 		this.dispatchEvent("drawstart"); // TODO: make cancellable?
-		Stage._snapToPixelEnabled = this.snapToPixelEnabled;
+		createjs.DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
 		if (this.autoClear) { this.clear(); }
 		var ctx = this.canvas.getContext("2d");
 		ctx.save();
@@ -612,29 +650,25 @@ var p = Stage.prototype = new createjs.Container();
 	 * @param {Event} e
 	 * @param {Number} pageX
 	 * @param {Number} pageY
+	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
 	 **/
-	p._handlePointerMove = function(id, e, pageX, pageY) {
+	p._handlePointerMove = function(id, e, pageX, pageY, owner) {
+		if (this._prevStage && owner === undefined) { return; } // redundant listener.
 		if (!this.canvas) { return; }
-		var o = this._getPointerData(id);
+		var nextStage=this._nextStage, o=this._getPointerData(id);
 
 		var inBounds = o.inBounds;
 		this._updatePointerPosition(id, e, pageX, pageY);
-		if (!inBounds && !o.inBounds && !this.mouseMoveOutside) { return; }
-		if (id == -1 && o.inBounds == !inBounds) {
-			this._dispatchMouseEvent(this, (inBounds ? "mouseleave" : "mouseenter"), false, id, o, e);
+		if (inBounds || o.inBounds || this.mouseMoveOutside) {
+			if (id == -1 && o.inBounds == !inBounds) {
+				this._dispatchMouseEvent(this, (inBounds ? "mouseleave" : "mouseenter"), false, id, o, e);
+			}
+			
+			this._dispatchMouseEvent(this, "stagemousemove", false, id, o, e);
+			this._dispatchMouseEvent(o.target, "pressmove", true, id, o, e);
 		}
 		
-		this._dispatchMouseEvent(this, "stagemousemove", false, id, o, e);
-		this._dispatchMouseEvent(o.target, "pressmove", true, id, o, e);
-
-		// TODO: deprecated:
-		var oEvent = o.event;
-		if (oEvent && oEvent.hasEventListener("mousemove")) {
-			// this doesn't use _dispatchMouseEvent because it requires re-targeting.
-			oEvent.dispatchEvent(new createjs.MouseEvent("mousemove", false, false, o.x, o.y, e, id, (id == this._primaryPointerID), o.rawX, o.rawY), o.target);
-		}
-
-		this.nextStage&&this.nextStage._handlePointerMove(id, e, pageX, pageY);
+		nextStage&&nextStage._handlePointerMove(id, e, pageX, pageY, null);
 	};
 
 	/**
@@ -689,33 +723,25 @@ var p = Stage.prototype = new createjs.Container();
 	 * @param {Number} id
 	 * @param {Event} e
 	 * @param {Boolean} clear
+	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
 	 **/
-	p._handlePointerUp = function(id, e, clear) {
-		var o = this._getPointerData(id);
-
+	p._handlePointerUp = function(id, e, clear, owner) {
+		var nextStage = this._nextStage, o = this._getPointerData(id);
+		if (this._prevStage && owner === undefined) { return; } // redundant listener.
+		
 		this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e);
-
-		var oTarget = o.target;
-		if (oTarget) {
-			if (this._getObjectsUnderPoint(o.x, o.y, null, true) == oTarget) {
-				this._dispatchMouseEvent(oTarget, "click", true, id, o, e);
-			}
-			this._dispatchMouseEvent(oTarget, "pressup", true, id, o, e);
-		}
-
-		// TODO: deprecated:
-		var oEvent = o.event;
-		if (oEvent && oEvent.hasEventListener("mouseup")) {
-			// this doesn't use _dispatchMouseEvent because it requires re-targeting.
-			oEvent.dispatchEvent(new createjs.MouseEvent("mouseup", false, false, o.x, o.y, e, id, (id==this._primaryPointerID), o.rawX, o.rawY), oTarget);
-		}
+		
+		var target=null, oTarget = o.target;
+		if (!owner && (oTarget || nextStage)) { target = this._getObjectsUnderPoint(o.x, o.y, null, true); }
+		if (target == oTarget) { this._dispatchMouseEvent(oTarget, "click", true, id, o, e); }
+		this._dispatchMouseEvent(oTarget, "pressup", true, id, o, e);
 
 		if (clear) {
 			if (id==this._primaryPointerID) { this._primaryPointerID = null; }
 			delete(this._pointerData[id]);
-		} else { o.event = o.target = null; }
-
-		this.nextStage&&this.nextStage._handlePointerUp(id, e, clear);
+		} else { o.target = null; }
+		
+		nextStage&&nextStage._handlePointerUp(id, e, clear, owner || target && this);
 	};
 
 	/**
@@ -734,33 +760,48 @@ var p = Stage.prototype = new createjs.Container();
 	 * @param {Event} e
 	 * @param {Number} pageX
 	 * @param {Number} pageY
+	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
 	 **/
-	p._handlePointerDown = function(id, e, pageX, pageY) {
+	p._handlePointerDown = function(id, e, pageX, pageY, owner) {
 		if (pageY != null) { this._updatePointerPosition(id, e, pageX, pageY); }
-		var o = this._getPointerData(id);
+		var target = null, nextStage = this._nextStage, o = this._getPointerData(id);
 
-		this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e);
+		if (o.inBounds) { this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e); }
+		
+		
+		if (!owner) {
+			target = o.target = this._getObjectsUnderPoint(o.x, o.y, null, true);
+			this._dispatchMouseEvent(o.target, "mousedown", true, id, o, e);
+		}
 
-		o.target = this._getObjectsUnderPoint(o.x, o.y, null, true);
-		// TODO: holding onto the event is deprecated:
-		o.event =  this._dispatchMouseEvent(o.target, "mousedown", true, id, o, e);
-
-		this.nextStage&&this.nextStage._handlePointerDown(id, e, pageX, pageY);
+		nextStage&&nextStage._handlePointerDown(id, e, pageX, pageY, owner || target && this);
 	};
 
 	/**
 	 * @method _testMouseOver
 	 * @param {Boolean} clear If true, clears the mouseover / rollover (ie. no target)
+	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 * @param {Stage} eventTarget The stage that the cursor is actively over.
 	 * @protected
 	 **/
-	p._testMouseOver = function(clear) {
+	p._testMouseOver = function(clear, owner, eventTarget) {
+		if (this._prevStage && owner === undefined) { return; } // redundant listener.
+		
+		var nextStage = this._nextStage;
+		if (!this._mouseOverIntervalID) {
+			// not enabled for mouseover, but should still relay the event.
+			nextStage&&nextStage._testMouseOver(clear, owner, eventTarget);
+			return;
+		}
+		
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
 		if (this._primaryPointerID != -1 || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
-		var o = this._getPointerData(-1);
-		var e = o.posEvtObj;
-		var target, common = -1, cursor="", t, i, l;
 		
-		if (clear || this.mouseInBounds && e && e.target == this.canvas) {
+		var o = this._getPointerData(-1), e = o.posEvtObj;
+		var isEventTarget = eventTarget || e&&(e.target == this.canvas);
+		var target=null, common = -1, cursor="", t, i, l;
+		
+		if (!owner && (clear || this.mouseInBounds && isEventTarget)) {
 			target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
 			this._mouseOverX = this.mouseX;
 			this._mouseOverY = this.mouseY;
@@ -778,6 +819,7 @@ var p = Stage.prototype = new createjs.Container();
 			t = t.parent;
 		}
 		this.canvas.style.cursor = cursor;
+		if (!owner && eventTarget) { eventTarget.canvas.style.cursor = cursor; }
 
 		// find common ancestor:
 		for (i=0,l=list.length; i<l; i++) {
@@ -800,20 +842,23 @@ var p = Stage.prototype = new createjs.Container();
 		if (oldTarget != target) {
 			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e);
 		}
-
+		
+		nextStage&&nextStage._testMouseOver(clear, owner || target && this, eventTarget || isEventTarget && this);
 	};
 
 	/**
 	 * @method _handleDoubleClick
 	 * @protected
 	 * @param {MouseEvent} e
+	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
 	 **/
-	p._handleDoubleClick = function(e) {
-		var o = this._getPointerData(-1);
-		var target = this._getObjectsUnderPoint(o.x, o.y, null, true);
-		this._dispatchMouseEvent(target, "dblclick", true, -1, o, e);
-
-		this.nextStage&&this.nextStage._handleDoubleClick(e);
+	p._handleDoubleClick = function(e, owner) {
+		var target=null, nextStage=this._nextStage, o=this._getPointerData(-1);
+		if (!owner) {
+			target = this._getObjectsUnderPoint(o.x, o.y, null, true);
+			this._dispatchMouseEvent(target, "dblclick", true, -1, o, e);
+		}
+		nextStage&&nextStage._handleDoubleClick(e, owner || target && this);
 	};
 
 	/**
@@ -837,8 +882,6 @@ var p = Stage.prototype = new createjs.Container();
 		*/
 		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
 		target.dispatchEvent(evt);
-		// TODO: returning evt is deprecated:
-		return evt;
 	};
 
 createjs.Stage = Stage;

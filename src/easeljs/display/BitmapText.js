@@ -45,9 +45,27 @@ this.createjs = this.createjs || {};
 function BitmapText(text, spriteSheet) {
 	this.initialize(text, spriteSheet);
 }
-var p = BitmapText.prototype = new createjs.DisplayObject();
+var p = BitmapText.prototype = new createjs.Container();
 
 // static properties:
+	/**
+	 * BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains
+	 * an internal object pool of sprite instances to reuse. Increasing this value can cause more sprites to be
+	 * retained, slightly increasing memory use, but reducing instantiation.
+	 * @property maxPoolSize
+	 * @type Number
+	 * @static
+	 * @default 100
+	 **/
+	BitmapText.maxPoolSize = 100;
+	
+	/**
+	 * Sprite object pool.
+	 * @type {Array}
+	 * @static
+	 * @private
+	 */
+	BitmapText._spritePool = [];
 
 // events:
 
@@ -103,8 +121,8 @@ var p = BitmapText.prototype = new createjs.DisplayObject();
 
 	/**
 	 * If a space character is not defined in the sprite sheet, then empty pixels equal to
-	 * spaceWidth will be inserted instead. If  0, then it will use a value calculated
-	 * by checking for the width of the "1", "E", or "A" character (in that order). If
+	 * spaceWidth will be inserted instead. If 0, then it will use a value calculated
+	 * by checking for the width of the "1", "l", "E", or "A" character (in that order). If
 	 * those characters are not defined, it will use the width of the first frame of the
 	 * sprite sheet.
 	 * @property spaceWidth
@@ -114,14 +132,20 @@ var p = BitmapText.prototype = new createjs.DisplayObject();
 	p.spaceWidth = 0;
 	
 // private properties:
+ 	/**
+	 * @property _oldProps
+	 * @type Object
+	 * @protected
+	 **/
+	p._oldProps = null;
 	
 // constructor:
 	/**
-	 * @property DisplayObject_initialize
+	 * @property Container_initialize
 	 * @type Function
 	 * @protected
 	 **/
-	p.DisplayObject_initialize = p.initialize;
+	p.Container_initialize = p.initialize;
 	
 	/**
 	 * Initialization method.
@@ -131,10 +155,11 @@ var p = BitmapText.prototype = new createjs.DisplayObject();
 	 * @protected
 	 **/
 	p.initialize = function (text, spriteSheet) {
-		this.DisplayObject_initialize();
+		this.Container_initialize();
 
 		this.text = text;
 		this.spriteSheet = spriteSheet;
+		this._oldProps = {text:0,spriteSheet:0,lineHeight:0,letterSpacing:0,spaceWidth:0};
 	};
 	
 // public methods:
@@ -143,21 +168,31 @@ var p = BitmapText.prototype = new createjs.DisplayObject();
 	 * @type Function
 	 * @protected
 	 **/
-	p.DisplayObject_draw = p.draw;
+	p.Container_draw = p.draw;
 	
 	/**
-	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
-	 * Returns true if the draw was handled (useful for overriding functionality).
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * @method draw
-	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
-	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	 * into itself).
+	 * Docced in superclass.
 	 **/
 	p.draw = function(ctx, ignoreCache) {
-		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		this._drawText(ctx);
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return; }
+		this._updateText();
+		this.Container_draw(ctx, ignoreCache);
+	};
+	
+	/**
+	 * @property Container_getBounds
+	 * @type Function
+	 * @protected
+	 **/
+	p.Container_getBounds = p.getBounds;
+	
+	/**
+	 * Docced in superclass.
+	 **/
+	p.getBounds = function() {
+		// getBounds is somewhat expensive 
+		this._updateText();
+		return this.Container_getBounds();
 	};
 	
 	/**
@@ -172,44 +207,51 @@ var p = BitmapText.prototype = new createjs.DisplayObject();
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	};
 	
-	/**
-	 * Docced in superclass.
-	 */
-	p.getBounds = function() {
-		var bounds = this._rectangle;
-		this._drawText(null, bounds);
-		return bounds.width ? bounds : null;
-	};
+	// TODO: should probably disable addChild / addChildAt
 
 // private methods:
 	/**
-	 * @method _getFrame
+	 * @method _getFrameIndex
 	 * @param {String} character
 	 * @param {SpriteSheet} spriteSheet
+	 * @return {Number}
 	 * @protected
 	 **/
-	p._getFrame = function(character, spriteSheet) {
+	p._getFrameIndex = function(character, spriteSheet) {
 		var c, o = spriteSheet.getAnimation(character);
 		if (!o) {
 			(character != (c = character.toUpperCase())) || (character != (c = character.toLowerCase())) || (c=null);
 			if (c) { o = spriteSheet.getAnimation(c); }
 		}
-		return o && spriteSheet.getFrame(o.frames[0]);
+		return o && o.frames[0];
+	};
+	
+	/**
+	 * @method _getFrame
+	 * @param {String} character
+	 * @param {SpriteSheet} spriteSheet
+	 * @return {Object}
+	 * @protected
+	 **/
+	p._getFrame = function(character, spriteSheet) {
+		var index = this._getFrameIndex(character, spriteSheet);
+		return index == null ? index : spriteSheet.getFrame(index);
 	};
 	
 	/**
 	 * @method _getLineHeight
 	 * @param {SpriteSheet} ss
+	 * @return {Number}
 	 * @protected
 	 **/
 	p._getLineHeight = function(ss) {
 		var frame = this._getFrame("1",ss) || this._getFrame("T",ss) || this._getFrame("L",ss) || ss.getFrame(0);
 		return frame ? frame.rect.height : 1;
 	};
-	
 	/**
 	 * @method _getSpaceWidth
 	 * @param {SpriteSheet} ss
+	 * @return {Number}
 	 * @protected
 	 **/
 	p._getSpaceWidth = function(ss) {
@@ -219,46 +261,55 @@ var p = BitmapText.prototype = new createjs.DisplayObject();
 	
 	/**
 	 * @method _drawText
-	 * @param {CanvasRenderingContext2D} ctx
-	 * @param {Object | Rectangle} bounds
 	 * @protected
 	 **/
-	p._drawText = function(ctx, bounds) {
-		var w, h, rx, x=0, y=0, spaceW=this.spaceWidth, lineH=this.lineHeight, ss=this.spriteSheet;
-				
+	p._updateText = function() {
+		var x=0, y=0, o=this._oldProps, change=false, spaceW=this.spaceWidth, lineH=this.lineHeight, ss=this.spriteSheet;
+		var pool=BitmapText._spritePool, kids=this.children, childIndex=0, numKids=kids.length, sprite;
+		
+		for (var n in o) {
+			if (o[n] != this[n]) {
+				o[n] = this[n];
+				change = true;
+			}
+		}
+		if (!change) { return; }
+		
 		var hasSpace = !!this._getFrame(" ", ss);
 		if (!hasSpace && spaceW==0) { spaceW = this._getSpaceWidth(ss); }
 		if (lineH==0) { lineH = this._getLineHeight(ss); }
 		
-		var maxX = 0;
 		for(var i=0, l=this.text.length; i<l; i++) {
 			var character = this.text.charAt(i);
-			if (!hasSpace && character == " ") {
+			if (character == " " && !hasSpace) {
 				x += spaceW;
 				continue;
 			} else if (character=="\n" || character=="\r") {
 				if (character=="\r" && this.text.charAt(i+1) == "\n") { i++; } // crlf
-				if (x-rx > maxX) { maxX = x-rx; }
 				x = 0;
 				y += lineH;
 				continue;
 			}
 
-			var o = this._getFrame(character, ss);
-			if (!o) { continue; }
-			var rect = o.rect;
-			rx = o.regX;
-			w = rect.width;
-			ctx&&ctx.drawImage(o.image, rect.x, rect.y, w, h=rect.height, x-rx, y-o.regY, w, h);
+			var index = this._getFrameIndex(character, ss);
+			if (index == null) { continue; }
 			
-			x += w + this.letterSpacing;
+			if (childIndex < numKids) {
+				sprite = kids[childIndex];
+			} else {
+				sprite = this.addChild( pool.length ? pool.pop() : new createjs.Sprite() );
+				numKids++;
+			}
+			sprite.spriteSheet = ss;
+			sprite.gotoAndStop(index);
+			sprite.x = x;
+			sprite.y = y;
+			childIndex++;
+			
+			x += sprite.getBounds().width + this.letterSpacing;
 		}
-		if (x-rx > maxX) { maxX = x-rx; }
-		
-		if (bounds) {
-			bounds.width = maxX-this.letterSpacing;
-			bounds.height = y+lineH;
-		}
+		while (numKids > childIndex) { pool.push(sprite = kids.pop()); sprite.parent = null; } // faster than removeChild.
+		if (pool.length > BitmapText.maxPoolSize) { pool.length = BitmapText.maxPoolSize; }
 	};
 
 	createjs.BitmapText = BitmapText;

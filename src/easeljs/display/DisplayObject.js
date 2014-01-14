@@ -137,6 +137,8 @@ var DisplayObject = function() {
 };
 var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	
+	
+// static properties:
 	/**
 	 * Listing of mouse event names. Used in _hasMouseEventListener.
 	 * @property _MOUSE_EVENTS
@@ -155,6 +157,15 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default false
 	 **/
 	DisplayObject.suppressCrossDomainErrors = false;
+	
+	/**
+	 * @property _snapToPixelEnabled
+	 * @protected
+	 * @static
+	 * @type {Boolean}
+	 * @default false
+	 **/
+	DisplayObject._snapToPixelEnabled = false; // stage.snapToPixelEnabled is temporarily copied here during a draw to provide global access.
 
 	/**
 	 * @property _hitTestCanvas
@@ -162,7 +173,6 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @static
 	 * @protected
 	 **/
-	 
 	/**
 	 * @property _hitTestContext
 	 * @type {CanvasRenderingContext2D}
@@ -471,21 +481,14 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p.compositeOperation = null;
 
 	/**
-	 * Indicates whether the display object should have its x & y position rounded prior to drawing it to stage.
-	 * Snapping to whole pixels can result in a sharper and faster draw for images (ex. Bitmap & cached objects).
-	 * This only applies if the enclosing stage has {{#crossLink "Stage/snapPixelsEnabled:property"}}{{/crossLink}} set
-	 * to `true`. The snapToPixel property is `true` by default for {{#crossLink "Bitmap"}}{{/crossLink}} and {{#crossLink "Sprite"}}{{/crossLink}}
-	 * instances, and `false` for all other display objects.
-	 *
-	 * Note that this applies only rounds the display object's local position. You should ensure that all of the display
-	 * object's ancestors (parent containers) are also on a whole pixel. You can do this by setting the ancestors'
-	 * snapToPixel property to `true`.
+	 * Indicates whether the display object should be drawn to a whole pixel when
+	 * {{#crossLink "Stage/snapToPixelEnabled"}}{{/crossLink}} is true. To enable/disable snapping on whole
+	 * categories of display objects, set this value on the prototype (Ex. Text.prototype.snapToPixel = true).
 	 * @property snapToPixel
 	 * @type {Boolean}
-	 * @default false
-	 * @deprecated Hardware acceleration in modern browsers makes this unnecessary.
+	 * @default true
 	 **/
-	p.snapToPixel = false;
+	p.snapToPixel = true;
 	
 	// TODO: remove handler docs in future:
 	/**
@@ -724,9 +727,12 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		}
 		
 		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
-		// TODO: should be a better way to manage this setting. For now, using dynamic access to avoid circular dependencies:
-		if (createjs["Stage"]._snapToPixelEnabled && o.snapToPixel) { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx+0.5|0, mtx.ty+0.5|0); }
-		else { ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
+		var tx = mtx.tx, ty = mtx.ty;
+		if (DisplayObject._snapToPixelEnabled && o.snapToPixel) {
+			tx = tx + (tx < 0 ? -0.5 : 0.5) | 0;
+			ty = ty + (ty < 0 ? -0.5 : 0.5) | 0;
+		}
+		ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, tx, ty);
 		ctx.globalAlpha *= o.alpha;
 		if (o.compositeOperation) { ctx.globalCompositeOperation = o.compositeOperation; }
 		if (o.shadow) { this._applyShadow(ctx, o.shadow); }
@@ -1003,7 +1009,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		else { matrix = new createjs.Matrix2D(); }
 		var o = this;
 		while (o != null) {
-			matrix.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).prependProperties(o.alpha, o.shadow, o.compositeOperation);
+			matrix.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).prependProperties(o.alpha, o.shadow, o.compositeOperation, o.visible);
 			o = o.parent;
 		}
 		return matrix;

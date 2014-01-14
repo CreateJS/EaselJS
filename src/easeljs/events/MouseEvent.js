@@ -36,7 +36,6 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-// TODO: deprecated. @uses EventDispatcher
 /**
  * Passed as the parameter to all mouse/pointer/touch related events. For a listing of mouse events and their properties,
  * see the {{#crossLink "DisplayObject"}}{{/crossLink}} and {{#crossLink "Stage"}}{{/crossLink}} event listings.
@@ -52,7 +51,6 @@ this.createjs = this.createjs||{};
  * @param {Number} rawX The raw x position relative to the stage.
  * @param {Number} rawY The raw y position relative to the stage.
  * @extends Event
- * @uses EventDispatcher
  * @constructor
  **/
 var MouseEvent = function(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY) {
@@ -61,9 +59,9 @@ var MouseEvent = function(type, bubbles, cancelable, stageX, stageY, nativeEvent
 var p = MouseEvent.prototype = new createjs.Event();
 
 // events:
-
+	// TODO: deprecated.
 	/**
-	 * For MouseEvent objects of type "mousedown", mousemove events will be dispatched from the event object until the
+	 * REMOVED. For MouseEvent objects of type "mousedown", mousemove events will be dispatched from the event object until the
 	 * user releases the mouse anywhere. This enables you to listen to mouse move interactions for the duration of a
 	 * press, which can be very useful for operations such as drag and drop.
 	 *
@@ -74,7 +72,7 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 */
 
 	/**
-	 * For MouseEvent objects of type "mousedown", a mouseup event will be dispatched from the event object when the
+	 * REMOVED. For MouseEvent objects of type "mousedown", a mouseup event will be dispatched from the event object when the
 	 * user releases the mouse anywhere. This enables you to listen for a corresponding mouse up from a specific press,
 	 * which can be very useful for operations such as drag and drop.
 	 *
@@ -157,17 +155,6 @@ var p = MouseEvent.prototype = new createjs.Event();
 	 * @type {Boolean}
 	 */
 	p.primary = false;
-
-// mix-ins:
-	// EventDispatcher methods:
-	// TODO: deprecated:
-	p.addEventListener = null;
-	p.removeEventListener = null;
-	p.removeAllEventListeners = null;
-	p.dispatchEvent = null;
-	p.hasEventListener = null;
-	p._listeners = null;
-	createjs.EventDispatcher.initialize(p); // inject EventDispatcher methods.
 	
 // getter / setters:
 	/**
