@@ -16,15 +16,13 @@
 			position: absolute;
 			right: 0;
 			top: 0;
-			border-color: #ffffff;
-			border-style: dashed;
+			border: 1px solid grey;
 		}
 		#canvasTwo {
 			position: absolute;
 			left: 0;
 			bottom: 0;
-			border-color: #ff0000;
-			border-style: solid;
+			border: 1px solid grey;
 		}
 	</style>
 
@@ -75,24 +73,25 @@
 	  http://code.createjs.com -->
 
 	<script>
-		var stage1, text1;
-		var stage2, text2;
+		var bottomStage, topStage;
 
 		function init() {
-			stage1 = stageSetup("canvasOne", handleEvt);
-			stage1.name = "Stage1";
-			//stage1.enableDOMEvents(false);	// to avoid duplicate interactions
+			bottomStage = stageSetup("canvasOne", handleEvt);
+			bottomStage.name = "bottomStage";
+			//bottomStage.enableDOMEvents(false);	// to avoid duplicate interactions
 
-			stage2 = stageSetup("canvasTwo", handleEvt2);
-			stage2.name = "Stage2";
-			stage2.nextStage = stage1;
+			topStage = stageSetup("canvasTwo", handleEvt);
+			topStage.name = "topStage";
+			topStage.enableMouseOver();
+			topStage.nextStage = bottomStage;
+			bottomStage.enableMouseOver();
 
-			stage1.addChild(makeSquare(30, 95, "#00F", handleEvt));
-			stage2.addChild(makeSquare(375, 30, "#0F0", handleEvt2));
+			bottomStage.addChild(makeSquare(30, 95, "red", handleEvt));
+			topStage.addChild(makeSquare(375, 30, "#0F0", handleEvt));
 
 			// text object to output the
-			text1 = stage1.addChild(new createjs.Text("", "15px monospace", "#FFF")).set({x:195, y:30, lineHeight:16.7});
-			text2 = stage2.addChild(new createjs.Text("", "15px monospace", "#FFF")).set({x:30, y:30, lineHeight:16.7});
+			bottomStage.text = bottomStage.addChild(new createjs.Text("", "15px monospace", "#FFF")).set({x:195, y:30, lineHeight:16.7});
+			topStage.text = topStage.addChild(new createjs.Text("", "15px monospace", "#FFF")).set({x:30, y:30, lineHeight:16.7});
 		}
 
 		/* create a stage object to work with the canvas
@@ -101,14 +100,14 @@
 		 */
 		function stageSetup(canvasName, handler) {
 			stage = new createjs.Stage(canvasName);
-			stage.enableMouseOver(20);
 			//stage.addEventListener("stagemousemove", handler);	// too noisy
 			stage.addEventListener("stagemousedown", handler);
 			stage.addEventListener("stagemouseup", handler);
 			stage.addEventListener("mouseleave", handler);
 			stage.addEventListener("mouseenter", handler);
-
+			
 			createjs.Ticker.addEventListener("tick", stage);
+			stage.log = [];
 
 			return stage;
 		}
@@ -117,13 +116,12 @@
 		function makeSquare(x, y, color, handler) {
 			var container = new createjs.Container().set({name:"container"});
 
-			var shape = container.addChild(new createjs.Shape()).set({name:"square", x:x, y:y, alpha:0.6});
+			var shape = container.addChild(new createjs.Shape()).set({name:"square", x:x, y:y});
 			shape.graphics.beginFill(color).drawRect(0,0,135,135);
 
 			container.addEventListener("mouseover", handler);
 			container.addEventListener("mouseout", handler);
-			//container.addEventListener("rollover", handler);
-			//container.addEventListener("rollout", handler);
+			container.addEventListener("dblclick", handler);
 			container.addEventListener("click", handler);
 
 			container.cursor = "pointer";
@@ -131,18 +129,16 @@
 		}
 
 		// log functions that update text object on related stages with mouse event info
-		var log1 = [];
 		function handleEvt(evt) {
-			log1.push(evt.type+" on "+evt.target.name+" x:"+evt.stageX+" y:"+evt.stageY);
-			while (log1.length > 12) { log1.shift(); }
-			text1.text = log1.join("\n");
-		}
-
-		var log2 = [];
-		function handleEvt2(evt) {
-			log2.push(evt.type+" on "+evt.target.name+" x:"+evt.stageX+" y:"+evt.stageY);
-			while (log2.length > 12) { log2.shift(); }
-			text2.text = log2.join("\n");
+			var target = evt.target, stage = target.getStage(), log = stage.log;
+			
+			log.push(evt.type+" on "+target.name+" x:"+evt.stageX+" y:"+evt.stageY);
+			while (log.length > 12) { log.shift(); }
+			
+			stage.text.text = log.join("\n");
+			
+			if (evt.type == "mouseover") { target.alpha = 0.5; }
+			if (evt.type == "mouseout") { target.alpha = 1; }
 		}
 	</script>
 

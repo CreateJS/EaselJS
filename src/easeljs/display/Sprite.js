@@ -123,14 +123,6 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	p.spriteSheet = null;
 
 	/**
-	 * Whether or not the image should be draw to the canvas at whole pixel coordinates.
-	 * @property snapToPixel
-	 * @type {Boolean}
-	 * @default true
-	 **/
-	p.snapToPixel = true;
-
-	/**
 	 * @property offset
 	 * @type {Number}
 	 * @default 0

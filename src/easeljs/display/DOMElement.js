@@ -148,7 +148,6 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 */
 	p.draw = function(ctx, ignoreCache) {
 		// this relies on the _tick method because draw isn't called if a parent is not visible.
-		if (this.visible) { this._visible = true; }
 		// the actual update happens in _handleDrawEnd
 		return true;
 	};
@@ -258,7 +257,6 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 	 */
 	p._tick = function(params) {
 		var stage = this.getStage();
-		this._visible = false;
 		stage&&stage.on("drawend", this._handleDrawEnd, this, true);
 		this.DisplayObject__tick(params);
 	};
@@ -273,11 +271,12 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 		if (!o) { return; }
 		var style = o.style;
 		
-		var visibility = this._visible ? "visible" : "hidden";
-		if (visibility != style.visibility) { style.visibility = visibility; }
-		if (!this._visible) { return; }
-		
 		var mtx = this.getConcatenatedMatrix(this._matrix);
+		
+		var visibility = mtx.visible ? "visible" : "hidden";
+		if (visibility != style.visibility) { style.visibility = visibility; }
+		if (!mtx.visible) { return; }
+		
 		var oMtx = this._oldMtx;
 		var n = 10000; // precision
 		if (!oMtx || oMtx.alpha != mtx.alpha) {

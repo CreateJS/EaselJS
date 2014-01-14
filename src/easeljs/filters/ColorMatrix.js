@@ -302,7 +302,7 @@ this.createjs = this.createjs||{};
 	 * @return {String} a string representation of the instance.
 	 **/
 	p.toString = function() {
-		return "[ColorMatrix ("+ this.toArray() +")]";
+		return "[ColorMatrix]";
 	};
 
 // private methods:
