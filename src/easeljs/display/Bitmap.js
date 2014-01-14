@@ -74,14 +74,6 @@ var p = Bitmap.prototype = new createjs.DisplayObject();
 	 * @type Image | HTMLCanvasElement | HTMLVideoElement
 	 **/
 	p.image = null;
-	
-	/**
-	 * Whether or not the Bitmap should be draw to the canvas at whole pixel coordinates.
-	 * @property snapToPixel
-	 * @type Boolean
-	 * @default true
-	 **/
-	p.snapToPixel = true;
 
 	/**
 	 * Specifies an area of the source image to draw. If omitted, the whole image will be drawn.

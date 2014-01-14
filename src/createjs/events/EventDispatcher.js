@@ -305,7 +305,7 @@ var p = EventDispatcher.prototype;
 			eventObj = new createjs.Event(eventObj);
 		}
 		// TODO: deprecated. Target param is deprecated, only use case is MouseEvent/mousemove, remove.
-		eventObj.target = target||this;
+		try { eventObj.target = target||this; } catch (e) {} // allows redispatching of native events
 
 		if (!eventObj.bubbles || !this.parent) {
 			this._dispatchEvent(eventObj, 2);
@@ -377,8 +377,8 @@ var p = EventDispatcher.prototype;
 		if (eventObj && listeners) {
 			var arr = listeners[eventObj.type];
 			if (!arr||!(l=arr.length)) { return; }
-			eventObj.currentTarget = this;
-			eventObj.eventPhase = eventPhase;
+			try { eventObj.currentTarget = this; } catch (e) {}
+			try { eventObj.eventPhase = eventPhase; } catch (e) {}
 			eventObj.removed = false;
 			arr = arr.slice(); // to avoid issues with items being removed or added during the dispatch
 			for (var i=0; i<l && !eventObj.immediatePropagationStopped; i++) {
