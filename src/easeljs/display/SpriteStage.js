@@ -906,6 +906,12 @@ var p = SpriteStage.prototype = new createjs.Stage();
 				vEnd = vStart + (rect.height / image.height);
 			} else {
 				image = null;
+
+				// Update BitmapText instances:
+				if (kid._spritestage_compatibility === 3) {
+					// TODO: this might change in the future to use a more general approach.
+					kid._updateText();
+				}
 			}
 
 			// Detect if this kid is a new display branch:
