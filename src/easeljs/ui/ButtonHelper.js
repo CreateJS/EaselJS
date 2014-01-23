@@ -111,6 +111,52 @@ var p = ButtonHelper.prototype;
 	 * @type Boolean
 	 **/
 	p.play = false;
+	
+// getter / setters:
+	
+	/**
+	 * Enables or disables the button functionality on the target.
+	 * @property enabled
+	 * @type {Boolean}
+	 **/
+	/**
+	 * Enables or disables the button functionality on the target.
+	 * @deprecated in favour of the enabled property.
+	 * @method setEnabled
+	 * @param {Boolean} value
+	 **/
+	p.setEnabled = function(value) { // TODO: deprecated.
+		var o = this.target;
+		this._enabled = value;
+		if (value) {
+			o.cursor = "pointer";
+			o.addEventListener("rollover", this);
+			o.addEventListener("rollout", this);
+			o.addEventListener("mousedown", this);
+			o.addEventListener("pressup", this);
+		} else {
+			o.cursor = null;
+			o.removeEventListener("rollover", this);
+			o.removeEventListener("rollout", this);
+			o.removeEventListener("mousedown", this);
+			o.removeEventListener("pressup", this);
+		}
+	};
+	/**
+	 * Returns enabled state of this instance.
+	 * @deprecated in favour of the enabled property.
+	 * @method getEnabled
+	 * @return {Boolean} The last value passed to setEnabled().
+	 **/
+	p.getEnabled = function() {
+		return this._enabled;
+	};
+
+	try {
+		Object.defineProperties(p, {
+			enabled: { get: p.getEnabled, set: p.setEnabled }
+		});
+	} catch (e) {} // TODO: use Log
 
 //  private properties
 	/**
@@ -126,6 +172,13 @@ var p = ButtonHelper.prototype;
 	 * @protected
 	 **/
 	p._isOver = false;
+
+	/**
+	 * @property _enabled
+	 * @type Boolean
+	 * @protected
+	 **/
+	p._enabled = false;
 
 // constructor:
 	/**
@@ -147,7 +200,7 @@ var p = ButtonHelper.prototype;
 	p.initialize = function(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
 		if (!target.addEventListener) { return; }
 		this.target = target;
-		target.cursor = "pointer";
+		target.mouseChildren = false; // prevents issues when children are removed from the display list when state changes.
 		this.overLabel = overLabel == null ? "over" : overLabel;
 		this.outLabel = outLabel == null ? "out" : outLabel;
 		this.downLabel = downLabel == null ? "down" : downLabel;
@@ -164,25 +217,6 @@ var p = ButtonHelper.prototype;
 	};
 
 // public methods:
-	/**
-	 * Enables or disables the button functionality on the target.
-	 * @method setEnabled
-	 * @param {Boolean} value
-	 **/
-	p.setEnabled = function(value) {
-		var o = this.target;
-		if (value) {
-			o.addEventListener("rollover", this);
-			o.addEventListener("rollout", this);
-			o.addEventListener("mousedown", this);
-			o.addEventListener("pressup", this);
-		} else {
-			o.removeEventListener("rollover", this);
-			o.removeEventListener("rollout", this);
-			o.removeEventListener("mousedown", this);
-			o.removeEventListener("pressup", this);
-		}
-	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -202,7 +236,6 @@ var p = ButtonHelper.prototype;
 	 **/
 	p.handleEvent = function(evt) {
 		var label, t = this.target, type = evt.type;
-
 		if (type == "mousedown") {
 			this._isPressed = true;
 			label = this.downLabel;
