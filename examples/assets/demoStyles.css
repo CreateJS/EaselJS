@@ -47,6 +47,11 @@ a:hover {
 		content:	"";
 		position:	absolute;
 	}
+	
+	#header code {
+		font-weight: bold;
+		color: #999;
+	}
 
 
 .content {

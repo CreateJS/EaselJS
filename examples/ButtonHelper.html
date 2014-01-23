@@ -34,6 +34,11 @@
 	<script type="text/javascript" src="../src/easeljs/ui/Touch.js"></script>
 	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetBuilder.js"></script>
+	
+	<script type="text/javascript" src="assets/tweenjs-NEXT.min.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/MovieClip.js"></script>
+	
+	<script type="text/javascript" src="assets/VectorButton.js"></script>
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
@@ -52,83 +57,46 @@
 			document.getElementById("header").style.display = "none";
 		}
 		document.getElementById("loader").className = "loader";
+		
 		// create stage and point it to the canvas:
-		canvas = document.getElementById("testCanvas");
-		stage = new createjs.Stage(canvas);
+		stage = new createjs.Stage("testCanvas");
 
 		// enable touch interactions if supported on the current device:
 		createjs.Touch.enable(stage);
 
-		// enabled mouse over / out events
+		// enable mouse over / out events, required for button rollovers
 		stage.enableMouseOver(10);
-		stage.mouseMoveOutside = true; // keep tracking the mouse even when it leaves the canvas
 
 		// load the source image:
 		var image = new Image();
-		image.src = "assets/daisy.png";
+		image.src = "assets/bitmapButton.png";
 		image.onload = handleImageLoad;
 	}
-
-	function stop() {
-		createjs.Ticker.removeEventListener("tick", tick);
-	}
-
-	function handleImageLoad(event) {
-		var image = event.target;
-		var bitmap;
-		var container = new createjs.Container();
-		stage.addChild(container);
-
-		// create and populate the screen with random daisies:
-		for(var i = 0; i < 100; i++){
-			bitmap = new createjs.Bitmap(image);
-			container.addChild(bitmap);
-			bitmap.x = canvas.width * Math.random()|0;
-			bitmap.y = canvas.height * Math.random()|0;
-			bitmap.rotation = 360 * Math.random()|0;
-			bitmap.regX = bitmap.image.width/2|0;
-			bitmap.regY = bitmap.image.height/2|0;
-			bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random()*0.4+0.6;
-			bitmap.name = "bmp_"+i;
-			bitmap.cursor = "pointer";
-			
-			// using "on" binds the listener to the scope of the currentTarget by default
-			// in this case that means it executes in the scope of the button.
-			bitmap.on("mousedown", function(evt) {
-				this.parent.addChild(this);
-				this.offset = {x:this.x-evt.stageX, y:this.y-evt.stageY};
-			});
-			
-			// the pressmove event is dispatched when the mouse moves after a mousedown on the target until the mouse is released.
-			bitmap.on("pressmove", function(evt) {
-				this.x = evt.stageX+ this.offset.x;
-				this.y = evt.stageY+ this.offset.y;
-				// indicate that the stage should be updated on the next tick:
-				update = true;
-			});
-			
-			bitmap.on("rollover", function(evt) {
-				this.scaleX = this.scaleY = this.scale*1.2;
-				update = true;
-			});
-			
-			bitmap.on("rollout", function(evt) {
-				this.scaleX = this.scaleY = this.scale;
-				update = true;
-			});
-
-		}
-
+	
+	function handleImageLoad(evt) {
 		document.getElementById("loader").className = "";
-		createjs.Ticker.addEventListener("tick", tick);
-	}
-
-	function tick(event) {
-		// this set makes it so the stage only re-renders when an event handler indicates a change has happened.
-		if (update) {
-			update = false; // only update once
-			stage.update(event);
-		}
+		
+		// spritesheet "bitmap" button:
+		var spriteSheet = new createjs.SpriteSheet({
+			images: [evt.target],
+			frames: {width:300, height:100},
+			animations: { out: 0, over: 1, down: 2 }
+		});
+		var bitmapButton = new createjs.Sprite(spriteSheet, "up");
+		stage.addChild(bitmapButton).set({x:50, y:50});
+		var bitmapHelper = new createjs.ButtonHelper(bitmapButton);
+		
+		// movieclip "vector" button:
+		var vectorButton = new lib.VectorButton();
+		stage.addChild(vectorButton).set({x: 400, y:50});
+		var vectorHelper = new createjs.ButtonHelper(vectorButton);
+		
+		bitmapButton.on("click", function() {
+			vectorHelper.enabled = !vectorHelper.enabled;
+			vectorButton.alpha = 0.5+vectorHelper.enabled*0.5;
+		});
+		
+		createjs.Ticker.addEventListener("tick", stage);
 	}
 	</script>
 
@@ -139,8 +107,8 @@
 	<div id="loader"></div>
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Drag &amp; Drop Example</h1>
-	    <p>Example of implementing drag &amp; drop using mouse events such as <strong>mousedown</strong>, <strong>mouseup</strong>, and <strong>pressmove</strong>. Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.</p>
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> ButtonHelper Example</h1>
+	    <p>Shows how to use a <code>ButtonHelper</code> with <code>Sprite</code> or <code>MovieClip</code> instances (or anything with a <code>gotoAndStop()</code> method). Clicking the bitmap button toggles <code>enabled</code> on the vector <code>ButtonHelper</code></p>
 	</header>
 
 	<div class="canvasHolder">
