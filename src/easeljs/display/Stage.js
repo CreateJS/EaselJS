@@ -283,18 +283,11 @@ var p = Stage.prototype = new createjs.Container();
 	 *	targetStage.enableDOMEvents(false);
 	 * 
 	 * @property nextStage
-	 * @param {Stage} targetStage The stage to relay mouse interactions to.
+	 * @type {Stage}
 	 **/
 	p._get_nextStage = function() {
 		return this._nextStage;
 	};
-	
-	/**
-	 * Returns the y position of the mouse in the local coordinate system of the current target (ie. the dispatcher).
-	 * @property localY
-	 * @type {Number}
-	 * @readonly
-	 */
 	p._set_nextStage = function(value) {
 		if (this._nextStage) { this._nextStage._prevStage = null; }
 		if (value) { value._prevStage = this; }
@@ -735,7 +728,7 @@ var p = Stage.prototype = new createjs.Container();
 		if (!owner && (oTarget || nextStage)) { target = this._getObjectsUnderPoint(o.x, o.y, null, true); }
 		if (target == oTarget) { this._dispatchMouseEvent(oTarget, "click", true, id, o, e); }
 		this._dispatchMouseEvent(oTarget, "pressup", true, id, o, e);
-
+		
 		if (clear) {
 			if (id==this._primaryPointerID) { this._primaryPointerID = null; }
 			delete(this._pointerData[id]);
