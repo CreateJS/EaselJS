@@ -149,6 +149,24 @@ var p = SpriteStage.prototype = new createjs.Stage();
 	 * @readonly
 	 **/
 	SpriteStage.MAX_BOXES_POINTS_INCREMENT = SpriteStage.MAX_INDEX_SIZE / 4;
+		
+// getter / setters:
+	/**
+	 * Indicates whether WebGL is being used for rendering. For example, this would be false if WebGL is not
+	 * supported in the browser.
+	 * @readonly
+	 * @property isWebGL
+	 * @type {Boolean}
+	 **/
+	p._get_isWebGL = function() {
+		return !!this._webGLContext;
+	};
+	
+	try {
+		Object.defineProperties(p, {
+			isWebGL: { get: p._get_isWebGL }
+		});
+	} catch (e) {} // TODO: use Log
 
 // private properties:
 
@@ -551,15 +569,6 @@ var p = SpriteStage.prototype = new createjs.Stage();
 	 **/
 	p.clearImageTexture = function(image) {
 		image.__easeljs_texture = null;
-	};
-
-	/**
-	 * Checks to see whether or not WebGL rendering is being used.
-	 * @method isWebGL
-	 * @return {Boolean}
-	 */
-	p.isWebGL = function() {
-		return this._webGLContext ? true : false;
 	};
 
 	/**

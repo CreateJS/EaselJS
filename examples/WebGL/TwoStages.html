@@ -2,7 +2,8 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>EaselJS Example: Two Stages passing mouse events</title>
+	<base href="../"/>
+	<title>EaselJS Example: Passing interactions between a Context2D and WebGL stage.</title>
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 
@@ -12,17 +13,19 @@
 			width: 960px;
 			height: 400px;
 		}
-		#canvasOne {
+		#webGLCanvas {
 			position: absolute;
 			right: 0;
 			top: 0;
-			border: 1px solid grey;
+			border: 1px solid #0BF;
+			background: rgba(0,180,255,0.1);
 		}
-		#canvasTwo {
+		#c2dCanvas {
 			position: absolute;
-			left: 0;
-			bottom: 0;
-			border: 1px solid grey;
+			right: 0;
+			top: 50px;
+			border: 1px solid #0F0;
+			background: rgba(0,255,0,0.2);
 		}
 	</style>
 
@@ -32,12 +35,14 @@
 
 	<header id="header" class="EaselJS">
 	    <h1><span class="text-product">Easel<strong>JS</strong></span> Two Stages passing mouse events</h1>
-	    <p>This example demonstrates using the nextStage property of Stage to pass mouse events between stages.</p>
+	    <p>This example shows a Context2D <code>Stage</code> (green) passing unhandled mouse events through to a WebGL <code>SpriteStage</code> (blue) layered below it via <code>.nextStage</code>.
+	    Notice that the rollover on the bottom stage works even while over the top (green) canvas.</p>
+	    <p>For example, this could be used for layering a rich UI with vector art & filters over a highly performant WebGL game engine.</p>
 	</header>
 
 	<div class="canvasHolder">
-		<canvas id="canvasOne" width="540" height="260"></canvas>
-		<canvas id="canvasTwo" width="540" height="260"></canvas>
+		<canvas id="webGLCanvas" width="958" height="398"></canvas>
+		<canvas id="c2dCanvas" width="958" height="160"></canvas>
 	</div>
 
 	<!-- Note: All core EaselJS classes are listed here: -->
@@ -68,77 +73,53 @@
 	<script type="text/javascript" src="../src/easeljs/ui/Touch.js"></script>
 	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
 	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetBuilder.js"></script>
+	
+	<!-- WebGL specific classes -->
+	<script type="text/javascript" src="../src/easeljs/display/SpriteContainer.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/SpriteStage.js"></script>
+	
+	<script type="text/javascript" src="assets/tweenjs-NEXT.min.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/MovieClip.js"></script>
+	
+	<script type="text/javascript" src="assets/VectorButton.js"></script>
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
 	<script>
-		var bottomStage, topStage;
 
 		function init() {
-			bottomStage = stageSetup("canvasOne", handleEvt);
-			bottomStage.name = "bottomStage";
-			//bottomStage.enableDOMEvents(false);	// you can set this if the bottom stage is completely covered by the top stage, to reduce the number of active event listeners.
-
-			topStage = stageSetup("canvasTwo", handleEvt);
-			topStage.name = "topStage";
-			topStage.enableMouseOver();
-			topStage.nextStage = bottomStage;
-			bottomStage.enableMouseOver();
-
-			bottomStage.addChild(makeSquare(30, 95, "red", handleEvt));
-			topStage.addChild(makeSquare(375, 30, "#0F0", handleEvt));
-
-			// text object to output the
-			bottomStage.text = bottomStage.addChild(new createjs.Text("", "15px monospace", "#FFF")).set({x:195, y:30, lineHeight:16.7});
-			topStage.text = topStage.addChild(new createjs.Text("", "15px monospace", "#FFF")).set({x:30, y:30, lineHeight:16.7});
+			// load the source image:
+			var image = new Image();
+			image.src = "assets/bitmapButton.png";
+			image.onload = handleImageLoad;
 		}
-
-		/* create a stage object to work with the canvas
-			add event listeners for stage events
-			start tick on stage
-		 */
-		function stageSetup(canvasName, handler) {
-			stage = new createjs.Stage(canvasName);
-			//stage.addEventListener("stagemousemove", handler);	// too noisy
-			stage.addEventListener("stagemousedown", handler);
-			stage.addEventListener("stagemouseup", handler);
-			stage.addEventListener("mouseleave", handler);
-			stage.addEventListener("mouseenter", handler);
+	
+		function handleImageLoad(evt) {
+			webGLStage = new createjs.SpriteStage("webGLCanvas");
+			webGLStage.enableMouseOver();
 			
-			createjs.Ticker.addEventListener("tick", stage);
-			stage.log = [];
-
-			return stage;
-		}
-
-		/* create a container with a shape that reports mouse events to handler */
-		function makeSquare(x, y, color, handler) {
-			var container = new createjs.Container().set({name:"container"});
-
-			var shape = container.addChild(new createjs.Shape()).set({name:"square", x:x, y:y});
-			shape.graphics.beginFill(color).drawRect(0,0,135,135);
-
-			container.addEventListener("mouseover", handler);
-			container.addEventListener("mouseout", handler);
-			container.addEventListener("dblclick", handler);
-			container.addEventListener("click", handler);
-
-			container.cursor = "pointer";
-			return container;
-		}
-
-		// log functions that update text object on related stages with mouse event info
-		function handleEvt(evt) {
-			var target = evt.target, stage = target.getStage(), log = stage.log;
+			c2dStage = new createjs.Stage("c2dCanvas");
+			c2dStage.enableMouseOver(10);
+			c2dStage.nextStage = webGLStage;
 			
-			log.push(evt.type+" on "+target.name+" x:"+evt.stageX+" y:"+evt.stageY);
-			while (log.length > 12) { log.shift(); }
-			
-			stage.text.text = log.join("\n");
-			
-			if (evt.type == "mouseover") { target.alpha = 0.5; }
-			if (evt.type == "mouseout") { target.alpha = 1; }
+			// spritesheet "bitmap" button:
+			var spriteSheet = new createjs.SpriteSheet({
+				images: [evt.target],
+				frames: {width:300, height:100},
+				animations: { out: 0, over: 1, down: 2 }
+			});
+			var bitmapButton = new createjs.Sprite(spriteSheet, "up");
+			webGLStage.addChild(bitmapButton).set({x:250, y:150});
+			var bitmapHelper = new createjs.ButtonHelper(bitmapButton);
+		
+			// movieclip "vector" button:
+			var vectorButton = new lib.VectorButton();
+			c2dStage.addChild(vectorButton).set({x: 50, y:50});
+			var vectorHelper = new createjs.ButtonHelper(vectorButton);
+		
+			createjs.Ticker.addEventListener("tick", c2dStage);
+			createjs.Ticker.addEventListener("tick", webGLStage);
 		}
 	</script>
 
