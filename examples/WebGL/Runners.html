@@ -13,7 +13,7 @@
 	<header id="header" class="EaselJS">
 	    <h1><span class="text-product">Easel<strong>JS</strong></span> WebGL, SpriteStage & SpriteContainer</h1>
 	    <p>This sample demonstrates WebGL rendering where available, and reducing effect complexity (in this case particle count)
-	    when WebGL is not supported. Append "?c2d" to the url to simulate no WebGL & notice how the particle count is reduced.</p>
+	    when WebGL is not supported. Append "<code>?c2d</code>" to the url to simulate no WebGL & notice how the particle count is reduced.</p>
 	</header>
 	<canvas id="testCanvas" width="960" height="400" style="background: #66AA99"></canvas>
 
@@ -65,7 +65,7 @@
 
 		function init() {
 			if (location.search.match(/c2d/i)) {
-				// force it to use Context2D if c2d appears in the query string Runners.html?c2d
+				// force it to use Context2D if c2d appears in the query string: ex. Runners.html?c2d
 				stage = new createjs.Stage("testCanvas");
 			} else {
 				stage = new createjs.SpriteStage("testCanvas");
