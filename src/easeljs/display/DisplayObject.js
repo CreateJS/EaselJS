@@ -316,7 +316,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * If a cache is active, this returns the canvas that holds the cached version of this display object. See {{#crossLink "cache"}}{{/crossLink}}
 	 * for more information.
 	 * @property cacheCanvas
-	 * @type {HTMLCanvasElement | Object}
+	 * @type {HTMLCanvasElement}
 	 * @default null
 	 * @readonly
 	 **/

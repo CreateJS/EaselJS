@@ -467,8 +467,8 @@ var p = Matrix2D.prototype;
 	 * may not match the transform properties you used to generate the matrix, though they will produce the same visual
 	 * results.
 	 * @method decompose
-	 * @param {Object} target The object to apply the transform properties to. If null, then a new object will be returned.
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @param {Object} [target=null] The object to apply the transform properties to. If null, then a new object will be returned.
+	 * @return {Object} Object with result properties.
 	*/
 	p.decompose = function(target) {
 		// TODO: it would be nice to be able to solve for whether the matrix can be decomposed into only scale/rotation
