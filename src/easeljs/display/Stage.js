@@ -238,14 +238,6 @@ var p = Stage.prototype = new createjs.Container();
 	 * @default false
 	 **/
 	p.mouseMoveOutside = false;
-	
-	// TODO: deprecated.
-	/**
-	 * Replaced by {{#crossLink "Stage/relayEventsTo"}}{{/crossLink}}.
-	 * @property nextStage
-	 * @type Stage
-	 * @deprecated Use relayEventsTo instead.
-	 **/
 
 	/**
 	 * The hitArea property is not supported for Stage.
