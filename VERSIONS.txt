@@ -1,3 +1,16 @@
+Version NEXT [Not Released]
+****************************************************************************************************
+- added SpriteStage & SpriteContainer for WebGL rendering
+- changes to how BitmapText works to support WebGL
+- added WebGL examples
+- added .visible to Matrix2D for use by DOMElement
+- removed the deprecated mousemove & mouseup events on MouseEvent
+- updates to how DisplayObject.snapToPixel & Stage.snapToPixelEnabled interact
+- major improvements to Stage.nextStage to better handle layered canvases
+- ButtonHelper now sets mouseChildren to false, and reverts to default cursor when disabled
+- doc updates
+
+
 Version 0.7.1 [December 12, 2013]
 ****************************************************************************************************
 - fixed issue with mouseChildren not working with nested Containers
