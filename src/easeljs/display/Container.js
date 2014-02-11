@@ -578,6 +578,10 @@ var p = Container.prototype = new createjs.DisplayObject();
 			var child = children[i];
 			var hitArea = child.hitArea;
 			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
+			if (!hitArea && child.useBoundsForMouseEvents) {
+				var bounds = child._getBounds(mtx);
+				if (bounds && (x < bounds.x || x > bounds.x + bounds.width || y < bounds.y || y > bounds.y + bounds.height)) { continue; }
+			}
 			// if a child container has a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
 			if (!hitArea && child instanceof Container) {
 				var result = child._getObjectsUnderPoint(x, y, arr, mouse, activeListener);
