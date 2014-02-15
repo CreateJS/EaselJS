@@ -770,8 +770,17 @@ var p = Stage.prototype = new createjs.Container();
 	 * @protected
 	 **/
 	p._testMouseOver = function(clear, owner, eventTarget) {
-		if (this._prevStage && owner === undefined) { return; } // redundant listener.
-		
+		var prevStage = this._prevStage;
+		var found = false;
+		while (prevStage) {
+			if (prevStage._mouseOverIntervalID) {
+				found = true;
+				break;
+			}
+			prevStage = prevStage._prevStage;
+		}
+		if (found && owner === undefined) { return; } // redundant listener.
+
 		var nextStage = this._nextStage;
 		if (!this._mouseOverIntervalID) {
 			// not enabled for mouseover, but should still relay the event.
@@ -783,7 +792,18 @@ var p = Stage.prototype = new createjs.Container();
 		if (this._primaryPointerID != -1 || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
 		
 		var o = this._getPointerData(-1), e = o.posEvtObj;
+		if (!eventTarget && e) {
+			prevStage = this._prevStage;
+			while(prevStage) {
+				if (e.target == prevStage.canvas) {
+					eventTarget = prevStage;
+					break;
+				}
+				prevStage = prevStage._prevStage;
+			}
+		}
 		var isEventTarget = eventTarget || e&&(e.target == this.canvas);
+		
 		var target=null, common = -1, cursor="", t, i, l;
 		
 		if (!owner && (clear || this.mouseInBounds && isEventTarget)) {

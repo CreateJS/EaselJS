@@ -589,6 +589,14 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 */
 	p.cursor = null;
 
+	/**
+	 * Indicates whether to use the set bounds for mouse events.
+	 * @property useBoundsForMouseEvents
+	 * @type Boolean
+	 * @default true
+	 **/
+	p.useBoundsForMouseEvents = true;
+	
 // private properties:
 
 	/**

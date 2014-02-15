@@ -105,6 +105,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	p.initialize = function() {
 		this.DisplayObject_initialize();
 		this.children = [];
+		this.useBoundsForMouseEvents = false;
 	};
 
 // public methods:
@@ -570,6 +571,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var ctx = createjs.DisplayObject._hitTestContext;
 		var mtx = this._matrix;
 		activeListener = activeListener || (mouse&&this._hasMouseEventListener());
+		var parentMtx;
 
 		// draw children one at a time, and check if we get a hit:
 		var children = this.children;
@@ -578,6 +580,13 @@ var p = Container.prototype = new createjs.DisplayObject();
 			var child = children[i];
 			var hitArea = child.hitArea;
 			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
+			var checkedBounds = false;
+			if (!hitArea && child.useBoundsForMouseEvents) {
+				if (!parentMtx) { parentMtx = this.getConcatenatedMatrix() };
+				var bounds = child._getBounds(parentMtx);
+				if (bounds && (x < bounds.x || x > bounds.x + bounds.width || y < bounds.y || y > bounds.y + bounds.height)) { continue; }
+				checkedBounds = true;
+			}
 			// if a child container has a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
 			if (!hitArea && child instanceof Container) {
 				var result = child._getObjectsUnderPoint(x, y, arr, mouse, activeListener);
@@ -585,19 +594,21 @@ var p = Container.prototype = new createjs.DisplayObject();
 			} else {
 				if (mouse && !activeListener && !child._hasMouseEventListener()) { continue; }
 				
-				child.getConcatenatedMatrix(mtx);
-				
-				if (hitArea) {
-					mtx.appendTransform(hitArea.x, hitArea.y, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
-					mtx.alpha = hitArea.alpha;
+				if(!checkedBounds) {
+					child.getConcatenatedMatrix(mtx);
+					
+					if (hitArea) {
+						mtx.appendTransform(hitArea.x, hitArea.y, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
+						mtx.alpha = hitArea.alpha;
+					}
+					
+					ctx.globalAlpha = mtx.alpha;
+					ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
+					(hitArea||child).draw(ctx);
+					if (!this._testHit(ctx)) { continue; }
+					ctx.setTransform(1, 0, 0, 1, 0, 0);
+					ctx.clearRect(0, 0, 2, 2);
 				}
-				
-				ctx.globalAlpha = mtx.alpha;
-				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
-				(hitArea||child).draw(ctx);
-				if (!this._testHit(ctx)) { continue; }
-				ctx.setTransform(1, 0, 0, 1, 0, 0);
-				ctx.clearRect(0, 0, 2, 2);
 				if (arr) { arr.push(child); }
 				else { return (mouse && !this.mouseChildren) ? this : child; }
 			}
