@@ -8,6 +8,7 @@ Version NEXT [Not Released]
 - updates to how DisplayObject.snapToPixel & Stage.snapToPixelEnabled interact
 - major improvements to Stage.nextStage to better handle layered canvases
 - ButtonHelper now sets mouseChildren to false, and reverts to default cursor when disabled
+- fixed issue introduced in 0.7.1 where getObjectsUnderPoint ignore elements without mouse listeners
 - doc updates
 
 
