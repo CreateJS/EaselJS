@@ -6,6 +6,7 @@ build/tools/yuidoc/.git/*
 #ignore compiled python files
 *.pyc
 
+build/node_modules/
 build/output/
 build/tmp/
 /.idea/
