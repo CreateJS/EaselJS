@@ -37,7 +37,8 @@
 	],
 
 	"movieclip_source": [
-		"../src/easeljs/display/MovieClip.js"
+		"../src/easeljs/display/MovieClip.js",
+		"../src/easeljs/version_movieclip.js"
 	],
 
 	"docs_out_path":"./output/EaselJSDocs/"

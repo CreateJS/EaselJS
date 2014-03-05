@@ -40,7 +40,16 @@ module.exports = function (grunt) {
 					},
 					build: {
 						files: {
-							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.combined.js': getCombinedSource()
+							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.combined.js': combineSource(
+									[
+										{cwd: '', config:'config.json', source:'easel_source'}
+									]
+							),
+							'output/movieclip-<%= version %>.combined.js': combineSource(
+									[
+										{cwd: '', config:'config.json', source:'movieclip_source'}
+									]
+							),
 						}
 					}
 				},
@@ -138,14 +147,6 @@ module.exports = function (grunt) {
 		}
 
 		return config[name];
-	}
-
-	function getCombinedSource() {
-		var configs = [
-			{cwd: '', config:'config.json', source:'easel_source'}
-		];
-
-		return combineSource(configs);
 	}
 
 	function combineSource(configs) {
