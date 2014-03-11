@@ -531,7 +531,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * event.
 	 * @property onTick
 	 * @type {Function}
-	 * @deprecatedtick
+	 * @deprecated Use addEventListener and the "tick" event.
 	 */
 
 	/**
@@ -999,7 +999,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * be used to transform positions between coordinate spaces, such as with {{#crossLink "DisplayObject/localToGlobal"}}{{/crossLink}}
 	 * and {{#crossLink "DisplayObject/globalToLocal"}}{{/crossLink}}.
 	 * @method getConcatenatedMatrix
-	 * @param {Matrix2D} [mtx] A {{#crossLink "Matrix2D"}}{{/crossLink}} object to populate with the calculated values.
+	 * @param {Matrix2D} [matrix] A {{#crossLink "Matrix2D"}}{{/crossLink}} object to populate with the calculated values.
 	 * If null, a new Matrix2D object is returned.
 	 * @return {Matrix2D} a concatenated Matrix2D object representing the combined transform of the display object and
 	 * all of its parent Containers up to the highest level ancestor (usually the {{#crossLink "Stage"}}{{/crossLink}}).
