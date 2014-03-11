@@ -241,18 +241,17 @@ var p = SpriteSheetBuilder.prototype = new createjs.EventDispatcher;
 	 * source to draw to the frame. If not specified, it will look for a <code>getBounds</code> method, bounds property,
 	 * or <code>nominalBounds</code> property on the source to use. If one is not found, the frame will be skipped.
 	 * @param {Number} [scale=1] Optional. The scale to draw this frame at. Default is 1.
-	 * @param {Function} [setupFunction] Optional. A function to call immediately before drawing this frame.
-	 * @param {Array} [setupParams] Parameters to pass to the setup function.
-	 * @param {Object} [setupScope] The scope to call the setupFunction in.
+	 * @param {Function} [setupFunction] A function to call immediately before drawing this frame. It will be called with two parameters: the source, and setupData.
+	 * @param {Object} [setupData] Arbitrary setup data to pass to setupFunction as the second parameter.
 	 * @return {Number} The index of the frame that was just added, or null if a sourceRect could not be determined.
 	 **/
-	p.addFrame = function(source, sourceRect, scale, setupFunction, setupParams, setupScope) {
+	p.addFrame = function(source, sourceRect, scale, setupFunction, setupData) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
 		var rect = sourceRect||source.bounds||source.nominalBounds;
 		if (!rect&&source.getBounds) { rect = source.getBounds(); }
 		if (!rect) { return null; }
 		scale = scale||1;
-		return this._frames.push({source:source, sourceRect:rect, scale:scale, funct:setupFunction, params:setupParams, scope:setupScope, index:this._frames.length, height:rect.height*scale})-1;
+		return this._frames.push({source:source, sourceRect:rect, scale:scale, funct:setupFunction, data:setupData, index:this._frames.length, height:rect.height*scale})-1;
 	};
 
 	/**
@@ -272,37 +271,35 @@ var p = SpriteSheetBuilder.prototype = new createjs.EventDispatcher;
 	};
 
 	/**
-	 * This will take a MovieClip, and add its frames and labels to this builder. Labels will be added as an animation
+	 * This will take a MovieClip instance, and add its frames and labels to this builder. Labels will be added as an animation
 	 * running from the label index to the next label. For example, if there is a label named "foo" at frame 0 and a label
 	 * named "bar" at frame 10, in a MovieClip with 15 frames, it will add an animation named "foo" that runs from frame
 	 * index 0 to 9, and an animation named "bar" that runs from frame index 10 to 14.
 	 *
 	 * Note that this will iterate through the full MovieClip with actionsEnabled set to false, ending on the last frame.
 	 * @method addMovieClip
-	 * @param {MovieClip} source The source MovieClip to add to the sprite sheet.
+	 * @param {MovieClip} source The source MovieClip instance to add to the sprite sheet.
 	 * @param {Rectangle} [sourceRect] A {{#crossLink "Rectangle"}}{{/crossLink}} defining the portion of the source to
 	 * draw to the frame. If not specified, it will look for a <code>getBounds</code> method, <code>frameBounds</code>
 	 * Array, <code>bounds</code> property, or <code>nominalBounds</code> property on the source to use. If one is not
 	 * found, the MovieClip will be skipped.
 	 * @param {Number} [scale=1] The scale to draw the movie clip at.
+	 * @param {Function} [setupFunction] A function to call immediately before drawing each frame. It will be called with three parameters: the source, setupData, and the frame index.
+	 * @param {Object} [setupData] Arbitrary setup data to pass to setupFunction as the second parameter.
+	 * @param {Function} [labelFunction] This method will be called for each movieclip label that is added with four parameters: the label name, the source movieclip instance, the starting frame index (in the movieclip timeline) and the end index. It must return a new name for the label/animation, or false to exclude the label.
 	 **/
-	p.addMovieClip = function(source, sourceRect, scale) {
+	p.addMovieClip = function(source, sourceRect, scale, setupFunction, setupData, labelFunction) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
 		var rects = source.frameBounds;
 		var rect = sourceRect||source.bounds||source.nominalBounds;
 		if (!rect&&source.getBounds) { rect = source.getBounds(); }
-		if (!rect && !rects) { return null; }
+		if (!rect && !rects) { return; }
 
-		var baseFrameIndex = this._frames.length;
+		var i, l, baseFrameIndex = this._frames.length;
 		var duration = source.timeline.duration;
-		for (var i=0; i<duration; i++) {
+		for (i=0; i<duration; i++) {
 			var r = (rects&&rects[i]) ? rects[i] : rect;
-			this.addFrame(source, r, scale, function(frame) {
-				var ae = this.actionsEnabled;
-				this.actionsEnabled = false;
-				this.gotoAndStop(frame);
-				this.actionsEnabled = ae;
-			}, [i], source);
+			this.addFrame(source, r, scale, this._setupMovieClipFrame, {i:i, f:setupFunction, d:setupData});
 		}
 		var labels = source.timeline._labels;
 		var lbls = [];
@@ -311,12 +308,16 @@ var p = SpriteSheetBuilder.prototype = new createjs.EventDispatcher;
 		}
 		if (lbls.length) {
 			lbls.sort(function(a,b){ return a.index-b.index; });
-			for (var i=0,l=lbls.length; i<l; i++) {
+			for (i=0,l=lbls.length; i<l; i++) {
 				var label = lbls[i].label;
 				var start = baseFrameIndex+lbls[i].index;
 				var end = baseFrameIndex+((i == l-1) ? duration : lbls[i+1].index);
 				var frames = [];
 				for (var j=start; j<end; j++) { frames.push(j); }
+				if (labelFunction) {
+					label = labelFunction(label, source, start, end);
+					if (!label) { continue; }
+				}
 				this.addAnimation(label, frames, true); // for now, this loops all animations.
 			}
 		}
@@ -416,6 +417,20 @@ var p = SpriteSheetBuilder.prototype = new createjs.EventDispatcher;
 			}
 		}
 	};
+	
+	
+	/**
+	 * @method _setupMovieClipFrame
+	 * @protected
+	 * @return {Number} The width & height of the row.
+	 **/
+	p._setupMovieClipFrame = function(source, data) {
+		var ae = source.actionsEnabled;
+		source.actionsEnabled = false;
+		source.gotoAndStop(data.i);
+		source.actionsEnabled = ae;
+		data.f&&data.f(source, data.d, data.i);
+	};
 
 	/**
 	 * @method _getSize
@@ -514,7 +529,7 @@ var p = SpriteSheetBuilder.prototype = new createjs.EventDispatcher;
 		var sourceRect = frame.sourceRect;
 		var canvas = this._data.images[frame.img];
 		var ctx = canvas.getContext("2d");
-		frame.funct&&frame.funct.apply(frame.scope, frame.params);
+		frame.funct&&frame.funct(frame.source, frame.data);
 		ctx.save();
 		ctx.beginPath();
 		ctx.rect(rect.x, rect.y, rect.width, rect.height);
