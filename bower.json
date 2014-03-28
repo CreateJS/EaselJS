@@ -1,0 +1,23 @@
+{
+  "name": "easeljs",
+  "description": "The Easel Javascript library provides a full, hierarchical display list, a core interaction model, and helper classes to make working with the HTML5 Canvas element much easier.",
+  "homepage": "http://createjs.com/#!/EaselJS",
+  "main": [
+    "lib/easeljs-0.7.1.min.js",
+    "lib/movieclip-0.7.1.min.js"
+  ],
+  "ignore": [
+    "**/.*",
+    "*.txt",
+    "build",
+    "docs",
+    "examples",
+    "src",
+    "tools",
+    "tutorials",
+    "*.md",
+    "Gruntfile.js",
+    "package.json",
+    "bower.json"
+  ]
+}
