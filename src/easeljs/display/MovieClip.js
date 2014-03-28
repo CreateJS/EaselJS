@@ -222,6 +222,23 @@ var p = MovieClip.prototype = new createjs.Container();
 	 */
 	p.frameBounds = null;
 	
+	/**
+	 * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
+	 * will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
+	 * framerate.
+	 *
+	 * For example, if a MovieClip with a framerate of 10 is placed on a Stage being updated at 40fps, then the MovieClip will
+	 * advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will
+	 * vary slightly between frames.
+	 *
+	 * This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being
+	 * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
+	 * @property framerate
+	 * @type {Number}
+	 * @default 0
+	 **/
+	p.framerate = null;
+	
 	
 // private properties:
 	/**
@@ -247,6 +264,14 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * @private
 	 */
 	p._prevPosition = 0;
+
+	/**
+	 * The time remaining from the previous tick, only applicable when .framerate is set.
+	 * @property _t
+	 * @type Number
+	 * @private
+	 */
+	p._t = 0;
 
 	/**
 	 * List of display objects that are actively being managed by the MovieClip.
@@ -361,6 +386,33 @@ var p = MovieClip.prototype = new createjs.Container();
 		this._goto(positionOrLabel);
 	};
 	
+	/**
+	 * Advances the playhead. This occurs automatically each tick by default.
+	 * @param [time] {Number} The amount of time in ms to advance by. Only applicable if framerate is set.
+	 * @method advance
+	*/
+	p.advance = function(time) {
+		// TODO: should we worry at all about clips who change their own modes via frame scripts?
+		var independent = MovieClip.INDEPENDENT;
+		if (this.mode != independent) { return; }
+		
+		var o=this, fps = o.framerate;
+		while ((o = o.parent) && fps == null) {
+			if (o.mode == independent) { fps = o._framerate; }
+		}
+		this._framerate = fps;
+		
+		var t = (fps != null && fps != -1 && time != null) ? time/(1000/fps) + this._t : 1;
+		var frames = t|0;
+		this._t = t-frames;
+		
+		while (frames--) {
+			if (!this.paused) {
+				this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
+				this._updateTimeline();
+			}
+		}
+	};
 	
 	/**
 	 * Returns a sorted list of the labels defined on this MovieClip. Shortcut to TweenJS: Timeline.getLabels();
@@ -411,16 +463,13 @@ var p = MovieClip.prototype = new createjs.Container();
 
 	/**
 	 * @method _tick
-	 * @param {Array} params Parameters to pass onto the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}}
+	 * @param {Object} props Properties to copy to the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}} event object.
 	 * function.
 	 * @protected
 	 **/
-	p._tick = function(params) {
-		if (!this.paused && this.mode == MovieClip.INDEPENDENT) {
-			this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
-			this._updateTimeline();
-		}
-		this.Container__tick(params);
+	p._tick = function(props) {
+		this.advance(props&&props.delta);
+		this.Container__tick(props);
 	};
 	
 	/**
@@ -434,6 +483,7 @@ var p = MovieClip.prototype = new createjs.Container();
 		// prevent _updateTimeline from overwriting the new position because of a reset:
 		if (this._prevPos == -1) { this._prevPos = NaN; }
 		this._prevPosition = pos;
+		this._t = 0;
 		this._updateTimeline();
 	};
 	
@@ -443,6 +493,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 **/
 	p._reset = function() {
 		this._prevPos = -1;
+		this._t = 0;
 		this.currentFrame = 0;
 	};
 	
