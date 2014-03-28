@@ -240,6 +240,18 @@ var p = Event.prototype;
 	p.clone = function() {
 		return new Event(this.type, this.bubbles, this.cancelable);
 	};
+	
+	/**
+	 * Provides a chainable shortcut method for setting a number of properties on the instance.
+	 *
+	 * @method set
+	 * @param {Object} props A generic object containing properties to copy to the instance.
+	 * @return {Event} Returns the instance the method is called on (useful for chaining calls.)
+	*/
+	p.set = function(props) {
+		for (var n in props) { this[n] = props[n]; }
+		return this;
+	};
 
 	/**
 	 * Returns a string representation of this object.
