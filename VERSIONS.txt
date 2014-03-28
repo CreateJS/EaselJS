@@ -19,7 +19,7 @@ OTHER:
 - display object tick events will now include delta, time, paused, and runTime properties if a tick event object is passed as the first param to Stage.update()
 - added Stage.tick()
 - added Event.set()
-
+- Added Bower support, including grunt task for automatically updating bower.json
 
 
 Version 0.7.1 [December 12, 2013]
