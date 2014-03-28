@@ -251,14 +251,14 @@ var p = DOMElement.prototype = new createjs.DisplayObject();
 
 	/**
 	 * @method _tick
-	 * @param {Array} params Parameters to pass onto the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}}
+	 * @param {Object} props Properties to copy to the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}} event object.
 	 * function.
 	 * @protected
 	 */
-	p._tick = function(params) {
+	p._tick = function(props) {
 		var stage = this.getStage();
 		stage&&stage.on("drawend", this._handleDrawEnd, this, true);
-		this.DisplayObject__tick(params);
+		this.DisplayObject__tick(props);
 	};
 	
 	/**

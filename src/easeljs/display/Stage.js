@@ -364,30 +364,19 @@ var p = Stage.prototype = new createjs.Container();
 // public methods:
 
 	/**
-	 * Each time the update method is called, the stage will tick all descendants (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}})
-	 * and then render the display list to the canvas. Any parameters passed to `update()` will be passed on to any
-	 * {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers.
-	 *
-	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-	 * a tick event object (or equivalent) be passed as the first parameter to update(). For example:
-	 *
-	 *      Ticker.addEventListener("tick", handleTick);
-	 * 	    function handleTick(evtObj) {
-	 * 	     	// do some work here, then update the stage, passing through the event object:
-	 * 	    	myStage.update(evtObj);
-	 * 	    }
+	 * Each time the update method is called, the stage will call {{#crossLink "Stage/tick"}}{{/crossLink}}
+	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false,
+	 * and then render the display list to the canvas.
 	 *
 	 * @method update
-	 * @param {*} [params]* Params to include when ticking descendants. The first param should usually be a tick event.
+	 * @param {*} [params]* Params to pass to .tick() if .tickOnUpdate is true.
 	 **/
 	p.update = function(params) {
 		if (!this.canvas) { return; }
-		if (this.tickOnUpdate) {
-			this.dispatchEvent("tickstart");  // TODO: make cancellable?
-			this.tickEnabled&&this._tick((arguments.length ? arguments : null));
-			this.dispatchEvent("tickend");
+		if (this.tickOnUpdate) { // update this logic in SpriteStage when necessary
+			this.tick.apply(this, arguments);
 		}
-		this.dispatchEvent("drawstart"); // TODO: make cancellable?
+		this.dispatchEvent("drawstart"); //TODO: make cancellable?
 		createjs.DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
 		if (this.autoClear) { this.clear(); }
 		var ctx = this.canvas.getContext("2d");
@@ -396,6 +385,47 @@ var p = Stage.prototype = new createjs.Container();
 		this.draw(ctx, false);
 		ctx.restore();
 		this.dispatchEvent("drawend");
+	};
+	
+	/**
+	 * Propagates a tick event through the display list. This is automatically called by {{#crossLink "Stage/update"}}{{/crossLink}}
+	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false.
+	 *
+	 * Any parameters passed to `tick()` will be included as an array in the "param" property of the event object dispatched
+	 * to {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers. Additionally, if the first parameter
+	 * is a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or has equivalent properties), then the delta,
+	 * time, runTime, and paused properties will be copied to the event object.
+	 *
+	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
+	 * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent) be passed as the first parameter
+	 * to tick(). For example:
+	 *
+	 * 	    Ticker.on("tick", handleTick);
+	 * 	    function handleTick(evtObj) {
+	 * 	    	// do some work here, then update the stage, passing through the tick event object as the first param
+	 * 	    	// and some custom data as the second and third param:
+	 * 	    	myStage.update(evtObj, "hello", 2014);
+	 * 	    }
+	 * 	    
+	 * 	    // ...
+	 * 	    myDisplayObject.on("tick", handleDisplayObjectTick);
+	 * 	    function handleDisplayObjectTick(evt) {
+	 * 	    	console.log(evt.params[0]); // the original tick evtObj
+	 * 	    	console.log(evt.delta, evt.paused); // ex. "17 false"
+	 * 	    	console.log(evt.params[1], evt.params[2]); // "hello 2014"
+	 * 	    }
+	 * 
+	 * @method tick
+	 * @param {*} [params]* Params to include when ticking descendants. The first param should usually be a tick event.
+	 **/
+	p.tick = function(params) {
+		this.dispatchEvent("tickstart");  //TODO: make cancellable?
+		var args = arguments.length ? Array.prototype.slice.call(arguments,0) : null;
+		var evt = args&&args[0];
+		var props = evt&&(evt.delta != null) ? {delta:evt.delta, paused:evt.paused, time:evt.time, runTime:evt.runTime } : {};
+		props.params = args;
+		this.tickEnabled&&this._tick(props);
+		this.dispatchEvent("tickend");
 	};
 
 	/**

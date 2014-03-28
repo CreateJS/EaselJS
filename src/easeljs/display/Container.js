@@ -542,18 +542,18 @@ var p = Container.prototype = new createjs.DisplayObject();
 	
 	/**
 	 * @method _tick
-	 * @param {Array} params Parameters to pass onto the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}}
+	 * @param {Object} props Properties to copy to the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}} event object.
 	 * function.
 	 * @protected
 	 **/
-	p._tick = function(params) {
+	p._tick = function(props) {
 		if (this.tickChildren) {
 			for (var i=this.children.length-1; i>=0; i--) {
 				var child = this.children[i];
-				if (child.tickEnabled && child._tick) { child._tick(params); }
+				if (child.tickEnabled && child._tick) { child._tick(props); }
 			}
 		}
-		this.DisplayObject__tick(params);
+		this.DisplayObject__tick(props);
 	};
 
 	/**

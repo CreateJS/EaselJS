@@ -1047,7 +1047,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	};
 	
 	/**
-	 * Provides a chainable shortcut method for setting a number of properties on a DisplayObject instance.
+	 * Provides a chainable shortcut method for setting a number of properties on the instance.
 	 *
 	 * <h4>Example</h4>
 	 *
@@ -1057,7 +1057,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 *
 	 * @method set
 	 * @param {Object} props A generic object containing properties to copy to the DisplayObject instance.
-	 * @return {DisplayObject} Returns The DisplayObject instance the method is called on (useful for chaining calls.)
+	 * @return {DisplayObject} Returns the instance the method is called on (useful for chaining calls.)
 	*/
 	p.set = function(props) {
 		for (var n in props) { this[n] = props[n]; }
@@ -1233,17 +1233,16 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	
 	/**
 	 * @method _tick
-	 * @param {Array} params Parameters to pass on to any listeners of the tick function. This will usually include the
+	 * @param {Object} props Props to copy to the tick event object. This will usually include the
 	 * properties from the {{#crossLink "Ticker"}}{{/crossLink}} "tick" event, such as `delta` and `paused`, but may
 	 * be undefined or contain other values depending on the usage by the application.
 	 * @protected
 	 **/
-	p._tick = function(params) {
+	p._tick = function(props) {
 		// because tick can be really performance sensitive, we'll inline some of the dispatchEvent work.
 		var ls = this._listeners;
 		if (ls && ls["tick"]) {
-			var evt = new createjs.Event("tick");
-			evt.params = params;
+			var evt = new createjs.Event("tick").set(props);
 			this._dispatchEvent(evt, this, 2);
 		}
 	};

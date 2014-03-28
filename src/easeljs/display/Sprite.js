@@ -56,7 +56,7 @@ this.createjs = this.createjs||{};
  * @constructor
  * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
  * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
- * @param {String|Number} frameOrAnimation The frame number or animation to play initially.
+ * @param {String|Number} [frameOrAnimation] The frame number or animation to play initially.
  **/
 var Sprite = function(spriteSheet, frameOrAnimation) {
   this.initialize(spriteSheet, frameOrAnimation);
@@ -375,14 +375,15 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	/**
 	 * Advances the <code>currentFrame</code> if paused is not true. This is called automatically when the {{#crossLink "Stage"}}{{/crossLink}}
 	 * ticks.
+	 * @param {Object} props Properties to copy to the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}} event object.
 	 * @protected
 	 * @method _tick
 	 **/
-	p._tick = function(params) {
+	p._tick = function(props) {
 		if (!this.paused) {
-			this.advance(params&&params[0]&&params[0].delta);
+			this.advance(props&&props.delta);
 		}
-		this.DisplayObject__tick(params);
+		this.DisplayObject__tick(props);
 	};
 
 
@@ -459,7 +460,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 
 	/**
 	 * @method cloneProps
-	 * @param {Text} o
+	 * @param {Sprite} o
 	 * @protected
 	 **/
 	p.cloneProps = function(o) {
