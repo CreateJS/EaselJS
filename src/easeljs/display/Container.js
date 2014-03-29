@@ -453,6 +453,8 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an
 	 * expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the
 	 * mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
+	 * 
+	 * Accounts for both {{#crossLink "DisplayObject/hitArea:property"}}{{/crossLink}} and {{#crossLink "DisplayObject/mask:property"}}{{/crossLink}}.
 	 * @method getObjectsUnderPoint
 	 * @param {Number} x The x position in the container to test.
 	 * @param {Number} y The y position in the container to test.
@@ -576,8 +578,23 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var l = children.length;
 		for (var i=l-1; i>=0; i--) {
 			var child = children[i];
-			var hitArea = child.hitArea;
+			var hitArea = child.hitArea, mask = child.mask;
 			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
+			if (!hitArea && mask && mask.graphics && !mask.graphics.isEmpty()) {
+				var maskMtx = mask.getMatrix(mask._matrix).prependMatrix(this.getConcatenatedMatrix(mtx));
+				ctx.setTransform(maskMtx.a,  maskMtx.b, maskMtx.c, maskMtx.d, maskMtx.tx-x, maskMtx.ty-y);
+				
+				// draw the mask as a solid fill:
+				mask.graphics.drawAsPath(ctx);
+				ctx.fillStyle = "#000";
+				ctx.fill();
+				
+				// if we don't hit the mask, then no need to keep looking at this DO:
+				if (!this._testHit(ctx)) { continue; }
+				ctx.setTransform(1, 0, 0, 1, 0, 0);
+				ctx.clearRect(0, 0, 2, 2);
+			}
+			
 			// if a child container has a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
 			if (!hitArea && child instanceof Container) {
 				var result = child._getObjectsUnderPoint(x, y, arr, mouse, activeListener);
