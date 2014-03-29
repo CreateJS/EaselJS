@@ -1016,9 +1016,8 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	};
 
 	/**
-	 * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at
-	 * the specified position). This ignores the alpha, shadow and compositeOperation of the display object, and all
-	 * transform properties including regX/Y.
+	 * Tests whether the display object intersects the specified point in local coordinates (ie. draws a pixel with alpha > 0 at
+	 * the specified position). This ignores the alpha, shadow, hitArea, mask, and compositeOperation of the display object.
 	 *
 	 * <h4>Example</h4>
 	 *
@@ -1035,7 +1034,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * local Point.
 	*/
 	p.hitTest = function(x, y) {
-		// TODO: update with support for .hitArea and update hitArea docs?
+		// TODO: update with support for .hitArea & .mask and update hitArea / mask docs?
 		var ctx = DisplayObject._hitTestContext;
 		ctx.setTransform(1, 0, 0, 1, -x, -y);
 		this.draw(ctx);
