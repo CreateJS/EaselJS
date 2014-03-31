@@ -90,6 +90,9 @@ function init() {
         {label:'drawRoundRect();', graphics:function () {
             return new Graphics().beginFill(FILL_COLOR).drawRoundRect(0, 0, 120, 120, 5);
         }},
+        {label:'drawRoundRectSuperEllipse();', graphics:function () {
+            return new Graphics().beginFill(FILL_COLOR).drawRoundRectSuperEllipse(0, 0, 120, 120, 40);
+        }},
         {label:'beginLinearGradientFill() with drawRoundRect();', graphics:function () {
             return new Graphics().beginLinearGradientFill([FILL_COLOR, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 130).drawRoundRect(0, 0, 120, 120, 5);
         }},
@@ -113,6 +116,9 @@ function init() {
         }},
         {label:'drawRoundRectComplex();', graphics:function () {
             return new Graphics().beginFill(FILL_COLOR).drawRoundRectComplex(5, 5, 70, 70, 5, 10, 15, 25);
+        }},
+        {label:'drawRoundRectSuperEllipseComplex();', graphics:function () {
+            return new Graphics().beginFill(FILL_COLOR).drawRoundRectSuperEllipseComplex(5, 5, 70, 70, 10, 20, 30, 40);
         }},
         {label:'drawCircle(); with beginBitmapFill();', graphics:function () {
             return new Graphics().beginStroke(STROKE_COLOR).beginBitmapFill(img).drawCircle(30, 30, 30).endStroke();

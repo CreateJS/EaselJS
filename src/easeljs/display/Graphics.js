@@ -833,7 +833,7 @@ var p = Graphics.prototype;
 	p.drawRect = p.rect;
 
 	/**
-	 * Draws a rounded rectangle with all corners with the specified radius.
+	 * Draws a rounded rectangle with all corners with the specified radius. A tiny API method "rr" also exists.
 	 * @method drawRoundRect
 	 * @param {Number} x
 	 * @param {Number} y
@@ -847,49 +847,111 @@ var p = Graphics.prototype;
 		return this;
 	};
 
-	/**
-	 * Draws a rounded rectangle with different corner radii. Supports positive and negative corner radii. A tiny API
-	 * method "rc" also exists.
-	 * @method drawRoundRectComplex
-	 * @param {Number} x The horizontal coordinate to draw the round rect.
-	 * @param {Number} y The vertical coordinate to draw the round rect.
-	 * @param {Number} w The width of the round rect.
-	 * @param {Number} h The height of the round rect.
-	 * @param {Number} radiusTL Top left corner radius.
-	 * @param {Number} radiusTR Top right corner radius.
-	 * @param {Number} radiusBR Bottom right corner radius.
-	 * @param {Number} radiusBL Bottom left corner radius.
-	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-	 **/
-	p.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
-		var max = (w<h?w:h)/2;
-		var mTL=0, mTR=0, mBR=0, mBL=0;
-		if (radiusTL < 0) { radiusTL *= (mTL=-1); }
-		if (radiusTL > max) { radiusTL = max; }
-		if (radiusTR < 0) { radiusTR *= (mTR=-1); }
-		if (radiusTR > max) { radiusTR = max; }
-		if (radiusBR < 0) { radiusBR *= (mBR=-1); }
-		if (radiusBR > max) { radiusBR = max; }
-		if (radiusBL < 0) { radiusBL *= (mBL=-1); }
-		if (radiusBL > max) { radiusBL = max; }
+    /**
+     * Draws a rounded rectangle with different corner radii. Supports positive and negative corner radii. A tiny API
+     * method "rc" also exists.
+     * @method drawRoundRectComplex
+     * @param {Number} x The horizontal coordinate to draw the round rect.
+     * @param {Number} y The vertical coordinate to draw the round rect.
+     * @param {Number} w The width of the round rect.
+     * @param {Number} h The height of the round rect.
+     * @param {Number} radiusTL Top left corner radius.
+     * @param {Number} radiusTR Top right corner radius.
+     * @param {Number} radiusBR Bottom right corner radius.
+     * @param {Number} radiusBL Bottom left corner radius.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     **/
+    p.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
+        var max = (w<h?w:h)/2;
+        var mTL=0, mTR=0, mBR=0, mBL=0;
+        if (radiusTL < 0) { radiusTL *= (mTL=-1); }
+        if (radiusTL > max) { radiusTL = max; }
+        if (radiusTR < 0) { radiusTR *= (mTR=-1); }
+        if (radiusTR > max) { radiusTR = max; }
+        if (radiusBR < 0) { radiusBR *= (mBR=-1); }
+        if (radiusBR > max) { radiusBR = max; }
+        if (radiusBL < 0) { radiusBL *= (mBL=-1); }
+        if (radiusBL > max) { radiusBL = max; }
 
-		this._dirty = this._active = true;
-		var arcTo=this._ctx.arcTo, lineTo=this._ctx.lineTo;
-		this._activeInstructions.push(
-			new Command(this._ctx.moveTo, [x+w-radiusTR, y]),
-			new Command(arcTo, [x+w+radiusTR*mTR, y-radiusTR*mTR, x+w, y+radiusTR, radiusTR]),
-			new Command(lineTo, [x+w, y+h-radiusBR]),
-			new Command(arcTo, [x+w+radiusBR*mBR, y+h+radiusBR*mBR, x+w-radiusBR, y+h, radiusBR]),
-			new Command(lineTo, [x+radiusBL, y+h]),
-			new Command(arcTo, [x-radiusBL*mBL, y+h+radiusBL*mBL, x, y+h-radiusBL, radiusBL]),
-			new Command(lineTo, [x, y+radiusTL]),
-			new Command(arcTo, [x-radiusTL*mTL, y-radiusTL*mTL, x+radiusTL, y, radiusTL]),
-			new Command(this._ctx.closePath)
-		);
-		return this;
-	};
+        this._dirty = this._active = true;
+        var arcTo=this._ctx.arcTo, lineTo=this._ctx.lineTo;
+        this._activeInstructions.push(
+            new Command(this._ctx.moveTo, [x+w-radiusTR, y]),
+            new Command(arcTo, [x+w+radiusTR*mTR, y-radiusTR*mTR, x+w, y+radiusTR, radiusTR]),
+            new Command(lineTo, [x+w, y+h-radiusBR]),
+            new Command(arcTo, [x+w+radiusBR*mBR, y+h+radiusBR*mBR, x+w-radiusBR, y+h, radiusBR]),
+            new Command(lineTo, [x+radiusBL, y+h]),
+            new Command(arcTo, [x-radiusBL*mBL, y+h+radiusBL*mBL, x, y+h-radiusBL, radiusBL]),
+            new Command(lineTo, [x, y+radiusTL]),
+            new Command(arcTo, [x-radiusTL*mTL, y-radiusTL*mTL, x+radiusTL, y, radiusTL]),
+            new Command(this._ctx.closePath)
+        );
+        return this;
+    };
 
-	/**
+    /**
+     * Draws a rounded rectangle with all corners with the specified radius using super ellipse formula.
+     * A tiny API method "rrs" also exists.
+     * @method drawRoundRectSuperEllipse
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} w
+     * @param {Number} h
+     * @param {Number} radius Corner radius.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     **/
+    p.drawRoundRectSuperEllipse = function(x, y, w, h, radius) {
+        this.drawRoundRectSuperEllipseComplex(x, y, w, h, radius, radius, radius, radius);
+        return this;
+    };
+
+    /**
+     * Draws a rounded rectangle with different corner radii using super ellipse formula.
+     * A tiny API method "rcs" also exists.
+     * @method drawRoundRectSuperEllipseComplex
+     * @param {Number} x The horizontal coordinate to draw the round rect.
+     * @param {Number} y The vertical coordinate to draw the round rect.
+     * @param {Number} w The width of the round rect.
+     * @param {Number} h The height of the round rect.
+     * @param {Number} radiusTL Top left corner radius.
+     * @param {Number} radiusTR Top right corner radius.
+     * @param {Number} radiusBR Bottom right corner radius.
+     * @param {Number} radiusBL Bottom left corner radius.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     **/
+    p.drawRoundRectSuperEllipseComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
+        this._dirty = this._active = true;
+
+        if (radiusTL <= 0) {
+            this._activeInstructions.push(new Command(this._ctx.lineTo, [x, y]));
+        } else {
+            this._drawSuperEllipseCurve(x + radiusTL, y + radiusTL, radiusTL, radiusTL, 180, 270, true);
+        }
+
+        if (radiusTR <= 0) {
+            this._activeInstructions.push(new Command(this._ctx.lineTo, [x + w, y]));
+        } else {
+            this._drawSuperEllipseCurve(x + w - radiusTR, y + radiusTR, radiusTR, radiusTR, 270, 360);
+        }
+
+        if (radiusBR <= 0) {
+            this._activeInstructions.push(new Command(this._ctx.lineTo, [x + w, y + h]));
+        } else {
+            this._drawSuperEllipseCurve(x + w - radiusBR, y + h - radiusBR, radiusBR, radiusBR, 0, 90);
+        }
+
+        if (radiusBL <= 0) {
+            this._activeInstructions.push(new Command(this._ctx.lineTo, [x, y + h]));
+        } else {
+            this._drawSuperEllipseCurve(x + radiusBL, y + h - radiusBL, radiusBL, radiusBL, 90, 180);
+        }
+
+        this._activeInstructions.push(new Command(this._ctx.closePath, []));
+
+        return this;
+    };
+
+    /**
 	 * Draws a circle with the specified radius at (x, y).
 	 *
 	 *      var g = new createjs.Graphics();
@@ -1287,19 +1349,34 @@ var p = Graphics.prototype;
 	 **/
 	p.dr = p.drawRect;
 
-	/** Shortcut to drawRoundRect.
-	 * @method rr
-	 * @protected
-	 * @type {Function}
-	 **/
-	p.rr = p.drawRoundRect;
+    /** Shortcut to drawRoundRect.
+     * @method rr
+     * @protected
+     * @type {Function}
+     **/
+    p.rr = p.drawRoundRect;
 
-	/** Shortcut to drawRoundRectComplex.
-	 * @method rc
-	 * @protected
-	 * @type {Function}
-	 **/
-	p.rc = p.drawRoundRectComplex;
+    /** Shortcut to drawRoundRectComplex.
+     * @method rc
+     * @protected
+     * @type {Function}
+     **/
+    p.rc = p.drawRoundRectComplex;
+
+
+    /** Shortcut to drawRoundRectSuperEllipse.
+     * @method rrs
+     * @protected
+     * @type {Function}
+     **/
+    p.rrs = p.drawRoundRectSuperEllipse;
+
+    /** Shortcut to drawRoundRectSuperEllipseComplex.
+     * @method rcs
+     * @protected
+     * @type {Function}
+     **/
+    p.rcs = p.drawRoundRectSuperEllipseComplex;
 
 	/** Shortcut to drawCircle.
 	 * @method dc
@@ -1399,6 +1476,48 @@ var p = Graphics.prototype;
 	p._setProp = function(name, value) {
 		this[name] = value;
 	};
+
+    /**
+     * Used to create super ellipse
+     * @method _drawSuperEllipseCurve
+     * @protected
+     **/
+    p._drawSuperEllipseCurve = function(cx, cy, xRadius, yRadius, startAngleDegrees, endAngleDegrees, moveFirst) {
+        var SEGMENT_SIZE = 2;
+
+        while (endAngleDegrees < startAngleDegrees) endAngleDegrees += 360;
+
+        var pt = null;
+        for (var angleDegrees = startAngleDegrees; angleDegrees < endAngleDegrees; angleDegrees += SEGMENT_SIZE) {
+            pt = this._getSuperEllipsePointOnCurve(cx, cy, angleDegrees, xRadius, yRadius);
+            if (angleDegrees == startAngleDegrees && moveFirst) {
+                this._activeInstructions.push(new Command(this._ctx.moveTo, [pt.x, pt.y]));
+            } else {
+                this._activeInstructions.push(new Command(this._ctx.lineTo, [pt.x, pt.y]));
+            }
+        }
+        // Last point
+        pt = this._getSuperEllipsePointOnCurve(cx, cy, endAngleDegrees, xRadius, yRadius);
+        this._activeInstructions.push(new Command(this._ctx.lineTo, [pt.x, pt.y]));
+    };
+
+    /**
+     * Used to create super ellipse
+     * @method _getSuperEllipsePointOnCurve
+     * @protected
+     **/
+    p._getSuperEllipsePointOnCurve = function(cx, cy, angleDegrees, xRadius, yRadius) {
+        const N = 5; // The n of the curve; 4 according to wikipedia, 5 for a stronger corner
+        var cn = 2 / N;
+        var angle = angleDegrees / 180 * Math.PI;
+        var ca = Math.cos(angle);
+        var sa = Math.sin(angle);
+        return new createjs.Point(
+            Math.pow(Math.abs(ca), cn) * xRadius * (ca < 0 ? -1 : 1) + cx,
+            Math.pow(Math.abs(sa), cn) * yRadius * (sa < 0 ? -1 : 1) + cy
+        );
+    };
+
 
 createjs.Graphics = Graphics;
 }());
