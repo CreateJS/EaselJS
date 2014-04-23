@@ -31,6 +31,7 @@
  * files of each library and are available on the createsjs namespace directly.
  *
  * <h4>Example</h4>
+ *
  *      myObject.addEventListener("change", createjs.proxy(myMethod, scope));
  *
  * @module CreateJS
