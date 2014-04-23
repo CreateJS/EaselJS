@@ -43,6 +43,7 @@ this.createjs = this.createjs||{};
  * Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
  *
  * <h4>Example</h4>
+ *
  *      var container = new createjs.Container();
  *      container.addChild(bitmapInstance, shapeInstance);
  *      container.x = 100;
@@ -162,6 +163,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * Adds a child to the top of the display list.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      container.addChild(bitmapInstance);
 	 *
 	 *  You can also add multiple children at once:
@@ -190,6 +192,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * setting its parent to this Container.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      addChildAt(child1, index);
 	 *
 	 * You can also add multiple children, such as:
@@ -227,6 +230,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * already known.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      container.removeChild(child);
 	 *
 	 * You can also remove multiple children:
@@ -285,6 +289,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * Removes all children from the display list.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      container.removeAlLChildren();
 	 *
 	 * @method removeAllChildren
@@ -298,6 +303,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * Returns the child at the specified index.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      container.getChildAt(2);
 	 *
 	 * @method getChildAt
@@ -346,6 +352,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * Returns the index of the specified child in the display list, or -1 if it is not in the display list.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      var index = container.getChildIndex(child);
 	 *
 	 * @method getChildIndex
