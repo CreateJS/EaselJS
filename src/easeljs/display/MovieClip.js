@@ -165,6 +165,7 @@ var p = MovieClip.prototype = new createjs.Container();
 	 * instances to the timeline.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
 	 *      var mc = new createjs.MovieClip();
 	 *      mc.timeline.addTween(tween);
