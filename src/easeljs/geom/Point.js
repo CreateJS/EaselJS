@@ -40,8 +40,9 @@ this.createjs = this.createjs||{};
  * Represents a point on a 2 dimensional x / y coordinate system.
  *
  * <h4>Example</h4>
- *      var point = new Point(0, 100);
- *
+ * 
+ *      var point = new createjs.Point(0, 100);
+ * 
  * @class Point
  * @param {Number} [x=0] X position.
  * @param {Number} [y=0] Y position.
