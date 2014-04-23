@@ -42,7 +42,6 @@ this.createjs = this.createjs||{};
  * <h4>Example</h4>
  * 
  *      var point = new createjs.Point(0, 100);
- *
  * 
  * @class Point
  * @param {Number} [x=0] X position.
