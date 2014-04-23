@@ -519,6 +519,7 @@ var p = Stage.prototype = new createjs.Container();
 	 * independently of mouse move events via the optional `frequency` parameter.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      var stage = new createjs.Stage("canvasId");
 	 *      stage.enableMouseOver(10); // 10 updates per second
 	 *
