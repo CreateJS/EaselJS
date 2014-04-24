@@ -89,6 +89,7 @@ var Touch = function() {
 	 **/
 	Touch.enable = function(stage, singleTouch, allowDefault) {
 		if (!stage || !stage.canvas || !Touch.isSupported()) { return false; }
+		if (stage.__touch) { return true; }
 
 		// inject required properties on stage:
 		stage.__touch = {pointers:{}, multitouch:!singleTouch, preventDefault:!allowDefault, count:0};
@@ -110,6 +111,8 @@ var Touch = function() {
 		if (!stage) { return; }
 		if ('ontouchstart' in window) { Touch._IOS_disable(stage); }
 		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { Touch._IE_disable(stage); }
+		
+		delete stage.__touch;
 	};
 
 // Private static methods:
