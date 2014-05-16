@@ -86,7 +86,7 @@
             color = colors[(index++)%colors.length];
             stroke = Math.random()*30 + 10 | 0;
             oldPt = new createjs.Point(stage.mouseX, stage.mouseY);
-            oldMidPt = oldPt;
+            oldMidPt = new createjs.Point(oldPt.x, oldPt.y);
             stage.addEventListener("stagemousemove" , handleMouseMove);
         }
 
