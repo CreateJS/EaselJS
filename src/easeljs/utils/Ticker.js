@@ -311,6 +311,8 @@ var Ticker = function() {
 			clearTimeout(Ticker._timerId);
 		}
 		Ticker.removeAllEventListeners("tick");
+		Ticker._timerId = null;
+		Ticker._inited = false;
 	};
 	
 	/**

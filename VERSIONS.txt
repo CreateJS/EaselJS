@@ -21,6 +21,7 @@ OTHER:
 - added Event.set()
 - Added Bower support, including grunt task for automatically updating bower.json
 - mouse interactions and getObjectsUnderPoint now respect masks
+- fixed an issue with Ticker.reset()
 
 
 Version 0.7.1 [December 12, 2013]
