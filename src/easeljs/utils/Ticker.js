@@ -46,6 +46,7 @@ this.createjs = this.createjs||{};
  * should not be instantiated.
  *
  * <h4>Example</h4>
+ *
  *      createjs.Ticker.addEventListener("tick", handleTick);
  *      function handleTick(event) {
  *          // Actions carried out each frame
@@ -121,6 +122,7 @@ var Ticker = function() {
 	 * {{#crossLink "Ticker/setPaused"}}{{/crossLink}}.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      createjs.Ticker.addEventListener("tick", handleTick);
 	 *      function handleTick(event) {
 	 *          console.log("Paused:", event.paused, event.delta);
@@ -415,6 +417,7 @@ var Ticker = function() {
 	 * callback when Ticker was paused. This is no longer the case.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      createjs.Ticker.addEventListener("tick", handleTick);
 	 *      createjs.Ticker.setPaused(true);
 	 *      function handleTick(event) {
@@ -437,6 +440,7 @@ var Ticker = function() {
 	 * callback when Ticker was paused. This is no longer the case.
 	 *
 	 * <h4>Example</h4>
+	 *
 	 *      createjs.Ticker.addEventListener("tick", handleTick);
 	 *      createjs.Ticker.setPaused(true);
 	 *      function handleTick(event) {

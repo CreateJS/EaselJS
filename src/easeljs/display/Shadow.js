@@ -41,6 +41,7 @@ this.createjs = this.createjs||{};
  * via its <code>shadow</code> property.
  *
  * <h4>Example</h4>
+ *
  *      myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
  *
  * @class Shadow
