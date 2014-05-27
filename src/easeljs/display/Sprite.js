@@ -45,6 +45,7 @@ this.createjs = this.createjs||{};
  * See the {{#crossLink "SpriteSheet"}}{{/crossLink}} class for more information on setting up frames and animations.
  *
  * <h4>Example</h4>
+ *
  *      var instance = new createjs.Sprite(spriteSheet);
  *      instance.gotoAndStop("frameName");
  *
