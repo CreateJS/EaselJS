@@ -181,6 +181,14 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.mouseY = 0;
 
+	/**
+	 * Specifies the area of the stage to affect when calling update. This can be use to selectively
+	 * re-render only active regions of the canvas. If null, the whole canvas area is affected.
+	 * @property drawRect
+	 * @type {Rectangle}
+	 */
+	p.drawRect = null;
+
 	// TODO: deprecated.
 	/**
 	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the "{{#crossLink "Stage/stagemousemove:event"}}{{/crossLink}}
@@ -379,9 +387,18 @@ var p = Stage.prototype = new createjs.Container();
 		}
 		if (this.dispatchEvent("drawstart")) { return; }
 		createjs.DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
-		if (this.autoClear) { this.clear(); }
-		var ctx = this.canvas.getContext("2d");
+		var r = this.drawRect, ctx = this.canvas.getContext("2d");
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		if (this.autoClear) {
+			if (r) { ctx.clearRect(r.x, r.y, r.width, r.height); }
+			else { ctx.clearRect(0, 0, this.canvas.width+1, this.canvas.height+1); }
+		}
 		ctx.save();
+		if (this.drawRect) {
+			ctx.beginPath();
+			ctx.rect(r.x, r.y, r.width, r.height);
+			ctx.clip();
+		}
 		this.updateContext(ctx);
 		this.draw(ctx, false);
 		ctx.restore();
