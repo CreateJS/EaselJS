@@ -104,8 +104,8 @@ var p = Stage.prototype = new createjs.Container();
 	 */
 	 
 	/**
-	 * Dispatched each update immediately before the tick event is propagated through the display list. Does not fire if
-	 * tickOnUpdate is false.
+	 * Dispatched each update immediately before the tick event is propagated through the display list.
+	 * You can call preventDefault on the event object to cancel propagating the tick event.
 	 * @event tickstart
 	 * @since 0.7.0
 	 */
@@ -119,6 +119,7 @@ var p = Stage.prototype = new createjs.Container();
 	 
 	/**
 	 * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
+	 * You can call preventDefault on the event object to cancel the draw.
 	 * @event drawstart
 	 * @since 0.7.0
 	 */
@@ -376,7 +377,7 @@ var p = Stage.prototype = new createjs.Container();
 		if (this.tickOnUpdate) { // update this logic in SpriteStage when necessary
 			this.tick.apply(this, arguments);
 		}
-		this.dispatchEvent("drawstart"); //TODO: make cancellable?
+		if (this.dispatchEvent("drawstart")) { return; }
 		createjs.DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
 		if (this.autoClear) { this.clear(); }
 		var ctx = this.canvas.getContext("2d");
@@ -419,12 +420,12 @@ var p = Stage.prototype = new createjs.Container();
 	 * @param {*} [params]* Params to include when ticking descendants. The first param should usually be a tick event.
 	 **/
 	p.tick = function(params) {
-		this.dispatchEvent("tickstart");  //TODO: make cancellable?
+		if (!this.tickEnabled || this.dispatchEvent("tickstart")) { return; }
 		var args = arguments.length ? Array.prototype.slice.call(arguments,0) : null;
 		var evt = args&&args[0];
 		var props = evt&&(evt.delta != null) ? {delta:evt.delta, paused:evt.paused, time:evt.time, runTime:evt.runTime } : {};
 		props.params = args;
-		this.tickEnabled&&this._tick(props);
+		this._tick(props);
 		this.dispatchEvent("tickend");
 	};
 
