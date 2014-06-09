@@ -71,7 +71,7 @@ var p = SpriteSheetBuilder.prototype = new createjs.EventDispatcher;
 
 	/**
 	 * Dispatched when an asynchronous build has progress.
-	 * @event complete
+	 * @event progress
 	 * @param {Object} target The object that dispatched the event.
 	 * @param {String} type The event type.
 	 * @param {Number} progress The current progress value (0-1).
