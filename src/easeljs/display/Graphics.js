@@ -1350,7 +1350,7 @@ var p = Graphics.prototype;
 			this._appendDraw(Graphics.fillCmd, this._fillMatrix);
 		}
 		if (this._strokeInstructions) {
-			this._appendDraw(Graphics.strokeCmd, this._strokeIgnoreScale&&[1,0,0,1,0,0]);
+			this._appendDraw(Graphics.strokeCmd, this._strokeIgnoreScale&&[1,0,0,1,0,0], true);
 		}
 	};
 
@@ -1366,12 +1366,12 @@ var p = Graphics.prototype;
 	 * @method _appendDraw
 	 * @protected
 	 **/
-	p._appendDraw = function(command, matrixArr) {
+	p._appendDraw = function(command, matrixArr, isGlobalMatrix) {
 		if (!matrixArr) { this._instructions.push(command); }
 		else {
 			this._instructions.push(
 				new Command(this._ctx.save, [], false),
-				new Command(this._ctx.transform, matrixArr, false),
+				new Command(isGlobalMatrix ? this._ctx.setTransform : this._ctx.transform, matrixArr, false),
 				command,
 				new Command(this._ctx.restore, [], false)
 			);
