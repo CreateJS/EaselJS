@@ -37,50 +37,56 @@ this.createjs = this.createjs||{};
 	"use strict";
 
 /**
-* Inner class used by the {{#crossLink "Graphics"}}{{/crossLink}} class. Used to create the instruction lists used in Graphics:
-* @class Command
-* @protected
-* @constructor
-**/
-function Command(f, params, path) {
-	this.f = f;
-	this.params = params;
-	this.path = path==null ? true : path;
-}
-
-/**
-* @method exec
-* @protected
-* @param {Object} scope
-**/
-Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); };
-
-/**
  * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a
- * specified context. Note that you can use Graphics without any dependency on the Easel framework by calling {{#crossLink "DisplayObject/draw"}}{{/crossLink}}
+ * specified context. Note that you can use Graphics without any dependency on the Easel framework by calling {{#crossLink "Graphics/draw"}}{{/crossLink}}
  * directly, or it can be used with the {{#crossLink "Shape"}}{{/crossLink}} object to draw vector graphics within the
- * context of an Easel display list.
+ * context of an EaselJS display list.
  *
- * <h4>Example</h4>
- *
+ * There are two approaches to working with Graphics object: calling methods on a Graphics instance (the "Graphics API"), or
+ * instantiating Graphics command objects and adding them to the graphics queue via {{#crossLink "Graphics/append"}}{{/crossLink}}.
+ * The former abstracts the latter, simplifying beginning and ending paths, fills, and strokes.
+ * 
  *      var g = new createjs.Graphics();
- *	    g.setStrokeStyle(1);
- *	    g.beginStroke(createjs.Graphics.getRGB(0,0,0));
- *	    g.beginFill(createjs.Graphics.getRGB(255,0,0));
- *	    g.drawCircle(0,0,3);
+ *      g.setStrokeStyle(1);
+ *      g.beginStroke("#000000");
+ *      g.beginFill("red");
+ *      g.drawCircle(0,0,30);
  *
- *	    var s = new createjs.Shape(g);
- *	    	s.x = 100;
- *	    	s.y = 100;
+ * All drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
+ * the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill:
  *
- *	    stage.addChild(s);
- *	    stage.update();
- *
- * Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
- * the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then
- * render it to the specified context2D:
- *
- *      myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
+ *      myGraphics.beginStroke("red").beginFill("blue").drawRect(20, 20, 100, 50);
+ *      
+ * Each graphics API call generates a command object (see below). The last command to be created can be accessed via
+ * {{#crossLink "Graphics/command:property"}}{{/crossLink}}:
+ * 
+ *      var fillCommand = myGraphics.beginFill("red").command;
+ *      // ... later, update the fill style/color:
+ *      fillCommand.style = "blue";
+ *      // or change it to a bitmap fill:
+ *      fillCommand.bitmap(myImage);
+ *      
+ * For more direct control of rendering, you can instantiate and append command objects to the graphics queue directly. In this case, you
+ * need to manage path creation manually, and ensure that fill/stroke is applied to a defined path:
+ * 
+ *      // start a new path. Graphics.beginPath is a reusable BeginPath instance:
+ *      myGraphics.append(Graphics.beginPath);
+ *      // we need to define the path before applying the fill:
+ *      var circle = new Graphics.Circle(0,0,30);
+ *      myGraphics.append(circle);
+ *      // fill the path we just defined:
+ *      var fill = new Graphics.Fill("red");
+ *      myGraphics.append(fill);
+ *      
+ * These approaches can be used together, for example to insert a custom command:
+ * 
+ *      myGraphics.beginFill("red");
+ *      var customCommand = new CustomSpiralCommand(etc);
+ *      myGraphics.append(customCommand);
+ *      myGraphics.beginFill("blue");
+ *      myGraphics.drawCircle(0, 0, 30);
+ *      
+ * See {{#crossLink "Graphics/append"}}{{/crossLink}} for more info on creating custom commands.
  *
  * <h4>Tiny API</h4>
  * The Graphics class also includes a "tiny API", which is one or two-letter methods that are shortcuts for all of the
@@ -120,16 +126,16 @@ Command.prototype.exec = function(scope) { this.f.apply(scope, this.params); };
  *
  * Here is the above example, using the tiny API instead.
  *
- *      myGraphics.s("#F00").f("#00F").r(20, 20, 100, 50).draw(myContext2D);
+ *      myGraphics.s("red").f("blue").r(20, 20, 100, 50);
  *
  * @class Graphics
  * @constructor
- * @for Graphics
  **/
 var Graphics = function() {
 	this.initialize();
 };
 var p = Graphics.prototype;
+var G = Graphics;
 
 // static public methods:
 
@@ -196,14 +202,15 @@ var p = Graphics.prototype;
 
 // static properties:
 
+	
 	/**
-	 * Exposes the Command class used internally by Graphics. Useful for extending the Graphics class or injecting
-	 * functionality.
-	 * @property Command
+	 * A reusable instance of {{#crossLink "Graphics/BeginPath"}}{{/crossLink}} to avoid
+	 * unnecessary instantiation.
+	 * @property beginCmd
+	 * @type {Graphics.BeginPath}
 	 * @static
-	 * @type {Function}
 	 **/
-	Graphics.Command = Command;
+	 // defined at the bottom of this file.
 
 	/**
 	 * Map of Base64 characters to values. Used by {{#crossLink "Graphics/decodePath"}}{{/crossLink}}.
@@ -254,52 +261,38 @@ var p = Graphics.prototype;
 	 * @protected
 	 * @type {CanvasRenderingContext2D}
 	 **/
-	 
-	/**
-	 * @property beginCmd
-	 * @static
-	 * @protected
-	 * @type {Command}
-	 **/
-	 
-	/**
-	 * @property fillCmd
-	 * @static
-	 * @protected
-	 * @type {Command}
-	 **/
-	 
-	/**
-	 * @property strokeCmd
-	 * @static
-	 * @protected
-	 * @type {Command}
-	 **/
 	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
 	if (canvas.getContext) {
-		var ctx = Graphics._ctx = canvas.getContext("2d");
-		Graphics.beginCmd = new Command(ctx.beginPath, [], false);
-		Graphics.fillCmd = new Command(ctx.fill, [], false);
-		Graphics.strokeCmd = new Command(ctx.stroke, [], false);
+		Graphics._ctx = canvas.getContext("2d");
 		canvas.width = canvas.height = 1;
 	}
 	
 // public properties
+	/**
+	 * Holds a reference to the last command that was created or appended. For example, you could retain a reference
+	 * to a Fill command in order to dynamically update the color later by using:
+	 * 		myFill = myGraphics.beginFill("red").command;
+	 * 		// update color later:
+	 * 		myFill.style = "yellow";
+	 * @property command
+	 * @type Object
+	 **/
+	p.command = null;
 
 // private properties
 	/**
-	 * @property _strokeInstructions
+	 * @property _stroke
 	 * @protected
 	 * @type {Array}
 	 **/
-	p._strokeInstructions = null;
+	p._stroke = null;
 
 	/**
-	 * @property _strokeStyleInstructions
+	 * @property _strokeStyle
 	 * @protected
 	 * @type {Array}
 	 **/
-	p._strokeStyleInstructions = null;
+	p._strokeStyle = null;
 
 	/**
 	 * @property _strokeIgnoreScale
@@ -309,18 +302,11 @@ var p = Graphics.prototype;
 	p._strokeIgnoreScale = false;
 
 	/**
-	 * @property _fillInstructions
+	 * @property _fill
 	 * @protected
 	 * @type {Array}
 	 **/
-	p._fillInstructions = null;
-
-	/**
-	 * @property _strokeMatrix
-	 * @protected
-	 * @type {Array}
-	 **/
-	p._fillMatrix = null;
+	p._fill = null;
 
 	/**
 	 * @property _instructions
@@ -385,12 +371,13 @@ var p = Graphics.prototype;
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	 * @param {Object} data Optional data that is passed to graphics command exec methods. When called from a Shape instance, the shape passes itself as the data parameter. This can be used by custom graphic commands to insert contextual data.
 	 **/
-	p.draw = function(ctx) {
+	p.draw = function(ctx, data) {
 		if (this._dirty) { this._updateInstructions(); }
 		var instr = this._instructions;
 		for (var i=0, l=instr.length; i<l; i++) {
-			instr[i].exec(ctx);
+			instr[i].exec(ctx, data);
 		}
 	};
 
@@ -405,7 +392,7 @@ var p = Graphics.prototype;
 		var instr, instrs = this._instructions;
 		for (var i=0, l=instrs.length; i<l; i++) {
 			// the first command is always a beginPath command.
-			if ((instr = instrs[i]).path || i==0) { instr.exec(ctx); }
+			if ((instr = instrs[i]).path !== false) { instr.exec(ctx); }
 		}
 	};
 
@@ -418,8 +405,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls).
 	 **/
 	p.moveTo = function(x, y) {
-		this._activeInstructions.push(new Command(this._ctx.moveTo, [x, y]));
-		return this;
+		return this.append(new G.MoveTo(x,y), true);
 	};
 
 	/**
@@ -435,9 +421,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.lineTo = function(x, y) {
-		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.lineTo, [x, y]));
-		return this;
+		return this.append(new G.LineTo(x,y));
 	};
 
 	/**
@@ -453,9 +437,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.arcTo = function(x1, y1, x2, y2, radius) {
-		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.arcTo, [x1, y1, x2, y2, radius]));
-		return this;
+		return this.append(new G.ArcTo(x1, y1, x2, y2, radius));
 	};
 
 	/**
@@ -477,10 +459,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
-		this._dirty = this._active = true;
-		if (anticlockwise == null) { anticlockwise = false; }
-		this._activeInstructions.push(new Command(this._ctx.arc, [x, y, radius, startAngle, endAngle, anticlockwise]));
-		return this;
+		return this.append(new G.Arc(x, y, radius, startAngle, endAngle, anticlockwise));
 	};
 
 	/**
@@ -495,9 +474,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.quadraticCurveTo = function(cpx, cpy, x, y) {
-		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.quadraticCurveTo, [cpx, cpy, x, y]));
-		return this;
+		return this.append(new G.QuadraticCurveTo(cpx, cpy, x, y));
 	};
 
 	/**
@@ -515,9 +492,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.bezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
-		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.bezierCurveTo, [cp1x, cp1y, cp2x, cp2y, x, y]));
-		return this;
+		return this.append(new G.BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y));
 	};
 
 	/**
@@ -533,9 +508,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.rect = function(x, y, w, h) {
-		this._dirty = this._active = true;
-		this._activeInstructions.push(new Command(this._ctx.rect, [x, y, w, h]));
-		return this;
+		return this.append(new G.Rect(x, y, w, h));
 	};
 
 	/**
@@ -545,11 +518,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.closePath = function() {
-		if (this._active) {
-			this._dirty = true;
-			this._activeInstructions.push(new Command(this._ctx.closePath, []));
-		}
-		return this;
+		return this._active ? this.append(new G.ClosePath()) : this;
 	};
 
 
@@ -564,7 +533,7 @@ var p = Graphics.prototype;
 		this._instructions = [];
 		this._oldInstructions = [];
 		this._activeInstructions = [];
-		this._strokeStyleInstructions = this._strokeInstructions = this._fillInstructions = this._fillMatrix = null;
+		this._strokeStyle = this._stroke = this._fill = null;
 		this._active = this._dirty = this._strokeIgnoreScale = false;
 		return this;
 	};
@@ -577,10 +546,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginFill = function(color) {
-		if (this._active) { this._newPath(); }
-		this._fillInstructions = color ? [new Command(this._setProp, ["fillStyle", color], false)] : null;
-		this._fillMatrix = null;
-		return this;
+		return this._setFill(color ? new G.Fill(color) : null);
 	};
 
 	/**
@@ -603,14 +569,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginLinearGradientFill = function(colors, ratios, x0, y0, x1, y1) {
-		if (this._active) { this._newPath(); }
-		var o = this._ctx.createLinearGradient(x0, y0, x1, y1);
-		for (var i=0, l=colors.length; i<l; i++) {
-			o.addColorStop(ratios[i], colors[i]);
-		}
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
-		this._fillMatrix = null;
-		return this;
+		return this._setFill(new G.Fill().linearGradient(colors, ratios, x0, y0, x1, y1));
 	};
 
 	/**
@@ -634,14 +593,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginRadialGradientFill = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
-		if (this._active) { this._newPath(); }
-		var o = this._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
-		for (var i=0, l=colors.length; i<l; i++) {
-			o.addColorStop(ratios[i], colors[i]);
-		}
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
-		this._fillMatrix = null;
-		return this;
+		return this._setFill(new G.Fill().radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1));
 	};
 
 	/**
@@ -658,12 +610,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginBitmapFill = function(image, repetition, matrix) {
-		if (this._active) { this._newPath(); }
-		repetition = repetition || "";
-		var o = this._ctx.createPattern(image, repetition);
-		this._fillInstructions = [new Command(this._setProp, ["fillStyle", o], false)];
-		this._fillMatrix = matrix ? [matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty] : null;
-		return this;
+		return this._setFill(new G.Fill(null,matrix).bitmap(image, repetition));
 	};
 
 	/**
@@ -699,12 +646,10 @@ var p = Graphics.prototype;
 	 **/
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit, ignoreScale) {
 		if (this._active) { this._newPath(); }
-		this._strokeStyleInstructions = [
-			new Command(this._setProp, ["lineWidth", (thickness == null ? "1" : thickness)], false),
-			new Command(this._setProp, ["lineCap", (caps == null ? "butt" : (isNaN(caps) ? caps : Graphics.STROKE_CAPS_MAP[caps]))], false),
-			new Command(this._setProp, ["lineJoin", (joints == null ? "miter" : (isNaN(joints) ? joints : Graphics.STROKE_JOINTS_MAP[joints]))], false),
-			new Command(this._setProp, ["miterLimit", (miterLimit == null ? "10" : miterLimit)], false)
-			];
+		this._strokeStyle = this.command = new G.StrokeStyle(thickness, caps, joints, miterLimit, ignoreScale);
+		
+		// ignoreScale lives on Stroke, not StrokeStyle, so we do a little trickery:
+		if (this._stroke) { this._stroke.ignoreScale = ignoreScale; }
 		this._strokeIgnoreScale = ignoreScale;
 		return this;
 	};
@@ -717,9 +662,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginStroke = function(color) {
-		if (this._active) { this._newPath(); }
-		this._strokeInstructions = color ? [new Command(this._setProp, ["strokeStyle", color], false)] : null;
-		return this;
+		return this._setStroke(color ? new G.Stroke(color) : null);
 	};
 
 	/**
@@ -743,15 +686,8 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginLinearGradientStroke = function(colors, ratios, x0, y0, x1, y1) {
-		if (this._active) { this._newPath(); }
-		var o = this._ctx.createLinearGradient(x0, y0, x1, y1);
-		for (var i=0, l=colors.length; i<l; i++) {
-			o.addColorStop(ratios[i], colors[i]);
-		}
-		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o], false)];
-		return this;
+		return this._setStroke(new G.Stroke().linearGradient(colors, ratios, x0, y0, x1, y1));
 	};
-
 
 	/**
 	 * Begins a radial gradient stroke. This ends the current sub-path. For example, the following code defines a red to
@@ -777,13 +713,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.beginRadialGradientStroke = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
-		if (this._active) { this._newPath(); }
-		var o = this._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
-		for (var i=0, l=colors.length; i<l; i++) {
-			o.addColorStop(ratios[i], colors[i]);
-		}
-		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o], false)];
-		return this;
+		return this._setStroke(new G.Stroke().radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1));
 	};
 
 	/**
@@ -799,11 +729,7 @@ var p = Graphics.prototype;
 	 **/
 	p.beginBitmapStroke = function(image, repetition) {
 		// NOTE: matrix is not supported for stroke because transforms on strokes also affect the drawn stroke width.
-		if (this._active) { this._newPath(); }
-		repetition = repetition || "";
-		var o = this._ctx.createPattern(image, repetition);
-		this._strokeInstructions = [new Command(this._setProp, ["strokeStyle", o], false)];
-		return this;
+		return this._setStroke(new G.Stroke().bitmap(image, repetition));
 	};
 
 	/**
@@ -813,8 +739,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.endStroke = function() {
-		this.beginStroke();
-		return this;
+		return this.beginStroke();
 	};
 
 	/**
@@ -844,8 +769,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.drawRoundRect = function(x, y, w, h, radius) {
-		this.drawRoundRectComplex(x, y, w, h, radius, radius, radius, radius);
-		return this;
+		return this.drawRoundRectComplex(x, y, w, h, radius, radius, radius, radius);
 	};
 
 	/**
@@ -863,31 +787,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.drawRoundRectComplex = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
-		var max = (w<h?w:h)/2;
-		var mTL=0, mTR=0, mBR=0, mBL=0;
-		if (radiusTL < 0) { radiusTL *= (mTL=-1); }
-		if (radiusTL > max) { radiusTL = max; }
-		if (radiusTR < 0) { radiusTR *= (mTR=-1); }
-		if (radiusTR > max) { radiusTR = max; }
-		if (radiusBR < 0) { radiusBR *= (mBR=-1); }
-		if (radiusBR > max) { radiusBR = max; }
-		if (radiusBL < 0) { radiusBL *= (mBL=-1); }
-		if (radiusBL > max) { radiusBL = max; }
-
-		this._dirty = this._active = true;
-		var arcTo=this._ctx.arcTo, lineTo=this._ctx.lineTo;
-		this._activeInstructions.push(
-			new Command(this._ctx.moveTo, [x+w-radiusTR, y]),
-			new Command(arcTo, [x+w+radiusTR*mTR, y-radiusTR*mTR, x+w, y+radiusTR, radiusTR]),
-			new Command(lineTo, [x+w, y+h-radiusBR]),
-			new Command(arcTo, [x+w+radiusBR*mBR, y+h+radiusBR*mBR, x+w-radiusBR, y+h, radiusBR]),
-			new Command(lineTo, [x+radiusBL, y+h]),
-			new Command(arcTo, [x-radiusBL*mBL, y+h+radiusBL*mBL, x, y+h-radiusBL, radiusBL]),
-			new Command(lineTo, [x, y+radiusTL]),
-			new Command(arcTo, [x-radiusTL*mTL, y-radiusTL*mTL, x+radiusTL, y, radiusTL]),
-			new Command(this._ctx.closePath)
-		);
-		return this;
+		return this.append(new G.RoundRect(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL));
 	};
 
 	/**
@@ -914,8 +814,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.drawCircle = function(x, y, radius) {
-		this.arc(x, y, radius, 0, Math.PI*2);
-		return this;
+		return this.append(new G.Circle(x, y, radius));
 	};
 
 	/**
@@ -932,70 +831,7 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.drawEllipse = function(x, y, w, h) {
-		this._dirty = this._active = true;
-		var k = 0.5522848;
-		var ox = (w / 2) * k;
-		var oy = (h / 2) * k;
-		var xe = x + w;
-		var ye = y + h;
-		var xm = x + w / 2;
-		var ym = y + h / 2;
-
-		this._activeInstructions.push(
-			new Command(this._ctx.moveTo, [x, ym]),
-			new Command(this._ctx.bezierCurveTo, [x, ym-oy, xm-ox, y, xm, y]),
-			new Command(this._ctx.bezierCurveTo, [xm+ox, y, xe, ym-oy, xe, ym]),
-			new Command(this._ctx.bezierCurveTo, [xe, ym+oy, xm+ox, ye, xm, ye]),
-			new Command(this._ctx.bezierCurveTo, [xm-ox, ye, x, ym+oy, x, ym])
-		);
-		return this;
-	};
-
-	/**
-	 * Provides a method for injecting arbitrary Context2D (aka Canvas) API calls into a Graphics queue. The specified
-	 * callback function will be called in sequence with other drawing instructions. The callback will be executed in the
-	 * scope of the target canvas's Context2D object, and will be passed the data object as a parameter.
-	 *
-	 * This is an advanced feature. It can allow for powerful functionality, like injecting output from tools that
-	 * export Context2D instructions, executing raw canvas calls within the context of the display list, or dynamically
-	 * modifying colors or stroke styles within a Graphics instance over time, but it is not intended for general use.
-	 *
-	 * Within a Graphics queue, each path begins by applying the fill and stroke styles and settings, followed by
-	 * drawing instructions, followed by the fill() and/or stroke() commands. This means that within a path, inject() can
-	 * update the fill & stroke styles, but for it to be applied in a predictable manner, you must have begun a fill or
-	 * stroke (as appropriate) normally via the Graphics API. For example:
-	 *
-	 * 	function setColor(color) {
-	 * 		this.fillStyle = color;
-	 * 	}
-	 *
-	 * 	// this will not draw anything - no fill was begun, so fill() is not called:
-	 * 	myGraphics.inject(setColor, "red").drawRect(0,0,100,100);
-	 *
-	 * 	// this will draw the rect in green:
-	 * 	myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100);
-	 *
-	 * 	// this will draw both rects in blue, because there is only a single path
-	 * 	// so the second inject overwrites the first:
-	 * 	myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100)
-	 * 		.inject(setColor, "blue").drawRect(100,0,100,100);
-	 *
-	 * 	// this will draw the first rect in green, and the second in blue:
-	 * 	myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100)
-	 * 		.beginFill("#000").inject(setColor, "blue").drawRect(100,0,100,100);
-	 *
-	 * @method inject
-	 * @param {Function} callback The function to execute.
-	 * @param {Object} data Arbitrary data that will be passed to the callback when it is executed.
-	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-	 **/
-	p.inject = function(callback, data) {
-		this._dirty = this._active = true;
-
-		this._activeInstructions.push(
-			new Command(callback, [data])
-		);
-		return this;
+		return this.append(new G.Ellipse(x, y, w, h));
 	};
 
 	/**
@@ -1020,22 +856,45 @@ var p = Graphics.prototype;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.drawPolyStar = function(x, y, radius, sides, pointSize, angle) {
-		this._dirty = this._active = true;
-		if (pointSize == null) { pointSize = 0; }
-		pointSize = 1-pointSize;
-		if (angle == null) { angle = 0; }
-		else { angle /= 180/Math.PI; }
-		var a = Math.PI/sides;
+		return this.append(new G.PolyStar(x, y, radius, sides, pointSize, angle));
+	};
 
-		this._activeInstructions.push(new Command(this._ctx.moveTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
-		for (var i=0; i<sides; i++) {
-			angle += a;
-			if (pointSize != 1) {
-				this._activeInstructions.push(new Command(this._ctx.lineTo, [x+Math.cos(angle)*radius*pointSize, y+Math.sin(angle)*radius*pointSize]));
-			}
-			angle += a;
-			this._activeInstructions.push(new Command(this._ctx.lineTo, [x+Math.cos(angle)*radius, y+Math.sin(angle)*radius]));
-		}
+	/**
+	 * Removed in favour of using custom command objects with {{#crossLink "Graphics/append"}}{{/crossLink}}.
+	 * @method inject
+	 * @deprecated
+	 **/
+	
+	/**
+	 * Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
+	 * that accepts two parameters: the Context2D to operate on, and an arbitrary data object passed into
+	 * {{#crossLink "Graphics/draw"}}{{/crossLink}}. The latter will usually be the Shape instance that called draw.
+	 * 
+	 * This method is used internally by Graphics methods, such as drawCircle, but can also be used directly to insert
+	 * built-in or custom graphics commands. For example:
+	 * 
+	 * 		// attach data to our shape, so we can access it during the draw:
+	 * 		myShape.color = "red";
+	 * 		
+	 * 		// append a Circle command object:
+	 * 		myShape.append(new Graphics.Circle(50, 50, 30));
+	 * 		
+	 * 		// append a custom command object with an exec method that sets the fill style
+	 * 		// based on the shape's data, and then fills the circle.
+	 * 		myShape.append({exec:function(ctx, shape) {
+	 * 			ctx.fillStyle = shape.color;
+	 * 			ctx.fill();
+	 * 		}});
+	 * 
+	 * @method append
+	 * @param {Object} command A graphics command object exposing an "exec" method.
+	 * @param {boolean} clean The clean param is primarily for internal use. A value of true indicates that a command does not generate a path that should be stroked or filled.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 **/
+	p.append = function(command, clean) {
+		this._activeInstructions.push(command);
+		if (!clean) { this._dirty = this._active = true; }
+		this.command = command;
 		return this;
 	};
 
@@ -1120,12 +979,11 @@ var p = Graphics.prototype;
 		o._instructions = this._instructions.slice();
 		o._activeInstructions = this._activeInstructions.slice();
 		o._oldInstructions = this._oldInstructions.slice();
-		if (this._fillInstructions) { o._fillInstructions = this._fillInstructions.slice(); }
-		if (this._strokeInstructions) { o._strokeInstructions = this._strokeInstructions.slice(); }
-		if (this._strokeStyleInstructions) { o._strokeStyleInstructions = this._strokeStyleInstructions.slice(); }
+		o._fill = this._fill;
+		o._stroke = this._stroke;
+		o._strokeStyle = this._strokeStyle;
 		o._active = this._active;
 		o._dirty = this._dirty;
-		o._fillMatrix = this._fillMatrix;
 		o._strokeIgnoreScale = this._strokeIgnoreScale;
 		return o;
 	};
@@ -1340,18 +1198,11 @@ var p = Graphics.prototype;
 		this._instructions = this._oldInstructions.slice();
 		this._instructions.push(Graphics.beginCmd);
 
-		this._appendInstructions(this._fillInstructions);
-		this._appendInstructions(this._strokeInstructions);
-		this._appendInstructions(this._strokeInstructions&&this._strokeStyleInstructions);
-
 		this._appendInstructions(this._activeInstructions);
-
-		if (this._fillInstructions) {
-			this._appendDraw(Graphics.fillCmd, this._fillMatrix);
-		}
-		if (this._strokeInstructions) {
-			this._appendDraw(Graphics.strokeCmd, this._strokeIgnoreScale&&[1,0,0,1,0,0]);
-		}
+		
+		if (this._fill) { this._instructions.push(this._fill); }
+		if (this._stroke && this._strokeStyle) { this._instructions.push(this._strokeStyle); }
+		if (this._stroke) { this._instructions.push(this._stroke); }
 	};
 
 	/**
@@ -1361,21 +1212,28 @@ var p = Graphics.prototype;
 	p._appendInstructions = function(instructions) {
 		if (instructions) { this._instructions.push.apply(this._instructions, instructions); }
 	};
-
+	
 	/**
-	 * @method _appendDraw
+	 * @method _setFill
 	 * @protected
 	 **/
-	p._appendDraw = function(command, matrixArr) {
-		if (!matrixArr) { this._instructions.push(command); }
-		else {
-			this._instructions.push(
-				new Command(this._ctx.save, [], false),
-				new Command(this._ctx.transform, matrixArr, false),
-				command,
-				new Command(this._ctx.restore, [], false)
-			);
+	p._setFill = function(fill) {
+		if (this._active) { this._newPath(); }
+		if (this._fill = fill) { this.command = fill; }
+		return this;
+	};
+	
+	/**
+	 * @method _setStroke
+	 * @protected
+	 **/
+	p._setStroke = function(stroke) {
+		if (this._active) { this._newPath(); }
+		if (this._stroke = stroke) {
+			this.command = stroke;
+			stroke.ignoreScale = this._strokeIgnoreScale;
 		}
+		return this;
 	};
 
 	/**
@@ -1388,18 +1246,608 @@ var p = Graphics.prototype;
 		this._activeInstructions = [];
 		this._active = this._dirty = false;
 	};
-
-	// used to create Commands that set properties:
+	
+// Command Objects:
 	/**
-	 * Used to create Commands that set properties
-	 * @method _setProp
-	 * @param {String} name
-	 * @param {String} value
-	 * @protected
+	 * @namespace Graphics
+	 */
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class MoveTo
+	 * @constructor
+	 * @param {Number} x
+	 * @param {Number} y
 	 **/
-	p._setProp = function(name, value) {
-		this[name] = value;
-	};
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	(G.LineTo = function(x, y) {
+		this.x = x; this.y = y;
+	}).prototype.exec = function(ctx) { ctx.lineTo(this.x,this.y); };
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class LineTo
+	 * @constructor
+	 * @param {Number} x
+	 * @param {Number} y
+	 **/
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	(G.MoveTo = function(x, y) {
+		this.x = x; this.y = y;
+	}).prototype.exec = function(ctx) { ctx.moveTo(this.x, this.y); };
 
+
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class ArcTo
+	 * @constructor
+	 * @param {Number} x1
+	 * @param {Number} y1
+	 * @param {Number} x2
+	 * @param {Number} y2
+	 * @param {Number} radius
+	 **/
+	/**
+	 * @property x1
+	 * @type Number
+	 */
+	/**
+	 * @property y1
+	 * @type Number
+	 */
+	/**
+	 * @property x2
+	 * @type Number
+	 */
+	/**
+	 * @property y2
+	 * @type Number
+	 */
+	/**
+	 * @property radius
+	 * @type Number
+	 */
+	(G.ArcTo = function(x1, y1, x2, y2, radius) {
+		this.x1 = x1; this.y1 = y1;
+		this.x2 = x2; this.y2 = y2;
+		this.radius = radius;
+	}).prototype.exec = function(ctx) { ctx.arcTo(this.x1, this.y1, this.x2, this.y2, this.radius); };
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class Arc
+	 * @constructor
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} radius
+	 * @param {Number} startAngle
+	 * @param {Number} endAngle
+	 * @param {Number} anticlockwise
+	 **/
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	/**
+	 * @property radius
+	 * @type Number
+	 */
+	/**
+	 * @property startAngle
+	 * @type Number
+	 */
+	/**
+	 * @property endAngle
+	 * @type Number
+	 */
+	/**
+	 * @property anticlockwise
+	 * @type Number
+	 */
+	(G.Arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
+		this.x = x; this.y = y;
+		this.radius = radius;
+		this.startAngle = startAngle; this.endAngle = endAngle; 
+		this.anticlockwise = !!anticlockwise; 
+	}).prototype.exec = function(ctx) { ctx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle, this.anticlockwise); };
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class QuadraticCurveTo
+	 * @constructor
+	 * @param {Number} cpx
+	 * @param {Number} cpy
+	 * @param {Number} x
+	 * @param {Number} y
+	 **/
+	/**
+	 * @property cpx
+	 * @type Number
+	 */
+	/**
+	 * @property cpy
+	 * @type Number
+	 */
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	(G.QuadraticCurveTo = function(cpx, cpy, x, y) {
+		this.cpx = cpx; this.cpy = cpy;
+		this.x = x; this.y = y;
+	}).prototype.exec = function(ctx) { ctx.quadraticCurveTo(this.cpx, this.cpy, this.x, this.y); };
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class BezierCurveTo
+	 * @constructor
+	 * @param {Number} cp1x
+	 * @param {Number} cp1y
+	 * @param {Number} cp2x
+	 * @param {Number} cp2y
+	 * @param {Number} x
+	 * @param {Number} y
+	 **/
+	/**
+	 * @property cp1x
+	 * @type Number
+	 */
+	/**
+	 * @property cp1y
+	 * @type Number
+	 */
+	/**
+	 * @property cp2x
+	 * @type Number
+	 */
+	/**
+	 * @property cp2y
+	 * @type Number
+	 */
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	(G.BezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
+		this.cp1x = cp1x; this.cp1y = cp1y;
+		this.cp2x = cp2x; this.cp2y = cp2y;
+		this.x = x; this.y = y;
+	}).prototype.exec = function(ctx) { ctx.bezierCurveTo(this.cp1x, this.cp1y, this.cp2x, this.cp2y, this.x, this.y); };
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class Rect
+	 * @constructor
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} w
+	 * @param {Number} h
+	 **/
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	/**
+	 * @property w
+	 * @type Number
+	 */
+	/**
+	 * @property h
+	 * @type Number
+	 */
+	(G.Rect = function(x, y, w, h) {
+		this.x = x; this.y = y;
+		this.w = w; this.h = h;
+	}).prototype.exec = function(ctx) { ctx.rect(this.x, this.y, this.w, this.h); };
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class ClosePath
+	 * @constructor
+	 **/
+	(G.ClosePath = function() {
+	}).prototype.exec = function(ctx) { ctx.closePath(); };
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class BeginPath
+	 * @constructor
+	 **/
+	(G.BeginPath = function() {
+	}).prototype.exec = function(ctx) { ctx.beginPath(); };	
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class Fill
+	 * @constructor
+	 * @param {Object} style A valid Context2D fillStyle.
+	 * @param {Matrix2D} matrix
+	 **/
+	/**
+	 * A valid Context2D fillStyle.
+	 * @property style
+	 * @type Object
+	 */
+	/**
+	 * @property matrix
+	 * @type Matrix2D
+	 */
+	p = (G.Fill = function(style, matrix) {
+		this.style = style;
+		this.matrix = matrix;
+	}).prototype;
+	p.exec = function(ctx) {
+		ctx.fillStyle = this.style;
+		var mtx = this.matrix;
+		if (mtx) { ctx.save(); ctx.transform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
+		ctx.fill();
+		if (mtx) { ctx.restore(); }
+	};
+	/**
+	 * Creates a linear gradient style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+	 * @method linearGradient
+	 * @param {Array} colors
+	 * @param {Array} ratios
+	 * @param {Number} x0
+	 * @param {Number} y0
+	 * @param {Number} x1
+	 * @param {Number} y1
+	 * @return {Fill} Returns this Fill object for chaining or assignment.
+	 */
+	p.linearGradient = function(colors, ratios, x0, y0, x1, y1) {
+		var o = this.style =  Graphics._ctx.createLinearGradient(x0, y0, x1, y1);
+		for (var i=0, l=colors.length; i<l; i++) { o.addColorStop(ratios[i], colors[i]); }
+		return this;
+	};
+	/**
+	 * Creates a radial gradient style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+	 * @method radialGradient
+	 * @param {Array} colors
+	 * @param {Array} ratios
+	 * @param {Number} x0
+	 * @param {Number} y0
+	 * @param {Number} r0
+	 * @param {Number} x1
+	 * @param {Number} y1
+	 * @param {Number} r1
+	 * @return {Fill} Returns this Fill object for chaining or assignment.
+	 */
+	p.radialGradient = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
+		var o = this.style =  Graphics._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
+		for (var i=0, l=colors.length; i<l; i++) { o.addColorStop(ratios[i], colors[i]); }
+		return this;
+	};
+	/**
+	 * Creates a bitmap fill style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+	 * @method bitmap
+	 * @param {Image} image
+	 * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
+	 * @return {Fill} Returns this Fill object for chaining or assignment.
+	 */
+	p.bitmap = function(image, repetition) {
+		this.style = Graphics._ctx.createPattern(image, repetition||"");
+		return this;
+	};
+	p.path = false;
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class Stroke
+	 * @constructor
+	 * @param {Object} style A valid Context2D fillStyle.
+	 * @param {Boolean} ignoreScale
+	 **/
+	/**
+	 * A valid Context2D strokeStyle.
+	 * @property style
+	 * @type Object
+	 */
+	/**
+	 * @property ignoreScale
+	 * @type Boolean
+	 */
+	p = (G.Stroke = function(style, ignoreScale) {
+		this.style = style;
+		this.ignoreScale = ignoreScale;
+	}).prototype;
+	p.exec = function(ctx) {
+		ctx.strokeStyle = this.style;
+		var mtx = this.matrix;
+		if (mtx) { ctx.save(); ctx.transform(1,0,0,1,0,0); }
+		ctx.stroke();
+		if (mtx) { ctx.restore(); }
+	};
+	/**
+	 * Creates a linear gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
+	 * @method linearGradient
+	 * @param {Array} colors
+	 * @param {Array} ratios
+	 * @param {Number} x0
+	 * @param {Number} y0
+	 * @param {Number} x1
+	 * @param {Number} y1
+	 * @return {Fill} Returns this Stroke object for chaining or assignment.
+	 */
+	p.linearGradient = G.Fill.prototype.linearGradient;
+	/**
+	 * Creates a radial gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
+	 * @method radialGradient
+	 * @param {Array} colors
+	 * @param {Array} ratios
+	 * @param {Number} x0
+	 * @param {Number} y0
+	 * @param {Number} r0
+	 * @param {Number} x1
+	 * @param {Number} y1
+	 * @param {Number} r1
+	 * @return {Fill} Returns this Stroke object for chaining or assignment.
+	 */
+	p.radialGradient = G.Fill.prototype.radialGradient;
+	/**
+	 * Creates a bitmap fill style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
+	 * @method bitmap
+	 * @param {Image} image
+	 * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
+	 * @return {Fill} Returns this Stroke object for chaining or assignment.
+	 */
+	p.bitmap = G.Fill.prototype.bitmap;
+	p.path = false;
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class StrokeStyle
+	 * @constructor
+	 * @param {Number} lineWidth
+	 * @param {String} caps
+	 * @param {String} joints
+	 * @param {Number} miterLimit
+	 **/
+	/**
+	 * @property lineWidth
+	 * @type Number
+	 */
+	/**
+	 * One of: butt, round, square
+	 * @property caps
+	 * @type String
+	 */
+	/**
+	 * One of: round, bevel, miter
+	 * @property joints
+	 * @type String
+	 */
+	/**
+	 * @property miterLimit
+	 * @type Number
+	 */
+	p = (G.StrokeStyle = function(lineWidth, caps, joints, miterLimit) {
+		this.lineWidth = lineWidth;
+		this.caps = caps;
+		this.joints = joints;
+		this.miterLimit = miterLimit;
+	}).prototype;
+	p.exec = function(ctx) {
+		ctx.lineWidth = (this.lineWidth == null ? "1" : this.lineWidth);
+		ctx.lineCap = (this.caps == null ? "butt" : this.caps);
+		ctx.lineJoin = (this.joints == null ? "miter" : this.joints);
+		ctx.miterLimit = (this.miterLimit == null ? "10" : this.miterLimit);
+	};
+	p.path = false;
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class RoundRect
+	 * @constructor
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} w
+	 * @param {Number} h
+	 * @param {Number} radiusTL
+	 * @param {Number} radiusTR
+	 * @param {Number} radiusBR
+	 * @param {Number} radiusBL
+	 **/
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	/**
+	 * @property w
+	 * @type Number
+	 */
+	/**
+	 * @property h
+	 * @type Number
+	 */
+	/**
+	 * @property radiusTL
+	 * @type Number
+	 */
+	/**
+	 * @property radiusTR
+	 * @type Number
+	 */
+	/**
+	 * @property radiusBR
+	 * @type Number
+	 */
+	/**
+	 * @property radiusBL
+	 * @type Number
+	 */
+	(G.RoundRect = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
+		this.x = x; this.y = y;
+		this.w = w; this.h = h;
+		this.radiusTL = radiusTL; this.radiusTR = radiusTR;
+		this.radiusBR = radiusBR; this.radiusBL = radiusBL;
+	}).prototype.exec = function(ctx) {
+		var max = (w<h?w:h)/2;
+		var mTL=0, mTR=0, mBR=0, mBL=0;
+		var x = this.x, y = this.y, w = this.w, h = this.h;
+		var rTL = this.radiusTL, rTR = this.radiusTR, rBR = this.radiusBR, rBL = this.radiusBL;
+		
+		if (rTL < 0) { rTL *= (mTL=-1); }
+		if (rTL > max) { rTL = max; }
+		if (rTR < 0) { rTR *= (mTR=-1); }
+		if (rTR > max) { rTR = max; }
+		if (rBR < 0) { rBR *= (mBR=-1); }
+		if (rBR > max) { rBR = max; }
+		if (rBL < 0) { rBL *= (mBL=-1); }
+		if (rBL > max) { rBL = max; }
+
+		ctx.moveTo(x+w-rTR, y);
+		ctx.arcTo(x+w+rTR*mTR, y-rTR*mTR, x+w, y+rTR, rTR);
+		ctx.lineTo(x+w, y+h-rBR);
+		ctx.arcTo(x+w+rBR*mBR, y+h+rBR*mBR, x+w-rBR, y+h, rBR);
+		ctx.lineTo(x+rBL, y+h);
+		ctx.arcTo(x-rBL*mBL, y+h+rBL*mBL, x, y+h-rBL, rBL);
+		ctx.lineTo(x, y+rTL);
+		ctx.arcTo(x-rTL*mTL, y-rTL*mTL, x+rTL, y, rTL);
+		ctx.closePath();
+	};
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class Circle
+	 * @constructor
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} radius
+	 **/
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	/**
+	 * @property radius
+	 * @type Number
+	 */
+	(G.Circle = function(x, y, radius) {
+		this.x = x; this.y = y;
+		this.radius = radius;
+	}).prototype.exec = function(ctx) { ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2); };
+	
+	(G.Ellipse = function(x, y, w, h) {
+		this.x = x; this.y = y;
+		this.w = w; this.h = h;
+	}).prototype.exec = function(ctx) {
+		var x = this.x, y = this.y;
+		var w = this.w, h = this.h;
+		
+		var k = 0.5522848;
+		var ox = (w / 2) * k;
+		var oy = (h / 2) * k;
+		var xe = x + w;
+		var ye = y + h;
+		var xm = x + w / 2;
+		var ym = y + h / 2;
+
+		ctx.moveTo(x, ym);
+		ctx.bezierCurveTo(x, ym-oy, xm-ox, y, xm, y);
+		ctx.bezierCurveTo(xm+ox, y, xe, ym-oy, xe, ym);
+		ctx.bezierCurveTo(xe, ym+oy, xm+ox, ye, xm, ye);
+		ctx.bezierCurveTo(xm-ox, ye, x, ym+oy, x, ym);
+	};
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class PolyStar
+	 * @constructor
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} radius
+	 * @param {Number} sides
+	 * @param {Number} pointSize
+	 * @param {Number} angle
+	 **/
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	/**
+	 * @property radius
+	 * @type Number
+	 */
+	/**
+	 * @property sides
+	 * @type Number
+	 */
+	/**
+	 * @property pointSize
+	 * @type Number
+	 */
+	/**
+	 * @property angle
+	 * @type Number
+	 */
+	(G.PolyStar = function(x, y, radius, sides, pointSize, angle) {
+		this.x = x; this.y = y;
+		this.radius = radius;
+		this.sides = sides;
+		this.pointSize = pointSize;
+		this.angle = angle;
+	}).prototype.exec = function(ctx) {
+		var x = this.x, y = this.y;
+		var radius = this.radius;
+		var angle = (this.angle||0)/180*Math.PI;
+		var sides = this.sides;
+		var ps = 1-(this.pointSize||0);
+		var a = Math.PI/sides;
+		
+		ctx.moveTo(x+Math.cos(angle)*radius, y+Math.sin(angle)*radius);
+		for (var i=0; i<sides; i++) {
+			angle += a;
+			if (ps != 1) {
+				ctx.lineTo(x+Math.cos(angle)*radius*ps, y+Math.sin(angle)*radius*ps);
+			}
+			angle += a;
+			ctx.lineTo(x+Math.cos(angle)*radius, y+Math.sin(angle)*radius);
+		}
+	};
+	
+	// docced above.
+	Graphics.beginCmd = new G.BeginPath(); // so we don't have to instantiate multiples.
+	
 createjs.Graphics = Graphics;
 }());
