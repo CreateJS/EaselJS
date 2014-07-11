@@ -240,7 +240,7 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 		var o = this.spriteSheet.getFrame(this._currentFrame|0);
 		if (!o) { return false; }
 		var rect = o.rect;
-		ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, -o.regX, -o.regY, rect.width, rect.height);
+		if (rect.width && rect.height) { ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, -o.regX, -o.regY, rect.width, rect.height); }
 		return true;
 	};
 
@@ -248,20 +248,20 @@ var p = Sprite.prototype = new createjs.DisplayObject();
 	//Bitmap. This is why they have no method implementations.
 
 	/**
-	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should not cache Bitmap instances as it can degrade performance.
+	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+	 * You should not cache Sprite instances as it can degrade performance.
 	 * @method cache
 	 **/
 
 	/**
-	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should not cache Bitmap instances as it can degrade performance.
+	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+	 * You should not cache Sprite instances as it can degrade performance.
 	 * @method updateCache
 	 **/
 
 	/**
-	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should not cache Bitmap instances as it can degrade performance.
+	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+	 * You should not cache Sprite instances as it can degrade performance.
 	 * @method uncache
 	 **/
 
