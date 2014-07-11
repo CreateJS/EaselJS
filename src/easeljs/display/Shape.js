@@ -61,7 +61,7 @@ this.createjs = this.createjs||{};
  **/
 var Shape = function(graphics) {
   this.initialize(graphics);
-}
+};
 var p = Shape.prototype = new createjs.DisplayObject();
 
 // public properties:
@@ -89,7 +89,7 @@ var p = Shape.prototype = new createjs.DisplayObject();
 	p.initialize = function(graphics) {
 		this.DisplayObject_initialize();
 		this.graphics = graphics ? graphics : new createjs.Graphics();
-	}
+	};
 
 	/**
 	 * Returns true or false indicating whether the Shape would be visible if drawn to a canvas.
@@ -123,9 +123,9 @@ var p = Shape.prototype = new createjs.DisplayObject();
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		this.graphics.draw(ctx);
+		this.graphics.draw(ctx, this);
 		return true;
-	}
+	};
 
 	/**
 	 * Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to
@@ -138,7 +138,7 @@ var p = Shape.prototype = new createjs.DisplayObject();
 		var o = new Shape((recursive && this.graphics) ? this.graphics.clone() : this.graphics);
 		this.cloneProps(o);
 		return o;
-	}
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -147,7 +147,7 @@ var p = Shape.prototype = new createjs.DisplayObject();
 	 **/
 	p.toString = function() {
 		return "[Shape (name="+  this.name +")]";
-	}
+	};
 
 createjs.Shape = Shape;
 }());
