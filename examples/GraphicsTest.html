@@ -3,7 +3,6 @@
 <head>
     <title>EaselJS: Simple Graphics</title>
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
 
 	<!-- Note: All core EaselJS classes are listed here: -->
 	<script type="text/javascript" src="../src/createjs/events/Event.js"></script>
@@ -59,7 +58,7 @@
         }
 
         function layout() {
-            var arr = [createStar, createHex, createLineTo, createRadialGradientFill, createEllipse, createRectGradientFill, createBitmapFill];
+            var arr = [createStar, createHex, createLineTo, createRadialGradientFill, createEllipse, createRectGradientFill, createBitmapFill, createRoundRect];
             var padding = 5;
             var _width = 155;
             var _height = 155;
@@ -90,7 +89,8 @@
         function createBitmapFill() {
             var container = createTile();
             var s = new createjs.Shape();
-            s.graphics.beginBitmapFill(img).setStrokeStyle(8).beginRadialGradientStroke(["#FFF","#000"],[0,1],0,0,0,0,30,130).drawRect(0, 0, 130, 130);
+            var mtx = new createjs.Matrix2D().rotate(1);
+            s.graphics.beginBitmapFill(img, null, mtx).setStrokeStyle(8).beginRadialGradientStroke(["#FFF","#000"],[0,1],0,0,0,0,30,130).drawRect(0, 0, 130, 130);
             s.x = 12;
             s.y = 10;
             container.addChild(s);
@@ -154,6 +154,16 @@
 
             container.addChild(s);
             return container;
+        }
+        
+        function createRoundRect() {
+        	var container = createTile();
+        	var s = new createjs.Shape();
+			s.graphics.setStrokeStyle(6).beginStroke("red").beginFill("green").drawRoundRect(0,0,130,130,30);
+			s.x = s.y = 12;
+			
+			container.addChild(s);
+			return container;
         }
 
         function createTile() {
