@@ -382,6 +382,7 @@ var p = SpriteSheet.prototype = new createjs.EventDispatcher();
 	 *     <LI>an image property holding a reference to the image object in which the frame is found</LI>
 	 *     <LI>a rect property containing a Rectangle instance which defines the boundaries for the frame within that
 	 *     image.</LI>
+	 *     <LI> A regX and regY property corresponding to the regX/Y values for the frame.
 	 * </UL>
 	 * @method getFrame
 	 * @param {Number} frameIndex The index of the frame.
