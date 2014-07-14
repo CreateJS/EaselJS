@@ -374,7 +374,7 @@ var G = Graphics;
 	 * @param {Object} data Optional data that is passed to graphics command exec methods. When called from a Shape instance, the shape passes itself as the data parameter. This can be used by custom graphic commands to insert contextual data.
 	 **/
 	p.draw = function(ctx, data) {
-		if (this._dirty) { this._updateInstructions(); }
+		this._updateInstructions();
 		var instr = this._instructions;
 		for (var i=0, l=instr.length; i<l; i++) {
 			instr[i].exec(ctx, data);
@@ -388,7 +388,7 @@ var G = Graphics;
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
 	 **/
 	p.drawAsPath = function(ctx) {
-		if (this._dirty) { this._updateInstructions(); }
+		this._updateInstructions();
 		var instr, instrs = this._instructions;
 		for (var i=0, l=instrs.length; i<l; i++) {
 			// the first command is always a beginPath command.
@@ -1195,6 +1195,7 @@ var G = Graphics;
 	 * @protected
 	 **/
 	p._updateInstructions = function() {
+		if (!this._dirty) { return; }
 		this._instructions = this._oldInstructions.slice();
 		this._instructions.push(Graphics.beginCmd);
 
@@ -1241,7 +1242,7 @@ var G = Graphics;
 	 * @protected
 	 **/
 	p._newPath = function() {
-		if (this._dirty) { this._updateInstructions(); }
+		this._updateInstructions();
 		this._oldInstructions = this._instructions;
 		this._activeInstructions = [];
 		this._active = this._dirty = false;
