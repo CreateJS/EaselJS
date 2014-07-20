@@ -291,6 +291,19 @@ var p = Text.prototype = new createjs.DisplayObject();
 		var y = lineHeight * Text.V_OFFSETS[this.textBaseline||"top"];
 		return this._rectangle.initialize(x, y, w, o.height);
 	};
+	
+	/**
+	 * Returns an object with width, height, and lines properties. The width and height are the visual width and height
+	 * of the drawn text. The lines property contains an array of strings, one for
+	 * each line of text that will be drawn, accounting for line breaks and wrapping. These strings have trailing
+	 * whitespace removed.
+	 * @method getMetrics
+	 * @return {Object} An object with width, height, and lines properties.
+	 **/
+	p.getMetrics = function() {
+		var o = {lines:[]};
+		return this._drawText(null, o, o.lines);
+	};
 
 	/**
 	 * Returns a clone of the Text instance.
@@ -354,18 +367,19 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @method _drawText
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @param {Object} o
+	 * @param {Array} lines
 	 * @return {Object}
 	 * @protected
 	 **/
-	p._drawText = function(ctx, o) {
+	p._drawText = function(ctx, o, lines) {
 		var paint = !!ctx;
 		if (!paint) { ctx = this._prepContext(Text._workingContext); }
 		var lineHeight = this.lineHeight||this.getMeasuredLineHeight();
 		
 		var maxW = 0, count = 0;
-		var lines = String(this.text).split(/(?:\r\n|\r|\n)/);
-		for (var i=0, l=lines.length; i<l; i++) {
-			var str = lines[i];
+		var hardLines = String(this.text).split(/(?:\r\n|\r|\n)/);
+		for (var i=0, l=hardLines.length; i<l; i++) {
+			var str = hardLines[i];
 			var w = null;
 			
 			if (this.lineWidth != null && (w = ctx.measureText(str).width) > this.lineWidth) {
@@ -379,6 +393,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 					var wordW = ctx.measureText(words[j] + words[j+1]).width;
 					if (w + wordW > this.lineWidth) {
 						if (paint) { this._drawTextLine(ctx, str, count*lineHeight); }
+						if (lines) { lines.push(str); }
 						if (w > maxW) { maxW = w; }
 						str = words[j+1];
 						w = ctx.measureText(str).width;
@@ -391,13 +406,13 @@ var p = Text.prototype = new createjs.DisplayObject();
 			}
 			
 			if (paint) { this._drawTextLine(ctx, str, count*lineHeight); }
+			if (lines) { lines.push(str); }
 			if (o && w == null) { w = ctx.measureText(str).width; }
 			if (w > maxW) { maxW = w; }
 			count++;
 		}
 		
 		if (o) {
-			o.count = count;
 			o.width = maxW;
 			o.height = count*lineHeight;
 		}
@@ -413,9 +428,8 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	p._drawTextLine = function(ctx, text, y) {
 		// Chrome 17 will fail to draw the text if the last param is included but null, so we feed it a large value instead:
-			if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth||0xFFFF); }
-			else { ctx.fillText(text, 0, y, this.maxWidth||0xFFFF); }
-
+		if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth||0xFFFF); }
+		else { ctx.fillText(text, 0, y, this.maxWidth||0xFFFF); }
 	};
 
 createjs.Text = Text;
