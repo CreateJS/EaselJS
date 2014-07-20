@@ -314,15 +314,17 @@ var G = Graphics;
 	 * @type {Array}
 	 **/
 	p._instructions = null;
-
+	
 	/**
-	 * @property _oldInstructions
+	 * Indicates the last instruction index that was committed.
+	 * @property _commitIndex
 	 * @protected
-	 * @type {Array}
+	 * @type {Number}
 	 **/
-	p._oldInstructions = null;
+	p._commitIndex = 0;
 
 	/**
+	 * Uncommitted instructions.
 	 * @property _activeInstructions
 	 * @protected
 	 * @type {Array}
@@ -330,14 +332,7 @@ var G = Graphics;
 	p._activeInstructions = null;
 
 	/**
-	 * @property _active
-	 * @protected
-	 * @type {Boolean}
-	 * @default false
-	 **/
-	p._active = false;
-
-	/**
+	 * This indicates that there have been changes to the activeInstruction list since the last updateInstructions call.
 	 * @property _dirty
 	 * @protected
 	 * @type {Boolean}
@@ -361,7 +356,7 @@ var G = Graphics;
 	 * @return {Boolean} Returns true if this Graphics instance has no drawing commands.
 	 **/
 	p.isEmpty = function() {
-		return !(this._instructions.length || this._oldInstructions.length || this._activeInstructions.length);
+		return !(this._instructions.length || this._activeInstructions.length);
 	};
 
 	/**
@@ -518,7 +513,7 @@ var G = Graphics;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.closePath = function() {
-		return this._active ? this.append(new G.ClosePath()) : this;
+		return this._activeInstructions.length ? this.append(new G.ClosePath()) : this;
 	};
 
 
@@ -531,10 +526,10 @@ var G = Graphics;
 	 **/
 	p.clear = function() {
 		this._instructions = [];
-		this._oldInstructions = [];
 		this._activeInstructions = [];
+		this._commitIndex = 0;
 		this._strokeStyle = this._stroke = this._fill = null;
-		this._active = this._dirty = this._strokeIgnoreScale = false;
+		this._dirty = this._strokeIgnoreScale = false;
 		return this;
 	};
 
@@ -645,7 +640,7 @@ var G = Graphics;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit, ignoreScale) {
-		if (this._active) { this._newPath(); }
+		this._updateInstructions(true);
 		this._strokeStyle = this.command = new G.StrokeStyle(thickness, caps, joints, miterLimit, ignoreScale);
 		
 		// ignoreScale lives on Stroke, not StrokeStyle, so we do a little trickery:
@@ -893,8 +888,8 @@ var G = Graphics;
 	 **/
 	p.append = function(command, clean) {
 		this._activeInstructions.push(command);
-		if (!clean) { this._dirty = this._active = true; }
 		this.command = command;
+		if (!clean) { this._dirty = true; }
 		return this;
 	};
 
@@ -968,6 +963,19 @@ var G = Graphics;
 		}
 		return this;
 	};
+	
+	/**
+	 * Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect)
+	 * Modifying the array directly is very likely to result in unexpected behaviour.
+	 * 
+	 * This method is mainly intended for introspection of the instructions (ex. for graphics export).
+	 * @method getInstructions
+	 * @return {Array} The graphics instructions array.
+	 **/
+	p.getInstructions = function() {
+		this._updateInstructions();
+		return this._instructions;
+	};
 
 	/**
 	 * Returns a clone of this Graphics instance.
@@ -978,11 +986,10 @@ var G = Graphics;
 		var o = new Graphics();
 		o._instructions = this._instructions.slice();
 		o._activeInstructions = this._activeInstructions.slice();
-		o._oldInstructions = this._oldInstructions.slice();
+		o._commitIndex = this._commitIndex;
 		o._fill = this._fill;
 		o._stroke = this._stroke;
 		o._strokeStyle = this._strokeStyle;
-		o._active = this._active;
 		o._dirty = this._dirty;
 		o._strokeIgnoreScale = this._strokeIgnoreScale;
 		return o;
@@ -1194,24 +1201,23 @@ var G = Graphics;
 	 * @method _updateInstructions
 	 * @protected
 	 **/
-	p._updateInstructions = function() {
-		if (!this._dirty) { return; }
-		this._instructions = this._oldInstructions.slice();
-		this._instructions.push(Graphics.beginCmd);
-
-		this._appendInstructions(this._activeInstructions);
+	p._updateInstructions = function(commit) {
+		var instr = this._instructions, active = this._activeInstructions, commitIndex = this._commitIndex;
+		if (!this._dirty || !active.length) { return; }
+		this._dirty = false;
 		
-		if (this._fill) { this._instructions.push(this._fill); }
-		if (this._stroke && this._strokeStyle) { this._instructions.push(this._strokeStyle); }
-		if (this._stroke) { this._instructions.push(this._stroke); }
-	};
-
-	/**
-	 * @method _appendInstructions
-	 * @protected
-	 **/
-	p._appendInstructions = function(instructions) {
-		if (instructions) { this._instructions.push.apply(this._instructions, instructions); }
+		instr.length = commitIndex;
+		instr.push(Graphics.beginCmd);
+		instr.push.apply(instr, active);
+		
+		if (this._fill) { instr.push(this._fill); }
+		if (this._stroke && this._strokeStyle) { instr.push(this._strokeStyle); }
+		if (this._stroke) { instr.push(this._stroke); }
+		
+		if (commit) {
+			active.length = 0;
+			this._commitIndex = instr.length;
+		}
 	};
 	
 	/**
@@ -1219,7 +1225,7 @@ var G = Graphics;
 	 * @protected
 	 **/
 	p._setFill = function(fill) {
-		if (this._active) { this._newPath(); }
+		this._updateInstructions(true);
 		if (this._fill = fill) { this.command = fill; }
 		return this;
 	};
@@ -1229,23 +1235,12 @@ var G = Graphics;
 	 * @protected
 	 **/
 	p._setStroke = function(stroke) {
-		if (this._active) { this._newPath(); }
+		this._updateInstructions(true);
 		if (this._stroke = stroke) {
 			this.command = stroke;
 			stroke.ignoreScale = this._strokeIgnoreScale;
 		}
 		return this;
-	};
-
-	/**
-	 * @method _newPath
-	 * @protected
-	 **/
-	p._newPath = function() {
-		this._updateInstructions();
-		this._oldInstructions = this._instructions;
-		this._activeInstructions = [];
-		this._active = this._dirty = false;
 	};
 	
 // Command Objects:
@@ -1627,13 +1622,13 @@ var G = Graphics;
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class StrokeStyle
 	 * @constructor
-	 * @param {Number} lineWidth
+	 * @param {Number} width
 	 * @param {String} caps
 	 * @param {String} joints
 	 * @param {Number} miterLimit
 	 **/
 	/**
-	 * @property lineWidth
+	 * @property width
 	 * @type Number
 	 */
 	/**
@@ -1650,14 +1645,14 @@ var G = Graphics;
 	 * @property miterLimit
 	 * @type Number
 	 */
-	p = (G.StrokeStyle = function(lineWidth, caps, joints, miterLimit) {
-		this.lineWidth = lineWidth;
+	p = (G.StrokeStyle = function(width, caps, joints, miterLimit) {
+		this.width = width;
 		this.caps = caps;
 		this.joints = joints;
 		this.miterLimit = miterLimit;
 	}).prototype;
 	p.exec = function(ctx) {
-		ctx.lineWidth = (this.lineWidth == null ? "1" : this.lineWidth);
+		ctx.lineWidth = (this.width == null ? "1" : this.width);
 		ctx.lineCap = (this.caps == null ? "butt" : this.caps);
 		ctx.lineJoin = (this.joints == null ? "miter" : this.joints);
 		ctx.miterLimit = (this.miterLimit == null ? "10" : this.miterLimit);
