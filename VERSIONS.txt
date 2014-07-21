@@ -27,6 +27,9 @@ OTHER:
 - preventDefault support added to the tickstart and drawstart events
 - added Stage.drawRect to support selective rendering
 - major rewrite of Graphics to use specific command objects
+- significant performance improvements for Graphics instances with a large number of instructions
+- added Graphics.getInstructions()
+- added Text.getMetrics()
 - fix for spritesheets that included 0 width/height frames
 
 
