@@ -1522,6 +1522,7 @@ var G = Graphics;
 	p.linearGradient = function(colors, ratios, x0, y0, x1, y1) {
 		var o = this.style =  Graphics._ctx.createLinearGradient(x0, y0, x1, y1);
 		for (var i=0, l=colors.length; i<l; i++) { o.addColorStop(ratios[i], colors[i]); }
+		o.props = {colors:colors, ratios:ratios, x0:x0, y0:y0, x1:x1, y1:y1, type:"linear"};
 		return this;
 	};
 	/**
@@ -1540,6 +1541,7 @@ var G = Graphics;
 	p.radialGradient = function(colors, ratios, x0, y0, r0, x1, y1, r1) {
 		var o = this.style =  Graphics._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
 		for (var i=0, l=colors.length; i<l; i++) { o.addColorStop(ratios[i], colors[i]); }
+		o.props = {colors:colors, ratios:ratios, x0:x0, y0:y0, r0:r0, x1:x1, y1:y1, r1:r1, type:"radial"};
 		return this;
 	};
 	/**
@@ -1550,7 +1552,8 @@ var G = Graphics;
 	 * @return {Fill} Returns this Fill object for chaining or assignment.
 	 */
 	p.bitmap = function(image, repetition) {
-		this.style = Graphics._ctx.createPattern(image, repetition||"");
+		var o = this.style = Graphics._ctx.createPattern(image, repetition||"");
+		o.props = {image:image, repetition:repetition, type:"bitmap"};
 		return this;
 	};
 	p.path = false;
