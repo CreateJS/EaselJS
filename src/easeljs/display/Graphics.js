@@ -1502,6 +1502,7 @@ var G = Graphics;
 		this.matrix = matrix;
 	}).prototype;
 	p.exec = function(ctx) {
+		if (!this.style) { return; }
 		ctx.fillStyle = this.style;
 		var mtx = this.matrix;
 		if (mtx) { ctx.save(); ctx.transform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
@@ -1579,11 +1580,11 @@ var G = Graphics;
 		this.ignoreScale = ignoreScale;
 	}).prototype;
 	p.exec = function(ctx) {
+		if (!this.style) { return; }
 		ctx.strokeStyle = this.style;
-		var mtx = this.matrix;
-		if (mtx) { ctx.save(); ctx.transform(1,0,0,1,0,0); }
+		if (this.ignoreScale) { ctx.save(); ctx.setTransform(1,0,0,1,0,0); }
 		ctx.stroke();
-		if (mtx) { ctx.restore(); }
+		if (this.ignoreScale) { ctx.restore(); }
 	};
 	/**
 	 * Creates a linear gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
@@ -1843,7 +1844,12 @@ var G = Graphics;
 			angle += a;
 			ctx.lineTo(x+Math.cos(angle)*radius, y+Math.sin(angle)*radius);
 		}
+		ctx.closePath();
 	};
+	
+	[G.Fill, G.Stroke].forEach(function(o) {o.prototype.type = 0; });
+	[G.MoveTo, G.LineTo, G.ArcTo, G.Arc, G.QuadraticCurveTo, G.BezierCurveTo, G.ClosePath].forEach(function(o) {o.prototype.type = 1; });
+	[G.Rect, G.Circle, G.RoundRect, G.Ellipse, G.PolyStar].forEach(function(o) {o.prototype.type = 2; });
 	
 	// docced above.
 	Graphics.beginCmd = new G.BeginPath(); // so we don't have to instantiate multiples.
