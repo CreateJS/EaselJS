@@ -302,6 +302,8 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	p.getMetrics = function() {
 		var o = {lines:[]};
+		o.lineHeight = this.lineHeight || this.getMeasuredLineHeight();
+		o.vOffset = o.lineHeight * Text.V_OFFSETS[this.textBaseline||"top"];
 		return this._drawText(null, o, o.lines);
 	};
 
