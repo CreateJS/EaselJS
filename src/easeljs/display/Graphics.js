@@ -1847,10 +1847,6 @@ var G = Graphics;
 		ctx.closePath();
 	};
 	
-	[G.Fill, G.Stroke].forEach(function(o) {o.prototype.type = 0; });
-	[G.MoveTo, G.LineTo, G.ArcTo, G.Arc, G.QuadraticCurveTo, G.BezierCurveTo, G.ClosePath].forEach(function(o) {o.prototype.type = 1; });
-	[G.Rect, G.Circle, G.RoundRect, G.Ellipse, G.PolyStar].forEach(function(o) {o.prototype.type = 2; });
-	
 	// docced above.
 	Graphics.beginCmd = new G.BeginPath(); // so we don't have to instantiate multiples.
 	
