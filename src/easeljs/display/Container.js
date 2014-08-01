@@ -184,6 +184,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.push(child);
+		child.dispatchEvent("added");
 		return child;
 	};
 
@@ -222,6 +223,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.splice(index, 0, child);
+		child.dispatchEvent("added");
 		return child;
 	};
 
@@ -282,6 +284,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var child = this.children[index];
 		if (child) { child.parent = null; }
 		this.children.splice(index, 1);
+		child.dispatchEvent("removed");
 		return true;
 	};
 
