@@ -122,23 +122,86 @@
 this.createjs = this.createjs||{};
 
 (function() {
-/**
- * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
- * {{#crossLink "Container"}}{{/crossLink}}, {{#crossLink "Bitmap"}}{{/crossLink}}, and {{#crossLink "Shape"}}{{/crossLink}}.
- * DisplayObject is the base class for all display classes in the EaselJS library. It defines the core properties and
- * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
- * caching, and mouse handlers.
- * @class DisplayObject
- * @extends EventDispatcher
- * @constructor
- **/
-var DisplayObject = function() {
-  this.initialize();
-};
-var p = DisplayObject.prototype = new createjs.EventDispatcher();
+
+    /**
+     * @author change by xingyan@360.cn
+     * @desc
+     * javascript的hidden class设计是v8对浏览器的极大贡献
+     * 不幸的是，本框架的作者来自地地道道的flash团队 因此现代浏览器JIT的红利被无视了
+     * 引入下段代码的修改解决了两个问题：
+     * 1、当每个displayObject的子类或者子类的子类或者子类的子类的子类中调用this指针的时候
+     * 该指针会因为下列代码经过n + 1(n表示继承层级)次查找，找到createjs.displayObjectProps中
+     * 此改变会让譬如一个孙子类method中{this.a = "XXX"; this.b = "XXX"; this.c = "XXX"}这种写法
+     * 的3 * 2 = 6次查找，变为 {var props = this.props; props.a = "XXX";.....}的1次查找
+     * 回顾游戏里方法动辄成千上万次的调用 这种优化只可以用丧心病狂来形容
+     * 2、对象初始化即有值 由于as的编译让开发人员对同源语言js的类型判断太过于乐观，v8的hidden class
+     * 解决掉的类型预编译在createjs框架中被一一巧妙的避开了，因此必须加回才好意思说这框架是js框架
+     *
+     * 以上修改相当于一个不太优雅的补丁
+     *
+     * “——那么，怎么样可以优雅的修复呢？”
+     * “——花有重开日，人无再少年，莫道前路无人识，几转轮回更惜君。”
+     *
+     * @constructor createjs.DisplayObjectProps
+     */
+    createjs.DisplayObjectProps = function(props) {
+        var props = props || {};
+        this.alpha = props.alpha || 1;
+        this.cacheCanvas = props.cacheCanvas || null;
+        this._cacheWidth = props._cacheWidth || 0;
+        this._cacheHeight = props._cacheHeight || 0;
+        this.mouseEnabled = props.mouseEnabled || true;
+        this.name = props.name || null;
+        this.parent = props.parent || null;
+        this.regX = props.regX || 0;
+        this.regY = props.regY || 0;
+        this.rotation = props.rotation || 0;
+        this.scaleX = props.scaleX || 1;
+        this.scaleY = props.scaleY || 1;
+        this.skewX = props.skewX || 0;
+        this.skewY = props.skewY || 0;
+        this.shadow = props.shadow || null;
+        this.visible = props.visible || true;
+        this.x = props.x || 0;
+        this.y = props.y || 0;
+        this.compositeOperation = props.compositeOperation || null;
+        this.snapToPixel = props.snapToPixel || false;
+
+        this.filters = null;
+        this.cacheID = props.cacheID || 0;
+        this.mask = null;
+        this.hitArea = null;
+        this.cursor = null;
+        this._listeners = null;
+        this._cacheOffsetX = props._cacheOffsetX || 0;
+        this._cacheOffsetY = props._cacheOffsetY || 0;
+        this._cacheScale = props._cacheScale || 1;
+        this._cacheDataURLID = props._cacheDataURLID || 0;
+        this._cacheDataURL = props._cacheDataURL || null;
+
+        this.id = createjs.UID.get();
+        this._matrix = new createjs.Matrix2D();
+        this._rectangle = new createjs.Rectangle();
+        this._bounds = null;
+    }
+
+
+    /**
+     * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
+     * {{#crossLink "Container"}}{{/crossLink}}, {{#crossLink "Bitmap"}}{{/crossLink}}, and {{#crossLink "Shape"}}{{/crossLink}}.
+     * DisplayObject is the base class for all display classes in the EaselJS library. It defines the core properties and
+     * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
+     * caching, and mouse handlers.
+     * @class DisplayObject
+     * @extends EventDispatcher
+     * @constructor
+     **/
+    var DisplayObject = function() {
+        this.initialize();
+    };
+    var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	
-	
-// static properties:
+    // static properties:
 	/**
 	 * Listing of mouse event names. Used in _hasMouseEventListener.
 	 * @property _MOUSE_EVENTS
@@ -665,9 +728,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @protected
 	*/
 	p.initialize = function() {
-		this.id = createjs.UID.get();
-		this._matrix = new createjs.Matrix2D();
-		this._rectangle = new createjs.Rectangle();
+        this.props = new createjs.DisplayObjectProps(Object.getPrototypeOf(this).props);
 	};
 
 // public methods:
@@ -680,7 +741,8 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
-		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0);
+        var props = this.props;
+		return !!(props.visible && props.alpha > 0 && props.scaleX != 0 && props.scaleY != 0);
 	};
 
 	/**
@@ -695,9 +757,10 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @return {Boolean}
 	 **/
 	p.draw = function(ctx, ignoreCache) {
-		var cacheCanvas = this.cacheCanvas;
+        var props = this.props,
+            cacheCanvas = props.cacheCanvas;
 		if (ignoreCache || !cacheCanvas) { return false; }
-		var scale = this._cacheScale, offX = this._cacheOffsetX, offY = this._cacheOffsetY, fBounds;
+		var scale = props._cacheScale, offX = props._cacheOffsetX, offY = props._cacheOffsetY, fBounds;
 		if (fBounds = this._applyFilterBounds(offX, offY, 0, 0)) {
 			offX = fBounds.x;
 			offY = fBounds.y;
@@ -713,8 +776,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D to update.
 	 **/
 	p.updateContext = function(ctx) {
-		var mtx, mask=this.mask, o=this;
-		
+		var props = this.props, mtx, mask = props.mask;
 		if (mask && mask.graphics && !mask.graphics.isEmpty()) {
 			mtx = mask.getMatrix(mask._matrix);
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
@@ -726,16 +788,16 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 		}
 		
-		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		mtx = props._matrix.identity().appendTransform(props.x, props.y, props.scaleX, props.scaleY, props.rotation, props.skewX, props.skewY, props.regX, props.regY);
 		var tx = mtx.tx, ty = mtx.ty;
-		if (DisplayObject._snapToPixelEnabled && o.snapToPixel) {
+		if (DisplayObject._snapToPixelEnabled && props.snapToPixel) {
 			tx = tx + (tx < 0 ? -0.5 : 0.5) | 0;
 			ty = ty + (ty < 0 ? -0.5 : 0.5) | 0;
 		}
 		ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, tx, ty);
-		ctx.globalAlpha *= o.alpha;
-		if (o.compositeOperation) { ctx.globalCompositeOperation = o.compositeOperation; }
-		if (o.shadow) { this._applyShadow(ctx, o.shadow); }
+		ctx.globalAlpha *= props.alpha;
+		if (props.compositeOperation) { ctx.globalCompositeOperation = props.compositeOperation; }
+		if (props.shadow) { this._applyShadow(ctx, props.shadow); }
 	};
 
 	/**
@@ -771,13 +833,14 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 **/
 	p.cache = function(x, y, width, height, scale) {
 		// draw to canvas.
+        var props = this.props;
 		scale = scale||1;
-		if (!this.cacheCanvas) { this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
-		this._cacheWidth = width;
-		this._cacheHeight = height;
-		this._cacheOffsetX = x;
-		this._cacheOffsetY = y;
-		this._cacheScale = scale;
+		if (!props.cacheCanvas) { props.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
+        props._cacheWidth = width;
+        props._cacheHeight = height;
+        props._cacheOffsetX = x;
+        props._cacheOffsetY = y;
+        props._cacheScale = scale;
 		this.updateCache();
 	};
 
@@ -801,8 +864,8 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * whatwg spec on compositing</a>.
 	 **/
 	p.updateCache = function(compositeOperation) {
-		var cacheCanvas = this.cacheCanvas, scale = this._cacheScale, offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
-		var w = this._cacheWidth, h = this._cacheHeight, fBounds;
+		var props = this.props, cacheCanvas = props.cacheCanvas, scale = props._cacheScale, offX = props._cacheOffsetX*scale, offY = props._cacheOffsetY*scale;
+		var w = props._cacheWidth, h = props._cacheHeight, fBounds;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
 		var ctx = cacheCanvas.getContext("2d");
 		
@@ -831,7 +894,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		// TODO: filters and cache scale don't play well together at present.
 		this._applyFilters();
 		ctx.restore();
-		this.cacheID = DisplayObject._nextCacheID++;
+        props.cacheID = DisplayObject._nextCacheID++;
 	};
 
 	/**
@@ -839,9 +902,10 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @method uncache
 	 **/
 	p.uncache = function() {
-		this._cacheDataURL = this.cacheCanvas = null;
-		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = 0;
-		this._cacheScale = 1;
+        var props = this.props;
+        props._cacheDataURL = props.cacheCanvas = null;
+        props.cacheID = props._cacheOffsetX = props._cacheOffsetY = 0;
+        props._cacheScale = 1;
 	};
 	
 	/**
@@ -851,9 +915,10 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @return {String} The image data url for the cache.
 	 **/
 	p.getCacheDataURL = function() {
-		if (!this.cacheCanvas) { return null; }
-		if (this.cacheID != this._cacheDataURLID) { this._cacheDataURL = this.cacheCanvas.toDataURL(); }
-		return this._cacheDataURL;
+        var props = this.props;
+		if (!props.cacheCanvas) { return null; }
+		if (props.cacheID != props._cacheDataURLID) { props._cacheDataURL = props.cacheCanvas.toDataURL(); }
+		return props._cacheDataURL;
 	};
 
 	/**
@@ -865,7 +930,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p.getStage = function() {
 		var o = this;
 		while (o.parent) {
-			o = o.parent;
+			o = o.props.parent;
 		}
 		// using dynamic access to avoid circular dependencies;
 		if (o instanceof createjs["Stage"]) { return o; }
@@ -893,7 +958,8 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * on the stage.
 	 **/
 	p.localToGlobal = function(x, y) {
-		var mtx = this.getConcatenatedMatrix(this._matrix);
+        var props = this.props,
+            mtx = this.getConcatenatedMatrix(props._matrix);
 		if (mtx == null) { return null; }
 		mtx.append(1, 0, 0, 1, x, y);
 		return new createjs.Point(mtx.tx, mtx.ty);
@@ -920,7 +986,8 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * display object's coordinate space.
 	 **/
 	p.globalToLocal = function(x, y) {
-		var mtx = this.getConcatenatedMatrix(this._matrix);
+		var props = this.props,
+            mtx = this.getConcatenatedMatrix(props._matrix);
 		if (mtx == null) { return null; }
 		mtx.invert();
 		mtx.append(1, 0, 0, 1, x, y);
@@ -969,15 +1036,16 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @return {DisplayObject} Returns this instance. Useful for chaining commands.
 	*/
 	p.setTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-		this.x = x || 0;
-		this.y = y || 0;
-		this.scaleX = scaleX == null ? 1 : scaleX;
-		this.scaleY = scaleY == null ? 1 : scaleY;
-		this.rotation = rotation || 0;
-		this.skewX = skewX || 0;
-		this.skewY = skewY || 0;
-		this.regX = regX || 0;
-		this.regY = regY || 0;
+        var props = this.props;
+        props.x = x || 0;
+        props.y = y || 0;
+        props.scaleX = scaleX == null ? 1 : scaleX;
+        props.scaleY = scaleY == null ? 1 : scaleY;
+        props.rotation = rotation || 0;
+        props.skewX = skewX || 0;
+        props.skewY = skewY || 0;
+        props.regX = regX || 0;
+        props.regY = regY || 0;
 		return this;
 	};
 	
@@ -989,8 +1057,8 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @return {Matrix2D} A matrix representing this display object's transform.
 	 **/
 	p.getMatrix = function(matrix) {
-		var o = this;
-		return (matrix ? matrix.identity() : new createjs.Matrix2D()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
+		var props = this.props;
+		return (matrix ? matrix.identity() : new createjs.Matrix2D()).appendTransform(props.x, props.y, props.scaleX, props.scaleY, props.rotation, props.skewX, props.skewY, props.regX, props.regY).appendProperties(props.alpha, props.shadow, props.compositeOperation);
 	};
 	
 	/**
@@ -1007,10 +1075,12 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p.getConcatenatedMatrix = function(matrix) {
 		if (matrix) { matrix.identity(); }
 		else { matrix = new createjs.Matrix2D(); }
-		var o = this;
+		var o = this,
+            props;
 		while (o != null) {
-			matrix.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).prependProperties(o.alpha, o.shadow, o.compositeOperation, o.visible);
-			o = o.parent;
+            props = this.props;
+			matrix.prependTransform(props.x, props.y, props.scaleX, props.scaleY, props.rotation, props.skewX, props.skewY, props.regX, props.regY).prependProperties(props.alpha, props.shadow, props.compositeOperation, props.visible);
+			o = props.parent;
 		}
 		return matrix;
 	};
@@ -1120,11 +1190,12 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * object.
 	 **/
 	p.getBounds = function() {
-		if (this._bounds) { return this._rectangle.copy(this._bounds); }
-		var cacheCanvas = this.cacheCanvas;
+        var props = this.props;
+		if (props._bounds) { return props._rectangle.copy(props._bounds); }
+		var cacheCanvas = props.cacheCanvas;
 		if (cacheCanvas) {
-			var scale = this._cacheScale;
-			return this._rectangle.initialize(this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
+			var scale = props._cacheScale;
+			return props._rectangle.initialize(props._cacheOffsetX, props._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
 		}
 		return null;
 	};
@@ -1162,8 +1233,9 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @param {Number} height The height of the bounds.
 	 **/
 	p.setBounds = function(x, y, width, height) {
-		if (x == null) { this._bounds = x; }
-		this._bounds = (this._bounds || new createjs.Rectangle()).initialize(x, y, width, height);
+        var props = this.props;
+		if (x == null) { props._bounds = x; }
+        props._bounds = (props._bounds || new createjs.Rectangle()).initialize(x, y, width, height);
 	};
 
 	/**
@@ -1184,7 +1256,8 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @return {String} a string representation of the instance.
 	 **/
 	p.toString = function() {
-		return "[DisplayObject (name="+  this.name +")]";
+        var props = this.props;
+		return "[DisplayObject (name="+  props.name +")]";
 	};
 
 // private methods:
@@ -1197,22 +1270,24 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * instance copied into.
 	 **/
 	p.cloneProps = function(o) {
-		o.alpha = this.alpha;
-		o.name = this.name;
-		o.regX = this.regX;
-		o.regY = this.regY;
-		o.rotation = this.rotation;
-		o.scaleX = this.scaleX;
-		o.scaleY = this.scaleY;
-		o.shadow = this.shadow;
-		o.skewX = this.skewX;
-		o.skewY = this.skewY;
-		o.visible = this.visible;
-		o.x  = this.x;
-		o.y = this.y;
-		o._bounds = this._bounds;
-		o.mouseEnabled = this.mouseEnabled;
-		o.compositeOperation = this.compositeOperation;
+        var props = this.props,
+            newProps = o.props;
+        newProps.alpha = props.alpha;
+        newProps.name = props.name;
+        newProps.regX = props.regX;
+        newProps.regY = props.regY;
+        newProps.rotation = props.rotation;
+        newProps.scaleX = props.scaleX;
+        newProps.scaleY = props.scaleY;
+        newProps.shadow = props.shadow;
+        newProps.skewX = props.skewX;
+        newProps.skewY = props.skewY;
+        newProps.visible = props.visible;
+        newProps.x  = props.x;
+        newProps.y = props.y;
+        newProps._bounds = props._bounds;
+        newProps.mouseEnabled = props.mouseEnabled;
+        newProps.compositeOperation = props.compositeOperation;
 	};
 
 	/**
@@ -1239,7 +1314,8 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 **/
 	p._tick = function(props) {
 		// because tick can be really performance sensitive, we'll inline some of the dispatchEvent work.
-		var ls = this._listeners;
+		var _props = this.props;
+        var ls = _props._listeners;
 		if (ls && ls["tick"]) {
 			var evt = new createjs.Event("tick").set(props);
 			this._dispatchEvent(evt, this, 2);
@@ -1268,13 +1344,14 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @protected
 	 **/
 	p._applyFilters = function() {
-		if (!this.filters || this.filters.length == 0 || !this.cacheCanvas) { return; }
-		var l = this.filters.length;
-		var ctx = this.cacheCanvas.getContext("2d");
-		var w = this.cacheCanvas.width;
-		var h = this.cacheCanvas.height;
+        var props = this.props;
+		if (!props.filters || props.filters.length == 0 || !props.cacheCanvas) { return; }
+		var l = props.filters.length;
+		var ctx = props.cacheCanvas.getContext("2d");
+		var w = props.cacheCanvas.width;
+		var h = props.cacheCanvas.height;
 		for (var i=0; i<l; i++) {
-			this.filters[i].applyFilter(ctx, 0, 0, w, h);
+            props.filters[i].applyFilter(ctx, 0, 0, w, h);
 		}
 	};
 	
@@ -1288,14 +1365,14 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @protected
 	 **/
 	p._applyFilterBounds = function(x, y, width, height) {
-		var bounds, l, filters = this.filters;
+		var props = this.props, bounds, l, filters = props.filters;
 		if (!filters || !(l=filters.length)) { return null; }
 		
 		for (var i=0; i<l; i++) {
-			var f = this.filters[i];
+			var f = props.filters[i];
 			var fBounds = f.getBounds&&f.getBounds();
 			if (!fBounds) { continue; }
-			if (!bounds) { bounds = this._rectangle.initialize(x,y,width,height); }
+			if (!bounds) { bounds = props._rectangle.initialize(x,y,width,height); }
 			bounds.x += fBounds.x;
 			bounds.y += fBounds.y;
 			bounds.width += fBounds.width;
@@ -1326,7 +1403,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p._transformBounds = function(bounds, matrix, ignoreTransform) {
 		if (!bounds) { return bounds; }
 		var x = bounds.x, y = bounds.y, width = bounds.width, height = bounds.height;
-		var mtx = ignoreTransform ? this._matrix.identity() : this.getMatrix(this._matrix);
+		var props = this.props, mtx = ignoreTransform ? props._matrix.identity() : this.getMatrix(props._matrix);
 		
 		if (x || y) { mtx.appendTransform(0,0,1,1,0,0,0,-x,-y); }
 		if (matrix) { mtx.prependMatrix(matrix); }
@@ -1355,12 +1432,36 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @protected
 	 **/
 	p._hasMouseEventListener = function() {
-		var evts = DisplayObject._MOUSE_EVENTS;
+		var evts = DisplayObject._MOUSE_EVENTS,
+            props = this.props;
 		for (var i= 0, l=evts.length; i<l; i++) {
 			if (this.hasEventListener(evts[i])) { return true; }
 		}
-		return !!this.cursor;
+		return !!props.cursor;
 	};
 
-createjs.DisplayObject = DisplayObject;
+
+    /**
+     * @desc 增加一坨set、get让DisplayObjectProps能跑起来
+     * @private
+     */
+    var privateProps = [
+            "alpha", "cacheCanvas", "_cacheWidth", "_cacheHeight", "mouseEnabled", "name", "parent",
+            "regX", "regY", "rotation", "scaleX", "scaleY", "skewX", "skewY", "shadow", "visible",
+            "x", "y", "compositeOperation", "snapToPixel", "filters", "cacheID", "mask", "hitArea",
+            "cursor", "_listeners", "_cacheOffsetX", "_cacheOffsetY", "_cacheScale", "_cacheDataURLID",
+            "_cacheDataURL", "id", "_matrix", "_rectangle", "_bounds"
+        ],
+        setPropsForDisplayObjectProps = function(k) {
+            Object.defineProperty(p, k, {
+                get: function() { return this.props[k]; },
+                set: function(v) { this.props[k] = v }
+            });
+        },
+        pLength = privateProps.length,
+        i = 0;
+    for(; i < pLength; i++) {
+        setPropsForDisplayObjectProps(privateProps[i]);
+    }
+    createjs.DisplayObject = DisplayObject;
 }());

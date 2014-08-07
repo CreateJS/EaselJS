@@ -194,6 +194,12 @@ var p = Text.prototype = new createjs.DisplayObject();
 	*/
 	p.initialize = function(text, font, color) {
 		this.DisplayObject_initialize();
+        this.textAlign = "left";
+        this.textBaseline = "top";
+        this.maxWidth = null;
+        this.outline = false;
+        this.lineHeight = 0;
+        this.lineWidth = null;
 		this.text = text;
 		this.font = font;
 		this.color = color;
@@ -207,8 +213,9 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @return {Boolean} Whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
+        var props = this.props;
 		var hasContent = this.cacheCanvas || (this.text != null && this.text !== "");
-		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
+		return !!(props.visible && props.alpha > 0 && props.scaleX != 0 && props.scaleY != 0 && hasContent);
 	};
 
 	/**
