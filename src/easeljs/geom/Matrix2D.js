@@ -170,6 +170,10 @@ var p = Matrix2D.prototype;
 		this.d = (d == null) ? 1 : d;
 		this.tx = tx || 0;
 		this.ty = ty || 0;
+        this.alpha = 1;
+        this.shadow = null;
+        this.compositeOperation = null;
+        this.visible = true;
 		return this;
 	};
 

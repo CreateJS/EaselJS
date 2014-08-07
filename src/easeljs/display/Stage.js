@@ -365,6 +365,19 @@ var p = Stage.prototype = new createjs.Container();
 	 **/
 	p.initialize = function(canvas) {
 		this.Container_initialize();
+        this.autoClear = true;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.drawRect = null;
+        this.snapToPixelEnabled = false;
+        this.mouseInBounds = false;
+        this.tickOnUpdate = true;
+        this.mouseMoveOutside = true;
+        this._pointerCount = 0;
+        this._primaryPointerID = null;
+        this._mouseOverIntervalID = null;
+        this._nextStage = null;
+        this._prevStage = null;
 		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
 		this._pointerData = {};
 		this.enableDOMEvents(true);
