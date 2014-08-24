@@ -579,7 +579,7 @@ var Ticker = function() {
 			Ticker.dispatchEvent(event);
 		}
 		
-		Ticker._tickTimes.unshift(Ticker._getTime()-time);
+		Ticker._tickTimes.unshift(Ticker._getTime()-Ticker._startTime-time);
 		while (Ticker._tickTimes.length > 100) { Ticker._tickTimes.pop(); }
 
 		Ticker._times.unshift(time);
