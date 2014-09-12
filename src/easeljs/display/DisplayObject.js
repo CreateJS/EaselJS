@@ -1375,6 +1375,36 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	};
 
 	/**
+	 * Dispatches "removed" and "removedFromStage" events.
+	 * Removes stage property.
+	 * @method _removed
+	 * @protected
+	 **/
+	p._removed = function() {
+		this.dispatchEvent(new createjs.Event("removed", false));
+		this._childrenRemovedStage();
+	};
+
+	/**
+	 * Finds all children and dispatches removedFromStage.
+	 * Also checks all children to dispatch event when adding order is messy.
+	 * @method _childrenRemovedStage
+	 * @private
+	 **/
+	p._childrenRemovedStage = function() {
+		if (this.children) {
+			var kids = this.children;
+			for (var i=0,l=kids.length;i<l;i++) {
+				if (kids[i]._added) { kids[i]._childrenRemovedStage(); }
+			}
+		}
+
+		this.dispatchEvent(new createjs.Event("removedFromStage", false));
+		this.parent = null;
+		this.stage = null;
+	};
+
+	/**
 	 * Dispatches "added" and "addedToStage" events.
 	 * Sets stage property to currently attached stage.
 	 * @method _added
@@ -1382,15 +1412,16 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 **/
 	p._added = function() {
 		this.dispatchEvent(new createjs.Event("added", false));
-		this._checkStage();
+		this._checkAddedStage();
 	};
+
 	/**
 	 * Finds stage and assigns to public variable.
 	 * Also checks all children to dispatch event when adding order is messy.
-	 * @method _checkStage
+	 * @method _checkAddedStage
 	 * @private
 	 **/
-	p._checkStage = function() {
+	p._checkAddedStage = function() {
 		var stage = this.getStage();
 		if (stage) {
 			this.stage = stage;
@@ -1399,7 +1430,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		if (this.children) {
 			var kids = this.children;
 			for (var i=0,l=kids.length;i<l;i++) {
-				if (kids[i]._added) { kids[i]._checkStage(); }
+				if (kids[i]._added) { kids[i]._checkAddedStage(); }
 			}
 		}
 	};

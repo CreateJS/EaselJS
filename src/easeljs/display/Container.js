@@ -282,13 +282,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		}
 		if (index < 0 || index > this.children.length-1) { return false; }
 		var child = this.children[index];
-		if (child) {
-			child.dispatchEvent(new createjs.Event("removed", false));
-			child.dispatchEvent(new createjs.Event("removedFromStage", false));
-			child.parent = null;
-			child.stage = null;
-		}
-		if (child) { child.parent = null; }
+		if (child) { child._removed(); }
 		this.children.splice(index, 1);
 		return true;
 	};
