@@ -1382,6 +1382,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 **/
 	p._removed = function() {
 		this.dispatchEvent(new createjs.Event("removed", false));
+		this.parent = null;
 		this._childrenRemovedStage();
 	};
 
@@ -1400,7 +1401,6 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		}
 
 		this.dispatchEvent(new createjs.Event("removedFromStage", false));
-		this.parent = null;
 		this.stage = null;
 	};
 
