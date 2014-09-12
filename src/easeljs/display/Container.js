@@ -184,7 +184,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.push(child);
-		child.dispatchEvent(new createjs.Event("added", false));
+		child._added();
 		return child;
 	};
 
@@ -223,7 +223,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.splice(index, 0, child);
-		child.dispatchEvent(new createjs.Event("added", false));
+		child._added();
 		return child;
 	};
 
@@ -282,9 +282,13 @@ var p = Container.prototype = new createjs.DisplayObject();
 		}
 		if (index < 0 || index > this.children.length-1) { return false; }
 		var child = this.children[index];
-		if (child) { child.parent = null; }
+		if (child) {
+			child.dispatchEvent(new createjs.Event("removed", false));
+			child.dispatchEvent(new createjs.Event("removedFromStage", false));
+			child.parent = null;
+			child.stage = null;
+		}
 		this.children.splice(index, 1);
-		child.dispatchEvent(new createjs.Event("removed", false));
 		return true;
 	};
 
