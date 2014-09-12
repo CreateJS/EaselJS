@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-*
+* 
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-*
+* 
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-*
+* 
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -136,8 +136,8 @@ var DisplayObject = function() {
   this.initialize();
 };
 var p = DisplayObject.prototype = new createjs.EventDispatcher();
-
-
+	
+	
 // static properties:
 	/**
 	 * Listing of mouse event names. Used in _hasMouseEventListener.
@@ -157,7 +157,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default false
 	 **/
 	DisplayObject.suppressCrossDomainErrors = false;
-
+	
 	/**
 	 * @property _snapToPixelEnabled
 	 * @protected
@@ -197,28 +197,28 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 // events:
 
 	/**
-	 * Dispatched when the user presses their left mouse button over the display object. See the
+	 * Dispatched when the user presses their left mouse button over the display object. See the 
 	 * {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event mousedown
 	 * @since 0.6.0
 	 */
-
+	 
 	/**
 	 * Dispatched when the user presses their left mouse button and then releases it while over the display object.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event click
 	 * @since 0.6.0
 	 */
-
+	 
 	/**
 	 * Dispatched when the user double clicks their left mouse button over this display object.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event dblclick
 	 * @since 0.6.0
 	 */
-
+	 
 	/**
-	 * Dispatched when the user's mouse enters this display object. This event must be enabled using
+	 * Dispatched when the user's mouse enters this display object. This event must be enabled using 
 	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}. See also {{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event mouseover
@@ -226,18 +226,18 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 */
 
 	/**
-	 * Dispatched when the user's mouse leaves this display object. This event must be enabled using
+	 * Dispatched when the user's mouse leaves this display object. This event must be enabled using 
 	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}. See also {{#crossLink "DisplayObject/rollout:event"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event mouseout
 	 * @since 0.6.0
 	 */
-
+	 
 	/**
 	 * This event is similar to {{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}, with the following
 	 * differences: it does not bubble, and it considers {{#crossLink "Container"}}{{/crossLink}} instances as an
 	 * aggregate of their content.
-	 *
+	 * 
 	 * For example, myContainer contains two overlapping children: shapeA and shapeB. The user moves their mouse over
 	 * shapeA and then directly on to shapeB. With a listener for {{#crossLink "mouseover:event"}}{{/crossLink}} on
 	 * myContainer, two events would be received, each targeting a child element:<OL>
@@ -246,18 +246,18 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * </OL>
 	 * However, with a listener for "rollover" instead, only a single event is received when the mouse first enters
 	 * the aggregate myContainer content (target=myContainer).
-	 *
+	 * 
 	 * This event must be enabled using {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event rollover
 	 * @since 0.7.0
 	 */
-
+	 
 	/**
 	 * This event is similar to {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}, with the following
 	 * differences: it does not bubble, and it considers {{#crossLink "Container"}}{{/crossLink}} instances as an
 	 * aggregate of their content.
-	 *
+	 * 
 	 * For example, myContainer contains two overlapping children: shapeA and shapeB. The user moves their mouse over
 	 * shapeA, then directly on to shapeB, then off both. With a listener for {{#crossLink "mouseout:event"}}{{/crossLink}}
 	 * on myContainer, two events would be received, each targeting a child element:<OL>
@@ -266,13 +266,13 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * </OL>
 	 * However, with a listener for "rollout" instead, only a single event is received when the mouse leaves
 	 * the aggregate myContainer content (target=myContainer).
-	 *
+	 * 
 	 * This event must be enabled using {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event rollout
 	 * @since 0.7.0
 	 */
-
+	 
 	/**
 	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressmove
 	 * event will be generated on that object whenever the mouse moves until the mouse press is released. This can be
@@ -280,7 +280,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @event pressmove
 	 * @since 0.7.0
 	 */
-
+	 
 	/**
 	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressup event
 	 * will be generated on that object when that mouse press is released. This can be useful for dragging and similar
@@ -288,7 +288,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @event pressup
 	 * @since 0.7.0
 	 */
-
+	 
 	/**
 	 * Dispatched on each display object on a stage whenever the stage updates. This occurs immediately before the
 	 * rendering (draw) pass. When {{#crossLink "Stage/update"}}{{/crossLink}} is called, first all display objects on
@@ -344,7 +344,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default true
 	 **/
 	p.mouseEnabled = true;
-
+	
 	/**
 	 * If false, the tick will not run on this display object (or its children). This can provide some performance benefits.
 	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
@@ -501,7 +501,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default true
 	 **/
 	p.snapToPixel = true;
-
+	
 	// TODO: remove handler docs in future:
 	/**
 	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}}
@@ -564,7 +564,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default 0
 	 */
 	p.cacheID = 0;
-
+	
 	/**
 	 * A Shape instance that defines a vector mask (clipping path) for this display object.  The shape's transformation
 	 * will be applied relative to the display object's parent coordinates (as if it were a child of the parent).
@@ -573,14 +573,14 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default null
 	 */
 	p.mask = null;
-
+	
 	/**
 	 * A display object that will be tested when checking mouse interactions or testing {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}.
 	 * The hit area will have its transformation applied relative to this display object's coordinate space (as though
 	 * the hit test object were a child of this display object and relative to its regX/Y). The hitArea will be tested
 	 * using only its own `alpha` value regardless of the alpha value on the target display object, or the target's
 	 * ancestors (parents).
-	 *
+	 * 
 	 * If set on a {{#crossLink "Container"}}{{/crossLink}}, children of the Container will not receive mouse events.
 	 * This is similar to setting {{#crossLink "mouseChildren"}}{{/crossLink}} to false.
 	 *
@@ -590,7 +590,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default null
 	 */
 	p.hitArea = null;
-
+	
 	/**
 	 * A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display
 	 * object. You must enable mouseover events using the {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} method to
@@ -618,7 +618,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default 0
 	 **/
 	p._cacheOffsetY = 0;
-
+	
 	/**
 	 * @property _cacheScale
 	 * @protected
@@ -634,7 +634,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	* @default 0
 	*/
 	p._cacheDataURLID = 0;
-
+	
 	/**
 	* @property _cacheDataURL
 	* @protected
@@ -666,7 +666,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * @default null
 	 **/
 	p._bounds = null;
-
+	
 
 // constructor:
 	// separated so it can be easily addressed in subclasses:
@@ -717,7 +717,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		ctx.drawImage(cacheCanvas, offX, offY, cacheCanvas.width/scale, cacheCanvas.height/scale);
 		return true;
 	};
-
+	
 	/**
 	 * Applies this display object's transformation, alpha, globalCompositeOperation, clipping path (mask), and shadow
 	 * to the specified context. This is typically called prior to {{#crossLink "DisplayObject/draw"}}{{/crossLink}}.
@@ -726,18 +726,18 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 **/
 	p.updateContext = function(ctx) {
 		var mtx, mask=this.mask, o=this;
-
+		
 		if (mask && mask.graphics && !mask.graphics.isEmpty()) {
 			mtx = mask.getMatrix(mask._matrix);
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
-
+			
 			mask.graphics.drawAsPath(ctx);
 			ctx.clip();
-
+			
 			mtx.invert();
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 		}
-
+		
 		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
 		var tx = mtx.tx, ty = mtx.ty;
 		if (DisplayObject._snapToPixelEnabled && o.snapToPixel) {
@@ -768,7 +768,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 *
 	 * Note that filters need to be defined <em>before</em> the cache is applied. Check out the {{#crossLink "Filter"}}{{/crossLink}}
 	 * class for more information. Some filters (ex. BlurFilter) will not work as expected in conjunction with the scale param.
-	 *
+	 * 
 	 * Usually, the resulting cacheCanvas will have the dimensions width*scale by height*scale, however some filters (ex. BlurFilter)
 	 * will add padding to the canvas dimensions.
 	 *
@@ -817,7 +817,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		var w = this._cacheWidth, h = this._cacheHeight, fBounds;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
 		var ctx = cacheCanvas.getContext("2d");
-
+		
 		// update bounds based on filters:
 		if (fBounds = this._applyFilterBounds(offX, offY, w, h)) {
 			offX = fBounds.x;
@@ -825,7 +825,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 			w = fBounds.width;
 			h = fBounds.height;
 		}
-
+		
 		w = Math.ceil(w*scale);
 		h = Math.ceil(h*scale);
 		if (w != cacheCanvas.width || h != cacheCanvas.height) {
@@ -835,7 +835,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		} else if (!compositeOperation) {
 			ctx.clearRect(0, 0, w+1, h+1);
 		}
-
+		
 		ctx.save();
 		ctx.globalCompositeOperation = compositeOperation;
 		ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
@@ -855,7 +855,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = 0;
 		this._cacheScale = 1;
 	};
-
+	
 	/**
 	 * Returns a data URL for the cache, or null if this display object is not cached.
 	 * Uses cacheID to ensure a new data URL is not generated if the cache has not changed.
@@ -992,7 +992,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		this.regY = regY || 0;
 		return this;
 	};
-
+	
 	/**
 	 * Returns a matrix based on this object's transform.
 	 * @method getMatrix
@@ -1004,7 +1004,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		var o = this;
 		return (matrix ? matrix.identity() : new createjs.Matrix2D()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
 	};
-
+	
 	/**
 	 * Generates a concatenated Matrix2D object representing the combined transform of the display object and all of its
 	 * parent Containers up to the highest level ancestor (usually the {{#crossLink "Stage"}}{{/crossLink}}). This can
@@ -1056,7 +1056,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		ctx.clearRect(0, 0, 2, 2);
 		return hit;
 	};
-
+	
 	/**
 	 * Provides a chainable shortcut method for setting a number of properties on the instance.
 	 *
@@ -1074,15 +1074,15 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		for (var n in props) { this[n] = props[n]; }
 		return this;
 	};
-
+	
 	/**
 	 * Returns a rectangle representing this object's bounds in its local coordinate system (ie. with no transformation).
 	 * Objects that have been cached will return the bounds of the cache.
-	 *
-	 * Not all display objects can calculate their own bounds (ex. Shape). For these objects, you can use
+	 * 
+	 * Not all display objects can calculate their own bounds (ex. Shape). For these objects, you can use 
 	 * {{#crossLink "DisplayObject/setBounds"}}{{/crossLink}} so that they are included when calculating Container
 	 * bounds.
-	 *
+	 * 
 	 * <table>
 	 * 	<tr><td><b>All</b></td><td>
 	 * 		All display objects support setting bounds manually using setBounds(). Likewise, display objects that
@@ -1111,22 +1111,22 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 * 		to (x=0,y=0).
 	 * 	</td></tr>
 	* </table>
-	 *
+	 * 
 	 * Bounds can be expensive to calculate for some objects (ex. text, or containers with many children), and
 	 * are recalculated each time you call getBounds(). You can prevent recalculation on static objects by setting the
 	 * bounds explicitly:
-	 *
+	 * 
 	 * 	var bounds = obj.getBounds();
 	 * 	obj.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
 	 * 	// getBounds will now use the set values, instead of recalculating
-	 *
+	 * 
 	 * To reduce memory impact, the returned Rectangle instance may be reused internally; clone the instance or copy its
 	 * values if you need to retain it.
-	 *
+	 * 
 	 * 	var myBounds = obj.getBounds().clone();
 	 * 	// OR:
 	 * 	myRect.copy(obj.getBounds());
-	 *
+	 * 
 	 * @method getBounds
 	 * @return {Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this
 	 * object.
@@ -1140,18 +1140,18 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		}
 		return null;
 	};
-
+	
 	/**
 	 * Returns a rectangle representing this object's bounds in its parent's coordinate system (ie. with transformations applied).
 	 * Objects that have been cached will return the transformed bounds of the cache.
-	 *
-	 * Not all display objects can calculate their own bounds (ex. Shape). For these objects, you can use
+	 * 
+	 * Not all display objects can calculate their own bounds (ex. Shape). For these objects, you can use 
 	 * {{#crossLink "DisplayObject/setBounds"}}{{/crossLink}} so that they are included when calculating Container
 	 * bounds.
-	 *
+	 * 
 	 * To reduce memory impact, the returned Rectangle instance may be reused internally; clone the instance or copy its
 	 * values if you need to retain it.
-	 *
+	 * 
 	 * Container instances calculate aggregate bounds for all children that return bounds via getBounds.
 	 * @method getTransformedBounds
 	 * @return {Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this object.
@@ -1159,12 +1159,12 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p.getTransformedBounds = function() {
 		return this._getBounds();
 	};
-
+	
 	/**
 	 * Allows you to manually specify the bounds of an object that either cannot calculate their own bounds (ex. Shape &
 	 * Text) for future reference, or so the object can be included in Container bounds. Manually set bounds will always
 	 * override calculated bounds.
-	 *
+	 * 
 	 * The bounds should be specified in the object's local (untransformed) coordinates. For example, a Shape instance
 	 * with a 25px radius circle centered at 0,0 would have bounds of (-25, -25, 50, 50).
 	 * @method setBounds
@@ -1240,8 +1240,8 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		ctx.shadowOffsetY = shadow.offsetY;
 		ctx.shadowBlur = shadow.blur;
 	};
-
-
+	
+	
 	/**
 	 * @method _tick
 	 * @param {Object} props Props to copy to the tick event object. This will usually include the
@@ -1289,7 +1289,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 			this.filters[i].applyFilter(ctx, 0, 0, w, h);
 		}
 	};
-
+	
 	/**
 	 * @method _applyFilterBounds
 	 * @param {Number} x
@@ -1302,7 +1302,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p._applyFilterBounds = function(x, y, width, height) {
 		var bounds, l, filters = this.filters;
 		if (!filters || !(l=filters.length)) { return null; }
-
+		
 		for (var i=0; i<l; i++) {
 			var f = this.filters[i];
 			var fBounds = f.getBounds&&f.getBounds();
@@ -1315,7 +1315,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		}
 		return bounds;
 	};
-
+	
 	/**
 	 * @method _getBounds
 	 * @param {Matrix2D} matrix
@@ -1326,7 +1326,7 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	p._getBounds = function(matrix, ignoreTransform){
 		return this._transformBounds(this.getBounds(), matrix, ignoreTransform);
 	};
-
+	
 	/**
 	 * @method _transformBounds
 	 * @param {Rectangle} bounds
@@ -1339,27 +1339,27 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		if (!bounds) { return bounds; }
 		var x = bounds.x, y = bounds.y, width = bounds.width, height = bounds.height;
 		var mtx = ignoreTransform ? this._matrix.identity() : this.getMatrix(this._matrix);
-
+		
 		if (x || y) { mtx.appendTransform(0,0,1,1,0,0,0,-x,-y); }
 		if (matrix) { mtx.prependMatrix(matrix); }
-
+		
 		var x_a = width*mtx.a, x_b = width*mtx.b;
 		var y_c = height*mtx.c, y_d = height*mtx.d;
 		var tx = mtx.tx, ty = mtx.ty;
-
+		
 		var minX = tx, maxX = tx, minY = ty, maxY = ty;
 
 		if ((x = x_a + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
 		if ((x = x_a + y_c + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
 		if ((x = y_c + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
-
+		
 		if ((y = x_b + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 		if ((y = x_b + y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 		if ((y = y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
-
+		
 		return bounds.initialize(minX, minY, maxX-minX, maxY-minY);
 	};
-
+	
 	/**
 	 * Indicates whether the display object has any mouse event listeners or a cursor.
 	 * @method _isMouseOpaque
@@ -1384,7 +1384,6 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 		this.dispatchEvent(new createjs.Event("added", false));
 		this._checkStage();
 	};
-
 	/**
 	 * Finds stage and assigns to public variable.
 	 * Also checks all children to dispatch event when adding order is messy.
@@ -1393,12 +1392,10 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 	 **/
 	p._checkStage = function() {
 		var stage = this.getStage();
-
 		if (stage) {
 			this.stage = stage;
 			this.dispatchEvent(new createjs.Event("addedToStage", false));
 		}
-
 		if (this.children) {
 			var kids = this.children;
 			for (var i=0,l=kids.length;i<l;i++) {

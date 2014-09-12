@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-*
+* 
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-*
+* 
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-*
+* 
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -68,7 +68,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @default null
 	 **/
 	p.children = null;
-
+	
 	/**
 	 * Indicates whether the children of this container are independently enabled for mouse/pointer interaction.
 	 * If false, the children will be aggregated under the container - for example, a click on a child shape would
@@ -78,7 +78,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @default true
 	 **/
 	p.mouseChildren = true;
-
+	
 	/**
 	 * If false, the tick will not be propagated to children of this Container. This can provide some performance benefits.
 	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
@@ -143,13 +143,13 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-
+		
 		// this ensures we don't have issues with display list changes that occur during a draw:
 		var list = this.children.slice(0);
 		for (var i=0,l=list.length; i<l; i++) {
 			var child = list[i];
 			if (!child.isVisible()) { continue; }
-
+			
 			// draw the child:
 			ctx.save();
 			child.updateContext(ctx);
@@ -158,7 +158,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		}
 		return true;
 	};
-
+	
 	/**
 	 * Adds a child to the top of the display list.
 	 *
@@ -288,6 +288,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			child.parent = null;
 			child.stage = null;
 		}
+		if (child) { child.parent = null; }
 		this.children.splice(index, 1);
 		return true;
 	};
@@ -320,7 +321,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	p.getChildAt = function(index) {
 		return this.children[index];
 	};
-
+	
 	/**
 	 * Returns the child with the specified name.
 	 * @method getChildByName
@@ -339,7 +340,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * Performs an array sort operation on the child list.
 	 *
 	 * <h4>Example: Display children with a higher y in front.</h4>
-	 *
+	 * 
 	 *      var sortFunction = function(obj1, obj2, options) {
 	 *          if (obj1.y > obj2.y) { return 1; }
 	 *          if (obj1.y < obj2.y) { return -1; }
@@ -378,7 +379,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	p.getNumChildren = function() {
 		return this.children.length;
 	};
-
+	
 	/**
 	 * Swaps the children at the specified indexes. Fails silently if either index is out of range.
 	 * @method swapChildrenAt
@@ -393,7 +394,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		kids[index1] = o2;
 		kids[index2] = o1;
 	};
-
+	
 	/**
 	 * Swaps the specified children's depth in the display list. Fails silently if either child is not a child of this
 	 * Container.
@@ -413,11 +414,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 		kids[index1] = child2;
 		kids[index2] = child1;
 	};
-
+	
 	/**
 	 * Changes the depth of the specified child. Fails silently if the child is not a child of this container, or the index is out of range.
 	 * @param {DisplayObject} child
-	 * @param {Number} index
+	 * @param {Number} index  
 	 * @method setChildIndex
 	 **/
 	p.setChildIndex = function(child, index) {
@@ -467,7 +468,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an
 	 * expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the
 	 * mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
-	 *
+	 * 
 	 * Accounts for both {{#crossLink "DisplayObject/hitArea:property"}}{{/crossLink}} and {{#crossLink "DisplayObject/mask:property"}}{{/crossLink}}.
 	 * @method getObjectsUnderPoint
 	 * @param {Number} x The x position in the container to test.
@@ -494,22 +495,22 @@ var p = Container.prototype = new createjs.DisplayObject();
 		var pt = this.localToGlobal(x, y);
 		return this._getObjectsUnderPoint(pt.x, pt.y);
 	};
-
+	
 	/**
 	 * @property DisplayObject_getBounds
 	 * @type Function
 	 * @protected
 	 **/
-	p.DisplayObject_getBounds = p.getBounds;
-
+	p.DisplayObject_getBounds = p.getBounds; 
+	
 	/**
 	 * Docced in superclass.
 	 */
 	p.getBounds = function() {
 		return this._getBounds(null, true);
 	};
-
-
+	
+	
 	/**
 	 * Docced in superclass.
 	 */
@@ -555,7 +556,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 	 * @private
 	 **/
 	p.DisplayObject__tick = p._tick;
-
+	
 	/**
 	 * @method _tick
 	 * @param {Object} props Properties to copy to the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}} event object.
@@ -597,32 +598,32 @@ var p = Container.prototype = new createjs.DisplayObject();
 			if (!hitArea && mask && mask.graphics && !mask.graphics.isEmpty()) {
 				var maskMtx = mask.getMatrix(mask._matrix).prependMatrix(this.getConcatenatedMatrix(mtx));
 				ctx.setTransform(maskMtx.a,  maskMtx.b, maskMtx.c, maskMtx.d, maskMtx.tx-x, maskMtx.ty-y);
-
+				
 				// draw the mask as a solid fill:
 				mask.graphics.drawAsPath(ctx);
 				ctx.fillStyle = "#000";
 				ctx.fill();
-
+				
 				// if we don't hit the mask, then no need to keep looking at this DO:
 				if (!this._testHit(ctx)) { continue; }
 				ctx.setTransform(1, 0, 0, 1, 0, 0);
 				ctx.clearRect(0, 0, 2, 2);
 			}
-
+			
 			// if a child container has a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
 			if (!hitArea && child instanceof Container) {
 				var result = child._getObjectsUnderPoint(x, y, arr, mouse, activeListener);
 				if (!arr && result) { return (mouse && !this.mouseChildren) ? this : result; }
 			} else {
 				if (mouse && !activeListener && !child._hasMouseEventListener()) { continue; }
-
+				
 				child.getConcatenatedMatrix(mtx);
-
+				
 				if (hitArea) {
 					mtx.appendTransform(hitArea.x, hitArea.y, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
 					mtx.alpha = hitArea.alpha;
 				}
-
+				
 				ctx.globalAlpha = mtx.alpha;
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				(hitArea||child).draw(ctx);
@@ -635,7 +636,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 		}
 		return null;
 	};
-
+	
 	/**
 	 * @method _getBounds
 	 * @param {Matrix2D} matrix
@@ -646,11 +647,11 @@ var p = Container.prototype = new createjs.DisplayObject();
 	p._getBounds = function(matrix, ignoreTransform) {
 		var bounds = this.DisplayObject_getBounds();
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
-
+		
 		var minX, maxX, minY, maxY;
 		var mtx = ignoreTransform ? this._matrix.identity() : this.getMatrix(this._matrix);
 		if (matrix) { mtx.prependMatrix(matrix); }
-
+		
 		var l = this.children.length;
 		for (var i=0; i<l; i++) {
 			var child = this.children[i];
@@ -661,7 +662,7 @@ var p = Container.prototype = new createjs.DisplayObject();
 			if (y1 < minY || minY == null) { minY = y1; }
 			if (y2 > maxY || maxY == null) { maxY = y2; }
 		}
-
+		
 		return (maxX == null) ? null : this._rectangle.initialize(minX, minY, maxX-minX, maxY-minY);
 	};
 
