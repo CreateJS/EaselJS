@@ -70,8 +70,8 @@ var p = Container3d.prototype = new createjs.Container();
 	// NOTE: refactor and use createjs.PerspectiveProjection instead?
 	// TODO: use fieldOfView instead (angle between 0 and 180, calculate focalLength dynamically by using stage width and height)
 	p.perspectiveProjection = {
-		focalLength: 120,
-		fieldOfView: 635.78,
+		focalLength: 635,
+		fieldOfView: 120,
 		projectionCenter: {
 			x: 0,
 			y: 0
