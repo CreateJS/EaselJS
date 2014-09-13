@@ -99,6 +99,12 @@ var p = Container3d.prototype = new createjs.Container();
 
 // public methods:
 
+	/**
+	 * Sets the specified focal length.
+	 * Calculates Field of view if projectionPlane sizes are passed
+	 *
+	 * @method setFocalLength
+	 **/
 	p.setFocalLength = function(value, projectionPlaneWidth, projectionPlaneHeight) {
 		this.perspectiveProjection.focalLength = value;
 
@@ -108,8 +114,14 @@ var p = Container3d.prototype = new createjs.Container();
 		this.perspectiveProjection.fieldOfView = 2 * Math.atan(diagonal / (2 * this.perspectiveProjection.focalLength)) * 180 / Math.PI;
 	};
 
+	/**
+	 * Sets the specified field of view.
+	 * Calculates focal length if projectionPlane sizes are passed
+	 *
+	 * @method setFieldOfView
+	 **/
 	p.setFieldOfView = function(value, projectionPlaneWidth, projectionPlaneHeight) {
-		if (value < 0 || value >= 180) throw new Error('field of view hast to be a value 0 and 180');
+		if (value <= 0 || value >= 180) throw new Error('field of view hast to be a value 0 and 180');
 
 		this.perspectiveProjection.fieldOfView = value;
 
