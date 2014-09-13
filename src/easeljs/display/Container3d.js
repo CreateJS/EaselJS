@@ -70,7 +70,8 @@ var p = Container3d.prototype = new createjs.Container();
 	// NOTE: refactor and use createjs.PerspectiveProjection instead?
 	// TODO: use fieldOfView instead (angle between 0 and 180, calculate focalLength dynamically by using stage width and height)
 	p.perspectiveProjection = {
-		focalLength: 100,
+		focalLength: 40,
+		fieldOfView: 56.81194375463726,
 		projectionCenter: {
 			x: 0,
 			y: 0
@@ -97,6 +98,26 @@ var p = Container3d.prototype = new createjs.Container();
 	};
 
 // public methods:
+
+	p.setFocalLength = function(value, projectionPlaneWidth, projectionPlaneHeight) {
+		this.perspectiveProjection.focalLength = value;
+
+		if (!(projectionPlaneWidth && projectionPlaneHeight)) return;
+
+		var diagonal = Math.sqrt( Math.pow(projectionPlaneWidth, 2) + Math.pow(projectionPlaneHeight, 2) );
+		this.perspectiveProjection.fieldOfView = 2 * Math.atan(diagonal / (2 * this.perspectiveProjection.focalLength)) * 180 / Math.PI;
+	};
+
+	p.setFieldOfView = function(value, projectionPlaneWidth, projectionPlaneHeight) {
+		if (value < 0 || value >= 180) throw new Error('field of view hast to be a value 0 and 180');
+
+		this.perspectiveProjection.fieldOfView = value;
+
+		if (!(projectionPlaneWidth && projectionPlaneHeight)) return;
+
+		var diagonal = Math.sqrt( Math.pow(projectionPlaneWidth, 2) + Math.pow(projectionPlaneHeight, 2) );
+		this.perspectiveProjection.focalLength = diagonal / (2 * Math.tan(Math.PI * this.perspectiveProjection.fieldOfView / 360));
+	};
 
 	/**
 	 * @property Container_draw

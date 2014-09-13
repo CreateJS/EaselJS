@@ -47,6 +47,7 @@
 	var stage;
 	var container;
 	var items = [];
+	var zStep = 0;
 
 	function init() {
 		//find canvas and load images, wait for last image to load
@@ -57,12 +58,14 @@
 
 		container = new createjs.Container3d();
 
-		container.perspectiveProjection.focalLength = 40;
+		container.setFieldOfView(90, stage.canvas.width, stage.canvas.height);
 		container.perspectiveProjection.projectionCenter.x = stage.canvas.width / 2;
 		container.perspectiveProjection.projectionCenter.y = 0;
 
+		zStep = container.perspectiveProjection.focalLength / 10;
+
 		for (var x = 0 - stage.canvas.width / 2; x < stage.canvas.width; x += 5) { 
-			for(var z = 0 - container.perspectiveProjection.focalLength; z < container.perspectiveProjection.focalLength; z += 5) {
+			for(var z = 0 - container.perspectiveProjection.focalLength; z < container.perspectiveProjection.focalLength; z += zStep) {
 				var pixel = new createjs.Shape();
 				pixel.graphics.beginFill('#FFF');
 				pixel.graphics.drawCircle(0, 0, 1);
@@ -90,7 +93,7 @@
 	function tick(){
 		for (var i = 0, l = items.length; i < l; i++) {
 			var pixel = items[i];
-			pixel.z -= 0.5;
+			pixel.z -= (zStep / 10);
 
 			if (pixel.z < 0 - container.perspectiveProjection.focalLength) {
 				pixel.z += (container.perspectiveProjection.focalLength * 2);
