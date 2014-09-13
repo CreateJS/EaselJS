@@ -55,101 +55,101 @@ this.createjs = this.createjs||{};
  * @constructor
  **/
 var Container3d = function() {
-  this.initialize();
+	this.initialize();
 };
 var p = Container3d.prototype = new createjs.Container();
 
 // public properties:
-  /**
-   * Holds a perspectiveProjection Object containing a defined field of view and x- and y-projectionCenters
-   * @property perspectiveProjection
-   * @type Object
-   * @default null
-   **/
+	/**
+	 * Holds a perspectiveProjection Object containing a defined field of view and x- and y-projectionCenters
+	 * @property perspectiveProjection
+	 * @type Object
+	 * @default null
+	 **/
 
-  // NOTE: refactor and use createjs.PerspectiveProjection instead?
-  p.perspectiveProjection = {
-    fieldOfView: 250,
-    projectionCenter: {
-      x: 0,
-      y: 0
-    }
-  };
+	// NOTE: refactor and use createjs.PerspectiveProjection instead?
+	p.perspectiveProjection = {
+		fieldOfView: 250,
+		projectionCenter: {
+			x: 0,
+			y: 0
+		}
+	};
 
 // constructor:
 
-  /**
-   * @property Container_initialize
-   * @type Function
-   * @private
-   **/
-  p.Container_initialize = p.initialize;
+	/**
+	 * @property Container_initialize
+	 * @type Function
+	 * @private
+	 **/
+	p.Container_initialize = p.initialize;
 
-  /**
-   * Initialization method.
-   * @method initialize
-   * @protected
-  */
-  p.initialize = function() {
-    this.Container_initialize();
-    this.children = [];
-  };
+	/**
+	 * Initialization method.
+	 * @method initialize
+	 * @protected
+	*/
+	p.initialize = function() {
+		this.Container_initialize();
+		this.children = [];
+	};
 
 // public methods:
 
-  /**
-   * @property Container_draw
-   * @type Function
-   * @private
-   **/
-  p.Container_draw = p.draw;
+	/**
+	 * @property Container_draw
+	 * @type Function
+	 * @private
+	 **/
+	p.Container_draw = p.draw;
 
-  /**
-   * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-   * Returns true if the draw was handled (useful for overriding functionality).
-   *
-   * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-   * @method draw
-   * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-   * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
-   * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-   * into itself).
-   **/
+	/**
+	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
+	 * Returns true if the draw was handled (useful for overriding functionality).
+	 *
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method draw
+	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
+	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+	 * into itself).
+	 **/
 
-   // TODO: add rotationX, rotationY, rotationZ, check skew etc.
-  p.draw = function(ctx, ignoreCache) {
-    var kids = this.children;
-    for (var i=0,l=kids.length;i<l;i++) {
-      var child = kids[i];
+	 // TODO: add rotationX, rotationY, rotationZ, check skew etc.
+	p.draw = function(ctx, ignoreCache) {
+		var kids = this.children;
+		for (var i=0,l=kids.length;i<l;i++) {
+			var child = kids[i];
 
-      if (child) {
-        // Store values that user changed at runtime
-        if (child.x != child._calculatedX) child._storeX = child.x;
-        if (child.y != child._calculatedY) child._storeY = child.y;
-        if (child.z != child._calculatedZ) child._storeZ = child.z;
-        if (child.scaleX != child._calculatedScaleX) child._storeScaleX = child.scaleX;
-        if (child.scaleY != child._calculatedScaleY) child._storeScaleY = child.scaleY;
+			if (child) {
+				// Store values that user changed at runtime
+				if (child.x != child._calculatedX) child._storeX = child.x;
+				if (child.y != child._calculatedY) child._storeY = child.y;
+				if (child.z != child._calculatedZ) child._storeZ = child.z;
+				if (child.scaleX != child._calculatedScaleX) child._storeScaleX = child.scaleX;
+				if (child.scaleY != child._calculatedScaleY) child._storeScaleY = child.scaleY;
 
-        // calculate scaling
-        var scale = this.perspectiveProjection.fieldOfView / (this.perspectiveProjection.fieldOfView + child._storeZ);
+				// calculate scaling
+				var scale = this.perspectiveProjection.fieldOfView / (this.perspectiveProjection.fieldOfView + child._storeZ);
 
-        // store newly calculated values
-        child._calculatedZ = scale;
-        child._calculatedX = (child._storeX + this.perspectiveProjection.projectionCenter.x) * scale;
-        child._calculatedY = (child._storeY + this.perspectiveProjection.projectionCenter.y) * scale;
-        
-        child._calculatedScaleX = child._storeScaleX * scale;
-        child._calculatedScaleY = child._storeScaleY * scale;
+				// store newly calculated values
+				child._calculatedZ = scale;
+				child._calculatedX = (child._storeX + this.perspectiveProjection.projectionCenter.x) * scale;
+				child._calculatedY = (child._storeY + this.perspectiveProjection.projectionCenter.y) * scale;
+				
+				child._calculatedScaleX = child._storeScaleX * scale;
+				child._calculatedScaleY = child._storeScaleY * scale;
 
-        child.scaleX = child._calculatedScaleX;
-        child.scaleY = child._calculatedScaleY;
-        child.x = child._calculatedX;
-        child.y = child._calculatedY;
-      }
-    }
+				child.scaleX = child._calculatedScaleX;
+				child.scaleY = child._calculatedScaleY;
+				child.x = child._calculatedX;
+				child.y = child._calculatedY;
+			}
+		}
 
-    if (this.Container_draw(ctx, ignoreCache)) { return true; }
-  };
+		if (this.Container_draw(ctx, ignoreCache)) { return true; }
+	};
 
 createjs.Container3d = Container3d;
 }());
