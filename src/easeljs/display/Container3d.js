@@ -46,7 +46,7 @@ this.createjs = this.createjs||{};
  *
  *      container.perspectiveProjection.projectionCenter.x = stage.canvas.width / 2;
  *      container.perspectiveProjection.projectionCenter.y = stage.canvas.height / 2;
- *      container.perspectiveProjection.fieldOfView = 100;
+ *      container.perspectiveProjection.focalLength = 100;
  *      
  *      container.addChild(child);
  *
@@ -68,8 +68,9 @@ var p = Container3d.prototype = new createjs.Container();
 	 **/
 
 	// NOTE: refactor and use createjs.PerspectiveProjection instead?
+	// TODO: use fieldOfView instead (angle between 0 and 180, calculate focalLength dynamically by using stage width and height)
 	p.perspectiveProjection = {
-		fieldOfView: 250,
+		focalLength: 100,
 		projectionCenter: {
 			x: 0,
 			y: 0
@@ -131,12 +132,12 @@ var p = Container3d.prototype = new createjs.Container();
 				if (child.scaleY != child._calculatedScaleY) child._storeScaleY = child.scaleY;
 
 				// calculate scaling
-				var scale = this.perspectiveProjection.fieldOfView / (this.perspectiveProjection.fieldOfView + child._storeZ);
+				var scale = this.perspectiveProjection.focalLength / (this.perspectiveProjection.focalLength + child._storeZ);
 
 				// store newly calculated values
 				child._calculatedZ = scale;
-				child._calculatedX = (child._storeX + this.perspectiveProjection.projectionCenter.x) * scale;
-				child._calculatedY = (child._storeY + this.perspectiveProjection.projectionCenter.y) * scale;
+				child._calculatedX = this.perspectiveProjection.projectionCenter.x - (this.perspectiveProjection.projectionCenter.x - child._storeX) * scale;
+				child._calculatedY = this.perspectiveProjection.projectionCenter.y - (this.perspectiveProjection.projectionCenter.y - child._storeY) * scale;
 				
 				child._calculatedScaleX = child._storeScaleX * scale;
 				child._calculatedScaleY = child._storeScaleY * scale;
