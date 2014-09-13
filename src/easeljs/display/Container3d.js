@@ -1,5 +1,4 @@
 /*
-* Container3d - Copyright (c) 2014 fabianirsara.com
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
