@@ -149,8 +149,6 @@ var p = Container3d.prototype = new createjs.Container();
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
-
-	 // TODO: add rotationX, rotationY, rotationZ, check skew etc.
 	p.draw = function(ctx, ignoreCache) {
 		var kids = this.children;
 		for (var i=0,l=kids.length;i<l;i++) {
@@ -158,27 +156,29 @@ var p = Container3d.prototype = new createjs.Container();
 
 			if (child) {
 				// Store values that user changed at runtime
-				if (child.x != child._calculatedX) child._storeX = child.x;
-				if (child.y != child._calculatedY) child._storeY = child.y;
-				if (child.z != child._calculatedZ) child._storeZ = child.z;
-				if (child.scaleX != child._calculatedScaleX) child._storeScaleX = child.scaleX;
-				if (child.scaleY != child._calculatedScaleY) child._storeScaleY = child.scaleY;
+				if (child.x != child._calculatedX) { child._storeX = child.x; changed = true; }
+				if (child.y != child._calculatedY) { child._storeY = child.y; changed = true; }
+				if (child.z != child._calculatedZ) { child._storeZ = child.z; changed = true; }
+				if (child.scaleX != child._calculatedScaleX) { child._storeScaleX = child.scaleX; changed = true; }
+				if (child.scaleY != child._calculatedScaleY) { child._storeScaleY = child.scaleY; changed = true; }
 
-				// calculate scaling
-				var scale = this.perspectiveProjection.focalLength / (this.perspectiveProjection.focalLength + child._storeZ);
+				if (changed) {
+					// calculate scaling
+					var scale = this.perspectiveProjection.focalLength / (this.perspectiveProjection.focalLength + child._storeZ);
 
-				// store newly calculated values
-				child._calculatedZ = scale;
-				child._calculatedX = this.perspectiveProjection.projectionCenter.x - (this.perspectiveProjection.projectionCenter.x - child._storeX) * scale;
-				child._calculatedY = this.perspectiveProjection.projectionCenter.y - (this.perspectiveProjection.projectionCenter.y - child._storeY) * scale;
-				
-				child._calculatedScaleX = child._storeScaleX * scale;
-				child._calculatedScaleY = child._storeScaleY * scale;
+					// store newly calculated values
+					child._calculatedZ = scale;
+					child._calculatedX = this.perspectiveProjection.projectionCenter.x - (this.perspectiveProjection.projectionCenter.x - child._storeX) * scale;
+					child._calculatedY = this.perspectiveProjection.projectionCenter.y - (this.perspectiveProjection.projectionCenter.y - child._storeY) * scale;
+					
+					child._calculatedScaleX = child._storeScaleX * scale;
+					child._calculatedScaleY = child._storeScaleY * scale;
 
-				child.scaleX = child._calculatedScaleX;
-				child.scaleY = child._calculatedScaleY;
-				child.x = child._calculatedX;
-				child.y = child._calculatedY;
+					child.scaleX = child._calculatedScaleX;
+					child.scaleY = child._calculatedScaleY;
+					child.x = child._calculatedX;
+					child.y = child._calculatedY;
+				}
 			}
 		}
 
