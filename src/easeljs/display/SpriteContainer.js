@@ -164,7 +164,7 @@ var p = SpriteContainer.prototype = new createjs.Container();
 		}
 		if (child._spritestage_compatibility <= 4) {
 			var spriteSheet = child.spriteSheet;
-			if ((!spriteSheet || !spriteSheet._images || spriteSheet._images.length > 1) || (this.spritesheet && spritesheet !== spritesheet)) {
+			if ((!spriteSheet || !spriteSheet._images || spriteSheet._images.length > 1) || (this.spriteSheet && spriteSheet !== spriteSheet)) {
 				console && console.log("Error: A child's spriteSheet must be equal to its parent spriteSheet and only use one image. [" + child.toString() + "]");
 				return child;
 			}
