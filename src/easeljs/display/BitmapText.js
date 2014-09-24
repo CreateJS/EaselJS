@@ -308,7 +308,7 @@ var p = BitmapText.prototype = new createjs.Container();
 			
 			x += sprite.getBounds().width + this.letterSpacing;
 		}
-		while (numKids > childIndex) { pool.push(sprite = kids.pop()); sprite.parent = null; } // faster than removeChild.
+		while (numKids > childIndex) { pool.push(sprite = kids.pop()); sprite.parent = null; numKids--; } // faster than removeChild.
 		if (pool.length > BitmapText.maxPoolSize) { pool.length = BitmapText.maxPoolSize; }
 	};
 
