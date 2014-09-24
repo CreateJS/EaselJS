@@ -358,7 +358,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @protected
 	 **/
 	p._prepContext = function(ctx) {
-		ctx.font = this.font;
+		ctx.font = this.font||"10px sans-serif";
 		ctx.textAlign = this.textAlign||"left";
 		ctx.textBaseline = this.textBaseline||"top";
 		return ctx;
