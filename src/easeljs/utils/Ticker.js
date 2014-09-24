@@ -456,26 +456,27 @@ var Ticker = function() {
 	};
 
 	/**
-	 * Returns the number of milliseconds that have elapsed since Ticker was initialized. For example, you could use
+	 * Returns the number of milliseconds that have elapsed since Ticker was initialized via {{#crossLink "Ticker/init"}}.
+	 * Returns -1 if Ticker has not been initialized. For example, you could use
 	 * this in a time synchronized animation to determine the exact amount of time that has elapsed.
 	 * @method getTime
 	 * @static
 	 * @param {Boolean} [runTime=false] If true only time elapsed while Ticker was not paused will be returned.
 	 * If false, the value returned will be total time elapsed since the first tick event listener was added.
-	 * @return {Number} Number of milliseconds that have elapsed since Ticker was initialized.
+	 * @return {Number} Number of milliseconds that have elapsed since Ticker was initialized or -1.
 	 **/
 	Ticker.getTime = function(runTime) {
-		return Ticker._getTime() - Ticker._startTime - (runTime ? Ticker._pausedTime : 0);
+		return Ticker._startTime ? Ticker._getTime() - Ticker._startTime - (runTime ? Ticker._pausedTime : 0) : -1;
 	};
 
 	/**
 	 * Similar to getTime(), but returns the time included with the current (or most recent) tick event object.
 	 * @method getEventTime
 	 * @param runTime {Boolean} [runTime=false] If true, the runTime property will be returned instead of time.
-	 * @returns {number} The time or runTime property from the most recent tick event.
+	 * @returns {number} The time or runTime property from the most recent tick event or -1.
 	 */
 	Ticker.getEventTime = function(runTime) {
-		return (Ticker._lastTime || Ticker._startTime) - (runTime ? Ticker._pausedTime : 0);
+		return Ticker._startTime ? (Ticker._lastTime || Ticker._startTime) - (runTime ? Ticker._pausedTime : 0) : -1;
 	};
 	
 	/**
