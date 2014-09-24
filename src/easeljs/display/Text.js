@@ -245,7 +245,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * @return {Number} The measured, untransformed width of the text.
 	 **/
 	p.getMeasuredWidth = function() {
-		return this._prepContext(Text._workingContext).measureText(this.text).width;
+		return this._getMeasuredWidth(this.text);
 	};
 
 	/**
@@ -256,7 +256,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 * based on the measured width of a "M" character multiplied by 1.2, which approximates em for most fonts.
 	 **/
 	p.getMeasuredLineHeight = function() {
-		return this._prepContext(Text._workingContext).measureText("M").width*1.2;
+		return this._getMeasuredWidth("M")*1.2;
 	};
 
 	/**
@@ -375,7 +375,11 @@ var p = Text.prototype = new createjs.DisplayObject();
 	 **/
 	p._drawText = function(ctx, o, lines) {
 		var paint = !!ctx;
-		if (!paint) { ctx = this._prepContext(Text._workingContext); }
+		if (!paint) {
+			ctx = Text._workingContext;
+			ctx.save();
+			this._prepContext(ctx);
+		}
 		var lineHeight = this.lineHeight||this.getMeasuredLineHeight();
 		
 		var maxW = 0, count = 0;
@@ -418,6 +422,7 @@ var p = Text.prototype = new createjs.DisplayObject();
 			o.width = maxW;
 			o.height = count*lineHeight;
 		}
+		if (!paint) { ctx.restore(); }
 		return o;
 	};
 
@@ -432,6 +437,20 @@ var p = Text.prototype = new createjs.DisplayObject();
 		// Chrome 17 will fail to draw the text if the last param is included but null, so we feed it a large value instead:
 		if (this.outline) { ctx.strokeText(text, 0, y, this.maxWidth||0xFFFF); }
 		else { ctx.fillText(text, 0, y, this.maxWidth||0xFFFF); }
+	};
+	
+	
+	/**
+	 * @method _getMeasuredWidth
+	 * @param {String} text
+	 * @protected
+	 **/
+	p._getMeasuredWidth = function(text) {
+		var ctx = Text._workingContext;
+		ctx.save();
+		var w = this._prepContext(ctx).measureText(text).width;
+		ctx.restore();
+		return w;
 	};
 
 createjs.Text = Text;
