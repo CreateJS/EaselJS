@@ -1203,16 +1203,18 @@ var G = Graphics;
 	 **/
 	p._updateInstructions = function(commit) {
 		var instr = this._instructions, active = this._activeInstructions, commitIndex = this._commitIndex;
-		if (!this._dirty || !active.length) { return; }
-		this._dirty = false;
 		
-		instr.length = commitIndex;
-		instr.push(Graphics.beginCmd);
-		instr.push.apply(instr, active);
-		
-		if (this._fill) { instr.push(this._fill); }
-		if (this._stroke && this._strokeStyle) { instr.push(this._strokeStyle); }
-		if (this._stroke) { instr.push(this._stroke); }
+		if (this._dirty && active.length) {
+			instr.length = commitIndex; // remove old, uncommitted commands
+			instr.push(Graphics.beginCmd);
+			instr.push.apply(instr, active);
+			
+			if (this._fill) { instr.push(this._fill); }
+			if (this._stroke && this._strokeStyle) { instr.push(this._strokeStyle); }
+			if (this._stroke) { instr.push(this._stroke); }
+			
+			this._dirty = false;
+		}
 		
 		if (commit) {
 			active.length = 0;
