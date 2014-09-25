@@ -636,7 +636,7 @@ var p = Stage.prototype = new createjs.Container();
 		var offX = (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || document.body.clientLeft || 0);
 		var offY = (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || document.body.clientTop  || 0);
 
-		var styles = window.getComputedStyle ? getComputedStyle(e) : e.currentStyle; // IE <9 compatibility.
+		var styles = window.getComputedStyle ? getComputedStyle(e,null) : e.currentStyle; // IE <9 compatibility.
 		var padL = parseInt(styles.paddingLeft)+parseInt(styles.borderLeftWidth);
 		var padT = parseInt(styles.paddingTop)+parseInt(styles.borderTopWidth);
 		var padR = parseInt(styles.paddingRight)+parseInt(styles.borderRightWidth);
