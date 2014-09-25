@@ -135,6 +135,7 @@ var Graphics = function() {
 	this.initialize();
 };
 var p = Graphics.prototype;
+Graphics.prototype.constructor = Graphics;
 var G = Graphics;
 
 // static public methods:

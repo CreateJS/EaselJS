@@ -69,6 +69,7 @@ var Text = function(text, font, color) {
   this.initialize(text, font, color);
 };
 var p = Text.prototype = new createjs.DisplayObject();
+Text.prototype.constructor = Text;
 
 	/**
 	 * @property _workingContext

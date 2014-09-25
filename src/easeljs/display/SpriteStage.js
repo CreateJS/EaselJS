@@ -81,6 +81,7 @@ var SpriteStage = function(canvas, preserveDrawingBuffer, antialias) {
   this.initialize(canvas, preserveDrawingBuffer, antialias);
 };
 var p = SpriteStage.prototype = new createjs.Stage();
+SpriteStage.prototype.constructor = SpriteStage;
 
 // static properties:
 

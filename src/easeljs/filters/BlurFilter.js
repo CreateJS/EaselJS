@@ -65,6 +65,7 @@ var BlurFilter = function( blurX, blurY, quality ) {
   this.initialize( blurX, blurY, quality );
 };
 var p = BlurFilter.prototype = new createjs.Filter();
+BlurFilter.prototype.constructor = BlurFilter;
 
 // constructor:
 	/** @ignore */

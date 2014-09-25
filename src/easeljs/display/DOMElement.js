@@ -74,6 +74,7 @@ var DOMElement = function(htmlElement) {
   this.initialize(htmlElement);
 };
 var p = DOMElement.prototype = new createjs.DisplayObject();
+DOMElement.prototype.constructor = DOMElement;
 
 // public properties:
 	/**

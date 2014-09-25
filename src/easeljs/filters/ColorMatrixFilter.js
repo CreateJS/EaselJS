@@ -65,6 +65,7 @@ var ColorMatrixFilter = function(matrix) {
   this.initialize(matrix);
 };
 var p = ColorMatrixFilter.prototype = new createjs.Filter();
+ColorMatrixFilter.prototype.constructor = ColorMatrixFilter;
 
 // public properties:
 	p.matrix = null;

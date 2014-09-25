@@ -63,6 +63,7 @@ var Stage = function(canvas) {
   this.initialize(canvas);
 };
 var p = Stage.prototype = new createjs.Container();
+Stage.prototype.constructor = Stage;
 
 // events:
 
