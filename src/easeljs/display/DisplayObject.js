@@ -1400,8 +1400,10 @@ var p = DisplayObject.prototype = new createjs.EventDispatcher();
 			}
 		}
 
-		this.dispatchEvent(new createjs.Event("removedFromStage", false));
-		this.stage = null;
+		if (this.stage) {
+			this.dispatchEvent(new createjs.Event("removedFromStage", false));
+			this.stage = null;
+		}
 	};
 
 	/**
