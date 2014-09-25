@@ -63,6 +63,7 @@ var SpriteContainer = function(spriteSheet) {
   this.initialize(spriteSheet);
 };
 var p = SpriteContainer.prototype = new createjs.Container();
+SpriteContainer.prototype.constructor = SpriteContainer;
 
 // public properties:
 

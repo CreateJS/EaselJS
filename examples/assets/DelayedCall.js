@@ -2,6 +2,8 @@
 
 	var DelayedCall = function (scope, handler, time, params) { this.init(scope, handler, time, params); }
 	var p = DelayedCall.prototype = {};
+	DelayedCall.prototype.constructor = DelayedCall;
+	DelayedCall.prototype.constructor = DelayedCall;
 
 	p.init = function(scope, handler, time, params) {
 		this.scope = scope;

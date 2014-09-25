@@ -141,6 +141,7 @@ var SpriteSheet = function(data) {
   this.initialize(data);
 };
 var p = SpriteSheet.prototype = new createjs.EventDispatcher();
+SpriteSheet.prototype.constructor = SpriteSheet;
 
 // events:
 

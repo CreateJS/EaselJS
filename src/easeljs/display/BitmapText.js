@@ -46,6 +46,7 @@ function BitmapText(text, spriteSheet) {
 	this.initialize(text, spriteSheet);
 }
 var p = BitmapText.prototype = new createjs.Container();
+BitmapText.prototype.constructor = BitmapText;
 
 // static properties:
 	/**
