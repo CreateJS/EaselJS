@@ -136,6 +136,7 @@ var DisplayObject = function() {
   this.initialize();
 };
 var p = DisplayObject.prototype = new createjs.EventDispatcher();
+DisplayObject.prototype.constructor = DisplayObject;
 	
 	
 // static properties:

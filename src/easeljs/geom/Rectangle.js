@@ -54,6 +54,7 @@ var Rectangle = function(x, y, width, height) {
   this.initialize(x, y, width, height);
 };
 var p = Rectangle.prototype;
+Rectangle.prototype.constructor = Rectangle;
 
 // public properties:
 	/**

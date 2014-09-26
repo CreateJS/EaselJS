@@ -4,6 +4,7 @@
 		this.initialize(width, height, displayLabel);
 	};
 	var p = SimpleScroller.prototype = new createjs.Container(); // inherit from Container
+	SimpleScroller.prototype.constructor = SimpleScroller;
 	p.bar;
 	p.track;
 	p.width;
