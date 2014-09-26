@@ -52,6 +52,7 @@ var Point = function(x, y) {
   this.initialize(x, y);
 };
 var p = Point.prototype;
+Point.prototype.constructor = Point;
 
 // public properties:
 

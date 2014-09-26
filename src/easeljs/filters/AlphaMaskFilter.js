@@ -68,6 +68,7 @@ this.createjs = this.createjs || {};
 		this.initialize(mask);
 	};
 	var p = AlphaMaskFilter.prototype = new createjs.Filter();
+	AlphaMaskFilter.prototype.constructor = AlphaMaskFilter;
 
 // constructor:
 	/** @ignore */

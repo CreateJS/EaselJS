@@ -60,6 +60,7 @@ var Event = function(type, bubbles, cancelable) {
   this.initialize(type, bubbles, cancelable);
 };
 var p = Event.prototype;
+Event.prototype.constructor = Event;
 
 // events:
 

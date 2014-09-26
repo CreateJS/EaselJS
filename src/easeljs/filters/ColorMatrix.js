@@ -58,6 +58,7 @@ this.createjs = this.createjs||{};
 	  this.initialize(brightness, contrast, saturation, hue);
 	};
 	var p = ColorMatrix.prototype;
+	ColorMatrix.prototype.constructor = ColorMatrix;
 
 	/**
 	 * Array of delta values for contrast calculations.
