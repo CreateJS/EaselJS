@@ -63,6 +63,7 @@ var Sprite = function(spriteSheet, frameOrAnimation) {
   this.initialize(spriteSheet, frameOrAnimation);
 };
 var p = Sprite.prototype = new createjs.DisplayObject();
+Sprite.prototype.constructor = Sprite;
 
 // events:
 

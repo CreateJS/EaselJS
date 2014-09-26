@@ -72,6 +72,7 @@ var ColorFilter = function(redMultiplier, greenMultiplier, blueMultiplier, alpha
   this.initialize(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset);
 }
 var p = ColorFilter.prototype = new createjs.Filter();
+ColorFilter.prototype.constructor = ColorFilter;
 
 // public properties:
 	/**

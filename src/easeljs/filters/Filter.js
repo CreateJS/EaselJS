@@ -70,6 +70,7 @@ var Filter = function() {
   this.initialize();
 };
 var p = Filter.prototype;
+Filter.prototype.constructor = Filter;
 
 // constructor:
 	/**

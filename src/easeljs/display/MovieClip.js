@@ -90,6 +90,7 @@ var MovieClip = function(mode, startPosition, loop, labels) {
   this.initialize(mode, startPosition, loop, labels);
 };
 var p = MovieClip.prototype = new createjs.Container();
+MovieClip.prototype.constructor = MovieClip;
 
 	/**
 	 * The MovieClip will advance independently of its parent, even if its parent is paused.

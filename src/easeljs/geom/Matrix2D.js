@@ -51,6 +51,7 @@ var Matrix2D = function(a, b, c, d, tx, ty) {
   this.initialize(a, b, c, d, tx, ty);
 };
 var p = Matrix2D.prototype;
+Matrix2D.prototype.constructor = Matrix2D;
 
 // static public properties:
 

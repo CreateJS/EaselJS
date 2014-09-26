@@ -68,6 +68,7 @@ this.createjs = this.createjs || {};
 		this.initialize(alphaMap);
 	};
 	var p = AlphaMapFilter.prototype = new createjs.Filter();
+	AlphaMapFilter.prototype.constructor = AlphaMapFilter;
 
 // constructor:
 	/** @ignore */

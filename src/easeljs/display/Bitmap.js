@@ -67,6 +67,7 @@ var Bitmap = function(imageOrUri) {
   this.initialize(imageOrUri);
 };
 var p = Bitmap.prototype = new createjs.DisplayObject();
+Bitmap.prototype.constructor = Bitmap;
 
 // public properties:
 	/**
