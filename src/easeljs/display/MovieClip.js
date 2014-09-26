@@ -405,13 +405,11 @@ var p = MovieClip.prototype = new createjs.Container();
 		
 		var t = (fps != null && fps != -1 && time != null) ? time/(1000/fps) + this._t : 1;
 		var frames = t|0;
-		this._t = t-frames;
+		this._t = t-frames; // leftover time
 		
-		while (frames--) {
-			if (!this.paused) {
-				this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
-				this._updateTimeline();
-			}
+		while (!this.paused && frames--) {
+			this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
+			this._updateTimeline();
 		}
 	};
 	
