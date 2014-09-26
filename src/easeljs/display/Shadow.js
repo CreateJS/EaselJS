@@ -55,6 +55,7 @@ var Shadow = function(color, offsetX, offsetY, blur) {
   this.initialize(color, offsetX, offsetY, blur);
 };
 var p = Shadow.prototype;
+Shadow.prototype.constructor = Shadow;
 
 // static public properties:
 	/**

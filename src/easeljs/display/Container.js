@@ -56,6 +56,7 @@ var Container = function() {
   this.initialize();
 };
 var p = Container.prototype = new createjs.DisplayObject();
+Container.prototype.constructor = Container;
 
 // public properties:
 	/**

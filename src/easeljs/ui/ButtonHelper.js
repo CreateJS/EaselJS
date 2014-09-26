@@ -73,6 +73,7 @@ var ButtonHelper = function(target, outLabel, overLabel, downLabel, play, hitAre
 	this.initialize(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel);
 };
 var p = ButtonHelper.prototype;
+ButtonHelper.prototype.constructor = ButtonHelper;
 
 // public properties:
 	/**

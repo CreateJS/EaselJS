@@ -57,6 +57,7 @@ var MouseEvent = function(type, bubbles, cancelable, stageX, stageY, nativeEvent
 	this.initialize(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY);
 };
 var p = MouseEvent.prototype = new createjs.Event();
+MouseEvent.prototype.constructor = MouseEvent;
 
 // events:
 	// TODO: deprecated.

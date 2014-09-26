@@ -63,6 +63,7 @@ var Shape = function(graphics) {
   this.initialize(graphics);
 };
 var p = Shape.prototype = new createjs.DisplayObject();
+Shape.prototype.constructor = Shape;
 
 // public properties:
 	/**

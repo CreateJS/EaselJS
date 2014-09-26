@@ -89,6 +89,7 @@ var EventDispatcher = function() {
 /*	this.initialize(); */ // not needed.
 };
 var p = EventDispatcher.prototype;
+EventDispatcher.prototype.constructor = EventDispatcher;
 
 
 	/**

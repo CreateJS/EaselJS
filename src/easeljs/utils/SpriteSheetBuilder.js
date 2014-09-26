@@ -54,6 +54,7 @@ var SpriteSheetBuilder = function() {
   this.initialize();
 };
 var p = SpriteSheetBuilder.prototype = new createjs.EventDispatcher;
+SpriteSheetBuilder.prototype.constructor = SpriteSheetBuilder;
 
 // constants:
 	SpriteSheetBuilder.ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
