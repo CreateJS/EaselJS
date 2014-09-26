@@ -6,7 +6,6 @@
 
 	var p = Ship.prototype = new createjs.Container();
 	Ship.prototype.constructor = Ship;
-	Ship.prototype.constructor = Ship;
 
 // public properties:
 	Ship.TOGGLE = 60;
