@@ -24,13 +24,17 @@ OTHER:
 - Added Bower support, including grunt task for automatically updating bower.json
 - mouse interactions and getObjectsUnderPoint now respect masks
 - fixed an issue with Ticker.reset()
+- Ticker.getTime()/getEventTime() now return -1 if the Ticker has not been initialized
 - preventDefault support added to the tickstart and drawstart events
 - added Stage.drawRect to support selective rendering
 - major rewrite of Graphics to use specific command objects
 - significant performance improvements for Graphics instances with a large number of instructions
 - added Graphics.getInstructions()
 - added Text.getMetrics()
+- fix for Text.getMeasuredWidth() when no font or an invalid font is specified
 - fix for spritesheets that included 0 width/height frames
+- the .constructor is now set correctly on all classes (thanks to @kaesve)
+- the CreateJS CDN now supports https / SSL
 
 
 Version 0.7.1 [December 12, 2013]
