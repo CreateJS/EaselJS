@@ -4,6 +4,7 @@ CRITICAL (may break existing content):
 - modified behaviour of SpriteSheetBuilder.addFrame setupFunction, setupParams & setupScope params
 - removed the deprecated mousemove & mouseup events on MouseEvent
 - removed Graphics.inject() in favour of Graphics.append()
+- Sprite now properly displays the first frame of animations after calling gotoAndPlay()
 
 *****
 OTHER:
@@ -35,6 +36,7 @@ OTHER:
 - fix for spritesheets that included 0 width/height frames
 - the .constructor is now set correctly on all classes (thanks to @kaesve)
 - the CreateJS CDN now supports https / SSL
+- improved how Sprite handles sequencing between animations with different speed values
 
 
 Version 0.7.1 [December 12, 2013]
