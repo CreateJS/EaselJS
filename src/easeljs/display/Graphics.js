@@ -347,6 +347,8 @@ var G = Graphics;
 	 * @protected
 	 **/
 	p.initialize = function() {
+		this._instructions = [];
+		this._activeInstructions = [];
 		this.clear();
 		this._ctx = Graphics._ctx;
 	};
@@ -526,9 +528,7 @@ var G = Graphics;
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 **/
 	p.clear = function() {
-		this._instructions = [];
-		this._activeInstructions = [];
-		this._commitIndex = 0;
+		this._instructions.length = this._activeInstructions.length = this._commitIndex = 0;
 		this._strokeStyle = this._stroke = this._fill = null;
 		this._dirty = this._strokeIgnoreScale = false;
 		return this;
