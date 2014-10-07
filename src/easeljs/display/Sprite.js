@@ -76,6 +76,14 @@ Sprite.prototype.constructor = Sprite;
 	 * @param {String} next The name of the next animation that will be played, or null. This will be the same as name if the animation is looping.
 	 * @since 0.6.0
 	 */
+	 
+	/**
+	 * Dispatched any time the current frame changes. For example, this could be due to automatic advancement on a tick,
+	 * or calling gotoAndPlay() or gotoAndStop().
+	 * @event change
+	 * @param {Object} target The object that dispatched the event.
+	 * @param {String} type The event type.
+	 */
 
 // public properties:
 	// TODO: deprecated.
@@ -390,45 +398,49 @@ Sprite.prototype.constructor = Sprite;
 	 * @method _normalizeFrame
 	 **/
 	p._normalizeFrame = function(frameDelta) {
-		frameDelta = frameDelta||0;
+		frameDelta = frameDelta || 0;
 		var animation = this._animation;
 		var paused = this.paused;
 		var frame = this._currentFrame;
 		var l;
 
 		if (animation) {
-			var speed = animation.speed||1;
+			var speed = animation.speed || 1;
 			var animFrame = this.currentAnimationFrame;
 			l = animation.frames.length;
-			if (animFrame+frameDelta*speed >= l) {
+			if (animFrame + frameDelta * speed >= l) {
 				var next = animation.next;
-				if (this._dispatchAnimationEnd(animation, frame, paused, next, l-1)) {
+				if (this._dispatchAnimationEnd(animation, frame, paused, next, l - 1)) {
 					// something changed in the event stack, so we shouldn't make any more changes here.
 					return;
 				} else if (next) {
 					// sequence. Automatically calls _normalizeFrame again with the remaining frames.
-					return this._goto(next, frameDelta - (l-animFrame)/speed);
+					return this._goto(next, frameDelta - (l - animFrame) / speed);
 				} else {
 					// end.
 					this.paused = true;
-					animFrame = animation.frames.length-1;
+					animFrame = animation.frames.length - 1;
 				}
 			} else {
 				animFrame += frameDelta * speed;
 			}
 			this.currentAnimationFrame = animFrame;
-			this._currentFrame = animation.frames[animFrame|0]
+			this._currentFrame = animation.frames[animFrame | 0]
 		} else {
 			frame = (this._currentFrame += frameDelta);
 			l = this.spriteSheet.getNumFrames();
 			if (frame >= l) {
-				if (!this._dispatchAnimationEnd(animation, frame, paused, l-1)) {
+				if (!this._dispatchAnimationEnd(animation, frame, paused, l - 1)) {
 					// looped.
 					if ((this._currentFrame -= l) >= l) { return this._normalizeFrame(); }
 				}
 			}
 		}
-		this.currentFrame = this._currentFrame|0;
+		var frame = this._currentFrame | 0;
+		if (this.currentFrame != frame) {
+			this.currentFrame = frame;
+			this.dispatchEvent("change");
+		}
 	};
 
 	/**
