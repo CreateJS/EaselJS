@@ -312,13 +312,9 @@ Sprite.prototype.constructor = Sprite;
 	 * @method advance
 	*/
 	p.advance = function(time) {
-		var speed = (this._animation&&this._animation.speed)||1;
 		var fps = this.framerate || this.spriteSheet.framerate;
 		var t = (fps && time != null) ? time/(1000/fps) : 1;
-		// TODO: this has the effect of applying the speed of the current animation to the remainder of the time in the .next
-		if (this._animation) { this.currentAnimationFrame+=t*speed; }
-		else { this._currentFrame+=t*speed; }
-		this._normalizeFrame();
+		this._normalizeFrame(t);
 	};
 	
 	/**
@@ -393,32 +389,37 @@ Sprite.prototype.constructor = Sprite;
 	 * @protected
 	 * @method _normalizeFrame
 	 **/
-	p._normalizeFrame = function() {
+	p._normalizeFrame = function(frameDelta) {
+		frameDelta = frameDelta||0;
 		var animation = this._animation;
 		var paused = this.paused;
 		var frame = this._currentFrame;
-		var animFrame = this.currentAnimationFrame;
 		var l;
 
 		if (animation) {
+			var speed = animation.speed||1;
+			var animFrame = this.currentAnimationFrame;
 			l = animation.frames.length;
-			if ((animFrame|0) >= l) {
+			if (animFrame+frameDelta*speed >= l) {
 				var next = animation.next;
 				if (this._dispatchAnimationEnd(animation, frame, paused, next, l-1)) {
-					// something changed in the event stack.
+					// something changed in the event stack, so we shouldn't make any more changes here.
+					return;
 				} else if (next) {
-					// sequence. Automatically calls _normalizeFrame again.
-					return this._goto(next, animFrame - l);
+					// sequence. Automatically calls _normalizeFrame again with the remaining frames.
+					return this._goto(next, frameDelta - (l-animFrame)/speed);
 				} else {
 					// end.
 					this.paused = true;
-					animFrame = this.currentAnimationFrame = animation.frames.length-1;
-					this._currentFrame = animation.frames[animFrame];
+					animFrame = animation.frames.length-1;
 				}
 			} else {
-				this._currentFrame = animation.frames[animFrame|0];
+				animFrame += frameDelta * speed;
 			}
+			this.currentAnimationFrame = animFrame;
+			this._currentFrame = animation.frames[animFrame|0]
 		} else {
+			frame = (this._currentFrame += frameDelta);
 			l = this.spriteSheet.getNumFrames();
 			if (frame >= l) {
 				if (!this._dispatchAnimationEnd(animation, frame, paused, l-1)) {
@@ -483,16 +484,15 @@ Sprite.prototype.constructor = Sprite;
 	 * @protected
 	 **/
 	p._goto = function(frameOrAnimation, frame) {
+		this.currentAnimationFrame = 0;
 		if (isNaN(frameOrAnimation)) {
 			var data = this.spriteSheet.getAnimation(frameOrAnimation);
 			if (data) {
-				this.currentAnimationFrame = frame||0;
 				this._animation = data;
 				this.currentAnimation = frameOrAnimation;
-				this._normalizeFrame();
+				this._normalizeFrame(frame);
 			}
 		} else {
-			this.currentAnimationFrame = 0;
 			this.currentAnimation = this._animation = null;
 			this._currentFrame = frameOrAnimation;
 			this._normalizeFrame();
