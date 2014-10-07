@@ -125,14 +125,6 @@ Sprite.prototype.constructor = Sprite;
 	p.spriteSheet = null;
 
 	/**
-	 * @property offset
-	 * @type {Number}
-	 * @default 0
-	 * @deprecated Not applicable to the new timing model in v0.7.0 and higher.
-	 */
-	p.offset = 0;
-
-	/**
 	 * Specifies the current frame index within the currently playing animation. When playing normally, this will increase
 	 * from 0 to n-1, where n is the number of frames in the current animation.
 	 *
@@ -163,15 +155,9 @@ Sprite.prototype.constructor = Sprite;
 	p.framerate = 0;
 
 // private properties:
-	/**
-	 * @property _advanceCount
-	 * @protected
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p._advanceCount = 0;
 
 	/**
+	 * Current animation object.
 	 * @property _animation
 	 * @protected
 	 * @type {Object}
@@ -180,12 +166,22 @@ Sprite.prototype.constructor = Sprite;
 	p._animation = null;
 
 	/**
-	 * @property _animation
+	 * Current frame index.
+	 * @property _currentFrame
 	 * @protected
-	 * @type {Object}
+	 * @type {Number}
 	 * @default null
 	 **/
 	p._currentFrame = null;
+	
+	/**
+	 * Skips the next auto advance. Used by gotoAndPlay to avoid immediately jumping to the next frame
+	 * @property _skipAdvance
+	 * @protected
+	 * @type {Boolean}
+	 * @default false
+	 **/
+	p._skipAdvance = false;
 
 // constructor:
 	/**
@@ -294,6 +290,7 @@ Sprite.prototype.constructor = Sprite;
 	 **/
 	p.gotoAndPlay = function(frameOrAnimation) {
 		this.paused = false;
+		this._skipAdvance = true;
 		this._goto(frameOrAnimation);
 	};
 
@@ -318,6 +315,7 @@ Sprite.prototype.constructor = Sprite;
 		var speed = (this._animation&&this._animation.speed)||1;
 		var fps = this.framerate || this.spriteSheet.framerate;
 		var t = (fps && time != null) ? time/(1000/fps) : 1;
+		// TODO: this has the effect of applying the speed of the current animation to the remainder of the time in the .next
 		if (this._animation) { this.currentAnimationFrame+=t*speed; }
 		else { this._currentFrame+=t*speed; }
 		this._normalizeFrame();
@@ -383,7 +381,8 @@ Sprite.prototype.constructor = Sprite;
 	 **/
 	p._tick = function(props) {
 		if (!this.paused) {
-			this.advance(props&&props.delta);
+			if (!this._skipAdvance) { this.advance(props&&props.delta); }
+			this._skipAdvance = false;
 		}
 		this.DisplayObject__tick(props);
 	};
