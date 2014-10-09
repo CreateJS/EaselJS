@@ -41,91 +41,114 @@ this.createjs = this.createjs||{};
  * images could be combined into a single 400x200 sprite sheet (4 frames across by 2 high).
  *
  * The data passed to the SpriteSheet constructor defines three critical pieces of information:<ol>
- *    <li> The image or images to use.</li>
- *    <li> The positions of individual image frames. This data can be represented in one of two ways:
- *    As a regular grid of sequential, equal-sized frames, or as individually defined, variable sized frames arranged in
- *    an irregular (non-sequential) fashion.</li>
- *    <li> Likewise, animations can be represented in two ways: As a series of sequential frames, defined by a start and
- *    end frame [0,3], or as a list of frames [0,1,2,3].</li>
+ * 	<li> The image or images to use.</li>
+ * 	<li> The positions of individual image frames. This data can be represented in one of two ways:
+ * 	As a regular grid of sequential, equal-sized frames, or as individually defined, variable sized frames arranged in
+ * 	an irregular (non-sequential) fashion.</li>
+ * 	<li> Likewise, animations can be represented in two ways: As a series of sequential frames, defined by a start and
+ * 	end frame [0,3], or as a list of frames [0,1,2,3].</li>
  * </OL>
  *
- * <h4>SpriteSheet Format</h4>
+ * <h3>SpriteSheet Format</h3>
+ * 
+ * SpriteSheets are defined using an object with two required properties (images and frames), and two optional properties
+ * (framerate and animations).
+ * 
+ * <h4>images</h4>
+ * An array of source images. Images can be either an HTMLImage
+ * element, or a string path to an image. The former is recommended to control preloading.
+ * 
+ * <h4>frames</h4>
+ * Defines the individual frames. There are two supported formats for frame data:<OL>
+ * 	<LI> when all of the frames are the same size, use an object with width, height, regX, regY, and count properties.
+ * 		width & height are required and specify the dimensions of the frames.
+ * 		regX & regY indicate the registration point or "origin" of the frames.
+ * 		count allows you to specify the total number of frames in the spritesheet; if omitted, this will be calculated
+ * 		based on the dimensions of the source images and the frames. Frames will be assigned indexes based on their position
+ * 		in the source images (left to right, top to bottom).
+ * 	<LI> if the frames are of different sizes, use an array of frame definitions. Each definition is itself an array
+ * 		with 4 required and 3 optional entries, in the order: x, y, width, height, imageIndex, regX, regY. The first
+ * 		four entries are required and define the frame rectangle. The fifth specifies the index of the source image (defaults to 0). The
+ * 		last two specify the registration point or "origin" of the frame.
+ * </OL>
+ * 
+ * <h4>animations</h4>
+ * Optional. Defines sequences of frames to play as named animations. An object where each property corresponds to an
+ * animation of the same name. Each animation must include the frame indexes in the animation, and may 
+ * also specify a playback speed (ex. 2 would playback at double speed, 0.5 at half), and
+ * the name of the "next" animation to sequence to after it completes.
+ * There are three formats supported for defining the frames in an animation, which can be mixed and matched as appropriate:<OL>
+ * 	<LI> for a single frame animation, you can simply specify the frame index
+ * 	<LI> for an animation of consecutive frames, you can use an array with two required, and two optional entries
+ * 		in the order: start, end, next, and speed. For example <code>[2, 4, "run", 3]</code> would play frames 2,3,4 at
+ * 		3x normal speed, and then sequence to the "run" animation.
+ * 	<LI> for non-consecutive frames, you can use an object with a frames property defining an array of frame indexes to
+ * 		play in order. The object can also specify next and speed properties.
+ * </OL>
+ * 
+ * <h4>framerate</h4>
+ * Optional. Indicates the default framerate to play this spritesheet at in frames per secong.
+ * See the {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} for more information.
+ * 
+ *	data = {
+ * 		// FRAMERATE:
+ * 		framerate: 20,
  *
- *      data = {
- *          // DEFINING FRAMERATE:
- *          // this specifies the framerate that will be set on the SpriteSheet. See {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}}
- *          // for more information.
- *          framerate: 20,
+ * 		// IMAGES:
+ * 		// list of images or image URIs to use.
+ * 		images: [image1, "path/to/image2.png"],
  *
- *          // DEFINING IMAGES:
- *          // list of images or image URIs to use. SpriteSheet can handle preloading.
- *          // the order dictates their index value for frame definition.
- *          images: [image1, "path/to/image2.png"],
+ * 		// FRAMES:
+ * 		// same-sized frames:
+ * 		frames: {width:64, height:64, count:20, regX: 32, regY:64},
  *
- *          // DEFINING FRAMES:
- * 	        // the simple way to define frames, only requires frame size because frames are consecutive:
- * 	        // define frame width/height, and optionally the frame count and registration point x/y.
- * 	        // if count is omitted, it will be calculated automatically based on image dimensions.
- * 	        frames: {width:64, height:64, count:20, regX: 32, regY:64},
+ * 		// or, define an individual rect for each frames.
+ * 		frames: [
+ * 			// x, y, width, height, imageIndex*, regX*, regY*
+ * 			[64, 0, 96, 64],
+ * 			[0, 0, 64, 64, 1, 32, 32]
+ * 			// etc.
+ * 		],
  *
- * 	        // OR, the complex way that defines individual rects for frames.
- * 	        // The 5th value is the image index per the list defined in "images" (defaults to 0).
- * 	        frames: [
- * 	        	// x, y, width, height, imageIndex, regX, regY
- * 	        	[0,0,64,64,0,32,64],
- * 	        	[64,0,96,64,0]
- * 	        ],
- *
- *          // DEFINING ANIMATIONS:
- *
- * 	        // simple animation definitions. Define a consecutive range of frames (begin to end inclusive).
- * 	        // optionally define a "next" animation to sequence to (or false to stop) and a playback "speed".
- * 	        animations: {
- * 	        	// start, end, next, speed
- * 	        	run: [0,8],
- * 	        	jump: [9,12,"run",2]
- * 	        }
- *
- *          // the complex approach which specifies every frame in the animation by index.
- *          animations: {
- *          	run: {
- *          		frames: [1,2,3,3,2,1]
- *          	},
- *          	jump: {
- *          		frames: [1,4,5,6,1],
- *          		next: "run",
- *          		speed: 2
- *          	},
- *          	stand: { frames: [7] }
- *          }
- *
- * 	        // the above two approaches can be combined, you can also use a single frame definition:
- * 	        animations: {
- * 	        	run: [0,8,true,2],
- * 	        	jump: {
- * 	        		frames: [8,9,10,9,8],
- * 	        		next: "run",
- * 	        		speed: 2
- * 	        	},
- * 	        	stand: 7
- * 	        }
- *      }
+ * 		// ANIMATIONS:
+ * 		// the different formats of animations can be used together:
+ * 		animations: {
+ * 			// single frame animations:
+ * 			sit: 6,
+ * 			stand: 7,
+ * 			
+ * 			// consecutive frame animations:
+ * 			// start, end, next*, speed*
+ * 			run: [0, 8],
+ * 			jump: [9, 12, "run", 2],
+ * 			
+ * 			// animations with non-consecutive frames:
+ * 			walk: {
+ * 			frames: [1,2,3,3,2,1]
+ * 			},
+ * 			shoot: {
+ * 				frames: [1,4,5,6],
+ * 				next: "walk",
+ * 				speed: 0.5
+ * 			},
+ * 		}
+ * 	}
  *
  * <strong>Note that the <code>speed</code> property was added in EaselJS 0.7.0. Earlier versions had a <code>frequency</code>
  * property instead, which was the inverse of speed. For example, a value of "4" would be 1/4 normal speed in earlier
- * versions, but us 4x normal speed in 0.7.0+.</strong>
+ * versions, but is 4x normal speed in 0.7.0+.</strong>
  *
  * <h4>Example</h4>
  * To define a simple sprite sheet, with a single image "sprites.jpg" arranged in a regular 50x50 grid with two
  * animations, "run" looping from frame 0-4 inclusive, and "jump" playing from frame 5-8 and sequencing back to run:
  *
- *      var data = {
- *          images: ["sprites.jpg"],
- *          frames: {width:50, height:50},
- *          animations: {run:[0,4], jump:[5,8,"run"]}
- *      };
- *      var spriteSheet = new createjs.SpriteSheet(data);
- *      var animation = new createjs.Sprite(spriteSheet, "run");
+ * 	var data = {
+ * 		images: ["sprites.jpg"],
+ * 		frames: {width:50, height:50},
+ * 		animations: {run:[0,4], jump:[5,8,"run"]}
+ * 	};
+ * 	var spriteSheet = new createjs.SpriteSheet(data);
+ * 	var animation = new createjs.Sprite(spriteSheet, "run");
  *
  *
  * <strong>Warning:</strong> Images loaded cross-origin will throw cross-origin security errors when interacted with
@@ -339,7 +362,7 @@ SpriteSheet.prototype.constructor = SpriteSheet;
 	/**
 	 * Returns the total number of frames in the specified animation, or in the whole sprite
 	 * sheet if the animation param is omitted.
-     * @method getNumFrames
+	 * @method getNumFrames
 	 * @param {String} animation The name of the animation to get a frame count for.
 	 * @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
 	*/
@@ -364,11 +387,11 @@ SpriteSheet.prototype.constructor = SpriteSheet;
 
 	/**
 	 * Returns an object defining the specified animation. The returned object contains:<UL>
-	 *     <LI>frames: an array of the frame ids in the animation</LI>
-	 *     <LI>speed: the playback speed for this animation</LI>
-	 *     <LI>name: the name of the animation</LI>
-	 *     <LI>next: the default animation to play next. If the animation loops, the name and next property will be the
-	 *     same.</LI>
+	 * 	<LI>frames: an array of the frame ids in the animation</LI>
+	 * 	<LI>speed: the playback speed for this animation</LI>
+	 * 	<LI>name: the name of the animation</LI>
+	 * 	<LI>next: the default animation to play next. If the animation loops, the name and next property will be the
+	 * 	same.</LI>
 	 * </UL>
 	 * @method getAnimation
 	 * @param {String} name The name of the animation to get.
@@ -380,10 +403,10 @@ SpriteSheet.prototype.constructor = SpriteSheet;
 
 	/**
 	 * Returns an object specifying the image and source rect of the specified frame. The returned object has:<UL>
-	 *     <LI>an image property holding a reference to the image object in which the frame is found</LI>
-	 *     <LI>a rect property containing a Rectangle instance which defines the boundaries for the frame within that
-	 *     image.</LI>
-	 *     <LI> A regX and regY property corresponding to the regX/Y values for the frame.
+	 * 	<LI>an image property holding a reference to the image object in which the frame is found</LI>
+	 * 	<LI>a rect property containing a Rectangle instance which defines the boundaries for the frame within that
+	 * 	image.</LI>
+	 * 	<LI> A regX and regY property corresponding to the regX/Y values for the frame.
 	 * </UL>
 	 * @method getFrame
 	 * @param {Number} frameIndex The index of the frame.
@@ -399,7 +422,7 @@ SpriteSheet.prototype.constructor = SpriteSheet;
 	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative
 	 * to the origin. For example, a 90 x 70 frame with a regX of 50 and a regY of 40 would return:
 	 *
-	 *      [x=-50, y=-40, width=90, height=70]
+	 * 	[x=-50, y=-40, width=90, height=70]
 	 *
 	 * @method getFrameBounds
 	 * @param {Number} frameIndex The index of the frame.
