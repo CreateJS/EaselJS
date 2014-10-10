@@ -40,112 +40,108 @@ this.createjs = this.createjs||{};
  * animation frames) combined into a larger image (or images). For example, an animation consisting of eight 100x100
  * images could be combined into a single 400x200 sprite sheet (4 frames across by 2 high).
  *
- * The data passed to the SpriteSheet constructor defines three critical pieces of information:<ol>
- * 	<li> The image or images to use.</li>
- * 	<li> The positions of individual image frames. This data can be represented in one of two ways:
- * 	As a regular grid of sequential, equal-sized frames, or as individually defined, variable sized frames arranged in
- * 	an irregular (non-sequential) fashion.</li>
- * 	<li> Likewise, animations can be represented in two ways: As a series of sequential frames, defined by a start and
- * 	end frame [0,3], or as a list of frames [0,1,2,3].</li>
+ * The data passed to the SpriteSheet constructor defines:<ol>
+ * 	<li> The source image or images to use.</li>
+ * 	<li> The positions of individual image frames.</li>
+ * 	<li> Sequences of frames that form named animations. Optional.</li>
+ * 	<li> The target playback framerate. Optional.</li>
  * </OL>
  *
  * <h3>SpriteSheet Format</h3>
  * 
- * SpriteSheets are defined using an object with two required properties (images and frames), and two optional properties
- * (framerate and animations).
+ * SpriteSheets are an object with two required properties (`images` and `frames`), and two optional properties
+ * (`framerate` and `animations`). This makes them easy to define in javascript code, or in JSON.
  * 
  * <h4>images</h4>
  * An array of source images. Images can be either an HTMLImage
- * element, or a string path to an image. The former is recommended to control preloading.
+ * instance, or a uri to an image. The former is recommended to control preloading.
+ * 
+ * 	images: [image1, "path/to/image2.png"],
  * 
  * <h4>frames</h4>
  * Defines the individual frames. There are two supported formats for frame data:<OL>
- * 	<LI> when all of the frames are the same size, use an object with width, height, regX, regY, and count properties.
- * 		width & height are required and specify the dimensions of the frames.
- * 		regX & regY indicate the registration point or "origin" of the frames.
- * 		count allows you to specify the total number of frames in the spritesheet; if omitted, this will be calculated
- * 		based on the dimensions of the source images and the frames. Frames will be assigned indexes based on their position
- * 		in the source images (left to right, top to bottom).
- * 	<LI> if the frames are of different sizes, use an array of frame definitions. Each definition is itself an array
- * 		with 4 required and 3 optional entries, in the order: x, y, width, height, imageIndex, regX, regY. The first
- * 		four entries are required and define the frame rectangle. The fifth specifies the index of the source image (defaults to 0). The
- * 		last two specify the registration point or "origin" of the frame.
+ * <LI> when all of the frames are the same size (in a grid), use an object with `width`, `height`, `regX`, `regY`, and `count` properties.
+ * `width` & `height` are required and specify the dimensions of the frames.
+ * `regX` & `regY` indicate the registration point or "origin" of the frames.
+ * `count` allows you to specify the total number of frames in the spritesheet; if omitted, this will be calculated
+ * based on the dimensions of the source images and the frames. Frames will be assigned indexes based on their position
+ * in the source images (left to right, top to bottom).
+ * 	
+ * 	frames: {width:64, height:64, count:20, regX: 32, regY:64}
+ * 	
+ * <LI> if the frames are of different sizes, use an array of frame definitions. Each definition is itself an array
+ * with 4 required and 3 optional entries, in the order: `x`, `y`, `width`, `height`, `imageIndex`, `regX`, `regY`. The first
+ * four entries are required and define the frame rectangle. The fifth specifies the index of the source image (defaults to 0). The
+ * last two specify the registration point of the frame.
+ * 	
+ * 	frames: [
+ * 		// x, y, width, height, imageIndex*, regX*, regY*
+ * 		[64, 0, 96, 64],
+ * 		[0, 0, 64, 64, 1, 32, 32]
+ * 		// etc.
+ * 	]
+ * 	
  * </OL>
  * 
  * <h4>animations</h4>
- * Optional. Defines sequences of frames to play as named animations. An object where each property corresponds to an
- * animation of the same name. Each animation must include the frame indexes in the animation, and may 
- * also specify a playback speed (ex. 2 would playback at double speed, 0.5 at half), and
- * the name of the "next" animation to sequence to after it completes.
+ * Optional. An object defining sequences of frames to play as named animations. Each property corresponds to an
+ * animation of the same name. Each animation must specify the frames to play, and may 
+ * also include a relative playback `speed` (ex. 2 would playback at double speed, 0.5 at half), and
+ * the name of the `next` animation to sequence to after it completes.
+ * 
  * There are three formats supported for defining the frames in an animation, which can be mixed and matched as appropriate:<OL>
- * 	<LI> for a single frame animation, you can simply specify the frame index
- * 	<LI> for an animation of consecutive frames, you can use an array with two required, and two optional entries
- * 		in the order: start, end, next, and speed. For example <code>[2, 4, "run", 3]</code> would play frames 2,3,4 at
- * 		3x normal speed, and then sequence to the "run" animation.
- * 	<LI> for non-consecutive frames, you can use an object with a frames property defining an array of frame indexes to
- * 		play in order. The object can also specify next and speed properties.
- * </OL>
+ * <LI> for a single frame animation, you can simply specify the frame index
  * 
- * <h4>framerate</h4>
- * Optional. Indicates the default framerate to play this spritesheet at in frames per secong.
- * See the {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} for more information.
+ * 	animations: {
+ * 		sit: 7
+ * 	}
  * 
- *	data = {
- * 		// FRAMERATE:
- * 		framerate: 20,
- *
- * 		// IMAGES:
- * 		// list of images or image URIs to use.
- * 		images: [image1, "path/to/image2.png"],
- *
- * 		// FRAMES:
- * 		// same-sized frames:
- * 		frames: {width:64, height:64, count:20, regX: 32, regY:64},
- *
- * 		// or, define an individual rect for each frames.
- * 		frames: [
- * 			// x, y, width, height, imageIndex*, regX*, regY*
- * 			[64, 0, 96, 64],
- * 			[0, 0, 64, 64, 1, 32, 32]
- * 			// etc.
- * 		],
- *
- * 		// ANIMATIONS:
- * 		// the different formats of animations can be used together:
- * 		animations: {
- * 			// single frame animations:
- * 			sit: 6,
- * 			stand: 7,
- * 			
- * 			// consecutive frame animations:
- * 			// start, end, next*, speed*
- * 			run: [0, 8],
- * 			jump: [9, 12, "run", 2],
- * 			
- * 			// animations with non-consecutive frames:
- * 			walk: {
+ * <LI> for an animation of consecutive frames, you can use an array with two required, and two optional entries
+ * in the order: `start`, `end`, `next`, and `speed`. This will play the frames from start to end inclusive.
+ * 
+ * 	animations: {
+ * 		// start, end, next*, speed*
+ * 		run: [0, 8],
+ * 		jump: [9, 12, "run", 2]
+ * 	}
+ * 
+ * <LI> for non-consecutive frames, you can use an object with a `frames` property defining an array of frame indexes to
+ * play in order. The object can also specify `next` and `speed` properties.
+ * 
+ * 	animations: {
+ * 		walk: {
  * 			frames: [1,2,3,3,2,1]
- * 			},
- * 			shoot: {
- * 				frames: [1,4,5,6],
- * 				next: "walk",
- * 				speed: 0.5
- * 			},
+ * 		},
+ * 		shoot: {
+ * 			frames: [1,4,5,6],
+ * 			next: "walk",
+ * 			speed: 0.5
  * 		}
  * 	}
- *
- * <strong>Note that the <code>speed</code> property was added in EaselJS 0.7.0. Earlier versions had a <code>frequency</code>
- * property instead, which was the inverse of speed. For example, a value of "4" would be 1/4 normal speed in earlier
- * versions, but is 4x normal speed in 0.7.0+.</strong>
+ * 
+ * </OL>
+ * <strong>Note:</strong> the `speed` property was added in EaselJS 0.7.0. Earlier versions had a `frequency`
+ * property instead, which was the inverse of `speed`. For example, a value of "4" would be 1/4 normal speed in earlier
+ * versions, but is 4x normal speed in 0.7.0+.
+ * 
+ * <h4>framerate</h4>
+ * Optional. Indicates the default framerate to play this spritesheet at in frames per second.
+ * See {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} for more information.
+ * 
+ * 	framerate: 20
  *
  * <h4>Example</h4>
- * To define a simple sprite sheet, with a single image "sprites.jpg" arranged in a regular 50x50 grid with two
- * animations, "run" looping from frame 0-4 inclusive, and "jump" playing from frame 5-8 and sequencing back to run:
+ * To define a simple sprite sheet, with a single image "sprites.jpg" arranged in a regular 50x50 grid with three
+ * animations: "stand" showing the first frame, "run" looping frame 1-5 inclusive, and "jump" playing  frame 6-8 and sequencing back to run.
  *
  * 	var data = {
  * 		images: ["sprites.jpg"],
  * 		frames: {width:50, height:50},
- * 		animations: {run:[0,4], jump:[5,8,"run"]}
+ * 		animations: {
+ * 			stand:0,
+ * 			run:[1,5],
+ * 			jump:[6,8,"run"]
+ * 		}
  * 	};
  * 	var spriteSheet = new createjs.SpriteSheet(data);
  * 	var animation = new createjs.Sprite(spriteSheet, "run");
@@ -172,11 +168,13 @@ SpriteSheet.prototype.constructor = SpriteSheet;
 	 * Dispatched when all images are loaded.  Note that this only fires if the images
 	 * were not fully loaded when the sprite sheet was initialized. You should check the complete property
 	 * to prior to adding a listener. Ex.
-	 * <pre><code>var sheet = new SpriteSheet(data);
-	 * if (!sheet.complete) {
-	 *  &nbsp; // not preloaded, listen for the complete event:
-	 *  &nbsp; sheet.addEventListener("complete", handler);
-	 * }</code></pre>
+	 * 
+	 * 	var sheet = new SpriteSheet(data);
+	 * 	if (!sheet.complete) {
+	 * 		// not preloaded, listen for the complete event:
+	 * 		sheet.addEventListener("complete", handler);
+	 * 	}
+	 * 	
 	 * @event complete
 	 * @param {Object} target The object that dispatched the event.
 	 * @param {String} type The event type.
