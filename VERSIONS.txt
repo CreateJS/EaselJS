@@ -39,6 +39,7 @@ OTHER:
 - the CreateJS CDN now supports https / SSL
 - improved how Sprite handles sequencing between animations with different speed values
 - added "change" event to Sprite
+- added "added" and "removed" events to DisplayObject
 
 
 Version 0.7.1 [December 12, 2013]
