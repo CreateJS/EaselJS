@@ -378,6 +378,18 @@ DisplayObject.prototype.constructor = DisplayObject;
 	p.parent = null;
 
 	/**
+	 * A reference to the {{#crossLink "Stage"}}{{/crossLink}} object that
+	 * contains this display object, or null if it has not been added
+	 * to one.
+	 * @property stage
+	 * @final
+	 * @type {Stage}
+	 * @default null
+	 * @readonly
+	 **/
+	p.stage = null;
+
+	/**
 	 * The left offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate
 	 * around its center, you would set regX and {{#crossLink "DisplayObject/regY:property"}}{{/crossLink}} to 50.
 	 * @property regX
@@ -1361,6 +1373,69 @@ DisplayObject.prototype.constructor = DisplayObject;
 			if (this.hasEventListener(evts[i])) { return true; }
 		}
 		return !!this.cursor;
+	};
+
+	/**
+	 * Dispatches "removed" and "removedFromStage" events.
+	 * Removes stage property.
+	 * @method _removed
+	 * @protected
+	 **/
+	p._removed = function() {
+		this.dispatchEvent(new createjs.Event("removed", false));
+		this.parent = null;
+		this._childrenRemovedStage();
+	};
+
+	/**
+	 * Finds all children and dispatches removedFromStage.
+	 * Also checks all children to dispatch event when adding order is messy.
+	 * @method _childrenRemovedStage
+	 * @private
+	 **/
+	p._childrenRemovedStage = function() {
+		if (this.children) {
+			var kids = this.children;
+			for (var i=0,l=kids.length;i<l;i++) {
+				if (kids[i]._added) { kids[i]._childrenRemovedStage(); }
+			}
+		}
+
+		if (this.stage) {
+			this.dispatchEvent(new createjs.Event("removedFromStage", false));
+			this.stage = null;
+		}
+	};
+
+	/**
+	 * Dispatches "added" and "addedToStage" events.
+	 * Sets stage property to currently attached stage.
+	 * @method _added
+	 * @protected
+	 **/
+	p._added = function() {
+		this.dispatchEvent(new createjs.Event("added", false));
+		this._checkAddedStage();
+	};
+
+	/**
+	 * Finds stage and assigns to public variable.
+	 * Also checks all children to dispatch event when adding order is messy.
+	 * @method _checkAddedStage
+	 * @private
+	 **/
+	p._checkAddedStage = function() {
+		var stage = this.getStage();
+		if (stage) {
+			this.stage = stage;
+			this.dispatchEvent(new createjs.Event("addedToStage", false));
+		}
+		if (this.children) {
+			var kids = this.children;
+			for (var i=0,l=kids.length;i<l;i++) {
+				if (kids[i]._added) { kids[i]._checkAddedStage(); }
+			}
+		}
 	};
 
 createjs.DisplayObject = DisplayObject;

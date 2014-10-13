@@ -185,6 +185,7 @@ Container.prototype.constructor = Container;
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.push(child);
+		child._added();
 		return child;
 	};
 
@@ -223,6 +224,7 @@ Container.prototype.constructor = Container;
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.splice(index, 0, child);
+		child._added();
 		return child;
 	};
 
@@ -281,7 +283,7 @@ Container.prototype.constructor = Container;
 		}
 		if (index < 0 || index > this.children.length-1) { return false; }
 		var child = this.children[index];
-		if (child) { child.parent = null; }
+		if (child) { child._removed(); }
 		this.children.splice(index, 1);
 		return true;
 	};
