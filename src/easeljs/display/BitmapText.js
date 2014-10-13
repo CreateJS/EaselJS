@@ -36,6 +36,9 @@ this.createjs = this.createjs || {};
  * using new line characters, but automatic wrapping is not supported. See the 
  * {{#crossLink "BitmapText/spriteSheet:attribute"}}{{/crossLink}}
  * property for more information on defining glyphs.
+ * 
+ * <strong>Important:</strong> BitmapText extends Container, but is not designed to be used as one.
+ * As such, methods like addChild and removeChild are disabled.
  * @class BitmapText
  * @extends DisplayObject
  * @param {String} [text=""] The text to display.
@@ -208,7 +211,27 @@ BitmapText.prototype.constructor = BitmapText;
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	};
 	
-	// TODO: should probably disable addChild / addChildAt
+	/**
+	 * <strong>Disabled in BitmapText.</strong>
+	 * @method addChild
+	 **/
+	/**
+	 * <strong>Disabled in BitmapText.</strong>
+	 * @method addChildAt
+	 **/
+	/**
+	 * <strong>Disabled in BitmapText.</strong>
+	 * @method removeChild
+	 **/
+	/**
+	 * <strong>Disabled in BitmapText.</strong>
+	 * @method removeChildAt
+	 **/
+	/**
+	 * <strong>Disabled in BitmapText.</strong>
+	 * @method removeAllChildren
+	 **/
+	p.addChild = p.addChildAt = p.removeChild = p.removeChildAt = p.removeAllChildren = function() {};
 
 // private methods:
 	/**

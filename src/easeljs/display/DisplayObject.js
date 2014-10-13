@@ -291,6 +291,16 @@ DisplayObject.prototype.constructor = DisplayObject;
 	 */
 	 
 	/**
+	 * Dispatched when the display object is added to a parent container.
+	 * @event added
+	 */
+	 
+	/**
+	 * Dispatched when the display object is removed from its parent container.
+	 * @event removed
+	 */
+	 
+	/**
 	 * Dispatched on each display object on a stage whenever the stage updates. This occurs immediately before the
 	 * rendering (draw) pass. When {{#crossLink "Stage/update"}}{{/crossLink}} is called, first all display objects on
 	 * the stage dispatch the tick event, then all of the display objects are drawn to stage. Children will have their

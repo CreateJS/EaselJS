@@ -185,6 +185,7 @@ Container.prototype.constructor = Container;
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.push(child);
+		child.dispatchEvent("added");
 		return child;
 	};
 
@@ -223,6 +224,7 @@ Container.prototype.constructor = Container;
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.splice(index, 0, child);
+		child.dispatchEvent("added");
 		return child;
 	};
 
@@ -283,6 +285,7 @@ Container.prototype.constructor = Container;
 		var child = this.children[index];
 		if (child) { child.parent = null; }
 		this.children.splice(index, 1);
+		child.dispatchEvent("removed");
 		return true;
 	};
 
@@ -297,7 +300,7 @@ Container.prototype.constructor = Container;
 	 **/
 	p.removeAllChildren = function() {
 		var kids = this.children;
-		while (kids.length) { kids.pop().parent = null; }
+		while (kids.length) { this.removeChildAt(0); }
 	};
 
 	/**
