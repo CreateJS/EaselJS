@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	<!-- include the performance framework first, so it can initialize and inject its UI -->
+	<script src="perfFramework.js"></script>
+	
+	<!-- this test will use PreloadJS to load required assets -->
+	<script src="../../examples/assets/preloadjs-NEXT.min.js"></script>
+	<script>
+		// runTest is a special method called by the performance framework
+		// it passes the version array (ex. [0,7,1]) and a hash of all the query string values
+		function runTest(version, qs) {
+			var queue = new createjs.LoadQueue();
+			queue.on("complete", assetsLoaded);
+			queue.loadManifest([
+				{id:"bmpfont", src:"BitmapFont.png"}
+			], true, "../../examples/assets/");
+		}
+		
+		function assetsLoaded(evt) {
+			// the performance framework defines a function called checkVersion
+			// it returns true if the loaded version of EaselJS is equal or greater than the version string passed in.
+			// for example, in version 0.5.0 all classes were moved to the createjs namespace from the global (window) namespace.
+			var ns = checkVersion("0.5") ? createjs : window;
+			// similarly, in version 0.7.0, BitmapAnimation was renamed to Sprite.
+			var SpriteClass = checkVersion("0.7") ? ns.Sprite : ns.BitmapAnimation;
+			
+			// some spritesheet data we're going to use in the test:
+			var spritesheet = new ns.SpriteSheet({
+				"images":[evt.target.getResult("bmpfont").src],
+				"frames":[
+					[155, 2, 25, 41, 0, -10, -3],
+					[72, 2, 28, 43, 0, -8, -1],
+					[599, 2, 28, 38, 0, -8, -4],
+					[41, 2, 27, 44, 0, -8, -1],
+					[728, 2, 32, 38, 0, -6, -4],
+					[184, 2, 35, 41, 0, -4, -2],
+					[409, 2, 30, 39, 0, -7, -3],
+					[443, 2, 29, 39, 0, -7, -3],
+					[901, 2, 13, 35, 0, -8, -5],
+					[698, 2, 26, 38, 0, -9, -4],
+					[666, 2, 28, 38, 0, -8, -4],
+					[764, 2, 23, 38, 0, -10, -4],
+					[828, 2, 37, 36, 0, -3, -5],
+					[567, 2, 28, 38, 0, -8, -4],
+					[519, 2, 44, 38, 0, 1, -4],
+					[869, 2, 28, 36, 0, -8, -5],
+					[476, 2, 39, 38, 0, -2, -4],
+					[371, 2, 34, 39, 0, -5, -3],
+					[631, 2, 31, 38, 0, -6, -4],
+					[289, 2, 39, 40, 0, -2, -3],
+					[918, 2, 31, 32, 0, -6, -7],
+					[791, 2, 33, 37, 0, -5, -4],
+					[2, 2, 35, 46, 0, -4, 1],
+					[253, 2, 32, 40, 0, -6, -3],
+					[104, 2, 32, 43, 0, -6, -1],
+					[332, 2, 35, 39, 0, -5, -4],
+					[953, 2, 9, 16, 0, -17, -29],
+					[140, 2, 11, 41, 0, -16, -1],
+					[223, 2, 26, 41, 0, -7, -1],
+					[966, 2, 9, 10, 0, -17, -31]
+				]
+			});
+			
+			// grab the canvas, and create a stage, using the appropriate namespace:
+			var canvas = document.getElementById("testCanvas");
+			var w=canvas.width, h=canvas.height;
+			var stage = new ns.Stage("testCanvas");
+			// we're not interested in the performance of the tick event here, so we'll disable it:
+			stage.tickOnUpdate = false;
+			
+			// performanceFramework adds time and timeEnd functions, which start and end a named timer
+			// in this case, our test will measure three values: time to instantiate, render, and total
+			time("total");
+			time("instantiate");
+			for (var i=0; i<50000; i++) {
+				var sprite = new SpriteClass(spritesheet);
+				sprite.gotoAndStop(Math.random()*26|0);
+				sprite.x = Math.random()*w|0;
+				sprite.y = Math.random()*h|0;
+				stage.addChild(sprite);
+			}
+			// setting the second param of endTime to false prevents it from being logged in automated tests
+			endTime("instantiate", true);
+			
+			time("render");
+			stage.update();
+			endTime("render", true);
+			endTime("total", true);
+			
+			// when the test has completely finished, you need to call endTest()
+			// this outputs the results, or continues the automated test
+			// note that tests can be asynchronous, or even require user interaction
+			endTest();
+		}
+	</script>
+	
+	<p>Tests performance of instantiating and rendering 50k Sprite instances on stage.</p>
+	<canvas id="testCanvas" width="900" height="450"></canvas>
+</body>
+</html>
