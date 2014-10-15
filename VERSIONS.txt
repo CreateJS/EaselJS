@@ -40,6 +40,7 @@ OTHER:
 - improved how Sprite handles sequencing between animations with different speed values
 - added "change" event to Sprite
 - added "added" and "removed" events to DisplayObject
+- added the extras folder, with: SVGExport, Context2DLog, and PerformanceTests
 
 
 Version 0.7.1 [December 12, 2013]
