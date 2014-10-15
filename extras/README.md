@@ -1,4 +1,4 @@
-# EaselJS: extras
+# extras directory
 
 This directory contains extra tools, utilities, and classes that may be useful, but are not a core part of the library.
 
