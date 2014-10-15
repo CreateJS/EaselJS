@@ -5,35 +5,27 @@ EaselJS is a library to make working with the Canvas element easier. It provides
 ## Simple Example
 
 	//Draw a square on screen.
-	var canvas = document.getElementById('canvas');
-	var stage = new createjs.Stage(canvas);
+	var stage = new createjs.Stage('myCanvas');
 	var shape = new createjs.Shape();
-	shape.graphics.beginFill('rgba(255,0,0,1)').drawRoundRect(0, 0, 120, 120, 10);
+	shape.graphics.beginFill('rgba(255,0,0,1)').drawRect(0, 0, 120, 120);
 	stage.addChild(shape);
 	stage.update();
 
-## Animation Example
+## Sprite Animation Example
 	var ss = new createjs.SpriteSheet({
-		"frames": {
-			"width": 200,
-			"numFrames": 64,
-			"regX": 2,
-			"regY": 2,
-			"height": 361
+		frames: {
+			width: 32,
+			height: 64,
+			numFrames: 19
 		},
-		"animations": {"jump": [26, 63], "run": [0, 25]},
-		"images": ["./assets/runningGrant.png"]
+		animations: {"jump": [26, 63], "run": [0, 25]},
+		images: ["./assets/runningGrant.png"]
 	});
-	
-	ss.getAnimation("run").speed = 2;
-	ss.getAnimation("run").next = "jump";
-	ss.getAnimation("jump").next = "run";
 	
 	var sprite = new createjs.Sprite(ss, "run");
 	sprite.scaleY = sprite.scaleX = 0.4;
 	
-	createjs.Ticker.setFPS(60);
-	createjs.Ticker.addEventListener("tick", stage);
+	createjs.Ticker.on("tick", stage);
 	stage.addChild(sprite);
 
 
@@ -50,7 +42,7 @@ can use it for almost any purpose (including commercial projects). We appreciate
 
 ## Classes
 
-The API is inspired by Flash's display list, and should be easy to pick up for both JS and AS3 developers. Check out the [docs](http://createjs.com/Docs/EaselJS/) for more information.
+The API is inspired in part by Flash's display list, and should be easy to pick up for both JS and AS3 developers. Check out the [docs](http://createjs.com/Docs/EaselJS/) for more information.
 
 **DisplayObject**
 Abstract base class for all display elements in EaselJS. Exposes all of the display properties (ex. x, y, rotation, scaleX, scaleY, skewX, skewY, alpha, shadow, etc) that are common to all display objects.
