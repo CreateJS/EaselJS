@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title></title>
+	<script type="text/javascript" src="../../lib/easeljs-NEXT.combined.js"></script>
+	<script type="text/javascript" src="../../examples/assets/preloadjs-NEXT.min.js"></script>
+	<script type="text/javascript" src="SVGExporter.js"></script>
+	<script type="text/javascript" src="../../src/easeljs/display/Graphics.js"></script>
+</head>
+<body>
+	<p><b>EaselJS SVG Export Test</b></p><p>Canvas (left) vs SVG (right). Exporting: Bitmap, Sprite, Container, Shape, Text, masks, caches.</p>
+	<p>Check out the code comments in the html & js for more information and limitations.</p>
+	<p id="statusEl">Running</p>
+	<canvas width="500" height="800" id="test" style="border:1px solid black"></canvas>
+	<script>
+		// Embedded SpriteSheet data.
+		var ssdata = {
+			"animations":{
+				"V":{"frames":[21]},
+				"A":{"frames":[0]},
+				",":{"frames":[26]},
+				"W":{"frames":[22]},
+				"B":{"frames":[1]},
+				"X":{"frames":[23]},
+				"C":{"frames":[2]},
+				".":{"frames":[29]},
+				"Y":{"frames":[24]},
+				"D":{"frames":[3]},
+				"Z":{"frames":[25]},
+				"E":{"frames":[4]},
+				"F":{"frames":[5]},
+				"G":{"frames":[6]},
+				"H":{"frames":[7]},
+				"I":{"frames":[8]},
+				"J":{"frames":[9]},
+				"K":{"frames":[10]},
+				"!":{"frames":[27]},
+				"L":{"frames":[11]},
+				"M":{"frames":[12]},
+				"N":{"frames":[13]},
+				"O":{"frames":[14]},
+				"P":{"frames":[15]},
+				"Q":{"frames":[16]},
+				"R":{"frames":[17]},
+				"S":{"frames":[18]},
+				"T":{"frames":[19]},
+				"?":{"frames":[28]},
+				"U":{"frames":[20]}
+			},
+			"images":["BitmapFont.png"],
+			"frames":[
+				[155, 2, 25, 41, 0, -10, -3],
+				[72, 2, 28, 43, 0, -8, -1],
+				[599, 2, 28, 38, 0, -8, -4],
+				[41, 2, 27, 44, 0, -8, -1],
+				[728, 2, 32, 38, 0, -6, -4],
+				[184, 2, 35, 41, 0, -4, -2],
+				[409, 2, 30, 39, 0, -7, -3],
+				[443, 2, 29, 39, 0, -7, -3],
+				[901, 2, 13, 35, 0, -8, -5],
+				[698, 2, 26, 38, 0, -9, -4],
+				[666, 2, 28, 38, 0, -8, -4],
+				[764, 2, 23, 38, 0, -10, -4],
+				[828, 2, 37, 36, 0, -3, -5],
+				[567, 2, 28, 38, 0, -8, -4],
+				[519, 2, 44, 38, 0, 1, -4],
+				[869, 2, 28, 36, 0, -8, -5],
+				[476, 2, 39, 38, 0, -2, -4],
+				[371, 2, 34, 39, 0, -5, -3],
+				[631, 2, 31, 38, 0, -6, -4],
+				[289, 2, 39, 40, 0, -2, -3],
+				[918, 2, 31, 32, 0, -6, -7],
+				[791, 2, 33, 37, 0, -5, -4],
+				[2, 2, 35, 46, 0, -4, 1],
+				[253, 2, 32, 40, 0, -6, -3],
+				[104, 2, 32, 43, 0, -6, -1],
+				[332, 2, 35, 39, 0, -5, -4],
+				[953, 2, 9, 16, 0, -17, -29],
+				[140, 2, 11, 41, 0, -16, -1],
+				[223, 2, 26, 41, 0, -7, -1],
+				[966, 2, 9, 10, 0, -17, -31]
+			]
+		};
+	</script>
+	<script>
+		
+		var c = createjs, stage, exporter;
+		
+		var queue = new c.LoadQueue();
+		queue.on("complete", setup);
+		queue.loadManifest([
+			{id:"daisy", src:"daisy.png"},
+			{id:"bmpfont", src:"BitmapFont.png"}
+		], true, "../../examples/assets/");
+		
+		function setup() {
+			stage = new c.Stage("test");
+			var mask = new c.Shape();
+			mask.graphics.beginFill("red").drawEllipse(0,0,500,800);
+			stage.mask = mask; // this will cause Sprites to disappear in Illustrator, because sprites use masks, and AI doesn't import nested masks correctly
+			
+			var shape = new c.Shape(), g = shape.graphics;
+			stage.addChild(shape);
+			for (var i=0; i<50; i++) {
+				var h = Math.random()*360|0;
+				var fill = c.Graphics.getHSL(h, 80, 50);
+				var stroke = c.Graphics.getHSL(h+180, 80, 50)
+				var size = Math.random()*40+20;
+				g.f(fill).s(stroke).ss(Math.random()*9+3|0)
+				if (Math.random() > 0.8) {
+					g.dc(Math.random()*500-size/2, Math.random()*750-size/2+50, size/2);
+				} else if (Math.random() > 0.6) {
+					g.r(Math.random()*500-size/2, Math.random()*750-size/2+50, size, size);
+				} else {
+					g.de(Math.random()*500-size/2, Math.random()*750-size/2+50, Math.random()*40+20, Math.random()*40+20);
+				}
+				//shape.compositeOperation = "multiply"; // blend modes are not supported in most browsers in SVG, and not supported on canvas in IE
+			}
+			
+			// lines
+			g.s("black").ss(20);
+			for (var i=1; i<20; i++) {
+				g.lineTo(300+(i%3-1)*100,i*40);
+			}
+			
+			// quadratic curves
+			g.s("green").f();
+			for (var i=0; i<20; i++) {
+				g.ss(i/4+1).moveTo(i*20,0).quadraticCurveTo(0,i*40, 0,300);
+			}
+			
+			// cubic curves
+			g.s("black").ss(1);
+			for (var i=0; i<30; i++) {
+				g.f(c.Graphics.getHSL(i*20,100,50,0.2)).moveTo(400,300+i*5).bezierCurveTo(-i*10,i*30, i*20,300-i*10, i*5,0);
+			}
+			
+			// arcTo, currently unsupported:
+			g.s("purple").ss(20).moveTo(220, 20).lineTo(300, 20)
+				.arcTo(350, 20, 350, 70, 50)
+				.arcTo(400, 70, 400, 0, 50);
+				
+			// arc:
+			for (i=0; i<8; i++) {
+				g.s("grey").ss(10).arc(300, 50+i*100, 45, 0, i*1.5-2, false);
+				g.s("grey").ss(10).arc(400, 50+i*100, 45, 0, i*1.5-2, true);
+			}
+			
+			// polystar:
+			g.s("yellow").ss(10).drawPolyStar(300, 300, 90, 5, 0.4);
+			
+			// complex round rect:
+			g.f("red").rr(430, 10, 50, 50, 10);
+			
+			// linear gradient fill:
+			g.s().beginLinearGradientFill(["hsla(0,100%,50%,0.2)","#00F"], [0.2, 0.8], 50,50, 200,200).drawRect(50,50,150,150);
+			
+			// radial gradient fill:
+			// export of radial gradients is not completely accurate.
+			// Illustrator does not import radial gradients correctly.
+			g.s("orange").ss(8).beginRadialGradientFill(["hsla(30,100%,50%,0.6)","#00F"], [0.2, 0.8], 90,290, 20, 140,350, 100).drawRect(50,250,150,150);
+			
+			// bitmap fill:
+			// Illustrator does not support referenced/linked images in patterns, so this won't import correctly.
+			var mtx = new c.Matrix2D(2,0.33,0.33,2,40,40);
+			g.beginBitmapFill(queue.getResult("daisy"), null, mtx).rc(50,450,300,300,50,10,-50,10);
+			
+			// Bitmap:
+			var bmp = new c.Bitmap(queue.getResult("daisy")).set({rotation:0, x: 100, y:100, alpha:0.7, scaleX:4, scaleY:4});
+			bmp.name = "daisy";
+			stage.addChild(bmp);
+			
+			
+			// scale invariant strokes (aka ignoreScale):
+			var shape2 = new c.Shape();
+			shape2.graphics.f().s("green").ss(4, null, null, null, true).drawRect(0,0,10,10);
+			shape2.scaleX = shape2.scaleY = 10;
+			shape2.x = 350;
+			shape2.y = 50;
+			stage.addChild(shape2);
+			
+			// text:
+			var text = new c.Text("Hello World!!", "120px Arial", "red");
+			text.y = 300;
+			text.lineWidth = 400;
+			text.textAlign = "left";
+			text.textBaseline = "alphabetic";
+			text.outline = 5;
+			stage.addChild(text);
+			
+			// caching:
+			var shape3 = stage.addChild(new c.Shape());
+			shape3.x = shape3.y = 150;
+			shape3.graphics.f("yellow").dc(0,0,50);
+			shape3.cache(-50,-50,100,100,2); // ignored unless useCache is set to true on the exporter
+			//shape3.visible = false;
+			
+			// Sprite:
+			// these will not show up in Illustrator if the stage mask is on, due to an issue importing SVG with nested masks
+			ssdata.images[0] = queue.getResult("bmpfont");
+			var spriteSheet = new c.SpriteSheet(ssdata);
+			for (i=0; i<26; i++) {
+				var sprite = new c.Sprite(spriteSheet, String.fromCharCode(i+65));
+				sprite.set({x: Math.random()*400, y: Math.random()*800});
+				stage.addChild(sprite);
+			}
+			
+			stage.update();
+			runExport();
+		}
+		
+		function runExport() {
+			exporter = new SVGExporter(stage, false, false, false);
+			var t = new Date().getTime();
+			exporter.run();
+			statusEl.innerHTML = "Export took: "+(new Date().getTime() - t)+"ms ";
+			setTimeout(addDownload, 1); // for some reason, it takes a tick for the browser to init the SVG
+			document.body.appendChild(exporter.svg);
+		}
+		
+		function addDownload() {
+			var serializer = new XMLSerializer();
+			var svgStr = serializer.serializeToString(exporter.svg);
+			var link = document.createElement("a");
+			link.innerText = "SAVE SVG TO FILE";
+			link.download = "export.svg";
+			link.href = "data:image/svg+xml,\n"+encodeURIComponent(svgStr);
+			statusEl.appendChild(link);
+		}
+	</script>
+</body>
+</html>
