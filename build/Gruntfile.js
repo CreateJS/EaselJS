@@ -216,6 +216,14 @@ module.exports = function (grunt) {
 	grunt.registerTask('next', [
 		"coreBuild"
 	]);
+	
+	/**
+	 * Task for exporting only the next lib.
+	 *
+	 */
+	grunt.registerTask('nextlib', [
+		"updateversion", "combine", "uglify", "copy:src"
+	]);
 
 	/**
 	 * Task for exporting a release build (version based on package.json)
