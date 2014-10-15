@@ -1,6 +1,10 @@
 # EaselJS
 
-EaselJS is a library to make it easy to build high-performance interactive 2D content in HTML5. It provides a display list to allow you to work with display elements on a canvas as nested objects. It also provides a simple framework for providing shape based mouse interactions on elements in the display list. This is useful for games, generative art, ads, data visualization, and other highly graphical experiences.
+EaselJS is a library for building high-performance interactive 2D content in HTML5. It provides a feature-rich display list to allow you to manipulate and animate graphics. It also provides a robust interactive model for mouse and touch interactions.
+
+It is excellent for building games, generative art, ads, data visualization, and other highly graphical experiences. It works well alone, or with the rest of the CreateJS suite: SoundJS, PreloadJS, and TweenJS.
+
+It has no external dependencies, and should be compatible with virtually any framework you enjoy using.
 
 ## Simple Example
 
