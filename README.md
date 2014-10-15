@@ -2,7 +2,7 @@
 
 EaselJS is a library for building high-performance interactive 2D content in HTML5. It provides a feature-rich display list to allow you to manipulate and animate graphics. It also provides a robust interactive model for mouse and touch interactions.
 
-It is excellent for building games, generative art, ads, data visualization, and other highly graphical experiences. It works well alone, or with the rest of the CreateJS suite: SoundJS, PreloadJS, and TweenJS.
+It is excellent for building games, generative art, ads, data visualization, and other highly graphical experiences. It works well alone, or with the rest of the [CreateJS](http://createjs.com/) suite: [SoundJS](http://createjs.com/SoundJS), [PreloadJS](http://createjs.com/PreloadJS), and [TweenJS](http://createjs.com/TweenJS).
 
 It has no external dependencies, and should be compatible with virtually any framework you enjoy using.
 
@@ -11,7 +11,7 @@ It has no external dependencies, and should be compatible with virtually any fra
 	//Draw a square on screen.
 	var stage = new createjs.Stage('myCanvas');
 	var shape = new createjs.Shape();
-	shape.graphics.beginFill('rgba(255,0,0,1)').drawRect(0, 0, 120, 120);
+	shape.graphics.beginFill('red').drawRect(0, 0, 120, 120);
 	stage.addChild(shape);
 	stage.update();
 
@@ -22,15 +22,17 @@ It has no external dependencies, and should be compatible with virtually any fra
 			height: 64,
 			numFrames: 19
 		},
-		animations: {"jump": [26, 63], "run": [0, 25]},
+		animations: {run: [0, 25], jump: [26, 63, "run"]},
 		images: ["./assets/runningGrant.png"]
 	});
 	
 	var sprite = new createjs.Sprite(ss, "run");
 	sprite.scaleY = sprite.scaleX = 0.4;
+	stage.addChild(sprite);
+	
+	sprite.on("click", function() { sprite.gotoAndPlay("jump"); });
 	
 	createjs.Ticker.on("tick", stage);
-	stage.addChild(sprite);
 
 
 ## Support and Resources
