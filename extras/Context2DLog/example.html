@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	<script src="Context2DLog.js"></script>
+	<script src="../../lib/easeljs-NEXT.min.js"></script>
+	
+	<p>Very simple example of the Context2DLog class. Output is in the console.</p>
+	<canvas id="testCanvas" width="500" height="500" style="background:#EEE"></canvas>
+	
+	<script>
+		var c = createjs;
+		
+		(function run() {
+			var stage = new c.Stage("testCanvas");
+			var logger = new Context2DLog(stage.canvas);
+			
+			var shape = stage.addChild(new c.Shape());
+			shape.x = shape.y = 200;
+			shape.rotation = 30;
+			shape.graphics.beginFill("red").drawRect(-50,-50,100,100);
+			
+			// note that nothing will be output until you actually render the stage to the canvas:
+			stage.update();
+		})();
+	</script>
+</body>
+</html>
