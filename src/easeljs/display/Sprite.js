@@ -403,7 +403,7 @@ Sprite.prototype.constructor = Sprite;
 		var paused = this.paused;
 		var frame = this._currentFrame;
 		var l;
-
+		
 		if (animation) {
 			var speed = animation.speed || 1;
 			var animFrame = this.currentAnimationFrame;
@@ -436,7 +436,7 @@ Sprite.prototype.constructor = Sprite;
 				}
 			}
 		}
-		var frame = this._currentFrame | 0;
+		frame = this._currentFrame | 0;
 		if (this.currentFrame != frame) {
 			this.currentFrame = frame;
 			this.dispatchEvent("change");
