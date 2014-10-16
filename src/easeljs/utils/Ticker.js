@@ -268,6 +268,27 @@ var Ticker = function() {
 	Ticker._tickTimes = null;
 
 	/**
+	 * @property _maxTimes
+	 * @type {Number}
+	 * @protected
+	 **/
+	Ticker._maxTimes = 100;
+
+	/**
+	 * @property _numTimes
+	 * @type {Number}
+	 * @protected
+	 **/
+	Ticker._numTimes = 0;
+
+	/**
+	 * @property _currTime
+	 * @type {Number}
+	 * @protected
+	 **/
+	Ticker._currTime = 0;
+
+	/**
 	 * Stores the timeout or requestAnimationFrame id.
 	 * @property _timerId
 	 * @type {Number}
@@ -382,11 +403,26 @@ var Ticker = function() {
 	 **/
 	Ticker.getMeasuredTickTime = function(ticks) {
 		var ttl=0, times=Ticker._tickTimes;
-		if (times.length < 1) { return -1; }
+
+		var numTimes = Ticker._numTimes;
+		if (numTimes < 1) { return -1; }
 
 		// by default, calculate average for the past ~1 second:
-		ticks = Math.min(times.length, ticks||(Ticker.getFPS()|0));
-		for (var i=0; i<ticks; i++) { ttl += times[i]; }
+		if (!ticks)
+			ticks = Ticker.getFPS() | 0;
+
+		if (ticks > numTimes)
+			ticks = numTimes;
+
+		var i = Ticker._currTime;
+
+		for (var n = 0; n < ticks; n++, i--)
+			{
+				if (i < 0)
+					i += Ticker._maxTimes;
+				ttl += times[i];
+			}
+
 		return ttl/ticks;
 	};
 
@@ -401,11 +437,24 @@ var Ticker = function() {
 	 **/
 	Ticker.getMeasuredFPS = function(ticks) {
 		var times = Ticker._times;
-		if (times.length < 2) { return -1; }
+
+		var numTimes = Ticker._numTimes;
+		if (numTimes < 2) { return -1; }
 
 		// by default, calculate fps for the past ~1 second:
-		ticks = Math.min(times.length-1, ticks||(Ticker.getFPS()|0));
-		return 1000/((times[0]-times[ticks])/ticks);
+		if (!ticks)
+			ticks = Ticker.getFPS() | 0;
+
+		if (ticks > numTimes)
+			ticks = numTimes;
+
+		var newest = Ticker._currTime;
+
+		var oldest = newest - ticks + 1;
+		if (oldest < 0)
+			oldest += Ticker._maxTimes;
+
+		return 1000 / ((times[newest] - times[oldest]) / ticks);
 	};
 
 	/**
@@ -580,11 +629,15 @@ var Ticker = function() {
 			Ticker.dispatchEvent(event);
 		}
 		
-		Ticker._tickTimes.unshift(Ticker._getTime()-time);
-		while (Ticker._tickTimes.length > 100) { Ticker._tickTimes.pop(); }
+		Ticker._currTime += 1;
+		if (Ticker._currTime == Ticker._maxTimes)
+			Ticker._currTime = 0;
 
-		Ticker._times.unshift(time);
-		while (Ticker._times.length > 100) { Ticker._times.pop(); }
+		if (Ticker._numTimes < Ticker._maxTimes)
+			Ticker._numTimes += 1;
+
+		Ticker._times[Ticker._currTime] = time;
+		Ticker._tickTimes[Ticker._currTime] = Ticker._getTime() - Ticker._startTime - time;
 	};
 
 	/**
