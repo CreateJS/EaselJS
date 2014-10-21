@@ -559,7 +559,8 @@ var Ticker = function() {
 	 * @protected
 	 **/
 	Ticker._tick = function() {
-		var time = Ticker._getTime()-Ticker._startTime;
+		var time = Ticker._getTime();
+		var adjTime = time-Ticker._startTime;
 		var elapsedTime = time-Ticker._lastTime;
 		var paused = Ticker._paused;
 		
@@ -568,22 +569,22 @@ var Ticker = function() {
 			Ticker._pausedTicks++;
 			Ticker._pausedTime += elapsedTime;
 		}
-		Ticker._lastTime = time;
+		Ticker._lastTime = adjTime;
 		
 		if (Ticker.hasEventListener("tick")) {
 			var event = new createjs.Event("tick");
 			var maxDelta = Ticker.maxDelta;
 			event.delta = (maxDelta && elapsedTime > maxDelta) ? maxDelta : elapsedTime;
 			event.paused = paused;
-			event.time = time;
-			event.runTime = time-Ticker._pausedTime;
+			event.time = adjTime;
+			event.runTime = adjTime-Ticker._pausedTime;
 			Ticker.dispatchEvent(event);
 		}
 		
 		Ticker._tickTimes.unshift(Ticker._getTime()-time);
 		while (Ticker._tickTimes.length > 100) { Ticker._tickTimes.pop(); }
 
-		Ticker._times.unshift(time);
+		Ticker._times.unshift(adjTime);
 		while (Ticker._times.length > 100) { Ticker._times.pop(); }
 	};
 
