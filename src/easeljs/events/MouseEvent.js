@@ -226,7 +226,7 @@ MouseEvent.prototype.constructor = MouseEvent;
 	 * @return {MouseEvent} a clone of the MouseEvent instance.
 	 **/
 	p.clone = function() {
-		return new MouseEvent(this.type, this.bubbles, this.cancelable, this.stageX, this.stageY, this.target, this.nativeEvent, this.pointerID, this.primary, this.rawX, this.rawY);
+		return new MouseEvent(this.type, this.bubbles, this.cancelable, this.stageX, this.stageY, this.nativeEvent, this.pointerID, this.primary, this.rawX, this.rawY);
 	};
 
 	/**

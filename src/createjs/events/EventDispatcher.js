@@ -294,19 +294,19 @@ EventDispatcher.prototype.constructor = EventDispatcher;
 	 * @param {Object | String | Event} eventObj An object with a "type" property, or a string type.
 	 * While a generic object will work, it is recommended to use a CreateJS Event instance. If a string is used,
 	 * dispatchEvent will construct an Event instance with the specified type.
-	 * @param {Object} [target] The object to use as the target property of the event object. This will default to the
-	 * dispatching object. <b>This parameter is deprecated and will be removed.</b>
 	 * @return {Boolean} Returns the value of eventObj.defaultPrevented.
 	 **/
-	p.dispatchEvent = function(eventObj, target) {
+	p.dispatchEvent = function(eventObj) {
 		if (typeof eventObj == "string") {
 			// won't bubble, so skip everything if there's no listeners:
 			var listeners = this._listeners;
 			if (!listeners || !listeners[eventObj]) { return false; }
 			eventObj = new createjs.Event(eventObj);
+		} else if (eventObj.target && eventObj.clone) {
+			// redispatching an active event object, so clone it:
+			eventObj = eventObj.clone();
 		}
-		// TODO: deprecated. Target param is deprecated, only use case is MouseEvent/mousemove, remove.
-		try { eventObj.target = target||this; } catch (e) {} // allows redispatching of native events
+		try { eventObj.target = this; } catch (e) {} // try/catch allows redispatching of native events
 
 		if (!eventObj.bubbles || !this.parent) {
 			this._dispatchEvent(eventObj, 2);
