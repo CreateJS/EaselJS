@@ -101,14 +101,14 @@
 		
 		var div = doc.createElement("div");
 		div.setAttribute("style","background:#EEE; padding: 0.75em;");
-		div.innerText = "Version: ";
+		div.textContent = "Version: ";
 		
 		var select = doc.createElement("select");
 		select.id = "version";
 		select.addEventListener("change", function() { console.log("eh"); reload(document.getElementById("version").value); });
 		for (var i=0; i<versions.length; i++) {
 			var option = doc.createElement("option");
-			option.value = option.innerText = versions[i];
+			option.value = option.textContent = versions[i];
 			select.appendChild(option);
 		}
 		div.appendChild(select);
