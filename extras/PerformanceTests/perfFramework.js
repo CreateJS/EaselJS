@@ -10,7 +10,9 @@
 		"0.4.1"
 	];
 	var NEXT_PATH = "../../lib/easeljs-NEXT.combined.js";
-	var AUTO_ITERATIONS = 5;
+	var AUTO_ITERATIONS = 3;
+	var DATA_KEY = "workingperfdata";
+	var SHARE_KEY = "perfdata";
 	
 	var qs, version, versionStr, times={}, startTimes={};
 	var data, iterations, result;
@@ -19,7 +21,7 @@
 		injectUI();
 		qs = w.queryString = readQueryString();
 		
-		var dataStr = localStorage["perfdata"];
+		var dataStr = localStorage[DATA_KEY];
 		
 		if (qs.auto) {
 			iterations = parseInt(qs.auto);
@@ -28,13 +30,13 @@
 			var index = qs.index = Number(qs.index)|0;
 			qs.iteration = Number(qs.iteration)|0;
 			if (qs.index == 0 && qs.iteration == 0) { 
-				data = {};
+				data = {rows:[], cols:[], raw:{}};
 			} else {
 				data = JSON.parse(dataStr);
 			}
-			qs.version = index==CDN_VERSIONS.length ? "NEXT" : CDN_VERSIONS[index];
+			qs.version = index==0 ? "NEXT" : CDN_VERSIONS[index-1];
 		} else if (dataStr) {
-			localStorage["perfdata"] = "";
+			localStorage[DATA_KEY] = "";
 			data = JSON.parse(dataStr);
 			report(data);
 			return;
@@ -60,7 +62,7 @@
 	}
 	
 	function onLibLoad() {
-		setTimeout(runTest, 500);
+		setTimeout(runTest, 300);
 	}
 	
 	function runTest() {
@@ -85,15 +87,10 @@
 	}
 	
 	function readQueryString() {
-		var match;
-		var search = /([^&=]+)=?([^&]*)/g;
-		var decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); };
+		var match, search = /([^&=]+)=?([^&]*)/g, o={};
 		var query  = window.location.search.substring(1);
-	
-		var o = {};
-		while (match = search.exec(query)) {
-			o[decode(match[1])] = decode(match[2]);
-		}
+		var decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); };
+		while (match = search.exec(query)) { o[decode(match[1])] = decode(match[2]); }
 		return o;
 	}
 	
@@ -173,22 +170,29 @@
 			console&&console.log(str, t.toFixed(2)+"ms");
 			result += str+": <b>"+(t+0.5|0)+"ms</b> ";
 		}
+		if (data && data.cols.indexOf(str) == -1) { data.cols.push(str); }
 		return t;
 	};
 	
 	window.endTest = function() {
 		if (!qs.auto) { setStatus(result); return; }
 		
-		if (!data[versionStr]) { data[versionStr] = []; }
-		data[versionStr][qs.iteration] = times;
-		localStorage["perfdata"] = JSON.stringify(data);
+		if (!qs.iteration) { data.rows.push(versionStr); }
+		var raw = data.raw;
+		if (!raw[versionStr]) { raw[versionStr] = []; }
+		
+		raw[versionStr][qs.iteration] = times;
+		localStorage[DATA_KEY] = JSON.stringify(data);
 		
 		if (++qs.iteration >= iterations) {
 			qs.index++;
 			qs.iteration = 0;
 		}
 		if (qs.index > CDN_VERSIONS.length) {
-			qs = {};
+			delete(qs.version);
+			delete(qs.index);
+			delete(qs.iteration);
+			delete(qs.auto);
 		}
 		
 		delete(qs.version);
@@ -204,28 +208,40 @@
 	};
 	
 	function report(data) {
-		data = normalizeData(data);
-		data = prepData(data);
+		normalizeData(data);
+		prepData(data);
 		
-		var col, row, str = "version", cols=data.cols, rows=data.rows;
-		for (col in cols) { str += "\t"+col; }
+		if (qs.report) {
+			launchReport(qs.report, data);
+			return;
+		}
 		
-		for (row in rows) {
-			str += "\n"+row;
-			for (col in cols) {
-				var stats = rows[row][col];
-				str += "\t"+(stats&&stats.mean ? stats.mean.toFixed(1) : "----")+"ms";
+		var i, j, str = "version", stats = data.stats, cols=data.cols, rows=data.rows, colCount = cols.length;
+		for (i= 0; i<colCount; i++) { str += "\t"+cols[i]; }
+		
+		for (i=0; i<rows.length; i++) {
+			str += "\n"+rows[i];
+			for (j=0; j<colCount; j++) {
+				var vals = stats[rows[i]][cols[j]];
+				str += "\t"+(vals&&vals.mean ? vals.mean.toFixed(1) : "----")+"ms";
 			}
 		}
 		console.log(str);
 		setStatus("see console for results");
 	}
 	
+	function launchReport(report, data) {
+		localStorage[SHARE_KEY] = JSON.stringify(data);
+		if (report.indexOf("/") == -1) { report = "./reports/"+report+".html"; }
+		window.location = report + (report.indexOf("?") == -1 ? "?" : "&") + "key="+SHARE_KEY;
+	}
+	
 	function normalizeData(data) {
-		var norm = {};
-		for (var row in data) {
-			var arr = data[row];
-			var o = norm[row] = {};
+		var results = data.results = {};
+		var raw = data.raw;
+		for (var row in raw) {
+			var arr = raw[row];
+			var o = results[row] = {};
 			for (var i= 0,l=arr.length; i<l; i++) {
 				var tests = arr[i];
 				for (var test in tests) {
@@ -234,22 +250,18 @@
 				}
 			}
 		}
-		return norm;
 	}
 	
 	function prepData(data) {
-		var prep = {};
-		var cols = prep.cols = {};
-		var rows = prep.rows = {};
-		for (var row in data) {
-			var tests = data[row];
-			rows[row] = {};
+		var stats = data.stats = {};
+		var results = data.results;
+		for (var row in results) {
+			var tests = results[row];
+			stats[row] = {};
 			for (var test in tests) {
-				cols[test] = 1;
-				rows[row][test] = getStats(tests[test]);
+				stats[row][test] = getStats(tests[test]);
 			}
 		}
-		return prep;
 	}
 	
 	function getStats(arr) {
@@ -257,6 +269,6 @@
 		for (i=0; i<l; i++) { sum += arr[i]; }
 		mean = sum/l;
 		for (i=0; i<l; i++) { dev += (arr[i]-mean)*(arr[i]-mean); }
-		return {sum:sum, mean:mean, sd:Math.sqrt(dev/l)};
+		return {sum:sum, mean:mean, sd:Math.sqrt(dev/l), samples:l};
 	}
 })(window);

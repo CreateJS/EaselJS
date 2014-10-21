@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title></title>
+	<style type="text/css">
+		body { font-family: arial, sans-serif; background: #111; }
+		i { display: block; font-size: 0.66em; opacity: 0.25; font-style: normal; }
+		i.sd { font-weight: bold; opacity: 1; border: dotted 1px rgba(255,255,255,0.33); }
+		td { text-align: center; padding: 0.6em; color: #fff; min-width: 6em;  }
+		td:first-child { background: #DDD; color: black; }
+		th { background: #333; color: white; padding: 1em; }
+		table { border: solid 4px #444; border-spacing: 2px; }
+	</style>
+</head>
+<body>
+<script>
+	function readQueryString() {
+		var match, search = /([^&=]+)=?([^&]*)/g, o={};
+		var query  = window.location.search.substring(1);
+		var decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); };
+		while (match = search.exec(query)) { o[decode(match[1])] = decode(match[2]); }
+		return o;
+	}
+	
+	function generateReport() {
+		var key = readQueryString().key;
+		var data = localStorage[key];
+		if (!data) { w("no data"); return; }
+		
+		data = JSON.parse(data);
+		var cols=data.cols, rows=data.rows, stats=data.stats;
+		w("<table><tr><th>version</th>");
+		cols.forEach(function(value) { w("<th>"+value+"</th>") });
+		w("</tr>");
+		
+		for (var i=0; i<rows.length; i++) {
+			w("<tr><td class='label'>"+rows[i]+"</td>");
+			for (var j=0; j<cols.length; j++) {
+				var val = stats[rows[i]][cols[j]];
+				var str = "--", style="";
+				if (val) {
+					if (i+1 < rows.length) {
+						var oldVal = stats[rows[i+1]][cols[j]];
+						if (oldVal) {
+							var delta = (val.mean-oldVal.mean)/oldVal.mean;
+							var h = (delta > 0) ? 0 : 130;
+							var a = Math.min(1, Math.max(0, (delta > 0) ? delta : delta*-2));
+							style += "background:hsla("+h+",100%,50%,"+a+");";
+							console.log(style);
+						}
+					}
+					str = val.mean.toFixed(0) + "<i"+(val.sd/val.mean > 0.15 ? " class='sd'" : "")+">+/-"+val.sd.toFixed(0)+"</i>";
+				}
+				w("<td style='"+style+"'>"+str+"</td>");
+			}
+			w("</tr>");
+		}
+		w("</table>");
+	}
+	generateReport();
+	
+	function w(str) {
+		document.write(str);
+	}
+</script>
+</body>
+</html>

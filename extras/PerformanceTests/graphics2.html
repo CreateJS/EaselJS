@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	<script src="perfFramework.js"></script>
+	<script>
+		function runTest(version, qs) {
+			var ns = checkVersion("0.5") ? createjs : window;
+			
+			var canvas = document.getElementById("testCanvas");
+			var w=canvas.width, h=canvas.height;
+			var stage = new ns.Stage("testCanvas");
+			stage.tickOnUpdate = false;
+			
+			
+			var shape = new ns.Shape();
+			stage.addChild(shape);
+			var g = shape.graphics.moveTo(0,0).beginStroke("rgba(0,0,0,0.1)");
+			
+			time("total");
+			time("draw");
+			for (var i=0; i<250000; i++) {
+				g.lineTo(Math.random()*w,Math.random()*h);
+			}
+			endTime("draw", true);
+			
+			time("render");
+			stage.update();
+			endTime("render", true);
+			endTime("total", true);
+			
+			endTest();
+		}
+	</script>
+	
+	<p>Tests performance of 250k vector graphics calls when not changing fill / stroke.</p>
+	<canvas id="testCanvas" width="900" height="450"></canvas>
+</body>
+</html>
