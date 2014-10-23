@@ -979,7 +979,7 @@ var G = Graphics;
 	};
 
 	/**
-	 * Returns a clone of this Graphics instance.
+	 * Returns a clone of this Graphics instance. Note that the individual command objects are not cloned.
 	 * @method clone
 	 * @return {Graphics} A clone of the current Graphics instance.
 	 **/
