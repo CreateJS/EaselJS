@@ -569,7 +569,7 @@ var Ticker = function() {
 			Ticker._pausedTicks++;
 			Ticker._pausedTime += elapsedTime;
 		}
-		Ticker._lastTime = adjTime;
+		Ticker._lastTime = time;
 		
 		if (Ticker.hasEventListener("tick")) {
 			var event = new createjs.Event("tick");
