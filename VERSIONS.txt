@@ -5,6 +5,7 @@ CRITICAL (may break existing content):
 - removed the deprecated mousemove & mouseup events on MouseEvent
 - removed Graphics.inject() in favour of Graphics.append()
 - Sprite now properly displays the first frame of animations after calling gotoAndPlay() (thanks MannyC)
+- Moved Ticker into the "createjs" package since it will be included with TweenJS in future releases.
 
 *****
 OTHER:
