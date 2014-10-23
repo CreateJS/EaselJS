@@ -469,11 +469,10 @@ Matrix2D.prototype.constructor = Matrix2D;
 	 * results.
 	 * @method decompose
 	 * @param {Object} target The object to apply the transform properties to. If null, then a new object will be returned.
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @return {Object} The target, or a new generic object with the transform properties applied.
 	*/
 	p.decompose = function(target) {
-		// TODO: it would be nice to be able to solve for whether the matrix can be decomposed into only scale/rotation
-		// even when scale is negative
+		// TODO: it would be nice to be able to solve for whether the matrix can be decomposed into only scale/rotation even when scale is negative
 		if (target == null) { target = {}; }
 		target.x = this.tx;
 		target.y = this.ty;
