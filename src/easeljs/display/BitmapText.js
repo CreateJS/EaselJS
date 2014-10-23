@@ -321,7 +321,8 @@ BitmapText.prototype.constructor = BitmapText;
 			if (childIndex < numKids) {
 				sprite = kids[childIndex];
 			} else {
-				sprite = this.addChild( pool.length ? pool.pop() : new createjs.Sprite() );
+				kids.push(sprite = pool.length ? pool.pop() : new createjs.Sprite());
+				sprite.parent = this;
 				numKids++;
 			}
 			sprite.spriteSheet = ss;
