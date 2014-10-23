@@ -27,7 +27,7 @@
 */
 
 /**
- * @module EaselJS
+ * @module CreateJS
  */
 
 // namespace:
