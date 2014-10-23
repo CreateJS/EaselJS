@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EaselJS Example: ScaleBitmap</title>
+	<script type="text/javascript" src="../../lib/easeljs-NEXT.combined.js"></script>
+
+    <script type="text/javascript" src="ScaleBitmap.js"></script>
+
+	<script>
+		var stage, text;
+		function init() {
+            stage = new createjs.Stage("testCanvas");
+
+			var image = new Image();
+			image.onload = function() { stage.update(); }
+			image.src = "ScaleBitmapImage.png";
+
+            var sb = new createjs.ScaleBitmap(image, new createjs.Rectangle(25, 22, 20, 22));
+            sb.setDrawSize(200, 300);
+            stage.addChild(sb);
+
+            stage.on("stagemousedown", function(e) {
+                sb.setDrawSize(Math.random() * 300 + 100 | 0, Math.random() * 100 + 60 | 0);
+				stage.update();
+            });
+        }
+	</script>
+</head>
+<body onload="init()">
+<p>Click the stage to re-scale the ScaleBitmap.</p>
+<canvas id="testCanvas" width="960" height="400"></canvas>
+</body>
+</html>
