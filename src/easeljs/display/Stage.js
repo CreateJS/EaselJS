@@ -471,6 +471,7 @@ Stage.prototype.constructor = Stage;
 	p.clear = function() {
 		if (!this.canvas) { return; }
 		var ctx = this.canvas.getContext("2d");
+		this.canvas.width = this.canvas.width;
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, this.canvas.width+1, this.canvas.height+1);
 	};
