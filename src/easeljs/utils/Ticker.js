@@ -382,7 +382,7 @@ var Ticker = function() {
 	 **/
 	Ticker.getMeasuredTickTime = function(ticks) {
 		var ttl=0, times=Ticker._tickTimes;
-		if (times.length < 1) { return -1; }
+		if (!times || times.length < 1) { return -1; }
 
 		// by default, calculate average for the past ~1 second:
 		ticks = Math.min(times.length, ticks||(Ticker.getFPS()|0));
@@ -401,7 +401,7 @@ var Ticker = function() {
 	 **/
 	Ticker.getMeasuredFPS = function(ticks) {
 		var times = Ticker._times;
-		if (times.length < 2) { return -1; }
+		if (!times || times.length < 2) { return -1; }
 
 		// by default, calculate fps for the past ~1 second:
 		ticks = Math.min(times.length-1, ticks||(Ticker.getFPS()|0));
@@ -569,7 +569,7 @@ var Ticker = function() {
 			Ticker._pausedTicks++;
 			Ticker._pausedTime += elapsedTime;
 		}
-		Ticker._lastTime = adjTime;
+		Ticker._lastTime = time;
 		
 		if (Ticker.hasEventListener("tick")) {
 			var event = new createjs.Event("tick");
