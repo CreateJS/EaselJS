@@ -499,10 +499,10 @@ SpriteSheet.prototype.constructor = SpriteSheet;
 
 		this._frames = [];
 
-		var fMax = (this._numFrames)?this._numFrames:Infinity;
-		var fCount = 0;
-		var fWidth = this._frameWidth;
-		var fHeight = this._frameHeight;
+		var maxFrames = (this._numFrames)?this._numFrames:Infinity;
+		var frameCount = 0;
+		var frameWidth = this._frameWidth;
+		var frameHeight = this._frameHeight;
 		var spacing = this._spacing;
 		var margin = this._margin;
 
@@ -510,24 +510,24 @@ SpriteSheet.prototype.constructor = SpriteSheet;
 			var img = imgs[i];
 			
 			var y = margin;
-			while (y <= img.height-margin-fHeight) {
+			while (y <= (img.height-margin-frameHeight)) {
 				var x = margin;
-				while (x <= img.width-margin-fWidth) {
-					fCount++;
+				while (x <= (img.width-margin-frameWidth)) {
+					frameCount++;
 					this._frames.push({
-						image:img, 
-						rect:new createjs.Rectangle(x, y, fWidth, fHeight), 
-						regX:this._regX, 
-						regY:this._regY
+						image: img, 
+						rect: new createjs.Rectangle(x, y, frameWidth, frameHeight), 
+						regX: this._regX, 
+						regY: this._regY
 					});
-					x += fWidth+spacing;
-					if (fCount > fMax) { break; }
+					x += frameWidth+spacing;
+					if (frameCount > maxFrames) { break; }
 				}
-				y += fHeight+spacing;
-				if (fCount > fMax) { break; }
+				y += frameHeight+spacing;
+				if (frameCount > maxFrames) { break; }
 			}
 		}
-		this._numFrames = fCount;
+		this._numFrames = frameCount;
 	};
 
 
