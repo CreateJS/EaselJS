@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	<script src="FauxCanvas.js"></script>
+	<script src="../../lib/easeljs-NEXT.min.js"></script>
+	
+	<p>Very simple example of the FauxCanvas class. Output is in the console.</p>
+	<canvas id="realCanvas" width="500" height="500" style="background:#EEE"></canvas>
+	
+	<script>
+		var c = createjs;
+		
+		(function run() {
+			// test a stage with a real canvas:
+			var stage1 = new c.Stage("realCanvas");
+			var time1 = runTest(stage1);
+			
+			// test a stage with a fake canvas:
+			// because this does not have to actually draw to a canvas, it reflects only the time spent in EaselJS.
+			var stage2 = new c.Stage(new FauxCanvas(500,500));
+			stage2.enableDOMEvents(false); // to prevent errors from mouse events
+			var time2 = runTest(stage2);
+			
+			// calculate approximately how much time was spent in the browser actually rendering graphics to screen:
+			var renderTime = time1-time2;
+			
+			console.log("total time for update: "+time1+"ms");
+			console.log("time in EaselJS: "+time2+"ms");
+			console.log("time in browser render: "+renderTime+"ms");
+		})();
+		
+		function runTest(stage) {
+			// place 20000 shapes on the stage:
+			for (var i=0; i<20000; i++) {
+				var shape = new c.Shape();
+				shape.graphics.beginFill(c.Graphics.getHSL(Math.random()*360, 100, 50)).drawRect(-8,-8,16,16);
+				shape.x = Math.random()*500;
+				shape.y = Math.random()*500;
+				shape.alpha = Math.random();
+				shape.rotation = Math.random()*360;
+				stage.addChild(shape);
+			}
+			
+			// time how long it takes to run stage.update():
+			var t = getTime();
+			stage.update();
+			return getTime()-t;
+		}
+		
+		var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
+		function getTime() {
+			return (now&&now.call(performance))||(new Date().getTime());
+		}
+	</script>
+</body>
+</html>
