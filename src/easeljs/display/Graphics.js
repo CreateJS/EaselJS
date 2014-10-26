@@ -340,6 +340,15 @@ var G = Graphics;
 	 * @default false
 	 **/
 	p._dirty = false;
+	
+	/**
+	 * Index to draw from if a store operation has happened.
+	 * @property _storeIndex
+	 * @protected
+	 * @type {Number}
+	 * @default 0
+	 **/
+	p._storeIndex = 0;
 
 	/**
 	 * Initialization method.
@@ -374,7 +383,7 @@ var G = Graphics;
 	p.draw = function(ctx, data) {
 		this._updateInstructions();
 		var instr = this._instructions;
-		for (var i=0, l=instr.length; i<l; i++) {
+		for (var i=this._storeIndex, l=instr.length; i<l; i++) {
 			instr[i].exec(ctx, data);
 		}
 	};
@@ -962,6 +971,60 @@ var G = Graphics;
 			}
 			f.apply(this,params);
 		}
+		return this;
+	};
+	
+	/**
+	 * Stores all graphics commands so they won't be executed in future draws. Calling store() a second time adds to
+	 * the existing store.
+	 * 
+	 * This is useful in cases where you are creating vector graphics in an iterative manner, so that only new
+	 * graphics need to be drawn (which can provide huge performance benefits), but you wish to retain all of
+	 * the vector instructions for later use (ex. scaling, modifying, or exporting).
+	 * 
+	 * Note that calling store() will force the active path (if any) to be ended in a manner similar to changing
+	 * the fill or stroke.
+	 * 
+	 * For example, consider a application where the user draws lines with the mouse. As each line segment (or collection of
+	 * segments) are added to a Shape, it can be rasterized using {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}, 
+	 * and then stored, so that it can be redrawn at a different scale when the application is resized, or exported to SVG.
+	 * 
+	 * 	// set up cache:
+	 * 	myShape.cache(0,0,500,500,scale);
+	 * 	
+	 * 	// when the user drags, draw a new line:
+	 * 	myShape.graphics.moveTo(oldX,oldY).lineTo(newX,newY);
+	 * 	// then draw it into the existing cache:
+	 * 	myShape.updateCache("source-over");
+	 * 	// store the new line, so it isn't redrawn next time:
+	 * 	myShape.store();
+	 * 	
+	 * 	// then, when the window resizes, we can re-render at a different scale:
+	 * 	// first, unstore all our lines:
+	 * 	myShape.unstore();
+	 * 	// then cache using the new scale:
+	 * 	myShape.cache(0,0,500,500,newScale);
+	 * 	// finally, store the existing commands again:
+	 * 	myShape.store();
+	 * 
+	 * @method store
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 **/
+	p.store = function() {
+		this._updateInstructions(true);
+		this._storeIndex = this._instructions.length;
+		return this;
+	};
+	
+	/**
+	 * Unstores any graphics commands that were previously stored using {{#crossLink "Graphics/store"}}{{/crossLink}}
+	 * so that they will be executed in subsequent draw calls.
+	 * 
+	 * @method unstore
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 **/
+	p.unstore = function() {
+		this._storeIndex = 0;
 		return this;
 	};
 	
