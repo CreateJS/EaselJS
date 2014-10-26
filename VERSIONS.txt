@@ -42,6 +42,7 @@ OTHER:
 - added "change" event to Sprite
 - added "added" and "removed" events to DisplayObject
 - added the extras folder, with: SVGExport, Context2DLog, and PerformanceTests
+- added Graphics.store() / unstore()
 
 
 Version 0.7.1 [December 12, 2013]
