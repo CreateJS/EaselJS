@@ -272,7 +272,7 @@ this.createjs = this.createjs||{};
 // public methods:
 	/**
 	 * Returns the total number of frames in the specified animation, or in the whole sprite
-	 * sheet if the animation param is omitted. Returns null if the spritesheet relies on calculated frame counts, and
+	 * sheet if the animation param is omitted. Returns 0 if the spritesheet relies on calculated frame counts, and
 	 * the images have not been fully loaded.
 	 * @method getNumFrames
 	 * @param {String} animation The name of the animation to get a frame count for.
