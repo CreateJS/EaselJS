@@ -272,14 +272,15 @@ this.createjs = this.createjs||{};
 // public methods:
 	/**
 	 * Returns the total number of frames in the specified animation, or in the whole sprite
-	 * sheet if the animation param is omitted.
+	 * sheet if the animation param is omitted. Returns null if the spritesheet relies on calculated frame counts, and
+	 * the images have not been fully loaded.
 	 * @method getNumFrames
 	 * @param {String} animation The name of the animation to get a frame count for.
 	 * @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
 	*/
 	p.getNumFrames = function(animation) {
 		if (animation == null) {
-			return this._frames ? this._frames.length : this._numFrames;
+			return this._frames ? this._frames.length : this._numFrames || 0;
 		} else {
 			var data = this._data[animation];
 			if (data == null) { return 0; }
