@@ -189,8 +189,8 @@ this.createjs = this.createjs||{};
 		
 		var stackIn = null;
 
-		var mul_table = BlurFilter.mul_table;
-		var shg_table = BlurFilter.shg_table;
+		var mul_table = BlurFilter.MUL_TABLE;
+		var shg_table = BlurFilter.SHG_TABLE;
 		
 		while ( iterations-- > 0 ) {
 			yw = yi = 0;
