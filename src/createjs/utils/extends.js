@@ -27,7 +27,7 @@
 */
 
 /**
-  * @module CreateJS
+ * @module CreateJS
  */
 "use strict";
 
@@ -38,10 +38,13 @@ this.createjs = this.createjs||{};
  * @class Utility Methods
  */
 
-/*
+
+
+/**
  * Takes a newly created class and makes it extend a specified super class. Sets up the prototype chain (so instanceof works),
  * and automatically sets up local aliases for methods that are being overridden. It must always be called after the classes'
  * prototypes are fully populated
+ * @method extends
  * @param {Function} sub The subclass.
  * @param {Function} sup The superclass to extend.
  * @param {String} [supName] The name of the superclass. This is only necessary if the constructor is an anonymous function (`MyClass = function()` instead of `function MyClass()`).
