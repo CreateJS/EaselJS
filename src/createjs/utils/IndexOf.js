@@ -27,7 +27,7 @@
 */
 
 /**
-  * @module CreateJS
+ * @module CreateJS
  */
 "use strict";
 
