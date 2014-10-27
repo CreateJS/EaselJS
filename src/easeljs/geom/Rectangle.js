@@ -36,58 +36,58 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
- *
- * <h4>Example</h4>
- *
- *      var rect = new createjs.Rectangle(0, 0, 100, 100);
- *
- * @class Rectangle
- * @param {Number} [x=0] X position.
- * @param {Number} [y=0] Y position.
- * @param {Number} [width=0] The width of the Rectangle.
- * @param {Number} [height=0] The height of the Rectangle.
- * @constructor
- **/
-var Rectangle = function(x, y, width, height) {
-  this.initialize(x, y, width, height);
-};
-var p = Rectangle.prototype;
-Rectangle.prototype.constructor = Rectangle;
-
-// public properties:
-	/**
-	 * X position.
-	 * @property x
-	 * @type Number
-	 **/
-	p.x = 0;
-
-	/**
-	 * Y position.
-	 * @property y
-	 * @type Number
-	 **/
-	p.y = 0;
-
-	/**
-	 * Width.
-	 * @property width
-	 * @type Number
-	 **/
-	p.width = 0;
-
-	/**
-	 * Height.
-	 * @property height
-	 * @type Number
-	 **/
-	p.height = 0;
 
 // constructor:
+	/**
+	 * Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      var rect = new createjs.Rectangle(0, 0, 100, 100);
+	 *
+	 * @class Rectangle
+	 * @param {Number} [x=0] X position.
+	 * @param {Number} [y=0] Y position.
+	 * @param {Number} [width=0] The width of the Rectangle.
+	 * @param {Number} [height=0] The height of the Rectangle.
+	 * @constructor
+	 **/
+	function Rectangle(x, y, width, height) {
+		this.initialize(x, y, width, height);
+		
+		
+	// public properties:
+		// assigned in the initialize method.
+		/**
+		 * X position.
+		 * @property x
+		 * @type Number
+		 **/
+	
+		/**
+		 * Y position.
+		 * @property y
+		 * @type Number
+		 **/
+	
+		/**
+		 * Width.
+		 * @property width
+		 * @type Number
+		 **/
+	
+		/**
+		 * Height.
+		 * @property height
+		 * @type Number
+		 **/
+	}
+	var p = Rectangle.prototype;
+
+
+// public methods:
 	/** 
-	 * Initialization method. Can also be used to reinitialize the instance.
+	 * Reinitializes the instance with the specified values.
 	 * @method initialize
 	 * @param {Number} [x=0] X position.
 	 * @param {Number} [y=0] Y position.
@@ -96,6 +96,7 @@ Rectangle.prototype.constructor = Rectangle;
 	 * @return {Rectangle} This instance. Useful for chaining method calls.
 	*/
 	p.initialize = function(x, y, width, height) {
+		// don't forget to update docs in the constructor if these change:
 		this.x = x||0;
 		this.y = y||0;
 		this.width = width||0;
@@ -103,7 +104,6 @@ Rectangle.prototype.constructor = Rectangle;
 		return this;
 	};
 	
-// public methods:
 	/**
 	 * Copies all properties from the specified rectangle to this rectangle.
 	 * @method copy
@@ -132,5 +132,6 @@ Rectangle.prototype.constructor = Rectangle;
 		return "[Rectangle (x="+this.x+" y="+this.y+" width="+this.width+" height="+this.height+")]";
 	};
 	
-createjs.Rectangle = Rectangle;
+	
+	createjs.Rectangle = Rectangle;
 }());

@@ -1,5 +1,5 @@
 /*
-* indexOf
+* extends
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
@@ -38,22 +38,26 @@ this.createjs = this.createjs||{};
  * @class Utility Methods
  */
 
-/**
- * Finds the first occurrence of a specified value searchElement in the passed in array, and returns the index of
- * that value.  Returns -1 if value is not found.
- *
- *      var i = createjs.indexOf(myArray, myElementToFind);
- *
- * @method indexOf
- * @param {Array} array Array to search for searchElement
- * @param searchElement Element to find in array.
- * @return {Number} The first index of searchElement in array.
+/*
+ * Takes a newly created class and makes it extend a specified super class. Sets up the prototype chain (so instanceof works),
+ * and automatically sets up local aliases for methods that are being overridden. It must always be called after the classes'
+ * prototypes are fully populated
+ * @param {Function} sub The subclass.
+ * @param {Function} sup The superclass to extend.
+ * @param {String} [supName] The name of the superclass. This is only necessary if the constructor is an anonymous function (`MyClass = function()` instead of `function MyClass()`).
+ * @return {Function} Returns the subclass for chaining.
  */
-createjs.indexOf = function (array, searchElement){
-	for (var i = 0,l=array.length; i < l; i++) {
-		if (searchElement === array[i]) {
-			return i;
-		}
-	}
-	return -1;
+createjs.extends = function (sub, sup, supName) {
+	var supP = sup.prototype, subP = sub.prototype;
+	supName = supName || supP.constructor.name || /^function\s+([^\s\(]+)\s*\(/.exec(String(supP.constructor))[1];
+	
+	function o() { this.constructor = sub; }
+	o.prototype = sup.prototype;
+	var p = sub.prototype = new o();
+	
+	subP[supName+"_constructor"] = supP.constructor; // constructor is not innumerable
+	for (var n in supP) { if (subP[n] && (typeof supP[n] == "function")) { subP[supName+"_"+n] = supP[n]; } } 
+	for (n in subP) { p[n] = subP[n]; }
+	
+	return sub;
 };

@@ -36,16 +36,20 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * Global utility for generating sequential unique ID numbers. The UID class uses a static interface (ex. <code>UID.get()</code>)
- * and should not be instantiated.
- * @class UID
- * @static
- **/
-var UID = function() {
-	throw "UID cannot be instantiated";
-}
 
+// constructor:
+	/**
+	 * Global utility for generating sequential unique ID numbers. The UID class uses a static interface (ex. <code>UID.get()</code>)
+	 * and should not be instantiated.
+	 * @class UID
+	 * @static
+	 **/
+	function UID() {
+		throw "UID cannot be instantiated";
+	}
+
+
+// private static properties:
 	/**
 	 * @property _nextID
 	 * @type Number
@@ -53,6 +57,8 @@ var UID = function() {
 	 **/
 	UID._nextID = 0;
 
+
+// public static methods:
 	/**
 	 * Returns the next unique id.
 	 * @method get
@@ -61,7 +67,8 @@ var UID = function() {
 	 **/
 	UID.get = function() {
 		return UID._nextID++;
-	}
+	};
 
-createjs.UID = UID;
+
+	createjs.UID = UID;
 }());

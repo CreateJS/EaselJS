@@ -36,34 +36,94 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
- * @class Matrix2D
- * @param {Number} [a=1] Specifies the a property for the new matrix.
- * @param {Number} [b=0] Specifies the b property for the new matrix.
- * @param {Number} [c=0] Specifies the c property for the new matrix.
- * @param {Number} [d=1] Specifies the d property for the new matrix.
- * @param {Number} [tx=0] Specifies the tx property for the new matrix.
- * @param {Number} [ty=0] Specifies the ty property for the new matrix.
- * @constructor
- **/
-var Matrix2D = function(a, b, c, d, tx, ty) {
-  this.initialize(a, b, c, d, tx, ty);
-};
-var p = Matrix2D.prototype;
-Matrix2D.prototype.constructor = Matrix2D;
 
-// static public properties:
-
+// constructor:
 	/**
-	 * An identity matrix, representing a null transformation.
-	 * @property identity
-	 * @static
-	 * @type Matrix2D
-	 * @readonly
+	 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
+	 * @class Matrix2D
+	 * @param {Number} [a=1] Specifies the a property for the new matrix.
+	 * @param {Number} [b=0] Specifies the b property for the new matrix.
+	 * @param {Number} [c=0] Specifies the c property for the new matrix.
+	 * @param {Number} [d=1] Specifies the d property for the new matrix.
+	 * @param {Number} [tx=0] Specifies the tx property for the new matrix.
+	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
+	 * @constructor
 	 **/
-	Matrix2D.identity = null; // set at bottom of class definition.
+	function Matrix2D(a, b, c, d, tx, ty) {
+		this.initialize(a,b,c,d,tx,ty);
+		
+	// public properties:
+		// assigned in the initialize method.
+		/**
+		 * Position (0, 0) in a 3x3 affine transformation matrix.
+		 * @property a
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (0, 1) in a 3x3 affine transformation matrix.
+		 * @property b
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (1, 0) in a 3x3 affine transformation matrix.
+		 * @property c
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (1, 1) in a 3x3 affine transformation matrix.
+		 * @property d
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (2, 0) in a 3x3 affine transformation matrix.
+		 * @property tx
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (2, 1) in a 3x3 affine transformation matrix.
+		 * @property ty
+		 * @type Number
+		 **/
+	
+		/**
+		 * Property representing the alpha that will be applied to a display object. This is not part of matrix
+		 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values.
+		 * @property alpha
+		 * @type Number
+		 **/
+	
+		/**
+		 * Property representing the shadow that will be applied to a display object. This is not part of matrix
+		 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values.
+		 * @property shadow
+		 * @type Shadow
+		 **/
+	
+		/**
+		 * Property representing the compositeOperation that will be applied to a display object. This is not part of
+		 * matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated
+		 * compositeOperation values. You can find a list of valid composite operations at:
+		 * <a href="https://developer.mozilla.org/en/Canvas_tutorial/Compositing">https://developer.mozilla.org/en/Canvas_tutorial/Compositing</a>
+		 * @property compositeOperation
+		 * @type String
+		 **/
+		
+		/**
+		 * Property representing the value for visible that will be applied to a display object. This is not part of matrix
+		 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated visible values.
+		 * @property visible
+		 * @type Boolean
+		 **/
+	}
+	var p = Matrix2D.prototype;
 
+
+// constants:
 	/**
 	 * Multiplier for converting degrees to radians. Used internally by Matrix2D.
 	 * @property DEG_TO_RAD
@@ -75,86 +135,20 @@ Matrix2D.prototype.constructor = Matrix2D;
 	Matrix2D.DEG_TO_RAD = Math.PI/180;
 
 
-// public properties:
+// static public properties:
 	/**
-	 * Position (0, 0) in a 3x3 affine transformation matrix.
-	 * @property a
-	 * @type Number
+	 * An identity matrix, representing a null transformation.
+	 * @property identity
+	 * @static
+	 * @type Matrix2D
+	 * @readonly
 	 **/
-	p.a = 1;
-
-	/**
-	 * Position (0, 1) in a 3x3 affine transformation matrix.
-	 * @property b
-	 * @type Number
-	 **/
-	p.b = 0;
-
-	/**
-	 * Position (1, 0) in a 3x3 affine transformation matrix.
-	 * @property c
-	 * @type Number
-	 **/
-	p.c = 0;
-
-	/**
-	 * Position (1, 1) in a 3x3 affine transformation matrix.
-	 * @property d
-	 * @type Number
-	 **/
-	p.d = 1;
-
-	/**
-	 * Position (2, 0) in a 3x3 affine transformation matrix.
-	 * @property tx
-	 * @type Number
-	 **/
-	p.tx = 0;
-
-	/**
-	 * Position (2, 1) in a 3x3 affine transformation matrix.
-	 * @property ty
-	 * @type Number
-	 **/
-	p.ty = 0;
-
-	/**
-	 * Property representing the alpha that will be applied to a display object. This is not part of matrix
-	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values.
-	 * @property alpha
-	 * @type Number
-	 **/
-	p.alpha = 1;
-
-	/**
-	 * Property representing the shadow that will be applied to a display object. This is not part of matrix
-	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values.
-	 * @property shadow
-	 * @type Shadow
-	 **/
-	p.shadow  = null;
-
-	/**
-	 * Property representing the compositeOperation that will be applied to a display object. This is not part of
-	 * matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated
-	 * compositeOperation values. You can find a list of valid composite operations at:
-	 * <a href="https://developer.mozilla.org/en/Canvas_tutorial/Compositing">https://developer.mozilla.org/en/Canvas_tutorial/Compositing</a>
-	 * @property compositeOperation
-	 * @type String
-	 **/
-	p.compositeOperation = null;
+	Matrix2D.identity = null; // set at bottom of class definition.
 	
-	/**
-	 * Property representing the value for visible that will be applied to a display object. This is not part of matrix
-	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated visible values.
-	 * @property visible
-	 * @type Boolean
-	 **/
-	p.visible = true;
 
-// constructor:
+// public methods:
 	/**
-	 * Initialization method. Can also be used to reinitialize the instance.
+	 * Reinitializes the instance with the specified values.
 	 * @method initialize
 	 * @param {Number} [a=1] Specifies the a property for the new matrix.
 	 * @param {Number} [b=0] Specifies the b property for the new matrix.
@@ -165,16 +159,20 @@ Matrix2D.prototype.constructor = Matrix2D;
 	 * @return {Matrix2D} This instance. Useful for chaining method calls.
 	*/
 	p.initialize = function(a, b, c, d, tx, ty) {
+		// don't forget to update docs in the constructor if these change:
 		this.a = (a == null) ? 1 : a;
 		this.b = b || 0;
 		this.c = c || 0;
 		this.d = (d == null) ? 1 : d;
 		this.tx = tx || 0;
 		this.ty = ty || 0;
+		
+		this.alpha = 1;
+		this.shadow = this.compositeOperation = null;
+		this.visible = true;
 		return this;
 	};
 
-// public methods:
 	/**
 	 * Concatenates the specified matrix properties with this matrix. All parameters are required.
 	 * @method prepend
@@ -584,5 +582,6 @@ Matrix2D.prototype.constructor = Matrix2D;
 	// this has to be populated after the class is defined:
 	Matrix2D.identity = new Matrix2D();
 
-createjs.Matrix2D = Matrix2D;
+
+	createjs.Matrix2D = Matrix2D;
 }());

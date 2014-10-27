@@ -35,94 +35,71 @@ this.createjs = this.createjs||{};
 
 (function() {
 	"use strict";
-// TODO: fix problems with rotation.
-// TODO: exclude from getObjectsUnderPoint
 
-/**
- * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>
- *
- * A DOMElement allows you to associate a HTMLElement with the display list. It will be transformed
- * within the DOM as though it is child of the {{#crossLink "Container"}}{{/crossLink}} it is added to. However, it is
- * not rendered to canvas, and as such will retain whatever z-index it has relative to the canvas (ie. it will be
- * drawn in front of or behind the canvas).
- *
- * The position of a DOMElement is relative to their parent node in the DOM. It is recommended that
- * the DOM Object be added to a div that also contains the canvas so that they share the same position
- * on the page.
- *
- * DOMElement is useful for positioning HTML elements over top of canvas content, and for elements
- * that you want to display outside the bounds of the canvas. For example, a tooltip with rich HTML
- * content.
- *
- * <h4>Mouse Interaction</h4>
- *
- * DOMElement instances are not full EaselJS display objects, and do not participate in EaselJS mouse
- * events or support methods like hitTest. To get mouse events from a DOMElement, you must instead add handlers to
- * the htmlElement (note, this does not support EventDispatcher)
- *
- *      var domElement = new createjs.DOMElement(htmlElement);
- *      domElement.htmlElement.onclick = function() {
- *          console.log("clicked");
- *      }
- *
- * @class DOMElement
- * @extends DisplayObject
- * @constructor
- * @param {HTMLElement} htmlElement A reference or id for the DOM element to manage.
- */
-var DOMElement = function(htmlElement) {
-  this.initialize(htmlElement);
-};
-var p = DOMElement.prototype = new createjs.DisplayObject();
-DOMElement.prototype.constructor = DOMElement;
-
-// public properties:
-	/**
-	 * The DOM object to manage.
-	 * @property htmlElement
-	 * @type HTMLElement
-	 */
-	p.htmlElement = null;
-
-// private properties:
-	/**
-	 * @property _oldMtx
-	 * @type Matrix2D
-	 * @protected
-	 */
-	p._oldMtx = null;
-	
-	/**
-	 * @property _visible
-	 * @type Boolean
-	 * @protected
-	 */
-	p._visible = false;
 
 // constructor:
 	/**
-	 * @property DisplayObject_initialize
-	 * @type Function
-	 * @private
-	 */
-	p.DisplayObject_initialize = p.initialize;
-
-	/**
-	 * Initialization method.
-	 * @method initialize
+	 * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>
+	 *
+	 * A DOMElement allows you to associate a HTMLElement with the display list. It will be transformed
+	 * within the DOM as though it is child of the {{#crossLink "Container"}}{{/crossLink}} it is added to. However, it is
+	 * not rendered to canvas, and as such will retain whatever z-index it has relative to the canvas (ie. it will be
+	 * drawn in front of or behind the canvas).
+	 *
+	 * The position of a DOMElement is relative to their parent node in the DOM. It is recommended that
+	 * the DOM Object be added to a div that also contains the canvas so that they share the same position
+	 * on the page.
+	 *
+	 * DOMElement is useful for positioning HTML elements over top of canvas content, and for elements
+	 * that you want to display outside the bounds of the canvas. For example, a tooltip with rich HTML
+	 * content.
+	 *
+	 * <h4>Mouse Interaction</h4>
+	 *
+	 * DOMElement instances are not full EaselJS display objects, and do not participate in EaselJS mouse
+	 * events or support methods like hitTest. To get mouse events from a DOMElement, you must instead add handlers to
+	 * the htmlElement (note, this does not support EventDispatcher)
+	 *
+	 *      var domElement = new createjs.DOMElement(htmlElement);
+	 *      domElement.htmlElement.onclick = function() {
+	 *          console.log("clicked");
+	 *      }
+	 *
+	 * @class DOMElement
+	 * @extends DisplayObject
+	 * @constructor
 	 * @param {HTMLElement} htmlElement A reference or id for the DOM element to manage.
-	 * @protected
-	*/
-	p.initialize = function(htmlElement) {
+	 */
+	function DOMElement(htmlElement) {
+		this.DisplayObject_constructor();
+		
 		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
-		this.DisplayObject_initialize();
 		this.mouseEnabled = false;
-		this.htmlElement = htmlElement;
+		
 		var style = htmlElement.style;
-		// this relies on the _tick method because draw isn't called if a parent is not visible.
 		style.position = "absolute";
 		style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
-	};
+		
+		
+	// public properties:
+		/**
+		 * The DOM object to manage.
+		 * @property htmlElement
+		 * @type HTMLElement
+		 */
+		this.htmlElement = htmlElement;
+	
+	
+	// private properties:
+		/**
+		 * @property _oldMtx
+		 * @type Matrix2D
+		 * @protected
+		 */
+		this._oldMtx = null;
+	}
+	var p = DOMElement.prototype;
+	
 
 // public methods:
 	/**
@@ -148,7 +125,7 @@ DOMElement.prototype.constructor = DOMElement;
 	 * @return {Boolean}
 	 */
 	p.draw = function(ctx, ignoreCache) {
-		// this relies on the _tick method because draw isn't called if a parent is not visible.
+		// this relies on the _tick method because draw isn't called if the parent is not visible.
 		// the actual update happens in _handleDrawEnd
 		return true;
 	};
@@ -244,13 +221,6 @@ DOMElement.prototype.constructor = DOMElement;
 
 // private methods:
 	/**
-	 * @property DisplayObject__tick
-	 * @type Function
-	 * @protected
-	 */
-	p.DisplayObject__tick = p._tick;
-
-	/**
 	 * @method _tick
 	 * @param {Object} props Properties to copy to the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}} event object.
 	 * function.
@@ -284,6 +254,8 @@ DOMElement.prototype.constructor = DOMElement;
 			style.opacity = ""+(mtx.alpha*n|0)/n;
 			if (oMtx) { oMtx.alpha = mtx.alpha; }
 		}
+		
+		// TODO: move this comparison into a .equals method in Matrix2D:
 		if (!oMtx || oMtx.tx != mtx.tx || oMtx.ty != mtx.ty || oMtx.a != mtx.a || oMtx.b != mtx.b || oMtx.c != mtx.c || oMtx.d != mtx.d) {
 			var str = "matrix(" + (mtx.a*n|0)/n +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n +","+ (mtx.tx+0.5|0);
 			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty+0.5|0) +")";
@@ -292,5 +264,6 @@ DOMElement.prototype.constructor = DOMElement;
 		}
 	};
 
-createjs.DOMElement = DOMElement;
+
+	createjs.DOMElement = createjs.extends(DOMElement, createjs.DisplayObject);
 }());
