@@ -505,12 +505,11 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	Ticker._handleSynch = function() {
-		var time = Ticker._getTime() - Ticker._startTime;
 		Ticker._timerId = null;
 		Ticker._setupTick();
 
 		// run if enough time has elapsed, with a little bit of flexibility to be early:
-		if (time - Ticker._lastTime >= (Ticker._interval-1)*0.97) {
+		if (Ticker._getTime() - Ticker._lastTime >= (Ticker._interval-1)*0.97) {
 			Ticker._tick();
 		}
 	};
