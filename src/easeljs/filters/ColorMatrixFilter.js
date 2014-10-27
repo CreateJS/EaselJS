@@ -36,52 +36,49 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
- * {{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors. For an easier color transform,
- * consider the {{#crossLink "ColorFilter"}}{{/crossLink}}.
- *
- * <h4>Example</h4>
- * This example creates a red circle, inverts its hue, and then saturates it to brighten it up.
- *
- *      var shape = new createjs.Shape().set({x:100,y:100});
- *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
- *
- *      var matrix = new createjs.ColorMatrix().adjustHue(180).adjustSaturation(100);
- *      shape.filters = [
- *          new createjs.ColorMatrixFilter(matrix)
- *      ];
- *
- *      shape.cache(-50, -50, 100, 100);
- *
- * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
- * @class ColorMatrixFilter
- * @constructor
- * @extends Filter
- * @param {Array} matrix A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
- * class.
- **/
-var ColorMatrixFilter = function(matrix) {
-  this.initialize(matrix);
-};
-var p = ColorMatrixFilter.prototype = new createjs.Filter();
-ColorMatrixFilter.prototype.constructor = ColorMatrixFilter;
-
-// public properties:
-	p.matrix = null;
 
 // constructor:
-	// TODO: detailed docs.
 	/**
-	 * @method initialize
-	 * @protected
-	 * @param {Array} matrix A 4x5 matrix describing the color operation to perform.
+	 * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
+	 * {{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors. For an easier color transform,
+	 * consider the {{#crossLink "ColorFilter"}}{{/crossLink}}.
+	 *
+	 * <h4>Example</h4>
+	 * This example creates a red circle, inverts its hue, and then saturates it to brighten it up.
+	 *
+	 *      var shape = new createjs.Shape().set({x:100,y:100});
+	 *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
+	 *
+	 *      var matrix = new createjs.ColorMatrix().adjustHue(180).adjustSaturation(100);
+	 *      shape.filters = [
+	 *          new createjs.ColorMatrixFilter(matrix)
+	 *      ];
+	 *
+	 *      shape.cache(-50, -50, 100, 100);
+	 *
+	 * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
+	 * @class ColorMatrixFilter
+	 * @constructor
+	 * @extends Filter
+	 * @param {Array | ColorMatrix} matrix A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
+	 * class.
 	 **/
-	p.initialize = function(matrix) {
+	function ColorMatrixFilter(matrix) {
+	
+		
+	// public properties:
+		/**
+		 * A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
+		 * @property matrix
+		 * @type Array | ColorMatrix
+		 **/
 		this.matrix = matrix;
-	};
+	}
+	var p = ColorMatrixFilter.prototype;
+	
 
 // public methods:
+	/** docced in super class **/
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
 		targetCtx = targetCtx || ctx;
 		if (targetX == null) { targetX = x; }
@@ -89,7 +86,6 @@ ColorMatrixFilter.prototype.constructor = ColorMatrixFilter;
 		try {
 			var imageData = ctx.getImageData(x, y, width, height);
 		} catch(e) {
-			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
 			return false;
 		}
 		var data = imageData.data;
@@ -115,19 +111,17 @@ ColorMatrixFilter.prototype.constructor = ColorMatrixFilter;
 		return true;
 	};
 
+	
+	/** docced in super class **/
 	p.toString = function() {
 		return "[ColorMatrixFilter]";
 	};
 
-	/**
-	 * Returns a clone of this ColorMatrixFilter instance.
-	 * @method clone
-	 * @return {ColorMatrixFilter} A clone of the current ColorMatrixFilter instance.
-	 **/
+	/** docced in super class **/
 	p.clone = function() {
 		return new ColorMatrixFilter(this.matrix);
 	};
 
-	createjs.ColorMatrixFilter = ColorMatrixFilter;
 
+	createjs.ColorMatrixFilter = createjs.extends(ColorMatrixFilter, createjs.Filter);
 }());

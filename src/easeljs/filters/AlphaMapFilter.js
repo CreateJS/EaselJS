@@ -35,6 +35,9 @@ this.createjs = this.createjs || {};
 
 (function () {
 	"use strict";
+	
+	
+// constructor:
 	/**
 	 * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
 	 * be copied from the red channel of the map, and the RGB channels will be copied from the target.
@@ -64,34 +67,39 @@ this.createjs = this.createjs || {};
 	 * @param {Image|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
 	 * result. This should be exactly the same dimensions as the target.
 	 **/
-	var AlphaMapFilter = function (alphaMap) {
-		this.initialize(alphaMap);
-	};
-	var p = AlphaMapFilter.prototype = new createjs.Filter();
-	AlphaMapFilter.prototype.constructor = AlphaMapFilter;
-
-// constructor:
-	/** @ignore */
-	p.initialize = function (alphaMap) {
+	function AlphaMapFilter(alphaMap) {
+	
+	
+	// public properties:
+		/**
+		 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
+		 * dimensions as the target.
+		 * @property alphaMap
+		 * @type Image|HTMLCanvasElement
+		 **/
 		this.alphaMap = alphaMap;
-	};
+		
+		
+	// private properties:
+		/**
+		 * @property _alphaMap
+		 * @protected
+		 * @type Image|HTMLCanvasElement
+		 **/
+		this._alphaMap = null;
+		
+		/**
+		 * @property _mapData
+		 * @protected
+		 * @type Uint8ClampedArray
+		 **/
+		this._mapData = null;
+	}
+	var p = AlphaMapFilter.prototype;
 
-// public properties:
-
-	/**
-	 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
-	 * dimensions as the target.
-	 * @property alphaMap
-	 * @type Image|HTMLCanvasElement
-	 **/
-	p.alphaMap = null;
-
-// private properties:
-	p._alphaMap = null;
-	p._mapData = null;
 
 // public methods:
-
+	/** docced in super class **/
 	p.applyFilter = function (ctx, x, y, width, height, targetCtx, targetX, targetY) {
 		if (!this.alphaMap) {
 			return true;
@@ -123,20 +131,22 @@ this.createjs = this.createjs || {};
 		return true;
 	};
 
-	/**
-	 * Returns a clone of this object.
-	 * @method clone
-	 * @return {AlphaMapFilter} A clone of the current AlphaMapFilter instance.
-	 **/
+	/** docced in super class **/
 	p.clone = function () {
 		return new AlphaMapFilter(this.alphaMap);
 	};
 
+	/** docced in super class **/
 	p.toString = function () {
 		return "[AlphaMapFilter]";
 	};
 
+
 // private methods:
+	/**
+	 * @method _prepAlphaMap
+	 * @protected
+	 **/
 	p._prepAlphaMap = function () {
 		if (!this.alphaMap) {
 			return false;
@@ -169,6 +179,6 @@ this.createjs = this.createjs || {};
 		return true;
 	};
 
-	createjs.AlphaMapFilter = AlphaMapFilter;
 
+	createjs.AlphaMapFilter = createjs.extends(AlphaMapFilter, createjs.Filter);
 }());

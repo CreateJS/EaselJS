@@ -36,6 +36,8 @@ this.createjs = this.createjs || {};
 (function () {
 	"use strict";
 
+
+// constructor:
 	/**
 	 * Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
 	 * be derived from the mask, and the RGB channels will be copied from the target. This can be used, for example, to
@@ -64,29 +66,21 @@ this.createjs = this.createjs || {};
 	 * @constructor
 	 * @param {Image} mask
 	 **/
-	var AlphaMaskFilter = function (mask) {
-		this.initialize(mask);
-	};
-	var p = AlphaMaskFilter.prototype = new createjs.Filter();
-	AlphaMaskFilter.prototype.constructor = AlphaMaskFilter;
-
-// constructor:
-	/** @ignore */
-	p.initialize = function (mask) {
+	function AlphaMaskFilter(mask) {
+	
+	
+	// public properties:
+		/**
+		 * The image (or canvas) to use as the mask.
+		 * @property mask
+		 * @type Image
+		 **/
 		this.mask = mask;
-	};
-
-// public properties:
-
-	/**
-	 * The image (or canvas) to use as the mask.
-	 * @property mask
-	 * @type Image
-	 **/
-	p.mask = null;
+	}
+	var p = AlphaMaskFilter.prototype;
+	
 
 // public methods:
-
 	/**
 	 * Applies the filter to the specified context.
 	 *
@@ -127,21 +121,16 @@ this.createjs = this.createjs || {};
 		return true;
 	};
 
-	/**
-	 * Returns a clone of this object.
-	 * @method clone
-	 * @return {AlphaMaskFilter}
-	 **/
+	/** docced in super class **/
 	p.clone = function () {
 		return new AlphaMaskFilter(this.mask);
 	};
 
+	/** docced in super class **/
 	p.toString = function () {
 		return "[AlphaMaskFilter]";
 	};
 
-// private methods:
 
-
-	createjs.AlphaMaskFilter = AlphaMaskFilter;
+	createjs.AlphaMaskFilter = createjs.extends(AlphaMaskFilter, createjs.Filter);
 }());

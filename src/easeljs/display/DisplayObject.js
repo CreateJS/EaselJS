@@ -122,21 +122,331 @@
 this.createjs = this.createjs||{};
 
 (function() {
-/**
- * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
- * {{#crossLink "Container"}}{{/crossLink}}, {{#crossLink "Bitmap"}}{{/crossLink}}, and {{#crossLink "Shape"}}{{/crossLink}}.
- * DisplayObject is the base class for all display classes in the EaselJS library. It defines the core properties and
- * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
- * caching, and mouse handlers.
- * @class DisplayObject
- * @extends EventDispatcher
- * @constructor
- **/
-var DisplayObject = function() {
-  this.initialize();
-};
-var p = DisplayObject.prototype = new createjs.EventDispatcher();
-DisplayObject.prototype.constructor = DisplayObject;
+
+// constructor:
+	/**
+	 * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
+	 * {{#crossLink "Container"}}{{/crossLink}}, {{#crossLink "Bitmap"}}{{/crossLink}}, and {{#crossLink "Shape"}}{{/crossLink}}.
+	 * DisplayObject is the base class for all display classes in the EaselJS library. It defines the core properties and
+	 * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
+	 * caching, and mouse handlers.
+	 * @class DisplayObject
+	 * @extends EventDispatcher
+	 * @constructor
+	 **/
+	function DisplayObject() {
+		this.EventDispatcher_constructor();
+		
+		
+	// public properties:
+		/**
+		 * The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque.
+		 * @property alpha
+		 * @type {Number}
+		 * @default 1
+		 **/
+		this.alpha = 1;
+	
+		/**
+		 * If a cache is active, this returns the canvas that holds the cached version of this display object. See {{#crossLink "cache"}}{{/crossLink}}
+		 * for more information.
+		 * @property cacheCanvas
+		 * @type {HTMLCanvasElement | Object}
+		 * @default null
+		 * @readonly
+		 **/
+		this.cacheCanvas = null;
+	
+		/**
+		 * Unique ID for this display object. Makes display objects easier for some uses.
+		 * @property id
+		 * @type {Number}
+		 * @default -1
+		 **/
+		this.id = createjs.UID.get();
+	
+		/**
+		 * Indicates whether to include this object when running mouse interactions. Setting this to `false` for children
+		 * of a {{#crossLink "Container"}}{{/crossLink}} will cause events on the Container to not fire when that child is
+		 * clicked. Setting this property to `false` does not prevent the {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}
+		 * method from returning the child.
+		 *
+		 * <strong>Note:</strong> In EaselJS 0.7.0, the mouseEnabled property will not work properly with nested Containers. Please
+		 * check out the latest NEXT version in <a href="https://github.com/CreateJS/EaselJS/tree/master/lib">GitHub</a> for an updated version with this issue resolved. The fix will be
+		 * provided in the next release of EaselJS.
+		 * @property mouseEnabled
+		 * @type {Boolean}
+		 * @default true
+		 **/
+		this.mouseEnabled = true;
+		
+		/**
+		 * If false, the tick will not run on this display object (or its children). This can provide some performance benefits.
+		 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
+		 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+		 * @property tickEnabled
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.tickEnabled = true;
+	
+		/**
+		 * An optional name for this display object. Included in {{#crossLink "DisplayObject/toString"}}{{/crossLink}} . Useful for
+		 * debugging.
+		 * @property name
+		 * @type {String}
+		 * @default null
+		 **/
+		this.name = null;
+	
+		/**
+		 * A reference to the {{#crossLink "Container"}}{{/crossLink}} or {{#crossLink "Stage"}}{{/crossLink}} object that
+		 * contains this display object, or null if it has not been added
+		 * to one.
+		 * @property parent
+		 * @final
+		 * @type {Container}
+		 * @default null
+		 * @readonly
+		 **/
+		this.parent = null;
+	
+		/**
+		 * The left offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate
+		 * around its center, you would set regX and {{#crossLink "DisplayObject/regY:property"}}{{/crossLink}} to 50.
+		 * @property regX
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.regX = 0;
+	
+		/**
+		 * The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
+		 * its center, you would set {{#crossLink "DisplayObject/regX:property"}}{{/crossLink}} and regY to 50.
+		 * @property regY
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.regY = 0;
+	
+		/**
+		 * The rotation in degrees for this display object.
+		 * @property rotation
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.rotation = 0;
+	
+		/**
+		 * The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display
+		 * object to twice its nominal width. To horizontally flip an object, set the scale to a negative number.
+		 * @property scaleX
+		 * @type {Number}
+		 * @default 1
+		 **/
+		this.scaleX = 1;
+	
+		/**
+		 * The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display
+		 * object to half its nominal height. To vertically flip an object, set the scale to a negative number.
+		 * @property scaleY
+		 * @type {Number}
+		 * @default 1
+		 **/
+		this.scaleY = 1;
+	
+		/**
+		 * The factor to skew this display object horizontally.
+		 * @property skewX
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.skewX = 0;
+	
+		/**
+		 * The factor to skew this display object vertically.
+		 * @property skewY
+		 * @type {Number}
+		 * @default 0
+		 **/
+		p.skewY = 0;
+	
+		/**
+		 * A shadow object that defines the shadow to render on this display object. Set to `null` to remove a shadow. If
+		 * null, this property is inherited from the parent container.
+		 * @property shadow
+		 * @type {Shadow}
+		 * @default null
+		 **/
+		this.shadow = null;
+	
+		/**
+		 * Indicates whether this display object should be rendered to the canvas and included when running the Stage
+		 * {{#crossLink "Stage/getObjectsUnderPoint"}}{{/crossLink}} method.
+		 * @property visible
+		 * @type {Boolean}
+		 * @default true
+		 **/
+		this.visible = true;
+	
+		/**
+		 * The x (horizontal) position of the display object, relative to its parent.
+		 * @property x
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.x = 0;
+	
+		/** The y (vertical) position of the display object, relative to its parent.
+		 * @property y
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.y = 0;
+	
+		/**
+		 * The composite operation indicates how the pixels of this display object will be composited with the elements
+		 * behind it. If `null`, this property is inherited from the parent container. For more information, read the
+		 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
+		 * whatwg spec on compositing</a>.
+		 * @property compositeOperation
+		 * @type {String}
+		 * @default null
+		 **/
+		this.compositeOperation = null;
+	
+		/**
+		 * Indicates whether the display object should be drawn to a whole pixel when
+		 * {{#crossLink "Stage/snapToPixelEnabled"}}{{/crossLink}} is true. To enable/disable snapping on whole
+		 * categories of display objects, set this value on the prototype (Ex. Text.prototype.snapToPixel = true).
+		 * @property snapToPixel
+		 * @type {Boolean}
+		 * @default true
+		 **/
+		this.snapToPixel = true;
+	
+		/**
+		 * An array of Filter objects to apply to this display object. Filters are only applied / updated when {{#crossLink "cache"}}{{/crossLink}}
+		 * or {{#crossLink "updateCache"}}{{/crossLink}} is called on the display object, and only apply to the area that is
+		 * cached.
+		 * @property filters
+		 * @type {Array}
+		 * @default null
+		 **/
+		this.filters = null;
+	
+		/**
+		 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
+		 * determine if the cache has changed since a previous check.
+		 * @property cacheID
+		 * @type {Number}
+		 * @default 0
+		 */
+		this.cacheID = 0;
+		
+		/**
+		 * A Shape instance that defines a vector mask (clipping path) for this display object.  The shape's transformation
+		 * will be applied relative to the display object's parent coordinates (as if it were a child of the parent).
+		 * @property mask
+		 * @type {Shape}
+		 * @default null
+		 */
+		this.mask = null;
+		
+		/**
+		 * A display object that will be tested when checking mouse interactions or testing {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}.
+		 * The hit area will have its transformation applied relative to this display object's coordinate space (as though
+		 * the hit test object were a child of this display object and relative to its regX/Y). The hitArea will be tested
+		 * using only its own `alpha` value regardless of the alpha value on the target display object, or the target's
+		 * ancestors (parents).
+		 * 
+		 * If set on a {{#crossLink "Container"}}{{/crossLink}}, children of the Container will not receive mouse events.
+		 * This is similar to setting {{#crossLink "mouseChildren"}}{{/crossLink}} to false.
+		 *
+		 * Note that hitArea is NOT currently used by the `hitTest()` method, nor is it supported for {{#crossLink "Stage"}}{{/crossLink}}.
+		 * @property hitArea
+		 * @type {DisplayObject}
+		 * @default null
+		 */
+		this.hitArea = null;
+		
+		/**
+		 * A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display
+		 * object. You must enable mouseover events using the {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} method to
+		 * use this property. Setting a non-null cursor on a Container will override the cursor set on its descendants.
+		 * @property cursor
+		 * @type {String}
+		 * @default null
+		 */
+		this.cursor = null;
+	
+	
+	// private properties:
+		/**
+		 * @property _cacheOffsetX
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._cacheOffsetX = 0;
+	
+		/**
+		 * @property _cacheOffsetY
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._cacheOffsetY = 0;
+		
+		/**
+		 * @property _cacheScale
+		 * @protected
+		 * @type {Number}
+		 * @default 1
+		 **/
+		this._cacheScale = 1;
+	
+		/**
+		* @property _cacheDataURLID
+		* @protected
+		* @type {Number}
+		* @default 0
+		*/
+		this._cacheDataURLID = 0;
+		
+		/**
+		* @property _cacheDataURL
+		* @protected
+		* @type {String}
+		* @default null
+		*/
+		this._cacheDataURL = null;
+	
+		/**
+		 * @property _matrix
+		 * @protected
+		 * @type {Matrix2D}
+		 * @default null
+		 **/
+		this._matrix = new createjs.Matrix2D();
+	
+		/**
+		 * @property _rectangle
+		 * @protected
+		 * @type {Rectangle}
+		 * @default null
+		 **/
+		this._rectangle = new createjs.Rectangle();
+	
+		/**
+		 * @property _bounds
+		 * @protected
+		 * @type {Rectangle}
+		 * @default null
+		 **/
+		this._bounds = null;
+	}
+	var p = DisplayObject.prototype;
 	
 	
 // static properties:
@@ -195,8 +505,8 @@ DisplayObject.prototype.constructor = DisplayObject;
 	 **/
 	DisplayObject._nextCacheID = 1;
 
-// events:
 
+// events:
 	/**
 	 * Dispatched when the user presses their left mouse button over the display object. See the 
 	 * {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
@@ -313,373 +623,7 @@ DisplayObject.prototype.constructor = DisplayObject;
 	 *      example if you called stage.update("hello"), then the params would be ["hello"].
 	 * @since 0.6.0
 	 */
-
-// public properties:
-	/**
-	 * The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque.
-	 * @property alpha
-	 * @type {Number}
-	 * @default 1
-	 **/
-	p.alpha = 1;
-
-	/**
-	 * If a cache is active, this returns the canvas that holds the cached version of this display object. See {{#crossLink "cache"}}{{/crossLink}}
-	 * for more information.
-	 * @property cacheCanvas
-	 * @type {HTMLCanvasElement | Object}
-	 * @default null
-	 * @readonly
-	 **/
-	p.cacheCanvas = null;
-
-	/**
-	 * Unique ID for this display object. Makes display objects easier for some uses.
-	 * @property id
-	 * @type {Number}
-	 * @default -1
-	 **/
-	p.id = -1;
-
-	/**
-	 * Indicates whether to include this object when running mouse interactions. Setting this to `false` for children
-	 * of a {{#crossLink "Container"}}{{/crossLink}} will cause events on the Container to not fire when that child is
-	 * clicked. Setting this property to `false` does not prevent the {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}
-	 * method from returning the child.
-	 *
-	 * <strong>Note:</strong> In EaselJS 0.7.0, the mouseEnabled property will not work properly with nested Containers. Please
-	 * check out the latest NEXT version in <a href="https://github.com/CreateJS/EaselJS/tree/master/lib">GitHub</a> for an updated version with this issue resolved. The fix will be
-	 * provided in the next release of EaselJS.
-	 * @property mouseEnabled
-	 * @type {Boolean}
-	 * @default true
-	 **/
-	p.mouseEnabled = true;
 	
-	/**
-	 * If false, the tick will not run on this display object (or its children). This can provide some performance benefits.
-	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
-	 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
-	 * @property tickEnabled
-	 * @type Boolean
-	 * @default true
-	 **/
-	p.tickEnabled = true;
-
-	/**
-	 * An optional name for this display object. Included in {{#crossLink "DisplayObject/toString"}}{{/crossLink}} . Useful for
-	 * debugging.
-	 * @property name
-	 * @type {String}
-	 * @default null
-	 **/
-	p.name = null;
-
-	/**
-	 * A reference to the {{#crossLink "Container"}}{{/crossLink}} or {{#crossLink "Stage"}}{{/crossLink}} object that
-	 * contains this display object, or null if it has not been added
-	 * to one.
-	 * @property parent
-	 * @final
-	 * @type {Container}
-	 * @default null
-	 * @readonly
-	 **/
-	p.parent = null;
-
-	/**
-	 * The left offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate
-	 * around its center, you would set regX and {{#crossLink "DisplayObject/regY:property"}}{{/crossLink}} to 50.
-	 * @property regX
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p.regX = 0;
-
-	/**
-	 * The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
-	 * its center, you would set {{#crossLink "DisplayObject/regX:property"}}{{/crossLink}} and regY to 50.
-	 * @property regY
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p.regY = 0;
-
-	/**
-	 * The rotation in degrees for this display object.
-	 * @property rotation
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p.rotation = 0;
-
-	/**
-	 * The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display
-	 * object to twice its nominal width. To horizontally flip an object, set the scale to a negative number.
-	 * @property scaleX
-	 * @type {Number}
-	 * @default 1
-	 **/
-	p.scaleX = 1;
-
-	/**
-	 * The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display
-	 * object to half its nominal height. To vertically flip an object, set the scale to a negative number.
-	 * @property scaleY
-	 * @type {Number}
-	 * @default 1
-	 **/
-	p.scaleY = 1;
-
-	/**
-	 * The factor to skew this display object horizontally.
-	 * @property skewX
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p.skewX = 0;
-
-	/**
-	 * The factor to skew this display object vertically.
-	 * @property skewY
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p.skewY = 0;
-
-	/**
-	 * A shadow object that defines the shadow to render on this display object. Set to `null` to remove a shadow. If
-	 * null, this property is inherited from the parent container.
-	 * @property shadow
-	 * @type {Shadow}
-	 * @default null
-	 **/
-	p.shadow = null;
-
-	/**
-	 * Indicates whether this display object should be rendered to the canvas and included when running the Stage
-	 * {{#crossLink "Stage/getObjectsUnderPoint"}}{{/crossLink}} method.
-	 * @property visible
-	 * @type {Boolean}
-	 * @default true
-	 **/
-	p.visible = true;
-
-	/**
-	 * The x (horizontal) position of the display object, relative to its parent.
-	 * @property x
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p.x = 0;
-
-	/** The y (vertical) position of the display object, relative to its parent.
-	 * @property y
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p.y = 0;
-
-	/**
-	 * The composite operation indicates how the pixels of this display object will be composited with the elements
-	 * behind it. If `null`, this property is inherited from the parent container. For more information, read the
-	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
-	 * whatwg spec on compositing</a>.
-	 * @property compositeOperation
-	 * @type {String}
-	 * @default null
-	 **/
-	p.compositeOperation = null;
-
-	/**
-	 * Indicates whether the display object should be drawn to a whole pixel when
-	 * {{#crossLink "Stage/snapToPixelEnabled"}}{{/crossLink}} is true. To enable/disable snapping on whole
-	 * categories of display objects, set this value on the prototype (Ex. Text.prototype.snapToPixel = true).
-	 * @property snapToPixel
-	 * @type {Boolean}
-	 * @default true
-	 **/
-	p.snapToPixel = true;
-	
-	// TODO: remove handler docs in future:
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}}
-	 * event.
-	 * @property onPress
-	 * @type {Function}
-	 * @deprecated Use addEventListener and the "mousedown" event.
-	 */
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/click:event"}}{{/crossLink}}
-	 * event.
-	 * @property onClick
-	 * @type {Function}
-	 * @deprecated Use addEventListener and the "click" event.
-	 */
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/dblclick:event"}}{{/crossLink}}
-	 * event.
-	 * @property onDoubleClick
-	 * @type {Function}
-	 * @deprecated Use addEventListener and the "dblclick" event.
-	 */
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
-	 * event.
-	 * @property onMouseOver
-	 * @type {Function}
-	 * @deprecated Use addEventListener and the "mouseover" event.
-	 */
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}
-	 * event.
-	 * @property onMouseOut
-	 * @type {Function}
-	 * @deprecated Use addEventListener and the "mouseout" event.
-	 */
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}}
-	 * event.
-	 * @property onTick
-	 * @type {Function}
-	 * @deprecated Use addEventListener and the "tick" event.
-	 */
-
-	/**
-	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when {{#crossLink "cache"}}{{/crossLink}}
-	 * or {{#crossLink "updateCache"}}{{/crossLink}} is called on the display object, and only apply to the area that is
-	 * cached.
-	 * @property filters
-	 * @type {Array}
-	 * @default null
-	 **/
-	p.filters = null;
-
-	/**
-	 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
-	 * determine if the cache has changed since a previous check.
-	 * @property cacheID
-	 * @type {Number}
-	 * @default 0
-	 */
-	p.cacheID = 0;
-	
-	/**
-	 * A Shape instance that defines a vector mask (clipping path) for this display object.  The shape's transformation
-	 * will be applied relative to the display object's parent coordinates (as if it were a child of the parent).
-	 * @property mask
-	 * @type {Shape}
-	 * @default null
-	 */
-	p.mask = null;
-	
-	/**
-	 * A display object that will be tested when checking mouse interactions or testing {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}.
-	 * The hit area will have its transformation applied relative to this display object's coordinate space (as though
-	 * the hit test object were a child of this display object and relative to its regX/Y). The hitArea will be tested
-	 * using only its own `alpha` value regardless of the alpha value on the target display object, or the target's
-	 * ancestors (parents).
-	 * 
-	 * If set on a {{#crossLink "Container"}}{{/crossLink}}, children of the Container will not receive mouse events.
-	 * This is similar to setting {{#crossLink "mouseChildren"}}{{/crossLink}} to false.
-	 *
-	 * Note that hitArea is NOT currently used by the `hitTest()` method, nor is it supported for {{#crossLink "Stage"}}{{/crossLink}}.
-	 * @property hitArea
-	 * @type {DisplayObject}
-	 * @default null
-	 */
-	p.hitArea = null;
-	
-	/**
-	 * A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display
-	 * object. You must enable mouseover events using the {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} method to
-	 * use this property. Setting a non-null cursor on a Container will override the cursor set on its descendants.
-	 * @property cursor
-	 * @type {String}
-	 * @default null
-	 */
-	p.cursor = null;
-
-// private properties:
-
-	/**
-	 * @property _cacheOffsetX
-	 * @protected
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p._cacheOffsetX = 0;
-
-	/**
-	 * @property _cacheOffsetY
-	 * @protected
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p._cacheOffsetY = 0;
-	
-	/**
-	 * @property _cacheScale
-	 * @protected
-	 * @type {Number}
-	 * @default 1
-	 **/
-	p._cacheScale = 1;
-
-	/**
-	* @property _cacheDataURLID
-	* @protected
-	* @type {Number}
-	* @default 0
-	*/
-	p._cacheDataURLID = 0;
-	
-	/**
-	* @property _cacheDataURL
-	* @protected
-	* @type {String}
-	* @default null
-	*/
-	p._cacheDataURL = null;
-
-	/**
-	 * @property _matrix
-	 * @protected
-	 * @type {Matrix2D}
-	 * @default null
-	 **/
-	p._matrix = null;
-
-	/**
-	 * @property _rectangle
-	 * @protected
-	 * @type {Rectangle}
-	 * @default null
-	 **/
-	p._rectangle = null;
-
-	/**
-	 * @property _bounds
-	 * @protected
-	 * @type {Rectangle}
-	 * @default null
-	 **/
-	p._bounds = null;
-	
-
-// constructor:
-	// separated so it can be easily addressed in subclasses:
-
-	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @protected
-	*/
-	p.initialize = function() {
-		this.id = createjs.UID.get();
-		this._matrix = new createjs.Matrix2D();
-		this._rectangle = new createjs.Rectangle();
-	};
 
 // public methods:
 	/**
@@ -1198,8 +1142,8 @@ DisplayObject.prototype.constructor = DisplayObject;
 		return "[DisplayObject (name="+  this.name +")]";
 	};
 
-// private methods:
 
+// private methods:
 	// separated so it can be used more easily in subclasses:
 	/**
 	 * @method cloneProps
@@ -1373,5 +1317,5 @@ DisplayObject.prototype.constructor = DisplayObject;
 		return !!this.cursor;
 	};
 
-createjs.DisplayObject = DisplayObject;
+	createjs.DisplayObject = createjs.extends(DisplayObject, createjs.EventDispatcher);
 }());

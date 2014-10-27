@@ -31,21 +31,24 @@ this.createjs = this.createjs||{};
 
 (function() {
 	"use strict";
-/**
- * Deprecated in favour of {{#crossLink "Sprite"}}{{/crossLink}}.
- *
- * @class BitmapAnimation
- * @extends DisplayObject
- * @constructor
- * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
- * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
- * @deprecated Renamed to Sprite. Will be removed in a future version.
- **/
+	
+	/**
+	 * Deprecated in favour of {{#crossLink "Sprite"}}{{/crossLink}}.
+	 *
+	 * @class BitmapAnimation
+	 * @extends DisplayObject
+	 * @constructor
+	 * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
+	 * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
+	 * @deprecated Renamed to Sprite. Will be removed in a future version.
+	 **/
+	
+	var e = "BitmapAnimation is deprecated in favour of Sprite. See VERSIONS file for info on changes.";
+	if (!createjs.Sprite) { throw(e); }
+	function BitmapAnimation(spriteSheet) {
+	  console.log(e);
+	  this.Sprite_constructor(spriteSheet);
+	}
 
-var e = "BitmapAnimation is deprecated in favour of Sprite. See VERSIONS file for info on changes.";
-if (!createjs.Sprite) { throw(e); }
-(createjs.BitmapAnimation = function(spriteSheet) {
-  console.log(e);
-  this.initialize(spriteSheet);
-}).prototype = new createjs.Sprite();
+	createjs.BitmapAnimation = createjs.extends(BitmapAnimation, createjs.Sprite);
 })();

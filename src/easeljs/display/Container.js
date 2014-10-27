@@ -30,7 +30,10 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
+	
 
+// constructor:
 /**
  * A Container is a nestable display list that allows you to work with compound display elements. For  example you could
  * group arm, leg, torso and head {{#crossLink "Bitmap"}}{{/crossLink}} instances together into a Person Container, and
@@ -52,65 +55,46 @@ this.createjs = this.createjs||{};
  * @extends DisplayObject
  * @constructor
  **/
-var Container = function() {
-  this.initialize();
-};
-var p = Container.prototype = new createjs.DisplayObject();
-Container.prototype.constructor = Container;
-
-// public properties:
-	/**
-	 * The array of children in the display list. You should usually use the child management methods such as
-	 * {{#crossLink "Container/addChild"}}{{/crossLink}}, {{#crossLink "Container/removeChild"}}{{/crossLink}},
-	 * {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is
-	 * included for advanced uses.
-	 * @property children
-	 * @type Array
-	 * @default null
-	 **/
-	p.children = null;
-	
-	/**
-	 * Indicates whether the children of this container are independently enabled for mouse/pointer interaction.
-	 * If false, the children will be aggregated under the container - for example, a click on a child shape would
-	 * trigger a click event on the container.
-	 * @property mouseChildren
-	 * @type Boolean
-	 * @default true
-	 **/
-	p.mouseChildren = true;
-	
-	/**
-	 * If false, the tick will not be propagated to children of this Container. This can provide some performance benefits.
-	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
-	 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
-	 * @property tickChildren
-	 * @type Boolean
-	 * @default true
-	 **/
-	p.tickChildren = true;
-
-// constructor:
-
-	/**
-	 * @property DisplayObject_initialize
-	 * @type Function
-	 * @private
-	 **/
-	p.DisplayObject_initialize = p.initialize;
-
-	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @protected
-	*/
-	p.initialize = function() {
-		this.DisplayObject_initialize();
+	function Container() {
+		this.DisplayObject_constructor();
+		
+		
+	// public properties:
+		/**
+		 * The array of children in the display list. You should usually use the child management methods such as
+		 * {{#crossLink "Container/addChild"}}{{/crossLink}}, {{#crossLink "Container/removeChild"}}{{/crossLink}},
+		 * {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is
+		 * included for advanced uses.
+		 * @property children
+		 * @type Array
+		 * @default null
+		 **/
 		this.children = [];
-	};
+		
+		/**
+		 * Indicates whether the children of this container are independently enabled for mouse/pointer interaction.
+		 * If false, the children will be aggregated under the container - for example, a click on a child shape would
+		 * trigger a click event on the container.
+		 * @property mouseChildren
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.mouseChildren = true;
+		
+		/**
+		 * If false, the tick will not be propagated to children of this Container. This can provide some performance benefits.
+		 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
+		 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+		 * @property tickChildren
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.tickChildren = true;
+	}
+	var p = Container.prototype;
+	
 
 // public methods:
-
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.
@@ -123,13 +107,6 @@ Container.prototype.constructor = Container;
 		var hasContent = this.cacheCanvas || this.children.length;
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	};
-
-	/**
-	 * @property DisplayObject_draw
-	 * @type Function
-	 * @private
-	 **/
-	p.DisplayObject_draw = p.draw;
 
 	/**
 	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
@@ -493,13 +470,6 @@ Container.prototype.constructor = Container;
 	};
 	
 	/**
-	 * @property DisplayObject_getBounds
-	 * @type Function
-	 * @protected
-	 **/
-	p.DisplayObject_getBounds = p.getBounds; 
-	
-	/**
 	 * Docced in superclass.
 	 */
 	p.getBounds = function() {
@@ -545,14 +515,8 @@ Container.prototype.constructor = Container;
 		return "[Container (name="+  this.name +")]";
 	};
 
-// private properties:
-	/**
-	 * @property DisplayObject__tick
-	 * @type Function
-	 * @private
-	 **/
-	p.DisplayObject__tick = p._tick;
-	
+
+// private methods:
 	/**
 	 * @method _tick
 	 * @param {Object} props Properties to copy to the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}} event object.
@@ -662,5 +626,6 @@ Container.prototype.constructor = Container;
 		return (maxX == null) ? null : this._rectangle.initialize(minX, minY, maxX-minX, maxY-minY);
 	};
 
-createjs.Container = Container;
+
+	createjs.Container = createjs.extends(Container, createjs.DisplayObject);
 }());
