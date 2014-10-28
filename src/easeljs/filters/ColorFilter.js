@@ -130,7 +130,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this.alphaOffset = alphaOffset || 0;
 	}
-	var p = ColorFilter.prototype;
+	var p = createjs.extend(ColorFilter, createjs.Filter);
 
 
 // public methods:
@@ -168,5 +168,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.ColorFilter = createjs.extends(ColorFilter, createjs.Filter);
+	createjs.ColorFilter = createjs.promote(ColorFilter);
 }());

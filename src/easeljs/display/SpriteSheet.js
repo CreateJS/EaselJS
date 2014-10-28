@@ -247,7 +247,7 @@ this.createjs = this.createjs||{};
 	// setup:
 		this._parseData(data);
 	}
-	var p = SpriteSheet.prototype;
+	var p = createjs.extend(SpriteSheet, createjs.EventDispatcher);
 
 
 // events:
@@ -496,5 +496,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.SpriteSheet = createjs.extends(SpriteSheet, createjs.EventDispatcher);
+	createjs.SpriteSheet = createjs.promote(SpriteSheet);
 }());

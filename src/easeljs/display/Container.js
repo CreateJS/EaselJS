@@ -91,7 +91,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this.tickChildren = true;
 	}
-	var p = Container.prototype;
+	var p = createjs.extend(Container, createjs.DisplayObject);
 	
 
 // public methods:
@@ -99,7 +99,7 @@ this.createjs = this.createjs||{};
 	 * Constructor alias for backwards compatibility. This method will be removed in future versions.
 	 * Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
 	 * @method initialize
-	 * @deprecated in favour of `createjs.extends()`
+	 * @deprecated in favour of `createjs.promote()`
 	 **/
 	p.initialize = Container; // TODO: deprecated.
 	
@@ -636,5 +636,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.Container = createjs.extends(Container, createjs.DisplayObject);
+	createjs.Container = createjs.promote(Container);
 }());

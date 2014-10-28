@@ -77,7 +77,7 @@ this.createjs = this.createjs || {};
 		 **/
 		this.mask = mask;
 	}
-	var p = AlphaMaskFilter.prototype;
+	var p = createjs.extend(AlphaMaskFilter, createjs.Filter);
 	
 
 // public methods:
@@ -132,5 +132,5 @@ this.createjs = this.createjs || {};
 	};
 
 
-	createjs.AlphaMaskFilter = createjs.extends(AlphaMaskFilter, createjs.Filter);
+	createjs.AlphaMaskFilter = createjs.promote(AlphaMaskFilter);
 }());

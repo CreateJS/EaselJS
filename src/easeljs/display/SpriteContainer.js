@@ -74,7 +74,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this.spriteSheet = spriteSheet;
 	}
-	var p = SpriteContainer.prototype;
+	var p = createjs.extend(SpriteContainer, createjs.Container);
 
 	
 
@@ -169,5 +169,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.SpriteContainer = createjs.extends(SpriteContainer, createjs.Container);
+	createjs.SpriteContainer = createjs.promote(SpriteContainer);
 }());

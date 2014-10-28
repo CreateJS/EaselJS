@@ -146,7 +146,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this.lineWidth = null;
 	}
-	var p = Text.prototype;
+	var p = createjs.extend(Text, createjs.DisplayObject);
 
 	
 // static properties:
@@ -414,5 +414,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.Text = createjs.extends(Text, createjs.DisplayObject);
+	createjs.Text = createjs.promote(Text);
 }());

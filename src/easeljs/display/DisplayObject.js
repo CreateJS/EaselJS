@@ -446,7 +446,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this._bounds = null;
 	}
-	var p = DisplayObject.prototype;
+	var p = createjs.extend(DisplayObject, createjs.EventDispatcher);
 	
 	
 // static properties:
@@ -1317,5 +1317,5 @@ this.createjs = this.createjs||{};
 		return !!this.cursor;
 	};
 
-	createjs.DisplayObject = createjs.extends(DisplayObject, createjs.EventDispatcher);
+	createjs.DisplayObject = createjs.promote(DisplayObject);
 }());

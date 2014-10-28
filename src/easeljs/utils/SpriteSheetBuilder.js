@@ -173,7 +173,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this._scale = 1;
 	}
-	var p = SpriteSheetBuilder.prototype;
+	var p = createjs.extend(SpriteSheetBuilder, createjs.EventDispatcher);
 
 // constants:
 	SpriteSheetBuilder.ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
@@ -515,5 +515,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.SpriteSheetBuilder = createjs.extends(SpriteSheetBuilder, createjs.EventDispatcher);
+	createjs.SpriteSheetBuilder = createjs.promote(SpriteSheetBuilder);
 }());

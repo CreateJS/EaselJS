@@ -74,7 +74,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this.matrix = matrix;
 	}
-	var p = ColorMatrixFilter.prototype;
+	var p = createjs.extend(ColorMatrixFilter, createjs.Filter);
 	
 
 // public methods:
@@ -123,5 +123,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.ColorMatrixFilter = createjs.extends(ColorMatrixFilter, createjs.Filter);
+	createjs.ColorMatrixFilter = createjs.promote(ColorMatrixFilter);
 }());

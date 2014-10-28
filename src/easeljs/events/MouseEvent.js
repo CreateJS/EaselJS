@@ -116,7 +116,7 @@ this.createjs = this.createjs||{};
 		 */
 		this.primary = !!primary;
 	}
-	var p = MouseEvent.prototype;
+	var p = createjs.extend(MouseEvent, createjs.Event);
 	
 	
 // getter / setters:
@@ -168,5 +168,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.MouseEvent = createjs.extends(MouseEvent, createjs.Event);
+	createjs.MouseEvent = createjs.promote(MouseEvent);
 }());

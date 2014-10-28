@@ -165,7 +165,7 @@ this.createjs = this.createjs||{};
 		
 		if (frameOrAnimation) { this.gotoAndPlay(frameOrAnimation); }
 	}
-	var p = Sprite.prototype;
+	var p = createjs.extend(Sprite, createjs.DisplayObject);
 
 
 // events:
@@ -463,5 +463,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.Sprite = createjs.extends(Sprite, createjs.DisplayObject);
+	createjs.Sprite = createjs.promote(Sprite);
 }());
