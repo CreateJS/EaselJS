@@ -63,10 +63,11 @@ createjs.extend = function(subclass, superclass) {
 };
 
 /**
- * Sets up aliases on this class to its super class's constructor and any methods that were overridden.
+ * Promotes any methods on the super class that were overridden, by creating an alias in the format `SuperClassName_methodName`.
+ * An alias to the super class's constructor is always added in the format `SuperClassName_constructor`.
  * This allows the subclass to call super class methods without using `function.call`, providing better performance.
  * 
- * For example, if MySubClass extends MySuperClass, and both define a `draw` method, then calling `promote(MySubClass)`
+ * For example, if `MySubClass` extends `MySuperClass`, and both define a `draw` method, then calling `promote(MySubClass)`
  * would: add a `MySuperClass_constructor` method to MySubClass and promote the `draw` method on MySuperClass to the
  * prototype of MySubClass as `MySuperClass_draw`.
  * 
@@ -95,17 +96,17 @@ createjs.extend = function(subclass, superclass) {
  * @method extends
  * @param {Function} subclass The subclass to promote super class methods on.
  * @param {String} [superclassName] The name of the superclass. This is only necessary if the constructor is an anonymous function (`MyClass = function()` instead of `function MyClass()`).
- * @return {Function} Returns the subclass for chaining.
+ * @return {Function} Returns the subclass.
  */
 createjs.promote = function(subclass, superclassName) {
-	var getProto = Object.getPrototypeOf;
-	var subP = subclass.prototype, supP = getProto ? getProto(subP) : subP.__proto__;
-	superclassName = superclassName || supP.constructor.name || /^function\s+([^\s\(]+)\s*\(/.exec(String(supP.constructor))[1];
-	
-	subP[superclassName+"_constructor"] = supP.constructor; // constructor is not always innumerable
-	for (var n in supP) {
-		if (subP[n] && (typeof supP[n] == "function")) { subP[superclassName+"_"+n] = supP[n]; }
-	} 
-	
+	var subP = subclass.prototype, supP = (Object.getPrototypeOf&&Object.getPrototypeOf(subP))||subP.__proto__;
+	if (supP) {
+		superclassName = superclassName || supP.constructor.name || /^function\s+([^\s\(]+)\s*\(/.exec(String(supP.constructor))[1];
+
+		subP[superclassName + "_constructor"] = supP.constructor; // constructor is not always innumerable
+		for (var n in supP) {
+			if (subP[n] && (typeof supP[n] == "function")) { subP[superclassName + "_" + n] = supP[n]; }
+		}
+	}
 	return subclass;
 };
