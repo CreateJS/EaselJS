@@ -171,14 +171,7 @@ ColorFilter.prototype.constructor = ColorFilter;
 			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
 			return false;
 		}
-		var data = imageData.data;
-		var l = data.length;
-		for (var i=0; i<l; i+=4) {
-			data[i] = data[i]*this.redMultiplier+this.redOffset;
-			data[i+1] = data[i+1]*this.greenMultiplier+this.greenOffset;
-			data[i+2] = data[i+2]*this.blueMultiplier+this.blueOffset;
-			data[i+3] = data[i+3]*this.alphaMultiplier+this.alphaOffset;
-		}
+		p._applyFilter(imageData.data);
 		targetCtx.putImageData(imageData, targetX, targetY);
 		return true;
 	}
@@ -194,6 +187,22 @@ ColorFilter.prototype.constructor = ColorFilter;
 	 **/
 	p.clone = function() {
 		return new ColorFilter(this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier, this.redOffset, this.greenOffset, this.blueOffset, this.alphaOffset);
+	}
+
+// private methods:
+	/**
+	 * @method _applyFilter
+	 * @param {Object} data
+	 * @protected
+	**/
+	p._applyFilter = function(data) {
+		var l = data.length;
+		for (var i=0; i<l; i+=4) {
+			data[i] = data[i]*this.redMultiplier+this.redOffset;
+			data[i+1] = data[i+1]*this.greenMultiplier+this.greenOffset;
+			data[i+2] = data[i+2]*this.blueMultiplier+this.blueOffset;
+			data[i+3] = data[i+3]*this.alphaMultiplier+this.alphaOffset;
+		}
 	}
 
 	createjs.ColorFilter = ColorFilter;
