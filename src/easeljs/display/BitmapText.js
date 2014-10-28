@@ -208,7 +208,7 @@ BitmapText.prototype.constructor = BitmapText;
 	 **/
 	p.isVisible = function() {
 		var hasContent = this.cacheCanvas || (this.spriteSheet && this.spriteSheet.complete && this.text);
-		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
+		return !!(this.visible && this.alpha > 0 && this.scaleX !== 0 && this.scaleY !== 0 && hasContent);
 	};
 	
 	/**
@@ -259,7 +259,7 @@ BitmapText.prototype.constructor = BitmapText;
 	 **/
 	p._getFrame = function(character, spriteSheet) {
 		var index = this._getFrameIndex(character, spriteSheet);
-		return index == null ? index : spriteSheet.getFrame(index);
+		return index === null ? index : spriteSheet.getFrame(index);
 	};
 	
 	/**
@@ -292,16 +292,18 @@ BitmapText.prototype.constructor = BitmapText;
 		var pool=BitmapText._spritePool, kids=this.children, childIndex=0, numKids=kids.length, sprite;
 		
 		for (var n in o) {
-			if (o[n] != this[n]) {
-				o[n] = this[n];
-				change = true;
+			if(o.hasOwnProperty(n)){
+				if (o[n] != this[n]) {
+					o[n] = this[n];
+					change = true;
+				}
 			}
 		}
 		if (!change) { return; }
 		
 		var hasSpace = !!this._getFrame(" ", ss);
-		if (!hasSpace && spaceW==0) { spaceW = this._getSpaceWidth(ss); }
-		if (lineH==0) { lineH = this._getLineHeight(ss); }
+		if (!hasSpace && spaceW===0) { spaceW = this._getSpaceWidth(ss); }
+		if (lineH===0) { lineH = this._getLineHeight(ss); }
 		
 		for(var i=0, l=this.text.length; i<l; i++) {
 			var character = this.text.charAt(i);
@@ -316,7 +318,7 @@ BitmapText.prototype.constructor = BitmapText;
 			}
 
 			var index = this._getFrameIndex(character, ss);
-			if (index == null) { continue; }
+			if (index === null) { continue; }
 			
 			if (childIndex < numKids) {
 				sprite = kids[childIndex];
@@ -333,7 +335,14 @@ BitmapText.prototype.constructor = BitmapText;
 			
 			x += sprite.getBounds().width + this.letterSpacing;
 		}
-		while (numKids > childIndex) { pool.push(sprite = kids.pop()); sprite.parent = null; numKids--; } // faster than removeChild.
+		while (numKids > childIndex) {
+			// faster than removeChild.
+			sprite = kids.pop();
+			pool.push(sprite);
+			sprite.parent = null;
+			numKids--;
+		}
+
 		if (pool.length > BitmapText.maxPoolSize) { pool.length = BitmapText.maxPoolSize; }
 	};
 
