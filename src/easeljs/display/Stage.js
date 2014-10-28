@@ -219,8 +219,7 @@ this.createjs = this.createjs||{};
 	// initialize:
 		this.enableDOMEvents(true);
 	}
-	var p = Stage.prototype;
-
+	var p = createjs.extend(Stage, createjs.Container);
 
 // events:
 	/**
@@ -884,5 +883,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-createjs.Stage = createjs.extends(Stage, createjs.Container);
+	createjs.Stage = createjs.promote(Stage);
 }());

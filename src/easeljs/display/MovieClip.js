@@ -250,7 +250,7 @@ this.createjs = this.createjs||{};
 		 */
 		this._managed = {};
 	}
-	var p = MovieClip.prototype;
+	var p = createjs.extend(MovieClip, createjs.Container);
 
 
 // constants:
@@ -292,7 +292,7 @@ this.createjs = this.createjs||{};
 	 * Constructor alias for backwards compatibility. This method will be removed in future versions.
 	 * Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
 	 * @method initialize
-	 * @deprecated in favour of `createjs.extends()`
+	 * @deprecated in favour of `createjs.promote()`
 	 **/
 	p.initialize = MovieClip; // TODO: deprecated.
 
@@ -566,7 +566,7 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.MovieClip = createjs.extends(MovieClip, createjs.Container);
+	createjs.MovieClip = createjs.promote(MovieClip);
 
 
 

@@ -95,7 +95,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this.quality = quality | 0;
 	}
-	var p = BlurFilter.prototype;
+	var p = createjs.extend(BlurFilter, createjs.Filter);
 
 
 
@@ -359,5 +359,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.BlurFilter = createjs.extends(BlurFilter, createjs.Filter);
+	createjs.BlurFilter = createjs.promote(BlurFilter);
 }());

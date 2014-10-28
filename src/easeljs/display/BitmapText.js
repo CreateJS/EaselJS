@@ -122,7 +122,7 @@ this.createjs = this.createjs || {};
 		 **/
 		this._oldProps = {text:0,spriteSheet:0,lineHeight:0,letterSpacing:0,spaceWidth:0};
 	}
-	var p = BitmapText.prototype;
+	var p = createjs.extend(BitmapText, createjs.Container);
 
 
 // static properties:
@@ -304,5 +304,5 @@ this.createjs = this.createjs || {};
 	};
 
 
-	createjs.BitmapText = createjs.extends(BitmapText, createjs.Container);
+	createjs.BitmapText = createjs.promote(BitmapText);
 }());

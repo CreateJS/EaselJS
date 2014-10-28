@@ -73,7 +73,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this.graphics = graphics ? graphics : new createjs.Graphics();
 	}
-	var p = Shape.prototype;
+	var p = createjs.extend(Shape, createjs.DisplayObject);
 
 
 // public methods:
@@ -129,5 +129,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.Shape = createjs.extends(Shape, createjs.DisplayObject);
+	createjs.Shape = createjs.promote(Shape);
 }());

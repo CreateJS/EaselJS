@@ -95,7 +95,7 @@ this.createjs = this.createjs || {};
 		 **/
 		this._mapData = null;
 	}
-	var p = AlphaMapFilter.prototype;
+	var p = createjs.extend(AlphaMapFilter, createjs.Filter);
 
 
 // public methods:
@@ -180,5 +180,5 @@ this.createjs = this.createjs || {};
 	};
 
 
-	createjs.AlphaMapFilter = createjs.extends(AlphaMapFilter, createjs.Filter);
+	createjs.AlphaMapFilter = createjs.promote(AlphaMapFilter);
 }());

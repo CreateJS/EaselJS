@@ -98,7 +98,7 @@ this.createjs = this.createjs||{};
 		 */
 		this._oldMtx = null;
 	}
-	var p = DOMElement.prototype;
+	var p = createjs.extend(DOMElement, createjs.DisplayObject);
 	
 
 // public methods:
@@ -265,5 +265,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.DOMElement = createjs.extends(DOMElement, createjs.DisplayObject);
+	createjs.DOMElement = createjs.promote(DOMElement);
 }());

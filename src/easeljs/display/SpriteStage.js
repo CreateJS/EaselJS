@@ -263,7 +263,7 @@ this.createjs = this.createjs||{};
 	// setup:
 		this._initializeWebGL();
 	}
-	var p = SpriteStage.prototype;
+	var p = createjs.extend(SpriteStage, createjs.Stage);
 
 
 // constants:
@@ -1004,5 +1004,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.SpriteStage = createjs.extends(SpriteStage, createjs.Stage);
+	createjs.SpriteStage = createjs.promote(SpriteStage);
 }());

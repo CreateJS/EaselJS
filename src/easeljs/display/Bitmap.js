@@ -88,7 +88,7 @@ this.createjs = this.createjs||{};
 		 */
 		this.sourceRect = null;
 	}
-	var p = Bitmap.prototype;
+	var p = createjs.extend(Bitmap, createjs.DisplayObject);
 	
 	
 // public methods:
@@ -194,5 +194,5 @@ this.createjs = this.createjs||{};
 	};
 
 	
-	createjs.Bitmap = createjs.extends(Bitmap, createjs.DisplayObject);
+	createjs.Bitmap = createjs.promote(Bitmap);
 }());
