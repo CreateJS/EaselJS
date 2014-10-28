@@ -618,6 +618,7 @@ this.createjs = this.createjs||{};
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
 		
 		var minX, maxX, minY, maxY;
+		minX = maxX = minY = maxY = null;
 		var mtx = ignoreTransform ? this._matrix.identity() : this.getMatrix(this._matrix);
 		if (matrix) { mtx.prependMatrix(matrix); }
 		
@@ -626,10 +627,11 @@ this.createjs = this.createjs||{};
 			var child = this.children[i];
 			if (!child.visible || !(bounds = child._getBounds(mtx))) { continue; }
 			var x1=bounds.x, y1=bounds.y, x2=x1+bounds.width, y2=y1+bounds.height;
-			if (x1 < minX || minX == null) { minX = x1; }
-			if (x2 > maxX || maxX == null) { maxX = x2; }
-			if (y1 < minY || minY == null) { minY = y1; }
-			if (y2 > maxY || maxY == null) { maxY = y2; }
+			// TODO: this could be moved into a Rectangle method:
+			if (x1 < minX || minX === null) { minX = x1; }
+			if (x2 > maxX || maxX === null) { maxX = x2; }
+			if (y1 < minY || minY === null) { minY = y1; }
+			if (y2 > maxY || maxY === null) { maxY = y2; }
 		}
 		
 		return (maxX == null) ? null : this._rectangle.initialize(minX, minY, maxX-minX, maxY-minY);
