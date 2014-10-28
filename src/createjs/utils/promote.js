@@ -39,30 +39,6 @@ this.createjs = this.createjs||{};
  */
 
 /**
- * Sets up the prototype chain and constructor property for a new class.
- * 
- * This should be called right after creating the class constructor.
- * 
- * 	function MySubClass() {}
- * 	createjs.extend(MySubClass, MySuperClass); // returns the prototype
- * 	ClassB.prototype.doSomething = function() { }
- * 	
- * 	var foo = new MySubClass();
- * 	console.log(foo instanceof MySuperClass); // true
- * 	console.log(foo.prototype.constructor === MySubClass); // true
- * 
- * @method extends
- * @param {Function} subclass The subclass.
- * @param {Function} superclass The superclass to extend.
- * @return {Function} Returns the subclass's new prototype.
- */
-createjs.extend = function(subclass, superclass) {
-	function o() { this.constructor = subclass; }
-	o.prototype = superclass.prototype;
-	return (subclass.prototype = new o());
-};
-
-/**
  * Promotes any methods on the super class that were overridden, by creating an alias in the format `SuperClassName_methodName`.
  * An alias to the super class's constructor is always added in the format `SuperClassName_constructor`.
  * This allows the subclass to call super class methods without using `function.call`, providing better performance.
