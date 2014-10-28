@@ -189,7 +189,7 @@ this.createjs = this.createjs||{};
 		 * @type Array
 		 * @default null
 		 */
-		this.frameBounds = null;
+		this.frameBounds = this.frameBounds||null; // TODO: Deprecated. This is for backwards support of FlashCC
 		
 		/**
 		 * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
@@ -294,7 +294,7 @@ this.createjs = this.createjs||{};
 	 * @method initialize
 	 * @deprecated in favour of `createjs.promote()`
 	 **/
-	p.initialize = MovieClip; // TODO: deprecated.
+	p.initialize = MovieClip; // TODO: Deprecated. This is for backwards support of FlashCC
 
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
