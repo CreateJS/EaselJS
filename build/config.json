@@ -1,6 +1,6 @@
 {
 	"easel_source": [
-		"../src/createjs/utils/extends.js",
+		"../src/createjs/utils/core.js",
 		"../src/createjs/events/Event.js",
 		"../src/createjs/events/EventDispatcher.js",
 		"../src/createjs/utils/IndexOf.js",
