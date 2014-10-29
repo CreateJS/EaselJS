@@ -113,6 +113,15 @@ module.exports = function (grunt) {
 						version: '<%= version %>'
 					}
 				},
+				
+				clearversion: {
+					easel: {
+						file: '../src/easeljs/version.js'
+					},
+					movieclip: {
+						file: '../src/easeljs/version_movieclip.js'
+					}
+				},
 			}
 	);
 	function getHubTasks() {
@@ -221,7 +230,7 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('nextlib', [
-		"updateversion", "combine", "uglify", "copy:src"
+		"updateversion", "combine", "clearversion", "uglify", "copy:src"
 	]);
 
 	/**
@@ -237,7 +246,7 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('coreBuild', [
-		"updateversion", "combine", "uglify", "docs", "copy:src"
+		"updateversion", "combine", "clearversion", "uglify", "docs", "copy:src"
 	]);
 
 	/**
