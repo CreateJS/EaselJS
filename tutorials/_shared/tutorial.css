@@ -32,30 +32,49 @@ header p {
 }
 
 header p strong {
-	color: #808999;
+	color: #808387;
+	text-transform: uppercase;
+}
+
+h1::after {
+	display: block;
+	content: "";
+	background: url('../_shared/createjs-logo-horizontal-gray-lightest.svg') no-repeat;
+	height:2em;
+	width: 6em;
+	margin-top: -0.1em;
+	float: right;
 }
 
 h1, h2 {
 	color: #FFF;
-	font-size: 2em;
+	font-size: 1.6em;
 	margin-bottom: 0;
-	padding: 0.66em;
-	padding-bottom: 0.5em;
+	padding: 1.5em;
+	padding-bottom: 1.2em;
 	background: #374252;
 	text-transform: uppercase;
 }
 
+h1 em {
+	font-weight: 200;
+	font-style: normal;
+}
+
 h2 {
-	font-size: 1.5em;
+	font-size: 1.3em;
+	padding: 1em;
+	padding-bottom: 0.8em;
 }
 
 h3 {
-	background: #d9dadf;
+	background: #e0e1e5;
 	color: #374252;
 	font-size: 1.25em;
 	padding: 0.5em;
 	margin-top: 1.25em;
 	margin-bottom: -0.5em;
+	position: relative;
 }
 
 div.demo {
