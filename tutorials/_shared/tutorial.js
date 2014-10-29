@@ -30,7 +30,7 @@ function injectDemos() {
 		var p = document.createElement("p");
 		var srcLabel = src.split("\\").join("/").split("/").pop();
 		var html = "<strong>Demo</strong>";
-		if (e.longDesc) { html += ": "+e.longDesc; }
+		if (e.dataset) { html += ": "+(e.dataset.description||""); }
 		html += "<a href='"+src+"' target='_blank'>"+srcLabel+"</a>";
 		p.innerHTML = html;
 		div.appendChild(p);
