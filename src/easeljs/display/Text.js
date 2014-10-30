@@ -280,9 +280,7 @@ this.createjs = this.createjs||{};
 	 * @return {Text} a clone of the Text instance.
 	 **/
 	p.clone = function() {
-		var o = new Text(this.text, this.font, this.color);
-		this._cloneProps(o);
-		return o;
+		return this._cloneProps(new Text(this.text, this.font, this.color));
 	};
 
 	/**
@@ -297,9 +295,10 @@ this.createjs = this.createjs||{};
 
 // private methods:
 	/**
-	 * @method cloneProps
+	 * @method _cloneProps
 	 * @param {Text} o
 	 * @protected
+	 * @return {Text} o
 	 **/
 	p._cloneProps = function(o) {
 		this.DisplayObject__cloneProps(o);
@@ -309,6 +308,7 @@ this.createjs = this.createjs||{};
 		o.outline = this.outline;
 		o.lineHeight = this.lineHeight;
 		o.lineWidth = this.lineWidth;
+		return o;
 	};
 
 	/**

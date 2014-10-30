@@ -176,6 +176,10 @@ this.createjs = this.createjs || {};
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	};
 	
+	p.clone = function() {
+		return this._cloneProps(new BitmapText(text, spriteSheet));
+	};
+	
 	/**
 	 * <strong>Disabled in BitmapText.</strong>
 	 * @method addChild
@@ -200,6 +204,20 @@ this.createjs = this.createjs || {};
 
 
 // private methods:
+ 	/**
+	 * @method _cloneProps
+	 * @param {BitmapText} o
+	 * @return {BitmapText} o
+	 * @protected
+	 **/
+	p._cloneProps = function(o) {
+		this.DisplayObject__cloneProps(o);
+		o.lineHeight = this.lineHeight;
+		o.letterSpacing = this.letterSpacing;
+		o.spaceWidth = this.spaceWidth;
+		return o;
+	};
+	
 	/**
 	 * @method _getFrameIndex
 	 * @param {String} character
