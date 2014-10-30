@@ -502,8 +502,7 @@ this.createjs = this.createjs||{};
 	 * @return {Container} A clone of the current Container instance.
 	 **/
 	p.clone = function(recursive) {
-		var o = new Container();
-		this._cloneProps(o);
+		var o = this._cloneProps(new Container());
 		if (recursive) { this._cloneChildren(o); }
 		return o;
 	};

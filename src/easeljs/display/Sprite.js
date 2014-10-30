@@ -319,9 +319,7 @@ this.createjs = this.createjs||{};
 	 * @return {Sprite} a clone of the Sprite instance.
 	 **/
 	p.clone = function() {
-		var o = new Sprite(this.spriteSheet);
-		this._cloneProps(o);
-		return o;
+		return this._cloneProps(new Sprite(this.spriteSheet));
 	};
 
 	/**
@@ -334,6 +332,24 @@ this.createjs = this.createjs||{};
 	};
 
 // private methods:
+	/**
+	 * @method _cloneProps
+	 * @param {Sprite} o
+	 * @return {Sprite} o
+	 * @protected
+	 **/
+	p._cloneProps = function(o) {
+		this.DisplayObject__cloneProps(o);
+		o.currentFrame = this.currentFrame;
+		o._currentFrame = this._currentFrame;
+		o.currentAnimation = this.currentAnimation;
+		o.paused = this.paused;
+		o._animation = this._animation;
+		o.currentAnimationFrame = this.currentAnimationFrame;
+		o.framerate = this.framerate;
+		return o;
+	};
+	
 	/**
 	 * Advances the <code>currentFrame</code> if paused is not true. This is called automatically when the {{#crossLink "Stage"}}{{/crossLink}}
 	 * ticks.
@@ -421,22 +437,6 @@ this.createjs = this.createjs||{};
 		// if the animation hasn't changed, but the sprite was paused, then we want to stick to the last frame:
 		if (!changed && !paused && this.paused) { this.currentAnimationFrame = end; changed = true; }
 		return changed;
-	};
-
-	/**
-	 * @method cloneProps
-	 * @param {Sprite} o
-	 * @protected
-	 **/
-	p._cloneProps = function(o) {
-		this.DisplayObject__cloneProps(o);
-		o.currentFrame = this.currentFrame;
-		o._currentFrame = this._currentFrame;
-		o.currentAnimation = this.currentAnimation;
-		o.paused = this.paused;
-		o._animation = this._animation;
-		o.currentAnimationFrame = this.currentAnimationFrame;
-		o.framerate = this.framerate;
 	};
 
 	/**

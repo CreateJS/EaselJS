@@ -1129,9 +1129,7 @@ this.createjs = this.createjs||{};
 	 * @return {DisplayObject} A clone of the current DisplayObject instance.
 	 **/
 	p.clone = function() {
-		var o = new DisplayObject();
-		this._cloneProps(o);
-		return o;
+		return this._cloneProps(new DisplayObject());
 	};
 
 	/**
@@ -1147,10 +1145,11 @@ this.createjs = this.createjs||{};
 // private methods:
 	// separated so it can be used more easily in subclasses:
 	/**
-	 * @method cloneProps
-	 * @protected
+	 * @method _cloneProps
 	 * @param {DisplayObject} o The DisplayObject instance which will have properties from the current DisplayObject
 	 * instance copied into.
+	 * @return {DisplayObject} o
+	 * @protected
 	 **/
 	p._cloneProps = function(o) {
 		o.alpha = this.alpha;
@@ -1175,6 +1174,7 @@ this.createjs = this.createjs||{};
 		o.hitArea = this.hitArea;
 		o.cursor = this.cursor;
 		o._bounds = this._bounds;
+		return o;
 	};
 
 	/**
