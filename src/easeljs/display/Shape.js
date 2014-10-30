@@ -115,7 +115,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clone = function(recursive) {
 		var o = new Shape((recursive && this.graphics) ? this.graphics.clone() : this.graphics);
-		this.cloneProps(o);
+		this._cloneProps(o);
 		return o;
 	};
 

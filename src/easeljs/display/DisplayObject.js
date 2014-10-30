@@ -1130,7 +1130,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clone = function() {
 		var o = new DisplayObject();
-		this.cloneProps(o);
+		this._cloneProps(o);
 		return o;
 	};
 
@@ -1152,7 +1152,7 @@ this.createjs = this.createjs||{};
 	 * @param {DisplayObject} o The DisplayObject instance which will have properties from the current DisplayObject
 	 * instance copied into.
 	 **/
-	p.cloneProps = function(o) {
+	p._cloneProps = function(o) {
 		o.alpha = this.alpha;
 		o.mouseEnabled = this.mouseEnabled;
 		o.tickEnabled = this.tickEnabled;

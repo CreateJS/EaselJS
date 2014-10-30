@@ -281,7 +281,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clone = function() {
 		var o = new Text(this.text, this.font, this.color);
-		this.cloneProps(o);
+		this._cloneProps(o);
 		return o;
 	};
 
@@ -301,8 +301,8 @@ this.createjs = this.createjs||{};
 	 * @param {Text} o
 	 * @protected
 	 **/
-	p.cloneProps = function(o) {
-		this.DisplayObject_cloneProps(o);
+	p._cloneProps = function(o) {
+		this.DisplayObject__cloneProps(o);
 		o.textAlign = this.textAlign;
 		o.textBaseline = this.textBaseline;
 		o.maxWidth = this.maxWidth;
