@@ -133,7 +133,10 @@ this.createjs = this.createjs || {};
 
 	/** docced in super class **/
 	p.clone = function () {
-		return new AlphaMapFilter(this.alphaMap);
+		var o = new AlphaMapFilter(this.alphaMap);
+		o._alphaMap = this._alphaMap;
+		o._mapData = this._mapData;
+		return o;
 	};
 
 	/** docced in super class **/
