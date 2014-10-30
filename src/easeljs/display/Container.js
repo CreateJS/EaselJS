@@ -503,15 +503,8 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clone = function(recursive) {
 		var o = new Container();
-		if (recursive) {
-			var arr = o.children = [];
-			for (var i=0, l=this.children.length; i<l; i++) {
-				var clone = this.children[i].clone(recursive);
-				clone.parent = o;
-				arr.push(clone);
-			}
-		}
 		this._cloneProps(o);
+		if (recursive) { this._cloneChildren(o); }
 		return o;
 	};
 
@@ -540,6 +533,22 @@ this.createjs = this.createjs||{};
 			}
 		}
 		this.DisplayObject__tick(props);
+	};
+	
+	/**
+	 * Recursively clones all children of this container, and adds them to the target container.
+	 * @method cloneChildren
+	 * @protected
+	 * @param {Container} o The target container.
+	 **/
+	p._cloneChildren = function(o) {
+		if (o.children.length) { o.removeAllChildren(); }
+		var arr = o.children;
+		for (var i=0, l=this.children.length; i<l; i++) {
+			var clone = this.children[i].clone(true);
+			clone.parent = o;
+			arr.push(clone);
+		}
 	};
 
 	/**
