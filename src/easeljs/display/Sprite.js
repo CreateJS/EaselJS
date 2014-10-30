@@ -341,12 +341,14 @@ this.createjs = this.createjs||{};
 	p._cloneProps = function(o) {
 		this.DisplayObject__cloneProps(o);
 		o.currentFrame = this.currentFrame;
-		o._currentFrame = this._currentFrame;
 		o.currentAnimation = this.currentAnimation;
 		o.paused = this.paused;
-		o._animation = this._animation;
 		o.currentAnimationFrame = this.currentAnimationFrame;
 		o.framerate = this.framerate;
+		
+		o._animation = this._animation;
+		o._currentFrame = this._currentFrame;
+		o._skipAdvance = this._skipAdvance;
 		return o;
 	};
 	

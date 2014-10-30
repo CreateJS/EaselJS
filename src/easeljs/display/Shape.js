@@ -114,9 +114,8 @@ this.createjs = this.createjs||{};
 	 * cloned. If false, the Graphics instance will be shared with the new Shape.
 	 **/
 	p.clone = function(recursive) {
-		var o = new Shape((recursive && this.graphics) ? this.graphics.clone() : this.graphics);
-		this._cloneProps(o);
-		return o;
+		var g = (recursive && this.graphics) ? this.graphics.clone() : this.graphics;
+		return  this._cloneProps(new Shape(g));
 	};
 
 	/**

@@ -177,7 +177,7 @@ this.createjs = this.createjs || {};
 	};
 	
 	p.clone = function() {
-		return this._cloneProps(new BitmapText(text, spriteSheet));
+		return this._cloneProps(new BitmapText(this.text, this.spriteSheet));
 	};
 	
 	/**
