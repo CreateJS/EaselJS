@@ -158,6 +158,15 @@ this.createjs = this.createjs||{};
 		this.cacheCanvas = null;
 	
 		/**
+		 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
+		 * determine if the cache has changed since a previous check.
+		 * @property cacheID
+		 * @type {Number}
+		 * @default 0
+		 */
+		this.cacheID = 0;
+	
+		/**
 		 * Unique ID for this display object. Makes display objects easier for some uses.
 		 * @property id
 		 * @type {Number}
@@ -334,15 +343,6 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this.filters = null;
-	
-		/**
-		 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
-		 * determine if the cache has changed since a previous check.
-		 * @property cacheID
-		 * @type {Number}
-		 * @default 0
-		 */
-		this.cacheID = 0;
 		
 		/**
 		 * A Shape instance that defines a vector mask (clipping path) for this display object.  The shape's transformation
@@ -1123,7 +1123,8 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
-	 * reverted to their defaults (for example .parent). Also note that caches are not maintained across clones.
+	 * reverted to their defaults (for example .parent). Caches are not maintained across clones, and some elements
+	 * are copied by reference (masks, individual filter instances, hit area)
 	 * @method clone
 	 * @return {DisplayObject} A clone of the current DisplayObject instance.
 	 **/
@@ -1153,6 +1154,8 @@ this.createjs = this.createjs||{};
 	 **/
 	p.cloneProps = function(o) {
 		o.alpha = this.alpha;
+		o.mouseEnabled = this.mouseEnabled;
+		o.tickEnabled = this.tickEnabled;
 		o.name = this.name;
 		o.regX = this.regX;
 		o.regY = this.regY;
@@ -1165,9 +1168,13 @@ this.createjs = this.createjs||{};
 		o.visible = this.visible;
 		o.x  = this.x;
 		o.y = this.y;
-		o._bounds = this._bounds;
-		o.mouseEnabled = this.mouseEnabled;
 		o.compositeOperation = this.compositeOperation;
+		o.snapToPixel = this.snapToPixel;
+		o.filters = this.filters.slice(0);
+		o.mask = this.mask;
+		o.hitArea = this.hitArea;
+		o.cursor = this.cursor;
+		o._bounds = this._bounds;
 	};
 
 	/**
