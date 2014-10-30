@@ -269,7 +269,7 @@ this.createjs = this.createjs||{};
 		 * @type {Number}
 		 * @default 0
 		 **/
-		p.skewY = 0;
+		this.skewY = 0;
 	
 		/**
 		 * A shadow object that defines the shadow to render on this display object. Set to `null` to remove a shadow. If
