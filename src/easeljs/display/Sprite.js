@@ -320,7 +320,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clone = function() {
 		var o = new Sprite(this.spriteSheet);
-		this.cloneProps(o);
+		this._cloneProps(o);
 		return o;
 	};
 
@@ -428,8 +428,8 @@ this.createjs = this.createjs||{};
 	 * @param {Sprite} o
 	 * @protected
 	 **/
-	p.cloneProps = function(o) {
-		this.DisplayObject_cloneProps(o);
+	p._cloneProps = function(o) {
+		this.DisplayObject__cloneProps(o);
 		o.currentFrame = this.currentFrame;
 		o._currentFrame = this._currentFrame;
 		o.currentAnimation = this.currentAnimation;

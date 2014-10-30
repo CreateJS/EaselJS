@@ -571,7 +571,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clone = function() {
 		var o = new Stage(null);
-		this.cloneProps(o);
+		this._cloneProps(o);
 		return o;
 	};
 

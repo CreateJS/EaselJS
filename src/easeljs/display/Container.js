@@ -503,7 +503,6 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clone = function(recursive) {
 		var o = new Container();
-		this.cloneProps(o);
 		if (recursive) {
 			var arr = o.children = [];
 			for (var i=0, l=this.children.length; i<l; i++) {
@@ -512,6 +511,7 @@ this.createjs = this.createjs||{};
 				arr.push(clone);
 			}
 		}
+		this._cloneProps(o);
 		return o;
 	};
 
