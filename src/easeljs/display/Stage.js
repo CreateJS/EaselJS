@@ -565,14 +565,11 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Returns a clone of this Stage.
+	 * Stage instances cannot be cloned.
 	 * @method clone
-	 * @return {Stage} A clone of the current Container instance.
 	 **/
 	p.clone = function() {
-		var o = new Stage(null);
-		this._cloneProps(o);
-		return o;
+		throw("Stage cannot be cloned.");
 	};
 
 	/**

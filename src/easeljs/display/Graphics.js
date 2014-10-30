@@ -1042,14 +1042,16 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clone = function() {
 		var o = new Graphics();
-		o._instructions = this._instructions.slice();
-		o._activeInstructions = this._activeInstructions.slice();
-		o._commitIndex = this._commitIndex;
-		o._fill = this._fill;
+		o.command = this.command;
 		o._stroke = this._stroke;
 		o._strokeStyle = this._strokeStyle;
-		o._dirty = this._dirty;
 		o._strokeIgnoreScale = this._strokeIgnoreScale;
+		o._fill = this._fill;
+		o._instructions = this._instructions.slice();
+		o._commitIndex = this._commitIndex;
+		o._activeInstructions = this._activeInstructions.slice();
+		o._dirty = this._dirty;
+		o._storeIndex = this._storeIndex;
 		return o;
 	};
 

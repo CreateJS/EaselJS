@@ -356,23 +356,11 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Returns a clone of the SpriteSheet instance.
+	 * SpriteSheet cannot be cloned. A SpriteSheet can be shared by multiple Sprite instances without cloning it.
 	 * @method clone
-	 * @return {SpriteSheet} a clone of the SpriteSheet instance.
 	 **/
 	p.clone = function() {
-		// TODO: there isn't really any reason to clone SpriteSheet instances, because they can be reused.
-		var o = new SpriteSheet();
-		o.complete = this.complete;
-		o._animations = this._animations;
-		o._frames = this._frames;
-		o._images = this._images;
-		o._data = this._data;
-		o._frameHeight = this._frameHeight;
-		o._frameWidth = this._frameWidth;
-		o._numFrames = this._numFrames;
-		o._loadCount = this._loadCount;
-		return o;
+		throw("SpriteSheet cannot be cloned.")
 	};
 
 // private methods:
