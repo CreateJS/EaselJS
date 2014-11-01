@@ -132,5 +132,5 @@ this.createjs = this.createjs || {};
 	};
 
 
-	createjs.AlphaMaskFilter = createjs.promote(AlphaMaskFilter);
+	createjs.AlphaMaskFilter = createjs.promote(AlphaMaskFilter, "Filter");
 }());

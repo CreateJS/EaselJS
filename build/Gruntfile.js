@@ -121,7 +121,7 @@ module.exports = function (grunt) {
 					movieclip: {
 						file: '../src/easeljs/version_movieclip.js'
 					}
-				},
+				}
 			}
 	);
 	function getHubTasks() {

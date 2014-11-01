@@ -128,5 +128,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.Shape = createjs.promote(Shape);
+	createjs.Shape = createjs.promote(Shape, "DisplayObject");
 }());

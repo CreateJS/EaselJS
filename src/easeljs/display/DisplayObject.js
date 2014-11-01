@@ -122,6 +122,8 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
+
 
 // constructor:
 	/**
@@ -1324,5 +1326,5 @@ this.createjs = this.createjs||{};
 		return !!this.cursor;
 	};
 
-	createjs.DisplayObject = createjs.promote(DisplayObject);
+	createjs.DisplayObject = createjs.promote(DisplayObject, "EventDispatcher");
 }());

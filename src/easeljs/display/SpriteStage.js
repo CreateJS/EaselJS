@@ -1004,5 +1004,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.SpriteStage = createjs.promote(SpriteStage);
+	createjs.SpriteStage = createjs.promote(SpriteStage, "Stage");
 }());

@@ -194,5 +194,5 @@ this.createjs = this.createjs||{};
 	};
 
 	
-	createjs.Bitmap = createjs.promote(Bitmap);
+	createjs.Bitmap = createjs.promote(Bitmap, "DisplayObject");
 }());

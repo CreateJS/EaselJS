@@ -566,7 +566,7 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.MovieClip = createjs.promote(MovieClip);
+	createjs.MovieClip = createjs.promote(MovieClip, "Container");
 
 
 

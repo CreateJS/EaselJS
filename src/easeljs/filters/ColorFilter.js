@@ -168,5 +168,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.ColorFilter = createjs.promote(ColorFilter);
+	createjs.ColorFilter = createjs.promote(ColorFilter, "Filter");
 }());

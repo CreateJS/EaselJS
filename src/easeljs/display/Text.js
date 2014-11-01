@@ -414,5 +414,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.Text = createjs.promote(Text);
+	createjs.Text = createjs.promote(Text, "DisplayObject");
 }());

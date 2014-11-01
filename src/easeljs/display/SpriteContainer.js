@@ -169,5 +169,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.SpriteContainer = createjs.promote(SpriteContainer);
+	createjs.SpriteContainer = createjs.promote(SpriteContainer, "Container");
 }());

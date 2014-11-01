@@ -465,5 +465,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.Sprite = createjs.promote(Sprite);
+	createjs.Sprite = createjs.promote(Sprite, "DisplayObject");
 }());

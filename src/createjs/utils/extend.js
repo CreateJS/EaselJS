@@ -44,7 +44,7 @@ this.createjs = this.createjs||{};
  * This should be called right after creating the class constructor.
  * 
  * 	function MySubClass() {}
- * 	createjs.extend(MySubClass, MySuperClass); // returns the prototype
+ * 	createjs.extend(MySubClass, MySuperClass);
  * 	ClassB.prototype.doSomething = function() { }
  * 	
  * 	var foo = new MySubClass();

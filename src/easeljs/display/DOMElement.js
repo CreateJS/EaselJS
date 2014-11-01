@@ -265,5 +265,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.DOMElement = createjs.promote(DOMElement);
+	createjs.DOMElement = createjs.promote(DOMElement, "DisplayObject");
 }());

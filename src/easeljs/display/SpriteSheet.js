@@ -484,5 +484,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.SpriteSheet = createjs.promote(SpriteSheet);
+	createjs.SpriteSheet = createjs.promote(SpriteSheet, "EventDispatcher");
 }());
