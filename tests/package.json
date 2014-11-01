@@ -1,0 +1,12 @@
+{
+  "name": "EaselJS-UnitTests",
+  "version": "0.0.1",
+  "description": "EaselJS unit testing.",
+  "url": "http://www.createjs.com/#!/EaselJS",
+  "logo": "assets/docs-icon-EaselJS.png",
+  "devDependencies": {
+    "canvas": "^1.1.6",
+    "imagediff": "^1.0.7"
+  },
+  "engine": "node >= 0.10.22"
+}
