@@ -8,7 +8,7 @@ CRITICAL (may break existing content):
 - Moved Ticker into the "createjs" package since it will be included with TweenJS in future releases.
 - re-architected the class and inheritance model
 	- helper methods: extend & promote (see the "Utility Methods" docs)
-	- no more initialize methods, SuperClass_constructor used instead
+	- initialize methods removed, use SuperClass_constructor instead
 	- property definitions are now instance level, and in the constructor (performance gains)
 
 *****
