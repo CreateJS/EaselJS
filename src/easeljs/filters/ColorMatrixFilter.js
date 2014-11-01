@@ -123,5 +123,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.ColorMatrixFilter = createjs.promote(ColorMatrixFilter);
+	createjs.ColorMatrixFilter = createjs.promote(ColorMatrixFilter, "Filter");
 }());

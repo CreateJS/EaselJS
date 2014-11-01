@@ -183,5 +183,5 @@ this.createjs = this.createjs || {};
 	};
 
 
-	createjs.AlphaMapFilter = createjs.promote(AlphaMapFilter);
+	createjs.AlphaMapFilter = createjs.promote(AlphaMapFilter, "Filter");
 }());

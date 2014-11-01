@@ -880,5 +880,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.Stage = createjs.promote(Stage);
+	createjs.Stage = createjs.promote(Stage, "Container");
 }());

@@ -39,13 +39,14 @@ this.createjs = this.createjs||{};
  */
 
 /**
- * Promotes any methods on the super class that were overridden, by creating an alias in the format `SuperClassName_methodName`.
- * An alias to the super class's constructor is always added in the format `SuperClassName_constructor`.
+ * Promotes any methods on the super class that were overridden, by creating an alias in the format `prefix_methodName`.
+ * It is recommended to use the super class's name as the prefix.
+ * An alias to the super class's constructor is always added in the format `prefix_constructor`.
  * This allows the subclass to call super class methods without using `function.call`, providing better performance.
  * 
- * For example, if `MySubClass` extends `MySuperClass`, and both define a `draw` method, then calling `promote(MySubClass)`
- * would: add a `MySuperClass_constructor` method to MySubClass and promote the `draw` method on MySuperClass to the
- * prototype of MySubClass as `MySuperClass_draw`.
+ * For example, if `MySubClass` extends `MySuperClass`, and both define a `draw` method, then calling `promote(MySubClass, "MySuperClass")`
+ * would add a `MySuperClass_constructor` method to MySubClass and promote the `draw` method on `MySuperClass` to the
+ * prototype of `MySubClass` as `MySuperClass_draw`.
  * 
  * This should be called after the class's prototype is fully defined.
  * 
@@ -64,24 +65,22 @@ this.createjs = this.createjs||{};
  * 	ClassB.prototype.greet = function() {
  * 		return this.ClassA_greet()+this.punctuation;
  * 	}
- * 	createjs.promote(ClassB);
+ * 	createjs.promote(ClassB, "ClassA");
  * 	
  * 	var foo = new ClassB("World", "!?!");
  * 	console.log(foo.greet()); // Hello World!?!
  * 
- * @method extends
- * @param {Function} subclass The subclass to promote super class methods on.
- * @param {String} [superclassName] The name of the superclass. This is only necessary if the constructor is an anonymous function (`MyClass = function()` instead of `function MyClass()`).
+ * @method promote
+ * @param {Function} subclass The class to promote super class methods on.
+ * @param {String} prefix The prefix to add to the promoted method names. Usually the name of the superclass.
  * @return {Function} Returns the subclass.
  */
-createjs.promote = function(subclass, superclassName) {
+createjs.promote = function(subclass, prefix) {
 	var subP = subclass.prototype, supP = (Object.getPrototypeOf&&Object.getPrototypeOf(subP))||subP.__proto__;
 	if (supP) {
-		superclassName = superclassName || supP.constructor.name || /^function\s+([^\s\(]+)\s*\(/.exec(String(supP.constructor))[1];
-
-		subP[superclassName + "_constructor"] = supP.constructor; // constructor is not always innumerable
+		subP[(prefix+="_") + "constructor"] = supP.constructor; // constructor is not always innumerable
 		for (var n in supP) {
-			if (subP[n] && (typeof supP[n] == "function")) { subP[superclassName + "_" + n] = supP[n]; }
+			if (subP.hasOwnProperty(n) && (typeof supP[n] == "function")) { subP[prefix + n] = supP[n]; }
 		}
 	}
 	return subclass;

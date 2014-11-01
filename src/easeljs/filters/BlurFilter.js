@@ -359,5 +359,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.BlurFilter = createjs.promote(BlurFilter);
+	createjs.BlurFilter = createjs.promote(BlurFilter, "Filter");
 }());

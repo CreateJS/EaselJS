@@ -639,5 +639,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.Container = createjs.promote(Container);
+	createjs.Container = createjs.promote(Container, "DisplayObject");
 }());
