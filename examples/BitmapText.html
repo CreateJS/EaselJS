@@ -18,12 +18,7 @@
 			img.onload = function() {
 				var ss = new createjs.SpriteSheet(data);
 
-				text = new createjs.BitmapText("Hello World,\nWhat's Happening?", ss);
-
-				// Center the text
-				var bounds = text.getBounds();
-				text.x = stage.canvas.width - bounds.width >> 1;
-				text.y = stage.canvas.height - bounds.height >> 1;
+				var text = new createjs.BitmapText("abcdef\nghijklm\nnopqr\nstuvw\nxyz", ss);
 
 				stage.addChild(text);
 				stage.update();
