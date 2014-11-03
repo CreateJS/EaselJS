@@ -168,5 +168,5 @@ this.createjs = this.createjs||{};
 	};
 
 
-	createjs.MouseEvent = createjs.promote(MouseEvent, "MouseEvent");
+	createjs.MouseEvent = createjs.promote(MouseEvent, "Event");
 }());
