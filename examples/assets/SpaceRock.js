@@ -6,7 +6,7 @@
 		this.activate(size);
 	}
 
-	var p = SpaceRock.prototype;
+	var p = createjs.extend(SpaceRock, createjs.Shape);
 
 // static properties:
 	SpaceRock.LRG_ROCK = 40;
@@ -141,6 +141,6 @@
 	}
 
 
-	window.SpaceRock = createjs.extends(SpaceRock, createjs.Shape);
+	window.SpaceRock = createjs.promote(SpaceRock, "Shape");
 
 }(window));
