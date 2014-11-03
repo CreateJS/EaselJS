@@ -169,7 +169,7 @@ this.createjs = this.createjs||{};
 		if (rect) { return rect; }
 		var o = this.sourceRect || this.image;
 		var hasContent = (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
-		return hasContent ? this._rectangle.initialize(0, 0, o.width, o.height) : null;
+		return hasContent ? this._rectangle.setValues(0, 0, o.width, o.height) : null;
 	};
 	
 	/**

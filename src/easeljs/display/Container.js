@@ -562,7 +562,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p._getObjectsUnderPoint = function(x, y, arr, mouse, activeListener) {
 		var ctx = createjs.DisplayObject._hitTestContext;
-		var mtx = this._matrix;
+		var props = this._props, mtx = props.matrix;
 		activeListener = activeListener || (mouse&&this._hasMouseEventListener());
 
 		// draw children one at a time, and check if we get a hit:
@@ -573,8 +573,8 @@ this.createjs = this.createjs||{};
 			var hitArea = child.hitArea, mask = child.mask;
 			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
 			if (!hitArea && mask && mask.graphics && !mask.graphics.isEmpty()) {
-				var maskMtx = mask.getMatrix(mask._matrix).prependMatrix(this.getConcatenatedMatrix(mtx));
-				ctx.setTransform(maskMtx.a,  maskMtx.b, maskMtx.c, maskMtx.d, maskMtx.tx-x, maskMtx.ty-y);
+				mtx = mask.getMatrix(mask._props.matrix).prependMatrix(this.getConcatenatedMatrix(mtx));
+				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				
 				// draw the mask as a solid fill:
 				mask.graphics.drawAsPath(ctx);
@@ -594,14 +594,16 @@ this.createjs = this.createjs||{};
 			} else {
 				if (mouse && !activeListener && !child._hasMouseEventListener()) { continue; }
 				
-				child.getConcatenatedMatrix(mtx);
+				// TODO: can we pass displayProps forward, to avoid having to calculate this backwards every time? It's kind of a mixed bag. When we're only hunting for DOs with event listeners, it may not make sense.
+				child.getConcatenatedDisplayProps(props);
+				mtx = props.matrix;
 				
 				if (hitArea) {
 					mtx.appendTransform(hitArea.x, hitArea.y, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
-					mtx.alpha = hitArea.alpha;
+					props.alpha = hitArea.alpha;
 				}
 				
-				ctx.globalAlpha = mtx.alpha;
+				ctx.globalAlpha = props.alpha;
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				(hitArea||child).draw(ctx);
 				if (!this._testHit(ctx)) { continue; }
@@ -625,7 +627,8 @@ this.createjs = this.createjs||{};
 		var bounds = this.DisplayObject_getBounds();
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
 		
-		var mtx = ignoreTransform ? this._matrix.identity() : this.getMatrix(this._matrix);
+		var mtx = this._props.matrix;
+		mtx = ignoreTransform ? mtx.identity() : this.getMatrix(mtx);
 		if (matrix) { mtx.prependMatrix(matrix); }
 		
 		var l = this.children.length, rect=null;

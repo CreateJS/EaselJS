@@ -96,7 +96,7 @@ this.createjs = this.createjs||{};
 		 * @type Matrix2D
 		 * @protected
 		 */
-		this._oldMtx = null;
+		this._oldProps = null;
 	}
 	var p = createjs.extend(DOMElement, createjs.DisplayObject);
 	
@@ -242,25 +242,27 @@ this.createjs = this.createjs||{};
 		if (!o) { return; }
 		var style = o.style;
 		
-		var mtx = this.getConcatenatedMatrix(this._matrix);
+		var props = this.getConcatenatedDisplayProps(this._props), mtx = props.matrix;
 		
-		var visibility = mtx.visible ? "visible" : "hidden";
+		var visibility = props.visible ? "visible" : "hidden";
 		if (visibility != style.visibility) { style.visibility = visibility; }
-		if (!mtx.visible) { return; }
+		if (!props.visible) { return; }
 		
-		var oMtx = this._oldMtx;
+		var oldProps = this._oldProps, oldMtx = oldProps&&oldProps.matrix;
 		var n = 10000; // precision
-		if (!oMtx || oMtx.alpha != mtx.alpha) {
-			style.opacity = ""+(mtx.alpha*n|0)/n;
-			if (oMtx) { oMtx.alpha = mtx.alpha; }
-		}
 		
 		// TODO: move this comparison into a .equals method in Matrix2D:
-		if (!oMtx || oMtx.tx != mtx.tx || oMtx.ty != mtx.ty || oMtx.a != mtx.a || oMtx.b != mtx.b || oMtx.c != mtx.c || oMtx.d != mtx.d) {
+		if (!oldMtx || !oldMtx.equals(mtx)) {
 			var str = "matrix(" + (mtx.a*n|0)/n +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n +","+ (mtx.tx+0.5|0);
 			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty+0.5|0) +")";
 			style.MozTransform = str +"px,"+ (mtx.ty+0.5|0) +"px)";
-			this._oldMtx = oMtx ? oMtx.copy(mtx) : mtx.clone();
+			if (!oldProps) { oldProps = this._oldProps = new createjs.DisplayProps(true, NaN); }
+			oldProps.matrix.copy(mtx);
+		}
+		
+		if (oldProps.alpha != props.alpha) {
+			style.opacity = ""+(props.alpha*n|0)/n;
+			oldProps.alpha = props.alpha;
 		}
 	};
 

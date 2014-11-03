@@ -343,7 +343,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.getFrameBounds = function(frameIndex, rectangle) {
 		var frame = this.getFrame(frameIndex);
-		return frame ? (rectangle||new createjs.Rectangle()).initialize(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null;
+		return frame ? (rectangle||new createjs.Rectangle()).setValues(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null;
 	};
 
 	/**

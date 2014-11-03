@@ -50,10 +50,10 @@ this.createjs = this.createjs||{};
 	 * @constructor
 	 **/
 	function Matrix2D(a, b, c, d, tx, ty) {
-		this.initialize(a,b,c,d,tx,ty);
+		this.setValues(a,b,c,d,tx,ty);
 		
 	// public properties:
-		// assigned in the initialize method.
+		// assigned in the setValues method.
 		/**
 		 * Position (0, 0) in a 3x3 affine transformation matrix.
 		 * @property a
@@ -89,36 +89,6 @@ this.createjs = this.createjs||{};
 		 * @property ty
 		 * @type Number
 		 **/
-	
-		/**
-		 * Property representing the alpha that will be applied to a display object. This is not part of matrix
-		 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values.
-		 * @property alpha
-		 * @type Number
-		 **/
-	
-		/**
-		 * Property representing the shadow that will be applied to a display object. This is not part of matrix
-		 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values.
-		 * @property shadow
-		 * @type Shadow
-		 **/
-	
-		/**
-		 * Property representing the compositeOperation that will be applied to a display object. This is not part of
-		 * matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated
-		 * compositeOperation values. You can find a list of valid composite operations at:
-		 * <a href="https://developer.mozilla.org/en/Canvas_tutorial/Compositing">https://developer.mozilla.org/en/Canvas_tutorial/Compositing</a>
-		 * @property compositeOperation
-		 * @type String
-		 **/
-		
-		/**
-		 * Property representing the value for visible that will be applied to a display object. This is not part of matrix
-		 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated visible values.
-		 * @property visible
-		 * @type Boolean
-		 **/
 	}
 	var p = Matrix2D.prototype;
 
@@ -148,8 +118,8 @@ this.createjs = this.createjs||{};
 
 // public methods:
 	/**
-	 * Reinitializes the instance with the specified values.
-	 * @method initialize
+	 * Sets the specified values on this instance. 
+	 * @method setValues
 	 * @param {Number} [a=1] Specifies the a property for the new matrix.
 	 * @param {Number} [b=0] Specifies the b property for the new matrix.
 	 * @param {Number} [c=0] Specifies the c property for the new matrix.
@@ -158,7 +128,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
 	 * @return {Matrix2D} This instance. Useful for chaining method calls.
 	*/
-	p.initialize = function(a, b, c, d, tx, ty) {
+	p.setValues = function(a, b, c, d, tx, ty) {
 		// don't forget to update docs in the constructor if these change:
 		this.a = (a == null) ? 1 : a;
 		this.b = b || 0;
@@ -166,10 +136,6 @@ this.createjs = this.createjs||{};
 		this.d = (d == null) ? 1 : d;
 		this.tx = tx || 0;
 		this.ty = ty || 0;
-		
-		this.alpha = 1;
-		this.shadow = this.compositeOperation = null;
-		this.visible = true;
 		return this;
 	};
 
@@ -232,9 +198,7 @@ this.createjs = this.createjs||{};
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.prependMatrix = function(matrix) {
-		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-		this.prependProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation, matrix.visible);
-		return this;
+		return this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	};
 
 	/**
@@ -244,9 +208,7 @@ this.createjs = this.createjs||{};
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.appendMatrix = function(matrix) {
-		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-		this.appendProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation, matrix.visible);
-		return this;
+		return this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	};
 
 	/**
@@ -408,10 +370,8 @@ this.createjs = this.createjs||{};
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.identity = function() {
-		this.alpha = this.a = this.d = 1;
+		this.a = this.d = 1;
 		this.b = this.c = this.tx = this.ty = 0;
-		this.shadow = this.compositeOperation = null;
-		this.visible = true;
 		return this;
 	};
 
@@ -443,7 +403,11 @@ this.createjs = this.createjs||{};
 	 * @return {Boolean}
 	 **/
 	p.isIdentity = function() {
-		return this.tx == 0 && this.ty == 0 && this.a == 1 && this.b == 0 && this.c == 0 && this.d == 1;
+		return this.tx === 0 && this.ty === 0 && this.a === 1 && this.b === 0 && this.c === 0 && this.d === 1;
+	};
+	
+	p.equals = function(matrix) {
+		return this.tx === matrix.tx && this.ty === matrix.ty && this.a === matrix.a && this.b === matrix.b && this.c === matrix.c && this.d === matrix.d;
 	};
 
 	/**
@@ -492,30 +456,6 @@ this.createjs = this.createjs||{};
 		}
 		return target;
 	};
-
-	/**
-	 * Reinitializes all matrix properties to those specified.
-	 * @method reinitialize
-	 * @param {Number} [a=1] Specifies the a property for the new matrix.
-	 * @param {Number} [b=0] Specifies the b property for the new matrix.
-	 * @param {Number} [c=0] Specifies the c property for the new matrix.
-	 * @param {Number} [d=1] Specifies the d property for the new matrix.
-	 * @param {Number} [tx=0] Specifies the tx property for the new matrix.
-	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
-	 * @param {Number} [alpha=1] desired alpha value
-	 * @param {Shadow} [shadow=null] desired shadow value
-	 * @param {String} [compositeOperation=null] desired composite operation value
-	 * @param {Boolean} [visible=true] desired visible value
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
-	*/
-	p.reinitialize = function(a, b, c, d, tx, ty, alpha, shadow, compositeOperation, visible) {
-		this.initialize(a,b,c,d,tx,ty);
-		this.alpha = alpha == null ? 1 : alpha;
-		this.shadow = shadow;
-		this.compositeOperation = compositeOperation;
-		this.visible = visible == null ? true : visible;
-		return this;
-	};
 	
 	/**
 	 * Copies all properties from the specified matrix to this matrix.
@@ -524,41 +464,7 @@ this.createjs = this.createjs||{};
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
 	p.copy = function(matrix) {
-		return this.reinitialize(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty, matrix.alpha, matrix.shadow, matrix.compositeOperation, matrix.visible);
-	};
-
-	/**
-	 * Appends the specified visual properties to the current matrix.
-	 * @method appendProperties
-	 * @param {Number} alpha desired alpha value
-	 * @param {Shadow} shadow desired shadow value
-	 * @param {String} compositeOperation desired composite operation value
-	 * @param {Boolean} visible desired visible value
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
-	*/
-	p.appendProperties = function(alpha, shadow, compositeOperation, visible) {
-		this.alpha *= alpha;
-		this.shadow = shadow || this.shadow;
-		this.compositeOperation = compositeOperation || this.compositeOperation;
-		this.visible = this.visible && visible;
-		return this;
-	};
-
-	/**
-	 * Prepends the specified visual properties to the current matrix.
-	 * @method prependProperties
-	 * @param {Number} alpha desired alpha value
-	 * @param {Shadow} shadow desired shadow value
-	 * @param {String} compositeOperation desired composite operation value
-	 * @param {Boolean} visible desired visible value
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
-	*/
-	p.prependProperties = function(alpha, shadow, compositeOperation, visible) {
-		this.alpha *= alpha;
-		this.shadow = this.shadow || shadow;
-		this.compositeOperation = this.compositeOperation || compositeOperation;
-		this.visible = this.visible && visible;
-		return this;
+		return this.setValues(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	};
 
 	/**
@@ -567,7 +473,7 @@ this.createjs = this.createjs||{};
 	 * @return {Matrix2D} a clone of the Matrix2D instance.
 	 **/
 	p.clone = function() {
-		return (new Matrix2D()).copy(this);
+		return new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
 	};
 
 	/**

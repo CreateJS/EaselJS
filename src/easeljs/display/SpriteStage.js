@@ -857,7 +857,7 @@ this.createjs = this.createjs||{};
 		for (var i = 0, l = kids.length; i < l; i++) {
 			kid = kids[i];
 			if (!kid.isVisible()) { continue; }
-			mtx = kid._matrix;
+			mtx = kid._props.matrix;
 
 			// Get the kid's global matrix (relative to the stage):
 			mtx = (parentMVMatrix ? mtx.copy(parentMVMatrix) : mtx.identity())
