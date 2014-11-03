@@ -346,5 +346,4 @@ describe("DisplayList", function () {
 		}
 		expect(err).toBe(true);
 	});
-
 });

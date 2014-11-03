@@ -7,8 +7,11 @@ module.exports = function (grunt) {
 				run: {
 					src: '../lib/easeljs-NEXT.combined.js',
 					options: {
-						specs: 'spec/*.js',
-						helpers: ['lib/js-imagediff/imagediff.js']
+						specs: 'spec/*Spec.js',
+						helpers: [
+							'spec/Helpers.js',
+							'lib/js-imagediff/imagediff.js'
+						]
 					}
 				}
 			},
