@@ -45,5 +45,5 @@ p.handleRollOver = function(event) {
 	this.alpha = event.type == "rollover" ? 0.4 : 1;
 };
 
-window.Button = createjs.promote(Button);
+window.Button = createjs.promote(Button, "Container");
 }());

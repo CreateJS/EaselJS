@@ -53,7 +53,7 @@ p.draw = function() {
 	// add custom logic here.
 }
 
-window.Button = createjs.promote(Button);
+window.Button = createjs.promote(Button, "Container");
 }());
 			</textarea>
 			<p>
@@ -83,7 +83,8 @@ window.Button = createjs.promote(Button);
 			<h3>Using createjs.promote()</h3>
 			<p>
 				Line 14 calls <code>promote</code>, which identifies all of the methods in Container that were overridden in Button
-				(including the constructor) and promotes them into Button with a new name in the format <code>SuperClassName_methodName</code>.
+				(including the constructor) and promotes them into Button with a new name in the format <code>prefix_methodName</code>.
+				We specified "Container" as the prefix which results in promoted methods that look like <code>Container_draw</code>.
 				This gives you an easy and highly performant way to call super class methods in the instance scope.
 			</p>
 			<p>
