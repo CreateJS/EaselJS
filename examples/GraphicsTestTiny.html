@@ -31,7 +31,7 @@
         }
 
         function layout() {
-            var arr = [createStar, createHex, createLineTo, createRadialGradientFill, createEllipse, createRectGradientFill, createBitmapFill];
+            var arr = [createStar, createHex, createLineTo, createRadialGradientFill, createEllipse, createRectGradientFill, createBitmapFill, createRoundRect];
             var padding = 5;
             var _width = 155;
             var _height = 155;
@@ -127,6 +127,16 @@
             container.addChild(s);
             return container;
         }
+        
+		function createRoundRect() {
+			var container = createTile();
+			var s = new createjs.Shape();
+			s.graphics.ss(6).s("red").f("green").rr(0,0,130,130,30);
+			s.x = s.y = 12;
+			
+			container.addChild(s);
+			return container;
+		}
 
         function createTile() {
             var container = new createjs.Container();
