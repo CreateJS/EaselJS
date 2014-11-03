@@ -24,6 +24,7 @@
 			this.addEventListener("rollover", this);
 			this.addEventListener("rollout", this);
 		}
+		createjs.extend(TextLink, createjs.Text);
 		
 		// use the same approach with draw:
 		TextLink.prototype.draw = function(ctx, ignoreCache) {
@@ -48,7 +49,7 @@
 		};
 		
 		// set up the inheritance relationship: TextLink extends Text.
-		createjs.extends(TextLink, createjs.Text);
+		createjs.promote(TextLink, "Text");
 	</script>
 
 
