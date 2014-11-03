@@ -33,7 +33,7 @@
             var data = {
                 images:["assets/sparkle_21x23.png"],
                 frames:{width:21, height:23, regX:10, regY:11}
-            }
+            };
 
             // set up an animation instance, which we will clone
             sprite = new createjs.Sprite(new createjs.SpriteSheet(data));
@@ -89,7 +89,6 @@
         }
 
         function addSparkles(count, x, y, speed) {
-        	console.log(sprite.spriteSheet.getNumFrames());
             //create the specified number of sparkles
             for(var i = 0; i < count; i++) {
                 // clone the original sparkle, so we don't need to set shared properties:

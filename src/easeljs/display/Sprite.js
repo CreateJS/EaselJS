@@ -405,7 +405,7 @@ this.createjs = this.createjs||{};
 		} else {
 			frame = (this._currentFrame += frameDelta);
 			l = this.spriteSheet.getNumFrames();
-			if (frame >= l) {
+			if (frame >= l && l > 0) {
 				if (!this._dispatchAnimationEnd(animation, frame, paused, l - 1)) {
 					// looped.
 					if ((this._currentFrame -= l) >= l) { return this._normalizeFrame(); }
