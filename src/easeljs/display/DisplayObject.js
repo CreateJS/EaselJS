@@ -1185,7 +1185,7 @@ this.createjs = this.createjs||{};
 		o.y = this.y;
 		o.compositeOperation = this.compositeOperation;
 		o.snapToPixel = this.snapToPixel;
-		o.filters = this.filters.slice(0);
+		o.filters = this.filters==null?null:this.filters.slice(0);
 		o.mask = this.mask;
 		o.hitArea = this.hitArea;
 		o.cursor = this.cursor;
