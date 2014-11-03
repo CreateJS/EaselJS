@@ -1,112 +1,68 @@
 describe("Graphics", function () {
-	var sColor = "#000";
-	var fColor = "#ff0000";
-	var g;
-	var stage;
-	var img;
-
-	/**
-	 * Compare each drawing to a pre-saved base line image.
-	 * Need to has a small tolerance (100),
-	 * to account for antialiasing differnces between the saved images also browser to browser to browser differnces.
-	 *
-	 * @param path
-	 * @param done
-	 * @param expect
-	 */
-	var compareBaseLine = function (path, done, expect, pixelTolerance) {
-		stage.update();
-
-		var img = new Image();
-		img.src = path;
-		img.onload = function () {
-			var pixels = 200 * 200;
-			var tolerance = pixels * (pixelTolerance == null ? .005 : pixelTolerance);
-			expect(stage.canvas).toImageDiffEqual(this, tolerance);
-			done();
-		}
-	}
-
-	beforeEach(function (done) {
-		stage = new createjs.Stage(imagediff.createCanvas(200, 200));
-		var shape = new createjs.Shape();
-		g = shape.graphics;
-		stage.addChild(shape);
-
-		baseStage = new createjs.Stage(imagediff.createCanvas(200, 200));
-
-		jasmine.addMatchers(imagediff.jasmine);
-
-		img = new Image();
-		img.onload = function () {
-			done();
-		}
-		img.src = "assets/daisy.png";
-	});
 
 	it("arc()", function (done) {
-		g.setStrokeStyle(2);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
-		g.moveTo(120, 100).arc(100, 100, 20, 0, Math.PI);
+		this.g.setStrokeStyle(2);
+		this.g.beginStroke(this.sColor);
+		this.g.beginFill(this.fColor);
+		this.g.moveTo(120, 100).arc(100, 100, 20, 0, Math.PI);
 
-		compareBaseLine("assets/arc.png", done, expect);
+		this.compareBaseLine("assets/arc.png", done, expect);
 	});
 
 	it("arcTo()", function (done) {
-		g.setStrokeStyle(2);
-		g.beginStroke(sColor);
-		g.moveTo(25, 25).arcTo(150, 25, 150, 70, 50, Math.PI * 2);
+		this.g.setStrokeStyle(2);
+		this.g.beginStroke(this.sColor);
+		this.g.moveTo(25, 25).arcTo(150, 25, 150, 70, 50, Math.PI * 2);
 
-		compareBaseLine("assets/arcTo.png", done, expect);
+		this.compareBaseLine("assets/arcTo.png", done, expect);
 	});
 
 	it("beginBitmapFill()", function (done) {
-		g.beginBitmapFill(img).drawRect(5, 5, 100, 100);
+		this.g.beginBitmapFill(this.img).drawRect(5, 5, 100, 100);
 
-		compareBaseLine("assets/beginBitmapFill.png", done, expect);
+		this.compareBaseLine("assets/beginBitmapFill.png", done, expect);
 	});
 
 	it("beginBitmapStroke()", function (done) {
-		g.setStrokeStyle(10).beginBitmapStroke(img).drawRect(5, 5, 100, 100);
+		this.g.setStrokeStyle(10).beginBitmapStroke(this.img).drawRect(5, 5, 100, 100);
 
-		compareBaseLine("assets/beginBitmapStroke.png", done, expect);
+		this.compareBaseLine("assets/beginBitmapStroke.png", done, expect);
 	});
 
 	it("beginLinearGradientFill()", function (done) {
-		g.beginLinearGradientFill([fColor, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 130).drawRect(0, 0, 120, 120);
+		this.g.beginLinearGradientFill([this.fColor, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 130).drawRect(0, 0, 120, 120);
 
-		compareBaseLine("assets/beginLinearGradientFill.png", done, expect);
+		this.compareBaseLine("assets/beginLinearGradientFill.png", done, expect);
 	});
 
 	it("beginLinearGradientStroke()", function (done) {
-		g.beginLinearGradientStroke([sColor, "rgba(50, 50, 50, 1)"], [0, .4], 0, 0, 70, 140).moveTo(5, 25).lineTo(110, 25).endStroke();
+		this.g.beginLinearGradientStroke([this.sColor, "rgba(50, 50, 50, 1)"], [0, .4], 0, 0, 70, 140).moveTo(5, 25).lineTo(110, 25).endStroke();
 
-		compareBaseLine("assets/beginLinearGradientStroke.png", done, expect);
+		this.compareBaseLine("assets/beginLinearGradientStroke.png", done, expect);
 	});
 
 	it("beginRadialGradientFill()", function (done) {
-		g.beginRadialGradientFill([fColor, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 0, 0, 60).drawRect(40, 40, 40, 40);
+		this.g.beginRadialGradientFill([this.fColor, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 0, 0, 60).drawRect(40, 40, 40, 40);
 
-		compareBaseLine("assets/beginRadialGradientFill.png", done, expect, 300);
+		this.compareBaseLine("assets/beginRadialGradientFill.png", done, expect, 300);
 	});
 
 	it("beginRadialGradientStroke()", function (done) {
-		g.setStrokeStyle(10).beginRadialGradientStroke(["#F00", "#00F"], [0, 1], 150, 150, 200, 100, 100, 25).drawRect(25, 25, 125, 125);
+		this.g.setStrokeStyle(10).beginRadialGradientStroke(["#F00", "#00F"], [0, 1], 150, 150, 200, 100, 100, 25).drawRect(25, 25, 125, 125);
 
-		compareBaseLine("assets/beginRadialGradientStroke.png", done, expect);
+		this.compareBaseLine("assets/beginRadialGradientStroke.png", done, expect);
 	});
 
 	it("bezierCurveTo()", function (done) {
-		g.beginFill(fColor).beginStroke(sColor).moveTo(25, 25).bezierCurveTo(45, 175, 125, 75, 25, 25);
+		this.g.beginFill(this.fColor).beginStroke(this.sColor).moveTo(25, 25).bezierCurveTo(45, 175, 125, 75, 25, 25);
 
-		compareBaseLine("assets/bezierCurveTo.png", done, expect);
+		this.compareBaseLine("assets/bezierCurveTo.png", done, expect);
 	});
 
 	it("quadraticCurveTo() / curveTo()", function (done) {
-		g.beginFill(fColor).beginStroke(sColor).moveTo(5, 5).quadraticCurveTo(200, 20, 190, 190).endStroke();
+		this.g.beginFill(this.fColor).beginStroke(this.sColor).moveTo(5, 5).quadraticCurveTo(200, 20, 190, 190).endStroke();
 
-		compareBaseLine("assets/quadraticCurveTo.png", done, expect);
+		this.compareBaseLine("assets/quadraticCurveTo.png", done, expect);
 	});
 
 	it("decodePath()", function (done) {
@@ -155,69 +111,69 @@ describe("Graphics", function () {
 		this.shape_10.graphics.f("#CC0000").s().p("AMnDfQAGgpARgmQAMgeAAgfQAAgxgdg7QgZg4gagRQgvgfgSgJQgsgZgmgDQh9gNjAgOIiqgNIiUAAIgGADInxABQhkATg4AJQhTALhPgBQgPAAgFgGQADgPBygMQCpgPA7gMIHogCQAHgCAAAAICPAAQAJABCiAIQDDAKCaAUQAiAFApAdQAYAPAuAjQAZAQAMAaIAWA3QAQArAAAyQAAA5gDALQgGAegkAvQgHgDgDgEg");
 		this.shape_10.setTransform(103.6, 30.5);
 
-		stage.addChild(this.shape_10, this.shape_9, this.shape_8, this.shape_7, this.shape_6, this.shape_5, this.shape_4, this.shape_3, this.shape_2, this.shape_1, this.shape);
+		this.stage.addChild(this.shape_10, this.shape_9, this.shape_8, this.shape_7, this.shape_6, this.shape_5, this.shape_4, this.shape_3, this.shape_2, this.shape_1, this.shape);
 
-		compareBaseLine("assets/decodePath.png", done, expect, .01);
+		this.compareBaseLine("assets/decodePath.png", done, expect, .01);
 	});
 
 	it("drawCircle()", function (done) {
-		g.setStrokeStyle(2);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
-		g.drawCircle(100, 100, 50);
-		g.endFill();
+		this.g.setStrokeStyle(2);
+		this.g.beginStroke(this.sColor);
+		this.g.beginFill(this.fColor);
+		this.g.drawCircle(100, 100, 50);
+		this.g.endFill();
 
-		compareBaseLine("assets/drawCircle.png", done, expect);
+		this.compareBaseLine("assets/drawCircle.png", done, expect);
 	});
 
 	it("drawEllipse()", function (done) {
-		g.setStrokeStyle(2);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
-		g.drawEllipse(25, 25, 75, 150);
-		g.endFill();
+		this.g.setStrokeStyle(2);
+		this.g.beginStroke(this.sColor);
+		this.g.beginFill(this.fColor);
+		this.g.drawEllipse(25, 25, 75, 150);
+		this.g.endFill();
 
-		compareBaseLine("assets/drawEllipse.png", done, expect);
+		this.compareBaseLine("assets/drawEllipse.png", done, expect);
 	});
 
 	it("drawPolyStar()", function (done) {
-		g.setStrokeStyle(2);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
-		g.drawPolyStar(100, 100, 75, 5, 0.6, -90);
-		g.endFill();
+		this.g.setStrokeStyle(2);
+		this.g.beginStroke(this.sColor);
+		this.g.beginFill(this.fColor);
+		this.g.drawPolyStar(100, 100, 75, 5, 0.6, -90);
+		this.g.endFill();
 
-		compareBaseLine("assets/drawPolyStar.png", done, expect);
+		this.compareBaseLine("assets/drawPolyStar.png", done, expect);
 	});
 
 	it("drawRect()", function (done) {
-		g.setStrokeStyle(1);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
-		g.drawRect(5, 5, 100, 100);
-		g.endFill();
+		this.g.setStrokeStyle(1);
+		this.g.beginStroke(this.sColor);
+		this.g.beginFill(this.fColor);
+		this.g.drawRect(5, 5, 100, 100);
+		this.g.endFill();
 
-		compareBaseLine("assets/drawRect.png", done, expect);
+		this.compareBaseLine("assets/drawRect.png", done, expect);
 	});
 
 	it("drawRoundRect()", function (done) {
-		g.setStrokeStyle(1);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
-		g.drawRoundRect(5, 5, 100, 100, 7);
-		g.endFill();
+		this.g.setStrokeStyle(1);
+		this.g.beginStroke(this.sColor);
+		this.g.beginFill(this.fColor);
+		this.g.drawRoundRect(5, 5, 100, 100, 7);
+		this.g.endFill();
 
-		compareBaseLine("assets/drawRoundRect.png", done, expect);
+		this.compareBaseLine("assets/drawRoundRect.png", done, expect);
 	});
 
 	it("drawRoundRectComplex()", function (done) {
-		g.setStrokeStyle(1);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
-		g.drawRoundRectComplex(5, 5, 100, 100, 5, 10, 15, 20);
-		g.endFill();
+		this.g.setStrokeStyle(1);
+		this.g.beginStroke(this.sColor);
+		this.g.beginFill(this.fColor);
+		this.g.drawRoundRectComplex(5, 5, 100, 100, 5, 10, 15, 20);
+		this.g.endFill();
 
-		compareBaseLine("assets/drawRoundRectComplex.png", done, expect);
+		this.compareBaseLine("assets/drawRoundRectComplex.png", done, expect);
 	});
 
 	it("getHSL()", function () {
@@ -230,118 +186,118 @@ describe("Graphics", function () {
 	});
 
 	it("isEmpty()", function () {
-		expect(g.isEmpty()).toBe(true);
-		g.drawRect(0, 0, 5, 5);
-		expect(g.isEmpty()).toBe(false);
+		expect(this.g.isEmpty()).toBe(true);
+		this.g.drawRect(0, 0, 5, 5);
+		expect(this.g.isEmpty()).toBe(false);
 	});
 
 	it("lineTo()", function (done) {
-		g.beginStroke(sColor).moveTo(5, 35).lineTo(110, 75);
+		this.g.beginStroke(this.sColor).moveTo(5, 35).lineTo(110, 75);
 
-		compareBaseLine("assets/lineTo.png", done, expect);
+		this.compareBaseLine("assets/lineTo.png", done, expect);
 	});
 
 	it("setStrokeStyle()", function (done) {
-		g.setStrokeStyle(25, 1, 1, 0, true).beginStroke(sColor).rect(30, 30, 100, 100);
+		this.g.setStrokeStyle(25, 1, 1, 0, true).beginStroke(this.sColor).rect(30, 30, 100, 100);
 
-		compareBaseLine("assets/setStrokeStyle.png", done, expect);
+		this.compareBaseLine("assets/setStrokeStyle.png", done, expect);
 	});
 
 	describe("tiny api", function () {
 		it('moveTo should equal mt', function () {
-			expect(g['moveTo']).toBe(g['mt']);
+			expect(this.g['moveTo']).toBe(this.g['mt']);
 		});
 
 		it('arc should equal a', function () {
-			expect(g['arc']).toBe(g['a']);
+			expect(this.g['arc']).toBe(this.g['a']);
 		});
 
 		it('arcTo should equal at', function () {
-			expect(g['arcTo']).toBe(g['at']);
+			expect(this.g['arcTo']).toBe(this.g['at']);
 		});
 
 		it('quadraticCurveTo should equal qt', function () {
-			expect(g['quadraticCurveTo']).toBe(g['qt']);
+			expect(this.g['quadraticCurveTo']).toBe(this.g['qt']);
 		});
 
 		it('curveTo should equal qt', function () {
-			expect(g['curveTo']).toBe(g['qt']);
+			expect(this.g['curveTo']).toBe(this.g['qt']);
 		});
 
 		it('closePath should equal cp', function () {
-			expect(g['closePath']).toBe(g['cp']);
+			expect(this.g['closePath']).toBe(this.g['cp']);
 		});
 
 		it('beginFill should equal f', function () {
-			expect(g['beginFill']).toBe(g['f']);
+			expect(this.g['beginFill']).toBe(this.g['f']);
 		});
 
 		it('beginLinearGradientFill should equal lf', function () {
-			expect(g['beginLinearGradientFill']).toBe(g['lf']);
+			expect(this.g['beginLinearGradientFill']).toBe(this.g['lf']);
 		});
 
 		it('beginRadialGradientFill should equal rf', function () {
-			expect(g['beginRadialGradientFill']).toBe(g['rf']);
+			expect(this.g['beginRadialGradientFill']).toBe(this.g['rf']);
 		});
 
 		it('beginBitmapFill should equal bf', function () {
-			expect(g['beginBitmapFill']).toBe(g['bf']);
+			expect(this.g['beginBitmapFill']).toBe(this.g['bf']);
 		});
 
 		it('endFill should equal ef', function () {
-			expect(g['endFill']).toBe(g['ef']);
+			expect(this.g['endFill']).toBe(this.g['ef']);
 		});
 
 		it('setStrokeStyle should equal ss', function () {
-			expect(g['setStrokeStyle']).toBe(g['ss']);
+			expect(this.g['setStrokeStyle']).toBe(this.g['ss']);
 		});
 
 		it('beginStroke should equal s', function () {
-			expect(g['beginStroke']).toBe(g['s']);
+			expect(this.g['beginStroke']).toBe(this.g['s']);
 		});
 
 		it('beginLinearGradientStroke should equal ls', function () {
-			expect(g['beginLinearGradientStroke']).toBe(g['ls']);
+			expect(this.g['beginLinearGradientStroke']).toBe(this.g['ls']);
 		});
 
 		it('beginRadialGradientStroke should equal rs', function () {
-			expect(g['beginRadialGradientStroke']).toBe(g['rs']);
+			expect(this.g['beginRadialGradientStroke']).toBe(this.g['rs']);
 		});
 
 		it('beginBitmapStroke should equal bs', function () {
-			expect(g['beginBitmapStroke']).toBe(g['bs']);
+			expect(this.g['beginBitmapStroke']).toBe(this.g['bs']);
 		});
 
 		it('endStroke should equal es', function () {
-			expect(g['endStroke']).toBe(g['es']);
+			expect(this.g['endStroke']).toBe(this.g['es']);
 		});
 
 		it('drawRect should equal dr', function () {
-			expect(g['drawRect']).toBe(g['dr']);
+			expect(this.g['drawRect']).toBe(this.g['dr']);
 		});
 
 		it('drawRoundRect should equal rr', function () {
-			expect(g['drawRoundRect']).toBe(g['rr']);
+			expect(this.g['drawRoundRect']).toBe(this.g['rr']);
 		});
 
 		it('drawRoundRectComplex should equal rc', function () {
-			expect(g['drawRoundRectComplex']).toBe(g['rc']);
+			expect(this.g['drawRoundRectComplex']).toBe(this.g['rc']);
 		});
 
 		it('drawCircle should equal dc', function () {
-			expect(g['drawCircle']).toBe(g['dc']);
+			expect(this.g['drawCircle']).toBe(this.g['dc']);
 		});
 
 		it('drawEllipse should equal de', function () {
-			expect(g['drawEllipse']).toBe(g['de']);
+			expect(this.g['drawEllipse']).toBe(this.g['de']);
 		});
 
 		it('drawPolyStar should equal dp', function () {
-			expect(g['drawPolyStar']).toBe(g['dp']);
+			expect(this.g['drawPolyStar']).toBe(this.g['dp']);
 		});
 
 		it('decodePath should equal p', function () {
-			expect(g['decodePath']).toBe(g['p']);
+			expect(this.g['decodePath']).toBe(this.g['p']);
 		});
 	});
 });
