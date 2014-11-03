@@ -10,6 +10,9 @@ CRITICAL (may break existing content):
 	- helper methods: extend & promote (see the "Utility Methods" docs)
 	- initialize methods removed, use SuperClass_constructor instead
 	- property definitions are now instance level, and in the constructor (performance gains)
+	- renamed initialize on geom classes to "setValues()"
+- removed secondary properties (visible, alpha, compositeOperation, shadow) and related functionality from Matrix2D
+	- added DisplayProps to hold these properties + a matrix instance
 
 *****
 OTHER:
@@ -48,7 +51,11 @@ OTHER:
 - added the extras folder, with: SVGExport, Context2DLog, and PerformanceTests
 - added Graphics.store() / unstore()
 - examples now all use the combined lib
-- SpriteSheet.numFrames now returns 0 instead of null if images are not loaded.
+- SpriteSheet.getNumFrames() now returns 0 instead of null if images are not loaded.
+- added some initial unit tests for the library
+- added helper methods to Rectangle: union, intersects, extend, intersection, isEmpty, & contains.
+- updated clone() method for all classes
+- added Matrix2D.equals() method
 
 
 Version 0.7.1 [December 12, 2013]
