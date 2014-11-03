@@ -425,12 +425,12 @@ this.createjs = this.createjs||{};
 		this._cacheDataURL = null;
 	
 		/**
-		 * @property _matrix
+		 * @property _props
 		 * @protected
-		 * @type {Matrix2D}
+		 * @type {DisplayObject}
 		 * @default null
 		 **/
-		this._matrix = new createjs.Matrix2D();
+		this._props = new createjs.DisplayProps();
 	
 		/**
 		 * @property _rectangle
@@ -670,10 +670,10 @@ this.createjs = this.createjs||{};
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D to update.
 	 **/
 	p.updateContext = function(ctx) {
-		var mtx, mask=this.mask, o=this;
+		var o=this, mask=o.mask, mtx= o._props.matrix;
 		
 		if (mask && mask.graphics && !mask.graphics.isEmpty()) {
-			mtx = mask.getMatrix(mask._matrix);
+			mtx = mask.getMatrix(mtx);
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 			
 			mask.graphics.drawAsPath(ctx);
@@ -683,7 +683,7 @@ this.createjs = this.createjs||{};
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 		}
 		
-		mtx = o._matrix.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		mtx = mtx.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
 		var tx = mtx.tx, ty = mtx.ty;
 		if (DisplayObject._snapToPixelEnabled && o.snapToPixel) {
 			tx = tx + (tx < 0 ? -0.5 : 0.5) | 0;
@@ -850,7 +850,7 @@ this.createjs = this.createjs||{};
 	 * on the stage.
 	 **/
 	p.localToGlobal = function(x, y) {
-		var mtx = this.getConcatenatedMatrix(this._matrix);
+		var mtx = this.getConcatenatedMatrix(this._props.matrix);
 		if (mtx == null) { return null; }
 		mtx.append(1, 0, 0, 1, x, y);
 		return new createjs.Point(mtx.tx, mtx.ty);
@@ -877,7 +877,7 @@ this.createjs = this.createjs||{};
 	 * display object's coordinate space.
 	 **/
 	p.globalToLocal = function(x, y) {
-		var mtx = this.getConcatenatedMatrix(this._matrix);
+		var mtx = this.getConcatenatedMatrix(this._props.matrix);
 		if (mtx == null) { return null; }
 		mtx.invert();
 		mtx.append(1, 0, 0, 1, x, y);
@@ -947,29 +947,43 @@ this.createjs = this.createjs||{};
 	 **/
 	p.getMatrix = function(matrix) {
 		var o = this;
-		return (matrix ? matrix.identity() : new createjs.Matrix2D()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).appendProperties(o.alpha, o.shadow, o.compositeOperation);
+		return (matrix ? matrix.identity() : new createjs.Matrix2D()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
 	};
 	
 	/**
-	 * Generates a concatenated Matrix2D object representing the combined transform of the display object and all of its
+	 * Generates a Matrix2D object representing the combined transform of the display object and all of its
 	 * parent Containers up to the highest level ancestor (usually the {{#crossLink "Stage"}}{{/crossLink}}). This can
 	 * be used to transform positions between coordinate spaces, such as with {{#crossLink "DisplayObject/localToGlobal"}}{{/crossLink}}
 	 * and {{#crossLink "DisplayObject/globalToLocal"}}{{/crossLink}}.
 	 * @method getConcatenatedMatrix
 	 * @param {Matrix2D} [matrix] A {{#crossLink "Matrix2D"}}{{/crossLink}} object to populate with the calculated values.
 	 * If null, a new Matrix2D object is returned.
-	 * @return {Matrix2D} a concatenated Matrix2D object representing the combined transform of the display object and
-	 * all of its parent Containers up to the highest level ancestor (usually the {{#crossLink "Stage"}}{{/crossLink}}).
+	 * @return {Matrix2D} The combined matrix.
 	 **/
 	p.getConcatenatedMatrix = function(matrix) {
-		if (matrix) { matrix.identity(); }
-		else { matrix = new createjs.Matrix2D(); }
-		var o = this;
-		while (o != null) {
-			matrix.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY).prependProperties(o.alpha, o.shadow, o.compositeOperation, o.visible);
-			o = o.parent;
-		}
-		return matrix;
+		var o = this, mtx = matrix ? matrix.identity() : new createjs.Matrix2D();
+		do {
+			mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		} while (o = o.parent);
+		return mtx;
+	};
+	
+	/**
+	 * Generates a DisplayProps object representing the combined display properties of the  object and all of its
+	 * parent Containers up to the highest level ancestor (usually the {{#crossLink "Stage"}}{{/crossLink}}).
+	 * @method getConcatenatedDisplayProps
+	 * @param {DisplayProps} [props] A {{#crossLink "DisplayProps"}}{{/crossLink}} object to populate with the calculated values.
+	 * If null, a new DisplayProps object is returned.
+	 * @return {DisplayProps} The combined display properties.
+	 **/
+	p.getConcatenatedDisplayProps = function(props) {
+		props = props ? props.identity() : new createjs.DisplayProps();
+		var o = this, mtx = props.matrix;
+		do {
+			props.prepend(o.visible, o.alpha, o.shadow, o.compositeOperation);
+			mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY)
+		} while (o = o.parent);
+		return props;
 	};
 
 	/**
@@ -1081,7 +1095,7 @@ this.createjs = this.createjs||{};
 		var cacheCanvas = this.cacheCanvas;
 		if (cacheCanvas) {
 			var scale = this._cacheScale;
-			return this._rectangle.initialize(this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
+			return this._rectangle.setValues(this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
 		}
 		return null;
 	};
@@ -1120,7 +1134,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.setBounds = function(x, y, width, height) {
 		if (x == null) { this._bounds = x; }
-		this._bounds = (this._bounds || new createjs.Rectangle()).initialize(x, y, width, height);
+		this._bounds = (this._bounds || new createjs.Rectangle()).setValues(x, y, width, height);
 	};
 
 	/**
@@ -1259,7 +1273,7 @@ this.createjs = this.createjs||{};
 			var f = this.filters[i];
 			var fBounds = f.getBounds&&f.getBounds();
 			if (!fBounds) { continue; }
-			if (!bounds) { bounds = this._rectangle.initialize(x,y,width,height); }
+			if (!bounds) { bounds = this._rectangle.setValues(x,y,width,height); }
 			bounds.x += fBounds.x;
 			bounds.y += fBounds.y;
 			bounds.width += fBounds.width;
@@ -1289,8 +1303,8 @@ this.createjs = this.createjs||{};
 	 **/
 	p._transformBounds = function(bounds, matrix, ignoreTransform) {
 		if (!bounds) { return bounds; }
-		var x = bounds.x, y = bounds.y, width = bounds.width, height = bounds.height;
-		var mtx = ignoreTransform ? this._matrix.identity() : this.getMatrix(this._matrix);
+		var x = bounds.x, y = bounds.y, width = bounds.width, height = bounds.height, mtx = this._props.matrix;
+		mtx = ignoreTransform ? mtx.identity() : this.getMatrix(mtx);
 		
 		if (x || y) { mtx.appendTransform(0,0,1,1,0,0,0,-x,-y); }
 		if (matrix) { mtx.prependMatrix(matrix); }
@@ -1309,7 +1323,7 @@ this.createjs = this.createjs||{};
 		if ((y = x_b + y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 		if ((y = y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 		
-		return bounds.initialize(minX, minY, maxX-minX, maxY-minY);
+		return bounds.setValues(minX, minY, maxX-minX, maxY-minY);
 	};
 	
 	/**

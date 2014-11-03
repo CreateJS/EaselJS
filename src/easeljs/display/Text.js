@@ -256,7 +256,7 @@ this.createjs = this.createjs||{};
 		var x = w * Text.H_OFFSETS[this.textAlign||"left"];
 		var lineHeight = this.lineHeight||this.getMeasuredLineHeight();
 		var y = lineHeight * Text.V_OFFSETS[this.textBaseline||"top"];
-		return this._rectangle.initialize(x, y, w, o.height);
+		return this._rectangle.setValues(x, y, w, o.height);
 	};
 	
 	/**

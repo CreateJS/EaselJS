@@ -53,11 +53,11 @@ this.createjs = this.createjs||{};
 	 * @constructor
 	 **/
 	function Rectangle(x, y, width, height) {
-		this.initialize(x, y, width, height);
+		this.setValues(x, y, width, height);
 		
 		
 	// public properties:
-		// assigned in the initialize method.
+		// assigned in the setValues method.
 		/**
 		 * X position.
 		 * @property x
@@ -87,15 +87,15 @@ this.createjs = this.createjs||{};
 
 // public methods:
 	/** 
-	 * Reinitializes the instance with the specified values.
-	 * @method initialize
+	 * Sets the specified values on this instance.
+	 * @method setValues
 	 * @param {Number} [x=0] X position.
 	 * @param {Number} [y=0] Y position.
 	 * @param {Number} [width=0] The width of the Rectangle.
 	 * @param {Number} [height=0] The height of the Rectangle.
 	 * @return {Rectangle} This instance. Useful for chaining method calls.
 	*/
-	p.initialize = function(x, y, width, height) {
+	p.setValues = function(x, y, width, height) {
 		// don't forget to update docs in the constructor if these change:
 		this.x = x||0;
 		this.y = y||0;
@@ -190,7 +190,7 @@ this.createjs = this.createjs||{};
 	 * @return {Rectangle} This rectangle. Useful for chaining method calls.
 	*/
 	p.copy = function(rectangle) {
-		return this.initialize(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+		return this.setValues(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 	};
 	
 	/**

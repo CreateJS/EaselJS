@@ -56,7 +56,7 @@ this.createjs = this.createjs||{};
 	 * @constructor
 	 **/
 	function ColorMatrix(brightness, contrast, saturation, hue) {
-		this.initialize(brightness, contrast, saturation, hue);
+		this.setColor(brightness, contrast, saturation, hue);
 	}
 	var p = ColorMatrix.prototype;
 
@@ -110,18 +110,16 @@ this.createjs = this.createjs||{};
 
 // public methods:
 	/**
-	 * Reinitializes the instance with the specified values.
-	 * @method initialize
+	 * Resets the instance with the specified values.
+	 * @method setColor
 	 * @param {Number} brightness
 	 * @param {Number} contrast
 	 * @param {Number} saturation
 	 * @param {Number} hue
 	 * @protected
 	 */
-	p.initialize = function(brightness,contrast,saturation,hue) {
-		this.reset();
-		this.adjustColor(brightness,contrast,saturation,hue);
-		return this;
+	p.setColor = function(brightness,contrast,saturation,hue) {
+		return this.reset().adjustColor(brightness,contrast,saturation,hue);;
 	};
 
 	/**

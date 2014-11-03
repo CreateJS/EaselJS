@@ -51,11 +51,11 @@ this.createjs = this.createjs||{};
 	 * @constructor
 	 **/
 	function Point(x, y) {
-	 	this.initialize(x, y);
+	 	this.setValues(x, y);
 	 	
 	 	
 	// public properties:
-		// assigned in the initialize method.
+		// assigned in the setValues method.
 		/**
 		 * X position.
 		 * @property x
@@ -73,14 +73,13 @@ this.createjs = this.createjs||{};
 	
 // public methods:
 	/** 
-	 * Reinitializes the instance with the specified values.
-	 * @method initialize
+	 * Sets the specified values on this instance.
+	 * @method setValues
 	 * @param {Number} [x=0] X position.
 	 * @param {Number} [y=0] Y position.
 	 * @return {Point} This instance. Useful for chaining method calls.
 	*/
-	p.initialize = function(x, y) {
-		// don't forget to update docs in the constructor if these change:
+	p.setValues = function(x, y) {
 		this.x = x||0;
 		this.y = y||0;
 		return this;
@@ -93,7 +92,9 @@ this.createjs = this.createjs||{};
 	 * @return {Point} This point. Useful for chaining method calls.
 	*/
 	p.copy = function(point) {
-		return this.initialize(point.x, point.y);
+		this.x = point.x;
+		this.y = point.y;
+		return this;
 	};
 	
 	/**
