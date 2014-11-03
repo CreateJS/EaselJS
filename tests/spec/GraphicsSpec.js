@@ -246,4 +246,102 @@ describe("Graphics", function () {
 
 		compareBaseLine("assets/setStrokeStyle.png", done, expect);
 	});
+
+	describe("tiny api", function () {
+		it('moveTo should equal mt', function () {
+			expect(g['moveTo']).toBe(g['mt']);
+		});
+
+		it('arc should equal a', function () {
+			expect(g['arc']).toBe(g['a']);
+		});
+
+		it('arcTo should equal at', function () {
+			expect(g['arcTo']).toBe(g['at']);
+		});
+
+		it('quadraticCurveTo should equal qt', function () {
+			expect(g['quadraticCurveTo']).toBe(g['qt']);
+		});
+
+		it('curveTo should equal qt', function () {
+			expect(g['curveTo']).toBe(g['qt']);
+		});
+
+		it('closePath should equal cp', function () {
+			expect(g['closePath']).toBe(g['cp']);
+		});
+
+		it('beginFill should equal f', function () {
+			expect(g['beginFill']).toBe(g['f']);
+		});
+
+		it('beginLinearGradientFill should equal lf', function () {
+			expect(g['beginLinearGradientFill']).toBe(g['lf']);
+		});
+
+		it('beginRadialGradientFill should equal rf', function () {
+			expect(g['beginRadialGradientFill']).toBe(g['rf']);
+		});
+
+		it('beginBitmapFill should equal bf', function () {
+			expect(g['beginBitmapFill']).toBe(g['bf']);
+		});
+
+		it('endFill should equal ef', function () {
+			expect(g['endFill']).toBe(g['ef']);
+		});
+
+		it('setStrokeStyle should equal ss', function () {
+			expect(g['setStrokeStyle']).toBe(g['ss']);
+		});
+
+		it('beginStroke should equal s', function () {
+			expect(g['beginStroke']).toBe(g['s']);
+		});
+
+		it('beginLinearGradientStroke should equal ls', function () {
+			expect(g['beginLinearGradientStroke']).toBe(g['ls']);
+		});
+
+		it('beginRadialGradientStroke should equal rs', function () {
+			expect(g['beginRadialGradientStroke']).toBe(g['rs']);
+		});
+
+		it('beginBitmapStroke should equal bs', function () {
+			expect(g['beginBitmapStroke']).toBe(g['bs']);
+		});
+
+		it('endStroke should equal es', function () {
+			expect(g['endStroke']).toBe(g['es']);
+		});
+
+		it('drawRect should equal dr', function () {
+			expect(g['drawRect']).toBe(g['dr']);
+		});
+
+		it('drawRoundRect should equal rr', function () {
+			expect(g['drawRoundRect']).toBe(g['rr']);
+		});
+
+		it('drawRoundRectComplex should equal rc', function () {
+			expect(g['drawRoundRectComplex']).toBe(g['rc']);
+		});
+
+		it('drawCircle should equal dc', function () {
+			expect(g['drawCircle']).toBe(g['dc']);
+		});
+
+		it('drawEllipse should equal de', function () {
+			expect(g['drawEllipse']).toBe(g['de']);
+		});
+
+		it('drawPolyStar should equal dp', function () {
+			expect(g['drawPolyStar']).toBe(g['dp']);
+		});
+
+		it('decodePath should equal p', function () {
+			expect(g['decodePath']).toBe(g['p']);
+		});
+	});
 });
