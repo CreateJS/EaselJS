@@ -230,7 +230,7 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('nextlib', [
-		"updateversion", "combine", "clearversion", "uglify", "copy:src"
+		"updateversion", "combine", "uglify", "clearversion", "copy:src"
 	]);
 
 	/**
@@ -246,7 +246,7 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('coreBuild', [
-		"updateversion", "combine", "clearversion", "uglify", "docs", "copy:src"
+		"updateversion", "combine", "uglify", "clearversion", "docs", "copy:src"
 	]);
 
 	/**
