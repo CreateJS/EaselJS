@@ -15,7 +15,7 @@
 		this.vX = 0;
 		this.vY = 0;
 	}
-	var p = Ship.prototype;
+	var p = createjs.extend(Ship, createjs.Container);
 
 // public properties:
 	Ship.TOGGLE = 60;
@@ -116,6 +116,6 @@
 		this.vY = Math.min(Ship.MAX_VELOCITY, Math.max(-Ship.MAX_VELOCITY, this.vY));
 	}
 
-	window.Ship = createjs.extends(Ship, createjs.Container);
+	window.Ship = createjs.promote(Ship, "Container");
 
 }(window));

@@ -3,8 +3,8 @@
 	var SimpleScroller = function(width, height, displayLabel) {
 		this.initialize(width, height, displayLabel);
 	};
-	var p = SimpleScroller.prototype = new createjs.Container(); // inherit from Container
-	SimpleScroller.prototype.constructor = SimpleScroller;
+	var p = createjs.extend(SimpleScroller, createjs.Container);
+	
 	p.bar;
 	p.track;
 	p.width;
@@ -15,7 +15,6 @@
 	p.label;
 	p.displayLabel;
 
-	p.Container_initialize = p.initialize;
 	p.initialize = function(width, height, displayLabel) {
 		this.Container_initialize();
 
@@ -66,5 +65,5 @@
 		target.dispatchEvent("change");
 	};
 
-	window.SimpleScroller = SimpleScroller;
+	window.SimpleScroller = createjs.promote(SimpleScroller, "Container");
 }());
