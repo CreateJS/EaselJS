@@ -3,11 +3,7 @@ describe("Graphics", function () {
 	var fColor = "#ff0000";
 	var g;
 	var stage;
-
 	var img;
-
-	var w = 100;
-	var h = 100;
 
 	/**
 	 * Compare each drawing to a pre-saved base line image.
@@ -26,7 +22,6 @@ describe("Graphics", function () {
 		img.onload = function () {
 			var pixels = 200 * 200;
 			var tolerance = pixels * (pixelTolerance == null ? .005 : pixelTolerance);
-			console.log("tolerance: ", tolerance);
 			expect(stage.canvas).toImageDiffEqual(this, tolerance);
 			done();
 		}
@@ -67,13 +62,13 @@ describe("Graphics", function () {
 	});
 
 	it("beginBitmapFill()", function (done) {
-		g.beginBitmapFill(img).drawRect(5, 5, w, h);
+		g.beginBitmapFill(img).drawRect(5, 5, 100, 100);
 
 		compareBaseLine("assets/beginBitmapFill.png", done, expect);
 	});
 
 	it("beginBitmapStroke()", function (done) {
-		g.setStrokeStyle(10).beginBitmapStroke(img).drawRect(5, 5, w, h);
+		g.setStrokeStyle(10).beginBitmapStroke(img).drawRect(5, 5, 100, 100);
 
 		compareBaseLine("assets/beginBitmapStroke.png", done, expect);
 	});
@@ -169,7 +164,7 @@ describe("Graphics", function () {
 		g.setStrokeStyle(2);
 		g.beginStroke(sColor);
 		g.beginFill(fColor);
-		g.drawCircle(w, h, h / 2);
+		g.drawCircle(100, 100, 50);
 		g.endFill();
 
 		compareBaseLine("assets/drawCircle.png", done, expect);
@@ -199,7 +194,7 @@ describe("Graphics", function () {
 		g.setStrokeStyle(1);
 		g.beginStroke(sColor);
 		g.beginFill(fColor);
-		g.drawRect(5, 5, w, h);
+		g.drawRect(5, 5, 100, 100);
 		g.endFill();
 
 		compareBaseLine("assets/drawRect.png", done, expect);
@@ -209,7 +204,7 @@ describe("Graphics", function () {
 		g.setStrokeStyle(1);
 		g.beginStroke(sColor);
 		g.beginFill(fColor);
-		g.drawRoundRect(5, 5, w, h, 7);
+		g.drawRoundRect(5, 5, 100, 100, 7);
 		g.endFill();
 
 		compareBaseLine("assets/drawRoundRect.png", done, expect);
@@ -219,7 +214,7 @@ describe("Graphics", function () {
 		g.setStrokeStyle(1);
 		g.beginStroke(sColor);
 		g.beginFill(fColor);
-		g.drawRoundRectComplex(5, 5, w, h, 5, 10, 15, 20);
+		g.drawRoundRectComplex(5, 5, 100, 100, 5, 10, 15, 20);
 		g.endFill();
 
 		compareBaseLine("assets/drawRoundRectComplex.png", done, expect);
