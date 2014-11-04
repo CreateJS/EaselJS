@@ -103,6 +103,6 @@ describe("Utlity Methods", function () {
 		var square3 = new createjs.Sprite(spriteSheet, "square2");
 		this.stage.addChild(square3).set({x:80});
 
-		this.compareBaseLine("assets/SpriteSheetBuilder.png", done, expect);
+		this.compareBaseLine("assets/SpriteSheetBuilder.png", done, expect, 0.01);
 	});
 });
