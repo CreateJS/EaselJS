@@ -3,10 +3,6 @@ beforeEach(function (done) {
 	this.fColor = "#ff0000";
 
 	this.stage = new createjs.Stage(imagediff.createCanvas(200, 200));
-	var shape = new createjs.Shape();
-
-	this.g = shape.graphics;
-	this.stage.addChild(shape);
 
 	jasmine.addMatchers(imagediff.jasmine);
 
@@ -31,7 +27,7 @@ beforeEach(function (done) {
 		var img = new Image();
 		img.src = path;
 		img.onload = function () {
-			var pixels = 200 * 200;
+			var pixels = this.width * this.height;
 			var tolerance = pixels * (pixelTolerance == null ? .005 : pixelTolerance);
 			expect(stage.canvas).toImageDiffEqual(this, tolerance);
 			done();
