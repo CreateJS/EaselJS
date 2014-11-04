@@ -12,7 +12,7 @@ describe("DisplayList", function () {
 		c = document.createElement("canvas");
 		stage = new createjs.Stage(c);
 		image = new Image();
-		image.src = "assets/daisy.png";
+		image.src = "daisy.png";
 		image.onload = function () {
 			done();
 		}
@@ -375,7 +375,7 @@ describe("DisplayList", function () {
 			}, 5);
 		};
 
-		img.src = "assets/BitmapFontSpriteSheet.png";
+		img.src = "BitmapFont.png";
 
 		// Embedded SpriteSheet data.
 		var data = {
@@ -411,7 +411,7 @@ describe("DisplayList", function () {
 				"?": {"frames": [28]},
 				"U": {"frames": [20]}
 			},
-			"images": ["assets/BitmapFontSpriteSheet.png"],
+			"images": ["BitmapFont.png"],
 			"frames": [
 				[155, 2, 25, 41, 0, -10, -3],
 				[72, 2, 28, 43, 0, -8, -1],

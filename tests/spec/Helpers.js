@@ -14,7 +14,7 @@ beforeEach(function (done) {
 	this.img.onload = function () {
 		done();
 	}
-	this.img.src = "assets/daisy.png";
+	this.img.src = "daisy.png";
 	/**
 	 * Compare each drawing to a pre-saved base line image.
 	 * Need to has a small tolerance (100),
