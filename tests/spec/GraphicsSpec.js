@@ -1,5 +1,11 @@
 describe("Graphics", function () {
 
+	beforeEach(function() {
+		var shape = new createjs.Shape();
+		this.g = shape.graphics;
+		this.stage.addChild(shape);
+	});
+
 	it("arc()", function (done) {
 		this.g.setStrokeStyle(2);
 		this.g.beginStroke(this.sColor);
