@@ -429,4 +429,33 @@ describe("DisplayList", function () {
 			]
 		};
 	});
+
+	it("masks should work", function (done) {
+		// masks can only be shapes.
+		var star = new createjs.Shape();
+
+		// the mask's position will be relative to the parent of its target:
+		star.x = this.img.width / 2;
+		star.y = this.img.height / 2;
+
+		// only the drawPolyStar call is needed for the mask to work:
+		star.graphics.beginStroke("#FF0").setStrokeStyle(3).drawPolyStar(0, 0, this.img.height / 2, 5, 0.6);
+
+		var bg = new createjs.Bitmap(this.img);
+		// blur and desaturate the background image:
+		bg.filters = [new createjs.BlurFilter(2, 2, 2), new createjs.ColorMatrixFilter(new createjs.ColorMatrix(0, 0, -100, 0))];
+		bg.cache(0, 0, this.img.width, this.img.height);
+		this.stage.addChild(bg);
+
+		var bmp = new createjs.Bitmap(this.img);
+		this.stage.addChild(bmp);
+		bmp.mask = star;
+
+		// note that the shape can be used in the display list as well if you'd like, or
+		// we can reuse the Graphics instance in another shape if we'd like to transform it differently.
+		this.stage.addChild(star);
+
+		this.stage.update();
+		this.compareBaseLine("assets/mask.png", done, expect, 0.01);
+	});
 });
