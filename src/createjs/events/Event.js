@@ -179,7 +179,7 @@ this.createjs = this.createjs||{};
 	 * @method preventDefault
 	 **/
 	p.preventDefault = function() {
-		this.defaultPrevented = true;
+		this.defaultPrevented = this.cancelable&&true;
 	};
 
 	/**
