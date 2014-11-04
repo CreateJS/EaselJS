@@ -118,12 +118,18 @@ this.createjs = this.createjs||{};
 	 * @return {Boolean}
 	 **/
 	p.draw = function(ctx, ignoreCache) {
-		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		var rect = this.sourceRect;
+		if (this.DisplayObject_draw(ctx, ignoreCache) || !this.image.complete) { return true; }
+		var img = this.image, rect = this.sourceRect;
 		if (rect) {
-			ctx.drawImage(this.image, rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width, rect.height);
+			// some browsers choke on out of bound values, so we'll fix them:
+			var x1 = rect.x, y1 = rect.y, x2 = x1 + rect.width, y2 = y1 + rect.height, x = 0, y = 0, w = img.width, h = img.height;
+			if (x1 < 0) { x -= x1; x1 = 0; }
+			if (x2 > w) { x2 = w; }
+			if (y1 < 0) { y -= y1; y1 = 0; }
+			if (y2 > h) { y2 = h; }
+			ctx.drawImage(img, x1, y1, x2-x1, y2-y1, x, y, x2-x1, y2-y1);
 		} else {
-			ctx.drawImage(this.image, 0, 0);
+			ctx.drawImage(img, 0, 0);
 		}
 		return true;
 	};
