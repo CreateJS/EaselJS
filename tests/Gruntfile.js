@@ -5,7 +5,11 @@ module.exports = function (grunt) {
 
 			jasmine: {
 				run: {
-					src: '../lib/easeljs-NEXT.combined.js',
+					src: [
+						'../lib/easeljs-NEXT.combined.js',
+						'../examples/assets/tweenjs-NEXT.min.js',
+						'../lib/movieclip-0.7.1.combined.js',
+					],
 					options: {
 						specs: 'spec/*Spec.js',
 						helpers: [
@@ -20,7 +24,7 @@ module.exports = function (grunt) {
 				server: {
 					options: {
 						keepalive: true,
-						base: ['../examples/assets/', '../lib/', './']
+						base: ['../lib/', '../', './']
 					}
 				}
 			},

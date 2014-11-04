@@ -358,7 +358,7 @@ describe("DisplayList", function () {
 			}, 5);
 		};
 
-		img.src = "BitmapFont.png";
+		img.src = this.assetsBasePath+"BitmapFont.png";
 
 		// Embedded SpriteSheet data.
 		var data = {
@@ -394,7 +394,7 @@ describe("DisplayList", function () {
 				"?": {"frames": [28]},
 				"U": {"frames": [20]}
 			},
-			"images": ["BitmapFont.png"],
+			"images": [this.assetsBasePath+"BitmapFont.png"],
 			"frames": [
 				[155, 2, 25, 41, 0, -10, -3],
 				[72, 2, 28, 43, 0, -8, -1],

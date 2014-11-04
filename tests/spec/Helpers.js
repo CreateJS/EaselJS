@@ -1,4 +1,6 @@
 beforeEach(function (done) {
+	this.assetsBasePath = "../examples/assets/";
+
 	this.sColor = "#000";
 	this.fColor = "#ff0000";
 
@@ -10,7 +12,7 @@ beforeEach(function (done) {
 	this.img.onload = function () {
 		done();
 	}
-	this.img.src = "daisy.png";
+	this.img.src = this.assetsBasePath+"daisy.png";
 	/**
 	 * Compare each drawing to a pre-saved base line image.
 	 * Need to has a small tolerance (100),
