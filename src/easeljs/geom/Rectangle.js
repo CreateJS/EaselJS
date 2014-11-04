@@ -161,7 +161,7 @@ this.createjs = this.createjs||{};
 		if (this.y > y1) { y1 = this.y; }
 		if (this.x + this.width < x2) { x2 = this.x + this.width; }
 		if (this.y + this.height < y2) { y2 = this.y + this.height; }
-		return (x2 < x1 || y2 < y1) ? null : new Rectangle(x1, y1, x2-x1, y2-y1);
+		return (x2 <= x1 || y2 <= y1) ? null : new Rectangle(x1, y1, x2-x1, y2-y1);
 	};
 	
 	/** 
