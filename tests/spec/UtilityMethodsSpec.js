@@ -50,13 +50,12 @@ describe("Utlity Methods", function () {
 		});
 
 		it("getTime", function () {
-			expect(createjs.Ticker.getTicks()).not.toBe(null);
+			expect(createjs.Ticker.getTime()).not.toBe(null);
 		});
 
 		it("getEventTime", function () {
-			expect(createjs.Ticker.getTicks()).not.toBe(null);
+			expect(createjs.Ticker.getEventTime()).not.toBe(null);
 		});
-
 	});
 
 	it("SpriteSheetBuilder", function(done) {

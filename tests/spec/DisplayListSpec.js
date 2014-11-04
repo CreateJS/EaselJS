@@ -6,17 +6,17 @@ describe("DisplayList", function () {
 		this.displayObjectProps = {
 			alpha: .5,
 			name: "foo",
-			regX: 5,
-			regY: 5,
+			regX: 1,
+			regY: 2,
 			rotation: 90,
 			scaleX: 1.5,
 			scaleY: 1.6,
 			shadow: this.shadow,
-			skewX: 5,
-			skewY: 5,
+			skewX: 3,
+			skewY: 4,
 			visible: false,
-			x: 15,
-			y: 15,
+			x: 5,
+			y: 6,
 			mouseEnabled: true,
 			compositeOperation: "copy"
 		};
