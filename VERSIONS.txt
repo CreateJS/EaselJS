@@ -56,6 +56,7 @@ OTHER:
 - added helper methods to Rectangle: union, intersects, extend, intersection, isEmpty, & contains.
 - updated clone() method for all classes
 - added Matrix2D.equals() method
+- added DisplayObject.transformMatrix
 
 
 Version 0.7.1 [December 12, 2013]

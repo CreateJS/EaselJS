@@ -561,8 +561,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._getObjectsUnderPoint = function(x, y, arr, mouse, activeListener) {
-		var ctx = createjs.DisplayObject._hitTestContext;
-		var props = this._props, mtx = props.matrix;
+		var mtx, ctx = createjs.DisplayObject._hitTestContext;
 		activeListener = activeListener || (mouse&&this._hasMouseEventListener());
 
 		// draw children one at a time, and check if we get a hit:
@@ -573,7 +572,7 @@ this.createjs = this.createjs||{};
 			var hitArea = child.hitArea, mask = child.mask;
 			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
 			if (!hitArea && mask && mask.graphics && !mask.graphics.isEmpty()) {
-				mtx = mask.getMatrix(mask._props.matrix).prependMatrix(this.getConcatenatedMatrix(mtx));
+				mtx = mask.getMatrix(mask._props.matrix).prependMatrix(this.getConcatenatedMatrix(this._props.matrix));
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				
 				// draw the mask as a solid fill:
@@ -595,11 +594,11 @@ this.createjs = this.createjs||{};
 				if (mouse && !activeListener && !child._hasMouseEventListener()) { continue; }
 				
 				// TODO: can we pass displayProps forward, to avoid having to calculate this backwards every time? It's kind of a mixed bag. When we're only hunting for DOs with event listeners, it may not make sense.
-				child.getConcatenatedDisplayProps(props);
+				var props = child.getConcatenatedDisplayProps(child._props);
 				mtx = props.matrix;
 				
 				if (hitArea) {
-					mtx.appendTransform(hitArea.x, hitArea.y, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
+					mtx.appendMatrix(hitArea.getMatrix(hitArea._props.matrix));
 					props.alpha = hitArea.alpha;
 				}
 				
