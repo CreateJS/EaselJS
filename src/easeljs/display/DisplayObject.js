@@ -314,7 +314,16 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 **/
 		this.y = 0;
-	
+		
+		/**
+		 * If set, defines the transformation for this display object, overriding all other transformation properties
+		 * (x, y, rotation, scale, skew).
+		 * @property transformMatrix
+		 * @type {Matrix2D}
+		 * @default null
+		 **/
+		this.transformMatrix = null;
+		
 		/**
 		 * The composite operation indicates how the pixels of this display object will be composited with the elements
 		 * behind it. If `null`, this property is inherited from the parent container. For more information, read the
@@ -672,8 +681,9 @@ this.createjs = this.createjs||{};
 	p.updateContext = function(ctx) {
 		var o=this, mask=o.mask, mtx= o._props.matrix;
 		
+		if (this.mask) { console.log(mask, mask.graphics.empty()); }
 		if (mask && mask.graphics && !mask.graphics.isEmpty()) {
-			mtx = mask.getMatrix(mtx);
+			mask.getMatrix(mtx);
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 			
 			mask.graphics.drawAsPath(ctx);
@@ -683,7 +693,7 @@ this.createjs = this.createjs||{};
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 		}
 		
-		mtx = mtx.identity().appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		this.getMatrix(mtx);
 		var tx = mtx.tx, ty = mtx.ty;
 		if (DisplayObject._snapToPixelEnabled && o.snapToPixel) {
 			tx = tx + (tx < 0 ? -0.5 : 0.5) | 0;
@@ -939,15 +949,15 @@ this.createjs = this.createjs||{};
 	};
 	
 	/**
-	 * Returns a matrix based on this object's transform.
+	 * Returns a matrix based on this object's current transform.
 	 * @method getMatrix
 	 * @param {Matrix2D} matrix Optional. A Matrix2D object to populate with the calculated values. If null, a new
 	 * Matrix object is returned.
 	 * @return {Matrix2D} A matrix representing this display object's transform.
 	 **/
 	p.getMatrix = function(matrix) {
-		var o = this;
-		return (matrix ? matrix.identity() : new createjs.Matrix2D()).appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		var o = this, mtx = matrix&&matrix.identity() || new createjs.Matrix2D();
+		return o.transformMatrix ?  mtx.copy(o.transformMatrix) : mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
 	};
 	
 	/**
@@ -961,10 +971,10 @@ this.createjs = this.createjs||{};
 	 * @return {Matrix2D} The combined matrix.
 	 **/
 	p.getConcatenatedMatrix = function(matrix) {
-		var o = this, mtx = matrix ? matrix.identity() : new createjs.Matrix2D();
-		do {
-			mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
-		} while (o = o.parent);
+		var o = this, mtx = this.getMatrix(matrix);
+		while (o = o.parent) {
+			mtx.prependMatrix(o.getMatrix(o._props.matrix));
+		}
 		return mtx;
 	};
 	
@@ -978,10 +988,10 @@ this.createjs = this.createjs||{};
 	 **/
 	p.getConcatenatedDisplayProps = function(props) {
 		props = props ? props.identity() : new createjs.DisplayProps();
-		var o = this, mtx = props.matrix;
+		var o = this, mtx = o.getMatrix(props.matrix);
 		do {
 			props.prepend(o.visible, o.alpha, o.shadow, o.compositeOperation);
-			mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY)
+			if (o != this) { mtx.prependMatrix(o.getMatrix(o._props.matrix)); } //.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
 		} while (o = o.parent);
 		return props;
 	};
@@ -1005,7 +1015,6 @@ this.createjs = this.createjs||{};
 	 * local Point.
 	*/
 	p.hitTest = function(x, y) {
-		// TODO: update with support for .hitArea & .mask and update hitArea / mask docs?
 		var ctx = DisplayObject._hitTestContext;
 		ctx.setTransform(1, 0, 0, 1, -x, -y);
 		this.draw(ctx);
@@ -1306,7 +1315,7 @@ this.createjs = this.createjs||{};
 		var x = bounds.x, y = bounds.y, width = bounds.width, height = bounds.height, mtx = this._props.matrix;
 		mtx = ignoreTransform ? mtx.identity() : this.getMatrix(mtx);
 		
-		if (x || y) { mtx.appendTransform(0,0,1,1,0,0,0,-x,-y); }
+		if (x || y) { mtx.appendTransform(0,0,1,1,0,0,0,-x,-y); } // TODO: simplify this.
 		if (matrix) { mtx.prependMatrix(matrix); }
 		
 		var x_a = width*mtx.a, x_b = width*mtx.b;
