@@ -1,7 +1,8 @@
-## Setup ##
-* No setup is required to run the tests, simply run index.html through a webserver.
-* To run via Grunt (Recommend)
-    * npm install;
+## Setup and run tests ##
+* Run via Grunt
+    * Install dependencies; npm install;
+    * Run tests in browser: grunt;
+    * Run headless: grunt jasmine;
     
 ### Install headless version ###
 * node-canvas is required for headless testing.
@@ -16,8 +17,3 @@
 	
 	# Source:
 	https://github.com/Homebrew/homebrew/issues/14123
-	
-
-## Run Tests ##
-* Run in browser: grunt;
-* Run headless: grunt jasmine;

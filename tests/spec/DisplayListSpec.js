@@ -1,144 +1,127 @@
 describe("DisplayList", function () {
-	var c;
-	var stage;
-	var image;
-	var sColor = "#000";
-	var fColor = "#ff0000";
-	var displayObjectProps;
-	var bitmapProps;
-	var shadow;
+	beforeEach(function () {
+		this.shadow = new createjs.Shadow();
 
-	beforeEach(function (done) {
-		c = document.createElement("canvas");
-		stage = new createjs.Stage(c);
-		image = new Image();
-		image.src = "assets/daisy.png";
-		image.onload = function () {
-			done();
-		}
-
-		shadow = new createjs.Shadow();
-
-		// Used to test clone operations
-		displayObjectProps = {
+		// Used to test clone() and set() operations
+		this.displayObjectProps = {
 			alpha: .5,
 			name: "foo",
-			regX: 5,
-			regY: 5,
+			regX: 1,
+			regY: 2,
 			rotation: 90,
 			scaleX: 1.5,
 			scaleY: 1.6,
-			shadow: shadow,
-			skewX: 5,
-			skewY: 5,
+			shadow: this.shadow,
+			skewX: 3,
+			skewY: 4,
 			visible: false,
-			x: 15,
-			y: 15,
+			x: 5,
+			y: 6,
 			mouseEnabled: true,
 			compositeOperation: "copy"
 		};
 
-		bitmapProps = {sourceRect: new createjs.Rectangle(1, 2, 3, 4)};
-		for (var n in displayObjectProps) {
-			bitmapProps[n] = displayObjectProps[n];
+		this.bitmapProps = {sourceRect: new createjs.Rectangle(1, 2, 3, 4)};
+		for (var n in this.displayObjectProps) {
+			this.bitmapProps[n] = this.displayObjectProps[n];
 		}
 	});
 
 	it("stage.addChild() should work", function () {
 		var child = new createjs.Container();
-		stage.addChild(child);
+		this.stage.addChild(child);
 
-		expect(stage.contains(child)).toBe(true);
+		expect(this.stage.contains(child)).toBe(true);
 	});
 
 	it("stage.contains() and stage.removeChild() should work", function () {
 		var child = new createjs.Container();
-		stage.addChild(child);
-		stage.removeChild(child);
+		this.stage.addChild(child);
+		this.stage.removeChild(child);
 
-		expect(stage.contains(child)).toBe(false);
+		expect(this.stage.contains(child)).toBe(false);
 	});
 
 	it("stage.removeChildAt(0) should work", function () {
 		var child = new createjs.Container();
-		stage.addChild(child);
-		stage.removeChildAt(0);
+		this.stage.addChild(child);
+		this.stage.removeChildAt(0);
 
-		expect(stage.contains(child)).toBe(false);
+		expect(this.stage.contains(child)).toBe(false);
 	});
 
 	it("stage.getChildIndex() should work", function () {
 		var child = new createjs.Container();
-		stage.addChild(new createjs.Container());
-		stage.addChildAt(child, 0);
+		this.stage.addChild(new createjs.Container());
+		this.stage.addChildAt(child, 0);
 
-		expect(stage.getChildIndex(child)).toBe(0);
+		expect(this.stage.getChildIndex(child)).toBe(0);
 	});
 
 	it("stage.addChildAt() should work.", function () {
 		var child = new createjs.Container();
-		stage.addChild(new createjs.Container());
-		stage.addChildAt(child, 1);
+		this.stage.addChild(new createjs.Container());
+		this.stage.addChildAt(child, 1);
 
-		expect(stage.getChildIndex(child)).toBe(1);
+		expect(this.stage.getChildIndex(child)).toBe(1);
 	});
 
 	it("stage.getChildByName('foo') should work", function () {
 		var child = new createjs.Container();
 		child.name = "foo";
-		stage.addChild(child);
+		this.stage.addChild(child);
 
-		expect(stage.getChildByName("foo")).not.toBe(null);
+		expect(this.stage.getChildByName("foo")).not.toBe(null);
 	});
 
 	it("stage.getMatrix() should work", function () {
-		expect(stage.getMatrix()).not.toBe(null);
+		expect(this.stage.getMatrix()).not.toBe(null);
 	});
 
 	it("stage.getConcatenatedMatrix() should work", function () {
-		expect(stage.getConcatenatedMatrix()).not.toBe(null);
+		expect(this.stage.getConcatenatedMatrix()).not.toBe(null);
 	});
 
 	it("stage.getNumChildren() should be 2", function () {
-		stage.addChild(new createjs.Sprite());
-		stage.addChild(new createjs.Sprite());
-		expect(stage.getNumChildren()).toBe(2);
+		this.stage.addChild(new createjs.Sprite());
+		this.stage.addChild(new createjs.Sprite());
+		expect(this.stage.getNumChildren()).toBe(2);
 	});
 
 	it("stage.getStage() should eq stage.", function () {
-		expect(stage.getStage()).toBe(stage);
+		expect(this.stage.getStage()).toBe(this.stage);
 	});
 
 	it("Bitmap.clone();", function () {
-		var bmp = new createjs.Bitmap(image).set(bitmapProps);
+		var bmp = new createjs.Bitmap(this.img).set(this.bitmapProps);
 		var clone = bmp.clone();
 
-		for (var n in bitmapProps) {
+		for (var n in this.bitmapProps) {
 			if (clone[n] instanceof createjs.Rectangle) {
-				var a = bitmapProps[n];
+				var a = this.bitmapProps[n];
 				var b = clone[n];
 				expect(a.x).toBe(b.x);
 				expect(a.y).toBe(b.y);
 				expect(a.width).toBe(b.width);
 				expect(a.height).toBe(b.height);
 			} else {
-				expect(clone[n]).toBe(bitmapProps[n]);
+				expect(clone[n]).toBe(this.bitmapProps[n]);
 			}
 		}
 	});
 
 	it("DisplayObject.clone();", function () {
-		var obj = new createjs.DisplayObject().set(displayObjectProps);
+		var obj = new createjs.DisplayObject().set(this.displayObjectProps);
 		var clone = obj.clone();
 
-		for (var n in displayObjectProps) {
-			expect(clone[n]).toBe(displayObjectProps[n]);
+		for (var n in this.displayObjectProps) {
+			expect(clone[n]).toBe(this.displayObjectProps[n]);
 		}
 	});
 
 	it("getTransformedBounds() should work", function () {
-		var bmp = new createjs.Bitmap(image);
-		stage.addChild(bmp);
+		var bmp = new createjs.Bitmap(this.img);
+		this.stage.addChild(bmp);
 		var bounds = bmp.getTransformedBounds();
 		expect(bounds.width).toBe(80);
 		expect(bounds.height).toBe(67);
@@ -149,15 +132,15 @@ describe("DisplayList", function () {
 
 		var g = dot.graphics;
 		g.setStrokeStyle(1);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
+		g.beginStroke(this.sColor);
+		g.beginFill(this.fColor);
 		g.drawRect(0, 0, 5, 5);
 		g.endFill();
 
-		stage.addChild(dot);
-		stage.update();
+		this.stage.addChild(dot);
+		this.stage.update();
 
-		var objects = stage.getObjectsUnderPoint(1, 1);
+		var objects = this.stage.getObjectsUnderPoint(1, 1);
 		expect(objects.length).toBe(1);
 	});
 
@@ -166,15 +149,15 @@ describe("DisplayList", function () {
 
 		var g = dot.graphics;
 		g.setStrokeStyle(1);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
+		g.beginStroke(this.sColor);
+		g.beginFill(this.fColor);
 		g.drawRect(0, 0, 5, 5);
 		g.endFill();
 
-		stage.addChild(dot);
-		stage.update();
+		this.stage.addChild(dot);
+		this.stage.update();
 
-		expect(stage.getObjectsUnderPoint(1, 1)).not.toBe(null);
+		expect(this.stage.getObjectsUnderPoint(1, 1)).not.toBe(null);
 	});
 
 	it("hitTest() should be true.", function () {
@@ -182,15 +165,15 @@ describe("DisplayList", function () {
 
 		var g = dot.graphics;
 		g.setStrokeStyle(1);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
+		g.beginStroke(this.sColor);
+		g.beginFill(this.fColor);
 		g.drawRect(0, 0, 5, 5);
 		g.endFill();
 
-		stage.addChild(dot);
-		stage.update();
+		this.stage.addChild(dot);
+		this.stage.update();
 
-		expect(stage.hitTest(1, 1)).toBe(true);
+		expect(this.stage.hitTest(1, 1)).toBe(true);
 	});
 
 	it("isVisible() should be true.", function () {
@@ -198,8 +181,8 @@ describe("DisplayList", function () {
 
 		var g = dot.graphics;
 		g.setStrokeStyle(1);
-		g.beginStroke(sColor);
-		g.beginFill(fColor);
+		g.beginStroke(this.sColor);
+		g.beginFill(this.fColor);
 		g.drawRect(0, 0, 5, 5);
 		g.endFill();
 
@@ -207,61 +190,61 @@ describe("DisplayList", function () {
 	});
 
 	it("localToGlobal() should work.", function () {
-		var pt = stage.localToGlobal(0, 0);
+		var pt = this.stage.localToGlobal(0, 0);
 		expect(pt.x).toBe(0);
 	});
 
 	it("localToLocal() should work.", function () {
 		var s = new createjs.Shape();
-		stage.addChild(s);
+		this.stage.addChild(s);
 
-		var pt = stage.localToLocal(0, 0, s);
+		var pt = this.stage.localToLocal(0, 0, s);
 		expect(pt.x).toBe(0);
 	});
 
 	it("set() should work", function () {
-		var shape = stage.addChild(new createjs.Shape()).set(displayObjectProps);
+		var shape = this.stage.addChild(new createjs.Shape()).set(this.displayObjectProps);
 
-		for (var n in displayObjectProps) {
-			expect(shape[n]).toBe(displayObjectProps[n]);
+		for (var n in this.displayObjectProps) {
+			expect(shape[n]).toBe(this.displayObjectProps[n]);
 		}
 	});
 
 	it("setBounds() should work.", function () {
 		var s = new createjs.Shape();
-		stage.addChild(s);
+		this.stage.addChild(s);
 
-		s.setBounds(0, 0, 5, 5);
+		s.setBounds(1, 2, 3, 4);
 
 		var b = s.getBounds();
-		expect(b.x).toBe(0);
-		expect(b.y).toBe(0);
-		expect(b.width).toBe(5);
-		expect(b.width).toBe(5);
+		expect(b.x).toBe(1);
+		expect(b.y).toBe(2);
+		expect(b.width).toBe(3);
+		expect(b.height).toBe(4);
 	});
 
 	it("setChildIndex() should work.", function () {
 		var foo = new createjs.Shape();
 		var bar = new createjs.Shape();
-		stage.addChild(bar);
-		stage.addChild(foo);
-		stage.setChildIndex(foo, 0);
-		expect(stage.getChildIndex(foo)).toBe(0);
+		this.stage.addChild(bar);
+		this.stage.addChild(foo);
+		this.stage.setChildIndex(foo, 0);
+		expect(this.stage.getChildIndex(foo)).toBe(0);
 	});
 
 	it("setTransform() should work.", function () {
 		var foo = new createjs.Shape();
-		foo.setTransform(5, 5, 2, 2, 90, 5, 5, 2, 2);
+		foo.setTransform(5, 6, 2, 3, 90, 10, 11, 50, 55);
 
 		expect(foo.x).toBe(5);
-		expect(foo.y).toBe(5);
+		expect(foo.y).toBe(6);
 		expect(foo.scaleX).toBe(2);
-		expect(foo.scaleY).toBe(2);
+		expect(foo.scaleY).toBe(3);
 		expect(foo.rotation).toBe(90);
-		expect(foo.skewX).toBe(5);
-		expect(foo.skewY).toBe(5);
-		expect(foo.regX).toBe(2);
-		expect(foo.regY).toBe(2);
+		expect(foo.skewX).toBe(10);
+		expect(foo.skewY).toBe(11);
+		expect(foo.regX).toBe(50);
+		expect(foo.regY).toBe(55);
 	});
 
 	it("sortChildren() higher y should be on-top", function () {
@@ -317,7 +300,7 @@ describe("DisplayList", function () {
 	});
 
 	it("toDataURL() should return a valid image.", function (done) {
-		var url = stage.toDataURL("#ffffff");
+		var url = this.stage.toDataURL("#ffffff");
 
 		var image = new Image();
 		image.onload = function () {
@@ -329,18 +312,18 @@ describe("DisplayList", function () {
 	});
 
 	it("stage.toString() should work.", function () {
-		expect(stage.toString()).not.toBe(null);
+		expect(this.stage.toString()).not.toBe(null);
 	});
 
 	it("cache(), updateCache() and uncache() should work.", function () {
-		stage.cache(0, 0, 25, 25);
-		expect(stage.cacheCanvas).not.toBe(null);
-		stage.updateCache();
-		stage.uncache();
+		this.stage.cache(0, 0, 25, 25);
+		expect(this.stage.cacheCanvas).not.toBe(null);
+		this.stage.updateCache();
+		this.stage.uncache();
 
 		var err = false;
 		try {
-			stage.updateCache();
+			this.stage.updateCache();
 		} catch (e) {
 			err = true;
 		}
@@ -375,7 +358,7 @@ describe("DisplayList", function () {
 			}, 5);
 		};
 
-		img.src = "assets/BitmapFontSpriteSheet.png";
+		img.src = this.assetsBasePath+"BitmapFont.png";
 
 		// Embedded SpriteSheet data.
 		var data = {
@@ -411,7 +394,7 @@ describe("DisplayList", function () {
 				"?": {"frames": [28]},
 				"U": {"frames": [20]}
 			},
-			"images": ["assets/BitmapFontSpriteSheet.png"],
+			"images": [this.assetsBasePath+"BitmapFont.png"],
 			"frames": [
 				[155, 2, 25, 41, 0, -10, -3],
 				[72, 2, 28, 43, 0, -8, -1],
@@ -445,5 +428,34 @@ describe("DisplayList", function () {
 				[966, 2, 9, 10, 0, -17, -31]
 			]
 		};
+	});
+
+	it("masks should work", function (done) {
+		// masks can only be shapes.
+		var star = new createjs.Shape();
+
+		// the mask's position will be relative to the parent of its target:
+		star.x = this.img.width / 2;
+		star.y = this.img.height / 2;
+
+		// only the drawPolyStar call is needed for the mask to work:
+		star.graphics.beginStroke("#FF0").setStrokeStyle(3).drawPolyStar(0, 0, this.img.height / 2, 5, 0.6);
+
+		var bg = new createjs.Bitmap(this.img);
+		// blur and desaturate the background image:
+		bg.filters = [new createjs.BlurFilter(2, 2, 2), new createjs.ColorMatrixFilter(new createjs.ColorMatrix(0, 0, -100, 0))];
+		bg.cache(0, 0, this.img.width, this.img.height);
+		this.stage.addChild(bg);
+
+		var bmp = new createjs.Bitmap(this.img);
+		this.stage.addChild(bmp);
+		bmp.mask = star;
+
+		// note that the shape can be used in the display list as well if you'd like, or
+		// we can reuse the Graphics instance in another shape if we'd like to transform it differently.
+		this.stage.addChild(star);
+
+		this.stage.update();
+		this.compareBaseLine("assets/mask.png", done, expect, 0.01);
 	});
 });
