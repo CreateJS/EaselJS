@@ -50,13 +50,12 @@ describe("Utlity Methods", function () {
 		});
 
 		it("getTime", function () {
-			expect(createjs.Ticker.getTicks()).not.toBe(null);
+			expect(createjs.Ticker.getTime()).not.toBe(null);
 		});
 
 		it("getEventTime", function () {
-			expect(createjs.Ticker.getTicks()).not.toBe(null);
+			expect(createjs.Ticker.getEventTime()).not.toBe(null);
 		});
-
 	});
 
 	it("SpriteSheetBuilder", function(done) {
@@ -103,6 +102,6 @@ describe("Utlity Methods", function () {
 		var square3 = new createjs.Sprite(spriteSheet, "square2");
 		this.stage.addChild(square3).set({x:80});
 
-		this.compareBaseLine("assets/SpriteSheetBuilder.png", done, expect);
+		this.compareBaseLine("assets/SpriteSheetBuilder.png", done, expect, 0.001);
 	});
 });

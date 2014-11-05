@@ -11,15 +11,13 @@
 	<script type="text/javascript" src="lib/jasmine-2.0.2/jasmine-html.js"></script>
 	<script type="text/javascript" src="lib/jasmine-2.0.2/boot.js"></script>
 
-	<!-- include source files here... -->
-
-	<!-- Grunt points to ../lib -->
-	<script src="assets/tweenjs-NEXT.min.js"></script>
+	<!--
+		grunt-connect points to: ['../lib/', '../']
+		Use ../examples/assets/ so the tests can be run headless.
+	-->
+	<script src="../examples/assets/tweenjs-NEXT.min.js"></script>
 	<script src="easeljs-NEXT.combined.js"></script>
 	<script src="movieclip-NEXT.min.js"></script>
-
-	<!-- Include relative path, so this can be run without grunt -->
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
 
 	<script type="text/javascript" src="lib/js-imagediff/imagediff.js"></script>
 	<script type="text/javascript" src="spec/Helpers.js"></script>
