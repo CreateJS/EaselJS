@@ -406,6 +406,12 @@ this.createjs = this.createjs||{};
 		return this.tx === 0 && this.ty === 0 && this.a === 1 && this.b === 0 && this.c === 0 && this.d === 1;
 	};
 	
+	/**
+	 * Returns true if this matrix is equal to the specified matrix (all property values are equal).
+	 * @method equals
+	 * @param {Matrix2D} matrix The matrix to compare.
+	 * @return {Boolean}
+	 **/
 	p.equals = function(matrix) {
 		return this.tx === matrix.tx && this.ty === matrix.ty && this.a === matrix.a && this.b === matrix.b && this.c === matrix.c && this.d === matrix.d;
 	};
@@ -426,7 +432,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that this these values
+	 * Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that these values
 	 * may not match the transform properties you used to generate the matrix, though they will produce the same visual
 	 * results.
 	 * @method decompose
@@ -444,7 +450,8 @@ this.createjs = this.createjs||{};
 		var skewX = Math.atan2(-this.c, this.d);
 		var skewY = Math.atan2(this.b, this.a);
 
-		if (skewX == skewY) {
+		var delta = Math.abs(1-skewX/skewY);
+		if (delta < 0.00001) { // effectively identical, can use rotation:
 			target.rotation = skewY/Matrix2D.DEG_TO_RAD;
 			if (this.a < 0 && this.d >= 0) {
 				target.rotation += (target.rotation <= 0) ? 180 : -180;
