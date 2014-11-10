@@ -453,7 +453,13 @@ this.createjs = this.createjs||{};
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) {
 			this.dispatchEvent("tickstart");  // TODO: make cancellable?
-			this._tick((arguments.length ? arguments : null));
+
+			var args = arguments.length ? Array.prototype.slice.call(arguments,0) : null;
+			var evt = args&&args[0];
+			var props = evt&&(evt.delta != null) ? {delta:evt.delta, paused:evt.paused, time:evt.time, runTime:evt.runTime } : {};
+			props.params = args;
+
+			this._tick(props);
 			this.dispatchEvent("tickend");
 		}
 		this.dispatchEvent("drawstart"); // TODO: make cancellable?
