@@ -36,80 +36,88 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * Applies a box blur to DisplayObjects. Note that this filter is fairly CPU intensive, particularly if the quality is
- * set higher than 1.
- *
- * <h4>Example</h4>
- * This example creates a red circle, and then applies a 5 pixel blur to it. It uses the {{#crossLink "Filter/getBounds"}}{{/crossLink}}
- * method to account for the spread that the blur causes.
- *
- *      var shape = new createjs.Shape().set({x:100,y:100});
- *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
- *
- *      var blurFilter = new createjs.BlurFilter(5, 5, 1);
- *      shape.filters = [blurFilter];
- *      var bounds = blurFilter.getBounds();
- *
- *      shape.cache(-50+bounds.x, -50+bounds.y, 100+bounds.width, 100+bounds.height);
- *
- * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
- * @class BlurFilter
- * @extends Filter
- * @constructor
- * @param {Number} [blurX=0] The horizontal blur radius in pixels.
- * @param {Number} [blurY=0] The vertical blur radius in pixels.
- * @param {Number} [quality=1] The number of blur iterations.
- **/
-var BlurFilter = function( blurX, blurY, quality ) {
-  this.initialize( blurX, blurY, quality );
-};
-var p = BlurFilter.prototype = new createjs.Filter();
-BlurFilter.prototype.constructor = BlurFilter;
 
 // constructor:
-	/** @ignore */
-	p.initialize = function( blurX, blurY, quality ) {
+	/**
+	 * Applies a box blur to DisplayObjects. Note that this filter is fairly CPU intensive, particularly if the quality is
+	 * set higher than 1.
+	 *
+	 * <h4>Example</h4>
+	 * This example creates a red circle, and then applies a 5 pixel blur to it. It uses the {{#crossLink "Filter/getBounds"}}{{/crossLink}}
+	 * method to account for the spread that the blur causes.
+	 *
+	 *      var shape = new createjs.Shape().set({x:100,y:100});
+	 *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
+	 *
+	 *      var blurFilter = new createjs.BlurFilter(5, 5, 1);
+	 *      shape.filters = [blurFilter];
+	 *      var bounds = blurFilter.getBounds();
+	 *
+	 *      shape.cache(-50+bounds.x, -50+bounds.y, 100+bounds.width, 100+bounds.height);
+	 *
+	 * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
+	 * @class BlurFilter
+	 * @extends Filter
+	 * @constructor
+	 * @param {Number} [blurX=0] The horizontal blur radius in pixels.
+	 * @param {Number} [blurY=0] The vertical blur radius in pixels.
+	 * @param {Number} [quality=1] The number of blur iterations.
+	 **/
+	function BlurFilter( blurX, blurY, quality) {
 		if ( isNaN(blurX) || blurX < 0 ) blurX = 0;
-		this.blurX = blurX | 0;
 		if ( isNaN(blurY) || blurY < 0 ) blurY = 0;
-		this.blurY = blurY | 0;
 		if ( isNaN(quality) || quality < 1  ) quality = 1;
-		this.quality = quality | 0;
-	};
-
-// public properties:
-
-	/**
-	 * Horizontal blur radius in pixels
-	 * @property blurX
-	 * @default 0
-	 * @type Number
-	 **/
-	p.blurX = 0;
-
-	/**
-	 * Vertical blur radius in pixels
-	 * @property blurY
-	 * @default 0
-	 * @type Number
-	 **/
-	p.blurY = 0;
-
-	/**
-	 * Number of blur iterations. For example, a value of 1 will produce a rough blur. A value of 2 will produce a
-	 * smoother blur, but take twice as long to run.
-	 * @property quality
-	 * @default 1
-	 * @type Number
-	 **/
-	p.quality = 1;
+		
+		
+	// public properties:
+		/**
+		 * Horizontal blur radius in pixels
+		 * @property blurX
+		 * @default 0
+		 * @type Number
+		 **/
+		this.blurX = blurX | 0;
 	
-	//TODO: There might be a better better way to place these two lookup tables:
-	p.mul_table = [ 1,171,205,293,57,373,79,137,241,27,391,357,41,19,283,265,497,469,443,421,25,191,365,349,335,161,155,149,9,278,269,261,505,245,475,231,449,437,213,415,405,395,193,377,369,361,353,345,169,331,325,319,313,307,301,37,145,285,281,69,271,267,263,259,509,501,493,243,479,118,465,459,113,446,55,435,429,423,209,413,51,403,199,393,97,3,379,375,371,367,363,359,355,351,347,43,85,337,333,165,327,323,5,317,157,311,77,305,303,75,297,294,73,289,287,71,141,279,277,275,68,135,67,133,33,262,260,129,511,507,503,499,495,491,61,121,481,477,237,235,467,232,115,457,227,451,7,445,221,439,218,433,215,427,425,211,419,417,207,411,409,203,202,401,399,396,197,49,389,387,385,383,95,189,47,187,93,185,23,183,91,181,45,179,89,177,11,175,87,173,345,343,341,339,337,21,167,83,331,329,327,163,81,323,321,319,159,79,315,313,39,155,309,307,153,305,303,151,75,299,149,37,295,147,73,291,145,289,287,143,285,71,141,281,35,279,139,69,275,137,273,17,271,135,269,267,133,265,33,263,131,261,130,259,129,257,1];
-        
-   
-	p.shg_table = [0,9,10,11,9,12,10,11,12,9,13,13,10,9,13,13,14,14,14,14,10,13,14,14,14,13,13,13,9,14,14,14,15,14,15,14,15,15,14,15,15,15,14,15,15,15,15,15,14,15,15,15,15,15,15,12,14,15,15,13,15,15,15,15,16,16,16,15,16,14,16,16,14,16,13,16,16,16,15,16,13,16,15,16,14,9,16,16,16,16,16,16,16,16,16,13,14,16,16,15,16,16,10,16,15,16,14,16,16,14,16,16,14,16,16,14,15,16,16,16,14,15,14,15,13,16,16,15,17,17,17,17,17,17,14,15,17,17,16,16,17,16,15,17,16,17,11,17,16,17,16,17,16,17,17,16,17,17,16,17,17,16,16,17,17,17,16,14,17,17,17,17,15,16,14,16,15,16,13,16,15,16,14,16,15,16,12,16,15,16,17,17,17,17,17,13,16,15,17,17,17,16,15,17,17,17,16,15,17,17,14,16,17,17,16,17,17,16,15,17,16,14,17,16,15,17,16,17,17,16,17,15,16,17,14,17,16,15,17,16,17,13,17,16,17,17,16,17,14,17,16,17,16,17,16,17,9];
+		/**
+		 * Vertical blur radius in pixels
+		 * @property blurY
+		 * @default 0
+		 * @type Number
+		 **/
+		this.blurY = blurY | 0;
+	
+		/**
+		 * Number of blur iterations. For example, a value of 1 will produce a rough blur. A value of 2 will produce a
+		 * smoother blur, but take twice as long to run.
+		 * @property quality
+		 * @default 1
+		 * @type Number
+		 **/
+		this.quality = quality | 0;
+	}
+	var p = createjs.extend(BlurFilter, createjs.Filter);
+
+
+
+// constants:
+	/**
+	 * Array of multiply values for blur calculations.
+	 * @property MUL_TABLE
+	 * @type Array
+	 * @protected
+	 * @static
+	 **/
+	BlurFilter.MUL_TABLE = [ 1,171,205,293,57,373,79,137,241,27,391,357,41,19,283,265,497,469,443,421,25,191,365,349,335,161,155,149,9,278,269,261,505,245,475,231,449,437,213,415,405,395,193,377,369,361,353,345,169,331,325,319,313,307,301,37,145,285,281,69,271,267,263,259,509,501,493,243,479,118,465,459,113,446,55,435,429,423,209,413,51,403,199,393,97,3,379,375,371,367,363,359,355,351,347,43,85,337,333,165,327,323,5,317,157,311,77,305,303,75,297,294,73,289,287,71,141,279,277,275,68,135,67,133,33,262,260,129,511,507,503,499,495,491,61,121,481,477,237,235,467,232,115,457,227,451,7,445,221,439,218,433,215,427,425,211,419,417,207,411,409,203,202,401,399,396,197,49,389,387,385,383,95,189,47,187,93,185,23,183,91,181,45,179,89,177,11,175,87,173,345,343,341,339,337,21,167,83,331,329,327,163,81,323,321,319,159,79,315,313,39,155,309,307,153,305,303,151,75,299,149,37,295,147,73,291,145,289,287,143,285,71,141,281,35,279,139,69,275,137,273,17,271,135,269,267,133,265,33,263,131,261,130,259,129,257,1];
+	
+	/**
+	 * Array of shift values for blur calculations.
+	 * @property SHG_TABLE
+	 * @type Array
+	 * @protected
+	 * @static
+	 **/
+	BlurFilter.SHG_TABLE = [0,9,10,11,9,12,10,11,12,9,13,13,10,9,13,13,14,14,14,14,10,13,14,14,14,13,13,13,9,14,14,14,15,14,15,14,15,15,14,15,15,15,14,15,15,15,15,15,14,15,15,15,15,15,15,12,14,15,15,13,15,15,15,15,16,16,16,15,16,14,16,16,14,16,13,16,16,16,15,16,13,16,15,16,14,9,16,16,16,16,16,16,16,16,16,13,14,16,16,15,16,16,10,16,15,16,14,16,16,14,16,16,14,16,16,14,15,16,16,16,14,15,14,15,13,16,16,15,17,17,17,17,17,17,14,15,17,17,16,16,17,16,15,17,16,17,11,17,16,17,16,17,16,17,17,16,17,17,16,17,17,16,16,17,17,17,16,14,17,17,17,17,15,16,14,16,15,16,13,16,15,16,14,16,15,16,12,16,15,16,17,17,17,17,17,13,16,15,17,17,17,16,15,17,17,17,16,15,17,17,14,16,17,17,16,17,17,16,15,17,16,14,17,16,15,17,16,17,17,16,17,15,16,17,14,17,16,15,17,16,17,13,17,16,17,17,16,17,14,17,16,17,16,17,16,17,9];
+
 
 // public methods:
 	/** docced in super class **/
@@ -117,7 +125,8 @@ BlurFilter.prototype.constructor = BlurFilter;
 		var q = Math.pow(this.quality, 0.6)*0.5;
 		return new createjs.Rectangle(-this.blurX*q,-this.blurY*q,2*this.blurX*q,2*this.blurY*q);
 	};
-
+	
+	/** docced in super class **/
 	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
 		targetCtx = targetCtx || ctx;
 		if (targetX == null) { targetX = x; }
@@ -147,6 +156,7 @@ BlurFilter.prototype.constructor = BlurFilter;
 
 		var pixels = imageData.data;
 
+		// TODO: there are a lot of unused variables in this method:
 		var x, y, i, p, yp, yi, yw, r_sum, g_sum, b_sum, a_sum, 
 		r_out_sum, g_out_sum, b_out_sum, a_out_sum,
 		r_in_sum, g_in_sum, b_in_sum, a_in_sum, 
@@ -179,13 +189,13 @@ BlurFilter.prototype.constructor = BlurFilter;
 		
 		var stackIn = null;
 
-
-
+		var mul_table = BlurFilter.MUL_TABLE;
+		var shg_table = BlurFilter.SHG_TABLE;
 		
 		while ( iterations-- > 0 ) {
 			yw = yi = 0;
-			var mul_sum = this.mul_table[radiusX];
-			var shg_sum = this.shg_table[radiusX];
+			var mul_sum = mul_table[radiusX];
+			var shg_sum = shg_table[radiusX];
 			for ( y = height; --y > -1; )
 			{
 				r_sum = rxp1 * ( pr = pixels[yi] );
@@ -236,8 +246,8 @@ BlurFilter.prototype.constructor = BlurFilter;
 				yw += width;
 			}
 
-			mul_sum = this.mul_table[radiusY];
-			shg_sum = this.shg_table[radiusY];
+			mul_sum = mul_table[radiusY];
+			shg_sum = shg_table[radiusY];
 			for ( x = 0; x < width; x++ )
 			{
 				yi = x << 2;
@@ -338,19 +348,16 @@ BlurFilter.prototype.constructor = BlurFilter;
 		return true;
 	};
 
-	/**
-	 * Returns a clone of this object.
-	 * @method clone
-	 * @return {BlurFilter}
-	 **/
+	/** docced in super class **/
 	p.clone = function() {
 		return new BlurFilter(this.blurX, this.blurY, this.quality);
 	};
 
+	/** docced in super class **/
 	p.toString = function() {
 		return "[BlurFilter]";
 	};
 
-	createjs.BlurFilter = BlurFilter;
 
+	createjs.BlurFilter = createjs.promote(BlurFilter, "Filter");
 }());

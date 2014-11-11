@@ -14,10 +14,10 @@
 	<link href="../_shared/SyntaxHighlighter/shThemeCreateJS.css" rel="stylesheet" type="text/css">
 </head>
 	
-<body onLoad="initTutorial();">
+<body onload="initTutorial();">
 	<article>
 		<header>
-			<h1>EaselJS: Mouse Interaction</h1>
+			<h1>EaselJS <em>Mouse Interaction</em></h1>
 			<p>
 				<strong>Synopsis:</strong> Learn about mouse events on display objects and the stage.<br>
 				<strong>Topics:</strong> MouseEvent, addEventListener, on, click, dblclick, mouseover, mouseout,
@@ -42,7 +42,7 @@
 circle.addEventListener("click", function(event) { alert("clicked"); })
 				</textarea>
 			</p>
-			<iframe src="basic.html" class="demo" longDesc="the onClick handler" width="100%" height="220px"></iframe>
+			<iframe src="basic.html" class="demo" data-description="the onClick handler" width="100%" height="220px"></iframe>
 			<p>
 				There are a number of events you can listen for on display objects: <code>click</code>,
 				<code>mousedown</code>, <code>mouseup</code>, <code>dblclick</code>, <code>pressmove</code>,
@@ -79,7 +79,7 @@ circle.on("click", function(evt) {
 });
 			</textarea>
 			</p>
-			<iframe src="events.html" class="demo" longDesc="demonstrating the different mouse event types on display objects" width="100%" height="220px"></iframe>
+			<iframe src="events.html" class="demo" data-description="demonstrating the different mouse event types on display objects" width="100%" height="220px"></iframe>
 		</section>
 		
 		<section>
@@ -108,7 +108,7 @@ circle.on("click", function(evt) {
 				background shape, and a text label. All three display objects and the stage have listeners for the
 				"click" event both with and without the useCapture param.
 			</p>
-			<iframe src="bubbling.html" class="demo" longDesc="event bubbling" width="100%" height="120px"></iframe>
+			<iframe src="bubbling.html" class="demo" data-description="event bubbling" width="100%" height="120px"></iframe>
 		</section>
 		
 		<section>
@@ -153,7 +153,7 @@ circle.mouseEnabled = false;
 				Hit area display objects are used within the coordinate system (ie. concatenated transformation) of
 				their owner, and as such you can reuse the same display object as the <code>hitArea</code> of multiple objects.
 			</p>
-			<iframe src="hitArea.html" class="demo" longDesc="mouse event handlers on containers" width="100%" height="170px"></iframe>
+			<iframe src="hitArea.html" class="demo" data-description="mouse event handlers on containers" width="100%" height="170px"></iframe>
 			<p>
 				Notice how in this demo, as you roll over the red text, it only registers a hit when the pointer is
 				over a non-transparent pixel, whereas the blue text uses the rectangular <code>hitArea</code> to calculate the hit.
@@ -181,7 +181,7 @@ stage.on("stagemousedown", function(evt) {
 			<p>
 				The following demo demonstrates using these events to let you finger paint on the canvas:
 			</p>
-			<iframe src="stage.html" class="demo" longDesc="using stagemousedown, stagemouseup & stagemousemove." width="100%" height="220px"></iframe>
+			<iframe src="stage.html" class="demo" data-description="using stagemousedown, stagemouseup & stagemousemove." width="100%" height="220px"></iframe>
 			<p>
 				By default, you will stop getting <code>stagemousemove</code> events whenever the pointer is outside of the canvas.
 			</p>
@@ -225,7 +225,7 @@ circle.on("pressup", function(evt) { console.log("up"); })
 				Check out the source for the demo below for a simple example of this in action. It's also a great place
                 to test out the <code>mouseMoveOutside</code> property.
 			</p>
-			<iframe src="drag.html" class="demo" longDesc="implementing drag and drop" width="100%" height="220px"></iframe>
+			<iframe src="drag.html" class="demo" data-description="implementing drag and drop" width="100%" height="220px"></iframe>
 		</section>
 		
 		<section>

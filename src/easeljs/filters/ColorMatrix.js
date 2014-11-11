@@ -36,10 +36,11 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
+
+// constructor:
 	/**
-	 * Provides helper functions for assembling a matrix for use with the {{#crossLink "ColorMatrixFilter"}}{{/crossLink}},
-	 * or can be used directly as the matrix for a ColorMatrixFilter. Most methods return the instance to facilitate
-	 * chained calls.
+	 * Provides helper functions for assembling a matrix for use with the {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}.
+	 * Most methods return the instance to facilitate chained calls.
 	 *
 	 * <h4>Example</h4>
 	 *
@@ -54,12 +55,13 @@ this.createjs = this.createjs||{};
 	 * @param {Number} hue
 	 * @constructor
 	 **/
-	var ColorMatrix = function(brightness, contrast, saturation, hue) {
-	  this.initialize(brightness, contrast, saturation, hue);
-	};
+	function ColorMatrix(brightness, contrast, saturation, hue) {
+		this.setColor(brightness, contrast, saturation, hue);
+	}
 	var p = ColorMatrix.prototype;
-	ColorMatrix.prototype.constructor = ColorMatrix;
 
+
+// constants:
 	/**
 	 * Array of delta values for contrast calculations.
 	 * @property DELTA_INDEX
@@ -106,19 +108,18 @@ this.createjs = this.createjs||{};
 	ColorMatrix.LENGTH = ColorMatrix.IDENTITY_MATRIX.length;
 
 
+// public methods:
 	/**
-	 * Initialization method.
-	 * @method initialize
+	 * Resets the instance with the specified values.
+	 * @method setColor
 	 * @param {Number} brightness
 	 * @param {Number} contrast
 	 * @param {Number} saturation
 	 * @param {Number} hue
 	 * @protected
 	 */
-	p.initialize = function(brightness,contrast,saturation,hue) {
-		this.reset();
-		this.adjustColor(brightness,contrast,saturation,hue);
-		return this;
+	p.setColor = function(brightness,contrast,saturation,hue) {
+		return this.reset().adjustColor(brightness,contrast,saturation,hue);;
 	};
 
 	/**
@@ -307,23 +308,23 @@ this.createjs = this.createjs||{};
 		return "[ColorMatrix]";
 	};
 
-// private methods:
 
+// private methods:
 	/**
 	 * @method _multiplyMatrix
 	 * @param {Array} matrix
 	 * @protected
 	 **/
 	p._multiplyMatrix = function(matrix) {
-		var col = [];
+		var i, j, k, col = [];
 
-		for (var i=0;i<5;i++) {
-			for (var j=0;j<5;j++) {
+		for (i=0;i<5;i++) {
+			for (j=0;j<5;j++) {
 				col[j] = this[j+i*5];
 			}
-			for (var j=0;j<5;j++) {
+			for (j=0;j<5;j++) {
 				var val=0;
-				for (var k=0;k<5;k++) {
+				for (k=0;k<5;k++) {
 					val += matrix[j+k*5]*col[k];
 				}
 				this[j+i*5] = val;
@@ -342,7 +343,6 @@ this.createjs = this.createjs||{};
 		return Math.min(limit,Math.max(-limit,value));
 	};
 
-	//
 	/**
 	 * Makes sure matrixes are 5x5 (25 long).
 	 * @method _fixMatrix
@@ -359,6 +359,6 @@ this.createjs = this.createjs||{};
 		return matrix;
 	};
 
-	createjs.ColorMatrix = ColorMatrix;
 
+	createjs.ColorMatrix = ColorMatrix;
 }());

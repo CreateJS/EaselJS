@@ -1,11 +1,21 @@
 (function (window) {
 
 	function Ship() {
-		this.initialize();
-	}
+		this.Container_constructor();
 
-	var p = Ship.prototype = new createjs.Container();
-	Ship.prototype.constructor = Ship;
+		this.shipFlame = new createjs.Shape();
+		this.shipBody = new createjs.Shape();
+
+		this.addChild(this.shipFlame);
+		this.addChild(this.shipBody);
+
+		this.makeShape();
+		this.timeout = 0;
+		this.thrust = 0;
+		this.vX = 0;
+		this.vY = 0;
+	}
+	var p = createjs.extend(Ship, createjs.Container);
 
 // public properties:
 	Ship.TOGGLE = 60;
@@ -24,25 +34,7 @@
 
 	p.bounds;
 	p.hit;
-
-// constructor:
-	p.Container_initialize = p.initialize;	//unique to avoid overiding base class
-
-	p.initialize = function () {
-		this.Container_initialize();
-
-		this.shipFlame = new createjs.Shape();
-		this.shipBody = new createjs.Shape();
-
-		this.addChild(this.shipFlame);
-		this.addChild(this.shipBody);
-
-		this.makeShape();
-		this.timeout = 0;
-		this.thrust = 0;
-		this.vX = 0;
-		this.vY = 0;
-	}
+	
 
 // public methods:
 	p.makeShape = function () {
@@ -124,6 +116,6 @@
 		this.vY = Math.min(Ship.MAX_VELOCITY, Math.max(-Ship.MAX_VELOCITY, this.vY));
 	}
 
-	window.Ship = Ship;
+	window.Ship = createjs.promote(Ship, "Container");
 
 }(window));

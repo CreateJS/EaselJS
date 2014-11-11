@@ -30,7 +30,10 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
+	
 
+// constructor:
 /**
  * A Container is a nestable display list that allows you to work with compound display elements. For  example you could
  * group arm, leg, torso and head {{#crossLink "Bitmap"}}{{/crossLink}} instances together into a Person Container, and
@@ -52,65 +55,54 @@ this.createjs = this.createjs||{};
  * @extends DisplayObject
  * @constructor
  **/
-var Container = function() {
-  this.initialize();
-};
-var p = Container.prototype = new createjs.DisplayObject();
-Container.prototype.constructor = Container;
-
-// public properties:
-	/**
-	 * The array of children in the display list. You should usually use the child management methods such as
-	 * {{#crossLink "Container/addChild"}}{{/crossLink}}, {{#crossLink "Container/removeChild"}}{{/crossLink}},
-	 * {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is
-	 * included for advanced uses.
-	 * @property children
-	 * @type Array
-	 * @default null
-	 **/
-	p.children = null;
-	
-	/**
-	 * Indicates whether the children of this container are independently enabled for mouse/pointer interaction.
-	 * If false, the children will be aggregated under the container - for example, a click on a child shape would
-	 * trigger a click event on the container.
-	 * @property mouseChildren
-	 * @type Boolean
-	 * @default true
-	 **/
-	p.mouseChildren = true;
-	
-	/**
-	 * If false, the tick will not be propagated to children of this Container. This can provide some performance benefits.
-	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
-	 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
-	 * @property tickChildren
-	 * @type Boolean
-	 * @default true
-	 **/
-	p.tickChildren = true;
-
-// constructor:
-
-	/**
-	 * @property DisplayObject_initialize
-	 * @type Function
-	 * @private
-	 **/
-	p.DisplayObject_initialize = p.initialize;
-
-	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @protected
-	*/
-	p.initialize = function() {
-		this.DisplayObject_initialize();
+	function Container() {
+		this.DisplayObject_constructor();
+		
+		
+	// public properties:
+		/**
+		 * The array of children in the display list. You should usually use the child management methods such as
+		 * {{#crossLink "Container/addChild"}}{{/crossLink}}, {{#crossLink "Container/removeChild"}}{{/crossLink}},
+		 * {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is
+		 * included for advanced uses.
+		 * @property children
+		 * @type Array
+		 * @default null
+		 **/
 		this.children = [];
-	};
+		
+		/**
+		 * Indicates whether the children of this container are independently enabled for mouse/pointer interaction.
+		 * If false, the children will be aggregated under the container - for example, a click on a child shape would
+		 * trigger a click event on the container.
+		 * @property mouseChildren
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.mouseChildren = true;
+		
+		/**
+		 * If false, the tick will not be propagated to children of this Container. This can provide some performance benefits.
+		 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
+		 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+		 * @property tickChildren
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.tickChildren = true;
+	}
+	var p = createjs.extend(Container, createjs.DisplayObject);
+	
 
 // public methods:
-
+	/**
+	 * Constructor alias for backwards compatibility. This method will be removed in future versions.
+	 * Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
+	 * @method initialize
+	 * @deprecated in favour of `createjs.promote()`
+	 **/
+	p.initialize = Container; // TODO: deprecated.
+	
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.
@@ -123,13 +115,6 @@ Container.prototype.constructor = Container;
 		var hasContent = this.cacheCanvas || this.children.length;
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	};
-
-	/**
-	 * @property DisplayObject_draw
-	 * @type Function
-	 * @private
-	 **/
-	p.DisplayObject_draw = p.draw;
 
 	/**
 	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
@@ -480,7 +465,8 @@ Container.prototype.constructor = Container;
 
 	/**
 	 * Similar to {{#crossLink "Container/getObjectsUnderPoint()"}}{{/crossLink}}, but returns only the top-most display
-	 * object. This runs significantly faster than <code>getObjectsUnderPoint()<code>, but is still an expensive
+	 * object. This runs significantly faster than <code>getObjectsUnderPoint()</code>, but is still an expensive
+	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	 * @method getObjectUnderPoint
 	 * @param {Number} x The x position in the container to test.
@@ -491,13 +477,6 @@ Container.prototype.constructor = Container;
 		var pt = this.localToGlobal(x, y);
 		return this._getObjectsUnderPoint(pt.x, pt.y);
 	};
-	
-	/**
-	 * @property DisplayObject_getBounds
-	 * @type Function
-	 * @protected
-	 **/
-	p.DisplayObject_getBounds = p.getBounds; 
 	
 	/**
 	 * Docced in superclass.
@@ -523,16 +502,8 @@ Container.prototype.constructor = Container;
 	 * @return {Container} A clone of the current Container instance.
 	 **/
 	p.clone = function(recursive) {
-		var o = new Container();
-		this.cloneProps(o);
-		if (recursive) {
-			var arr = o.children = [];
-			for (var i=0, l=this.children.length; i<l; i++) {
-				var clone = this.children[i].clone(recursive);
-				clone.parent = o;
-				arr.push(clone);
-			}
-		}
+		var o = this._cloneProps(new Container());
+		if (recursive) { this._cloneChildren(o); }
 		return o;
 	};
 
@@ -545,14 +516,8 @@ Container.prototype.constructor = Container;
 		return "[Container (name="+  this.name +")]";
 	};
 
-// private properties:
-	/**
-	 * @property DisplayObject__tick
-	 * @type Function
-	 * @private
-	 **/
-	p.DisplayObject__tick = p._tick;
-	
+
+// private methods:
 	/**
 	 * @method _tick
 	 * @param {Object} props Properties to copy to the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}} event object.
@@ -568,6 +533,22 @@ Container.prototype.constructor = Container;
 		}
 		this.DisplayObject__tick(props);
 	};
+	
+	/**
+	 * Recursively clones all children of this container, and adds them to the target container.
+	 * @method cloneChildren
+	 * @protected
+	 * @param {Container} o The target container.
+	 **/
+	p._cloneChildren = function(o) {
+		if (o.children.length) { o.removeAllChildren(); }
+		var arr = o.children;
+		for (var i=0, l=this.children.length; i<l; i++) {
+			var clone = this.children[i].clone(true);
+			clone.parent = o;
+			arr.push(clone);
+		}
+	};
 
 	/**
 	 * @method _getObjectsUnderPoint
@@ -580,8 +561,7 @@ Container.prototype.constructor = Container;
 	 * @protected
 	 **/
 	p._getObjectsUnderPoint = function(x, y, arr, mouse, activeListener) {
-		var ctx = createjs.DisplayObject._hitTestContext;
-		var mtx = this._matrix;
+		var mtx, ctx = createjs.DisplayObject._hitTestContext;
 		activeListener = activeListener || (mouse&&this._hasMouseEventListener());
 
 		// draw children one at a time, and check if we get a hit:
@@ -592,8 +572,8 @@ Container.prototype.constructor = Container;
 			var hitArea = child.hitArea, mask = child.mask;
 			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
 			if (!hitArea && mask && mask.graphics && !mask.graphics.isEmpty()) {
-				var maskMtx = mask.getMatrix(mask._matrix).prependMatrix(this.getConcatenatedMatrix(mtx));
-				ctx.setTransform(maskMtx.a,  maskMtx.b, maskMtx.c, maskMtx.d, maskMtx.tx-x, maskMtx.ty-y);
+				mtx = mask.getMatrix(mask._props.matrix).prependMatrix(this.getConcatenatedMatrix(this._props.matrix));
+				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				
 				// draw the mask as a solid fill:
 				mask.graphics.drawAsPath(ctx);
@@ -613,14 +593,16 @@ Container.prototype.constructor = Container;
 			} else {
 				if (mouse && !activeListener && !child._hasMouseEventListener()) { continue; }
 				
-				child.getConcatenatedMatrix(mtx);
+				// TODO: can we pass displayProps forward, to avoid having to calculate this backwards every time? It's kind of a mixed bag. When we're only hunting for DOs with event listeners, it may not make sense.
+				var props = child.getConcatenatedDisplayProps(child._props);
+				mtx = props.matrix;
 				
 				if (hitArea) {
-					mtx.appendTransform(hitArea.x, hitArea.y, hitArea.scaleX, hitArea.scaleY, hitArea.rotation, hitArea.skewX, hitArea.skewY, hitArea.regX, hitArea.regY);
-					mtx.alpha = hitArea.alpha;
+					mtx.appendMatrix(hitArea.getMatrix(hitArea._props.matrix));
+					props.alpha = hitArea.alpha;
 				}
 				
-				ctx.globalAlpha = mtx.alpha;
+				ctx.globalAlpha = props.alpha;
 				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
 				(hitArea||child).draw(ctx);
 				if (!this._testHit(ctx)) { continue; }
@@ -644,23 +626,20 @@ Container.prototype.constructor = Container;
 		var bounds = this.DisplayObject_getBounds();
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
 		
-		var minX, maxX, minY, maxY;
-		var mtx = ignoreTransform ? this._matrix.identity() : this.getMatrix(this._matrix);
+		var mtx = this._props.matrix;
+		mtx = ignoreTransform ? mtx.identity() : this.getMatrix(mtx);
 		if (matrix) { mtx.prependMatrix(matrix); }
 		
-		var l = this.children.length;
+		var l = this.children.length, rect=null;
 		for (var i=0; i<l; i++) {
 			var child = this.children[i];
 			if (!child.visible || !(bounds = child._getBounds(mtx))) { continue; }
-			var x1=bounds.x, y1=bounds.y, x2=x1+bounds.width, y2=y1+bounds.height;
-			if (x1 < minX || minX == null) { minX = x1; }
-			if (x2 > maxX || maxX == null) { maxX = x2; }
-			if (y1 < minY || minY == null) { minY = y1; }
-			if (y2 > maxY || maxY == null) { maxY = y2; }
+			if (rect) { rect.extend(bounds.x, bounds.y, bounds.width, bounds.height); }
+			else { rect = bounds.clone(); }
 		}
-		
-		return (maxX == null) ? null : this._rectangle.initialize(minX, minY, maxX-minX, maxY-minY);
+		return rect;
 	};
 
-createjs.Container = Container;
+
+	createjs.Container = createjs.promote(Container, "DisplayObject");
 }());

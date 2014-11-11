@@ -36,26 +36,57 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * This class encapsulates the properties required to define a shadow to apply to a {{#crossLink "DisplayObject"}}{{/crossLink}}
- * via its <code>shadow</code> property.
- *
- * <h4>Example</h4>
- *
- *      myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
- *
- * @class Shadow
- * @constructor
- * @param {String} color The color of the shadow.
- * @param {Number} offsetX The x offset of the shadow in pixels.
- * @param {Number} offsetY The y offset of the shadow in pixels.
- * @param {Number} blur The size of the blurring effect.
- **/
-var Shadow = function(color, offsetX, offsetY, blur) {
-  this.initialize(color, offsetX, offsetY, blur);
-};
-var p = Shadow.prototype;
-Shadow.prototype.constructor = Shadow;
+
+// constructor:
+	/**
+	 * This class encapsulates the properties required to define a shadow to apply to a {{#crossLink "DisplayObject"}}{{/crossLink}}
+	 * via its <code>shadow</code> property.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
+	 *
+	 * @class Shadow
+	 * @constructor
+	 * @param {String} color The color of the shadow.
+	 * @param {Number} offsetX The x offset of the shadow in pixels.
+	 * @param {Number} offsetY The y offset of the shadow in pixels.
+	 * @param {Number} blur The size of the blurring effect.
+	 **/
+	function Shadow(color, offsetX, offsetY, blur) {
+		
+		
+	// public properties:
+		/** The color of the shadow.
+		 * property color
+		 * @type String
+		 * @default null
+		 */
+		this.color = color||"black";
+	
+		/** The x offset of the shadow.
+		 * property offsetX
+		 * @type Number
+		 * @default 0
+		 */
+		this.offsetX = offsetX||0;
+	
+		/** The y offset of the shadow.
+		 * property offsetY
+		 * @type Number
+		 * @default 0
+		 */
+		this.offsetY = offsetY||0;
+	
+		/** The blur of the shadow.
+		 * property blur
+		 * @type Number
+		 * @default 0
+		 */
+		this.blur = blur||0;
+	}
+	var p = Shadow.prototype;
+
 
 // static public properties:
 	/**
@@ -66,53 +97,8 @@ Shadow.prototype.constructor = Shadow;
 	 * @final
 	 * @readonly
 	 **/
-	Shadow.identity = null; // set at bottom of class definition.
+	Shadow.identity = new Shadow("transparent", 0, 0, 0);
 
-// public properties:
-	/** The color of the shadow.
-	 * property color
-	 * @type String
-	 * @default null
-	 */
-	p.color = null;
-
-	/** The x offset of the shadow.
-	 * property offsetX
-	 * @type Number
-	 * @default 0
-	 */
-	p.offsetX = 0;
-
-	/** The y offset of the shadow.
-	 * property offsetY
-	 * @type Number
-	 * @default 0
-	 */
-	p.offsetY = 0;
-
-	/** The blur of the shadow.
-	 * property blur
-	 * @type Number
-	 * @default 0
-	 */
-	p.blur = 0;
-
-// constructor:
-	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @protected
-	 * @param {String} color The color of the shadow.
-	 * @param {Number} offsetX The x offset of the shadow.
-	 * @param {Number} offsetY The y offset of the shadow.
-	 * @param {Number} blur The size of the blurring effect.
-	 **/
-	p.initialize = function(color, offsetX, offsetY, blur) {
-		this.color = color;
-		this.offsetX = offsetX;
-		this.offsetY = offsetY;
-		this.blur = blur;
-	};
 
 // public methods:
 	/**
@@ -124,7 +110,6 @@ Shadow.prototype.constructor = Shadow;
 		return "[Shadow]";
 	};
 
-
 	/**
 	 * Returns a clone of this Shadow instance.
 	 * @method clone
@@ -133,9 +118,7 @@ Shadow.prototype.constructor = Shadow;
 	p.clone = function() {
 		return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);
 	};
+	
 
-	// this has to be populated after the class is defined:
-	Shadow.identity = new Shadow("transparent", 0, 0, 0);
-
-createjs.Shadow = Shadow;
+	createjs.Shadow = Shadow;
 }());

@@ -30,73 +30,55 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
-/**
- * A SpriteContainer is a nestable display list that enables aggressively optimized rendering of bitmap content.
- * In order to accomplish these optimizations, SpriteContainer enforces a few restrictions on its content.
- *
- * Restrictions:
- *     - only Sprite, SpriteContainer, BitmapText and DOMElement are allowed to be added as children.
- *     - a spriteSheet MUST be either be passed into the constructor or defined on the first child added.
- *     - all children (with the exception of DOMElement) MUST use the same spriteSheet.
- *
- * <h4>Example</h4>
- *
- *      var data = {
- *          images: ["sprites.jpg"],
- *          frames: {width:50, height:50},
- *          animations: {run:[0,4], jump:[5,8,"run"]}
- *      };
- *      var spriteSheet = new createjs.SpriteSheet(data);
- *      var container = new createjs.SpriteContainer(spriteSheet);
- *      container.addChild(spriteInstance, spriteInstance2);
- *      container.x = 100;
- *
- * <strong>Note:</strong> SpriteContainer is not included in the minified version of EaselJS.
- *
- * @class SpriteContainer
- * @extends Container
- * @constructor
- * @param {SpriteSheet} [spriteSheet] The spriteSheet to use for this SpriteContainer and its children.
- **/
-var SpriteContainer = function(spriteSheet) {
-  this.initialize(spriteSheet);
-};
-var p = SpriteContainer.prototype = new createjs.Container();
-SpriteContainer.prototype.constructor = SpriteContainer;
-
-// public properties:
 
 	/**
-	 * The SpriteSheet that this container enforces use of.
-	 * @property spriteSheet
-	 * @type {SpriteSheet}
-	 * @readonly
+	 * A SpriteContainer is a nestable display list that enables aggressively optimized rendering of bitmap content.
+	 * In order to accomplish these optimizations, SpriteContainer enforces a few restrictions on its content.
+	 *
+	 * Restrictions:
+	 *     - only Sprite, SpriteContainer, BitmapText and DOMElement are allowed to be added as children.
+	 *     - a spriteSheet MUST be either be passed into the constructor or defined on the first child added.
+	 *     - all children (with the exception of DOMElement) MUST use the same spriteSheet.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      var data = {
+	 *          images: ["sprites.jpg"],
+	 *          frames: {width:50, height:50},
+	 *          animations: {run:[0,4], jump:[5,8,"run"]}
+	 *      };
+	 *      var spriteSheet = new createjs.SpriteSheet(data);
+	 *      var container = new createjs.SpriteContainer(spriteSheet);
+	 *      container.addChild(spriteInstance, spriteInstance2);
+	 *      container.x = 100;
+	 *
+	 * <strong>Note:</strong> SpriteContainer is not included in the minified version of EaselJS.
+	 *
+	 * @class SpriteContainer
+	 * @extends Container
+	 * @constructor
+	 * @param {SpriteSheet} [spriteSheet] The spriteSheet to use for this SpriteContainer and its children.
 	 **/
-	p.spriteSheet = null;
-
-// constructor:
-
-	/**
-	 * @property Container_initialize
-	 * @type Function
-	 * @private
-	 **/
-	p.Container_initialize = p.initialize;
-
-	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @param {SpriteSheet} spriteSheet Optional. The spriteSheet to use for this SpriteContainer and its children.
-	 * @protected
-	*/
-	p.initialize = function(spriteSheet) {
-		this.Container_initialize();
+	function SpriteContainer(spriteSheet) {
+		this.Container_constructor();
+		
+		
+	// public properties:
+		/**
+		 * The SpriteSheet that this container enforces use of.
+		 * @property spriteSheet
+		 * @type {SpriteSheet}
+		 * @readonly
+		 **/
 		this.spriteSheet = spriteSheet;
-	};
+	}
+	var p = createjs.extend(SpriteContainer, createjs.Container);
+
+	
 
 // public methods:
-
 	/**
 	 * Adds a child to the top of the display list.
 	 * Only children of type SpriteContainer, Sprite, Bitmap, BitmapText, or DOMElement are allowed.
@@ -186,5 +168,6 @@ SpriteContainer.prototype.constructor = SpriteContainer;
 		return "[SpriteContainer (name="+  this.name +")]";
 	};
 
-createjs.SpriteContainer = SpriteContainer;
+
+	createjs.SpriteContainer = createjs.promote(SpriteContainer, "Container");
 }());

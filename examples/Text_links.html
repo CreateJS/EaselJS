@@ -6,52 +6,16 @@
 
 	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
 
-	<!-- Note: All core EaselJS classes are listed here: -->
-	<script type="text/javascript" src="../src/createjs/events/Event.js"></script>
-	<script type="text/javascript" src="../src/createjs/events/EventDispatcher.js"></script>
-	<script type="text/javascript" src="../src/createjs/utils/IndexOf.js"></script>
-	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
-	<script type="text/javascript" src="../src/createjs/utils/Ticker.js"></script>
-	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
-	<script type="text/javascript" src="../src/easeljs/geom/Point.js"></script>
-	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Shadow.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/BitmapAnimation.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/BitmapText.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/DOMElement.js"></script>
-	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
-	<script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
-	<script type="text/javascript" src="../src/easeljs/ui/ButtonHelper.js"></script>
-	<script type="text/javascript" src="../src/easeljs/ui/Touch.js"></script>
-	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
-	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetBuilder.js"></script>
-
+	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
 	<script>
-		// define a new TextLink class that extends Text, and handles drawing a hit area
+		// define a new TextLink class that extends / subclasses Text, and handles drawing a hit area
 		// and implementing a hover color.
-		var TextLink = function(text, font, color, hoverColor) {
-			this.initialize(text, font, color, hoverColor);
-		}
-		TextLink.prototype = new createjs.Text(); // extend Text.
-		
-		// save off initialize method from Text so we can call it from our own:
-		TextLink.prototype.Text_initialize = TextLink.prototype.initialize;
-		
-		// overwrite Text's initialize method with our own:
-		TextLink.prototype.initialize = function(text, font, color, hoverColor) {
-			this.Text_initialize(text, font, color); 
+		function TextLink(text, font, color, hoverColor) {
+			// this super class constructor reference is automatically created by createjs.extends:
+			this.Text_constructor(text, font, color); 
 			this.hoverColor = hoverColor;
 			this.hover = false;
 			this.hitArea = new createjs.Shape();
@@ -60,15 +24,16 @@
 			this.addEventListener("rollover", this);
 			this.addEventListener("rollout", this);
 		}
+		createjs.extend(TextLink, createjs.Text);
 		
 		// use the same approach with draw:
-		TextLink.prototype.Text_draw = TextLink.prototype.draw;
 		TextLink.prototype.draw = function(ctx, ignoreCache) {
 			// save default color, and overwrite it with the hover color if appropriate:
 			var color = this.color;
 			if (this.hover) { this.color = this.hoverColor; }
 			
 			// call Text's drawing method to do the real work of drawing to the canvas:
+			// this super class method reference is automatically created by createjs.extends for methods overridden in the subclass:
 			this.Text_draw(ctx, ignoreCache);
 			
 			// restore the default color value:
@@ -76,12 +41,15 @@
 			
 			// update hit area so the full text area is clickable, not just the characters:
 			this.hitArea.graphics.clear().beginFill("#FFF").drawRect(0,0,this.getMeasuredWidth(), this.getMeasuredHeight());
-		}
+		};
 
 		// set up the handlers for mouseover / out:
 		TextLink.prototype.handleEvent = function(evt) {
 			this.hover = (evt.type == "rollover");
-		}
+		};
+		
+		// set up the inheritance relationship: TextLink extends Text.
+		createjs.promote(TextLink, "Text");
 	</script>
 
 

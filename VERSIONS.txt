@@ -6,6 +6,13 @@ CRITICAL (may break existing content):
 - removed Graphics.inject() in favour of Graphics.append()
 - Sprite now properly displays the first frame of animations after calling gotoAndPlay() (thanks MannyC)
 - Moved Ticker into the "createjs" package since it will be included with TweenJS in future releases.
+- re-architected the class and inheritance model
+	- helper methods: extend & promote (see the "Utility Methods" docs)
+	- initialize methods removed, use SuperClass_constructor instead
+	- property definitions are now instance level, and in the constructor (performance gains)
+	- renamed initialize on geom classes to "setValues()"
+- removed secondary properties (visible, alpha, compositeOperation, shadow) and related functionality from Matrix2D
+	- added DisplayProps to hold these properties + a matrix instance
 
 *****
 OTHER:
@@ -43,6 +50,13 @@ OTHER:
 - added "added" and "removed" events to DisplayObject
 - added the extras folder, with: SVGExport, Context2DLog, and PerformanceTests
 - added Graphics.store() / unstore()
+- examples now all use the combined lib
+- SpriteSheet.getNumFrames() now returns 0 instead of null if images are not loaded.
+- added some initial unit tests for the library
+- added helper methods to Rectangle: union, intersects, extend, intersection, isEmpty, & contains.
+- updated clone() method for all classes
+- added Matrix2D.equals() method
+- added DisplayObject.transformMatrix
 
 
 Version 0.7.1 [December 12, 2013]

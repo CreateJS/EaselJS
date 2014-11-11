@@ -36,62 +36,47 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * A Shape allows you to display vector art in the display list. It composites a {{#crossLink "Graphics"}}{{/crossLink}}
- * instance which exposes all of the vector drawing methods. The Graphics instance can be shared between multiple Shape
- * instances to display the same vector graphics with different positions or transforms.
- *
- * If the vector art will not
- * change between draws, you may want to use the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method to reduce the
- * rendering cost.
- *
- * <h4>Example</h4>
- *
- *      var graphics = new createjs.Graphics().beginFill("#ff0000").drawRect(0, 0, 100, 100);
- *      var shape = new createjs.Shape(graphics);
- *
- *      //Alternatively use can also use the graphics property of the Shape class to renderer the same as above.
- *      var shape = new createjs.Shape();
- *      shape.graphics.beginFill("#ff0000").drawRect(0, 0, 100, 100);
- *
- * @class Shape
- * @extends DisplayObject
- * @constructor
- * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
- **/
-var Shape = function(graphics) {
-  this.initialize(graphics);
-};
-var p = Shape.prototype = new createjs.DisplayObject();
-Shape.prototype.constructor = Shape;
-
-// public properties:
-	/**
-	 * The graphics instance to display.
-	 * @property graphics
-	 * @type Graphics
-	 **/
-	p.graphics = null;
 
 // constructor:
 	/**
-	 * @property DisplayObject_initialize
-	 * @private
-	 * @type Function
+	 * A Shape allows you to display vector art in the display list. It composites a {{#crossLink "Graphics"}}{{/crossLink}}
+	 * instance which exposes all of the vector drawing methods. The Graphics instance can be shared between multiple Shape
+	 * instances to display the same vector graphics with different positions or transforms.
+	 *
+	 * If the vector art will not
+	 * change between draws, you may want to use the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method to reduce the
+	 * rendering cost.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      var graphics = new createjs.Graphics().beginFill("#ff0000").drawRect(0, 0, 100, 100);
+	 *      var shape = new createjs.Shape(graphics);
+	 *
+	 *      //Alternatively use can also use the graphics property of the Shape class to renderer the same as above.
+	 *      var shape = new createjs.Shape();
+	 *      shape.graphics.beginFill("#ff0000").drawRect(0, 0, 100, 100);
+	 *
+	 * @class Shape
+	 * @extends DisplayObject
+	 * @constructor
+	 * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
 	 **/
-	p.DisplayObject_initialize = p.initialize;
-
-	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @param {Graphics} graphics
-	 * @protected
-	 **/
-	p.initialize = function(graphics) {
-		this.DisplayObject_initialize();
+	function Shape(graphics) {
+		this.DisplayObject_constructor();
+		
+		
+	// public properties:
+		/**
+		 * The graphics instance to display.
+		 * @property graphics
+		 * @type Graphics
+		 **/
 		this.graphics = graphics ? graphics : new createjs.Graphics();
-	};
+	}
+	var p = createjs.extend(Shape, createjs.DisplayObject);
 
+
+// public methods:
 	/**
 	 * Returns true or false indicating whether the Shape would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.
@@ -103,13 +88,6 @@ Shape.prototype.constructor = Shape;
 		var hasContent = this.cacheCanvas || (this.graphics && !this.graphics.isEmpty());
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	};
-
-	/**
-	 * @property DisplayObject_draw
-	 * @private
-	 * @type Function
-	 **/
-	p.DisplayObject_draw = p.draw;
 
 	/**
 	 * Draws the Shape into the specified context ignoring its visible, alpha, shadow, and transform. Returns true if
@@ -136,9 +114,8 @@ Shape.prototype.constructor = Shape;
 	 * cloned. If false, the Graphics instance will be shared with the new Shape.
 	 **/
 	p.clone = function(recursive) {
-		var o = new Shape((recursive && this.graphics) ? this.graphics.clone() : this.graphics);
-		this.cloneProps(o);
-		return o;
+		var g = (recursive && this.graphics) ? this.graphics.clone() : this.graphics;
+		return  this._cloneProps(new Shape(g));
 	};
 
 	/**
@@ -150,5 +127,6 @@ Shape.prototype.constructor = Shape;
 		return "[Shape (name="+  this.name +")]";
 	};
 
-createjs.Shape = Shape;
+
+	createjs.Shape = createjs.promote(Shape, "DisplayObject");
 }());

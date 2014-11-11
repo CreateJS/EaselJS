@@ -14,10 +14,10 @@
 	<link href="../_shared/SyntaxHighlighter/shThemeCreateJS.css" rel="stylesheet" type="text/css">
 </head>
 	
-<body onLoad="initTutorial();">
+<body onload="initTutorial();">
 	<article>
 		<header>
-			<h1>EaselJS: Getting Started</h1>
+			<h1>EaselJS <em>Getting Started</em></h1>
 			<p>
 				<strong>Synopsis:</strong> Set up an HTML document with a canvas tag and the EaselJS libraries, and draw a shape to the stage.<br>
 				<strong>Topics:</strong> linking libraries, Stage, Shape, addChild, Stage.update(), CDN, source files<br>
@@ -47,7 +47,7 @@
 		}
 	</script>
 </head>
-<body onLoad="init();">
+<body onload="init();">
 	<canvas id="demoCanvas" width="500" height="300">
 		alternate content
 	</canvas>
@@ -111,7 +111,7 @@ stage.addChild(circle);
 				EaselJS also supports shortcuts to let you chain together your calls. In fact, if you really wanted to you could write all of the above code in a single line:
 			</p>
 			<textarea class="brush: js;" readonly>
-stage.addChild(new createjs.Shape()).setTransform(100,100).graphics.f("red").dc(0,0,50);
+stage.addChild(new createjs.Shape()).set({x:100,y:100}).graphics.f("red").dc(0,0,50);
 			</textarea>
 		</section>	
 			
@@ -128,7 +128,7 @@ stage.update();
 			<p>
 				This tells the stage to clear the canvas, then run through all of its children and draw them to the canvas. You can see the working demo below. Be sure to open it up and check out the complete code.
 			</p>
-			<iframe src="demo.html" class="demo" longDesc="drawing a circle with EaselJS" width="100%" height="220px"></iframe>
+			<iframe src="demo.html" class="demo" data-description="drawing a circle with EaselJS" width="100%" height="220px"></iframe>
 		</section>
 		
 	</article>

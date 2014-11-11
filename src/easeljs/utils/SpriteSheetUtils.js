@@ -35,26 +35,29 @@ this.createjs = this.createjs||{};
 
 (function() {
 	"use strict";
+	
+	
 // constructor:
-/**
- * The SpriteSheetUtils class is a collection of static methods for working with {{#crossLink "SpriteSheet"}}{{/crossLink}}s.
- * A sprite sheet is a series of images (usually animation frames) combined into a single image on a regular grid. For
- * example, an animation consisting of 8 100x100 images could be combined into a 400x200 sprite sheet (4 frames across
- * by 2 high). The SpriteSheetUtils class uses a static interface and should not be instantiated.
- * @class SpriteSheetUtils
- * @static
- **/
-var SpriteSheetUtils = function() {
-	throw "SpriteSheetUtils cannot be instantiated";
-};
+	/**
+	 * The SpriteSheetUtils class is a collection of static methods for working with {{#crossLink "SpriteSheet"}}{{/crossLink}}s.
+	 * A sprite sheet is a series of images (usually animation frames) combined into a single image on a regular grid. For
+	 * example, an animation consisting of 8 100x100 images could be combined into a 400x200 sprite sheet (4 frames across
+	 * by 2 high). The SpriteSheetUtils class uses a static interface and should not be instantiated.
+	 * @class SpriteSheetUtils
+	 * @static
+	 **/
+	function SpriteSheetUtils() {
+		throw "SpriteSheetUtils cannot be instantiated";
+	}
 
+
+// private static properties:
 	/**
 	 * @property _workingCanvas
 	 * @static
 	 * @type HTMLCanvasElement | Object
 	 * @protected
 	*/
-	
 	/**
 	 * @property _workingContext
 	 * @static
@@ -68,7 +71,6 @@ var SpriteSheetUtils = function() {
 		canvas.width = canvas.height = 1;
 	}
 
-	
 
 // public static methods:
 	/**
@@ -222,5 +224,5 @@ var SpriteSheetUtils = function() {
 	};
 
 
-createjs.SpriteSheetUtils = SpriteSheetUtils;
+	createjs.SpriteSheetUtils = SpriteSheetUtils;
 }());

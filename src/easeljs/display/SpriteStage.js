@@ -36,55 +36,237 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-// Set which classes are compatible with SpriteStage.
-// The order is important!!! If it's changed/appended, make sure that any logic that 
-// checks _spritestage_compatibility accounts for it!
-[createjs.SpriteContainer, createjs.Sprite, createjs.BitmapText, createjs.Bitmap, createjs.DOMElement].forEach(function(_class, index) {
-	_class.prototype._spritestage_compatibility = index + 1;
-});
 
-/**
- * A sprite stage is the root level {{#crossLink "Container"}}{{/crossLink}} for an aggressively optimized display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
- * method is called, it will render its display list to its target canvas. WebGL content is fully compatible with the existing Context2D renderer.
- * On devices or browsers that don't support WebGL, content will automatically be rendered via canvas 2D.
- *
- * Restrictions:
- *     - only Sprite, SpriteContainer, BitmapText, Bitmap and DOMElement are allowed to be added to the display list.
- *     - a child being added (with the exception of DOMElement) MUST have an image or spriteSheet defined on it.
- *     - a child's image/spriteSheet MUST never change while being on the display list.
- *
- * <h4>Example</h4>
- * This example creates a sprite stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
- * and redraw the stage using {{#crossLink "SpriteStage/update"}}{{/crossLink}}.
- *
- *      var stage = new createjs.SpriteStage("canvasElementId", false, false);
- *      stage.updateViewport(800, 600);
- *      var image = new createjs.Bitmap("imagePath.png");
- *      stage.addChild(image);
- *      createjs.Ticker.addEventListener("tick", handleTick);
- *      function handleTick(event) {
- *          image.x += 10;
- *          stage.update();
- *      }
- *
- * <strong>Note:</strong> SpriteStage is not included in the minified version of EaselJS.
- *
- * @class SpriteStage
- * @extends Stage
- * @constructor
- * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the SpriteStage will render to, or the string id
- * of a canvas object in the current document.
- * @param {Boolean} preserveDrawingBuffer If true, the canvas is NOT auto-cleared by WebGL (spec discourages true). Useful if you want to use p.autoClear = false.
- * @param {Boolean} antialias Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
- **/
-var SpriteStage = function(canvas, preserveDrawingBuffer, antialias) {
-  this.initialize(canvas, preserveDrawingBuffer, antialias);
-};
-var p = SpriteStage.prototype = new createjs.Stage();
-SpriteStage.prototype.constructor = SpriteStage;
+	// Set which classes are compatible with SpriteStage.
+	// The order is important!!! If it's changed/appended, make sure that any logic that 
+	// checks _spritestage_compatibility accounts for it!
+	[createjs.SpriteContainer, createjs.Sprite, createjs.BitmapText, createjs.Bitmap, createjs.DOMElement].forEach(function(_class, index) {
+		_class.prototype._spritestage_compatibility = index + 1;
+	});
+	
 
-// static properties:
+// constructor:
+	/**
+	 * A sprite stage is the root level {{#crossLink "Container"}}{{/crossLink}} for an aggressively optimized display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
+	 * method is called, it will render its display list to its target canvas. WebGL content is fully compatible with the existing Context2D renderer.
+	 * On devices or browsers that don't support WebGL, content will automatically be rendered via canvas 2D.
+	 *
+	 * Restrictions:
+	 *     - only Sprite, SpriteContainer, BitmapText, Bitmap and DOMElement are allowed to be added to the display list.
+	 *     - a child being added (with the exception of DOMElement) MUST have an image or spriteSheet defined on it.
+	 *     - a child's image/spriteSheet MUST never change while being on the display list.
+	 *
+	 * <h4>Example</h4>
+	 * This example creates a sprite stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
+	 * and redraw the stage using {{#crossLink "SpriteStage/update"}}{{/crossLink}}.
+	 *
+	 *      var stage = new createjs.SpriteStage("canvasElementId", false, false);
+	 *      stage.updateViewport(800, 600);
+	 *      var image = new createjs.Bitmap("imagePath.png");
+	 *      stage.addChild(image);
+	 *      createjs.Ticker.addEventListener("tick", handleTick);
+	 *      function handleTick(event) {
+	 *          image.x += 10;
+	 *          stage.update();
+	 *      }
+	 *
+	 * <strong>Note:</strong> SpriteStage is not included in the minified version of EaselJS.
+	 *
+	 * @class SpriteStage
+	 * @extends Stage
+	 * @constructor
+	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the SpriteStage will render to, or the string id
+	 * of a canvas object in the current document.
+	 * @param {Boolean} preserveDrawingBuffer If true, the canvas is NOT auto-cleared by WebGL (spec discourages true). Useful if you want to use p.autoClear = false.
+	 * @param {Boolean} antialias Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
+	 **/
+	function SpriteStage(canvas, preserveDrawingBuffer, antialias) {
+		this.Stage_constructor(canvas);
+		
+		
+	// private properties:
+		/**
+		 * Specifies whether or not the canvas is auto-cleared by WebGL. Spec discourages true.
+		 * If true, the canvas is NOT auto-cleared by WebGL. Value is ignored if `_alphaEnabled` is false.
+		 * Useful if you want to use `autoClear = false`.
+		 * @property _preserveDrawingBuffer
+		 * @protected
+		 * @type {Boolean}
+		 * @default false
+		 **/
+		this._preserveDrawingBuffer = preserveDrawingBuffer||false;
+	
+		/**
+		 * Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
+		 * @property _antialias
+		 * @protected
+		 * @type {Boolean}
+		 * @default false
+		 **/
+		this._antialias = antialias||false;
+	
+		/**
+		 * The width of the canvas element.
+		 * @property _viewportWidth
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._viewportWidth = 0;
+	
+		/**
+		 * The height of the canvas element.
+		 * @property _viewportHeight
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._viewportHeight = 0;
+	
+		/**
+		 * A 2D projection matrix used to convert WebGL's clipspace into normal pixels.
+		 * @property _projectionMatrix
+		 * @protected
+		 * @type {Float32Array}
+		 * @default null
+		 **/
+		this._projectionMatrix = null;
+	
+		/**
+		 * The current WebGL canvas context.
+		 * @property _webGLContext
+		 * @protected
+		 * @type {WebGLRenderingContext}
+		 * @default null
+		 **/
+		this._webGLContext = null;
+	
+		/**
+		 * Indicates whether or not an error has been detected when dealing with WebGL.
+		 * If the is true, the behavior should be to use Canvas 2D rendering instead.
+		 * @property _webGLErrorDetected
+		 * @protected
+		 * @type {Boolean}
+		 * @default false
+		 **/
+		this._webGLErrorDetected = false;
+	
+		/**
+		 * The color to use when the WebGL canvas has been cleared.
+		 * @property _clearColor
+		 * @protected
+		 * @type {Object}
+		 * @default null
+		 **/
+		this._clearColor = null;
+		
+		/**
+		 * The maximum number of textures WebGL can work with per draw call.
+		 * @property _maxTexturesPerDraw
+		 * @protected
+		 * @type {Number}
+		 * @default 1
+		 **/
+		this._maxTexturesPerDraw = 1; // TODO: this is currently unused.
+	
+		/**
+		 * The maximum total number of boxes points that can be defined per draw call.
+		 * @property _maxBoxesPointsPerDraw
+		 * @protected
+		 * @type {Number}
+		 * @default null
+		 **/
+		this._maxBoxesPointsPerDraw = null;
+	
+		/**
+		 * The maximum number of boxes (sprites) that can be drawn in one draw call.
+		 * @property _maxBoxesPerDraw
+		 * @protected
+		 * @type {Number}
+		 * @default null
+		 **/
+		this._maxBoxesPerDraw = null;
+	
+		/**
+		 * The maximum number of indices that can be drawn in one draw call.
+		 * @property _maxIndicesPerDraw
+		 * @protected
+		 * @type {Number}
+		 * @default null
+		 **/
+		this._maxIndicesPerDraw = null;
+	
+		/**
+		 * The shader program used to draw everything.
+		 * @property _shaderProgram
+		 * @protected
+		 * @type {WebGLProgram}
+		 * @default null
+		 **/
+		this._shaderProgram = null;
+	
+		/**
+		 * The vertices data for the current draw call.
+		 * @property _vertices
+		 * @protected
+		 * @type {Float32Array}
+		 * @default null
+		 **/
+		this._vertices = null;
+	
+		/**
+		 * The buffer that contains all the vertices data.
+		 * @property _verticesBuffer
+		 * @protected
+		 * @type {WebGLBuffer}
+		 * @default null
+		 **/
+		this._verticesBuffer = null;
+	
+		/**
+		 * The indices to the vertices defined in this._vertices.
+		 * @property _indices
+		 * @protected
+		 * @type {Uint16Array}
+		 * @default null
+		 **/
+		this._indices = null;
+	
+		/**
+		 * The buffer that contains all the indices data.
+		 * @property _indicesBuffer
+		 * @protected
+		 * @type {WebGLBuffer}
+		 * @default null
+		 **/
+		this._indicesBuffer = null;
+	
+		/**
+		 * The current box index being defined for drawing.
+		 * @property _currentBoxIndex
+		 * @protected
+		 * @type {Number}
+		 * @default -1
+		 **/
+		this._currentBoxIndex = -1;
+	
+		/**
+		 * The current texture that will be used to draw into the GPU.
+		 * @property _drawTexture
+		 * @protected
+		 * @type {WebGLTexture}
+		 * @default null
+		 **/
+		this._drawTexture = null;
+		
+		
+	// setup:
+		this._initializeWebGL();
+	}
+	var p = createjs.extend(SpriteStage, createjs.Stage);
 
+
+// constants:
 	/**
 	 * The number of properties defined per vertex in p._verticesBuffer.
 	 * x, y, textureU, textureV, alpha
@@ -150,7 +332,8 @@ SpriteStage.prototype.constructor = SpriteStage;
 	 * @readonly
 	 **/
 	SpriteStage.MAX_BOXES_POINTS_INCREMENT = SpriteStage.MAX_INDEX_SIZE / 4;
-		
+
+
 // getter / setters:
 	/**
 	 * Indicates whether WebGL is being used for rendering. For example, this would be false if WebGL is not
@@ -169,209 +352,8 @@ SpriteStage.prototype.constructor = SpriteStage;
 		});
 	} catch (e) {} // TODO: use Log
 
-// private properties:
-
-	/**
-	 * Specifies whether or not the canvas is auto-cleared by WebGL. Spec discourages true.
-	 * If true, the canvas is NOT auto-cleared by WebGL. Value is ignored if p._alphaEnabled is false.
-	 * Useful if you want to use p.autoClear = false.
-	 * @property _preserveDrawingBuffer
-	 * @protected
-	 * @type {Boolean}
-	 * @default false
-	 **/
-	p._preserveDrawingBuffer = false;
-
-	/**
-	 * Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
-	 * @property _antialias
-	 * @protected
-	 * @type {Boolean}
-	 * @default false
-	 **/
-	p._antialias = false;
-
-	/**
-	 * The width of the canvas element.
-	 * @property _viewportWidth
-	 * @protected
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p._viewportWidth = 0;
-
-	/**
-	 * The height of the canvas element.
-	 * @property _viewportHeight
-	 * @protected
-	 * @type {Number}
-	 * @default 0
-	 **/
-	p._viewportHeight = 0;
-
-	/**
-	 * A 2D projection matrix used to convert WebGL's clipspace into normal pixels.
-	 * @property _projectionMatrix
-	 * @protected
-	 * @type {Float32Array}
-	 * @default null
-	 **/
-	p._projectionMatrix = null;
-
-	/**
-	 * The current WebGL canvas context.
-	 * @property _webGLContext
-	 * @protected
-	 * @type {WebGLRenderingContext}
-	 * @default null
-	 **/
-	p._webGLContext = null;
-
-	/**
-	 * Indicates whether or not an error has been detected when dealing with WebGL.
-	 * If the is true, the behavior should be to use Canvas 2D rendering instead.
-	 * @property _webGLErrorDetected
-	 * @protected
-	 * @type {Boolean}
-	 * @default false
-	 **/
-	p._webGLErrorDetected = false;
-
-	/**
-	 * The color to use when the WebGL canvas has been cleared.
-	 * @property _clearColor
-	 * @protected
-	 * @type {Object}
-	 * @default null
-	 **/
-	p._clearColor = null;
-
-	/**
-	 * The maximum number of textures WebGL can work with per draw call.
-	 * @property _maxTexturesPerDraw
-	 * @protected
-	 * @type {Number}
-	 * @default 1
-	 **/
-	p._maxTexturesPerDraw = 1;
-
-	/**
-	 * The maximum total number of boxes points that can be defined per draw call.
-	 * @property _maxBoxesPointsPerDraw
-	 * @protected
-	 * @type {Number}
-	 * @default null
-	 **/
-	p._maxBoxesPointsPerDraw = null;
-
-	/**
-	 * The maximum number of boxes (sprites) that can be drawn in one draw call.
-	 * @property _maxBoxesPerDraw
-	 * @protected
-	 * @type {Number}
-	 * @default null
-	 **/
-	p._maxBoxesPerDraw = null;
-
-	/**
-	 * The maximum number of indices that can be drawn in one draw call.
-	 * @property _maxIndicesPerDraw
-	 * @protected
-	 * @type {Number}
-	 * @default null
-	 **/
-	p._maxIndicesPerDraw = null;
-
-	/**
-	 * The shader program used to draw everything.
-	 * @property _shaderProgram
-	 * @protected
-	 * @type {WebGLProgram}
-	 * @default null
-	 **/
-	p._shaderProgram = null;
-
-	/**
-	 * The vertices data for the current draw call.
-	 * @property _vertices
-	 * @protected
-	 * @type {Float32Array}
-	 * @default null
-	 **/
-	p._vertices = null;
-
-	/**
-	 * The buffer that contains all the vertices data.
-	 * @property _verticesBuffer
-	 * @protected
-	 * @type {WebGLBuffer}
-	 * @default null
-	 **/
-	p._verticesBuffer = null;
-
-	/**
-	 * The indices to the vertices defined in p._vertices.
-	 * @property _indices
-	 * @protected
-	 * @type {Uint16Array}
-	 * @default null
-	 **/
-	p._indices = null;
-
-	/**
-	 * The buffer that contains all the indices data.
-	 * @property _indicesBuffer
-	 * @protected
-	 * @type {WebGLBuffer}
-	 * @default null
-	 **/
-	p._indicesBuffer = null;
-
-	/**
-	 * The current box index being defined for drawing.
-	 * @property _currentBoxIndex
-	 * @protected
-	 * @type {Number}
-	 * @default -1
-	 **/
-	p._currentBoxIndex = -1;
-
-	/**
-	 * The current texture that will be used to draw into the GPU.
-	 * @property _drawTexture
-	 * @protected
-	 * @type {WebGLTexture}
-	 * @default null
-	 **/
-	p._drawTexture = null;
-
-// constructor:
-
-	/**
-	 * @property Stage_initialize
-	 * @type Function
-	 * @private
-	 **/
-	p.Stage_initialize = p.initialize;
-
-	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object, or the string id of a canvas object in the current document.
-	 * @param {Boolean} preserveDrawingBuffer              If true, the canvas is NOT auto-cleared by WebGL (spec discourages true). Useful if you want to use p.autoClear = false.
-	 * @param {Boolean} antialias                          Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
-	 * @protected
-	 **/
-	p.initialize = function(canvas, preserveDrawingBuffer, antialias) {
-		this._preserveDrawingBuffer = preserveDrawingBuffer !== undefined ? preserveDrawingBuffer : this._preserveDrawingBuffer;
-		this._antialias = antialias !== undefined ? antialias : this._antialias;
-
-		this.Stage_initialize(canvas);
-		this._initializeWebGL();
-	};
 
 // public methods:
-
 	/**
 	 * Adds a child to the top of the display list.
 	 * Only children of type SpriteContainer, Sprite, Bitmap, BitmapText, or DOMElement are allowed.
@@ -471,7 +453,13 @@ SpriteStage.prototype.constructor = SpriteStage;
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) {
 			this.dispatchEvent("tickstart");  // TODO: make cancellable?
-			this._tick((arguments.length ? arguments : null));
+
+			var args = arguments.length ? Array.prototype.slice.call(arguments,0) : null;
+			var evt = args&&args[0];
+			var props = evt&&(evt.delta != null) ? {delta:evt.delta, paused:evt.paused, time:evt.time, runTime:evt.runTime } : {};
+			props.params = args;
+
+			this._tick(props);
 			this.dispatchEvent("tickend");
 		}
 		this.dispatchEvent("drawstart"); // TODO: make cancellable?
@@ -508,13 +496,6 @@ SpriteStage.prototype.constructor = SpriteStage;
 			ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
 		}
 	};
-
-	/**
-	 * @property Stage_draw
-	 * @type {Function}
-	 * @private
-	 **/
-	p.Stage_draw = p.draw;
 
 	/**
 	 * Draws the stage into the specified context (using WebGL) ignoring its visible, alpha, shadow, and transform.
@@ -882,7 +863,7 @@ SpriteStage.prototype.constructor = SpriteStage;
 		for (var i = 0, l = kids.length; i < l; i++) {
 			kid = kids[i];
 			if (!kid.isVisible()) { continue; }
-			mtx = kid._matrix;
+			mtx = kid._props.matrix;
 
 			// Get the kid's global matrix (relative to the stage):
 			mtx = (parentMVMatrix ? mtx.copy(parentMVMatrix) : mtx.identity())
@@ -1028,5 +1009,6 @@ SpriteStage.prototype.constructor = SpriteStage;
 		this._drawTexture = null;
 	};
 
-createjs.SpriteStage = SpriteStage;
+
+	createjs.SpriteStage = createjs.promote(SpriteStage, "Stage");
 }());
