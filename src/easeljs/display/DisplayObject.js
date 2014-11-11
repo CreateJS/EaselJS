@@ -1227,7 +1227,9 @@ this.createjs = this.createjs||{};
 		// because tick can be really performance sensitive, we'll inline some of the dispatchEvent work.
 		var ls = this._listeners;
 		if (ls && ls["tick"]) {
-			var evt = new createjs.Event("tick").set(props);
+			var evt = new createjs.Event("tick");
+			// TODO: temporary loop for better compatibility with FlashCC & old libs. Replace with .set(props)
+			for (var n in props) { evt[n] = props[n]; }
 			this._dispatchEvent(evt, this, 2);
 		}
 	};
