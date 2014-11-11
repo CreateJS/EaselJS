@@ -681,7 +681,6 @@ this.createjs = this.createjs||{};
 	p.updateContext = function(ctx) {
 		var o=this, mask=o.mask, mtx= o._props.matrix;
 		
-		if (this.mask) { console.log(mask, mask.graphics.empty()); }
 		if (mask && mask.graphics && !mask.graphics.isEmpty()) {
 			mask.getMatrix(mtx);
 			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
