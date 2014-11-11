@@ -1,36 +1,36 @@
 module.exports = function (grunt) {
 
 	grunt.registerMultiTask('updateversion', function() {
-		var data = this.data;
-		var file = data.file;
-		var version = data.version;
+		var newValues = {date:new Date().toUTCString(), version:this.data.version};
+		replaceMetaData(this.data.file, newValues);
+	});
 
+	grunt.registerMultiTask('clearversion', function() {
+		// Don't clear the version when building everything (the combined build will run this after its done)
+		var buildArgs = grunt.config("buildArgs");
+		if (buildArgs && buildArgs[0] == "all") {
+			return;
+		}
+		replaceMetaData(this.data.file, {date:"", version:""});
+	});
+
+	function replaceMetaData(file, values) {
 		if (!grunt.file.exists(file)) {
 			grunt.log.error(file+' not found.');
 			return;
 		}
 
-		var contents = grunt.file.read(file);
-		var pattern = /\/\*version\*\/"([\w.]+)"/g;
+		var str = grunt.file.read(file);
 
-		var newValues = {date:new Date().toUTCString(), version:version};
-		var newFile = replaceMetaData(contents, newValues);
-		grunt.file.write(file, newFile);
-	});
-
-	function replaceMetaData(data, values) {
-	    var finalResult = "";
-	    var newData = data;
 	    for(var n in values) {
-	        var pattern = new RegExp("(\/\\*"+n+"\\*\/\")(.*)(\";)", "i");
-	        var result = pattern.test(data);
+	        var pattern = new RegExp("(\/\\*="+n+"\\*\/\")(.*)(\";)", "g");
+	        var result = pattern.test(str);
 	        if (result) {
-	            finalResult = newData.replace(pattern, "$1"+values[n]+"$3");
-	            newData = finalResult;
+	            str = str.replace(pattern, "$1"+values[n]+"$3");
 	        } else {
 	            grunt.log.error("Error -- Unable to resolve value:"+ pattern);
 	        }
 	    }
-	    return finalResult;
+		grunt.file.write(file, str);
 	}
 }

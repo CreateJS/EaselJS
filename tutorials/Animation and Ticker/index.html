@@ -14,10 +14,10 @@
 	<link href="../_shared/SyntaxHighlighter/shThemeCreateJS.css" rel="stylesheet" type="text/css">
 </head>
 	
-<body onLoad="initTutorial();">
+<body onload="initTutorial();">
 	<article>
 		<header>
-			<h1>EaselJS: Animation and Ticker</h1>
+			<h1>EaselJS <em>Animation and Ticker</em></h1>
 			<p>
 				<strong>Synopsis:</strong> Create a simple programmatic animation, and learn about the Ticker class.<br>
 				<strong>Topics:</strong> animation, Ticker, setFPS, timingMode, getTime, setPaused, requestAnimationFrame, Stage.update, time based animation<br>
@@ -57,7 +57,7 @@ if (circle.x > stage.canvas.width) { circle.x = 0; }
 				<h2>Ticker</h2>
 			</header>
 			<p>
-				The <code>Ticker</code> class provides a simple static interface (meaning, you don't ever create a <code>new Ticker()</code>) to propagate a tick to various objects. To use it we just add a event listener with <code>addEventListener("tick", handler)</code>. The listener can be a function, or an object with a <code>tick</code> function defined.
+				The <code>Ticker</code> class provides a simple static interface (meaning, you don't ever create a <code>new Ticker()</code>) to propagate a tick to various objects. To use it we just add a event listener with <code>addEventListener("tick", handler)</code>. The listener can be a function, or an object with a <code>handleEvent</code> function defined.
 			</p>
 			<p>
 				The code below adds the window as a listener, and defines a tick function that will be called 20 times per second (<code>Ticker</code>'s default framerate):
@@ -66,7 +66,7 @@ createjs.Ticker.addEventListener("tick", tick);
 function tick() { console.log("TICK!!!"); }
 			</textarea>
 			<p>
-				You can easily change the default framerate by either setting an interval (the time between ticks) or a framerate (the number of ticks per frame).
+				You can easily change the default framerate by either setting an interval (the time between ticks) or a framerate (the number of ticks per second).
 			</p>
 			<textarea class="brush: js;" readonly>
 // these are equivalent, 1000ms / 40fps = 25ms
@@ -76,7 +76,7 @@ createjs.Ticker.setFPS(40);
 			<p>
 				Let's combine all of that to make a circle move across the stage at 30 frames per second. And don't forget to call <code>stage.update()</code> at the end of each tick to draw the changes to the canvas! Check out the source for simple.html for the complete code.
 			</p>
-			<iframe src="simple.html" class="demo" longDesc="animating a circle with Ticker" width="100%" height="120px"></iframe>
+			<iframe src="simple.html" class="demo" data-description="animating a circle with Ticker" width="100%" height="120px"></iframe>
 		</section>
 		
 		<section>
@@ -101,7 +101,7 @@ function tick(event) {
 			<p>
 				Now you can change the framerate, and the circle will take the same amount of time to cross the canvas (give or take a few milliseconds).
 			</p>
-			<iframe src="timeBased.html" class="demo" longDesc="time based animation, the red circle is using time based animation" width="100%" height="250px"></iframe>
+			<iframe src="timeBased.html" class="demo" data-description="time based animation, the red circle is using time based animation" width="100%" height="250px"></iframe>
 			<p>
 				Notice in the above demo how when you change the FPS, the red circle still moves at the same velocity, whereas the blue circle's velocity is relative to the framerate. Also note how at 20fps, the red circle moves very slightly faster than the blue circle, because it accounts for frames that take slightly longer than the expected 50ms.
 			</p>
@@ -145,7 +145,7 @@ createjs.Ticker.setFPS(30);
 			<p>
 				In the following demo, play with toggling pause, and see how the red "pauseable" circle stops, where the green "unpauseable" circle does not. You can also see how the total pauseable time stops updating when <code>Ticker</code> is paused.
 			</p>
-			<iframe src="pausing.html" class="demo" longDesc="showing Ticker.setPaused() at work. Click to toggle pause." width="100%" height="245px"></iframe>
+			<iframe src="pausing.html" class="demo" data-description="showing Ticker.setPaused() at work. Click to toggle pause." width="100%" height="245px"></iframe>
 		</section>
 		
 		<section>

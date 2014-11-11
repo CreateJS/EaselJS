@@ -35,135 +35,222 @@ this.createjs = this.createjs||{};
 
 (function() {
 	"use strict";
-/**
- * Encapsulates the properties and methods associated with a sprite sheet. A sprite sheet is a series of images (usually
- * animation frames) combined into a larger image (or images). For example, an animation consisting of eight 100x100
- * images could be combined into a single 400x200 sprite sheet (4 frames across by 2 high).
- *
- * The data passed to the SpriteSheet constructor defines:<ol>
- * 	<li> The source image or images to use.</li>
- * 	<li> The positions of individual image frames.</li>
- * 	<li> Sequences of frames that form named animations. Optional.</li>
- * 	<li> The target playback framerate. Optional.</li>
- * </OL>
- *
- * <h3>SpriteSheet Format</h3>
- * 
- * SpriteSheets are an object with two required properties (`images` and `frames`), and two optional properties
- * (`framerate` and `animations`). This makes them easy to define in javascript code, or in JSON.
- * 
- * <h4>images</h4>
- * An array of source images. Images can be either an HTMLImage
- * instance, or a uri to an image. The former is recommended to control preloading.
- * 
- * 	images: [image1, "path/to/image2.png"],
- * 
- * <h4>frames</h4>
- * Defines the individual frames. There are two supported formats for frame data:<OL>
- * <LI> when all of the frames are the same size (in a grid), use an object with `width`, `height`, `regX`, `regY`, and `count` properties.
- * `width` & `height` are required and specify the dimensions of the frames.
- * `regX` & `regY` indicate the registration point or "origin" of the frames.
- * `count` allows you to specify the total number of frames in the spritesheet; if omitted, this will be calculated
- * based on the dimensions of the source images and the frames. Frames will be assigned indexes based on their position
- * in the source images (left to right, top to bottom).
- * 	
- * 	frames: {width:64, height:64, count:20, regX: 32, regY:64}
- * 	
- * <LI> if the frames are of different sizes, use an array of frame definitions. Each definition is itself an array
- * with 4 required and 3 optional entries, in the order: `x`, `y`, `width`, `height`, `imageIndex`, `regX`, `regY`. The first
- * four entries are required and define the frame rectangle. The fifth specifies the index of the source image (defaults to 0). The
- * last two specify the registration point of the frame.
- * 	
- * 	frames: [
- * 		// x, y, width, height, imageIndex*, regX*, regY*
- * 		[64, 0, 96, 64],
- * 		[0, 0, 64, 64, 1, 32, 32]
- * 		// etc.
- * 	]
- * 	
- * </OL>
- * 
- * <h4>animations</h4>
- * Optional. An object defining sequences of frames to play as named animations. Each property corresponds to an
- * animation of the same name. Each animation must specify the frames to play, and may 
- * also include a relative playback `speed` (ex. 2 would playback at double speed, 0.5 at half), and
- * the name of the `next` animation to sequence to after it completes.
- * 
- * There are three formats supported for defining the frames in an animation, which can be mixed and matched as appropriate:<OL>
- * <LI> for a single frame animation, you can simply specify the frame index
- * 
- * 	animations: {
- * 		sit: 7
- * 	}
- * 
- * <LI> for an animation of consecutive frames, you can use an array with two required, and two optional entries
- * in the order: `start`, `end`, `next`, and `speed`. This will play the frames from start to end inclusive.
- * 
- * 	animations: {
- * 		// start, end, next*, speed*
- * 		run: [0, 8],
- * 		jump: [9, 12, "run", 2]
- * 	}
- * 
- * <LI> for non-consecutive frames, you can use an object with a `frames` property defining an array of frame indexes to
- * play in order. The object can also specify `next` and `speed` properties.
- * 
- * 	animations: {
- * 		walk: {
- * 			frames: [1,2,3,3,2,1]
- * 		},
- * 		shoot: {
- * 			frames: [1,4,5,6],
- * 			next: "walk",
- * 			speed: 0.5
- * 		}
- * 	}
- * 
- * </OL>
- * <strong>Note:</strong> the `speed` property was added in EaselJS 0.7.0. Earlier versions had a `frequency`
- * property instead, which was the inverse of `speed`. For example, a value of "4" would be 1/4 normal speed in earlier
- * versions, but is 4x normal speed in 0.7.0+.
- * 
- * <h4>framerate</h4>
- * Optional. Indicates the default framerate to play this spritesheet at in frames per second.
- * See {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} for more information.
- * 
- * 	framerate: 20
- *
- * <h4>Example</h4>
- * To define a simple sprite sheet, with a single image "sprites.jpg" arranged in a regular 50x50 grid with three
- * animations: "stand" showing the first frame, "run" looping frame 1-5 inclusive, and "jump" playing  frame 6-8 and sequencing back to run.
- *
- * 	var data = {
- * 		images: ["sprites.jpg"],
- * 		frames: {width:50, height:50},
- * 		animations: {
- * 			stand:0,
- * 			run:[1,5],
- * 			jump:[6,8,"run"]
- * 		}
- * 	};
- * 	var spriteSheet = new createjs.SpriteSheet(data);
- * 	var animation = new createjs.Sprite(spriteSheet, "run");
- *
- *
- * <strong>Warning:</strong> Images loaded cross-origin will throw cross-origin security errors when interacted with
- * using a mouse, using methods such as `getObjectUnderPoint`, using filters, or caching. You can get around this by
- * setting `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`
- *
- * @class SpriteSheet
- * @constructor
- * @param {Object} data An object describing the SpriteSheet data.
- * @extends EventDispatcher
- **/
-var SpriteSheet = function(data) {
-  this.initialize(data);
-};
-var p = SpriteSheet.prototype = new createjs.EventDispatcher();
-SpriteSheet.prototype.constructor = SpriteSheet;
+	
+	
+// constructor:
+	/**
+	 * Encapsulates the properties and methods associated with a sprite sheet. A sprite sheet is a series of images (usually
+	 * animation frames) combined into a larger image (or images). For example, an animation consisting of eight 100x100
+	 * images could be combined into a single 400x200 sprite sheet (4 frames across by 2 high).
+	 *
+	 * The data passed to the SpriteSheet constructor defines:<ol>
+	 * 	<li> The source image or images to use.</li>
+	 * 	<li> The positions of individual image frames.</li>
+	 * 	<li> Sequences of frames that form named animations. Optional.</li>
+	 * 	<li> The target playback framerate. Optional.</li>
+	 * </OL>
+	 *
+	 * <h3>SpriteSheet Format</h3>
+	 * 
+	 * SpriteSheets are an object with two required properties (`images` and `frames`), and two optional properties
+	 * (`framerate` and `animations`). This makes them easy to define in javascript code, or in JSON.
+	 * 
+	 * <h4>images</h4>
+	 * An array of source images. Images can be either an HTMLImage
+	 * instance, or a uri to an image. The former is recommended to control preloading.
+	 * 
+	 * 	images: [image1, "path/to/image2.png"],
+	 * 
+	 * <h4>frames</h4>
+	 * Defines the individual frames. There are two supported formats for frame data:<OL>
+	 * <LI> when all of the frames are the same size (in a grid), use an object with `width`, `height`, `regX`, `regY`, and `count` properties.
+	 * `width` & `height` are required and specify the dimensions of the frames.
+	 * `regX` & `regY` indicate the registration point or "origin" of the frames.
+	 * `count` allows you to specify the total number of frames in the spritesheet; if omitted, this will be calculated
+	 * based on the dimensions of the source images and the frames. Frames will be assigned indexes based on their position
+	 * in the source images (left to right, top to bottom).
+	 * 	
+	 * 	frames: {width:64, height:64, count:20, regX: 32, regY:64}
+	 * 	
+	 * <LI> if the frames are of different sizes, use an array of frame definitions. Each definition is itself an array
+	 * with 4 required and 3 optional entries, in the order: `x`, `y`, `width`, `height`, `imageIndex`, `regX`, `regY`. The first
+	 * four entries are required and define the frame rectangle. The fifth specifies the index of the source image (defaults to 0). The
+	 * last two specify the registration point of the frame.
+	 * 	
+	 * 	frames: [
+	 * 		// x, y, width, height, imageIndex*, regX*, regY*
+	 * 		[64, 0, 96, 64],
+	 * 		[0, 0, 64, 64, 1, 32, 32]
+	 * 		// etc.
+	 * 	]
+	 * 	
+	 * </OL>
+	 * 
+	 * <h4>animations</h4>
+	 * Optional. An object defining sequences of frames to play as named animations. Each property corresponds to an
+	 * animation of the same name. Each animation must specify the frames to play, and may 
+	 * also include a relative playback `speed` (ex. 2 would playback at double speed, 0.5 at half), and
+	 * the name of the `next` animation to sequence to after it completes.
+	 * 
+	 * There are three formats supported for defining the frames in an animation, which can be mixed and matched as appropriate:<OL>
+	 * <LI> for a single frame animation, you can simply specify the frame index
+	 * 
+	 * 	animations: {
+	 * 		sit: 7
+	 * 	}
+	 * 
+	 * <LI> for an animation of consecutive frames, you can use an array with two required, and two optional entries
+	 * in the order: `start`, `end`, `next`, and `speed`. This will play the frames from start to end inclusive.
+	 * 
+	 * 	animations: {
+	 * 		// start, end, next*, speed*
+	 * 		run: [0, 8],
+	 * 		jump: [9, 12, "run", 2]
+	 * 	}
+	 * 
+	 * <LI> for non-consecutive frames, you can use an object with a `frames` property defining an array of frame indexes to
+	 * play in order. The object can also specify `next` and `speed` properties.
+	 * 
+	 * 	animations: {
+	 * 		walk: {
+	 * 			frames: [1,2,3,3,2,1]
+	 * 		},
+	 * 		shoot: {
+	 * 			frames: [1,4,5,6],
+	 * 			next: "walk",
+	 * 			speed: 0.5
+	 * 		}
+	 * 	}
+	 * 
+	 * </OL>
+	 * <strong>Note:</strong> the `speed` property was added in EaselJS 0.7.0. Earlier versions had a `frequency`
+	 * property instead, which was the inverse of `speed`. For example, a value of "4" would be 1/4 normal speed in earlier
+	 * versions, but is 4x normal speed in 0.7.0+.
+	 * 
+	 * <h4>framerate</h4>
+	 * Optional. Indicates the default framerate to play this spritesheet at in frames per second.
+	 * See {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} for more information.
+	 * 
+	 * 	framerate: 20
+	 *
+	 * <h4>Example</h4>
+	 * To define a simple sprite sheet, with a single image "sprites.jpg" arranged in a regular 50x50 grid with three
+	 * animations: "stand" showing the first frame, "run" looping frame 1-5 inclusive, and "jump" playing  frame 6-8 and sequencing back to run.
+	 *
+	 * 	var data = {
+	 * 		images: ["sprites.jpg"],
+	 * 		frames: {width:50, height:50},
+	 * 		animations: {
+	 * 			stand:0,
+	 * 			run:[1,5],
+	 * 			jump:[6,8,"run"]
+	 * 		}
+	 * 	};
+	 * 	var spriteSheet = new createjs.SpriteSheet(data);
+	 * 	var animation = new createjs.Sprite(spriteSheet, "run");
+	 *
+	 *
+	 * <strong>Warning:</strong> Images loaded cross-origin will throw cross-origin security errors when interacted with
+	 * using a mouse, using methods such as `getObjectUnderPoint`, using filters, or caching. You can get around this by
+	 * setting `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`
+	 *
+	 * @class SpriteSheet
+	 * @constructor
+	 * @param {Object} data An object describing the SpriteSheet data.
+	 * @extends EventDispatcher
+	 **/
+	function SpriteSheet(data) {
+		this.EventDispatcher_constructor();
+	
+	
+	// public properties:
+		/**
+		 * Indicates whether all images are finished loading.
+		 * @property complete
+		 * @type Boolean
+		 * @readonly
+		 **/
+		this.complete = true;
+	
+		/**
+		 * Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See
+		 * Sprite.framerate for more information.
+		 * @property framerate
+		 * @type Number
+		 **/
+		this.framerate = 0;
+	
+	
+	// private properties:
+		/**
+		 * @property _animations
+		 * @protected
+		 **/
+		this._animations = null;
+	
+		/**
+		 * @property _frames
+		 * @protected
+		 **/
+		this._frames = null;
+	
+		/**
+		 * @property _images
+		 * @protected
+		 **/
+		this._images = null;
+	
+		/**
+		 * @property _data
+		 * @protected
+		 **/
+		this._data = null;
+	
+		/**
+		 * @property _loadCount
+		 * @protected
+		 **/
+		this._loadCount = 0;
+	
+		// only used for simple frame defs:
+		/**
+		 * @property _frameHeight
+		 * @protected
+		 **/
+		this._frameHeight = 0;
+	
+		/**
+		 * @property _frameWidth
+		 * @protected
+		 **/
+		this._frameWidth = 0;
+	
+		/**
+		 * @property _numFrames
+		 * @protected
+		 **/
+		this._numFrames = 0;
+	
+		/**
+		 * @property _regX
+		 * @protected
+		 **/
+		this._regX = 0;
+	
+		/**
+		 * @property _regY
+		 * @protected
+		 **/
+		this._regY = 0;
+		
+		
+	// setup:
+		this._parseData(data);
+	}
+	var p = createjs.extend(SpriteSheet, createjs.EventDispatcher);
+
 
 // events:
-
 	/**
 	 * Dispatched when all images are loaded.  Note that this only fires if the images
 	 * were not fully loaded when the sprite sheet was initialized. You should check the complete property
@@ -180,103 +267,109 @@ SpriteSheet.prototype.constructor = SpriteSheet;
 	 * @param {String} type The event type.
 	 * @since 0.6.0
 	 */
+	 
 
-// public properties:
+// public methods:
 	/**
-	 * Indicates whether all images are finished loading.
-	 * @property complete
-	 * @type Boolean
-	 * @readonly
+	 * Returns the total number of frames in the specified animation, or in the whole sprite
+	 * sheet if the animation param is omitted. Returns 0 if the spritesheet relies on calculated frame counts, and
+	 * the images have not been fully loaded.
+	 * @method getNumFrames
+	 * @param {String} animation The name of the animation to get a frame count for.
+	 * @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
+	*/
+	p.getNumFrames = function(animation) {
+		if (animation == null) {
+			return this._frames ? this._frames.length : this._numFrames || 0;
+		} else {
+			var data = this._data[animation];
+			if (data == null) { return 0; }
+			else { return data.frames.length; }
+		}
+	};
+
+	/**
+	 * Returns an array of all available animation names as strings.
+	 * @method getAnimations
+	 * @return {Array} an array of animation names available on this sprite sheet.
 	 **/
-	p.complete = true;
-
+	p.getAnimations = function() {
+		return this._animations.slice(0);
+	};
 
 	/**
-	 * Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See
-	 * Sprite.framerate for more information.
-	 * @property framerate
-	 * @type Number
+	 * Returns an object defining the specified animation. The returned object contains:<UL>
+	 * 	<LI>frames: an array of the frame ids in the animation</LI>
+	 * 	<LI>speed: the playback speed for this animation</LI>
+	 * 	<LI>name: the name of the animation</LI>
+	 * 	<LI>next: the default animation to play next. If the animation loops, the name and next property will be the
+	 * 	same.</LI>
+	 * </UL>
+	 * @method getAnimation
+	 * @param {String} name The name of the animation to get.
+	 * @return {Object} a generic object with frames, speed, name, and next properties.
 	 **/
-	p.framerate = 0;
+	p.getAnimation = function(name) {
+		return this._data[name];
+	};
 
-	// TODO: deprecated.
 	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "SpriteSheet/complete:event"}}{{/crossLink}}
-	 * event.
-	 * @property onComplete
-	 * @type Function
-	 * @deprecated Use addEventListener and the "complete" event.
+	 * Returns an object specifying the image and source rect of the specified frame. The returned object has:<UL>
+	 * 	<LI>an image property holding a reference to the image object in which the frame is found</LI>
+	 * 	<LI>a rect property containing a Rectangle instance which defines the boundaries for the frame within that
+	 * 	image.</LI>
+	 * 	<LI> A regX and regY property corresponding to the regX/Y values for the frame.
+	 * </UL>
+	 * @method getFrame
+	 * @param {Number} frameIndex The index of the frame.
+	 * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist.
 	 **/
+	p.getFrame = function(frameIndex) {
+		var frame;
+		if (this._frames && (frame=this._frames[frameIndex])) { return frame; }
+		return null;
+	};
 
-// private properties:
 	/**
-	 * @property _animations
-	 * @protected
+	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative
+	 * to the origin. For example, a 90 x 70 frame with a regX of 50 and a regY of 40 would return:
+	 *
+	 * 	[x=-50, y=-40, width=90, height=70]
+	 *
+	 * @method getFrameBounds
+	 * @param {Number} frameIndex The index of the frame.
+	 * @param {Rectangle} [rectangle] A Rectangle instance to copy the values into. By default a new instance is created.
+	 * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.
 	 **/
-	p._animations = null;
+	p.getFrameBounds = function(frameIndex, rectangle) {
+		var frame = this.getFrame(frameIndex);
+		return frame ? (rectangle||new createjs.Rectangle()).setValues(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null;
+	};
 
 	/**
-	 * @property _frames
-	 * @protected
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
 	 **/
-	p._frames = null;
+	p.toString = function() {
+		return "[SpriteSheet]";
+	};
 
 	/**
-	 * @property _images
-	 * @protected
+	 * SpriteSheet cannot be cloned. A SpriteSheet can be shared by multiple Sprite instances without cloning it.
+	 * @method clone
 	 **/
-	p._images = null;
+	p.clone = function() {
+		throw("SpriteSheet cannot be cloned.")
+	};
 
+// private methods:
 	/**
-	 * @property _data
-	 * @protected
-	 **/
-	p._data = null;
-
-	/**
-	 * @property _loadCount
-	 * @protected
-	 **/
-	p._loadCount = 0;
-
-	// only used for simple frame defs:
-	/**
-	 * @property _frameHeight
-	 * @protected
-	 **/
-	p._frameHeight = 0;
-
-	/**
-	 * @property _frameWidth
-	 * @protected
-	 **/
-	p._frameWidth = 0;
-
-	/**
-	 * @property _numFrames
-	 * @protected
-	 **/
-	p._numFrames = 0;
-
-	/**
-	 * @property _regX
-	 * @protected
-	 **/
-	p._regX = 0;
-
-	/**
-	 * @property _regY
-	 * @protected
-	 **/
-	p._regY = 0;
-
-// constructor:
-	/**
-	 * @method initialize
+	 * @method _parseData
 	 * @param {Object} data An object describing the SpriteSheet data.
 	 * @protected
 	 **/
-	p.initialize = function(data) {
+	p._parseData = function(data) {
 		var i,l,o,a;
 		if (data == null) { return; }
 
@@ -353,115 +446,8 @@ SpriteSheet.prototype.constructor = SpriteSheet;
 				this._data[name] = anim;
 			}
 		}
-
 	};
 
-// public methods:
-	/**
-	 * Returns the total number of frames in the specified animation, or in the whole sprite
-	 * sheet if the animation param is omitted.
-	 * @method getNumFrames
-	 * @param {String} animation The name of the animation to get a frame count for.
-	 * @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
-	*/
-	p.getNumFrames = function(animation) {
-		if (animation == null) {
-			return this._frames ? this._frames.length : this._numFrames;
-		} else {
-			var data = this._data[animation];
-			if (data == null) { return 0; }
-			else { return data.frames.length; }
-		}
-	};
-
-	/**
-	 * Returns an array of all available animation names as strings.
-	 * @method getAnimations
-	 * @return {Array} an array of animation names available on this sprite sheet.
-	 **/
-	p.getAnimations = function() {
-		return this._animations.slice(0);
-	};
-
-	/**
-	 * Returns an object defining the specified animation. The returned object contains:<UL>
-	 * 	<LI>frames: an array of the frame ids in the animation</LI>
-	 * 	<LI>speed: the playback speed for this animation</LI>
-	 * 	<LI>name: the name of the animation</LI>
-	 * 	<LI>next: the default animation to play next. If the animation loops, the name and next property will be the
-	 * 	same.</LI>
-	 * </UL>
-	 * @method getAnimation
-	 * @param {String} name The name of the animation to get.
-	 * @return {Object} a generic object with frames, speed, name, and next properties.
-	 **/
-	p.getAnimation = function(name) {
-		return this._data[name];
-	};
-
-	/**
-	 * Returns an object specifying the image and source rect of the specified frame. The returned object has:<UL>
-	 * 	<LI>an image property holding a reference to the image object in which the frame is found</LI>
-	 * 	<LI>a rect property containing a Rectangle instance which defines the boundaries for the frame within that
-	 * 	image.</LI>
-	 * 	<LI> A regX and regY property corresponding to the regX/Y values for the frame.
-	 * </UL>
-	 * @method getFrame
-	 * @param {Number} frameIndex The index of the frame.
-	 * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist.
-	 **/
-	p.getFrame = function(frameIndex) {
-		var frame;
-		if (this._frames && (frame=this._frames[frameIndex])) { return frame; }
-		return null;
-	};
-
-	/**
-	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative
-	 * to the origin. For example, a 90 x 70 frame with a regX of 50 and a regY of 40 would return:
-	 *
-	 * 	[x=-50, y=-40, width=90, height=70]
-	 *
-	 * @method getFrameBounds
-	 * @param {Number} frameIndex The index of the frame.
-	 * @param {Rectangle} [rectangle] A Rectangle instance to copy the values into. By default a new instance is created.
-	 * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.
-	 **/
-	p.getFrameBounds = function(frameIndex, rectangle) {
-		var frame = this.getFrame(frameIndex);
-		return frame ? (rectangle||new createjs.Rectangle()).initialize(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null;
-	};
-
-	/**
-	 * Returns a string representation of this object.
-	 * @method toString
-	 * @return {String} a string representation of the instance.
-	 **/
-	p.toString = function() {
-		return "[SpriteSheet]";
-	};
-
-	/**
-	 * Returns a clone of the SpriteSheet instance.
-	 * @method clone
-	 * @return {SpriteSheet} a clone of the SpriteSheet instance.
-	 **/
-	p.clone = function() {
-		// TODO: there isn't really any reason to clone SpriteSheet instances, because they can be reused.
-		var o = new SpriteSheet();
-		o.complete = this.complete;
-		o._animations = this._animations;
-		o._frames = this._frames;
-		o._images = this._images;
-		o._data = this._data;
-		o._frameHeight = this._frameHeight;
-		o._frameWidth = this._frameWidth;
-		o._numFrames = this._numFrames;
-		o._loadCount = this._loadCount;
-		return o;
-	};
-
-// private methods:
 	/**
 	 * @method _handleImageLoad
 	 * @protected
@@ -497,5 +483,6 @@ SpriteSheet.prototype.constructor = SpriteSheet;
 		this._numFrames = ttlFrames;
 	};
 
-createjs.SpriteSheet = SpriteSheet;
+
+	createjs.SpriteSheet = createjs.promote(SpriteSheet, "EventDispatcher");
 }());

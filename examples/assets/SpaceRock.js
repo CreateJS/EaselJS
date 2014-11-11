@@ -1,11 +1,12 @@
 (function (window) {
 
 	function SpaceRock(size) {
-		this.initialize(size);
+		this.Shape_constructor(); // super call
+
+		this.activate(size);
 	}
 
-	var p = SpaceRock.prototype = new createjs.Shape();
-	SpaceRock.prototype.constructor = SpaceRock;
+	var p = createjs.extend(SpaceRock, createjs.Shape);
 
 // static properties:
 	SpaceRock.LRG_ROCK = 40;
@@ -24,15 +25,7 @@
 	p.vY;		//velocity Y
 
 	p.active;	//is it active
-
-// constructor:
-	p.Shape_initialize = p.initialize;	//unique to avoid overiding base class
-
-	p.initialize = function (size) {
-		this.Shape_initialize(); // super call
-
-		this.activate(size);
-	}
+	
 
 // public methods:
 
@@ -148,6 +141,6 @@
 	}
 
 
-	window.SpaceRock = SpaceRock;
+	window.SpaceRock = createjs.promote(SpaceRock, "Shape");
 
 }(window));

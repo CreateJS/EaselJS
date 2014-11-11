@@ -36,32 +36,150 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * The SpriteSheetBuilder allows you to generate sprite sheets at run time from any display object. This can allow
- * you to maintain your assets as vector graphics (for low file size), and render them at run time as sprite sheets
- * for better performance.
- *
- * Sprite sheets can be built either synchronously, or asynchronously, so that large sprite sheets can be generated
- * without locking the UI.
- *
- * Note that the "images" used in the generated sprite sheet are actually canvas elements, and that they will be sized
- * to the nearest power of 2 up to the value of <code>maxWidth</code> or <code>maxHeight</code>.
- * @class SpriteSheetBuilder
- * @extends EventDispatcher
- * @constructor
- **/
-var SpriteSheetBuilder = function() {
-  this.initialize();
-};
-var p = SpriteSheetBuilder.prototype = new createjs.EventDispatcher;
-SpriteSheetBuilder.prototype.constructor = SpriteSheetBuilder;
+
+// constructor:
+	/**
+	 * The SpriteSheetBuilder allows you to generate sprite sheets at run time from any display object. This can allow
+	 * you to maintain your assets as vector graphics (for low file size), and render them at run time as sprite sheets
+	 * for better performance.
+	 *
+	 * Sprite sheets can be built either synchronously, or asynchronously, so that large sprite sheets can be generated
+	 * without locking the UI.
+	 *
+	 * Note that the "images" used in the generated sprite sheet are actually canvas elements, and that they will be sized
+	 * to the nearest power of 2 up to the value of <code>maxWidth</code> or <code>maxHeight</code>.
+	 * @class SpriteSheetBuilder
+	 * @extends EventDispatcher
+	 * @constructor
+	 **/
+	function SpriteSheetBuilder() {
+		this.EventDispatcher_constructor();
+		
+	// public properties:
+		/**
+		 * The maximum width for the images (not individual frames) in the generated sprite sheet. It is recommended to use
+		 * a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max dimensions, then
+		 * additional images will be created as needed.
+		 * @property maxWidth
+		 * @type Number
+		 * @default 2048
+		*/
+		this.maxWidth = 2048;
+	
+		/**
+		 * The maximum height for the images (not individual frames) in the generated sprite sheet. It is recommended to use
+		 * a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max dimensions, then
+		 * additional images will be created as needed.
+		 * @property maxHeight
+		 * @type Number
+		 * @default 2048
+		 **/
+		this.maxHeight = 2048;
+	
+		/**
+		 * The sprite sheet that was generated. This will be null before a build is completed successfully.
+		 * @property spriteSheet
+		 * @type SpriteSheet
+		 **/
+		this.spriteSheet = null;
+	
+		/**
+		 * The scale to apply when drawing all frames to the sprite sheet. This is multiplied against any scale specified
+		 * in the addFrame call. This can be used, for example, to generate a sprite sheet at run time that is tailored to
+		 * the a specific device resolution (ex. tablet vs mobile).
+		 * @property scale
+		 * @type Number
+		 * @default 1
+		 **/
+		this.scale = 1;
+	
+		/**
+		* The padding to use between frames. This is helpful to preserve antialiasing on drawn vector content.
+		* @property padding
+		* @type Number
+		* @default 1
+		**/
+		this.padding = 1;
+	
+		/**
+		 * A number from 0.01 to 0.99 that indicates what percentage of time the builder can use. This can be
+		 * thought of as the number of seconds per second the builder will use. For example, with a timeSlice value of 0.3,
+		 * the builder will run 20 times per second, using approximately 15ms per build (30% of available time, or 0.3s per second).
+		 * Defaults to 0.3.
+		 * @property timeSlice
+		 * @type Number
+		 * @default 0.3
+		 **/
+		this.timeSlice = 0.3;
+	
+		/**
+		 * A value between 0 and 1 that indicates the progress of a build, or -1 if a build has not
+		 * been initiated.
+		 * @property progress
+		 * @type Number
+		 * @default -1
+		 * @readonly
+		 **/
+		this.progress = -1;
+	
+	
+	// private properties:
+		/**
+		 * @property _frames
+		 * @protected
+		 * @type Array
+		 **/
+		this._frames = [];
+	
+		/**
+		 * @property _animations
+		 * @protected
+		 * @type Array
+		 **/
+		this._animations = {};
+	
+		/**
+		 * @property _data
+		 * @protected
+		 * @type Array
+		 **/
+		this._data = null;
+	
+		/**
+		 * @property _nextFrameIndex
+		 * @protected
+		 * @type Number
+		 **/
+		this._nextFrameIndex = 0;
+	
+		/**
+		 * @property _index
+		 * @protected
+		 * @type Number
+		 **/
+		this._index = 0;
+	
+		/**
+		 * @property _timerID
+		 * @protected
+		 * @type Number
+		 **/
+		this._timerID = null;
+	
+		/**
+		 * @property _scale
+		 * @protected
+		 * @type Number
+		 **/
+		this._scale = 1;
+	}
+	var p = createjs.extend(SpriteSheetBuilder, createjs.EventDispatcher);
 
 // constants:
 	SpriteSheetBuilder.ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
 	SpriteSheetBuilder.ERR_RUNNING = "a build is already running";
 
 // events:
-
 	/**
 	 * Dispatched when a build completes.
 	 * @event complete
@@ -79,154 +197,8 @@ SpriteSheetBuilder.prototype.constructor = SpriteSheetBuilder;
 	 * @since 0.6.0
 	 */
 
-// public properties:
-
-	/**
-	 * The maximum width for the images (not individual frames) in the generated sprite sheet. It is recommended to use
-	 * a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max dimensions, then
-	 * additional images will be created as needed.
-	 * @property maxWidth
-	 * @type Number
-	 * @default 2048
-	*/
-	p.maxWidth = 2048;
-
-	/**
-	 * The maximum height for the images (not individual frames) in the generated sprite sheet. It is recommended to use
-	 * a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max dimensions, then
-	 * additional images will be created as needed.
-	 * @property maxHeight
-	 * @type Number
-	 * @default 2048
-	 **/
-	p.maxHeight = 2048;
-
-	/**
-	 * The sprite sheet that was generated. This will be null before a build is completed successfully.
-	 * @property spriteSheet
-	 * @type SpriteSheet
-	 **/
-	p.spriteSheet = null;
-
-	/**
-	 * The scale to apply when drawing all frames to the sprite sheet. This is multiplied against any scale specified
-	 * in the addFrame call. This can be used, for example, to generate a sprite sheet at run time that is tailored to
-	 * the a specific device resolution (ex. tablet vs mobile).
-	 * @property scale
-	 * @type Number
-	 * @default 1
-	 **/
-	p.scale = 1;
-
-	/**
-	* The padding to use between frames. This is helpful to preserve antialiasing on drawn vector content.
-	* @property padding
-	* @type Number
-	* @default 1
-	**/
-	p.padding = 1;
-
-	/**
-	 * A number from 0.01 to 0.99 that indicates what percentage of time the builder can use. This can be
-	 * thought of as the number of seconds per second the builder will use. For example, with a timeSlice value of 0.3,
-	 * the builder will run 20 times per second, using approximately 15ms per build (30% of available time, or 0.3s per second).
-	 * Defaults to 0.3.
-	 * @property timeSlice
-	 * @type Number
-	 * @default 0.3
-	 **/
-	p.timeSlice = 0.3;
-
-	/**
-	 * A value between 0 and 1 that indicates the progress of a build, or -1 if a build has not
-	 * been initiated.
-	 * @property progress
-	 * @type Number
-	 * @default -1
-	 * @readonly
-	 **/
-	p.progress = -1;
-
-	// TODO: deprecated.
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "SpriteSheetBuilder/complete:event"}}{{/crossLink}}
-	 * event.
-	 * @property onComplete
-	 * @type Function
-	 * @deprecated Use addEventListener and the "complete" event.
-	 */
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "SpriteSheetBuilder/progress:event"}}{{/crossLink}}
-	 * event.
-	 * @property onProgress
-	 * @type Function
-	 * @deprecated Use addEventListener and the "progress" event.
-	 */
-
-// private properties:
-
-	/**
-	 * @property _frames
-	 * @protected
-	 * @type Array
-	 **/
-	p._frames = null;
-
-	/**
-	 * @property _animations
-	 * @protected
-	 * @type Array
-	 **/
-	p._animations = null;
-
-	/**
-	 * @property _data
-	 * @protected
-	 * @type Array
-	 **/
-	p._data = null;
-
-	/**
-	 * @property _nextFrameIndex
-	 * @protected
-	 * @type Number
-	 **/
-	p._nextFrameIndex = 0;
-
-	/**
-	 * @property _index
-	 * @protected
-	 * @type Number
-	 **/
-	p._index = 0;
-
-	/**
-	 * @property _timerID
-	 * @protected
-	 * @type Number
-	 **/
-	p._timerID = null;
-
-	/**
-	 * @property _scale
-	 * @protected
-	 * @type Number
-	 **/
-	p._scale = 1;
-
-// constructor:
-	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @protected
-	 **/
-	p.initialize = function() {
-		this._frames = [];
-		this._animations = {};
-	};
 
 // public methods:
-
 	/**
 	 * Adds a frame to the {{#crossLink "SpriteSheet"}}{{/crossLink}}. Note that the frame will not be drawn until you
 	 * call {{#crossLink "SpriteSheetBuilder/build"}}{{/crossLink}} method. The optional setup params allow you to have
@@ -378,6 +350,7 @@ SpriteSheetBuilder.prototype.constructor = SpriteSheetBuilder;
 		return "[SpriteSheetBuilder]";
 	};
 
+
 // private methods:
 	/**
 	 * @method _startBuild
@@ -418,7 +391,6 @@ SpriteSheetBuilder.prototype.constructor = SpriteSheetBuilder;
 			}
 		}
 	};
-	
 	
 	/**
 	 * @method _setupMovieClipFrame
@@ -542,5 +514,6 @@ SpriteSheetBuilder.prototype.constructor = SpriteSheetBuilder;
 		return (++this._index) < this._frames.length;
 	};
 
-createjs.SpriteSheetBuilder = SpriteSheetBuilder;
+
+	createjs.SpriteSheetBuilder = createjs.promote(SpriteSheetBuilder, "EventDispatcher");
 }());
