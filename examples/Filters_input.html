@@ -22,9 +22,7 @@
         var bmp;
         var DELTA_INDEX;
         var blurXSlider;
-        var blurFilter, hueFilter, constrastFilter, saturationFilter, brightnessFilter;
-        var redChannelFilter, greenChannelFilter, blueChannelFilter;
-        var colorFilter;
+        var blurFilter, colorMatrixFilter, colorFilter;
         var slideInterval = -1;
         var cm;
 
@@ -165,11 +163,9 @@
             cm = new createjs.ColorMatrix();
             cm.adjustColor(brightnessValue, contrastValue, saturationValue, hueValue);
 
-            colorFilter = new createjs.ColorMatrixFilter(cm);
+            colorMatrixFilter = new createjs.ColorMatrixFilter(cm);
             blurFilter = new createjs.BlurFilter(blurXValue,  blurYValue, 2);
-            redChannelFilter = new createjs.ColorFilter(redChannelvalue/255,1,1,1);
-            greenChannelFilter = new createjs.ColorFilter(1,greenChannelValue/255,1,1);
-            blueChannelFilter = new createjs.ColorFilter(1,1,blueChannelValue/255,1);
+			colorFilter = new createjs.ColorFilter(redChannelvalue/255,greenChannelValue/255,blueChannelValue/255,1);
 
             updateImage();
         }
@@ -189,7 +185,7 @@
         }
 
         function updateImage() {
-            bmp.filters = [colorFilter, blurFilter, redChannelFilter, greenChannelFilter, blueChannelFilter];
+            bmp.filters = [colorMatrixFilter, blurFilter, colorFilter];
             bmp.updateCache();
             stage.update();
         }
