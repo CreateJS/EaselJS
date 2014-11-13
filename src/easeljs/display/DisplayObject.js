@@ -1218,20 +1218,17 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * @method _tick
-	 * @param {Object} props Props to copy to the tick event object. This will usually include the
-	 * properties from the {{#crossLink "Ticker"}}{{/crossLink}} "tick" event, such as `delta` and `paused`, but may
-	 * be undefined or contain other values depending on the usage by the application.
+	 * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
 	 * @protected
 	 **/
-	p._tick = function(props) {
-		// because tick can be really performance sensitive, check for listeners before constructing the event object:
+	p._tick = function(evtObj) {
+		// because tick can be really performance sensitive, check for listeners before calling dispatchEvent.
 		var ls = this._listeners;
 		if (ls && ls["tick"]) {
-			// TODO: is it worth passing an event object forward, constructed on Stage? Would need to set target to undefined before the dispatch in that case.
-			var evt = new createjs.Event("tick");
-			// TODO: temporary loop for better compatibility with FlashCC & old libs. Replace with .set(props)
-			for (var n in props) { evt[n] = props[n]; }
-			this.dispatchEvent(evt);
+			// reset & reuse the event object to avoid construction / GC costs:
+			evtObj.target = null;
+			evtObj.propagationStopped = evtObj.immediatePropagationStopped = false;
+			this.dispatchEvent(evtObj);
 		}
 	};
 

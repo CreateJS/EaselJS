@@ -355,16 +355,16 @@ this.createjs = this.createjs||{};
 	/**
 	 * Advances the <code>currentFrame</code> if paused is not true. This is called automatically when the {{#crossLink "Stage"}}{{/crossLink}}
 	 * ticks.
-	 * @param {Object} props Properties to copy to the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}} event object.
+	 * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
 	 * @protected
 	 * @method _tick
 	 **/
-	p._tick = function(props) {
+	p._tick = function(evtObj) {
 		if (!this.paused) {
-			if (!this._skipAdvance) { this.advance(props&&props.delta); }
+			if (!this._skipAdvance) { this.advance(evtObj&&evtObj.delta); }
 			this._skipAdvance = false;
 		}
-		this.DisplayObject__tick(props);
+		this.DisplayObject__tick(evtObj);
 	};
 
 

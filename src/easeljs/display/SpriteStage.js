@@ -430,38 +430,10 @@ this.createjs = this.createjs||{};
 		return child;
 	};
 
-	/**
-	 * Each time the update method is called, the stage will tick all descendants (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}})
-	 * and then render the display list to the canvas using WebGL. If WebGL is not supported in the browser, it will default to a 2D context.
-	 * 
-	 * Any parameters passed to `update()` will be passed on to any
-	 * {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers.
-	 *
-	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-	 * a tick event object (or equivalent) be passed as the first parameter to update(). For example:
-	 *
-	 *      Ticker.addEventListener("tick", handleTick);
-	 *      function handleTick(evtObj) {
-	 *          // do some work here, then update the stage, passing through the event object:
-	 *          myStage.update(evtObj);
-	 *      }
-	 *
-	 * @method update
-	 * @param {*} [params]* Params to include when ticking descendants. The first param should usually be a tick event.
-	 **/
-	p.update = function(params) {
+	/** docced in super class **/
+	p.update = function(props) {
 		if (!this.canvas) { return; }
-		if (this.tickOnUpdate) {
-			this.dispatchEvent("tickstart");  // TODO: make cancellable?
-
-			var args = arguments.length ? Array.prototype.slice.call(arguments,0) : null;
-			var evt = args&&args[0];
-			var props = evt&&(evt.delta != null) ? {delta:evt.delta, paused:evt.paused, time:evt.time, runTime:evt.runTime } : {};
-			props.params = args;
-
-			this._tick(props);
-			this.dispatchEvent("tickend");
-		}
+		if (this.tickOnUpdate) { this.tick(props); }
 		this.dispatchEvent("drawstart"); // TODO: make cancellable?
 		if (this.autoClear) { this.clear(); }
 		var ctx = this._setWebGLContext();

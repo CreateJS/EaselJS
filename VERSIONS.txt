@@ -7,12 +7,23 @@ CRITICAL (may break existing content):
 - Sprite now properly displays the first frame of animations after calling gotoAndPlay() (thanks MannyC)
 - Moved Ticker into the "createjs" package since it will be included with TweenJS in future releases.
 - re-architected the class and inheritance model
-	- helper methods: extend & promote (see the "Utility Methods" docs)
 	- initialize methods removed, use SuperClass_constructor instead
+	- helper methods: extend & promote (see the "Utility Methods" docs)
 	- property definitions are now instance level, and in the constructor (performance gains)
+	- the .constructor is now set correctly on all classes (thanks kaesve)
 	- renamed initialize on geom classes to "setValues()"
 - removed secondary properties (visible, alpha, compositeOperation, shadow) and related functionality from Matrix2D
 	- added DisplayProps to hold these properties + a matrix instance
+
+***********
+PERFORMANCE:
+- added performance tests to extras
+- significant performance improvements:
+	- vector graphics (especially in Graphics instance with large numbers of instructions)
+	- filters (thanks pfirpfel) (~2-4x faster)
+	- overall display list performance (~2x faster)
+	- display object property access (~2x faster)
+	- tick event propagation (~3x faster)
 
 *****
 OTHER:
@@ -27,7 +38,8 @@ OTHER:
 - fixed issue introduced in 0.7.1 where getObjectsUnderPoint ignore elements without mouse listeners
 - doc updates
 - fixed example formatting in docs
-- display object tick events will now include delta, time, paused, and runTime properties if a tick event object is passed as the first param to Stage.update()
+- simplified handling of custom data passed into Stage.update()
+- display object tick events will now include delta, time, paused, and runTime properties if a Ticker tick event object is passed as the first param to Stage.update()
 - added Stage.tick()
 - added Event.set()
 - added MovieClip.framerate and support for time based movieclips
@@ -38,12 +50,10 @@ OTHER:
 - preventDefault support added to the tickstart and drawstart events
 - added Stage.drawRect to support selective rendering
 - major rewrite of Graphics to use specific command objects
-- significant performance improvements for Graphics instances with a large number of instructions
 - added Graphics.getInstructions()
 - added Text.getMetrics()
 - fix for Text.getMeasuredWidth() when no font or an invalid font is specified
 - fix for spritesheets that included 0 width/height frames
-- the .constructor is now set correctly on all classes (thanks kaesve)
 - the CreateJS CDN now supports https / SSL
 - improved how Sprite handles sequencing between animations with different speed values
 - added "change" event to Sprite
@@ -58,7 +68,7 @@ OTHER:
 - added Matrix2D.equals() method
 - added DisplayObject.transformMatrix
 - added a mode param to getObjectsUnderPoint() to respect mouseEnabled/mouseChildren and event listeners
-- improved filter performance (thanks pfirpfel)
+
 
 
 Version 0.7.1 [December 12, 2013]

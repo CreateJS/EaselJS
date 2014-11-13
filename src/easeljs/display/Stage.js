@@ -342,13 +342,11 @@ this.createjs = this.createjs||{};
 	 * and then render the display list to the canvas.
 	 *
 	 * @method update
-	 * @param {*} [params]* Params to pass to .tick() if .tickOnUpdate is true.
+	 * @param {Object} [props] Props object to pass to `tick()`. Should usually be a {{#crossLink "Ticker"}}{{/crossLink}} event object, or similar object with a delta property.
 	 **/
-	p.update = function(params) {
+	p.update = function(props) {
 		if (!this.canvas) { return; }
-		if (this.tickOnUpdate) { // update this logic in SpriteStage when necessary
-			this.tick.apply(this, arguments);
-		}
+		if (this.tickOnUpdate) { this.tick(props); }
 		if (this.dispatchEvent("drawstart")) { return; }
 		createjs.DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
 		var r = this.drawRect, ctx = this.canvas.getContext("2d");
@@ -373,40 +371,41 @@ this.createjs = this.createjs||{};
 	 * Propagates a tick event through the display list. This is automatically called by {{#crossLink "Stage/update"}}{{/crossLink}}
 	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false.
 	 *
-	 * Any parameters passed to `tick()` will be included as an array in the "param" property of the event object dispatched
-	 * to {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers. Additionally, if the first parameter
-	 * is a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or has equivalent properties), then the delta,
-	 * time, runTime, and paused properties will be copied to the event object.
+	 * If a props object is passed to `tick()`, then all of its properties will be copied to the event object that is
+	 * propagated to listeners.
 	 *
 	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-	 * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent) be passed as the first parameter
-	 * to tick(). For example:
+	 * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent object with a delta property) be
+	 * passed as the `props` parameter to `tick()`. For example:
 	 *
-	 * 	    Ticker.on("tick", handleTick);
-	 * 	    function handleTick(evtObj) {
-	 * 	    	// do some work here, then update the stage, passing through the tick event object as the first param
-	 * 	    	// and some custom data as the second and third param:
-	 * 	    	myStage.update(evtObj, "hello", 2014);
-	 * 	    }
-	 * 	    
-	 * 	    // ...
-	 * 	    myDisplayObject.on("tick", handleDisplayObjectTick);
-	 * 	    function handleDisplayObjectTick(evt) {
-	 * 	    	console.log(evt.params[0]); // the original tick evtObj
-	 * 	    	console.log(evt.delta, evt.paused); // ex. "17 false"
-	 * 	    	console.log(evt.params[1], evt.params[2]); // "hello 2014"
-	 * 	    }
+	 * 	Ticker.on("tick", handleTick);
+	 * 	function handleTick(evtObj) {
+	 * 		// clone the event object from Ticker, and add some custom data to it:
+	 * 		var evt = evtObj.clone().set({greeting:"hello", name:"world"});
+	 * 		
+	 * 		// pass it to stage.update():
+	 * 		myStage.update(evt); // subsequently calls tick() with the same param
+	 * 	}
+	 * 	
+	 * 	// ...
+	 * 	myDisplayObject.on("tick", handleDisplayObjectTick);
+	 * 	function handleDisplayObjectTick(evt) {
+	 * 		console.log(evt.delta); // the delta property from the Ticker tick event object
+	 * 		console.log(evt.greeting, evt.name); // custom data: "hello world"
+	 * 	}
 	 * 
 	 * @method tick
-	 * @param {*} [params]* Params to include when ticking descendants. The first param should usually be a tick event.
+	 * @param {Object} [props] An object with properties that should be copied to the event object. Should usually be a Ticker event object, or similar object with a delta property.
 	 **/
-	p.tick = function(params) {
+	p.tick = function(props) {
 		if (!this.tickEnabled || this.dispatchEvent("tickstart")) { return; }
-		var args = arguments.length ? Array.prototype.slice.call(arguments,0) : null;
-		var evt = args&&args[0];
-		var props = evt&&(evt.delta != null) ? {delta:evt.delta, paused:evt.paused, time:evt.time, runTime:evt.runTime } : {};
-		props.params = args;
-		this._tick(props);
+		var evtObj = new createjs.Event("tick");
+		if (props) {
+			for (var n in props) {
+				if (props.hasOwnProperty(n)) { evtObj[n] = props[n]; }
+			}
+		}
+		this._tick(evtObj);
 		this.dispatchEvent("tickend");
 	};
 
@@ -441,52 +440,28 @@ this.createjs = this.createjs||{};
 	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
 	 * be specified as the src value of an image element.
 	 * @method toDataURL
-	 * @param {String} backgroundColor The background color to be used for the generated image. The value can be any value HTML color
-	 * value, including HEX colors, rgb and rgba. The default value is a transparent background.
-	 * @param {String} mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
+	 * @param {String} [backgroundColor] The background color to be used for the generated image. Any valid CSS color
+	 * value is allowed. The default value is a transparent background.
+	 * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
 	 * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
 	 * @return {String} a Base64 encoded image.
 	 **/
 	p.toDataURL = function(backgroundColor, mimeType) {
-		if(!mimeType) {
-			mimeType = "image/png";
-		}
+		var data, ctx = this.canvas.getContext('2d'), w = this.canvas.width, h = this.canvas.height;
 
-		var ctx = this.canvas.getContext('2d');
-		var w = this.canvas.width;
-		var h = this.canvas.height;
-
-		var data;
-
-		if(backgroundColor) {
-
-			//get the current ImageData for the canvas.
+		if (backgroundColor) {
 			data = ctx.getImageData(0, 0, w, h);
-
-			//store the current globalCompositeOperation
 			var compositeOperation = ctx.globalCompositeOperation;
-
-			//set to draw behind current content
 			ctx.globalCompositeOperation = "destination-over";
-
-			//set background color
+			
 			ctx.fillStyle = backgroundColor;
-
-			//draw background on entire canvas
 			ctx.fillRect(0, 0, w, h);
 		}
 
-		//get the image data from the canvas
-		var dataURL = this.canvas.toDataURL(mimeType);
+		var dataURL = this.canvas.toDataURL(mimeType||"image/png");
 
 		if(backgroundColor) {
-			//clear the canvas
-			ctx.clearRect (0, 0, w+1, h+1);
-
-			//restore it with original settings
 			ctx.putImageData(data, 0, 0);
-
-			//reset the globalCompositeOperation to what it was
 			ctx.globalCompositeOperation = compositeOperation;
 		}
 
