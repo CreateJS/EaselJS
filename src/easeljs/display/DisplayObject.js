@@ -1224,13 +1224,14 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._tick = function(props) {
-		// because tick can be really performance sensitive, we'll inline some of the dispatchEvent work.
+		// because tick can be really performance sensitive, check for listeners before constructing the event object:
 		var ls = this._listeners;
 		if (ls && ls["tick"]) {
+			// TODO: is it worth passing an event object forward, constructed on Stage? Would need to set target to undefined before the dispatch in that case.
 			var evt = new createjs.Event("tick");
 			// TODO: temporary loop for better compatibility with FlashCC & old libs. Replace with .set(props)
 			for (var n in props) { evt[n] = props[n]; }
-			this._dispatchEvent(evt, this, 2);
+			this.dispatchEvent(evt);
 		}
 	};
 
