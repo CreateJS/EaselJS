@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	<!-- include the performance framework first, so it can initialize and inject its UI -->
+	<script src="perfFramework.js"></script>
+	
+	<!-- this test will use PreloadJS to load required assets -->
+	<script src="../../examples/assets/preloadjs-NEXT.min.js"></script>
+	<script>
+		// runTest is a special method called by the performance framework
+		// it passes the version array (ex. [0,7,1]) and a hash of all the query string values
+		function runTest(version, qs) {
+			if (!checkVersion("0.7.0")) { return endTest(); }
+			var queue = new createjs.LoadQueue();
+			queue.on("complete", assetsLoaded);
+			queue.loadManifest([
+				{id:"photo", src:"photo-hires.jpg"}
+			], true, "../../examples/assets/");
+		}
+		
+		function assetsLoaded(evt) {
+			
+			// grab the canvas, and create a stage, using the appropriate namespace:
+			var canvas = document.getElementById("testCanvas");
+			var w=canvas.width, h=canvas.height;
+			var stage = new createjs.Stage("testCanvas");
+			
+			// set up:
+			var img = evt.target.getResult("photo");
+			var bmp = stage.addChild(new createjs.Bitmap(img));
+			bmp.x = w-img.width>>1;
+			bmp.y = h-img.height>>1;
+			bmp.cache(0,0,img.width,img.height);
+			bmp.filters = [new createjs.BlurFilter(8,8,2)];
+			
+			
+			time("blur");
+			for (var i=0; i<10; i++) {
+				bmp.updateCache();
+			}
+			endTime("blur", true);
+			
+			
+			bmp.filters = [new createjs.ColorFilter(2,0,1,1,50,10,20,0)];
+			time("color");
+			for (var i=0; i<10; i++) {
+				bmp.updateCache();
+			}
+			endTime("color", true);
+			
+			
+			bmp.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix(0,0,100,180))];
+			time("colormatrix");
+			for (var i=0; i<10; i++) {
+				bmp.updateCache();
+			}
+			endTime("colormatrix", true);
+			
+			stage.update();
+			
+			// when the test has completely finished, you need to call endTest()
+			// this outputs the results, or continues the automated test
+			// note that tests can be asynchronous, or even require user interaction
+			endTest();
+		}
+	</script>
+	
+	<p>Tests performance of instantiating and rendering 50k Sprite instances on stage.</p>
+	<canvas id="testCanvas" width="1000" height="450"></canvas>
+</body>
+</html>
