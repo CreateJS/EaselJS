@@ -14,7 +14,9 @@
 		// runTest is a special method called by the performance framework
 		// it passes the version array (ex. [0,7,1]) and a hash of all the query string values
 		function runTest(version, qs) {
+			// filters under v0.7.0 aren't supported in this test:
 			if (!checkVersion("0.7.0")) { return endTest(); }
+			
 			var queue = new createjs.LoadQueue();
 			queue.on("complete", assetsLoaded);
 			queue.loadManifest([
@@ -61,15 +63,11 @@
 			endTime("colormatrix", true);
 			
 			stage.update();
-			
-			// when the test has completely finished, you need to call endTest()
-			// this outputs the results, or continues the automated test
-			// note that tests can be asynchronous, or even require user interaction
 			endTest();
 		}
 	</script>
 	
-	<p>Tests performance of instantiating and rendering 50k Sprite instances on stage.</p>
+	<p>Tests performance of a few Filter types.</p>
 	<canvas id="testCanvas" width="1000" height="450"></canvas>
 </body>
 </html>
