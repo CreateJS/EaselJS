@@ -14,7 +14,7 @@
 	var DATA_KEY = "workingperfdata";
 	var SHARE_KEY = "perfdata";
 	
-	var qs, version, versionStr, times={}, startTimes={};
+	var qs, version, versionStr, times={}, startTimes={}, hasResults=false;;
 	var data, iterations, result;
 	
 	(function setup() {
@@ -166,6 +166,7 @@
 		else { t = getTime()-t; }
 		if (log && qs.auto) {
 			times[str] = t;
+			hasResults = true;
 		} else {
 			console&&console.log(str, t.toFixed(2)+"ms");
 			result += str+": <b>"+(t+0.5|0)+"ms</b> ";
@@ -184,7 +185,7 @@
 		raw[versionStr][qs.iteration] = times;
 		localStorage[DATA_KEY] = JSON.stringify(data);
 		
-		if (++qs.iteration >= iterations) {
+		if (++qs.iteration >= iterations || !hasResults) {
 			qs.index++;
 			qs.iteration = 0;
 		}
