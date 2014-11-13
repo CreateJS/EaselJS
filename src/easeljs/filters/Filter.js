@@ -97,7 +97,22 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [targetY] The y position to draw the result to. Defaults to the value passed to y.
 	 * @return {Boolean} If the filter was applied successfully.
 	 **/
-	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {}
+	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
+		// this is the default behaviour because most filters access pixel data. It is overridden when not needed.
+		targetCtx = targetCtx || ctx;
+		if (targetX == null) { targetX = x; }
+		if (targetY == null) { targetY = y; }
+		try {
+			var imageData = ctx.getImageData(x, y, width, height);
+		} catch (e) {
+			return false;
+		}
+		if (this._applyFilter(imageData)) {
+			targetCtx.putImageData(imageData, targetX, targetY);
+			return true;
+		}
+		return false;
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -116,6 +131,14 @@ this.createjs = this.createjs||{};
 	p.clone = function() {
 		return new Filter();
 	};
+	
+// private methods:
+	/**
+	 * @method _applyFilter
+	 * @param {ImageData} imageData Target ImageData instance.
+	 * @return {Boolean}
+	 **/
+	p._applyFilter = function(imageData) { return true; };
 
 
 	createjs.Filter = Filter;

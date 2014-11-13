@@ -135,16 +135,19 @@ this.createjs = this.createjs||{};
 
 // public methods:
 	/** docced in super class **/
-	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
-		targetCtx = targetCtx || ctx;
-		if (targetX == null) { targetX = x; }
-		if (targetY == null) { targetY = y; }
-		try {
-			var imageData = ctx.getImageData(x, y, width, height);
-		} catch(e) {
-			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
-			return false;
-		}
+	p.toString = function() {
+		return "[ColorFilter]";
+	};
+
+	/** docced in super class **/
+	p.clone = function() {
+		return new ColorFilter(this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier, this.redOffset, this.greenOffset, this.blueOffset, this.alphaOffset);
+	};
+	
+
+// private methods:
+	/** docced in super class **/
+	p._applyFilter = function(imageData) {
 		var data = imageData.data;
 		var l = data.length;
 		for (var i=0; i<l; i+=4) {
@@ -153,18 +156,7 @@ this.createjs = this.createjs||{};
 			data[i+2] = data[i+2]*this.blueMultiplier+this.blueOffset;
 			data[i+3] = data[i+3]*this.alphaMultiplier+this.alphaOffset;
 		}
-		targetCtx.putImageData(imageData, targetX, targetY);
 		return true;
-	};
-
-	/** docced in super class **/
-	p.toString = function() {
-		return "[ColorFilter]";
-	};
-
-	/** docced in super class **/
-	p.clone = function() {
-		return new ColorFilter(this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier, this.redOffset, this.greenOffset, this.blueOffset, this.alphaOffset);
 	};
 
 

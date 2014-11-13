@@ -125,19 +125,22 @@ this.createjs = this.createjs||{};
 		var q = Math.pow(this.quality, 0.6)*0.5;
 		return new createjs.Rectangle(-this.blurX*q,-this.blurY*q,2*this.blurX*q,2*this.blurY*q);
 	};
-	
-	/** docced in super class **/
-	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
-		targetCtx = targetCtx || ctx;
-		if (targetX == null) { targetX = x; }
-		if (targetY == null) { targetY = y; }
-		try {
-			var imageData = ctx.getImageData(x, y, width, height);
-		} catch(e) {
-			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
-			return false;
-		}
 
+	/** docced in super class **/
+	p.clone = function() {
+		return new BlurFilter(this.blurX, this.blurY, this.quality);
+	};
+
+	/** docced in super class **/
+	p.toString = function() {
+		return "[BlurFilter]";
+	};
+
+
+// private methods:
+
+	/** docced in super class **/
+	p._applyFilter = function(imageData) {
 		var radiusX = this.blurX/2;
 		if ( isNaN(radiusX) || radiusX < 0 ) return false;
 		radiusX |= 0;
@@ -153,8 +156,8 @@ this.createjs = this.createjs||{};
 		iterations |= 0;
 		if ( iterations > 3 ) iterations = 3;
 		if ( iterations < 1 ) iterations = 1;
-
-		var pixels = imageData.data;
+		
+		var pixels = imageData.data, width = imageData.width, height=imageData.height;
 
 		// TODO: there are a lot of unused variables in this method:
 		var x, y, i, p, yp, yi, yw, r_sum, g_sum, b_sum, a_sum, 
@@ -344,20 +347,8 @@ this.createjs = this.createjs||{};
 				}
 			}
 		}
-		targetCtx.putImageData(imageData, targetX, targetY);
 		return true;
 	};
-
-	/** docced in super class **/
-	p.clone = function() {
-		return new BlurFilter(this.blurX, this.blurY, this.quality);
-	};
-
-	/** docced in super class **/
-	p.toString = function() {
-		return "[BlurFilter]";
-	};
-
 
 	createjs.BlurFilter = createjs.promote(BlurFilter, "Filter");
 }());

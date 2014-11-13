@@ -92,27 +92,22 @@ this.createjs = this.createjs || {};
 	 * @param {Number} y The y position to use for the source rect.
 	 * @param {Number} width The width to use for the source rect.
 	 * @param {Number} height The height to use for the source rect.
-	 * @param {CanvasRenderingContext2D} [targetCtx] The 2D context to draw the result to. Defaults to the context passed to ctx.
-	 * @param {Number} [targetX] The x position to draw the result to. Defaults to the value passed to x.
-	 * @param {Number} [targetY] The y position to draw the result to. Defaults to the value passed to y.
+	 * @param {CanvasRenderingContext2D} [targetCtx] NOT SUPPORTED IN THIS FILTER. The 2D context to draw the result to. Defaults to the context passed to ctx.
+	 * @param {Number} [targetX] NOT SUPPORTED IN THIS FILTER. The x position to draw the result to. Defaults to the value passed to x.
+	 * @param {Number} [targetY] NOT SUPPORTED IN THIS FILTER. The y position to draw the result to. Defaults to the value passed to y.
 	 * @return {Boolean} If the filter was applied successfully.
 	 **/
 	p.applyFilter = function (ctx, x, y, width, height, targetCtx, targetX, targetY) {
-		if (!this.mask) {
-			return true;
-		}
+		if (!this.mask) { return true; }
 		targetCtx = targetCtx || ctx;
-		if (targetX == null) {
-			targetX = x;
-		}
-		if (targetY == null) {
-			targetY = y;
-		}
+		if (targetX == null) { targetX = x; }
+		if (targetY == null) { targetY = y; }
 
 		targetCtx.save();
 		if (ctx != targetCtx) {
 			// TODO: support targetCtx and targetX/Y
 			// clearRect, then draw the ctx in?
+			return false;
 		}
 
 		targetCtx.globalCompositeOperation = "destination-in";

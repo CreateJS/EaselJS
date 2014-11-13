@@ -100,38 +100,6 @@ this.createjs = this.createjs || {};
 
 // public methods:
 	/** docced in super class **/
-	p.applyFilter = function (ctx, x, y, width, height, targetCtx, targetX, targetY) {
-		if (!this.alphaMap) {
-			return true;
-		}
-		if (!this._prepAlphaMap()) {
-			return false;
-		}
-		targetCtx = targetCtx || ctx;
-		if (targetX == null) {
-			targetX = x;
-		}
-		if (targetY == null) {
-			targetY = y;
-		}
-
-		try {
-			var imageData = ctx.getImageData(x, y, width, height);
-		} catch (e) {
-			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
-			return false;
-		}
-		var data = imageData.data;
-		var map = this._mapData;
-		var l = data.length;
-		for(var i = 0; i < l; i += 4) {
-			data[i + 3] = map[i] || 0;
-		}
-		targetCtx.putImageData(imageData, targetX, targetY);
-		return true;
-	};
-
-	/** docced in super class **/
 	p.clone = function () {
 		var o = new AlphaMapFilter(this.alphaMap);
 		o._alphaMap = this._alphaMap;
@@ -146,17 +114,26 @@ this.createjs = this.createjs || {};
 
 
 // private methods:
+	/** docced in super class **/
+	p._applyFilter = function (imageData) {
+		if (!this.alphaMap) { return true; }
+		if (!this._prepAlphaMap()) { return false; }
+		
+		// TODO: update to support scenarios where the target has different dimensions.
+		var data = imageData.data;
+		var map = this._mapData;
+		for(var i=0, l=data.length; i<l; i += 4) { data[i + 3] = map[i] || 0; }
+		
+		return true;
+	};
+
 	/**
 	 * @method _prepAlphaMap
 	 * @protected
 	 **/
 	p._prepAlphaMap = function () {
-		if (!this.alphaMap) {
-			return false;
-		}
-		if (this.alphaMap == this._alphaMap && this._mapData) {
-			return true;
-		}
+		if (!this.alphaMap) { return false; }
+		if (this.alphaMap == this._alphaMap && this._mapData) { return true; }
 
 		this._mapData = null;
 		var map = this._alphaMap = this.alphaMap;
@@ -178,6 +155,7 @@ this.createjs = this.createjs || {};
 			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
 			return false;
 		}
+		
 		this._mapData = imgData.data;
 		return true;
 	};

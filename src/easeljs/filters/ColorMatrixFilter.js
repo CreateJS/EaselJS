@@ -79,15 +79,18 @@ this.createjs = this.createjs||{};
 
 // public methods:
 	/** docced in super class **/
-	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
-		targetCtx = targetCtx || ctx;
-		if (targetX == null) { targetX = x; }
-		if (targetY == null) { targetY = y; }
-		try {
-			var imageData = ctx.getImageData(x, y, width, height);
-		} catch(e) {
-			return false;
-		}
+	p.toString = function() {
+		return "[ColorMatrixFilter]";
+	};
+
+	/** docced in super class **/
+	p.clone = function() {
+		return new ColorMatrixFilter(this.matrix);
+	};
+
+// private methods:
+	/** docced in super class **/
+	p._applyFilter = function(imageData) { 
 		var data = imageData.data;
 		var l = data.length;
 		var r,g,b,a;
@@ -107,19 +110,7 @@ this.createjs = this.createjs||{};
 			data[i+2] = r*m10+g*m11+b*m12+a*m13+m14; // blue
 			data[i+3] = r*m15+g*m16+b*m17+a*m18+m19; // alpha
 		}
-		targetCtx.putImageData(imageData, targetX, targetY);
 		return true;
-	};
-
-	
-	/** docced in super class **/
-	p.toString = function() {
-		return "[ColorMatrixFilter]";
-	};
-
-	/** docced in super class **/
-	p.clone = function() {
-		return new ColorMatrixFilter(this.matrix);
 	};
 
 
