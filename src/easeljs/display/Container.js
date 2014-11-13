@@ -450,32 +450,40 @@ this.createjs = this.createjs||{};
 	 * expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the
 	 * mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
 	 * 
+	 * By default this method evaluates all display objects. By setting the `mode` parameter to `1`, the `mouseEnabled`
+	 * and `mouseChildren` properties will be respected.
+	 * Setting it to `2` additionally excludes display objects that do not have active mouse event listeners
+	 * or a `cursor` property. That is, only objects that would normally intercept mouse interaction will be included.
+	 * This can significantly improve performance in some cases by reducing the number of
+	 * display objects that need to be tested.
+	 * 
 	 * Accounts for both {{#crossLink "DisplayObject/hitArea:property"}}{{/crossLink}} and {{#crossLink "DisplayObject/mask:property"}}{{/crossLink}}.
 	 * @method getObjectsUnderPoint
 	 * @param {Number} x The x position in the container to test.
 	 * @param {Number} y The y position in the container to test.
+	 * @param {Number} mode The mode to use to determine which display objects to include. 0-all, 1-respect mouseEnabled/mouseChildren, 2-only mouse opaque objects.
 	 * @return {Array} An Array of DisplayObjects under the specified coordinates.
 	 **/
-	p.getObjectsUnderPoint = function(x, y) {
+	p.getObjectsUnderPoint = function(x, y, mode) {
 		var arr = [];
 		var pt = this.localToGlobal(x, y);
-		this._getObjectsUnderPoint(pt.x, pt.y, arr);
+		this._getObjectsUnderPoint(pt.x, pt.y, arr, mode>0, mode==1);
 		return arr;
 	};
 
 	/**
 	 * Similar to {{#crossLink "Container/getObjectsUnderPoint()"}}{{/crossLink}}, but returns only the top-most display
-	 * object. This runs significantly faster than <code>getObjectsUnderPoint()</code>, but is still an expensive
-	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
+	 * object. This runs significantly faster than <code>getObjectsUnderPoint()</code>, but is still potentially an expensive
 	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	 * @method getObjectUnderPoint
 	 * @param {Number} x The x position in the container to test.
 	 * @param {Number} y The y position in the container to test.
+	 * @param {Number} mode The mode to use to determine which display objects to include.  0-all, 1-respect mouseEnabled/mouseChildren, 2-only mouse opaque objects.
 	 * @return {DisplayObject} The top-most display object under the specified coordinates.
 	 **/
-	p.getObjectUnderPoint = function(x, y) {
+	p.getObjectUnderPoint = function(x, y, mode) {
 		var pt = this.localToGlobal(x, y);
-		return this._getObjectsUnderPoint(pt.x, pt.y);
+		return this._getObjectsUnderPoint(pt.x, pt.y, null, mode>0, mode==1);
 	};
 	
 	/**
@@ -556,8 +564,8 @@ this.createjs = this.createjs||{};
 	 * @param {Number} y
 	 * @param {Array} arr
 	 * @param {Boolean} mouse If true, it will respect mouse interaction properties like mouseEnabled, mouseChildren, and active listeners.
-	 * @param {Boolean} activeListener If true, there is an active mouse event listener.
-	 * @return {Array}
+	 * @param {Boolean} activeListener If true, there is an active mouse event listener on a parent object.
+	 * @return {DisplayObject}
 	 * @protected
 	 **/
 	p._getObjectsUnderPoint = function(x, y, arr, mouse, activeListener) {
