@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	<!-- include the performance framework first, so it can initialize and inject its UI -->
+	<script src="perfFramework.js"></script>
+	
+	<!-- this test will use PreloadJS to load required assets -->
+	<script src="../../examples/assets/preloadjs-NEXT.min.js"></script>
+	<script>
+		var count = 0;
+		// runTest is a special method called by the performance framework
+		// it passes the version array (ex. [0,7,1]) and a hash of all the query string values
+		function runTest(version, qs) {
+			if (!checkVersion("0.6")) { return endTest(); }
+			
+			var canvas = document.getElementById("testCanvas");
+			var w=canvas.width, h=canvas.height;
+			var stage = new createjs.Stage("testCanvas");
+			stage.tickOnUpdate = false;
+			
+			var l=100000;
+			var g = new createjs.Graphics().beginFill("red").drawRect(-1,-1,3,3);
+			for (var i=0; i<l; i++) {
+				var sprite = new createjs.Shape(g);
+				sprite.x = Math.random()*w|0;
+				sprite.y = Math.random()*h|0;
+				sprite.addEventListener("tick", handleTick);
+				stage.addChild(sprite);
+			}
+			
+			time("tick");
+			if (checkVersion("0.8")) { stage.tick(); }
+			else { stage._tick(); }
+			endTime("tick", true);
+			endTest();
+			
+			
+			//stage.update();
+		}
+		
+		function handleTick(evt) {
+			count++;
+		}
+	</script>
+	
+	<p>Tests performance of propagating a tick event to a 100k listeners.</p>
+	<canvas id="testCanvas" width="900" height="450"></canvas>
+</body>
+</html>
