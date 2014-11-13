@@ -58,6 +58,7 @@ OTHER:
 - added Matrix2D.equals() method
 - added DisplayObject.transformMatrix
 - added a mode param to getObjectsUnderPoint() to respect mouseEnabled/mouseChildren and event listeners
+- improved filter performance (thanks pfirpfel)
 
 
 Version 0.7.1 [December 12, 2013]
