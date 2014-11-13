@@ -57,6 +57,7 @@ OTHER:
 - updated clone() method for all classes
 - added Matrix2D.equals() method
 - added DisplayObject.transformMatrix
+- added a mode param to getObjectsUnderPoint() to respect mouseEnabled/mouseChildren and event listeners
 
 
 Version 0.7.1 [December 12, 2013]
@@ -232,7 +233,7 @@ Version 0.6.0 [Feb 12, 2013]
 
 Version 0.5.0 [Aug 24, 2012]
 ****************************************************************************************************
-- moved all c lasses into a configurable createjs namespace
+- moved all classes into a configurable createjs namespace
 - added support for multitouch
 - complete rewrite of drawing model to use a hybrid approach (save/restore & matrix)
 - added DisplayObject.mask
