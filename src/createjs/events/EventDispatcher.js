@@ -372,6 +372,7 @@ this.createjs = this.createjs||{};
 		if (eventObj && listeners) {
 			var arr = listeners[eventObj.type];
 			if (!arr||!(l=arr.length)) { return; }
+			// TODO: should we separate these out into their own method to avoid try/catch performance issues?
 			try { eventObj.currentTarget = this; } catch (e) {}
 			try { eventObj.eventPhase = eventPhase; } catch (e) {}
 			eventObj.removed = false;
