@@ -9,8 +9,5 @@ node_modules/
 *.sublime-workspace
 config.local.json
 
-#-----------------------------
-# INVALID FILES
-# (for cross OS compatibility)
-#-----------------------------
 *[\<\>\:\"\/\\\|\?\*]*
+npm-debug.log
