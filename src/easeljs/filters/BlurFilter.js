@@ -160,14 +160,10 @@ this.createjs = this.createjs||{};
 		var pixels = imageData.data, width = imageData.width, height=imageData.height;
 
 		// TODO: there are a lot of unused variables in this method:
-		var x, y, i, p, yp, yi, yw, r_sum, g_sum, b_sum, a_sum, 
-		r_out_sum, g_out_sum, b_out_sum, a_out_sum,
-		r_in_sum, g_in_sum, b_in_sum, a_in_sum, 
-		pr, pg, pb, pa, rbs;
+		var x, y, i, p, yp, yi, yw, r_sum, g_sum, b_sum, a_sum, pr, pg, pb, pa;
 
 		var divx = radiusX + radiusX + 1;
 		var divy = radiusY + radiusY + 1;
-		var w4 = width << 2;
 		var widthMinus1  = width - 1;
 		var heightMinus1 = height - 1;
 		var rxp1  = radiusX + 1;
@@ -177,7 +173,6 @@ this.createjs = this.createjs||{};
 		for ( i = 1; i < divx; i++ )
 		{
 			stackx = stackx.next = {r:0,b:0,g:0,a:0,next:null};
-			if ( i == rxp1 ) var stackEndX = stackx;
 		}
 		stackx.next = stackStartX;
 		
@@ -186,7 +181,6 @@ this.createjs = this.createjs||{};
 		for ( i = 1; i < divy; i++ )
 		{
 			stacky = stacky.next = {r:0,b:0,g:0,a:0,next:null};
-			if ( i == ryp1 ) var stackEndY = stacky;
 		}
 		stacky.next = stackStartY;
 		
