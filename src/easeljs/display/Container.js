@@ -528,18 +528,17 @@ this.createjs = this.createjs||{};
 // private methods:
 	/**
 	 * @method _tick
-	 * @param {Object} props Properties to copy to the DisplayObject {{#crossLink "DisplayObject/tick"}}{{/crossLink}} event object.
-	 * function.
+	 * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
 	 * @protected
 	 **/
-	p._tick = function(props) {
+	p._tick = function(evtObj) {
 		if (this.tickChildren) {
 			for (var i=this.children.length-1; i>=0; i--) {
 				var child = this.children[i];
-				if (child.tickEnabled && child._tick) { child._tick(props); }
+				if (child.tickEnabled && child._tick) { child._tick(evtObj); }
 			}
 		}
-		this.DisplayObject__tick(props);
+		this.DisplayObject__tick(evtObj);
 	};
 	
 	/**
