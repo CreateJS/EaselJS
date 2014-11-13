@@ -14,16 +14,7 @@
 		// runTest is a special method called by the performance framework
 		// it passes the version array (ex. [0,7,1]) and a hash of all the query string values
 		function runTest(version, qs) {
-			var queue = new createjs.LoadQueue();
-			queue.on("complete", assetsLoaded);
-			queue.loadManifest([
-				{id:"bmpfont", src:"BitmapFont.png"}
-			], true, "../../examples/assets/");
-		}
-		
-		function assetsLoaded(evt) {
 			var ns = checkVersion("0.5") ? createjs : window;
-			
 			
 			var canvas = document.getElementById("testCanvas");
 			var w=canvas.width, h=canvas.height;
