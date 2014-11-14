@@ -564,38 +564,27 @@ this.createjs = this.createjs||{};
 	 * @param {Array} arr
 	 * @param {Boolean} mouse If true, it will respect mouse interaction properties like mouseEnabled, mouseChildren, and active listeners.
 	 * @param {Boolean} activeListener If true, there is an active mouse event listener on a parent object.
+	 * @param {Number} currentDepth Indicates the current depth of the search.
 	 * @return {DisplayObject}
 	 * @protected
 	 **/
-	p._getObjectsUnderPoint = function(x, y, arr, mouse, activeListener) {
+	p._getObjectsUnderPoint = function(x, y, arr, mouse, activeListener, currentDepth) {
+		currentDepth = currentDepth || 0;
+		if (!currentDepth && !this._testMask(this, x, y)) { return null; }
 		var mtx, ctx = createjs.DisplayObject._hitTestContext;
 		activeListener = activeListener || (mouse&&this._hasMouseEventListener());
 
 		// draw children one at a time, and check if we get a hit:
-		var children = this.children;
-		var l = children.length;
+		var children = this.children, l = children.length;
 		for (var i=l-1; i>=0; i--) {
 			var child = children[i];
-			var hitArea = child.hitArea, mask = child.mask;
+			var hitArea = child.hitArea;
 			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
-			if (!hitArea && mask && mask.graphics && !mask.graphics.isEmpty()) {
-				mtx = mask.getMatrix(mask._props.matrix).prependMatrix(this.getConcatenatedMatrix(this._props.matrix));
-				ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
-				
-				// draw the mask as a solid fill:
-				mask.graphics.drawAsPath(ctx);
-				ctx.fillStyle = "#000";
-				ctx.fill();
-				
-				// if we don't hit the mask, then no need to keep looking at this DO:
-				if (!this._testHit(ctx)) { continue; }
-				ctx.setTransform(1, 0, 0, 1, 0, 0);
-				ctx.clearRect(0, 0, 2, 2);
-			}
+			if (!hitArea && !this._testMask(child, x, y)) { continue; }
 			
 			// if a child container has a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
 			if (!hitArea && child instanceof Container) {
-				var result = child._getObjectsUnderPoint(x, y, arr, mouse, activeListener);
+				var result = child._getObjectsUnderPoint(x, y, arr, mouse, activeListener, currentDepth+1);
 				if (!arr && result) { return (mouse && !this.mouseChildren) ? this : result; }
 			} else {
 				if (mouse && !activeListener && !child._hasMouseEventListener()) { continue; }
@@ -620,6 +609,38 @@ this.createjs = this.createjs||{};
 			}
 		}
 		return null;
+	};
+	
+	
+	/**
+	 * @method _testMask
+	 * @param {DisplayObject} target
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @return {Boolean} Indicates whether the x/y is within the masked region.
+	 * @protected
+	 **/
+	p._testMask = function(target, x, y) {
+		var mask = target.mask;
+		if (!mask || !mask.graphics || mask.graphics.isEmpty()) { return true; }
+		
+		var mtx = this._props.matrix, parent = target.parent;
+		mtx = parent ? parent.getConcatenatedMatrix(mtx) : mtx.identity();
+		mtx = mask.getMatrix(mask._props.matrix).prependMatrix(mtx);
+		
+		var ctx = createjs.DisplayObject._hitTestContext;
+		ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
+		
+		// draw the mask as a solid fill:
+		mask.graphics.drawAsPath(ctx);
+		ctx.fillStyle = "#000";
+		ctx.fill();
+		
+		if (!this._testHit(ctx)) { return false; }
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.clearRect(0, 0, 2, 2);
+		
+		return true;
 	};
 	
 	/**
