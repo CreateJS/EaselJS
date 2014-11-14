@@ -25,6 +25,13 @@ describe("DisplayList", function () {
 		for (var n in this.displayObjectProps) {
 			this.bitmapProps[n] = this.displayObjectProps[n];
 		}
+
+		this.createShapeRect = function(x, y, w, h, fColor) {
+			var shape = new createjs.Shape();
+			var g = shape.graphics;
+			g.ss(1).s(this.sColor).f(fColor).dr(x, y, w, h).ef();
+			return shape;
+		}
 	});
 
 	it("stage.addChild() should work", function () {
@@ -127,37 +134,154 @@ describe("DisplayList", function () {
 		expect(bounds.height).toBe(67);
 	});
 
-	it("getObjectsUnderPoint() should return 1 object.", function () {
-		var dot = new createjs.Shape();
+	describe("getObjectsUnderPoint()", function() {
+		beforeEach(function () {
+			this.rect = this.createShapeRect(0, 0, 150, 150, this.fColor);
+			this.rect2 = this.createShapeRect(151, 151, 20, 20, this.fColor);
+			this.rect3 = this.createShapeRect(160, 160, 20, 20, this.fColor);
+			this.rect4 = this.createShapeRect(151, 151, 20, 20, this.fColor);
+			this.rect5 = this.createShapeRect(25, 25, 130, 130, this.fColor);
 
-		var g = dot.graphics;
-		g.setStrokeStyle(1);
-		g.beginStroke(this.sColor);
-		g.beginFill(this.fColor);
-		g.drawRect(0, 0, 5, 5);
-		g.endFill();
+			this.stage.addChild(this.rect, this.rect2, this.rect3, this.rect4, this.rect5);
+			this.stage.update();
 
-		this.stage.addChild(dot);
-		this.stage.update();
+			// document.body.appendChild(this.stage.canvas);
+		});
 
-		var objects = this.stage.getObjectsUnderPoint(1, 1);
-		expect(objects.length).toBe(1);
-	});
+		it("should return 1 object.", function () {
+			var objects = this.stage.getObjectsUnderPoint(1, 1);
+			expect(objects.length).toBe(1);
+		});
 
-	it("getObjectUnderPoint() should not be null.", function () {
-		var dot = new createjs.Shape();
+		it("should return 3 objects.", function () {
+			var objects = this.stage.getObjectsUnderPoint(152, 152);
+			expect(objects.length).toBe(3);
+		});
 
-		var g = dot.graphics;
-		g.setStrokeStyle(1);
-		g.beginStroke(this.sColor);
-		g.beginFill(this.fColor);
-		g.drawRect(0, 0, 5, 5);
-		g.endFill();
+		describe("should respect masks.", function () {
+			beforeEach(function () {
+				this.mask = new createjs.Shape();
+				var g = this.mask.graphics;
+				g.setStrokeStyle(1);
+				g.beginStroke(this.sColor);
+				g.beginFill(this.fColor);
+				g.drawRect(0, 0, 50, 50);
+				g.endFill();
 
-		this.stage.addChild(dot);
-		this.stage.update();
+				this.rect.mask = this.mask;
 
-		expect(this.stage.getObjectsUnderPoint(1, 1)).not.toBe(null);
+				this.stage.update();
+			});
+
+			it("should find the masked object on stage", function () {
+				var objects = this.stage.getObjectsUnderPoint(51, 51);
+				expect(objects.length).toBe(1);
+			});
+
+			it("should not find the object on stage", function () {
+				var objects = this.stage.getObjectsUnderPoint(51, 51);
+				expect(objects.length).toBe(1);
+			});
+
+			describe("container masks", function () {
+				beforeEach(function () {
+					this.stage.removeAllChildren();
+
+					this.container = new createjs.Container();
+					var wh = 100;
+					var o = 0;
+					var oi = 20;
+					this.rect1 = this.createShapeRect(o, o, wh, wh, "#ffcc88");
+					this.rect2 = this.createShapeRect(o+=oi, o, wh, wh, "#ccccee");
+					this.rect3 = this.createShapeRect(o+=oi, o, wh, wh, "#ccccee");
+					this.rect4 = this.createShapeRect(o+=oi, o, wh, wh, this.fColor);
+					this.rect5 = this.createShapeRect(o+=oi, o, wh, wh, this.fColor);
+					this.mask = this.createShapeRect(0, 0, 15, 15, this.fColor);
+				});
+
+				it(".getObjectsUnderPoint should return 4", function () {
+					this.container.addChild(this.rect1, this.rect2, this.rect3, this.rect4);
+					this.stage.addChild(this.container);
+					this.stage.update();
+
+					var dot = new createjs.Shape();
+					dot.graphics.f("#ffffff").de(50,50,2,2);
+
+					expect(this.container.getObjectsUnderPoint(48, 48).length).toBe(3);
+
+					this.container.addChild(dot);
+					this.stage.update();
+				});
+
+				it("should respect container masks from stage.getObjectsUnderPoint", function () {
+					this.container.addChild(this.rect1, this.rect2, this.rect3, this.rect4);
+					this.container.mask = this.mask;
+					this.stage.addChild(this.container);
+					this.stage.update();
+
+					expect(this.container.getObjectsUnderPoint(50, 50).length).toBe(0);
+				});
+
+				it("should respect containers masks", function () {
+					this.container.addChild(this.rect1, this.rect2, this.rect3, this.rect4);
+					this.container.mask = this.mask;
+					this.stage.addChild(this.container);
+					this.stage.update();
+
+					expect(this.stage.getObjectsUnderPoint(50, 50).length).toBe(0);
+				});
+			});
+		});
+
+		describe("hitareas", function () {
+			beforeEach(function () {
+				var hitarea = this.createShapeRect(0,0,10,10, "#ff00aa");
+
+				this.rect.mouseEnabled = true;
+				this.rect.hitArea = hitarea;
+
+				this.stage.update();
+			});
+
+			it("should find one object", function () {
+				var objects = this.stage.getObjectsUnderPoint(9, 9);
+				expect(objects.length).toBe(1);
+			});
+
+			it("should not return any objects", function () {
+				var objects = this.stage.getObjectsUnderPoint(11, 11);
+				expect(objects.length).toBe(0);
+			});
+		});
+
+		describe("mode", function () {
+			it("mode=0 should return mouseEnabled=false objects.", function () {
+				this.rect2.mouseEnabled = false;
+				this.rect3.mouseEnabled = false;
+
+				var objects = this.stage.getObjectsUnderPoint(152, 152, 0);
+				expect(objects.length).toBe(3);
+			});
+
+			it("mode=1 should ignore mouseEnabled=false objects.", function () {
+				this.rect2.mouseEnabled = false;
+				this.rect3.mouseEnabled = false;
+
+				var objects = this.stage.getObjectsUnderPoint(152, 152, 1);
+				expect(objects.length).toBe(2);
+			});
+
+			it("mode=2 should return objects with mouseEvents and mouseEnabled==true.", function () {
+				this.rect2.addEventListener("click", function () {
+				});
+				this.rect2.mouseEnabled = false;
+				this.rect3.mouseEnabled = false;
+				this.rect4.mouseEnabled = false;
+
+				var objects = this.stage.getObjectsUnderPoint(152, 152, 2);
+				expect(objects.length).toBe(0);
+			});
+		});
 	});
 
 	it("hitTest() should be true.", function () {
