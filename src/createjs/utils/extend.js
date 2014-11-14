@@ -3,7 +3,7 @@
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
-* 
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -29,7 +29,6 @@
 /**
  * @module CreateJS
  */
-"use strict";
 
 // namespace:
 this.createjs = this.createjs||{};
@@ -40,23 +39,25 @@ this.createjs = this.createjs||{};
 
 /**
  * Sets up the prototype chain and constructor property for a new class.
- * 
+ *
  * This should be called right after creating the class constructor.
- * 
+ *
  * 	function MySubClass() {}
  * 	createjs.extend(MySubClass, MySuperClass);
  * 	ClassB.prototype.doSomething = function() { }
- * 	
+ *
  * 	var foo = new MySubClass();
  * 	console.log(foo instanceof MySuperClass); // true
  * 	console.log(foo.prototype.constructor === MySubClass); // true
- * 
+ *
  * @method extends
  * @param {Function} subclass The subclass.
  * @param {Function} superclass The superclass to extend.
  * @return {Function} Returns the subclass's new prototype.
  */
 createjs.extend = function(subclass, superclass) {
+	"use strict";
+
 	function o() { this.constructor = subclass; }
 	o.prototype = superclass.prototype;
 	return (subclass.prototype = new o());
