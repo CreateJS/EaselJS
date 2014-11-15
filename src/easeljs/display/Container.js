@@ -611,7 +611,6 @@ this.createjs = this.createjs||{};
 		return null;
 	};
 	
-	
 	/**
 	 * @method _testMask
 	 * @param {DisplayObject} target
