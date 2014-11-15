@@ -140,7 +140,8 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Concatenates the specified matrix properties with this matrix. All parameters are required.
+	 * Appends the specified matrix properties with this matrix. All parameters are required.
+	 * This is the equivalent of multiplying the specified matrix against this matrix.
 	 * @method prepend
 	 * @param {Number} a
 	 * @param {Number} b
@@ -150,7 +151,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} ty
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
-	p.prepend = function(a, b, c, d, tx, ty) {
+	p.append = function(a, b, c, d, tx, ty) {
 		var tx1 = this.tx;
 		if (a != 1 || b != 0 || c != 0 || d != 1) {
 			var a1 = this.a;
@@ -166,7 +167,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Appends the specified matrix properties with this matrix. All parameters are required.
+	 * Appends the specified matrix properties with this matrix.
+	 * This is the equivalent of multiplying this matrix against the specified matrix.
+	 * All parameters are required.
 	 * @method append
 	 * @param {Number} a
 	 * @param {Number} b
@@ -176,7 +179,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} ty
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
-	p.append = function(a, b, c, d, tx, ty) {
+	p.prepend = function(a, b, c, d, tx, ty) {
 		var a1 = this.a;
 		var b1 = this.b;
 		var c1 = this.c;
@@ -192,18 +195,16 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Prepends the specified matrix with this matrix.
-	 * @method prependMatrix
-	 * @param {Matrix2D} matrix
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
-	 **/
-	p.prependMatrix = function(matrix) {
-		return this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-	};
-
-	/**
 	 * Appends the specified matrix with this matrix.
-	 * @method appendMatrix
+	 * This is the equivalent of multiplying the specified matrix against this matrix.
+	 * For example, you could calculate the combined transformation for a child object using:
+	 * 	var o = myDisplayObject;
+	 * 	var mtx = o.getMatrix();
+	 * 	while (o = o.parent) {
+	 * 		// append each parent's transformation in turn:
+	 * 		o.appendMatrix(o.getMatrix());
+	 * 	}
+	 * @method prependMatrix
 	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
@@ -212,52 +213,21 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Generates matrix properties from the specified display object transform properties, and prepends them with this matrix.
-	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
-	 * mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
-	 * @method prependTransform
-	 * @param {Number} x
-	 * @param {Number} y
-	 * @param {Number} scaleX
-	 * @param {Number} scaleY
-	 * @param {Number} rotation
-	 * @param {Number} skewX
-	 * @param {Number} skewY
-	 * @param {Number} regX Optional.
-	 * @param {Number} regY Optional.
+	 * Prepends the specified matrix with this matrix.
+	 * This is the equivalent of multiplying this matrix against the specified matrix.
+	 * @method appendMatrix
+	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
-	p.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-		if (rotation%360) {
-			var r = rotation*Matrix2D.DEG_TO_RAD;
-			var cos = Math.cos(r);
-			var sin = Math.sin(r);
-		} else {
-			cos = 1;
-			sin = 0;
-		}
-
-		if (regX || regY) {
-			// append the registration offset:
-			this.tx -= regX; this.ty -= regY;
-		}
-		if (skewX || skewY) {
-			// TODO: can this be combined into a single prepend operation?
-			skewX *= Matrix2D.DEG_TO_RAD;
-			skewY *= Matrix2D.DEG_TO_RAD;
-			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
-			this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
-		} else {
-			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
-		}
-		return this;
+	p.prependMatrix = function(matrix) {
+		return this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	};
 
 	/**
 	 * Generates matrix properties from the specified display object transform properties, and appends them with this matrix.
 	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
 	 * mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
-	 * @method appendTransform
+	 * @method prependTransform
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Number} scaleX
@@ -279,14 +249,56 @@ this.createjs = this.createjs||{};
 			sin = 0;
 		}
 
+		if (regX || regY) {
+			// append the registration offset:
+			this.tx -= regX; this.ty -= regY;
+		}
+		if (skewX || skewY) {
+			// TODO: can this be combined into a single prepend operation?
+			skewX *= Matrix2D.DEG_TO_RAD;
+			skewY *= Matrix2D.DEG_TO_RAD;
+			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
+			this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
+		} else {
+			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		}
+		return this;
+	};
+
+	/**
+	 * Generates matrix properties from the specified display object transform properties, and prepends them with this matrix.
+	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
+	 * mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
+	 * @method appendTransform
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} scaleX
+	 * @param {Number} scaleY
+	 * @param {Number} rotation
+	 * @param {Number} skewX
+	 * @param {Number} skewY
+	 * @param {Number} regX Optional.
+	 * @param {Number} regY Optional.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+		if (rotation%360) {
+			var r = rotation*Matrix2D.DEG_TO_RAD;
+			var cos = Math.cos(r);
+			var sin = Math.sin(r);
+		} else {
+			cos = 1;
+			sin = 0;
+		}
+
 		if (skewX || skewY) {
 			// TODO: can this be combined into a single append?
 			skewX *= Matrix2D.DEG_TO_RAD;
 			skewY *= Matrix2D.DEG_TO_RAD;
-			this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
-			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
+			this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
+			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
 		} else {
-			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
 		}
 
 		if (regX || regY) {
@@ -330,7 +342,7 @@ this.createjs = this.createjs||{};
 	p.skew = function(skewX, skewY) {
 		skewX = skewX*Matrix2D.DEG_TO_RAD;
 		skewY = skewY*Matrix2D.DEG_TO_RAD;
-		this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
+		this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
 		return this;
 	};
 
