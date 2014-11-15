@@ -594,7 +594,7 @@ this.createjs = this.createjs||{};
 				mtx = props.matrix;
 				
 				if (hitArea) {
-					mtx.appendMatrix(hitArea.getMatrix(hitArea._props.matrix));
+					mtx.prependMatrix(hitArea.getMatrix(hitArea._props.matrix));
 					props.alpha = hitArea.alpha;
 				}
 				
@@ -625,7 +625,7 @@ this.createjs = this.createjs||{};
 		
 		var mtx = this._props.matrix, parent = target.parent;
 		mtx = parent ? parent.getConcatenatedMatrix(mtx) : mtx.identity();
-		mtx = mask.getMatrix(mask._props.matrix).prependMatrix(mtx);
+		mtx = mask.getMatrix(mask._props.matrix).appendMatrix(mtx);
 		
 		var ctx = createjs.DisplayObject._hitTestContext;
 		ctx.setTransform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx-x, mtx.ty-y);
@@ -655,7 +655,7 @@ this.createjs = this.createjs||{};
 		
 		var mtx = this._props.matrix;
 		mtx = ignoreTransform ? mtx.identity() : this.getMatrix(mtx);
-		if (matrix) { mtx.prependMatrix(matrix); }
+		if (matrix) { mtx.appendMatrix(matrix); }
 		
 		var l = this.children.length, rect=null;
 		for (var i=0; i<l; i++) {

@@ -107,8 +107,35 @@ this.createjs = this.createjs||{};
 
 // public methods:
 	/**
-	 * Appends the specified display properties.
+	 * Appends the specified display properties. This is generally used to apply a parent's properties to a child's.
+	 * For example, to get the combined display properties that would be applied to a child, you could use:
+	 * 	var o = myDisplayObject;
+	 * 	var props = new createjs.DisplayProps();
+	 * 	do {
+	 * 		// append each parent's props in turn:
+	 * 		props.append(o.visible, o.alpha, o.shadow, o.compositeOperation, o.getMatrix());
+	 * 		o = o.parent;
+	 * 	} while (o);
 	 * @method append
+	 * @param {Boolean} visible desired visible value
+	 * @param {Number} alpha desired alpha value
+	 * @param {Shadow} shadow desired shadow value
+	 * @param {String} compositeOperation desired composite operation value
+	 * @param {Matrix2D} [matrix] a Matrix2D instance
+	 * @return {DisplayProps} This instance. Useful for chaining method calls.
+	*/
+	p.prepend = function(visible, alpha, shadow, compositeOperation, matrix) {
+		this.alpha *= alpha;
+		this.shadow = shadow || this.shadow;
+		this.compositeOperation = compositeOperation || this.compositeOperation;
+		this.visible = this.visible && visible;
+		matrix&&this.matrix.prependMatrix(matrix);
+		return this;
+	};
+	
+	/**
+	 * Prepends the specified display properties. This is generally used to apply a child's properties its parent's.
+	 * @method prepend
 	 * @param {Boolean} visible desired visible value
 	 * @param {Number} alpha desired alpha value
 	 * @param {Shadow} shadow desired shadow value
@@ -118,8 +145,8 @@ this.createjs = this.createjs||{};
 	*/
 	p.append = function(visible, alpha, shadow, compositeOperation, matrix) {
 		this.alpha *= alpha;
-		this.shadow = shadow || this.shadow;
-		this.compositeOperation = compositeOperation || this.compositeOperation;
+		this.shadow = this.shadow || shadow;
+		this.compositeOperation = this.compositeOperation || compositeOperation;
 		this.visible = this.visible && visible;
 		matrix&&this.matrix.appendMatrix(matrix);
 		return this;
@@ -135,25 +162,6 @@ this.createjs = this.createjs||{};
 		this.alpha = 1;
 		this.shadow = this.compositeOperation = null;
 		this.matrix.identity();
-		return this;
-	};
-	
-	/**
-	 * Prepends the specified display properties.
-	 * @method prepend
-	 * @param {Boolean} visible desired visible value
-	 * @param {Number} alpha desired alpha value
-	 * @param {Shadow} shadow desired shadow value
-	 * @param {String} compositeOperation desired composite operation value
-	 * @param {Matrix2D} [matrix] a Matrix2D instance
-	 * @return {DisplayProps} This instance. Useful for chaining method calls.
-	*/
-	p.prepend = function(visible, alpha, shadow, compositeOperation, matrix) {
-		this.alpha *= alpha;
-		this.shadow = this.shadow || shadow;
-		this.compositeOperation = this.compositeOperation || compositeOperation;
-		this.visible = this.visible && visible;
-		matrix&&this.matrix.prependMatrix(matrix);
 		return this;
 	};
 	
