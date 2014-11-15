@@ -25,7 +25,9 @@
 		"build",
 		"docs",
 		"examples",
+	  	"extras",
 		"src",
+	  	"tests",
 		"tutorials"
 	]
 }
