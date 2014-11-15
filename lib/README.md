@@ -1,11 +1,16 @@
 # lib directory
+This directory contains compressed versions of the EaselJS library, including the most recent tagged release and the in-progress NEXT release.
 
-This directory contains a compressed version of the EaselJS library.
+Both combined and minified versions of the library are included. The former being useful for debugging, and the latter for deployment.
 
-It is recommended that you use this version in almost all cases, unless you need to modify the original code. It is much smaller, results in less http requests, and you don't have to worry about the order in which you include the js files.
+You can also link to the libraries on the [CreateJS CDN](http://code.createjs.com/), to benefit from faster load times and shared caching across sites.
 
-easeljs-VERSION.min.js is a single file that contains compacted versions of all of the EaselJS classes (comments and white space stripped) except the contents of easeljs/filters and easeljs/display/MovieClip.
 
-movieclip-VERSION.min.js contains a compact version of the MovieClip class. This class is not commonly used for hand coded projects so it is packaged separately. Its version number is updated with EaselJS's version, but ONLY when the MovieClip class changes. For example, if MovieClip is updated when EaselJS is at version 0.5.0, but not when EaselJS is updated to 0.5.1, the minified version of MovieClip will remain at 0.5.0.
+# libraries
+**easeljs-VERSION.min.js** contains minified versions of all of the EaselJS classes (comments and white space stripped) except the contents of easeljs/filters and easeljs/display/MovieClip.
 
-You can also gzip the file to further reduce its size (by about 75%). Many servers do this automatically.
+**movieclip-VERSION.min.js** contains a minified version of the MovieClip class. This class is not commonly used for hand-coded projects so it is packaged separately.
+
+
+# license
+The libraries are ©2010 gskinner.com, inc., and made available under the highly permissive MIT open source software license. See the source file header for the full license text.
