@@ -22,12 +22,18 @@
 		"**/.*",
 		"node_modules",
 		"bower_components",
+	    "bower.json",
+	    ".bower.json",
 		"build",
 		"docs",
 		"examples",
 	  	"extras",
+	    "LICENSE.txt",
+	    "README.md",
+	    "README_SECURITY_ERROR.txt",
 		"src",
 	  	"tests",
-		"tutorials"
+		"tutorials",
+	    "VERSIONS.txt"
 	]
 }
