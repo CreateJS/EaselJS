@@ -876,11 +876,11 @@ this.createjs = this.createjs||{};
 	 * 		myShape.color = "red";
 	 * 		
 	 * 		// append a Circle command object:
-	 * 		myShape.append(new Graphics.Circle(50, 50, 30));
+	 * 		myShape.graphics.append(new Graphics.Circle(50, 50, 30));
 	 * 		
 	 * 		// append a custom command object with an exec method that sets the fill style
 	 * 		// based on the shape's data, and then fills the circle.
-	 * 		myShape.append({exec:function(ctx, shape) {
+	 * 		myShape.graphics.append({exec:function(ctx, shape) {
 	 * 			ctx.fillStyle = shape.color;
 	 * 			ctx.fill();
 	 * 		}});
