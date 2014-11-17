@@ -36,7 +36,7 @@ this.createjs = this.createjs || {};
 	/**
 	 * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
 	 * using new line characters, but automatic wrapping is not supported. See the 
-	 * {{#crossLink "BitmapText/spriteSheet:attribute"}}{{/crossLink}}
+	 * {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
 	 * property for more information on defining glyphs.
 	 * 
 	 * <strong>Important:</strong> BitmapText extends Container, but is not designed to be used as one.
