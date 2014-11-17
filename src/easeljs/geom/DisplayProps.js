@@ -107,7 +107,7 @@ this.createjs = this.createjs||{};
 
 // public methods:
 	/**
-	 * Appends the specified display properties. This is generally used to apply a parent's properties to a child's.
+	 * Prepends the specified display properties. This is generally used to apply a parent's properties to a child's.
 	 * For example, to get the combined display properties that would be applied to a child, you could use:
 	 * 	var o = myDisplayObject;
 	 * 	var props = new createjs.DisplayProps();
@@ -116,7 +116,7 @@ this.createjs = this.createjs||{};
 	 * 		props.append(o.visible, o.alpha, o.shadow, o.compositeOperation, o.getMatrix());
 	 * 		o = o.parent;
 	 * 	} while (o);
-	 * @method append
+	 * @method prepend
 	 * @param {Boolean} visible desired visible value
 	 * @param {Number} alpha desired alpha value
 	 * @param {Shadow} shadow desired shadow value
@@ -134,8 +134,8 @@ this.createjs = this.createjs||{};
 	};
 	
 	/**
-	 * Prepends the specified display properties. This is generally used to apply a child's properties its parent's.
-	 * @method prepend
+	 * Appends the specified display properties. This is generally used to apply a child's properties its parent's.
+	 * @method append
 	 * @param {Boolean} visible desired visible value
 	 * @param {Number} alpha desired alpha value
 	 * @param {Shadow} shadow desired shadow value

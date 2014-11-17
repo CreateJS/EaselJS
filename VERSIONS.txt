@@ -45,7 +45,6 @@ OTHER:
 - added Event.set()
 - added MovieClip.framerate and support for time based movieclips
 - Added Bower support, including grunt task for automatically updating bower.json
-- mouse interactions and getObjectsUnderPoint now respect masks
 - fixed an issue with Ticker.reset()
 - Ticker.getTime()/getEventTime() now return -1 if the Ticker has not been initialized
 - preventDefault support added to the tickstart and drawstart events
@@ -68,6 +67,7 @@ OTHER:
 - updated clone() method for all classes
 - added Matrix2D.equals() method
 - added DisplayObject.transformMatrix
+- mouse interactions and getObjectsUnderPoint now respect masks
 - added a mode param to getObjectsUnderPoint() to respect mouseEnabled/mouseChildren and event listeners
 
 

@@ -140,9 +140,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Appends the specified matrix properties with this matrix. All parameters are required.
-	 * This is the equivalent of multiplying the specified matrix against this matrix.
-	 * @method prepend
+	 * Appends the specified matrix properties to this matrix. All parameters are required.
+	 * This is the equivalent of multiplying `(this matrix) * (specified matrix)`.
+	 * @method append
 	 * @param {Number} a
 	 * @param {Number} b
 	 * @param {Number} c
@@ -167,10 +167,10 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Appends the specified matrix properties with this matrix.
-	 * This is the equivalent of multiplying this matrix against the specified matrix.
+	 * Prepends the specified matrix properties to this matrix.
+	 * This is the equivalent of multiplying `(specified matrix) * (this matrix)`.
 	 * All parameters are required.
-	 * @method append
+	 * @method prepend
 	 * @param {Number} a
 	 * @param {Number} b
 	 * @param {Number} c
@@ -195,8 +195,8 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Appends the specified matrix with this matrix.
-	 * This is the equivalent of multiplying the specified matrix against this matrix.
+	 * Appends the specified matrix to this matrix.
+	 * This is the equivalent of multiplying `(this matrix) * (specified matrix)`.
 	 * For example, you could calculate the combined transformation for a child object using:
 	 * 	var o = myDisplayObject;
 	 * 	var mtx = o.getMatrix();
@@ -204,7 +204,7 @@ this.createjs = this.createjs||{};
 	 * 		// append each parent's transformation in turn:
 	 * 		o.appendMatrix(o.getMatrix());
 	 * 	}
-	 * @method prependMatrix
+	 * @method appendMatrix
 	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
@@ -213,9 +213,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Prepends the specified matrix with this matrix.
-	 * This is the equivalent of multiplying this matrix against the specified matrix.
-	 * @method appendMatrix
+	 * Prepends the specified matrix to this matrix.
+	 * This is the equivalent of multiplying `(specified matrix) * (this matrix)`.
+	 * @method prependMatrix
 	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
@@ -224,10 +224,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Generates matrix properties from the specified display object transform properties, and appends them with this matrix.
-	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
-	 * mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
-	 * @method prependTransform
+	 * Generates matrix properties from the specified display object transform properties, and appends them to this matrix.
+	 * For example, you can use this to generate a matrix from a display object:
+	 * 
+	 * 	var mtx = new Matrix2D();
+	 * 	mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
+	 * @method appendTransform
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Number} scaleX
@@ -266,10 +268,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Generates matrix properties from the specified display object transform properties, and prepends them with this matrix.
-	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
-	 * mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
-	 * @method appendTransform
+	 * Generates matrix properties from the specified display object transform properties, and prepends them to this matrix.
+	 * For example, you can use this to generate a matrix from a display object:
+	 * 
+	 * 	var mtx = new Matrix2D();
+	 * 	mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
+	 * @method prependTransform
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Number} scaleX
@@ -312,7 +316,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Applies a rotation transformation to the matrix.
 	 * @method rotate
-	 * @param {Number} angle The angle in radians. To use degrees, multiply by <code>Math.PI/180</code>.
+	 * @param {Number} angle The angle in radians. To use degrees, multiply by `Math.PI/180`.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.rotate = function(angle) {
