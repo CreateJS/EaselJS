@@ -39,7 +39,7 @@ this.createjs = this.createjs||{};
 
 // constructor:
 	/**
-	 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
+	 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrices.
 	 * @class Matrix2D
 	 * @param {Number} [a=1] Specifies the a property for the new matrix.
 	 * @param {Number} [b=0] Specifies the b property for the new matrix.
@@ -61,13 +61,13 @@ this.createjs = this.createjs||{};
 		 **/
 	
 		/**
-		 * Position (0, 1) in a 3x3 affine transformation matrix.
+		 * Position (1, 0) in a 3x3 affine transformation matrix.
 		 * @property b
 		 * @type Number
 		 **/
 	
 		/**
-		 * Position (1, 0) in a 3x3 affine transformation matrix.
+		 * Position (0, 1) in a 3x3 affine transformation matrix.
 		 * @property c
 		 * @type Number
 		 **/
@@ -79,13 +79,13 @@ this.createjs = this.createjs||{};
 		 **/
 	
 		/**
-		 * Position (2, 0) in a 3x3 affine transformation matrix.
+		 * Position (0, 2) in a 3x3 affine transformation matrix.
 		 * @property tx
 		 * @type Number
 		 **/
 	
 		/**
-		 * Position (2, 1) in a 3x3 affine transformation matrix.
+		 * Position (1, 2) in a 3x3 affine transformation matrix.
 		 * @property ty
 		 * @type Number
 		 **/
@@ -256,7 +256,7 @@ this.createjs = this.createjs||{};
 			this.tx -= regX; this.ty -= regY;
 		}
 		if (skewX || skewY) {
-			// TODO: can this be combined into a single prepend operation?
+			// TODO: can this be combined into a single append operation?
 			skewX *= Matrix2D.DEG_TO_RAD;
 			skewY *= Matrix2D.DEG_TO_RAD;
 			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
@@ -296,7 +296,7 @@ this.createjs = this.createjs||{};
 		}
 
 		if (skewX || skewY) {
-			// TODO: can this be combined into a single append?
+			// TODO: can this be combined into a single prepend?
 			skewX *= Matrix2D.DEG_TO_RAD;
 			skewY *= Matrix2D.DEG_TO_RAD;
 			this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
@@ -314,32 +314,37 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Applies a rotation transformation to the matrix.
+	 * Applies a clockwise rotation transformation to the matrix.
 	 * @method rotate
-	 * @param {Number} angle The angle in radians. To use degrees, multiply by `Math.PI/180`.
+	 * @param {Number} angle The angle to rotate by, in degrees. To use a value in radians, multiply it by `180/Math.PI`.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.rotate = function(angle) {
+		angle = angle*Matrix2D.DEG_TO_RAD;
 		var cos = Math.cos(angle);
 		var sin = Math.sin(angle);
 
 		var a1 = this.a;
-		var c1 = this.c;
-		var tx1 = this.tx;
+		var b1 = this.b;
 
-		this.a = a1*cos-this.b*sin;
-		this.b = a1*sin+this.b*cos;
-		this.c = c1*cos-this.d*sin;
-		this.d = c1*sin+this.d*cos;
-		this.tx = tx1*cos-this.ty*sin;
-		this.ty = tx1*sin+this.ty*cos;
+		/* Note: the rotation matrix used here is
+		*
+		* [  cosƟ   sinƟ
+		*   -sinƟ   cosƟ ]
+		*
+		*   to cause clockwise rotation. The Y axis points down, not up.
+		 */
+		this.a = a1*cos+this.c*sin;
+		this.b = b1*cos+this.d*sin;
+		this.c = -a1*sin+this.c*cos;
+		this.d = -b1*sin+this.d*cos;
 		return this;
 	};
 
 	/**
 	 * Applies a skew transformation to the matrix.
 	 * @method skew
-	 * @param {Number} skewX The amount to skew horizontally in degrees.
+	 * @param {Number} skewX The amount to skew horizontally in degrees. To use a value in radians, multiply it by `180/Math.PI`.
 	 * @param {Number} skewY The amount to skew vertically in degrees.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
@@ -353,17 +358,17 @@ this.createjs = this.createjs||{};
 	/**
 	 * Applies a scale transformation to the matrix.
 	 * @method scale
-	 * @param {Number} x The amount to scale horizontally
-	 * @param {Number} y The amount to scale vertically
+	 * @param {Number} x The amount to scale horizontally. E.G. a value of 2 will double the size in the X direction, and 0.5 will halve it.
+	 * @param {Number} y The amount to scale vertically.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.scale = function(x, y) {
 		this.a *= x;
+		this.b *= x;
+		this.c *= y;
 		this.d *= y;
-		this.c *= x;
-		this.b *= y;
-		this.tx *= x;
-		this.ty *= y;
+		//this.tx *= x;
+		//this.ty *= y;
 		return this;
 	};
 
@@ -375,8 +380,8 @@ this.createjs = this.createjs||{};
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.translate = function(x, y) {
-		this.tx += x;
-		this.ty += y;
+		this.tx += this.a*x + this.c*y;
+		this.ty += this.b*x + this.d*y;
 		return this;
 	};
 
