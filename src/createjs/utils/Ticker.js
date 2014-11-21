@@ -280,7 +280,8 @@ this.createjs = this.createjs||{};
 	Ticker._timerId = null;
 	
 	/**
-	 * True if currently using requestAnimationFrame, false if using setTimeout.
+	 * True if currently using requestAnimationFrame, false if using setTimeout. This may be different than timingMode
+	 * if that property changed and a tick hasn't fired.
 	 * @property _raf
 	 * @type {Boolean}
 	 * @protected
@@ -317,7 +318,8 @@ this.createjs = this.createjs||{};
 			clearTimeout(Ticker._timerId);
 		}
 		Ticker.removeAllEventListeners("tick");
-		Ticker._timerId = null;
+		Ticker._timerId = Ticker._times = Ticker._tickTimes = null;
+		Ticker._startTime = Ticker._lastTime = 0;
 		Ticker._inited = false;
 	};
 	
@@ -470,11 +472,11 @@ this.createjs = this.createjs||{};
 	 * @return {Number} Number of milliseconds that have elapsed since Ticker was initialized or -1.
 	 **/
 	Ticker.getTime = function(runTime) {
-		return Ticker._startTime ? Ticker._getTime() - Ticker._startTime - (runTime ? Ticker._pausedTime : 0) : -1;
+		return Ticker._startTime ? Ticker._getTime() - (runTime ? Ticker._pausedTime : 0) : -1;
 	};
 
 	/**
-	 * Similar to getTime(), but returns the time included with the current (or most recent) tick event object.
+	 * Similar to getTime(), but returns the time on the most recent tick event object.
 	 * @method getEventTime
 	 * @param runTime {Boolean} [runTime=false] If true, the runTime property will be returned instead of time.
 	 * @returns {number} The time or runTime property from the most recent tick event or -1.
@@ -494,7 +496,7 @@ this.createjs = this.createjs||{};
 	 * @return {Number} of ticks that have been broadcast.
 	 **/
 	Ticker.getTicks = function(pauseable) {
-		return  Ticker._ticks - (pauseable ?Ticker._pausedTicks : 0);
+		return  Ticker._ticks - (pauseable ? Ticker._pausedTicks : 0);
 	};
 
 
@@ -563,32 +565,31 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	Ticker._tick = function() {
-		var time = Ticker._getTime();
-		var adjTime = time-Ticker._startTime;
-		var elapsedTime = time-Ticker._lastTime;
 		var paused = Ticker._paused;
-		
+		var time = Ticker._getTime();
+		var elapsedTime = time-Ticker._lastTime;
+		Ticker._lastTime = time;
 		Ticker._ticks++;
+		
 		if (paused) {
 			Ticker._pausedTicks++;
 			Ticker._pausedTime += elapsedTime;
 		}
-		Ticker._lastTime = time;
 		
 		if (Ticker.hasEventListener("tick")) {
 			var event = new createjs.Event("tick");
 			var maxDelta = Ticker.maxDelta;
 			event.delta = (maxDelta && elapsedTime > maxDelta) ? maxDelta : elapsedTime;
 			event.paused = paused;
-			event.time = adjTime;
-			event.runTime = adjTime-Ticker._pausedTime;
+			event.time = time;
+			event.runTime = time-Ticker._pausedTime;
 			Ticker.dispatchEvent(event);
 		}
 		
 		Ticker._tickTimes.unshift(Ticker._getTime()-time);
 		while (Ticker._tickTimes.length > 100) { Ticker._tickTimes.pop(); }
 
-		Ticker._times.unshift(adjTime);
+		Ticker._times.unshift(time);
 		while (Ticker._times.length > 100) { Ticker._times.pop(); }
 	};
 
@@ -599,7 +600,7 @@ this.createjs = this.createjs||{};
 	 **/
 	var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
 	Ticker._getTime = function() {
-		return (now&&now.call(performance))||(new Date().getTime());
+		return ((now&&now.call(performance))||(new Date().getTime())) - Ticker._startTime;
 	};
 
 
