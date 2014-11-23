@@ -118,7 +118,7 @@ this.createjs = this.createjs||{};
 	 * @return {Boolean}
 	 **/
 	p.draw = function(ctx, ignoreCache) {
-		if (this.DisplayObject_draw(ctx, ignoreCache) || !this.image.complete) { return true; }
+		if (this.DisplayObject_draw(ctx, ignoreCache) || !this.image) { return true; }
 		var img = this.image, rect = this.sourceRect;
 		if (rect) {
 			// some browsers choke on out of bound values, so we'll fix them:
