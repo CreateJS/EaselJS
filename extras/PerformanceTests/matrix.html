@@ -28,26 +28,11 @@
 			}
 			endTime("instantiate", true);
 			
-			
-			time("props");
-			for (var i=0; i<l; i++) {
-				var mtx = arr[i];
-				
-				var props = i%16;
-				if (props&1) { mtx.compositeOperation = "foo"; }
-				if (props&2) { mtx.alpha = Math.random(); }
-				if (props&4) { mtx.shadow = {}; }
-				if (props&8) { mtx.visible = false; }
-			}
-			endTime("props", true);
-			
 			time("calculate");
 			var sum = 0;
 			for (var i=0; i<l; i++) {
 				var mtx = arr[i];
 				mtx.appendTransform(Math.random()*500, Math.random()*500, Math.random(), Math.random(), Math.random()*360);
-				mtx.appendProperties(0.3, {}, "multiply", false);
-				sum += mtx.a+mtx.alpha;
 			}
 			endTime("calculate", true);
 			
