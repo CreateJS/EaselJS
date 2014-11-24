@@ -35,4 +35,24 @@ beforeEach(function (done) {
 			done();
 		}
 	}
+
+	var customMatchers = {
+		toBeInRange: function(util, customEqualityTesters) {
+			return {
+				compare: function(actual, excpected, range) {
+					var result = {};
+					range = range || 0;
+
+					if (actual <= (excpected + range) && actual >= (excpected - range)) {
+						result.pass = true;
+					} else {
+						result.pass = false;
+					}
+					return result;
+				}
+			}
+		}
+	};
+
+	jasmine.addMatchers(customMatchers);
 });
