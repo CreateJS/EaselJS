@@ -237,7 +237,7 @@ this.createjs = this.createjs||{};
 	 */
 
 	/**
-	 * Dispatched when the user the user releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
+	 * Dispatched when the user the user presses somewhere on the stage, then releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
 	 * You can use {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}} to check whether the mouse is currently within the stage bounds.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event stagemouseup
@@ -699,7 +699,8 @@ this.createjs = this.createjs||{};
 		var nextStage = this._nextStage, o = this._getPointerData(id);
 		if (this._prevStage && owner === undefined) { return; } // redundant listener.
 		
-		this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e);
+		if (o.down) { this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e); }
+		o.down = false;
 		
 		var target=null, oTarget = o.target;
 		if (!owner && (oTarget || nextStage)) { target = this._getObjectsUnderPoint(o.x, o.y, null, true); }
@@ -736,8 +737,7 @@ this.createjs = this.createjs||{};
 		if (pageY != null) { this._updatePointerPosition(id, e, pageX, pageY); }
 		var target = null, nextStage = this._nextStage, o = this._getPointerData(id);
 
-		if (o.inBounds) { this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e); }
-		
+		if (o.inBounds) { this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e); o.down = true; }
 		
 		if (!owner) {
 			target = o.target = this._getObjectsUnderPoint(o.x, o.y, null, true);
