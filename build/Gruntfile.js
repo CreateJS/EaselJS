@@ -214,11 +214,7 @@ module.exports = function (grunt) {
 	}
 
 	function getBuildArgs() {
-		var banner = "";
-		if (grunt.config("buildArgs")[0] != "all") {
-			banner = grunt.file.read("BANNER");
-		}
-
+		var banner = grunt.file.read("BANNER");
 		grunt.config("concat.options.banner", banner);
 	}
 
