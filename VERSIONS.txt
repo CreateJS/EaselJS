@@ -16,11 +16,23 @@ CRITICAL (may break existing content):
 	- added DisplayProps to hold these properties + a matrix instance
 - Matrix2D append/prepend naming was reversed. It was previously backwards from a math perspective.
 
+*****
+DEPRECATED (will be removed in a future version):
+- Container.getNumChildren() in favour of Container.numChildren
+- DisplayObject.getStage() in favour of DisplayObject.stage
+- Graphics.getInstructions() in favour of Graphics.instructions
+- MovieClip.getLabels() in favour of MovieClip.labels
+- MovieClip.getCurrentLabel() in favour of MovieClip.currentLabel
+- SpriteSheet.getAnimations() in favour of SpriteSheet.animations
+- Ticker.getInterval() in favour of Ticker.interval
+- Ticker.getFPS() in favour of Ticker.framerate
+- Ticker.getPaused() / setPaused() in favour of Ticker.paused
+
 ***********
 PERFORMANCE:
 - added performance tests to extras
 - significant performance improvements:
-	- vector graphics (especially in Graphics instance with large numbers of instructions)
+	- vector graphics (especially in Graphics instances with large numbers of instructions)
 	- filters (thanks pfirpfel) (~2-4x faster)
 	- overall display list performance (~2x faster)
 	- display object property access (~2x faster)
@@ -28,6 +40,7 @@ PERFORMANCE:
 
 *****
 OTHER:
+- replaced a number of get/set methods with getter / setters. See the DEPRECATED section above for a list.
 - added setupFunction, setupData, labelFunction to SpriteSheetBuilder.addMovieClip
 - added SpriteStage & SpriteContainer for WebGL rendering
 - changes to how BitmapText works to support WebGL
