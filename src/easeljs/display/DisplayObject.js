@@ -635,6 +635,34 @@ this.createjs = this.createjs||{};
 	 * @since 0.6.0
 	 */
 	
+	
+// getter / setters:
+	/**
+	 * Use the {{#crossLink "DisplayObject/stage:property"}}{{/crossLink}} property instead.
+	 * @method getStage
+	 * @return {Stage}
+	 * @deprecated
+	 **/
+	p.getStage = function() {
+		// uses dynamic access to avoid circular dependencies;
+		var o = this, _Stage = createjs["Stage"];
+		while (o.parent) { o = o.parent; }
+		if (o instanceof _Stage) { return o; }
+		return null;
+	};
+
+	/**
+	 * Returns the Stage instance that this display object will be rendered on, or null if it has not been added to one.
+	 * @property stage
+	 * @type {Stage}
+	 * @readonly
+	 **/
+	try {
+		Object.defineProperties(p, {
+			stage: { get: p.getStage }
+		});
+	} catch (e) {}
+
 
 // public methods:
 	/**
@@ -820,22 +848,6 @@ this.createjs = this.createjs||{};
 		if (!this.cacheCanvas) { return null; }
 		if (this.cacheID != this._cacheDataURLID) { this._cacheDataURL = this.cacheCanvas.toDataURL(); }
 		return this._cacheDataURL;
-	};
-
-	/**
-	 * Returns the stage that this display object will be rendered on, or null if it has not been added to one.
-	 * @method getStage
-	 * @return {Stage} The Stage instance that the display object is a descendent of. null if the DisplayObject has not
-	 * been added to a Stage.
-	 **/
-	p.getStage = function() {
-		var o = this;
-		while (o.parent) {
-			o = o.parent;
-		}
-		// using dynamic access to avoid circular dependencies;
-		if (o instanceof createjs["Stage"]) { return o; }
-		return null;
 	};
 
 	/**

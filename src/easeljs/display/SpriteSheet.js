@@ -268,6 +268,38 @@ this.createjs = this.createjs||{};
 	 * @since 0.6.0
 	 */
 	 
+	/**
+	 * Dispatched when getFrame is called with a valid frame index. This is primarily intended for use by {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}}
+	 * when doing on-demand rendering.
+	 * @event getframe
+	 * @param {Number} index The frame index.
+	 * @param {Object} frame The frame object that getFrame will return.
+	 */
+	
+	
+// getter / setters:
+	/**
+	 * Use the {{#crossLink "SpriteSheet/animations:property"}}{{/crossLink}} property instead.
+	 * @method getAnimations
+	 * @return {Array}
+	 * @deprecated
+	 **/
+	p.getAnimations = function() {
+		return this._animations.slice();
+	};
+
+	/**
+	 * Returns an array of all available animation names available on this sprite sheet as strings.
+	 * @property animations
+	 * @type {Array}
+	 * @readonly
+	 **/
+	try {
+		Object.defineProperties(p, {
+			animations: { get: p.getAnimations }
+		});
+	} catch (e) {}
+
 
 // public methods:
 	/**
@@ -286,15 +318,6 @@ this.createjs = this.createjs||{};
 			if (data == null) { return 0; }
 			else { return data.frames.length; }
 		}
-	};
-
-	/**
-	 * Returns an array of all available animation names as strings.
-	 * @method getAnimations
-	 * @return {Array} an array of animation names available on this sprite sheet.
-	 **/
-	p.getAnimations = function() {
-		return this._animations.slice(0);
 	};
 
 	/**

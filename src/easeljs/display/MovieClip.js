@@ -285,6 +285,51 @@ this.createjs = this.createjs||{};
 	 * @readonly
 	 **/
 	MovieClip.SYNCHED = "synched";
+	
+	
+// getter / setters:
+	/**
+	 * Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
+	 * @method getLabels
+	 * @return {Array}
+	 * @deprecated
+	 **/
+	p.getLabels = function() {
+		return this.timeline.getLabels();
+	};
+	
+	/**
+	 * Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
+	 * @method getCurrentLabel
+	 * @return {String}
+	 * @deprecated
+	 **/
+	p.getCurrentLabel = function() {
+		this._updateTimeline();
+		return this.timeline.getCurrentLabel();
+	};
+
+	/**
+	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
+	 * Shortcut to TweenJS: Timeline.getLabels();
+	 * @property labels
+	 * @type {Array}
+	 * @readonly
+	 **/
+	 
+	/**
+	 * Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
+	 * for more information.
+	 * @property currentLabel
+	 * @type {String}
+	 * @readonly
+	 **/
+	try {
+		Object.defineProperties(p, {
+			labels: { get: p.getLabels },
+			currentLabel: { get: p.getCurrentLabel }
+		});
+	} catch (e) {}
 
 
 // public methods:
@@ -386,26 +431,6 @@ this.createjs = this.createjs||{};
 			this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
 			this._updateTimeline();
 		}
-	};
-	
-	/**
-	 * Returns a sorted list of the labels defined on this MovieClip. Shortcut to TweenJS: Timeline.getLabels();
-	 * @method getLabels
-	 * @return {Array[Object]} A sorted array of objects with label and position (aka frame) properties.
-	 **/
-	p.getLabels = function() {
-		return this.timeline.getLabels();
-	};
-	
-	/**
-	 * Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
-	 * for more information.
-	 * @method getCurrentLabel
-	 * @return {String} The name of the current label or null if there is no label.
-	 **/
-	p.getCurrentLabel = function() {
-		this._updateTimeline();
-		return this.timeline.getCurrentLabel();
 	};
 	
 	/**

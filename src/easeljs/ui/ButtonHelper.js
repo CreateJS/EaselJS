@@ -154,15 +154,10 @@ this.createjs = this.createjs||{};
 	
 // getter / setters:
 	/**
-	 * Enables or disables the button functionality on the target.
-	 * @property enabled
-	 * @type {Boolean}
-	 **/
-	/**
-	 * Enables or disables the button functionality on the target.
-	 * @deprecated in favour of the enabled property.
+	 * Use the {{#crossLink "ButtonHelper/enabled:property"}}{{/crossLink}} property instead.
 	 * @method setEnabled
 	 * @param {Boolean} value
+	 * @deprecated
 	 **/
 	p.setEnabled = function(value) { // TODO: deprecated.
 		if (value == this._enabled) { return; }
@@ -183,15 +178,20 @@ this.createjs = this.createjs||{};
 		}
 	};
 	/**
-	 * Returns enabled state of this instance.
-	 * @deprecated in favour of the enabled property.
+	 * Use the {{#crossLink "ButtonHelper/enabled:property"}}{{/crossLink}} property instead.
 	 * @method getEnabled
-	 * @return {Boolean} The last value passed to setEnabled().
+	 * @return {Boolean}
+	 * @deprecated
 	 **/
 	p.getEnabled = function() {
 		return this._enabled;
 	};
 
+	/**
+	 * Enables or disables the button functionality on the target.
+	 * @property enabled
+	 * @type {Boolean}
+	 **/
 	try {
 		Object.defineProperties(p, {
 			enabled: { get: p.getEnabled, set: p.setEnabled }

@@ -58,7 +58,6 @@ this.createjs = this.createjs||{};
 	function Container() {
 		this.DisplayObject_constructor();
 		
-		
 	// public properties:
 		/**
 		 * The array of children in the display list. You should usually use the child management methods such as
@@ -92,6 +91,30 @@ this.createjs = this.createjs||{};
 		this.tickChildren = true;
 	}
 	var p = createjs.extend(Container, createjs.DisplayObject);
+	
+	
+// getter / setters:
+	/**
+	 * Use the {{#crossLink "Container/numChildren:property"}}{{/crossLink}} property instead.
+	 * @method getNumChildren
+	 * @return {Number}
+	 * @deprecated
+	 **/
+	p.getNumChildren = function() {
+		return this.children.length;
+	};
+
+	/**
+	 * Returns the number of children in the container.
+	 * @property numChildren
+	 * @type {Number}
+	 * @readonly
+	 **/
+	try {
+		Object.defineProperties(p, {
+			numChildren: { get: p.getNumChildren }
+		});
+	} catch (e) {}
 	
 
 // public methods:
@@ -131,7 +154,7 @@ this.createjs = this.createjs||{};
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		
 		// this ensures we don't have issues with display list changes that occur during a draw:
-		var list = this.children.slice(0);
+		var list = this.children.slice();
 		for (var i=0,l=list.length; i<l; i++) {
 			var child = list[i];
 			if (!child.isVisible()) { continue; }
@@ -351,15 +374,6 @@ this.createjs = this.createjs||{};
 	p.getChildIndex = function(child) {
 		return createjs.indexOf(this.children, child);
 	};
-
-	/**
-	 * Returns the number of children in the display list.
-	 * @method getNumChildren
-	 * @return {Number} The number of children in the display list.
-	 **/
-	p.getNumChildren = function() {
-		return this.children.length;
-	};
 	
 	/**
 	 * Swaps the children at the specified indexes. Fails silently if either index is out of range.
@@ -472,7 +486,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Similar to {{#crossLink "Container/getObjectsUnderPoint()"}}{{/crossLink}}, but returns only the top-most display
+	 * Similar to {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}, but returns only the top-most display
 	 * object. This runs significantly faster than <code>getObjectsUnderPoint()</code>, but is still potentially an expensive
 	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	 * @method getObjectUnderPoint

@@ -234,7 +234,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} y
 	 * @param {Number} scaleX
 	 * @param {Number} scaleY
-	 * @param {Number} rotation
+	 * @param {Number} rotation in degrees.
 	 * @param {Number} skewX
 	 * @param {Number} skewY
 	 * @param {Number} regX Optional.
@@ -278,7 +278,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} y
 	 * @param {Number} scaleX
 	 * @param {Number} scaleY
-	 * @param {Number} rotation
+	 * @param {Number} rotation in degrees.
 	 * @param {Number} skewX
 	 * @param {Number} skewY
 	 * @param {Number} regX Optional.

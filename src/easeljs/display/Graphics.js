@@ -40,7 +40,7 @@ this.createjs = this.createjs||{};
 // constructor:
 	/**
 	 * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a
-	 * specified context. Note that you can use Graphics without any dependency on the Easel framework by calling {{#crossLink "Graphics/draw"}}{{/crossLink}}
+	 * specified context. Note that you can use Graphics without any dependency on the EaselJS framework by calling {{#crossLink "Graphics/draw"}}{{/crossLink}}
 	 * directly, or it can be used with the {{#crossLink "Shape"}}{{/crossLink}} object to draw vector graphics within the
 	 * context of an EaselJS display list.
 	 *
@@ -352,6 +352,34 @@ this.createjs = this.createjs||{};
 		Graphics._ctx = canvas.getContext("2d");
 		canvas.width = canvas.height = 1;
 	}
+
+	
+// getter / setters:
+	/**
+	 * Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
+	 * @method getInstructions
+	 * @return {Array}
+	 * @deprecated
+	 **/
+	p.getInstructions = function() {
+		this._updateInstructions();
+		return this._instructions;
+	};
+
+	/**
+	 * Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect)
+	 * Modifying the returned array directly is not recommended, and is likely to result in unexpected behaviour.
+	 * 
+	 * This property is mainly intended for introspection of the instructions (ex. for graphics export).
+	 * @property instructions
+	 * @type {Array}
+	 * @readonly
+	 **/
+	try {
+		Object.defineProperties(p, {
+			instructions: { get: p.getInstructions }
+		});
+	} catch (e) {}
 	
 	
 // public methods:
@@ -858,6 +886,7 @@ this.createjs = this.createjs||{};
 		return this.append(new G.PolyStar(x, y, radius, sides, pointSize, angle));
 	};
 
+	// TODO: deprecated.
 	/**
 	 * Removed in favour of using custom command objects with {{#crossLink "Graphics/append"}}{{/crossLink}}.
 	 * @method inject
@@ -1020,19 +1049,6 @@ this.createjs = this.createjs||{};
 	p.unstore = function() {
 		this._storeIndex = 0;
 		return this;
-	};
-	
-	/**
-	 * Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect)
-	 * Modifying the array directly is very likely to result in unexpected behaviour.
-	 * 
-	 * This method is mainly intended for introspection of the instructions (ex. for graphics export).
-	 * @method getInstructions
-	 * @return {Array} The graphics instructions array.
-	 **/
-	p.getInstructions = function() {
-		this._updateInstructions();
-		return this._instructions;
 	};
 
 	/**
