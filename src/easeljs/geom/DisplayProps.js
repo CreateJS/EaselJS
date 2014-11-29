@@ -95,6 +95,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [compositeOperation=null] A compositeOperation value or null.
 	 * @param {Number} [matrix] A transformation matrix. Defaults to an identity matrix.
 	 * @return {DisplayProps} This instance. Useful for chaining method calls.
+	 * @chainable
 	*/
 	p.setValues = function (visible, alpha, shadow, compositeOperation, matrix) {
 		this.visible = visible == null ? true : !!visible;
@@ -123,6 +124,7 @@ this.createjs = this.createjs||{};
 	 * @param {String} compositeOperation desired composite operation value
 	 * @param {Matrix2D} [matrix] a Matrix2D instance
 	 * @return {DisplayProps} This instance. Useful for chaining method calls.
+	 * @chainable
 	*/
 	p.prepend = function(visible, alpha, shadow, compositeOperation, matrix) {
 		this.alpha *= alpha;
@@ -142,6 +144,7 @@ this.createjs = this.createjs||{};
 	 * @param {String} compositeOperation desired composite operation value
 	 * @param {Matrix2D} [matrix] a Matrix2D instance
 	 * @return {DisplayProps} This instance. Useful for chaining method calls.
+	 * @chainable
 	*/
 	p.append = function(visible, alpha, shadow, compositeOperation, matrix) {
 		this.alpha *= alpha;
@@ -156,6 +159,7 @@ this.createjs = this.createjs||{};
 	 * Resets this instance and its matrix to default values.
 	 * @method identity
 	 * @return {DisplayProps} This instance. Useful for chaining method calls.
+	 * @chainable
 	*/
 	p.identity = function() {
 		this.visible = true;

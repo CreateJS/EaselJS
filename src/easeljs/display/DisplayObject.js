@@ -940,6 +940,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [regX=0] The horizontal registration point in pixels
 	 * @param {Number} [regY=0] The vertical registration point in pixels
 	 * @return {DisplayObject} Returns this instance. Useful for chaining commands.
+	 * @chainable
 	*/
 	p.setTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		this.x = x || 0;
@@ -1045,6 +1046,7 @@ this.createjs = this.createjs||{};
 	 * @method set
 	 * @param {Object} props A generic object containing properties to copy to the DisplayObject instance.
 	 * @return {DisplayObject} Returns the instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	*/
 	p.set = function(props) {
 		for (var n in props) { this[n] = props[n]; }

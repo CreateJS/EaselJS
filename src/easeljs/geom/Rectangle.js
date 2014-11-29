@@ -94,6 +94,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [width=0] The width of the Rectangle.
 	 * @param {Number} [height=0] The height of the Rectangle.
 	 * @return {Rectangle} This instance. Useful for chaining method calls.
+	 * @chainable
 	*/
 	p.setValues = function(x, y, width, height) {
 		// don't forget to update docs in the constructor if these change:
@@ -112,6 +113,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [width=0] The width of the rectangle.
 	 * @param {Number} [height=0] The height of the rectangle.
 	 * @return {Rectangle} This instance. Useful for chaining method calls.
+	 * @chainable
 	*/
 	p.extend = function(x, y, width, height) {
 		width = width||0;
@@ -121,6 +123,17 @@ this.createjs = this.createjs||{};
 		if (x < this.x) { this.width += this.x-x; this.x = x; }
 		if (y < this.y) { this.height += this.y-y; this.y = y; }
 		return this;
+	};
+	
+	/**
+	 * Copies all properties from the specified rectangle to this rectangle.
+	 * @method copy
+	 * @param {Rectangle} rectangle The rectangle to copy properties from.
+	 * @return {Rectangle} This rectangle. Useful for chaining method calls.
+	 * @chainable
+	*/
+	p.copy = function(rectangle) {
+		return this.setValues(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 	};
 	
 	/** 
@@ -181,16 +194,6 @@ this.createjs = this.createjs||{};
 	*/
 	p.isEmpty = function() {
 		return this.width <= 0 || this.height <= 0;
-	};
-	
-	/**
-	 * Copies all properties from the specified rectangle to this rectangle.
-	 * @method copy
-	 * @param {Rectangle} rectangle The rectangle to copy properties from.
-	 * @return {Rectangle} This rectangle. Useful for chaining method calls.
-	*/
-	p.copy = function(rectangle) {
-		return this.setValues(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 	};
 	
 	/**

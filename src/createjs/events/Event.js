@@ -230,6 +230,7 @@ this.createjs = this.createjs||{};
 	 * @method set
 	 * @param {Object} props A generic object containing properties to copy to the instance.
 	 * @return {Event} Returns the instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	*/
 	p.set = function(props) {
 		for (var n in props) { this[n] = props[n]; }

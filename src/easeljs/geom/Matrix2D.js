@@ -127,6 +127,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [tx=0] Specifies the tx property for the new matrix.
 	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
 	 * @return {Matrix2D} This instance. Useful for chaining method calls.
+	 * @chainable
 	*/
 	p.setValues = function(a, b, c, d, tx, ty) {
 		// don't forget to update docs in the constructor if these change:
@@ -150,6 +151,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} tx
 	 * @param {Number} ty
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.append = function(a, b, c, d, tx, ty) {
 		var tx1 = this.tx;
@@ -178,6 +180,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} tx
 	 * @param {Number} ty
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.prepend = function(a, b, c, d, tx, ty) {
 		var a1 = this.a;
@@ -207,6 +210,7 @@ this.createjs = this.createjs||{};
 	 * @method appendMatrix
 	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.appendMatrix = function(matrix) {
 		return this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
@@ -218,6 +222,7 @@ this.createjs = this.createjs||{};
 	 * @method prependMatrix
 	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.prependMatrix = function(matrix) {
 		return this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
@@ -240,6 +245,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} regX Optional.
 	 * @param {Number} regY Optional.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
@@ -284,6 +290,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} regX Optional.
 	 * @param {Number} regY Optional.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		if (rotation%360) {
@@ -318,6 +325,7 @@ this.createjs = this.createjs||{};
 	 * @method rotate
 	 * @param {Number} angle The angle in radians. To use degrees, multiply by `Math.PI/180`.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.rotate = function(angle) {
 		var cos = Math.cos(angle);
@@ -342,12 +350,12 @@ this.createjs = this.createjs||{};
 	 * @param {Number} skewX The amount to skew horizontally in degrees.
 	 * @param {Number} skewY The amount to skew vertically in degrees.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	*/
 	p.skew = function(skewX, skewY) {
 		skewX = skewX*Matrix2D.DEG_TO_RAD;
 		skewY = skewY*Matrix2D.DEG_TO_RAD;
-		this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
-		return this;
+		return this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
 	};
 
 	/**
@@ -356,6 +364,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} x The amount to scale horizontally
 	 * @param {Number} y The amount to scale vertically
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.scale = function(x, y) {
 		this.a *= x;
@@ -373,6 +382,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.translate = function(x, y) {
 		this.tx += x;
@@ -384,6 +394,7 @@ this.createjs = this.createjs||{};
 	 * Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
 	 * @method identity
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.identity = function() {
 		this.a = this.d = 1;
@@ -395,6 +406,7 @@ this.createjs = this.createjs||{};
 	 * Inverts the matrix, causing it to perform the opposite transformation.
 	 * @method invert
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
 	 **/
 	p.invert = function() {
 		var a1 = this.a;
@@ -411,6 +423,17 @@ this.createjs = this.createjs||{};
 		this.tx = (c1*this.ty-d1*tx1)/n;
 		this.ty = -(a1*this.ty-b1*tx1)/n;
 		return this;
+	};
+	
+	/**
+	 * Copies all properties from the specified matrix to this matrix.
+	 * @method copy
+	 * @param {Matrix2D} matrix The matrix to copy properties from.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 * @chainable
+	*/
+	p.copy = function(matrix) {
+		return this.setValues(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	};
 
 	/**
@@ -437,14 +460,14 @@ this.createjs = this.createjs||{};
 	 * @method transformPoint
 	 * @param {Number} x The x component of the point to transform.
 	 * @param {Number} y The y component of the point to transform.
-	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
-	 * @return {Point} This matrix. Useful for chaining method calls.
+	 * @param {Object} [target] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
+	 * @return {Object} The target, or a new generic object with the results copied to it.
 	 **/
-	p.transformPoint = function(x, y, pt) {
-		pt = pt||{};
-		pt.x = x*this.a+y*this.c+this.tx;
-		pt.y = x*this.b+y*this.d+this.ty;
-		return pt;
+	p.transformPoint = function(x, y, target) {
+		target = target||{};
+		target.x = x*this.a+y*this.c+this.tx;
+		target.y = x*this.b+y*this.d+this.ty;
+		return target;
 	};
 
 	/**
@@ -478,16 +501,6 @@ this.createjs = this.createjs||{};
 			target.skewY = skewY/Matrix2D.DEG_TO_RAD;
 		}
 		return target;
-	};
-	
-	/**
-	 * Copies all properties from the specified matrix to this matrix.
-	 * @method copy
-	 * @param {Matrix2D} matrix The matrix to copy properties from.
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
-	*/
-	p.copy = function(matrix) {
-		return this.setValues(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	};
 
 	/**

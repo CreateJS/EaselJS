@@ -78,6 +78,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [x=0] X position.
 	 * @param {Number} [y=0] Y position.
 	 * @return {Point} This instance. Useful for chaining method calls.
+	 * @chainable
 	*/
 	p.setValues = function(x, y) {
 		this.x = x||0;
@@ -90,6 +91,7 @@ this.createjs = this.createjs||{};
 	 * @method copy
 	 * @param {Point} point The point to copy properties from.
 	 * @return {Point} This point. Useful for chaining method calls.
+	 * @chainable
 	*/
 	p.copy = function(point) {
 		this.x = point.x;

@@ -116,7 +116,8 @@ this.createjs = this.createjs||{};
 	 * @param {Number} contrast
 	 * @param {Number} saturation
 	 * @param {Number} hue
-	 * @protected
+	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 */
 	p.setColor = function(brightness,contrast,saturation,hue) {
 		return this.reset().adjustColor(brightness,contrast,saturation,hue);;
@@ -126,6 +127,7 @@ this.createjs = this.createjs||{};
 	 * Resets the matrix to identity values.
 	 * @method reset
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 */
 	p.reset = function() {
 		return this.copyMatrix(ColorMatrix.IDENTITY_MATRIX);
@@ -141,6 +143,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} saturation
 	 * @param {Number} hue
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 **/
 	p.adjustColor = function(brightness,contrast,saturation,hue) {
 		this.adjustHue(hue);
@@ -155,6 +158,7 @@ this.createjs = this.createjs||{};
 	 * @method adjustBrightness
 	 * @param {Number} value A value between -255 & 255 that will be added to the RGB channels.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 **/
 	p.adjustBrightness = function(value) {
 		if (value == 0 || isNaN(value)) { return this; }
@@ -175,6 +179,7 @@ this.createjs = this.createjs||{};
 	 * @method adjustContrast
 	 * @param {Number} value A value between -100 & 100.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 **/
 	p.adjustContrast = function(value) {
 		if (value == 0 || isNaN(value)) { return this; }
@@ -207,6 +212,7 @@ this.createjs = this.createjs||{};
 	 * @method adjustSaturation
 	 * @param {Number} value A value between -100 & 100.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 **/
 	p.adjustSaturation = function(value) {
 		if (value == 0 || isNaN(value)) { return this; }
@@ -231,6 +237,7 @@ this.createjs = this.createjs||{};
 	 * @method adjustHue
 	 * @param {Number} value A value between -180 & 180.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 **/
 	p.adjustHue = function(value) {
 		if (value == 0 || isNaN(value)) { return this; }
@@ -255,6 +262,7 @@ this.createjs = this.createjs||{};
 	 * @method concat
 	 * @param {Array} matrix An array or ColorMatrix instance.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 **/
 	p.concat = function(matrix) {
 		matrix = this._fixMatrix(matrix);
