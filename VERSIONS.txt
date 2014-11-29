@@ -15,6 +15,7 @@ CRITICAL (may break existing content):
 - removed secondary properties (visible, alpha, compositeOperation, shadow) and related functionality from Matrix2D
 	- added DisplayProps to hold these properties + a matrix instance
 - Matrix2D append/prepend naming was reversed. It was previously backwards from a math perspective.
+- renamed ColorMatrix.copyMatrix() to .copy() to reflect geom classes
 
 *****
 DEPRECATED (will be removed in a future version):

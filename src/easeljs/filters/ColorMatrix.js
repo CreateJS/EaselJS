@@ -295,11 +295,12 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Copy the specified matrix's values to this matrix.
-	 * @method copyMatrix
+	 * @method copy
 	 * @param {Array} matrix An array or ColorMatrix instance.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 **/
-	p.copyMatrix = function(matrix) {
+	p.copy = function(matrix) {
 		var l = ColorMatrix.LENGTH;
 		for (var i=0;i<l;i++) {
 			this[i] = matrix[i];
