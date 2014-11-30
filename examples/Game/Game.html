@@ -4,23 +4,19 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>CreateJS Example: Space Rocks Game</title>
 	
+	<link rel="stylesheet" type="text/css" href="../../_assets/css/shared.css" />
+	<link rel="stylesheet" type="text/css" href="../../_assets/css/examples.css" />
 	
-	<script>
-		// this sets the namespace for CreateJS to the window object, so you can instantiate objects without specifying 
-		// the namespace: "new Graphics()" instead of "new createjs.Graphics()"
-		// this is a quick way to make projects built on pervious versions of EaselJS run without extensive modifications
-	</script>
-	
-	<script type="text/javascript" src="assets/preloadjs-NEXT.min.js"></script>
-	<script type="text/javascript" src="assets/soundjs-NEXT.min.js"></script>
+	<script type="text/javascript" src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
+	<script type="text/javascript" src="../../_assets/libs/soundjs-NEXT.min.js"></script>
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+	<script type="text/javascript" src="../../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
 	<!-- Game script below -->
-	<script type="text/javascript" src="assets/SpaceRock.js"></script>
-	<script type="text/javascript" src="assets/Ship.js"></script>
+	<script type="text/javascript" src="SpaceRock.js"></script>
+	<script type="text/javascript" src="Ship.js"></script>
 	<script>
 
 	var DIFFICULTY = 2;			//how fast the game gets mor difficult
@@ -96,6 +92,7 @@
 		messageField = new createjs.Text("Loading", "bold 24px Arial", "#FFFFFF");
 		messageField.maxWidth = 1000;
 		messageField.textAlign = "center";
+		messageField.textBaseline = "middle";
 		messageField.x = canvas.width / 2;
 		messageField.y = canvas.height / 2;
 		stage.addChild(messageField);
@@ -103,11 +100,11 @@
 
 		// begin loading content (only sounds to load)
 		var manifest = [
-			{id:"begin", src:"assets/Game-Spawn.mp3|../../assets/Game-Spawn.ogg"},
-			{id:"break", src:"assets/Game-Break.mp3|../../assets/Game-Break.ogg", data:6},
-			{id:"death", src:"assets/Game-Death.mp3|../../assets/Game-Death.ogg"},
-			{id:"laser", src:"assets/Game-Shot.mp3|../../assets/Game-Shot.ogg", data:6},
-			{id:"music", src:"assets/18-machinae_supremacy-lord_krutors_dominion.mp3|../../assets/18-machinae_supremacy-lord_krutors_dominion.ogg"}
+			{id:"begin", src:"sounds/spawn.mp3|sounds/spawn.ogg"},
+			{id:"break", src:"sounds/break.mp3|sounds/break.ogg", data:6},
+			{id:"death", src:"sounds/death.mp3|sounds/death.ogg"},
+			{id:"laser", src:"sounds/shot.mp3|sounds/shot.ogg", data:6},
+			{id:"music", src:"sounds/music.mp3|sounds/music.ogg"}
 		];
 
         preload = new createjs.LoadQueue();
@@ -454,28 +451,18 @@
 	}
 
 	</script>
-
-	<link rel="stylesheet" type="text/css" href="assets/demoStyles.css" />
-	<style type="text/css">
-		#content {
-			user-select: none;
-			background-color:#000000;
-			width: 960px;
-			height: 400px;
-		}
-	</style>
 </head>
 
 <body onload="init();">
 
 	<header id="header" class="SoundJS">
-	    <h1><span class="text-product">Sound<strong>JS</strong></span> Space Rocks Game</h1>
-	    <p>Example use of SoundJS for a game, built <a href="http://www.easeljs.com" target="_blank">EaselJS</a> a canvas management tool.
+	    <h1>Space Rocks Game</h1>
+	    <p>Simple example game, built using SoundJS and EaselJS.
 	        Music Copyright &copy; 2010 <a href="http://machinaesupremacy.com" target="_blank">Machinae Supremacy</a> - Lord Krutors Dominion. Used with permission for non commercial use.</p>
 	</header>
 
 	<div id="content">
-		<canvas id="gameCanvas" width="960" height="400"></canvas>
+		<canvas id="gameCanvas" width="960" height="400" style="background:black;"></canvas>
 	</div>
 
 	<div id="error">
