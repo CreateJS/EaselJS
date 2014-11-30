@@ -23,29 +23,29 @@
 		stage.addChild(container);
 
 		var frame = new createjs.Shape();
-		frame.graphics.beginFill("#FF0").drawRect(0,0,340,280);
-		frame.regX = 170;
-		frame.regY = 140;
+		frame.graphics.beginFill("#F00").drawRect(0,0,300,300);
+		frame.regX = 150;
+		frame.regY = 150;
 
 		var content = new createjs.DOMElement("foo");
-		content.regX = 165;
-		content.regY = 135;
+		content.regX = 140;
+		content.regY = 140;
 		//content.visible = false;
 
 		
 		container.addChild(frame, content);
-		container.x = 300; container.y = 200;
+		container.x = 480; container.y = 150;
 		container.alpha = 0.8;
-		container.rotation = 25;
-		container.scaleX = 1.5;
+		container.rotation = -45;
 		//container.visible = false;
 		
+		createjs.Ticker.timingMode = createjs.Ticker.RAF;
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 	
 	function tick(event) {
-		container.rotation++;
-		container.alpha = 0.5*(1+Math.sin(container.rotation*0.01));
+		container.rotation+= event.delta*0.01;
+		container.alpha = 0.5*(1+Math.cos(container.rotation*0.01));
 		stage.update(event);
 	}
 
@@ -55,12 +55,12 @@
 <body onload="init();">
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> HTML Elements</h1>
-	    <p>Simple example of using <strong>DOMElement</strong> to position HTML content within the EaselJS display list. Note how the blue <strong>DOMElement</strong> can display outside the canvas boundaries, whereas the yellow <strong>Shape</strong> cannot.</p>
+	    <h1>DOMElement</h1>
+	    <p>Simple example of using <code>DOMElement</code> to position HTML content within the EaselJS display list. Note how the black <code>DOMElement</code> can display outside the canvas boundaries, whereas the red <code>Shape</code> cannot.</p>
 	</header>
 
 	<div class="canvasHolder">
-		<div id="foo" style="z-index: 1; position: absolute; background-color: #00F; color:#FFF; width:320px; height:260px; padding: 5px; visibility: hidden;">
+		<div id="foo" style="z-index: 1; position: absolute; background-color: #111; color:#FFF; width:260px; height:260px; padding: 10px; visibility: hidden;">
 			<b>Hello! I'm an HTML div.</b><br/><br/>
 			I am not rendered to the canvas, but I can be included in the display list for positioning and transformations.<br/><br/>
 			This means I can contain any HTML content (rich text, forms, video, etc), but I'm not a full part of the EaselJS display list.<br/><br/>
