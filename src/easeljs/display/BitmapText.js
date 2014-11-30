@@ -173,7 +173,7 @@ this.createjs = this.createjs || {};
 	 **/
 	p.isVisible = function() {
 		var hasContent = this.cacheCanvas || (this.spriteSheet && this.spriteSheet.complete && this.text);
-		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
+		return !!(this.visible && this.alpha > 0 && this.scaleX !== 0 && this.scaleY !== 0 && hasContent);
 	};
 	
 	p.clone = function() {
@@ -284,8 +284,8 @@ this.createjs = this.createjs || {};
 		if (!change) { return; }
 		
 		var hasSpace = !!this._getFrame(" ", ss);
-		if (!hasSpace && spaceW==0) { spaceW = this._getSpaceWidth(ss); }
-		if (lineH==0) { lineH = this._getLineHeight(ss); }
+		if (!hasSpace && !spaceW) { spaceW = this._getSpaceWidth(ss); }
+		if (!lineH) { lineH = this._getLineHeight(ss); }
 		
 		for(var i=0, l=this.text.length; i<l; i++) {
 			var character = this.text.charAt(i);
@@ -317,7 +317,12 @@ this.createjs = this.createjs || {};
 			
 			x += sprite.getBounds().width + this.letterSpacing;
 		}
-		while (numKids > childIndex) { pool.push(sprite = kids.pop()); sprite.parent = null; numKids--; } // faster than removeChild.
+		while (numKids > childIndex) {
+			 // faster than removeChild.
+			pool.push(sprite = kids.pop());
+			sprite.parent = null;
+			numKids--;
+		}
 		if (pool.length > BitmapText.maxPoolSize) { pool.length = BitmapText.maxPoolSize; }
 	};
 
