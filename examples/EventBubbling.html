@@ -46,7 +46,7 @@
 		container.cursor = "pointer";
 		
 		// text object to output the 
-		text = stage.addChild(new createjs.Text("Click the shape.", "14px monospace", "#FFF")).set({x:250, y:20, lineHeight:20});
+		text = stage.addChild(new createjs.Text("Click the shape.", "14px monospace", "#111")).set({x:250, y:20, lineHeight:20});
 
 		// call update on the stage to make it render the current display list to the canvas:
 		createjs.Ticker.addEventListener("tick", stage);
@@ -68,11 +68,11 @@
 <body onload="init();">
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Event bubbling</h1>
+	    <h1>Event bubbling</h1>
 	    <p>This example demonstrates event bubbling phases. The red Shape is a child of a Container, which is a child
 	    of the Stage. Event listeners have been added for the capture and bubble phase of the click event for all three
-	    objects. Clicking on the Shape outputs the event details, and demonstrates how the <strong>target</strong>, <strong>eventPhase</strong>, and
-		<strong>currentTarget</strong> properties work.</p>
+	    objects. Clicking on the Shape outputs the event details, and demonstrates how the <code>target</code>, <code>eventPhase</code>, and
+		<code>currentTarget</code> properties work.</p>
 		<p>Note how in the initial capture phase (eventPhase=1), the event moves from the stage down to the target,
 		is dispatched from the target in the target phase (eventPhase=2), and then bubbles back up to the stage in
 		the bubble phase (eventPhase=3).</p>

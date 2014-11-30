@@ -8,8 +8,6 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 
 	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
-	<!-- We also provide hosted minified versions of all CreateJS libraries.
-	  http://code.createjs.com -->
 
 	<script>
 
@@ -38,7 +36,7 @@
 
 		// load the source image:
 		var image = new Image();
-		image.src = "assets/daisy.png";
+		image.src = "../_assets/art/daisy.png";
 		image.onload = handleImageLoad;
 	}
 
@@ -112,8 +110,8 @@
 	<div id="loader"></div>
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Drag &amp; Drop Example</h1>
-	    <p>Example of implementing drag &amp; drop using mouse events such as <strong>mousedown</strong>, <strong>mouseup</strong>, and <strong>pressmove</strong>. Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.</p>
+	    <h1>Drag &amp; Drop Example</h1>
+	    <p>Example of implementing drag &amp; drop using mouse events such as <code>mousedown</code>, <code>mouseup</code>, and <code>pressmove</code>. Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.</p>
 	</header>
 
 	<div class="canvasHolder">

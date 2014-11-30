@@ -32,7 +32,7 @@
 
 		stage.addChild(container);
 
-        container.addEventListener("dblclick", function(evt) { alert("Double Clicked the container object"); });
+        container.on("dblclick", function(evt) { alert("Double Clicked the container object"); });
 
 		stage.update();
 	}
@@ -42,8 +42,8 @@
 	
 <body onload="init();">
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Double Click Example</h1>
-	    <p>An example to show how to use the <strong>dblclick</strong> event.</p>
+	    <h1>Double Click Example</h1>
+	    <p>An example to show how to use the <code>dblclick</code> event.</p>
 	</header>
 
 	<div class="canvasHolder">
