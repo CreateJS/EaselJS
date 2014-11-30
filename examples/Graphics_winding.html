@@ -17,15 +17,16 @@
 
             var shape = new createjs.Shape();
             stage.addChild(shape);
-            shape.graphics.beginFill("#006699");
+            shape.graphics.beginFill("#000");
+            shape.x = stage.canvas.width/2-225;
 
             // Draw the initial shape
             shape.graphics.drawRect(20, 20, 450, 360);
 
             // Additional draw calls are made to the same shape, but using reverse winding.
             // Change the winding to vary the results.
-            shape.graphics.arc(160, 160, 140, 0, Math.PI * 2, true).closePath(); // Subtracts from the square
-            shape.graphics.arc(330, 240, 140, 0, Math.PI * 2, true).closePath(); // Subtracts from the square, but ADDs to the first circle
+            shape.graphics.arc(160, 160, 120, 0, Math.PI * 2, true).closePath(); // Subtracts from the square
+            shape.graphics.arc(330, 240, 120, 0, Math.PI * 2, true).closePath(); // Subtracts from the square, but ADDs to the first circle
 
             // Use the same graphics to make another Shape
             var mask = new createjs.Shape(shape.graphics);
@@ -47,7 +48,7 @@
 <header id="header" class="EaselJS">
     <h1>Graphics Winding</h1>
 
-    <p>Demonstrates how to draw compound shapes using Graphics to create "holes" in the shape. This approach is
+    <p>Demonstrates how to draw compound shapes using winding to create "holes" in the shape. This approach is also
         useful for masks.</p>
 </header>
 
