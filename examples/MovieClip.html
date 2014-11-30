@@ -10,10 +10,10 @@
 <body onload="init()">
 
 <header id="header" class="EaselJS">
-    <h1>MovieClips</h1>
+    <h1>MovieClip</h1>
 
-    <p>Demonstrates creating a MovieClip using JavaScript. Each shape instance tweened, and then the tweens are
-        added to the <b>MovieClip.timeline</b>. The timeline can then be controlled by JavaScript.</p>
+    <p>Demonstrates creating a <code>MovieClip</code> using JavaScript. Each shape instance tweened, and then the tweens are
+        added to the <code>MovieClip.timeline</code>. The timeline can then be controlled by JavaScript. Requires <code>TweenJS</code>.</p>
 </header>
 
 <div class="canvasHolder">
@@ -25,8 +25,8 @@
   http://code.createjs.com -->
 
 <!-- MovieClip is not included in the core library, and is dependent on TweenJS -->
-<script type="text/javascript" src="assets/tweenjs-NEXT.min.js"></script>
-<script type="text/javascript" src="../src/easeljs/display/MovieClip.js"></script>
+<script type="text/javascript" src="../_assets/libs/tweenjs-NEXT.min.js"></script>
+<script type="text/javascript" src="../lib/movieclip-NEXT.combined.js"></script>
 
 <script type="text/javascript">
     function init() {
@@ -44,10 +44,10 @@
         // Create the States. Each state is just a circle shape.
         var state1 = new createjs.Shape(
                 new createjs.Graphics().beginFill("#999999")
-                        .drawCircle(100, 100, 100));
+                        .drawCircle(100, 200, 50));
         var state2 = new createjs.Shape(
-                new createjs.Graphics().beginFill("#5a9cfb")
-                    .drawCircle(100, 100, 100));
+                new createjs.Graphics().beginFill("#6699FF")
+                    .drawCircle(100, 200, 50));
 
         // Create a tween for each shape, animating from one side to the other.
         mc.timeline.addTween(
