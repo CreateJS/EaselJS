@@ -8,13 +8,11 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 
 	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
-	<!-- We also provide hosted minified versions of all CreateJS libraries.
-	  http://code.createjs.com -->
 	
-	<script type="text/javascript" src="assets/tweenjs-NEXT.min.js"></script>
+	<script type="text/javascript" src="../_assets/libs/tweenjs-NEXT.min.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/MovieClip.js"></script>
 	
-	<script type="text/javascript" src="assets/VectorButton.js"></script>
+	<script type="text/javascript" src="../_assets/art/VectorButton.js"></script>
 
 	<script>
 
@@ -42,7 +40,7 @@
 
 		// load the source image:
 		var image = new Image();
-		image.src = "assets/bitmapButton.png";
+		image.src = "../_assets/art/spritesheet_button.png";
 		image.onload = handleImageLoad;
 	}
 	
@@ -80,7 +78,7 @@
 	<div id="loader"></div>
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> ButtonHelper Example</h1>
+	    <h1>ButtonHelper Example</h1>
 	    <p>Shows how to use a <code>ButtonHelper</code> with <code>Sprite</code> or <code>MovieClip</code> instances (or anything with a <code>gotoAndStop()</code> method). Clicking the bitmap button toggles <code>enabled</code> on the vector <code>ButtonHelper</code></p>
 	</header>
 
