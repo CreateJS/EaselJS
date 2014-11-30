@@ -8,8 +8,6 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 
 	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
-	<!-- We also provide hosted minified versions of all CreateJS libraries.
-	  http://code.createjs.com -->
 
 	<script>
 	var canvas;
@@ -87,15 +85,14 @@
 <body onload="init();">
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Update Cache</h1>
-	    <p>This example draws a single vector star each tick, then composites it onto an existing cache using <strong>DisplayObject.updateCache();</strong> to avoid the cost of rendering the vectors each frame.
-	    	This provides a similar result as setting <strong>stage.autoclear</strong> to false, but can be managed on a per instance basis.
+	    <h1>updateCache</h1>
+	    <p>This example draws a single vector star each tick, then composites it onto an existing cache using <code>DisplayObject.updateCache()</code> to avoid the cost of rendering the vectors each frame.
+	    	This is similar to setting <code>stage.autoclear</code> to false, but can be managed on a per instance basis.
 	    </p>
 	</header>
 
-	<!-- background isn't set to black to demonstrate how the darkening applies -->
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400" style="background-color:#000"></canvas>
+		<canvas id="testCanvas" width="960" height="400" style="background:#000"></canvas>
 	</div>
 </body>
 </html>

@@ -15,8 +15,8 @@
         var canvas;
         var stage;
         var shape;
-        var circleRadius = 30;
-        var rings = 30;
+        var radius = 50;
+        var rings = 40;
 
         function init() {
             if (window.top != window) {
@@ -34,7 +34,7 @@
             for(var i = 0; i < 200; i++) {
                 shape = new createjs.Shape();
                 for(var j = rings; j > 0; j--) {
-                    shape.graphics.beginFill(colors[Math.random() * colors.length | 0]).drawCircle(0, 0, circleRadius * j / rings);
+                    shape.graphics.beginFill(colors[Math.random() * colors.length | 0]).drawCircle(0, 0, radius * j / rings);
                 }
                 shape.x = Math.random() * canvas.width;
                 shape.y = Math.random() * canvas.height;
@@ -55,20 +55,20 @@
             fpsLabel.y = 20;
 
             // start the tick and point it at the window so we can do some work before updating the stage:
+            createjs.Ticker.timingMode = createjs.Ticker.RAF;
             createjs.Ticker.addEventListener("tick", tick);
-            createjs.Ticker.setFPS(50);
         }
 
         function tick(event) {
-            var w = canvas.width;
-            var h = canvas.height;
+            var w = canvas.width + radius*2;
+            var h = canvas.height + radius*2;
             var l = stage.getNumChildren() - 1;
 
             // iterate through all the children and move them according to their velocity:
             for(var i = 1; i < l; i++) {
                 var shape = stage.getChildAt(i);
-                shape.x = (shape.x + shape.velX + w) % w;
-                shape.y = (shape.y + shape.velY + h) % h;
+                shape.x = (shape.x + radius + shape.velX + w) % w - radius;
+                shape.y = (shape.y + radius + shape.velY + h) % h - radius;
             }
 
             fpsLabel.text = Math.round(createjs.Ticker.getMeasuredFPS()) + " fps";
@@ -84,7 +84,7 @@
             for(var i = 0; i < l; i++) {
                 var shape = stage.getChildAt(i);
                 if (value) {
-                    shape.cache(-circleRadius, -circleRadius, circleRadius * 2, circleRadius * 2);
+                    shape.cache(-radius, -radius, radius * 2, radius * 2);
                 } else {
                     shape.uncache();
                 }
@@ -104,9 +104,9 @@
 <body onload="init();">
 
 <header id="header" class="EaselJS">
-    <h1><span class="text-product">Easel<strong>JS</strong></span> Cache as Bitmap Example</h1>
+    <h1>Cache as Bitmap Example</h1>
 
-    <p>This example demonstrates the effect of <strong>DisplayObject.cache()</strong> and <strong>snapToPixel</strong>
+    <p>This example demonstrates the effect of <code>DisplayObject.cache()</code> and <code>snapToPixel</code>
         on performance. Caching can provide performance benefits for some types of content because the complex vector
         shapes do not have to be re-rendered each tick. Different browsers have different thresholds for when
         caching makes sense. The results for snapToPixel vary between browsers, but in general it will have no
@@ -115,9 +115,10 @@
 
 <div class="controls">
     <input type="checkbox" onClick="toggleCache(this.checked);" id="toggleCache"/><label for="toggleCache">cache
-    enabled</label><br /><strong>Note that Safari 6+ performs worse in this demo with caching due to how it
-    handles vectors very well, and small textures very poorly.</strong>
+    enabled</label>
 </div>
 <canvas id="testCanvas" width="960" height="350"></canvas>
+<strong>Note:</strong> The performance benefit varies between browsers, based on the relative performance of
+vector rendering vs drawing small textures.
 </body>
 </html>
