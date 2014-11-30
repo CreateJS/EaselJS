@@ -13,6 +13,9 @@
 			width: 960px;
 			height: 400px;
 		}
+		canvas {
+			background:none;
+		}
 		#canvasOne {
 			position: absolute;
 			right: 0;
@@ -32,8 +35,8 @@
 <body onload="init();">
 
 	<header id="header" class="EaselJS">
-	    <h1>Two Stages passing mouse events</h1>
-	    <p>This example demonstrates using the nextStage property of Stage to pass mouse events between stages.</p>
+	    <h1>nextStage</h1>
+	    <p>This example demonstrates using <code>Stage.nextStage</code> to pass mouse events between layered <code>Stage</code> instances. Mouse over and click the squares to test interactions and see output.</p>
 	</header>
 
 	<div class="canvasHolder">
@@ -63,8 +66,8 @@
 			topStage.addChild(makeSquare(375, 30, "#0F0", handleEvt));
 
 			// text object to output the
-			bottomStage.text = bottomStage.addChild(new createjs.Text("", "15px monospace", "#FFF")).set({x:195, y:30, lineHeight:16.7});
-			topStage.text = topStage.addChild(new createjs.Text("", "15px monospace", "#FFF")).set({x:30, y:30, lineHeight:16.7});
+			bottomStage.text = bottomStage.addChild(new createjs.Text("", "15px monospace", "#111")).set({x:195, y:30, lineHeight:16.7});
+			topStage.text = topStage.addChild(new createjs.Text("", "15px monospace", "#111")).set({x:30, y:30, lineHeight:16.7});
 		}
 
 		/* create a stage object to work with the canvas
@@ -105,7 +108,7 @@
 		function handleEvt(evt) {
 			var target = evt.target, stage = target.getStage(), log = stage.log;
 			
-			log.push(evt.type+" on "+target.name+" x:"+evt.stageX+" y:"+evt.stageY);
+			log.push(evt.type+" on "+target.name+" x:"+evt.stageX.toFixed(0)+" y:"+evt.stageY.toFixed(0));
 			while (log.length > 12) { log.shift(); }
 			
 			stage.text.text = log.join("\n");

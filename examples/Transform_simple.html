@@ -23,7 +23,7 @@
             angle = 0;
             img = new Image();
             img.onload = handleImageLoad;
-            img.src = "assets/rotateDemoBot.png";
+            img.src = "../_assets/art/robot.png";
         }
 
         function stop() {
@@ -37,21 +37,22 @@
             bmp = new createjs.Bitmap(img);
             bmp.regX = img.width >> 1;
             bmp.regY = img.height >> 1;
-            bmp.x = canvas.width - (img.width/2)>>1;
-            bmp.y = 140+canvas.height - (img.height/2)>>1;
+            bmp.x = canvas.width>>1;
+            bmp.y = canvas.height>>1;
             bmp.scaleX = bmp.scaleY = 0.1;
             stage.addChild(bmp);
             stage.update();
-
+			
+			createjs.Ticker.timingMode = createjs.Ticker.RAF;
 			createjs.Ticker.addEventListener("tick", tick);
         }
 
         function tick(event) {
-            angle += 0.025;
-            var value = (Math.sin(angle) * 360);
+            angle += 0.01;
+            var value = Math.sin(angle) * 360;
 
-            bmp.setTransform (bmp.x , bmp.y , bmp.scaleX , bmp.scaleY , value/2 , bmp.skewX , bmp.skewY , bmp.regX , bmp.regY );
-            bmp.scaleX = bmp.scaleY = ((value)/360) + 0.25;
+            bmp.rotation = value;
+            bmp.scaleX = bmp.scaleY = value/360;
             stage.update(event);
         }
 
@@ -61,7 +62,7 @@
 
 	<header id="header" class="EaselJS">
 	    <h1>Simple Transform Example</h1>
-	    <p>A simple example of EaselJS transformations.</p>
+	    <p>A simple example of EaselJS transformations, such as <code>rotation</code>, <code>scaleX</code>, and <code>scaleY</code>.</p>
 	</header>
 
     <canvas id="testCanvas" width="960" height="400"></canvas>
