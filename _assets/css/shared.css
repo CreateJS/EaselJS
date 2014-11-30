@@ -1,5 +1,5 @@
 body {
-	margin: 3em;
+	margin: 3em auto;
 	padding: 0;
 	background-color: #eaebee;
 	font-family: Arial, Verdana, sans-serif;
@@ -32,9 +32,9 @@ h1::after {
 	display: block;
 	content: "";
 	background: url('../art/logo_createjs.svg') no-repeat;
-	height:2em;
+	height:1.5em;
 	width: 6em;
-	margin-top: -0.2em;
+	margin-top: -0.3em;
 	float: right;
 }
 
