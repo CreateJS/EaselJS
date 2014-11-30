@@ -4,13 +4,9 @@
 
 <title>EaselJS: API Test</title>
 
-<link href="assets/tricolore.css" rel="stylesheet" type="text/css"/>
 <link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.4.min.js"></script>
-<script src="assets/rainbow-custom.min.js"></script>
-
-<script type="text/javascript" src="assets/StringUtils.js"></script>
 
 <script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
 <!-- We also provide hosted minified versions of all CreateJS libraries.
@@ -31,7 +27,7 @@ function init() {
 
     img = new Image();
     img.onload = layout;
-    img.src = "./assets/daisy.png";
+    img.src = "../_assets/art/daisy.png";
 
     canvasHolder = document.getElementsByClassName('canvasHolder')[0];
 
@@ -157,28 +153,23 @@ function textDemo(stage) {
 
 function spriteDemo(stage) {
     var ss = new createjs.SpriteSheet({ "animations":{
-        "run":[0, 25],
-        "jump":[26, 63]},
-        "images":["assets/runningGrant.png"],
+        "run":[0, 25, "jump", 2],
+        "jump":[26, 63, "run"]},
+        "images":["../_assets/art/spritesheet_grant.png"],
         "frames":{
             "regX":0,
             "regY":0,
-            "height":292.5,
-            "width":165.75,
+            "height":293,
+            "width":166,
             "count":64
         }
     });
 
-    ss.getAnimation("run").speed = 2;
-    ss.getAnimation("run").next = "jump";
-    ss.getAnimation("jump").next = "run";
-
     var sprite = new createjs.Sprite(ss, "run");
     sprite.scaleY = sprite.scaleX = 0.4;
-
-    createjs.Ticker.setFPS(60);
-    createjs.Ticker.addEventListener("tick", stage);
     stage.addChild(sprite);
+
+    createjs.Ticker.addEventListener("tick", stage);
 }
 
 function layout() {
@@ -201,7 +192,6 @@ function layout() {
         }
 
         codeString = codeString.split('STROKE_COLOR').join('"' + STROKE_COLOR + '"').split('FILL_COLOR').join('"' + FILL_COLOR + '"');
-        codeString = codeString.trim();
         codeString = '//' + demo.label + '\n' + codeString;
 
         var code = $('<div style="width:750px">' +
