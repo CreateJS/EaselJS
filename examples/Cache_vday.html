@@ -46,7 +46,7 @@
 		var text = new createjs.Text("the longer I'm with you\nthe more I love you", "bold 24px Arial", "#312");
 		text.textAlign = "center";
 		text.x = w/2;
-		text.y = h/2;
+		text.y = h/2-text.getMeasuredLineHeight();
 		stage.addChild(text);
 
 		for (i=0; i<100; i++) {
@@ -104,14 +104,14 @@
 <body onload="init();">
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Infinte Hearts</h1>
-	    <p>Infinte hearts: code poetry for Valentine's day.
+	    <h1>Infinte Hearts</h1>
+	    <p>Infinte hearts: code poetry for Valentine's day. Uses <code>updateCache()</code> with multiple caches to
+	    create an "infinite bobs" effect.
 	    </p>
 	</header>
-	<!-- background isn't set to black to demonstrate how the darkening applies -->
 
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400" style="background-color:#312"></canvas>
+		<canvas id="testCanvas" width="960" height="400" style="background:#312"></canvas>
 	</div>
 </body>
 </html>
