@@ -14,31 +14,29 @@
 	<script>
 	var stage;
 	function init() {
-		stage = new createjs.Stage(document.getElementById("testCanvas"));
+		stage = new createjs.Stage("testCanvas");
 
 
-		var txt = new createjs.Text("", "18px Arial", "#FFF");
+		var txt = new createjs.Text("", "18px Arial", "#111");
 		
-		txt.text = "This text is rendered in canvas using the Text Object:\n\n";
-		txt.text += "The API is loosely based on Flash's display list. The key classes are:\n\n";
-		txt.text += "DisplayObject\nAbstract base class for all display elements in Easel. Exposes all of the display properties (ex. x, y, rotation, scaleX, scaleY, alpha, shadow, etc) that are common to all display objects.\n\n"
-		txt.text += "Stage\nThe root level display container for display elements. Each time tick() is called on Stage, it will update and render the display list to its associated canvas.\n\n";
-		txt.text += "Container\nA nestable display container, which lets you aggregate display objects and manipulate them as a group.\n\n";
-		txt.text += "Text\nRenders text in the context of the display list."
+		txt.text = "This wrapped multi-line text is rendered using the Text Object.\n\n";
+		txt.text += "Text is fairly limited in canvas and EaselJS. It's fine for simple labels, titles, and HUD elements. You are limited to a single style per Text object, and the text is not selectable, editable, or accessible.\n\n";
+		txt.text += "For more complicated text, you can use DOMElement to include HTML text in your display list. It's also worth taking a look at BitmapText for visually rich text for games or similar scenarios.\n\n";
+		txt.text += "Text line heights & bounds are approximated, but accurate enough for most uses (for example, the grey background on this text).";
 		
-		txt.lineWidth = 660;
-		//txt.maxWidth = 500;
+		txt.lineWidth = 550;
+		txt.lineHeight = 22;
 		txt.textBaseline = "top";
 		txt.textAlign = "left";
-		txt.y = 30;
-		txt.x = 30;
+		txt.y = 50;
+		txt.x = (stage.canvas.width-550)/2;
 		stage.addChild(txt);
 		
 		// use getBounds to dynamically draw a background for our text:
 		var bounds = txt.getBounds();
 		var pad = 10;
 		var bg = new createjs.Shape();
-		bg.graphics.beginFill("#114").drawRect(txt.x-pad+bounds.x, txt.y-pad+bounds.y, bounds.width+pad*2, bounds.height+pad*2);
+		bg.graphics.beginFill("#ABC").drawRect(txt.x-pad+bounds.x, txt.y-pad+bounds.y, bounds.width+pad*2, bounds.height+pad*2);
 		stage.addChildAt(bg,0);
 
 		stage.update();
@@ -48,8 +46,8 @@
 <body onload="init()">
 
 	<header id="header" class="EaselJS">
-	    <h1>Multi-line text</h1>
-	    <p>Simple sample showing multi-line text and text wrapping with <strong>Text</strong> elements.</p>
+	    <h1>Multi-line Text</h1>
+	    <p>Shows multi-line text and text wrapping with <code>Text</code> elements. It also uses <code>DisplayObject.getBounds()</code> to draw a background for the text.</p>
 	</header>
 
 	<div class="canvasHolder">

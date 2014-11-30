@@ -62,6 +62,7 @@
 		//find canvas and load images, wait for last image to load
 		canvas = document.getElementById("testCanvas");
 		stage = new createjs.Stage(canvas);
+		// we need to enable mouseover events for rollover/out and cursor to work:
 		stage.enableMouseOver(20);
 
 		// Create some TextLinks:
@@ -90,11 +91,11 @@
 
 	<header id="header" class="EaselJS">
 	    <h1>Text Sample</h1>
-	    <p>Example showing how you can simulate a text link with hover states using hitArea.</p>
+	    <p>Example showing how you can simulate a <code>Text</code> link with hover states using <code>DisplayObject.hitArea</code>, <code>DisplayObject.cursor</code>, and <code>rollover</code> / <code>rollout</code> events.</p>
 	</header>
 
 	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
+		<canvas id="testCanvas" width="960" height="400" style="background:#111"></canvas>
 	</div>
 </body>
 </html>
