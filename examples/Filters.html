@@ -18,7 +18,7 @@
 		//wait for the image to load
 		img = new Image();
 		img.onload = handleImageLoad;
-		img.src = "assets/photo.jpg";
+		img.src = "../_assets/art/flowers.jpg";
 	}
 
 	function handleImageLoad() {
@@ -52,7 +52,7 @@
 		]);
 		bmp = bmp.clone();
 		bmp.filters = [greyScaleFilter];
-		bmp.cache(0,0,img.width,img.height); // color filters don't change the bounds.
+		bmp.cache(0,0,img.width,img.height);
 		bmp.y += bmp.y+img.height;
 		stage.addChild(bmp);
 
@@ -60,7 +60,7 @@
 		var removeRedFilter = new createjs.ColorFilter(0,1,1,1); // red, green, blue, alpha
 		bmp = bmp.clone();
 		bmp.filters = [removeRedFilter];
-		bmp.cache(0,0,img.width,img.height); // color filters don't change the bounds.
+		bmp.cache(0,0,img.width,img.height);
 		bmp.x = (canvas.width-2*img.width)/3;
 		stage.addChild(bmp);
 
@@ -73,8 +73,8 @@
 
 <body onload="init();">
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Filters</h1>
-	    <p>Demonstrates using filters. Top-left: original. Top-right: <strong>BlurFilter</strong>. Bottom-left: <strong>ColorFilter</strong>. Bottom-right: <strong>ColorMatrixFilter</strong>.</p>
+	    <h1>Filters</h1>
+	    <p>Demonstrates using filters. Top-left: original. Top-right: <code>BlurFilter</code>. Bottom-left: <code>ColorFilter</code>. Bottom-right: <code>ColorMatrixFilter</code>.</p>
 	</header>
 
 	<div class="canvasHolder">
