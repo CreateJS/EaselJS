@@ -23,9 +23,9 @@
 		// Create a simple hierarchy:
 		var container = stage.addChild(new createjs.Container()).set({name:"container"});
 		
-		var blue = container.addChild(new createjs.Shape()).set({name:"blue", x:50, y:50});
+		var blue = container.addChild(new createjs.Shape()).set({name:"blue", x:50, y:100});
 		blue.graphics.beginFill("#00F").drawRect(0,0,200,200);
-		var red = container.addChild(new createjs.Shape()).set({name:"red", x:100, y:100});
+		var red = container.addChild(new createjs.Shape()).set({name:"red", x:100, y:150});
 		red.graphics.beginFill("#F00").drawRect(0,0,100,100);
 		
 		container.addEventListener("mouseover", handleEvt);
@@ -37,7 +37,7 @@
 		red.cursor = "";
 		
 		// text object to output the 
-		text = stage.addChild(new createjs.Text("", "14px monospace", "#FFF")).set({x:260, y:20, lineHeight:20});
+		text = stage.addChild(new createjs.Text("", "14px monospace", "#111")).set({x:280, y:100, lineHeight:20});
 
 		// call update on the stage to make it render the current display list to the canvas:
 		createjs.Ticker.addEventListener("tick", stage);
@@ -46,7 +46,7 @@
 	var log = [];
 	function handleEvt(evt) {
 		log.push("type="+evt.type+" target="+evt.target.name+" currentTarget="+evt.currentTarget.name);
-		while (log.length > 12) { log.shift(); }
+		while (log.length > 10) { log.shift(); }
 		text.text = log.join("\n");
 	}
 	</script>
@@ -56,7 +56,7 @@
 
 	<header id="header" class="EaselJS">
 	    <h1>rollover and mouseover</h1>
-	    <p>This example demonstrates the difference between rollover/out and mouseover/out events. The red and blue squares
+	    <p>This example demonstrates the difference between <code>rollover</code> / <code>rollout</code> and <code>mouseover</code> / <code>mouseout</code> events. The red and blue squares
 	    are separate Shape instances within a parent Container. The Container has both rollover/rollout and
 	    mouseover/mouseout events.</p>
 	    <p>

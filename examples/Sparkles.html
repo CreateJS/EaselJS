@@ -32,7 +32,7 @@
             // and the registration point of the frame
             // it will auto-calculate the number of frames from the image dimensions and loop them
             var data = {
-                images:["assets/sparkle_21x23.png"],
+                images:["../_assets/art/spritesheet_sparkle.png"],
                 frames:{width:21, height:23, regX:10, regY:11}
             };
 
@@ -46,7 +46,7 @@
             fpsLabel.y = 20;
 
             // start the tick and point it at the window so we can do some work before updating the stage:
-            createjs.Ticker.setFPS(20);
+            createjs.Ticker.timingMode = createjs.Ticker.RAF;
             createjs.Ticker.addEventListener("tick", tick);
         }
 
@@ -54,18 +54,19 @@
         function tick(event) {
             // loop through all of the active sparkles on stage:
             var l = stage.getNumChildren();
+            var m = event.delta/16;
             for(var i = l - 1; i > 0; i--) {
                 var sparkle = stage.getChildAt(i);
 
                 // apply gravity and friction
-                sparkle.vY += 2;
-                sparkle.vX *= 0.98;
+                sparkle.vY += 0.8*m;
+                sparkle.vX *= 0.99;
 
                 // update position, scale, and alpha:
-                sparkle.x += sparkle.vX;
-                sparkle.y += sparkle.vY;
-                sparkle.scaleX = sparkle.scaleY = sparkle.scaleX + sparkle.vS;
-                sparkle.alpha += sparkle.vA;
+                sparkle.x += sparkle.vX*m;
+                sparkle.y += sparkle.vY*m;
+                sparkle.scaleX = sparkle.scaleY = sparkle.scaleX + sparkle.vS*m;
+                sparkle.alpha += sparkle.vA*m;
 
                 //remove sparkles that are off screen or not invisble
                 if (sparkle.alpha <= 0 || sparkle.y > canvas.height) {
@@ -81,12 +82,12 @@
 
         //sparkle explosion
         function clickCanvas(evt) {
-            addSparkles(Math.random() * 200 + 100 | 0, stage.mouseX, stage.mouseY, 2);
+            addSparkles(Math.random() * 200 + 100 | 0, stage.mouseX, stage.mouseY, 1);
         }
 
         //sparkle trail
         function moveCanvas(evt) {
-            addSparkles(Math.random() * 2 + 1 | 0, stage.mouseX, stage.mouseY, 1);
+            addSparkles(Math.random() * 6 + 3 | 0, stage.mouseX, stage.mouseY, 0.5);
         }
 
         function addSparkles(count, x, y, speed) {
@@ -124,16 +125,16 @@
 <body onload="init();">
 
 <header id="header" class="EaselJS">
-    <h1>Sparkles Demo</h1>
+    <h1>Sparkles</h1>
 
-    <p>Example showing how to use simple animated <strong>Sprite</strong> elements. Move your mouse and click
-        on the canvas. It also demonstrates displaying the current measured framerate with <strong>Ticker.getMeasuredFramerate()</strong>
-        and <strong>Text</strong>. Click repeatedly to generate lots of sparkles and slow down the framerate.<br/>
+    <p>Example showing how to use simple animated <code>Sprite</code> instances with <code>stagemousemove</code> and <code>stagemousedown</code> events. Move your mouse and click
+        on the canvas. It also demonstrates displaying the current measured framerate with <code>Ticker.getMeasuredFramerate()</code>
+        and <code>Text</code>. Click repeatedly to generate lots of sparkles and slow down the framerate.<br/>
     </p>
 </header>
 
 <div class="canvasHolder">
-    <canvas id="testCanvas" width="960" height="400"></canvas>
+    <canvas id="testCanvas" width="960" height="400" style="background:black"></canvas>
 </div>
 </body>
 </html>
