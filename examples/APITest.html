@@ -17,8 +17,8 @@
 var canvas;
 var img;
 var demos;
-var STROKE_COLOR = 'rgba(255,255,255,1)';
-var FILL_COLOR = 'rgba(255,255,255,1)';
+var STROKE_COLOR = 'red';
+var FILL_COLOR = 'blue';
 
 function init() {
     if (window.top != window) {
@@ -46,7 +46,7 @@ function init() {
             return new Graphics().beginStroke(STROKE_COLOR).moveTo(5, 75).bezierCurveTo(45, 90, 75, 75, -25, -25).endStroke();
         }},
         {label:'beginLinearGradientStroke();', graphics:function () {
-            return new Graphics().beginLinearGradientStroke([STROKE_COLOR, "rgba(50, 50, 50, 1)"], [0, .4], 0, 0, 70, 140).moveTo(5, 25).lineTo(110, 25).endStroke();
+            return new Graphics().beginLinearGradientStroke([STROKE_COLOR, FILL_COLOR], [0, 1], 5, 0, 110, 0).moveTo(5, 25).lineTo(110, 25);
         }},
         {label:'drawRect();', graphics:function () {
             return new Graphics().beginFill(FILL_COLOR).rect(5, 5, 80, 80);
@@ -55,13 +55,13 @@ function init() {
             return new Graphics().beginFill(FILL_COLOR).drawRoundRect(0, 0, 120, 120, 5);
         }},
         {label:'beginLinearGradientFill() with drawRoundRect();', graphics:function () {
-            return new Graphics().beginLinearGradientFill([FILL_COLOR, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 130).drawRoundRect(0, 0, 120, 120, 5);
+            return new Graphics().beginLinearGradientFill([FILL_COLOR, STROKE_COLOR], [0, 1], 0, 0, 0, 130).drawRoundRect(0, 0, 120, 120, 5);
         }},
         {label:'drawCircle();', graphics:function () {
             return new Graphics().beginFill(FILL_COLOR).drawCircle(40, 40, 40);
         }},
         {label:'beginRadialGradientFill() with drawCircle();', graphics:function () {
-            return new Graphics().beginRadialGradientFill([FILL_COLOR, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 0, 0, 60).drawCircle(40, 40, 40);
+            return new Graphics().beginRadialGradientFill([FILL_COLOR, STROKE_COLOR], [0, 1], 40, 40, 0, 40, 40, 40).drawCircle(40, 40, 40);
         }},
         {label:'drawEllipse();', graphics:function () {
             return new Graphics().beginFill(FILL_COLOR).drawEllipse(5, 5, 60, 120);
@@ -146,8 +146,8 @@ function colorFilter(stage) {
 }
 
 function textDemo(stage) {
-    var txt = new createjs.Text("Hello CreateJS!", "15px Arial", "#FFF");
-    txt.y = 45;
+    var txt = new createjs.Text("Hello CreateJS!", "24px Arial", FILL_COLOR);
+    txt.lineWidth = 150;
     stage.addChild(txt);
 }
 
