@@ -12,6 +12,7 @@
 
     <script type="text/javascript">
         var img;
+        var bmp;
         var stage;
         var angle;
         var canvas;
@@ -21,17 +22,17 @@
         function init() {
             angle = 0;
             range = 30;
-            speed = 0.1;
+            speed = 0.02;
             img = new Image();
             img.onload = handleImageLoad;
-            img.src = "assets/flowers.jpg";
+            img.src = "../_assets/art/flowers.jpg";
         }
 
         function handleImageLoad() {
             canvas = document.getElementById("testCanvas");
             stage = new createjs.Stage(canvas);
 
-            bmp = new createjs.Bitmap(img).set({y:16});
+            bmp = new createjs.Bitmap(img).set({y:(canvas.height-img.height)/2});
             bmp.cache(0, 0, img.width, img.height);
 
             stage.addChild(bmp);
@@ -53,8 +54,8 @@
 <body onload="init()">
 
 	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Simple Filter Example</h1>
-	    <p>This sample loads an image, and applies a blur filter each frame with a varying value.</p>
+	    <h1>BlurFilter</h1>
+	    <p>This sample loads an image, and applies a <code>BlurFilter</code> each tick with a varying value.</p>
 	</header>
 
     <canvas id="testCanvas" width="960" height="400"></canvas>
