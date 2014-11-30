@@ -65,15 +65,15 @@
 		
 		// create our bitmap animations using the generated sprite sheet, and put them on stage:
 		var circle2 = new createjs.Sprite(spriteSheet, "circle");
-		circle2.setTransform(100,90+100);
+		circle2.setTransform(100,90+200);
 		stage.addChild(circle2);
 		
 		var square2 = new createjs.Sprite(spriteSheet, "square");
-		square2.setTransform(150,50+100);
+		square2.setTransform(150,50+200);
 		stage.addChild(square2);
 		
-		// append the generated spritesheet image for demo purposes:
-		document.body.appendChild(spriteSheet._images[0]);
+		// add in the generated spritesheet image for demo purposes:
+		stage.addChild(new createjs.Bitmap(spriteSheet._images[0])).set({x:75, y:150});
 		
 		// we want to do some work before we update the canvas,
 		// otherwise we could use Ticker.addEventListener("tick", stage);
@@ -87,7 +87,10 @@
 
 	<header id="header" class="EaselJS">
 	    <h1>SpriteSheetBuilder Sample</h1>
-	    <p>Using <strong>SpriteSheetBuilder</strong> to create <strong>SpriteSheet</strong> instances at run time.</p>
+	    <p>Using <code>SpriteSheetBuilder</code> to generate <code>SpriteSheet</code> instances at run time. The top row are the original vector "source" objects.
+		The middle row shows the spritesheet image that was generated.
+	    The bottom row contains <code>Sprite</code> instances displaying frames from the <code>SpriteSheet</code>.
+	    </p>
 	</header>
 
 	<div class="canvasHolder">
