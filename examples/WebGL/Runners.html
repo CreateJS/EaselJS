@@ -12,9 +12,9 @@
 
 <body onload="init();">
 	<header id="header" class="EaselJS">
-	    <h1>WebGL, SpriteStage & SpriteContainer</h1>
+	    <h1>WebGL Rendering</h1>
 	    <p>This sample demonstrates WebGL rendering where available, and reducing effect complexity (in this case particle count)
-	    when WebGL is not supported. Append "<code>?c2d</code>" to the url to simulate no WebGL & notice how the particle count is reduced.</p>
+	    when WebGL is not supported. Uses <code>SpriteStage</code> and <code>SpriteContainer</code>. Append "<code>?c2d</code>" to the url to disable WebGL & notice how the particle count is reduced.</p>
 	</header>
 	<canvas id="testCanvas" width="960" height="400" style="background: #66AA99"></canvas>
 
@@ -27,12 +27,12 @@
 	<script type="text/javascript" src="../src/easeljs/display/SpriteStage.js"></script>
 	
 	
-	<script type="text/javascript" src="assets/preloadjs-NEXT.min.js"></script>
+	<script type="text/javascript" src="../_assets/libs/preloadjs-NEXT.min.js"></script>
 
 	<script>
 		var stage;
 		var runnerSS, textSS, sparkleSS;
-		var runnerContainer, sparkleContainer, hitArea;
+		var runnerContainer, sparkleContainer;
 		var sparklePool, maxRunners=300, maxSparkles = 1000;
 
 		function init() {
@@ -53,10 +53,10 @@
 			var queue = new createjs.LoadQueue();
 			queue.on("complete", handleLoad, this);
 			queue.loadManifest([
-				{id: "runner", src: "assets/runningGrantSmall.png"},
-				{id: "sparkle", src: "assets/sparkle_21x23.png"},
-				{id: "font", src: "assets/BitmapFont.png"},
-				{id: "hill", src: "assets/parallaxHill1.png"}
+				{id: "runner", src: "../_assets/art/spritesheet_grant.png"},
+				{id: "sparkle", src: "../_assets/art/spritesheet_sparkle.png"},
+				{id: "font", src: "../_assets/art/spritesheet_font.png"},
+				{id: "hill", src: "../_assets/art/hill1.png"}
 				], true);
 		}
 		
@@ -71,6 +71,7 @@
 			// runners:
 			var l = runnerContainer.getNumChildren();
 			if (l < maxRunners && Math.random() < 0.3) { addRunner(); l++; }
+			
 			for (var i=0; i<l; i++) {
 				var runner = runnerContainer.getChildAt(i);
 				runner.x += runner.velX;
@@ -99,19 +100,18 @@
 		function addRunner() {
 			var runner = new createjs.Sprite(runnerSS, "run");
 			runner.on("mousedown", explodeRunner, this);
-			runner.hitArea = hitArea;
 			resetRunner(runner);
 		}
 		
 		function explodeRunner(evt) {
 			var runner = evt.target;
-			addSparkles(runner.x, runner.y-40*runner.scaleY, runner.velX, -8);
+			addSparkles(runner.x, runner.y-140*runner.scaleY, runner.velX, -8);
 			resetRunner(runner);
 		}
 		
 		function resetRunner(runner) {
-			runner.x = -50;
-			runner.y = Math.random()*100+300|0;
+			runner.x = -100;
+			runner.y = Math.random()*90+300|0;
 			
 			runnerContainer.removeChild(runner);
 			var l = runnerContainer.getNumChildren();
@@ -125,7 +125,7 @@
 			var size = Math.random()*Math.random()*Math.random();
 			runner.velX = 6-size*4;
 			runner.framerate = runner.velX*8;
-			runner.scaleX = runner.scaleY = size*2+1.5;
+			runner.scaleX = runner.scaleY = size+0.5;
 		}
 		
 		function addSparkles(x, y, velX, velY) {
@@ -165,18 +165,17 @@
 			
 			textContainer.addChild(topText);
 			stage.addChild(hill1, hill2, runnerContainer, bottomText, topText, sparkleContainer);
-			
-			// we can use Shape for hitArea, because mouse interaction doesn't use WebGL:
-			hitArea = new createjs.Shape();
-			hitArea.graphics.beginFill("#FFF").drawRect(-30,-70,60,80);
 		}
 		
 		function setupSpriteSheets(queue) {
 			runnerSS = 	new createjs.SpriteSheet({
 				framerate: 30,
-				images: [queue.getResult("runner")],
-				frames: { width: 51, height: 70, regX: 25, regY: 70, numFrames: 15},
-				animations: {"run": [0, 14]},
+				"images": [queue.getResult("runner")],
+				"frames": {"regX": 82, "height": 292, "count": 64, "regY": 292, "width": 165},
+				"animations": {
+					"run": [0, 25, "run"],
+					"jump": [26, 63, "run"]
+				}
 			});
 			
 			sparkleSS = new createjs.SpriteSheet({

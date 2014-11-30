@@ -36,8 +36,8 @@
 
 	<header id="header" class="EaselJS">
 	    <h1>Two Stages passing mouse events</h1>
-	    <p>This example shows a Context2D <code>Stage</code> (green) passing unhandled mouse events through to a WebGL <code>SpriteStage</code> (blue) layered below it via <code>.nextStage</code>.
-	    Notice that the rollover on the bottom stage works even while over the top (green) canvas.</p>
+	    <p>This example shows a Context2D <code>Stage</code> (green) passing unhandled mouse events through to a WebGL <code>SpriteStage</code> (blue) layered below it via <code>Stage.nextStage</code>.
+	    Notice that the <code>rollover</code> on the bottom stage works even while over the top (green) canvas.</p>
 	    <p>For example, this could be used for layering a rich UI with vector art & filters over a highly performant WebGL game engine.</p>
 	</header>
 
@@ -55,10 +55,10 @@
 	<script type="text/javascript" src="../src/easeljs/display/SpriteContainer.js"></script>
 	<script type="text/javascript" src="../src/easeljs/display/SpriteStage.js"></script>
 	
-	<script type="text/javascript" src="assets/tweenjs-NEXT.min.js"></script>
-	<script type="text/javascript" src="../src/easeljs/display/MovieClip.js"></script>
+	<script type="text/javascript" src="../_assets/libs/tweenjs-NEXT.min.js"></script>
+	<script type="text/javascript" src="../lib/movieclip-NEXT.combined.js"></script>
 	
-	<script type="text/javascript" src="assets/VectorButton.js"></script>
+	<script type="text/javascript" src="../_assets/art/VectorButton.js"></script>
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
@@ -68,7 +68,7 @@
 		function init() {
 			// load the source image:
 			var image = new Image();
-			image.src = "assets/BitmapButton.png";
+			image.src = "../_assets/art/spritesheet_button.png";
 			image.onload = handleImageLoad;
 		}
 	
@@ -88,12 +88,12 @@
 			});
 			var bitmapButton = new createjs.Sprite(spriteSheet, "up");
 			webGLStage.addChild(bitmapButton).set({x:250, y:150});
-			var bitmapHelper = new createjs.ButtonHelper(bitmapButton);
+			new createjs.ButtonHelper(bitmapButton);
 		
 			// movieclip "vector" button:
 			var vectorButton = new lib.VectorButton();
-			c2dStage.addChild(vectorButton).set({x: 50, y:50});
-			var vectorHelper = new createjs.ButtonHelper(vectorButton);
+			c2dStage.addChild(vectorButton).set({x: 50, y:30});
+			new createjs.ButtonHelper(vectorButton);
 		
 			createjs.Ticker.addEventListener("tick", c2dStage);
 			createjs.Ticker.addEventListener("tick", webGLStage);
