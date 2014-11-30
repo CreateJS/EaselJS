@@ -18,29 +18,24 @@
 			stage = new createjs.Stage(document.getElementById("testCanvas"));
 
 			// Define a spritesheet. Note that this data was exported by Zoë.
-			var ss = new createjs.SpriteSheet({
-				"animations":
-				{
-					"run": [0, 25, "jump"],
-					"jump": [26, 63, "run"]},
-					"images": ["assets/runningGrant.png"],
-					"frames":
-						{
-							"height": 292.5,
-							"width":165.75,
-							"regX": 0,
-							"regY": 0,
-							"count": 64
-						}
+			var spriteSheet = new createjs.SpriteSheet({
+					framerate: 30,
+					"images": ["../_assets/art/spritesheet_grant.png"],
+					"frames": {"regX": 82, "height": 292, "count": 64, "regY": 0, "width": 165},
+					// define two animations, run (loops, 1.5x speed) and jump (returns to run):
+					"animations": {
+						"run": [0, 25, "run", 1.5],
+						"jump": [26, 63, "run"]
+					}
 				});
 
-			var grant = new createjs.Sprite(ss, "run");
-			grant.x = 360;
+			var grant = new createjs.Sprite(spriteSheet, "run");
+			grant.x = stage.canvas.width/2;
 			grant.y = 22;
 
 			// Add Grant to the stage, and add it as a listener to Ticker to get updates each frame.
 			stage.addChild(grant);
-			createjs.Ticker.setFPS(60);
+			createjs.Ticker.timingMode = createjs.Ticker.RAF;
 			createjs.Ticker.addEventListener("tick", stage);
 		}
 
@@ -50,8 +45,7 @@
 
 	<header id="header" class="EaselJS">
 		<h1>Simple SpriteSheet Example</h1>
-		<p>A simple example of a sprite sheet using <strong>Sprite</strong>. This demos also shows playing named
-			animations (jump and run), and animation chaining using <strong>getAnimation("name").next</strong>.</p>
+		<p>A simple example of defining a <code>SpriteSheet</code> and playing it back using <code>Sprite</code>.</p>
 	</header>
 
 	<div class="canvasHolder">
