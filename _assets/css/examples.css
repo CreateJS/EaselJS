@@ -6,8 +6,8 @@ BODY, HTML {
 	font-family: 		Arial, Verdana, sans-serif;
 	font-size: 			12px;
 	font-weight:		normal;
-	color: 				#eee;
-	background-color:	#111;
+	color: 				#111;
+	background-color:	#eaebee;
 }
 
 BODY {
@@ -20,41 +20,47 @@ p {
 }
 
 a:link, a:visited {
-	color:			#fff;
+	color:			#345;
 	font-weight:	bold;
 }
 a:hover {
 }
 
 header {
-	width: 50em;
-	margin-bottom: 2em;
-	background: #222;
-	padding: 1em;
+	width: 960px;
+	margin-bottom: 1em;
 }
 	header h1 {
+		color: #FFF;
 		font-weight:	normal;
 		font-size:		1.6em;
 		margin:			0;
-		margin-bottom:	0.5em;
-		padding:		0;
+		padding:		1.5em;
+		padding-bottom: 1.2em;
+		text-transform: uppercase;
+		background: #374252;
 	}
 	
-	header h1:after {
-		content:"";
-		background: url('../art/logo_createjs.svg') no-repeat;
-		height: 1.5em;
-		width: 6em;
+	header h1::after {
 		display: block;
+		content: "";
+		background: url('../art/logo_createjs.svg') no-repeat;
+		height:2em;
+		width: 6em;
+		margin-top: -0.1em;
 		float: right;
+	}
+	
+	header h1:before {
+		content:"EASELJS ";
+		font-weight: bold;
 	}
 
 	header p {
-		margin:		0;
-		padding:	0;
-
 		font-size:	14px;
-		color:		#AAA;
+		color:		#111;
+		padding: 1em;
+		background: rgba(250, 252, 255, 0.7);
 	}
 	
 	header code {
@@ -62,6 +68,9 @@ header {
 		color: #FFF;
 	}
 
+canvas {
+	background: white;
+}
 
 .content {
 	width:		980px;
