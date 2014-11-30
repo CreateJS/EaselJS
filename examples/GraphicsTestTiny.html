@@ -28,7 +28,7 @@
             h = canvas.height;
             img = new Image();
             img.onload = layout;
-            img.src = "./assets/daisy.png";
+            img.src = "../_assets/art/daisy.png";
         }
 
         function layout() {
@@ -154,10 +154,10 @@
 <body onload="init();">
 
 	<header id="header" class="EaselJS">
-	    <h1>Graphics Test (tiny)</h1>
-	    <p>This demo is identical to the graphicsTest demo, except that it uses the tiny interface on <strong>Graphics</strong>
-		    to compact the drawing commands. It's possible to have even more compact drawing instructions using the <strong>Graphics.decodePath()</strong> method, but
-		    that format is not human readable.</p>
+	    <h1>Graphics Tiny API</h1>
+	    <p>This demo is identical to the graphicsTest demo, except that it uses the tiny API on <code>Graphics</code>
+		    to compact the drawing commands. It's possible to have even more compact drawing instructions using the <code>Graphics.decodePath()</code> method, but
+		    that format is not designed to be human readable.</p>
 	</header>
 
 	<div class="canvasHolder">

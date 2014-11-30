@@ -24,14 +24,15 @@
 
 		// Create a new Text object:
 		var text = new createjs.Text("Hello World!", "36px Arial", "#777");
+		text.textAlign = "center";
 
 		// add the text as a child of the stage. This means it will be drawn any time the stage is updated
 		// and that its transformations will be relative to the stage coordinates:
 		stage.addChild(text);
 
 		// position the text on screen, relative to the stage coordinates:
-		text.x = 360;
-		text.y = 200;
+		text.x = canvas.width/2;
+		text.y = 180;
 
 		// call update on the stage to make it render the current display list to the canvas:
 		stage.update();
@@ -43,7 +44,7 @@
 
 	<header id="header" class="EaselJS">
 	    <h1>Hello World!</h1>
-	    <p>Hello World example using <strong>Text</strong> and <strong>Stage</strong>.</p>
+	    <p>Hello World example using <code>Text</code> and <code>Stage</code>.</p>
 	</header>
 
 	<div class="canvasHolder">
