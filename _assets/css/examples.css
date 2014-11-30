@@ -4,6 +4,7 @@ body {
 
 h1 {
 	font-weight: 200;
+	margin-bottom: 1rem;
 }
 
 h1:before {
@@ -12,11 +13,13 @@ h1:before {
 }
 
 header p {
+	margin: 0;
 	padding: 1em;
 	background: rgba(250, 252, 255, 0.7);
 }
 
 canvas {
+	margin-top: 1rem;
 	background: white;
 }
 
