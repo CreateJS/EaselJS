@@ -418,7 +418,7 @@ this.createjs = this.createjs||{};
 	p.drawAsPath = function(ctx) {
 		this._updateInstructions();
 		var instr, instrs = this._instructions;
-		for (var i=0, l=instrs.length; i<l; i++) {
+		for (var i=this._storeIndex, l=instrs.length; i<l; i++) {
 			// the first command is always a beginPath command.
 			if ((instr = instrs[i]).path !== false) { instr.exec(ctx); }
 		}
