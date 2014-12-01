@@ -1,5 +1,5 @@
 beforeEach(function (done) {
-	this.assetsBasePath = "../examples/assets/";
+	this.assetsBasePath = "art/";
 
 	this.sColor = "#000";
 	this.fColor = "#ff0000";
