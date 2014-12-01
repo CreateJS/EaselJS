@@ -20,7 +20,7 @@ describe("Filters", function () {
 		this.stage.addChild(bmp2);
 
 		this.stage.update();
-		this.compareBaseLine("assets/AlphaMaskFilter.png", done, expect);
+		this.compareBaseLine("assets/AlphaMaskFilter.png", done, expect, .01);
 
 		expect(amf.clone().mask).toBe(maskShape.cacheCanvas);
 	});
