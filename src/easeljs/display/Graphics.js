@@ -71,13 +71,13 @@ this.createjs = this.createjs||{};
 	 * For more direct control of rendering, you can instantiate and append command objects to the graphics queue directly. In this case, you
 	 * need to manage path creation manually, and ensure that fill/stroke is applied to a defined path:
 	 * 
-	 *      // start a new path. Graphics.beginPath is a reusable BeginPath instance:
-	 *      myGraphics.append(Graphics.beginPath);
+	 *      // start a new path. Graphics.beginCmd is a reusable BeginPath instance:
+	 *      myGraphics.append(createjs.Graphics.beginCmd);
 	 *      // we need to define the path before applying the fill:
-	 *      var circle = new Graphics.Circle(0,0,30);
+	 *      var circle = new createjs.Graphics.Circle(0,0,30);
 	 *      myGraphics.append(circle);
 	 *      // fill the path we just defined:
-	 *      var fill = new Graphics.Fill("red");
+	 *      var fill = new createjs.Graphics.Fill("red");
 	 *      myGraphics.append(fill);
 	 *      
 	 * These approaches can be used together, for example to insert a custom command:
