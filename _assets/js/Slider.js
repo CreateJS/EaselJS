@@ -58,7 +58,7 @@
 
 	p.draw = function(ctx, ignoreCache) {
 		if (this._checkChange()) {
-			var x = (this.width-this.height) * (this.value-this.min) / (this.max-this.min);
+			var x = (this.width-this.height) * Math.max(0,Math.min(1,(this.value-this.min) / (this.max-this.min)));
 			this.graphics.clear()
 				.beginFill(this.trackColor).drawRect(0,0,this.width,this.height)
 				.beginFill(this.thumbColor).drawRect(x,0,this.height, this.height);
