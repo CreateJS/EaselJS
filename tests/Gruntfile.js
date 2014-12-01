@@ -24,7 +24,7 @@ module.exports = function (grunt) {
 				server: {
 					options: {
 						keepalive: true,
-						base: ['../lib/', '../', './']
+						base: ['../_assets/', '../lib/', '../', './']
 					}
 				}
 			},
