@@ -48,11 +48,11 @@
 
 		// draw the "shelf" at the bottom of the graph:
 		// note how the drawing instructions can be chained together.
-		bg.graphics.beginStroke("#444")
+		bg.graphics.beginStroke("#444850")
 			.moveTo(40, canvas.height-69.5)
 			.lineTo(canvas.width-70, canvas.height-69.5)
 			.endStroke()
-			.beginFill("#222")
+			.beginFill("#22252B")
 			.moveTo(canvas.width-70, canvas.height-70)
 			.lineTo(canvas.width-60, canvas.height-80)
 			.lineTo(50, canvas.height-80)
@@ -61,13 +61,13 @@
 
 		// draw the horizontal lines in the background:
 		for (i=0; i<9; i++) {
-			bg.graphics.beginStroke(i%2 ? "#333" : "#444")
+			bg.graphics.beginStroke(i%2 ? "#333840" : "#444850")
 				.moveTo(50,(canvas.height-80-i/8*barHeight|0)+0.5)
 				.lineTo(canvas.width-60,(canvas.height-80-i/8*barHeight|0)+0.5);
 		}
 
 		// add the graph title:
-		label = new createjs.Text("Bar Graph Example", "bold 30px Arial", "#FFF");
+		label = new createjs.Text("Quarterly Whatsits", "bold 24px Arial", "#FFF");
 		label.textAlign = "center";
 		label.x = canvas.width/2;
 		label.y = 20;
@@ -103,7 +103,7 @@
 
 			// if this has the max value, we can draw the star into the top:
 			if (barValues[i] == max) {
-				top.graphics.beginFill("rgba(0,0,0,0.45)").drawPolyStar(barWidth/2, 31, 7, 5, 0.6, -90).closePath();
+				top.graphics.beginFill("rgba(0,0,0,0.75)").drawPolyStar(barWidth/2, 31, 7, 5, 0.6, -90).closePath();
 			}
 
 			// prepare the side of the bar, this will be drawn dynamically in drawBar:
@@ -111,12 +111,12 @@
 			right.x = barWidth-0.5;
 
 			// create the label at the bottom of the bar:
-			var label = new createjs.Text("Label "+i, "16px Arial", "#FFF");
+			var label = new createjs.Text("Q"+i, "bold 16px Arial", "#FFF");
 			label.textAlign = "center";
 			label.x = barWidth/2;
 			label.maxWidth = barWidth;
 			label.y = 12;
-			label.alpha = 0.5;
+			label.alpha = 0.75;
 
 			// draw the tab that is placed under the label:
 			var tab = new createjs.Shape();
@@ -127,7 +127,7 @@
 			var value = new createjs.Text("foo","bold 14px Arial","#000");
 			value.textAlign = "center";
 			value.x = barWidth/2;
-			value.alpha = 0.45;
+			value.alpha = 0.75;
 
 			// add all of the elements to the bar Container:
 			bar.addChild(right,front,top,value,tab,label);

@@ -70,9 +70,9 @@
 // private methods:
 	p._checkChange = function() {
 		var a = this, b = a.values;
-		if (a.min !== b.min || a.max !== b.max || a.value !== b.value || a.width !== b.width || a.height !== b.height) {
+		if (a.value !== b.value || a.min !== b.min || a.max !== b.max || a.width !== b.width || a.height !== b.height) {
 			b.min = a.min;
-			b.max = a.max
+			b.max = a.max;
 			b.value = a.value;
 			b.width = a.width;
 			b.height = a.height;
