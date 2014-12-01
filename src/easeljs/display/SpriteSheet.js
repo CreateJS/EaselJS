@@ -445,8 +445,8 @@ this.createjs = this.createjs||{};
 			this._frameHeight = o.height;
 			this._regX = o.regX||0;
 			this._regY = o.regY||0;
-            this._spacing = o.spacing||0;
-            this._margin = o.margin||0;
+			this._spacing = o.spacing||0;
+			this._margin = o.margin||0;
 			this._numFrames = o.count;
 			if (this._loadCount == 0) { this._calculateFrames(); }
 		}
