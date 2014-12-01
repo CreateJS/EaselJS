@@ -120,17 +120,17 @@
 	}
 
 	function updateLoading() {
-		messageField.text = "Loading " + (preload.progress*100|0) + "%"
+		messageField.text = "Loading " + (preload.progress*100|0) + "%";
 		stage.update();
 	}
 
 
 	function doneLoading(event) {
 		clearInterval(loadingInterval);
-		scoreField = new createjs.Text("0", "bold 12px Arial", "#FFFFFF");
+		scoreField = new createjs.Text("0", "bold 18px Arial", "#FFFFFF");
 		scoreField.textAlign = "right";
-		scoreField.x = canvas.width - 10;
-		scoreField.y = 22;
+		scoreField.x = canvas.width - 20;
+		scoreField.y = 20;
 		scoreField.maxWidth = 1000;
 
 		messageField.text = "Welcome: Click to play";
