@@ -1,271 +1,108 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>EaselJS: Filters Example</title>
+	<title>EaselJS: Filters Example</title>
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-    <link type="text/css" href="assets/css/dark-hive/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+	<link type="text/css" href="assets/css/dark-hive/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 
 	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-   	<!-- We also provide hosted minified versions of all CreateJS libraries.
-   	  http://code.createjs.com -->
+	<script type="text/javascript" src="../_assets/js/Slider.js"></script>
 
-    <script type="text/javascript">
+	<script type="text/javascript">
 
-        var img;
-        var stage;
-        var bmp;
-        var DELTA_INDEX;
-        var blurXSlider;
-        var blurFilter, colorMatrixFilter, colorFilter;
-        var slideInterval = -1;
-        var cm;
+		var img;
+		var stage;
+		var bmp;
+		var sliders = {};
+		var colorMatrix;
+		var blurFilter;
 
-        function init() {
-        	if (window.top != window) {
-        		document.getElementById("header").style.display = "none";
-        	}
-	        document.getElementById("loader").className = "loader";
+		function init() {
+			if (window.top != window) {
+				document.getElementById("header").style.display = "none";
+			}
+			document.getElementById("loader").className = "loader";
 
-            img = new Image();
-            img.onload = handleImageLoad;
-            img.src = "../_assets/art/flowers.jpg";
-        }
+			img = new Image();
+			img.onload = handleImageLoad;
+			img.src = "../_assets/art/flowers.jpg";
+		}
 
-        function handleImageLoad() {
-	        document.getElementById("loader").className = "";
+		function handleImageLoad() {
+			document.getElementById("loader").className = "";
 
-            var canvas = document.getElementById("testCanvas");
+			var canvas = document.getElementById("testCanvas");
 
-            stage = new createjs.Stage(canvas);
+			stage = new createjs.Stage(canvas);
+			stage.enableMouseOver();
 
-            bmp = new createjs.Bitmap(img);
-	        bmp.scaleX = bmp.scaleY = 2;
-            bmp.cache(0,0,img.width,img.height);
-            stage.addChild(bmp);
+			bmp = new createjs.Bitmap(img);
+			bmp.cache(0,0,img.width,img.height);
+			stage.addChild(bmp);
+			
+			var panel = new createjs.Shape().set({alpha:0.7});
+			panel.graphics.beginFill("#111").drawRect(0, canvas.height-125, canvas.width, 125);
+			stage.addChild(panel);
+			
+			var sliderNames = ["brightness", "contrast", "hue", "saturation", "blurX", "blurY"];
+			for (var i=0; i<sliderNames.length; i++) {
+				var name = sliderNames[i];
+				var x = (i/2|0)*300;
+				var y = i%2*50+305;
+				
+				var label = new createjs.Text(name, "18px Arial", "white");
+				label.set({textAlign:"right", x:x+150, y:y});
+				
+				var slider = new Slider(0, 1, 150).set({x:x+160, y:y});
+				sliders[name] = slider;
+				if (i < 4) { slider.value = 0.5; }
+				slider.on("change", handleSliderChange, this);
+				
+				stage.addChild(label, slider);
+			}
+			
+			colorMatrix = new createjs.ColorMatrix();
+			var colorMatrixFilter = new createjs.ColorMatrixFilter(colorMatrix);
+			blurFilter = new createjs.BlurFilter(0,0,2);
+			
+			bmp.filters = [colorMatrixFilter, blurFilter];
+			
+			stage.update();
+		}
+		
+		function handleSliderChange(evt) {
+			blurFilter.blurX = sliders.blurX.value*32;
+			blurFilter.blurY = sliders.blurY.value*32;
+			
+			colorMatrix.setColor(
+				sliders.brightness.value*200-100,
+				sliders.contrast.value*200-100,
+				sliders.saturation.value*200-100,
+				sliders.hue.value*360-180);
+			
+			bmp.updateCache();
+			stage.update();
+		};
 
-            $(".brightnessSlider").slider({
-                value: 0,
-                min: -100,
-                max: 100,
-                disabled:false,
-	            change:handleChange,
-	            slide: handleSlide
-            });
-
-            $(".saturationSlider").slider({
-                value: 0,
-                min: -100,
-                max: 100,
-                disabled:false,
-	            change:handleChange,
-	            slide: handleSlide
-            });
-
-            $(".contrastSlider").slider({
-                value: 0,
-                min: -100,
-                max: 100,
-                disabled:false,
-	            change:handleChange,
-	            slide: handleSlide
-            });
-
-            $(".hueSlider").slider({
-                value: 0,
-                min: -100,
-                max: 100,
-                disabled:false,
-	            change:handleChange,
-	            slide: handleSlide
-            });
-
-            $(".blurYSlider").slider({
-                value: 0,
-                min: 0,
-                max: 30,
-                disabled:false,
-	            change:handleChange,
-	            slide: handleSlide
-            });
-
-            $(".blurXSlider").slider({
-                value: 0,
-                min: 0,
-                max: 30,
-                disabled:false,
-	            change:handleChange,
-	            slide: handleSlide
-            });
-
-            $(".redChannelSlider").slider({
-                value: 255,
-                min: 0,
-                max: 255,
-                disabled:false,
-	            change:handleChange,
-	            slide: handleSlide
-            });
-
-            $(".greenChannelSlider").slider({
-                value: 255,
-                min: 0,
-                max: 255,
-                disabled:false,
-	            change:handleChange,
-	            slide: handleSlide
-            });
-
-            $(".blueChannelSlider").slider({
-                value: 255,
-                min: 0,
-                max: 255,
-                disabled:false,
-	            change:handleChange,
-	            slide: handleSlide
-            });
-
-            $("#resetBtn").click(handleReset);
-
-            applyEffect();
-        }
-
-        function handleSlide() {
-	        if (slideInterval == -1) {
-		        slideInterval = setInterval(applyEffect, 250);
-	        }
-        }
-
-        function handleChange() {
-	        clearInterval(slideInterval);
-	        slideInterval = -1;
-	        applyEffect();
-        }
-
-        function applyEffect() {
-            var brightnessValue = $(".brightnessSlider").slider("option", "value");
-            var contrastValue =  $(".contrastSlider").slider("option", "value");
-            var saturationValue =  $(".saturationSlider").slider("option", "value");
-            var hueValue = $(".hueSlider").slider("option", "value");
-
-            var blurXValue = $(".blurXSlider").slider("option", "value");
-            var blurYValue = $(".blurYSlider").slider("option", "value");
-
-            var redChannelvalue = $(".redChannelSlider").slider("option", "value");
-            var greenChannelValue = $(".greenChannelSlider").slider("option", "value");
-            var blueChannelValue = $(".blueChannelSlider").slider("option", "value");
-
-            cm = new createjs.ColorMatrix();
-            cm.adjustColor(brightnessValue, contrastValue, saturationValue, hueValue);
-
-            colorMatrixFilter = new createjs.ColorMatrixFilter(cm);
-            blurFilter = new createjs.BlurFilter(blurXValue,  blurYValue, 2);
-			colorFilter = new createjs.ColorFilter(redChannelvalue/255,greenChannelValue/255,blueChannelValue/255,1);
-
-            updateImage();
-        }
-
-        function handleReset() {
-            $(".brightnessSlider").slider("option", "value", 0);
-            $(".saturationSlider").slider("option", "value", 0);
-            $(".hueSlider").slider("option", "value", 0);
-            $(".blurYSlider").slider("option", "value", 0);
-            $(".blurXSlider").slider("option", "value", 0);
-            $(".contrastSlider").slider("option", "value", 0);
-            $(".redChannelSlider").slider("option", "value", 255);
-            $(".greenChannelSlider").slider("option", "value", 255);
-            $(".blueChannelSlider").slider("option", "value", 255);
-
-            applyEffect();
-        }
-
-        function updateImage() {
-            bmp.filters = [colorMatrixFilter, blurFilter, colorFilter];
-            bmp.updateCache();
-            stage.update();
-        }
-
-    </script>
-
-    <style type="text/css">
-        /* define a width for the sliders by styling the wrapping div */
-        .hueSlider { width:100px; }
-        .saturationSlider { width:100px; }
-        .contrastSlider { width:100px; }
-        .brightnessSlider { width:100px; }
-        .blurXSlider { width:100px; }
-        .blurYSlider { width:100px; }
-        .redChannelSlider { width:100px; }
-        .greenChannelSlider { width:100px; }
-        .blueChannelSlider { width:100px; }
-    </style>
+	</script>
 </head>
 <body onload="init()">
 
-	<div id="loader"></div>
+<div id="loader"></div>
 
-	<header id="header" class="EaselJS">
-	    <h1>Filters</h1>
-	    <p>Demonstrates using filters. Change the values in order to preview the results. Filters are applied on top of each other.</p>
-	</header>
+<header id="header" class="EaselJS">
+	<h1>Filters</h1>
+	<p>Demonstrates using filters. Change the values in order to preview the results. Filters are applied on top of each other.</p>
+</header>
 
-	<canvas id="testCanvas" width="960" height="250"></canvas>
-    <table>
-        <td>
-        <table cellspacing="7" border="0" cellpadding="3">
-            <tr>
-                <th><div>Brightness:</div></th>
-                <td><div class="brightnessSlider"></div></td>
-            <td>
-                <th><div>Contrast:</div></th>
-                <td><div class="contrastSlider"></div></td>
-            </td>
-            </tr>
-            <tr>
-                <th><div>Hue:</div></th>
-                <td><div class="hueSlider"></div></td>
-
-            <td>
-                <th><div>Saturation:</div></th>
-                <td><div class="saturationSlider"></div></td>
-            </td>
-            </tr>
-        </table>
-        </td>
-        <td>
-            <table cellspacing="7" border="0" cellpadding="3">
-                <tr>
-                    <th rowspan="1" align="center">Blur:</th>
-                    <td>
-                        <div class="blurXSlider"></div>
-                    </td>
-                    <td>
-                        <div class="blurYSlider"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <th><div>RGB:</div></th>
-                    <td>
-                        <div class="redChannelSlider"></div>
-                    </td>
-                    <td>
-                        <div class="greenChannelSlider"></div>
-
-                    </td>
-                    <td>
-                        <div class="blueChannelSlider"></div>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </table>
-    <input type="button" id="resetBtn" name="resetBtn" value="Reset" />
+<canvas id="testCanvas" width="960" height="400"></canvas>
 
 </body>
 </html>
