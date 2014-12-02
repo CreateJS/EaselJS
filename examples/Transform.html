@@ -29,7 +29,7 @@
 		}
 
 		function handleImageLoad(evt) {
-			//examples.hideDistractor();
+			examples.hideDistractor();
 			
 			var img=evt.target, imgWidth=img.width, imgHeight=img.height, sliceCount=6;
 			
@@ -79,7 +79,7 @@
 </head>
 <body onload="init()">
 	<div id="loader"></div>
-	<header id="header" class="EaselJS">
+	<header>
 		<h1>Fold Effect 5</h1>
 		<p>Uses <code>DisplayObject.skewY</code>, <code>Bitmap.sourceRect</code>, and <code>ColorMatrixFilter</code> to create a folding effect. Adjust the strength of the effect with the slider.</p>
 	</header>
