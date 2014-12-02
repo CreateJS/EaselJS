@@ -4,8 +4,8 @@
 
 <title>EaselJS: API Test</title>
 
-<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 <link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.4.min.js"></script>
 
@@ -227,21 +227,23 @@ function drawToCanvas(canvas, data) {
 
 $(init);
 </script>
+<style>
+	code {
+		background: none;
+	}
+</style>
 </head>
 <body>
 
 <header id="header" class="EaselJS">
     <h1>API Test</h1>
-
-    <p>This demo shows the usage of many of the visual APIs.</p>
+    <p>Demonstrates many of the visual APIs.</p>
 </header>
 
-<div style="width: 960px; height: 400px; overflow: scroll; position: relative;"
-     id="wrap">
+<div style="width: 960px; height: 400px; overflow: scroll; position: relative; margin-top: 1rem; background: #F4F6F9;" id="wrap">
     <div id="toc"></div>
 
-    <div class="canvasHolder"
-         style=" padding-left:25px; float: left; height: 150px">
+    <div class="canvasHolder" style=" padding-left:25px; float: left; height: 150px">
     </div>
 </div>
 
