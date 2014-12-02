@@ -42,6 +42,7 @@
 
 			stage = new createjs.Stage(canvas);
 			stage.enableMouseOver();
+			stage.mouseMoveOutside = true;
 
 			bmp = new createjs.Bitmap(img);
 			bmp.cache(0,0,img.width,img.height);

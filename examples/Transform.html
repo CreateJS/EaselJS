@@ -19,6 +19,7 @@
 
 			stage = new createjs.Stage("testCanvas");
 			stage.enableMouseOver();
+			stage.mouseMoveOutside = true;
 
 			var img = new Image();
 			img.onload = handleImageLoad;
