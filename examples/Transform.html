@@ -8,18 +8,19 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../_assets/js/examples.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries. http://code.createjs.com -->
 	<script src="../_assets/js/Slider.js"></script>
 
 	<script>
 		var stage, sliceContainer, sliceWidth, degToRad = Math.PI/180;
-
+		
 		function init() {
-			if (window.top != window) { document.getElementById("header").style.display = "none"; }
-			document.getElementById("loader").className = "loader";
+			examples.showDistractor();
 
 			stage = new createjs.Stage("testCanvas");
 			stage.enableMouseOver();
+			createjs.Touch.enable(stage);
 			stage.mouseMoveOutside = true;
 
 			var img = new Image();
@@ -28,6 +29,8 @@
 		}
 
 		function handleImageLoad(evt) {
+			//examples.hideDistractor();
+			
 			var img=evt.target, imgWidth=img.width, imgHeight=img.height, sliceCount=6;
 			
 			sliceWidth = imgWidth/sliceCount;
@@ -42,7 +45,7 @@
 				sliceContainer.addChild(slice);
 			}
 
-			var slider = new Slider(0, 50, 200, 50).set({x:20, y:20, value:25});
+			var slider = new Slider(0, 50, 200, 50).set({x:20, y:330, value:25});
 			slider.on("change", handleSliderChange, this);
 
 			stage.addChild(sliceContainer, slider);
@@ -77,9 +80,10 @@
 <body onload="init()">
 	<div id="loader"></div>
 	<header id="header" class="EaselJS">
-		<h1>Fold Effect</h1>
+		<h1>Fold Effect 5</h1>
 		<p>Uses <code>DisplayObject.skewY</code>, <code>Bitmap.sourceRect</code>, and <code>ColorMatrixFilter</code> to create a folding effect. Adjust the strength of the effect with the slider.</p>
 	</header>
-	<canvas id="testCanvas" width="960" height="400"></canvas>
+	
+	<div><canvas id="testCanvas" width="960" height="400"></canvas></div>
 </body>
 </html>
