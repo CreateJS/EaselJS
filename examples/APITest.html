@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 
 <title>EaselJS: API Test</title>
@@ -9,13 +9,13 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.4.min.js"></script>
 
-<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+<script src="../lib/easeljs-NEXT.combined.js"></script>
 <!-- We also provide hosted minified versions of all CreateJS libraries.
   http://code.createjs.com -->
 
-<script type="text/javascript">
+<script>
 
-var canvas;
+var canvasHolder;
 var img;
 var demos;
 var STROKE_COLOR = 'red';
@@ -231,6 +231,9 @@ $(init);
 	code {
 		background: none;
 	}
+	canvas {
+		border: 1px solid #DDD;
+	}
 </style>
 </head>
 <body>
@@ -240,7 +243,7 @@ $(init);
     <p>Demonstrates many of the visual APIs.</p>
 </header>
 
-<div style="width: 960px; height: 400px; overflow: scroll; position: relative; margin-top: 1rem; background: #F4F6F9;" id="wrap">
+<div style="width: 960px; height: 400px; overflow: scroll; position: relative; margin-top: 1rem; background: white;" id="wrap">
     <div id="toc"></div>
 
     <div class="canvasHolder" style=" padding-left:25px; float: left; height: 150px">
