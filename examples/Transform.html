@@ -11,128 +11,73 @@
 	<script src="../_assets/js/Slider.js"></script>
 
 	<script type="text/javascript">
-		var stage;
-		var canvas;
-		var imageContainer;
-		var totalWidth;
-		var slideWidth;
-		var totalHeight;
-
+		var stage, sliceContainer, sliceWidth, degToRad = Math.PI/180;
 
 		function init() {
-			if (window.top != window) {
-				document.getElementById("header").style.display = "none";
-			}
+			if (window.top != window) { document.getElementById("header").style.display = "none"; }
 			document.getElementById("loader").className = "loader";
 
-			canvas = document.getElementById('testCanvas');
-			stage = new createjs.Stage(canvas);
+			stage = new createjs.Stage("testCanvas");
+			stage.enableMouseOver();
 
-			imageContainer = new createjs.Container();
-			stage.enableMouseOver (10);
+			var img = new Image();
+			img.onload = handleImageLoad;
+			img.src = "../_assets/art/flowers.jpg";
+		}
 
-			var slider = new Slider(-30, 30, 200, 50).set({x:canvas.width-200, y:0});
+		function handleImageLoad(evt) {
+			var img=evt.target, imgWidth=img.width, imgHeight=img.height, sliceCount=6;
+			
+			sliceWidth = imgWidth/sliceCount;
+			sliceContainer = new createjs.Container();
+			sliceContainer.x = stage.canvas.width/2;
+			
+			for(var i=0; i<sliceCount; i++) {
+				var slice = new createjs.Bitmap(img);
+				slice.sourceRect = new createjs.Rectangle(sliceWidth*i, 0, sliceWidth, imgHeight);
+				slice.cache(0, 0, sliceWidth, imgHeight);
+				slice.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
+				sliceContainer.addChild(slice);
+			}
+
+			var slider = new Slider(0, 50, 200, 50).set({x:20, y:20, value:25});
 			slider.on("change", handleSliderChange, this);
 
-			var robotImage = new Image();
-			robotImage.src = "../_assets/art/robot.png";
-			robotImage.onload = handleImageLoad;
-			stage.addChild(slider);
-			createjs.Ticker.addEventListener("tick", tick);
+			stage.addChild(sliceContainer, slider);
+			updateEffect(slider.value);
 		}
 
-		function handleImageLoad() {
-			var total = 4;
-			totalWidth = this.width | 0;
-			totalHeight = this.height | 0;
-			slideWidth = totalWidth/total;
-			var rect;
-			for(var i=0;i<total;i++) {
-				var bmp = new createjs.Bitmap(this);
-				rect = new createjs.Rectangle(slideWidth*i | 0, 0,slideWidth,totalHeight);
-				bmp.sourceRect = rect;
-				bmp.cache(0,0, slideWidth, totalHeight);
-				bmp.x = slideWidth*i | 0;
-				bmp.snapToPixel = true;
-				imageContainer.addChild(bmp);
-			}
-			imageContainer.regX = totalWidth>>1;
-			imageContainer.regY = totalHeight>>1;
-			centerImage();
-
-			stage.addChild(imageContainer);
+		function handleSliderChange(evt) {
+			updateEffect(evt.target.value);
 		}
-
-		function stop() {
-			createjs.Ticker.removeEventListener("tick", tick);
-		}
-
-		function show(value) {
-
-		}
-
-		function transformImage(value) {
-			if (value == 0) { return; }
-			var l = imageContainer.getNumChildren();
-			for(var i=0;i<l;i++) {
-				var bmp = imageContainer.getChildAt(i);
+		
+		function updateEffect(value) {
+			var l = sliceContainer.getNumChildren();
+			
+			for(var i=0; i<l; i++) {
+				var slice = sliceContainer.getChildAt(i);
+				slice.y = Math.sin(value*degToRad)*-sliceWidth/2;
 				if (i%2) {
-					bmp.skewY = value;
+					slice.skewY = value;
 				} else {
-					bmp.skewY = -value;
-					bmp.y = -(slideWidth) *Math.sin(bmp.skewY/180*Math.PI)
+					slice.skewY = -value;
+					slice.y -= sliceWidth * Math.sin(slice.skewY*degToRad);
 				}
-				bmp.x = ((slideWidth)*i) * Math.cos(bmp.skewY/180*Math.PI);
-				bmp.filters = [getColorMatrixFilter(bmp.skewY)];
-				bmp.updateCache();
+				slice.x = sliceWidth*(i-l/2) * Math.cos(slice.skewY*degToRad);
+				slice.filters[0].matrix.setColor(Math.sin(slice.skewY*degToRad)*-80);
+				slice.updateCache();
 			}
-
-			var _scale = (value > 0) ? 1/value * 15 : -1*(1/value * 15);
-			imageContainer.rotation = (value > 0) ? value>>1 : - 1*value>>1;
-			imageContainer.scaleX = imageContainer.scaleY = (_scale <= 1)?_scale : 1;
-			centerImage();
+			stage.update();
 		}
-
-		function centerImage() {
-			imageContainer.x = (totalWidth) + canvas.width
-					- totalWidth>> 1;
-			imageContainer.y = (totalHeight) + canvas.height -
-					totalHeight >> 1;
-		}
-
-		function getColorMatrixFilter(value) {
-			var cm = new createjs.ColorMatrix();
-			cm.adjustBrightness(value*0.85);
-			return new createjs.ColorMatrixFilter(cm);
-		}
-
-		function handleSliderChange(event) {
-			var target = event.target;
-			transformImage(target.value);
-		}
-
-		function tick(event) {
-			stage.update(event);
-		}
-
-		function touchstart(event) {
-			if (event.target.localName != "select") {
-				event.preventDefault();
-			}
-
-		}
-
 	</script>
-	<link rel="stylesheet" href="assets/demoStyles.css"/>
 
 </head>
-<body onload="init()" ontouchstart="touchstart(this)" style="-webkit-tap-highlight-color: rgba(0,0,0,0);">
+<body onload="init()">
 	<div id="loader"></div>
 	<header id="header" class="EaselJS">
-		<h1>Transformation</h1>
-		<p>This sample shows transformations, including skews. Drag the slider to affect the skew amount.</p>
+		<h1>Fold Effect</h1>
+		<p>Uses <code>DisplayObject.skewY</code>, <code>Bitmap.sourceRect</code>, and <code>ColorMatrixFilter</code> to create a folding effect. Adjust the strength of the effect with the slider.</p>
 	</header>
-	<canvas id="testCanvas" width="960" height="400" style="background-color:
-	 #000000"></canvas>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
 </body>
 </html>
