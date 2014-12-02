@@ -2,6 +2,10 @@ body {
 	width: 960px;
 }
 
+header {
+	margin-bottom: 1rem;
+}
+
 h1 {
 	font-weight: 200;
 	margin-bottom: 1rem;
@@ -18,13 +22,24 @@ header p {
 	background: rgba(250, 252, 255, 0.7);
 }
 
-canvas {
-	margin-top: 1rem;
+.content, canvas {
 	background: white;
+	width: 960px;
+	height: 400px;
+	overflow: hidden;
 }
 
-#loader {
-	display: none;
+.loading {
+	position: relative;
+}
+
+.loading:after {
+	content: url("../art/loading.gif");
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin: -13px 0 0 -51px;
+	opacity: 0.8;
 }
 
 #error {
@@ -34,13 +49,10 @@ canvas {
 	padding: 10px;
 }
 
-.loader {
-	width: 100%;
-	height: 50px;
-	position: absolute;
-	text-align:center;
-	margin-top: 250px;
-	background: url('loader.gif') no-repeat;
-	background-position: 50% 50%;
-	display: block !important;
+body.embedded header {
+	display: none;
+}
+
+body.embedded {
+	margin: 0;
 }
