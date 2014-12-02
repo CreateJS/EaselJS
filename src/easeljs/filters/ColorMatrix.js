@@ -130,7 +130,7 @@ this.createjs = this.createjs||{};
 	 * @chainable
 	 */
 	p.reset = function() {
-		return this.copyMatrix(ColorMatrix.IDENTITY_MATRIX);
+		return this.copy(ColorMatrix.IDENTITY_MATRIX);
 	};
 
 	/**
@@ -277,7 +277,7 @@ this.createjs = this.createjs||{};
 	 * @return {ColorMatrix} A clone of this ColorMatrix.
 	 **/
 	p.clone = function() {
-		return (new ColorMatrix()).copyMatrix(this);
+		return (new ColorMatrix()).copy(this);
 	};
 
 	/**
