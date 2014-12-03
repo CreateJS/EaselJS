@@ -159,6 +159,16 @@ this.createjs = this.createjs||{};
 		 * @default false
 		 **/
 		this.mouseMoveOutside = false;
+		
+		
+		/**
+		 * Prevents selection of other elements in the html page if the user clicks and drags, or double clicks on the canvas.
+		 * This works by calling `preventDefault()` on any mousedown events (or touch equivalent) originating on the canvas.
+		 * @property preventSelection
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.preventSelection = true;
 	
 		/**
 		 * The hitArea property is not supported for Stage.
@@ -734,6 +744,8 @@ this.createjs = this.createjs||{};
 	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
 	 **/
 	p._handlePointerDown = function(id, e, pageX, pageY, owner) {
+		if (this.preventSelection) { e.preventDefault(); }
+		
 		if (pageY != null) { this._updatePointerPosition(id, e, pageX, pageY); }
 		var target = null, nextStage = this._nextStage, o = this._getPointerData(id);
 

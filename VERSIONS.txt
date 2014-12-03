@@ -83,6 +83,7 @@ OTHER:
 - added DisplayObject.transformMatrix
 - mouse interactions and getObjectsUnderPoint now respect masks
 - added a mode param to getObjectsUnderPoint() to respect mouseEnabled/mouseChildren and event listeners
+- added Stage.preventSelection to block accidental selection of document elements
 
 
 
