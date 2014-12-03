@@ -24,6 +24,9 @@ header p {
 
 .content, canvas {
 	background: white;
+}
+
+.content {
 	width: 960px;
 	height: 400px;
 	overflow: hidden;
@@ -47,6 +50,13 @@ header p {
 	width: 960px;
 	text-align: left;
 	padding: 10px;
+}
+
+#mobile {
+    display:none;
+    width: 960px;
+    text-align: left;
+    padding: 10px;
 }
 
 body.embedded header {
