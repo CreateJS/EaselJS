@@ -15,28 +15,27 @@
 			var stage = new ns.Stage("testCanvas");
 			stage.tickOnUpdate = false;
 			
-			
 			var shape = new ns.Shape();
 			stage.addChild(shape);
 			var g = shape.graphics.moveTo(0,0).beginStroke("rgba(0,0,0,0.1)");
 			
 			time("total");
 			time("draw");
-			for (var i=0; i<250000; i++) {
+			for (var i=0; i<100000; i++) {
 				g.lineTo(Math.random()*w,Math.random()*h);
 			}
-			endTime("draw", true);
+			endTime("draw");
 			
 			time("render");
 			stage.update();
-			endTime("render", true);
-			endTime("total", true);
+			endTime("render");
+			endTime("total");
 			
 			endTest();
 		}
 	</script>
 	
-	<p>Tests performance of 250k vector graphics calls when not changing fill / stroke.</p>
+	<p>Tests performance of 100k vector graphics calls when not changing fill / stroke. <b>Note:</b> OSX Safari chokes on this test.</p>
 	<canvas id="testCanvas" width="900" height="450"></canvas>
 </body>
 </html>

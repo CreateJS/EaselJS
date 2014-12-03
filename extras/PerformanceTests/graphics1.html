@@ -15,7 +15,6 @@
 			var stage = new ns.Stage("testCanvas");
 			stage.tickOnUpdate = false;
 			
-			
 			var shape = new ns.Shape();
 			stage.addChild(shape);
 			var g = shape.graphics.moveTo(0,0).beginStroke("rgba(0,0,0,0.1)");
@@ -25,12 +24,12 @@
 			for (var i=0; i<10000; i++) {
 				g.beginStroke(ns.Graphics.getHSL(Math.random()*360, 100, 50)).moveTo(0,0).lineTo(Math.random()*w,Math.random()*h);
 			}
-			endTime("draw", true);
+			endTime("draw");
 			
 			time("render");
 			stage.update();
-			endTime("render", true);
-			endTime("total", true);
+			endTime("render");
+			endTime("total");
 			
 			endTest();
 		}

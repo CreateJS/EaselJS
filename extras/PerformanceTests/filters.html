@@ -9,7 +9,7 @@
 	<script src="perfFramework.js"></script>
 	
 	<!-- this test will use PreloadJS to load required assets -->
-	<script src="../../examples/assets/preloadjs-NEXT.min.js"></script>
+	<script src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
 	<script>
 		// runTest is a special method called by the performance framework
 		// it passes the version array (ex. [0,7,1]) and a hash of all the query string values
@@ -20,8 +20,8 @@
 			var queue = new createjs.LoadQueue();
 			queue.on("complete", assetsLoaded);
 			queue.loadManifest([
-				{id:"photo", src:"photo-hires.jpg"}
-			], true, "../../examples/assets/");
+				{id:"photo", src:"flowers.jpg"}
+			], true, "../../_assets/art/");
 		}
 		
 		function assetsLoaded(evt) {
@@ -43,7 +43,7 @@
 			for (var i=0; i<10; i++) {
 				bmp.updateCache();
 			}
-			endTime("blur", true);
+			endTime("blur");
 			
 			
 			bmp.filters = [new createjs.ColorFilter(2,0,1,1,50,10,20,0)];
@@ -51,7 +51,7 @@
 			for (var i=0; i<10; i++) {
 				bmp.updateCache();
 			}
-			endTime("color", true);
+			endTime("color");
 			
 			
 			bmp.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix(0,0,100,180))];
@@ -59,7 +59,7 @@
 			for (var i=0; i<10; i++) {
 				bmp.updateCache();
 			}
-			endTime("colormatrix", true);
+			endTime("colormatrix");
 			
 			stage.update();
 			endTest();
