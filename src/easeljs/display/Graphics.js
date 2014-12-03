@@ -1353,7 +1353,10 @@ this.createjs = this.createjs||{};
 		if (this._dirty && active.length) {
 			instr.length = commitIndex; // remove old, uncommitted commands
 			instr.push(Graphics.beginCmd);
-			instr.push.apply(instr, active);
+			
+			var l = active.length, ll = instr.length;
+			instr.length = ll+l;
+			for (var i=0; i<l; i++) { instr[i+ll] = active[i]; }
 			
 			if (this._fill) { instr.push(this._fill); }
 			if (this._stroke && this._strokeStyle) { instr.push(this._strokeStyle); }
