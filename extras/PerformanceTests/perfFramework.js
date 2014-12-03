@@ -161,6 +161,7 @@
 	};
 	
 	window.endTime =function(str, log) {
+		if (log == null) { log = true; }
 		var t = startTimes[str];
 		if (!t) { t = -1; }
 		else { t = getTime()-t; }
