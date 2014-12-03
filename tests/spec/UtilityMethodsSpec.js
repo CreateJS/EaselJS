@@ -72,7 +72,7 @@ describe("Utlity Methods", function () {
 		it("setFPS", function (done) {
 			createjs.Ticker.setFPS(40);
 			setTimeout(function () {
-				expect(createjs.Ticker.getTime() | 0).toBeInRange(40 * 2, 2);
+				expect(createjs.Ticker.getTime() | 0).toBeInRange(40 * 2, 3);
 				done();
 			}, 40 * 2);
 		});

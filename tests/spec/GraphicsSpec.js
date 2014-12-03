@@ -12,7 +12,7 @@ describe("Graphics", function () {
 		this.g.beginFill(this.fColor);
 		this.g.moveTo(120, 100).arc(100, 100, 20, 0, Math.PI);
 
-		this.compareBaseLine("assets/arc.png", done, expect);
+		this.compareBaseLine("assets/arc.png", done, expect, 0.01);
 	});
 
 	it("arcTo()", function (done) {
