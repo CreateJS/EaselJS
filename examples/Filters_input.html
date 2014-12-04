@@ -6,9 +6,9 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<link type="text/css" href="assets/css/dark-hive/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
@@ -16,95 +16,96 @@
 
 	<script src="../_assets/js/Slider.js"></script>
 
-	<script>
+<script id="editable">
 
-		var img;
-		var stage;
-		var bmp;
-		var sliders = {};
-		var colorMatrix;
-		var blurFilter;
+	var img;
+	var stage;
+	var bmp;
+	var sliders = {};
+	var colorMatrix;
+	var blurFilter;
 
-		function init() {
-			if (window.top != window) {
-				document.getElementById("header").style.display = "none";
+	function init() {
+		examples.showDistractor();
+
+		img = new Image();
+		img.onload = handleImageLoad;
+		img.src = "../_assets/art/flowers.jpg";
+	}
+
+	function handleImageLoad() {
+		examples.hideDistractor();
+
+		var canvas = document.getElementById("testCanvas");
+
+		stage = new createjs.Stage(canvas);
+		stage.enableMouseOver();
+		stage.mouseMoveOutside = true;
+
+		bmp = new createjs.Bitmap(img);
+		bmp.cache(0, 0, img.width, img.height);
+		stage.addChild(bmp);
+
+		var panel = new createjs.Shape().set({alpha: 0.7});
+		panel.graphics.beginFill("#111").drawRect(0, canvas.height - 125, canvas.width, 125);
+		stage.addChild(panel);
+
+		var sliderNames = ["brightness", "contrast", "hue", "saturation", "blurX", "blurY"];
+		for (var i = 0; i < sliderNames.length; i++) {
+			var name = sliderNames[i];
+			var x = (i / 2 | 0) * 300;
+			var y = i % 2 * 50 + 305;
+
+			var label = new createjs.Text(name, "18px Arial", "white");
+			label.set({textAlign: "right", x: x + 150, y: y});
+
+			var slider = new Slider(0, 1, 150).set({x: x + 160, y: y});
+			sliders[name] = slider;
+			if (i < 4) {
+				slider.value = 0.5;
 			}
-			document.getElementById("loader").className = "loader";
+			slider.on("change", handleSliderChange, this);
 
-			img = new Image();
-			img.onload = handleImageLoad;
-			img.src = "../_assets/art/flowers.jpg";
+			stage.addChild(label, slider);
 		}
 
-		function handleImageLoad() {
-			document.getElementById("loader").className = "";
+		colorMatrix = new createjs.ColorMatrix();
+		var colorMatrixFilter = new createjs.ColorMatrixFilter(colorMatrix);
+		blurFilter = new createjs.BlurFilter(0, 0, 2);
 
-			var canvas = document.getElementById("testCanvas");
+		bmp.filters = [colorMatrixFilter, blurFilter];
 
-			stage = new createjs.Stage(canvas);
-			stage.enableMouseOver();
-			stage.mouseMoveOutside = true;
+		stage.update();
+	}
 
-			bmp = new createjs.Bitmap(img);
-			bmp.cache(0,0,img.width,img.height);
-			stage.addChild(bmp);
-			
-			var panel = new createjs.Shape().set({alpha:0.7});
-			panel.graphics.beginFill("#111").drawRect(0, canvas.height-125, canvas.width, 125);
-			stage.addChild(panel);
-			
-			var sliderNames = ["brightness", "contrast", "hue", "saturation", "blurX", "blurY"];
-			for (var i=0; i<sliderNames.length; i++) {
-				var name = sliderNames[i];
-				var x = (i/2|0)*300;
-				var y = i%2*50+305;
-				
-				var label = new createjs.Text(name, "18px Arial", "white");
-				label.set({textAlign:"right", x:x+150, y:y});
-				
-				var slider = new Slider(0, 1, 150).set({x:x+160, y:y});
-				sliders[name] = slider;
-				if (i < 4) { slider.value = 0.5; }
-				slider.on("change", handleSliderChange, this);
-				
-				stage.addChild(label, slider);
-			}
-			
-			colorMatrix = new createjs.ColorMatrix();
-			var colorMatrixFilter = new createjs.ColorMatrixFilter(colorMatrix);
-			blurFilter = new createjs.BlurFilter(0,0,2);
-			
-			bmp.filters = [colorMatrixFilter, blurFilter];
-			
-			stage.update();
-		}
-		
-		function handleSliderChange(evt) {
-			blurFilter.blurX = sliders.blurX.value*32;
-			blurFilter.blurY = sliders.blurY.value*32;
-			
-			colorMatrix.setColor(
-				sliders.brightness.value*200-100,
-				sliders.contrast.value*200-100,
-				sliders.saturation.value*200-100,
-				sliders.hue.value*360-180);
-			
-			bmp.updateCache();
-			stage.update();
-		};
+	function handleSliderChange(evt) {
+		blurFilter.blurX = sliders.blurX.value * 32;
+		blurFilter.blurY = sliders.blurY.value * 32;
 
-	</script>
+		colorMatrix.setColor(
+						sliders.brightness.value * 200 - 100,
+						sliders.contrast.value * 200 - 100,
+						sliders.saturation.value * 200 - 100,
+						sliders.hue.value * 360 - 180);
+
+		bmp.updateCache();
+		stage.update();
+	}
+
+</script>
 </head>
+
 <body onload="init()">
-
-<div id="loader"></div>
-
-<header id="header" class="EaselJS">
+<header class="EaselJS">
 	<h1>Filters</h1>
-	<p>Demonstrates using <code>ColorMatrixFilter</code> and <code>BlurFilter</code>. Adjust sliders to view results.</p>
+
+	<p>Demonstrates using <code>ColorMatrixFilter</code> and
+		<code>BlurFilter</code>. Adjust sliders to view results.</p>
 </header>
 
-<canvas id="testCanvas" width="960" height="400"></canvas>
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 
 </body>
 </html>

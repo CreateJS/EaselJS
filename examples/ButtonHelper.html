@@ -6,15 +6,16 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
-	
+
 	<script src="../_assets/libs/tweenjs-NEXT.min.js"></script>
 	<script src="../src/easeljs/display/MovieClip.js"></script>
-	
+
 	<script src="../_assets/art/VectorButton.js"></script>
 
-	<script>
+<script id="editable">
 
 	var canvas, stage;
 
@@ -24,11 +25,8 @@
 	var update = true;
 
 	function init() {
-		if (window.top != window) {
-			document.getElementById("header").style.display = "none";
-		}
-		document.getElementById("loader").className = "loader";
-		
+		examples.showDistractor();
+
 		// create stage and point it to the canvas:
 		stage = new createjs.Stage("testCanvas");
 
@@ -43,47 +41,48 @@
 		image.src = "../_assets/art/spritesheet_button.png";
 		image.onload = handleImageLoad;
 	}
-	
+
 	function handleImageLoad(evt) {
-		document.getElementById("loader").className = "";
-		
+		examples.hideDistractor();
+
 		// spritesheet "bitmap" button:
 		var spriteSheet = new createjs.SpriteSheet({
-			images: [evt.target],
-			frames: {width:300, height:100},
-			animations: { out: 0, over: 1, down: 2 }
-		});
+													   images: [evt.target],
+													   frames: {width: 300, height: 100},
+													   animations: { out: 0, over: 1, down: 2 }
+												   });
 		var bitmapButton = new createjs.Sprite(spriteSheet, "up");
-		stage.addChild(bitmapButton).set({x:50, y:50});
+		stage.addChild(bitmapButton).set({x: 50, y: 50});
 		var bitmapHelper = new createjs.ButtonHelper(bitmapButton);
-		
+
 		// movieclip "vector" button:
 		var vectorButton = new lib.VectorButton();
-		stage.addChild(vectorButton).set({x: 400, y:50});
+		stage.addChild(vectorButton).set({x: 400, y: 50});
 		var vectorHelper = new createjs.ButtonHelper(vectorButton);
-		
-		bitmapButton.on("click", function() {
+
+		bitmapButton.on("click", function () {
 			vectorHelper.enabled = !vectorHelper.enabled;
-			vectorButton.alpha = 0.5+vectorHelper.enabled*0.5;
+			vectorButton.alpha = 0.5 + vectorHelper.enabled * 0.5;
 		});
-		
+
 		createjs.Ticker.addEventListener("tick", stage);
 	}
-	</script>
+</script>
 
 </head>
 
 <body onload="init();">
+<header class="EaselJS">
+	<h1>ButtonHelper Example</h1>
 
-	<div id="loader"></div>
+	<p>Shows how to use a <code>ButtonHelper</code> with <code>Sprite</code> or
+		<code>MovieClip</code> instances (or anything with a
+		<code>gotoAndStop()</code> method). Clicking the bitmap button toggles
+		<code>enabled</code> on the vector <code>ButtonHelper</code></p>
+</header>
 
-	<header id="header" class="EaselJS">
-	    <h1>ButtonHelper Example</h1>
-	    <p>Shows how to use a <code>ButtonHelper</code> with <code>Sprite</code> or <code>MovieClip</code> instances (or anything with a <code>gotoAndStop()</code> method). Clicking the bitmap button toggles <code>enabled</code> on the vector <code>ButtonHelper</code></p>
-	</header>
-
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

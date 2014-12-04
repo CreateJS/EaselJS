@@ -6,6 +6,7 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<!-- Note: All core EaselJS classes are listed here: -->
 
@@ -13,7 +14,7 @@
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
+<script id="editable">
 	var canvas;
 	var stage;
 
@@ -51,7 +52,7 @@
 		canvas.onmouseup = mouseUp;
 
 		// Alpha Rectangle, applied each frame at the bottom, fading out the previous content over time.
-		var fade = new createjs.Shape(new createjs.Graphics().f("#FFF").dr(0,0,canvas.width, canvas.height));
+		var fade = new createjs.Shape(new createjs.Graphics().f("#FFF").dr(0, 0, canvas.width, canvas.height));
 		fade.alpha = 0.02;
 		stage.addChild(fade);
 
@@ -67,13 +68,14 @@
 		// outside spinner:
 		spin1 = new createjs.Container();
 		spin1.addChild(spin2);
-		spin1.x = canvas.width/2;
-		spin1.y = canvas.height/2;
+		spin1.x = canvas.width / 2;
+		spin1.y = canvas.height / 2;
 		stage.addChild(spin1);
 
 		text = new createjs.Text("Click and Drag", "36px Arial", "#777777");
 		text.textBaseline = "middle";
-		text.x = 360; text.y = canvas.height/2;
+		text.x = 360;
+		text.y = canvas.height / 2;
 		stage.addChild(text);
 
 		//start ticking
@@ -89,18 +91,18 @@
 		spin2.rotation += -7.113;
 		shape.rotation += 1.77;
 
-		if(_mouseIsDown) {
+		if (_mouseIsDown) {
 
 			var color = createjs.Graphics.getHSL(
-				Math.cos((count++)*0.1) * 30 + colorOffset,
-				100,
-				50,
-				0.8);
+							Math.cos((count++) * 0.1) * 30 + colorOffset,
+							100,
+							50,
+							0.8);
 
-			graphics.setStrokeStyle(Math.random()*20,"round").beginStroke(color);
-			graphics.moveTo(0,0);
-			lastPt = shape.globalToLocal(_mouseX,_mouseY);
-			graphics.lineTo(lastPt.x,lastPt.y);
+			graphics.setStrokeStyle(Math.random() * 20, "round").beginStroke(color);
+			graphics.moveTo(0, 0);
+			lastPt = shape.globalToLocal(_mouseX, _mouseY);
+			graphics.lineTo(lastPt.x, lastPt.y);
 
 			// draw the new vector line to the canvas:
 			stage.update(event);
@@ -112,12 +114,16 @@
 
 	//start drawing
 	function mouseDown(event) {
-		if(!event){ var e = window.event; }
+		if (!event) {
+			var e = window.event;
+		}
 		stage.removeChild(text);
-		if (_mouseIsDown) { return; }
+		if (_mouseIsDown) {
+			return;
+		}
 		_mouseIsDown = true;
-		colorOffset = Math.random()*360;
-		lastPt = shape.globalToLocal(event.pageX-canvas.offsetLeft,event.pageY-canvas.offsetTop);
+		colorOffset = Math.random() * 360;
+		lastPt = shape.globalToLocal(event.pageX - canvas.offsetLeft, event.pageY - canvas.offsetTop);
 	}
 
 	//stop drawing
@@ -127,26 +133,31 @@
 
 	//update mouse positions
 	function mouseMove(e) {
-		if(!e){ var e = window.event; }
-		_mouseX = e.pageX-canvas.offsetLeft;
-		_mouseY = e.pageY-canvas.offsetTop;
+		if (!e) {
+			var e = window.event;
+		}
+		_mouseX = e.pageX - canvas.offsetLeft;
+		_mouseY = e.pageY - canvas.offsetTop;
 	}
 
-
-	</script>
+</script>
 </head>
-	
-<body onload="init();">
-	<header id="header" class="EaselJS">
-	    <h1>GlobalToLocal</h1>
-	    <p>Similar to globalToLocal1.html, but <code>Stage.autoClear</code> is set to false (so the stage never clears itself), and the
-		    vector <code>Shape</code> is cleared each tick, so only one line is rendered per tick. As such, you can draw continuously
-		    without a slow down. A mostly-transparent rectangular shape is drawn each frame to fade out content over time.
-	    </p>
-	</header>
 
-    <div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+<body onload="init();">
+<header class="EaselJS">
+	<h1>GlobalToLocal</h1>
+
+	<p>Similar to globalToLocal1.html, but <code>Stage.autoClear</code> is set
+		to false (so the stage never clears itself), and the
+		vector <code>Shape</code> is cleared each tick, so only one line is
+		rendered per tick. As such, you can draw continuously
+		without a slow down. A mostly-transparent rectangular shape is drawn
+		each frame to fade out content over time.
+	</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

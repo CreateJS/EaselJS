@@ -6,84 +6,88 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
-	<script src="../_assets/js/examples.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries. http://code.createjs.com -->
 	<script src="../_assets/js/Slider.js"></script>
 
-	<script>
-		var stage, sliceContainer, sliceWidth, degToRad = Math.PI/180;
-		
-		function init() {
-			examples.showDistractor();
+<script id="editable">
+	var stage, sliceContainer, sliceWidth, degToRad = Math.PI / 180;
 
-			stage = new createjs.Stage("testCanvas");
-			stage.enableMouseOver();
-			createjs.Touch.enable(stage);
-			stage.mouseMoveOutside = true;
+	function init() {
+		examples.showDistractor();
 
-			var img = new Image();
-			img.onload = handleImageLoad;
-			img.src = "../_assets/art/flowers.jpg";
+		stage = new createjs.Stage("testCanvas");
+		stage.enableMouseOver();
+		createjs.Touch.enable(stage);
+		stage.mouseMoveOutside = true;
+
+		var img = new Image();
+		img.onload = handleImageLoad;
+		img.src = "../_assets/art/flowers.jpg";
+	}
+
+	function handleImageLoad(evt) {
+		examples.hideDistractor();
+
+		var img = evt.target, imgWidth = img.width, imgHeight = img.height, sliceCount = 6;
+
+		sliceWidth = imgWidth / sliceCount;
+		sliceContainer = new createjs.Container();
+		sliceContainer.x = stage.canvas.width / 2;
+
+		for (var i = 0; i < sliceCount; i++) {
+			var slice = new createjs.Bitmap(img);
+			slice.sourceRect = new createjs.Rectangle(sliceWidth * i, 0, sliceWidth, imgHeight);
+			slice.cache(0, 0, sliceWidth, imgHeight);
+			slice.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
+			sliceContainer.addChild(slice);
 		}
 
-		function handleImageLoad(evt) {
-			examples.hideDistractor();
-			
-			var img=evt.target, imgWidth=img.width, imgHeight=img.height, sliceCount=6;
-			
-			sliceWidth = imgWidth/sliceCount;
-			sliceContainer = new createjs.Container();
-			sliceContainer.x = stage.canvas.width/2;
-			
-			for(var i=0; i<sliceCount; i++) {
-				var slice = new createjs.Bitmap(img);
-				slice.sourceRect = new createjs.Rectangle(sliceWidth*i, 0, sliceWidth, imgHeight);
-				slice.cache(0, 0, sliceWidth, imgHeight);
-				slice.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
-				sliceContainer.addChild(slice);
+		var slider = new Slider(0, 50, 200, 50).set({x: 20, y: 330, value: 25});
+		slider.on("change", handleSliderChange, this);
+
+		stage.addChild(sliceContainer, slider);
+		updateEffect(slider.value);
+	}
+
+	function handleSliderChange(evt) {
+		updateEffect(evt.target.value);
+	}
+
+	function updateEffect(value) {
+		var l = sliceContainer.getNumChildren();
+
+		for (var i = 0; i < l; i++) {
+			var slice = sliceContainer.getChildAt(i);
+			slice.y = Math.sin(value * degToRad) * -sliceWidth / 2;
+			if (i % 2) {
+				slice.skewY = value;
+			} else {
+				slice.skewY = -value;
+				slice.y -= sliceWidth * Math.sin(slice.skewY * degToRad);
 			}
-
-			var slider = new Slider(0, 50, 200, 50).set({x:20, y:330, value:25});
-			slider.on("change", handleSliderChange, this);
-
-			stage.addChild(sliceContainer, slider);
-			updateEffect(slider.value);
+			slice.x = sliceWidth * (i - l / 2) * Math.cos(slice.skewY * degToRad);
+			slice.filters[0].matrix.setColor(Math.sin(slice.skewY * degToRad) * -80);
+			slice.updateCache();
 		}
-
-		function handleSliderChange(evt) {
-			updateEffect(evt.target.value);
-		}
-		
-		function updateEffect(value) {
-			var l = sliceContainer.getNumChildren();
-			
-			for(var i=0; i<l; i++) {
-				var slice = sliceContainer.getChildAt(i);
-				slice.y = Math.sin(value*degToRad)*-sliceWidth/2;
-				if (i%2) {
-					slice.skewY = value;
-				} else {
-					slice.skewY = -value;
-					slice.y -= sliceWidth * Math.sin(slice.skewY*degToRad);
-				}
-				slice.x = sliceWidth*(i-l/2) * Math.cos(slice.skewY*degToRad);
-				slice.filters[0].matrix.setColor(Math.sin(slice.skewY*degToRad)*-80);
-				slice.updateCache();
-			}
-			stage.update();
-		}
-	</script>
+		stage.update();
+	}
+</script>
 
 </head>
 <body onload="init()">
-	<div id="loader"></div>
-	<header>
-		<h1>Fold Effect 5</h1>
-		<p>Uses <code>DisplayObject.skewY</code>, <code>Bitmap.sourceRect</code>, and <code>ColorMatrixFilter</code> to create a folding effect. Adjust the strength of the effect with the slider.</p>
-	</header>
-	
-	<div><canvas id="testCanvas" width="960" height="400"></canvas></div>
+<header>
+	<h1>Fold Effect 5</h1>
+
+	<p>Uses <code>DisplayObject.skewY</code>, <code>Bitmap.sourceRect</code>,
+		and <code>ColorMatrixFilter</code> to create a folding effect. Adjust
+		the strength of the effect with the slider.</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

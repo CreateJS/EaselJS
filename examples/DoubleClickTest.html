@@ -6,12 +6,14 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
+
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
 
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
+<script id="editable">
 	function init() {
 		//find canvas and load images, wait for last image to load
 		var canvas = document.getElementById("testCanvas");
@@ -23,7 +25,7 @@
 		container.y = 80;
 
 		var target = new createjs.Shape();
-		target.graphics.beginFill("#F00").drawRect(-10,-10,300,60).beginFill("#FFF");
+		target.graphics.beginFill("#F00").drawRect(-10, -10, 300, 60).beginFill("#FFF");
 		container.addChild(target);
 
 		var txt = new createjs.Text("Double Click Me!", "36px Arial", "#FFF");
@@ -32,22 +34,25 @@
 
 		stage.addChild(container);
 
-        container.on("dblclick", function(evt) { alert("Double Clicked the container object"); });
+		container.on("dblclick", function (evt) {
+			alert("Double Clicked the container object");
+		});
 
 		stage.update();
 	}
 
-	</script>
+</script>
 </head>
-	
-<body onload="init();">
-	<header id="header" class="EaselJS">
-	    <h1>Double Click Example</h1>
-	    <p>An example to show how to use the <code>dblclick</code> event.</p>
-	</header>
 
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+<body onload="init();">
+<header class="EaselJS">
+	<h1>Double Click Example</h1>
+
+	<p>An example to show how to use the <code>dblclick</code> event.</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

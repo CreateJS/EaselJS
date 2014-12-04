@@ -6,26 +6,30 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
 </head>
 
 <body onload="init();">
 
-<div id="loader"></div>
-<header id="header" class="EaselJS">
+<header class="EaselJS">
 	<h1>AlphaMaskFilter reveal</h1>
 
-	<p>This example demonstrates revealing an image using another image as the mask. The mask is created by drawing a
-		shape, and then caching the shape to make an image with an alpha channel. It is then applied to the image as
-		an mask using the <code>AlphaMaskFilter</code> filter. Another copy of the image is added below with a
-		<code>BlurFilter</code> and <code>ColorMatrixFilter</code> to make the effect cooler.</p>
+	<p>This example demonstrates revealing an image using another image as the
+		mask. The mask is created by drawing a
+		shape, and then caching the shape to make an image with an alpha
+		channel. It is then applied to the image as
+		an mask using the <code>AlphaMaskFilter</code> filter. Another copy of
+		the image is added below with a
+		<code>BlurFilter</code> and <code>ColorMatrixFilter</code> to make the
+		effect cooler.</p>
 </header>
-<canvas id="testCanvas" width="960" height="400"></canvas>
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 
-
-<script>
+<script id="editable">
 	var stage;
 	var isDrawing;
 	var drawingCanvas;
@@ -40,11 +44,7 @@
 	var blur;
 
 	function init() {
-		if (window.top != window) {
-			document.getElementById("header").style.display = "none";
-		}
-
-		document.getElementById("loader").className = "loader";
+		examples.showDistractor();
 
 		image = new Image();
 		image.onload = handleComplete;
@@ -57,7 +57,7 @@
 	}
 
 	function handleComplete() {
-		document.getElementById("loader").className = "";
+		examples.hideDistractor();
 		createjs.Touch.enable(stage);
 		stage.enableMouseOver();
 
@@ -91,18 +91,18 @@
 	function handleMouseMove(event) {
 		cursor.x = stage.mouseX;
 		cursor.y = stage.mouseY;
-		
+
 		if (!isDrawing) {
 			stage.update();
 			return;
 		}
-		
+
 		var midPoint = new createjs.Point(oldPt.x + stage.mouseX >> 1, oldPt.y + stage.mouseY >> 1);
 
 		drawingCanvas.graphics.setStrokeStyle(40, "round", "round")
-			.beginStroke("rgba(0,0,0,0.2)")
-			.moveTo(midPoint.x, midPoint.y)
-			.curveTo(oldPt.x, oldPt.y, oldMidPt.x, oldMidPt.y);
+				.beginStroke("rgba(0,0,0,0.2)")
+				.moveTo(midPoint.x, midPoint.y)
+				.curveTo(oldPt.x, oldPt.y, oldMidPt.x, oldMidPt.y);
 
 		oldPt.x = stage.mouseX;
 		oldPt.y = stage.mouseY;
@@ -111,7 +111,6 @@
 		oldMidPt.y = midPoint.y;
 
 		updateCacheImage(true);
-
 	}
 
 	function handleMouseUp(event) {

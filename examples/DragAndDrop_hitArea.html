@@ -6,13 +6,13 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
-
+<script id="editable">
 	var canvas, stage;
 
 	var mouseTarget;	// the display object currently under the mouse, or being dragged
@@ -21,10 +21,7 @@
 	var update = true;
 
 	function init() {
-		if (window.top != window) {
-			document.getElementById("header").style.display = "none";
-		}
-		document.getElementById("loader").className = "loader";
+		examples.showDistractor();
 		// create stage and point it to the canvas:
 		canvas = document.getElementById("testCanvas");
 
@@ -53,53 +50,53 @@
 		var bitmap;
 		var container = new createjs.Container();
 		stage.addChild(container);
-		
+
 		// create a shape that represents the center of the daisy image:
 		var hitArea = new createjs.Shape();
-		hitArea.graphics.beginFill("#FFF").drawEllipse(-11,-14,24,18);
+		hitArea.graphics.beginFill("#FFF").drawEllipse(-11, -14, 24, 18);
 		// position hitArea relative to the internal coordinate system of the target bitmap instances:
-		hitArea.x = image.width/2;
-		hitArea.y = image.height/2;
+		hitArea.x = image.width / 2;
+		hitArea.y = image.height / 2;
 
 		// create and populate the screen with random daisies:
-		for(var i = 0; i < 100; i++){
+		for (var i = 0; i < 100; i++) {
 			bitmap = new createjs.Bitmap(image);
 			container.addChild(bitmap);
-			bitmap.x = canvas.width * Math.random()|0;
-			bitmap.y = canvas.height * Math.random()|0;
-			bitmap.rotation = 360 * Math.random()|0;
-			bitmap.regX = bitmap.image.width/2|0;
-			bitmap.regY = bitmap.image.height/2|0;
-			bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random()*0.4+0.6;
-			bitmap.name = "bmp_"+i;
+			bitmap.x = canvas.width * Math.random() | 0;
+			bitmap.y = canvas.height * Math.random() | 0;
+			bitmap.rotation = 360 * Math.random() | 0;
+			bitmap.regX = bitmap.image.width / 2 | 0;
+			bitmap.regY = bitmap.image.height / 2 | 0;
+			bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random() * 0.4 + 0.6;
+			bitmap.name = "bmp_" + i;
 			bitmap.cursor = "pointer";
-			
+
 			// assign the hit area:
 			bitmap.hitArea = hitArea;
 
-			bitmap.addEventListener("mousedown", function(evt) {
+			bitmap.addEventListener("mousedown", function (evt) {
 				// bump the target in front of its siblings:
 				var o = evt.target;
 				o.parent.addChild(o);
-				o.offset = {x:o.x-evt.stageX, y:o.y-evt.stageY};
+				o.offset = {x: o.x - evt.stageX, y: o.y - evt.stageY};
 			});
-			
+
 			// the pressmove event is dispatched when the mouse moves after a mousedown on the target until the mouse is released.
-			bitmap.addEventListener("pressmove", function(evt) {
+			bitmap.addEventListener("pressmove", function (evt) {
 				var o = evt.target;
-				o.x = evt.stageX+ o.offset.x;
-				o.y = evt.stageY+ o.offset.y;
+				o.x = evt.stageX + o.offset.x;
+				o.y = evt.stageY + o.offset.y;
 				// indicate that the stage should be updated on the next tick:
 				update = true;
 			});
-			
-			bitmap.addEventListener("rollover", function(evt) {
+
+			bitmap.addEventListener("rollover", function (evt) {
 				var o = evt.target;
-				o.scaleX = o.scaleY = o.scale*1.2;
+				o.scaleX = o.scaleY = o.scale * 1.2;
 				update = true;
 			});
-			
-			bitmap.addEventListener("rollout", function(evt) {
+
+			bitmap.addEventListener("rollout", function (evt) {
 				var o = evt.target;
 				o.scaleX = o.scaleY = o.scale;
 				update = true;
@@ -107,7 +104,7 @@
 
 		}
 
-		document.getElementById("loader").className = "";
+		examples.hideDistractor();
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 
@@ -118,21 +115,21 @@
 			stage.update(event);
 		}
 	}
-	</script>
+</script>
 
 </head>
 
 <body onload="init();">
+<header class="EaselJS">
+	<h1>Drag &amp; Drop With Hit Areas</h1>
 
-	<div id="loader"></div>
+	<p>This example is the same as the DragAndDrop example, except it uses
+		<code>hitArea</code> to make only the center part of the daisy respond
+		to mouse interactions.</p>
+</header>
 
-	<header id="header" class="EaselJS">
-	    <h1>Drag &amp; Drop With Hit Areas</h1>
-	    <p>This example is the same as the DragAndDrop example, except it uses <code>hitArea</code> to make only the center part of the daisy respond to mouse interactions.</p>
-	</header>
-
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

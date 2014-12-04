@@ -6,92 +6,91 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
+<script id="editable">
 	var canvas;
 	var stage;
 	var headRadius;
 	var g;
 
 	function init() {
-		if (window.top != window) {
-			document.getElementById("header").style.display = "none";
-		}
+		canvas = document.getElementById('myCanvas');
+		width = canvas.width;
+		height = canvas.height;
+		stage = new createjs.Stage(canvas);
 
-	    canvas = document.getElementById('myCanvas');
-	    width = canvas.width;
-	    height = canvas.height;
-	    stage = new createjs.Stage(canvas);
+		layoutSmiley();
 
-	    layoutSmiley();
-
-	    stage.addEventListener("stagemousedown", handlePress);
-	    stage.update();
+		stage.addEventListener("stagemousedown", handlePress);
+		stage.update();
 
 	}
 
 	function layoutSmiley() {
-	    // get a single Graphics instance.
-	    g = drawSmiley(createjs.Graphics.getHSL(Math.random()*360,100,Math.random()*50+30));
-	    
-	    for(var i=0;i<141;i++) {
-	    	// share the Graphics instance between all of the shapes:
-	        var shape = new createjs.Shape(g);
-	        shape.scaleX = shape.scaleY = i/400 + 0.4;
-	        shape.x = Math.cos(i/4)*i*3.75 + canvas.width/2;
-	        shape.y = Math.sin(i/4)*i*3.75 + canvas.height/2;
-	        shape.rotation = Math.random()*360;
-	        stage.addChild(shape);
-	    }
+		// get a single Graphics instance.
+		g = drawSmiley(createjs.Graphics.getHSL(Math.random() * 360, 100, Math.random() * 50 + 30));
 
-	    stage.update();
+		for (var i = 0; i < 141; i++) {
+			// share the Graphics instance between all of the shapes:
+			var shape = new createjs.Shape(g);
+			shape.scaleX = shape.scaleY = i / 400 + 0.4;
+			shape.x = Math.cos(i / 4) * i * 3.75 + canvas.width / 2;
+			shape.y = Math.sin(i / 4) * i * 3.75 + canvas.height / 2;
+			shape.rotation = Math.random() * 360;
+			stage.addChild(shape);
+		}
+
+		stage.update();
 	}
 
 	function handlePress() {
-	    stage.removeAllChildren();
+		stage.removeAllChildren();
 		layoutSmiley();
 	}
 
 	function drawSmiley(fillColor) {
-	    var g = new createjs.Graphics();
+		var g = new createjs.Graphics();
 
-	    //Head
-	    g.setStrokeStyle(10, 'round', 'round');
-	    g.beginStroke("#000");
-	    g.beginFill(fillColor);
-	    g.drawCircle(0, 0, 100); //55,53
+		//Head
+		g.setStrokeStyle(10, 'round', 'round');
+		g.beginStroke("#000");
+		g.beginFill(fillColor);
+		g.drawCircle(0, 0, 100); //55,53
 
-	    //Mouth
-	    g.beginFill(); // no fill
-	    g.arc(0,0,60,0, Math.PI);
-	    
-	    //Right eye
-	    g.beginStroke(); // no stroke
-	    g.beginFill("#000");
-	    g.drawCircle(-30,-30,15);
+		//Mouth
+		g.beginFill(); // no fill
+		g.arc(0, 0, 60, 0, Math.PI);
 
-	    //Left eye
-	    g.drawCircle(30,-30,15);
-	    
-	    return g;
+		//Right eye
+		g.beginStroke(); // no stroke
+		g.beginFill("#000");
+		g.drawCircle(-30, -30, 15);
+
+		//Left eye
+		g.drawCircle(30, -30, 15);
+
+		return g;
 	}
 
-	</script>
+</script>
 
 </head>
 <body onload="init()">
 
-	<header id="header" class="EaselJS">
-	    <h1>Graphics Re-use</h1>
-	    <p>This example shows how a single <code>Graphics</code> object can be reused between multiple <code>Shape</code> instances.
-		    Click to redraw.</p>
-	</header>
+<header class="EaselJS">
+	<h1>Graphics Re-use</h1>
 
-	<canvas id="myCanvas" width="960" height="400"></canvas>
+	<p>This example shows how a single <code>Graphics</code> object can be
+		reused between multiple <code>Shape</code> instances.
+		Click to redraw.</p>
+</header>
+
+<canvas id="myCanvas" width="960" height="400"></canvas>
 
 </body>
 </html>

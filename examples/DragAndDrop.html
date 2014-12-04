@@ -6,11 +6,11 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
 
-	<script>
-
+<script id="editable">
 	var canvas, stage;
 
 	var mouseTarget;	// the display object currently under the mouse, or being dragged
@@ -19,10 +19,7 @@
 	var update = true;
 
 	function init() {
-		if (window.top != window) {
-			document.getElementById("header").style.display = "none";
-		}
-		document.getElementById("loader").className = "loader";
+		examples.showDistractor();
 		// create stage and point it to the canvas:
 		canvas = document.getElementById("testCanvas");
 		stage = new createjs.Stage(canvas);
@@ -51,46 +48,46 @@
 		stage.addChild(container);
 
 		// create and populate the screen with random daisies:
-		for(var i = 0; i < 100; i++){
+		for (var i = 0; i < 100; i++) {
 			bitmap = new createjs.Bitmap(image);
 			container.addChild(bitmap);
-			bitmap.x = canvas.width * Math.random()|0;
-			bitmap.y = canvas.height * Math.random()|0;
-			bitmap.rotation = 360 * Math.random()|0;
-			bitmap.regX = bitmap.image.width/2|0;
-			bitmap.regY = bitmap.image.height/2|0;
-			bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random()*0.4+0.6;
-			bitmap.name = "bmp_"+i;
+			bitmap.x = canvas.width * Math.random() | 0;
+			bitmap.y = canvas.height * Math.random() | 0;
+			bitmap.rotation = 360 * Math.random() | 0;
+			bitmap.regX = bitmap.image.width / 2 | 0;
+			bitmap.regY = bitmap.image.height / 2 | 0;
+			bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random() * 0.4 + 0.6;
+			bitmap.name = "bmp_" + i;
 			bitmap.cursor = "pointer";
-			
+
 			// using "on" binds the listener to the scope of the currentTarget by default
 			// in this case that means it executes in the scope of the button.
-			bitmap.on("mousedown", function(evt) {
+			bitmap.on("mousedown", function (evt) {
 				this.parent.addChild(this);
-				this.offset = {x:this.x-evt.stageX, y:this.y-evt.stageY};
+				this.offset = {x: this.x - evt.stageX, y: this.y - evt.stageY};
 			});
-			
+
 			// the pressmove event is dispatched when the mouse moves after a mousedown on the target until the mouse is released.
-			bitmap.on("pressmove", function(evt) {
-				this.x = evt.stageX+ this.offset.x;
-				this.y = evt.stageY+ this.offset.y;
+			bitmap.on("pressmove", function (evt) {
+				this.x = evt.stageX + this.offset.x;
+				this.y = evt.stageY + this.offset.y;
 				// indicate that the stage should be updated on the next tick:
 				update = true;
 			});
-			
-			bitmap.on("rollover", function(evt) {
-				this.scaleX = this.scaleY = this.scale*1.2;
+
+			bitmap.on("rollover", function (evt) {
+				this.scaleX = this.scaleY = this.scale * 1.2;
 				update = true;
 			});
-			
-			bitmap.on("rollout", function(evt) {
+
+			bitmap.on("rollout", function (evt) {
 				this.scaleX = this.scaleY = this.scale;
 				update = true;
 			});
 
 		}
 
-		document.getElementById("loader").className = "";
+		examples.hideDistractor();
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 
@@ -101,21 +98,23 @@
 			stage.update(event);
 		}
 	}
-	</script>
+</script>
 
 </head>
 
 <body onload="init();">
+<header class="EaselJS">
+	<h1>Drag &amp; Drop</h1>
 
-	<div id="loader"></div>
+	<p>Example of implementing drag &amp; drop using mouse events such as <code>mousedown</code>,
+		<code>mouseup</code>, and <code>pressmove</code>. Some browsers do not
+		allow access to pixel data when running local files, and may throw a
+		security error or not work unless the content is running on a server.
+	</p>
+</header>
 
-	<header id="header" class="EaselJS">
-	    <h1>Drag &amp; Drop</h1>
-	    <p>Example of implementing drag &amp; drop using mouse events such as <code>mousedown</code>, <code>mouseup</code>, and <code>pressmove</code>. Some browsers do not allow access to pixel data when running local files, and may throw a security error or not work unless the content is running on a server.</p>
-	</header>
-
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

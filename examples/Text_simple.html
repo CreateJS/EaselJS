@@ -6,12 +6,13 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
+<script id="editable">
 	var canvas;
 	var stage;
 
@@ -37,7 +38,7 @@
 		shape.x = txt.x;
 		shape.y = txt.y;
 		shape.rotation = txt.rotation;
-		stage.addChildAt(shape,0);
+		stage.addChildAt(shape, 0);
 
 		// we want to do some work before we update the canvas,
 		// otherwise we could use Ticker.addEventListener("tick", stage);
@@ -49,27 +50,29 @@
 		count++;
 
 		// update the text:
-		txt.text = "text on the canvas... "+count+"!";
+		txt.text = "text on the canvas... " + count + "!";
 
 		// draw a vector box of the appropriate width behind the text:
-		shape.graphics.clear().beginFill("#F00").drawRect(-10, -10, txt.getMeasuredWidth()+20, 36+20);
+		shape.graphics.clear().beginFill("#F00").drawRect(-10, -10, txt.getMeasuredWidth() + 20, 36 + 20);
 
 		// update the stage:
 		stage.update(event);
 	}
 
-	</script>
+</script>
 </head>
-	
+
 <body onload="init();">
 
-	<header id="header" class="EaselJS">
-	    <h1>Text Sample</h1>
-	    <p>Shows how to use <code>Text</code> elements, and <code>Text.getMeasuredWidth()</code>.</p>
-	</header>
+<header class="EaselJS">
+	<h1>Text Sample</h1>
 
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+	<p>Shows how to use <code>Text</code> elements, and <code>Text.getMeasuredWidth()</code>.
+	</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

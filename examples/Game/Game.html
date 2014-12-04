@@ -3,22 +3,60 @@
 <head>
 	<meta charset="utf-8">
 	<title>CreateJS Example: Space Rocks Game</title>
-	
-	<link rel="stylesheet" type="text/css" href="../../_assets/css/shared.css" />
-	<link rel="stylesheet" type="text/css" href="../../_assets/css/examples.css" />
-	
-	<script src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
-	<script src="../../_assets/libs/soundjs-NEXT.min.js"></script>
 
-	<script src="../../lib/easeljs-NEXT.combined.js"></script>
-	<!-- We also provide hosted minified versions of all CreateJS libraries.
-	  http://code.createjs.com -->
+	<link rel="stylesheet" type="text/css" href="../../_assets/css/shared.css"/>
+	<link rel="stylesheet" type="text/css"
+		  href="../../_assets/css/examples.css"/>
+	<script src="../../_assets/js/examples.js"></script>
+</head>
 
-	<!-- Game script below -->
-	<script src="SpaceRock.js"></script>
-	<script src="Ship.js"></script>
-	<script>
+<body onload="init();">
 
+<header class="SoundJS">
+	<h1>Space Rocks Game</h1>
+
+	<p>Simple example game, built using SoundJS and EaselJS.</p>
+</header>
+
+<div id="content">
+	<canvas id="gameCanvas" width="960" height="400"
+			style="background:black;"></canvas>
+</div>
+
+<div id="error">
+	<h1>Sorry!</h1>
+
+	<p>SoundJS is not currently supported in your browser.</p>
+
+	<p>Please <a href="http://github.com/CreateJS/SoundJS/issues"
+				 target="_blank">log a bug</a>
+		with the device and browser you are using. Thank you.</p>
+</div>
+
+<div id="mobile">
+	<h1>Sorry!</h1>
+
+	<p>Mobile devices require sound to be played inside of user events, which
+		this demo does not do.</p>
+
+	<p>Please <a href="http://github.com/CreateJS/SoundJS/issues"
+				 target="_blank">log a bug</a>
+		with the OS and browser if you see this on a device that is not mobile.
+		Thank you.</p>
+</div>
+
+<script src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
+<script src="../../_assets/libs/soundjs-NEXT.min.js"></script>
+
+<script src="../../lib/easeljs-NEXT.combined.js"></script>
+<!-- We also provide hosted minified versions of all CreateJS libraries.
+  http://code.createjs.com -->
+
+<!-- Game script below -->
+<script type="text/javascript" src="SpaceRock.js"></script>
+<script type="text/javascript" src="Ship.js"></script>
+
+<script id="editable">
 	var DIFFICULTY = 2;			//how fast the game gets mor difficult
 	var ROCK_TIME = 110;		//aprox tick count until a new asteroid gets introduced
 	var SUB_ROCK_COUNT = 4;		//how many small rocks to make on rock death
@@ -36,6 +74,9 @@
 	var KEYCODE_W = 87;			//useful keycode
 	var KEYCODE_A = 65;			//useful keycode
 	var KEYCODE_D = 68;			//useful keycode
+
+	var manifest;           // used to register sounds for preloading
+	var preload;
 
 	var shootHeld;			//is the user holding a shoot command
 	var lfHeld;				//is the user holding a turn left command
@@ -60,31 +101,21 @@
 
 	var loadingInterval = 0;
 
-    var preload;
-
 	//register key functions
 	document.onkeydown = handleKeyDown;
 	document.onkeyup = handleKeyUp;
 
-	var preload;
-
 	function init() {
-	    if (window.top != window) {
-	       document.getElementById("header").style.display = "none";
-	   	}
+		if (!createjs.Sound.initializeDefaultPlugins()) {
+			document.getElementById("error").style.display = "block";
+			document.getElementById("content").style.display = "none";
+			return;
+		}
 
-        document.getElementById("mobile").style.display = "none";
-
-	    if (!createjs.Sound.initializeDefaultPlugins()) {
-	         document.getElementById("error").style.display = "block";
-	         document.getElementById("content").style.display = "none";
-	         return;
-	    }
-
- 		if (createjs.Sound.BrowserDetect.isIOS || createjs.Sound.BrowserDetect.isAndroid || createjs.Sound.BrowserDetect.isBlackberry) {
+		if (createjs.Sound.BrowserDetect.isIOS || createjs.Sound.BrowserDetect.isAndroid || createjs.Sound.BrowserDetect.isBlackberry) {
 			document.getElementById("mobile").style.display = "block";
-	        document.getElementById("content").style.display = "none";
-	        return;
+			document.getElementById("content").style.display = "none";
+			return;
 		}
 
 		canvas = document.getElementById("gameCanvas");
@@ -99,31 +130,34 @@
 		stage.update(); 	//update the stage to show text
 
 		// begin loading content (only sounds to load)
-		var manifest = [
-			{id:"begin", src:"sounds/spawn.mp3|sounds/spawn.ogg"},
-			{id:"break", src:"sounds/break.mp3|sounds/break.ogg", data:6},
-			{id:"death", src:"sounds/death.mp3|sounds/death.ogg"},
-			{id:"laser", src:"sounds/shot.mp3|sounds/shot.ogg", data:6},
-			{id:"music", src:"sounds/music.mp3|sounds/music.ogg"}
+		var assetsPath = "sounds/";
+		manifest = [
+			{id: "begin", src: "spawn.ogg"},
+			{id: "break", src: "break.ogg", data: 6},
+			{id: "death", src: "death.ogg"},
+			{id: "laser", src: "shot.ogg", data: 6},
+			{id: "music", src: "music.ogg"}
 		];
 
-        preload = new createjs.LoadQueue();
-        preload.installPlugin(createjs.Sound);
+		createjs.Sound.alternateExtensions = ["mp3"];
+		preload = new createjs.LoadQueue(true, assetsPath);
+		preload.installPlugin(createjs.Sound);
 		preload.addEventListener("complete", doneLoading); // add an event listener for when load is completed
-        preload.addEventListener("progress", updateLoading);
-	    preload.loadManifest(manifest);
+		preload.addEventListener("progress", updateLoading);
+		preload.loadManifest(manifest);
 	}
 
 	function stop() {
-		if (preload != null) { preload.close(); }
+		if (preload != null) {
+			preload.close();
+		}
 		createjs.Sound.stop();
 	}
 
 	function updateLoading() {
-		messageField.text = "Loading " + (preload.progress*100|0) + "%";
+		messageField.text = "Loading " + (preload.progress * 100 | 0) + "%";
 		stage.update();
 	}
-
 
 	function doneLoading(event) {
 		clearInterval(loadingInterval);
@@ -136,7 +170,7 @@
 		messageField.text = "Welcome: Click to play";
 
 		// start the music
-		createjs.Sound.play("music", createjs.Sound.INTERRUPT_NONE, 0, 0, -1, 0.4);
+		createjs.Sound.play("music", {interrupt: createjs.Sound.INTERRUPT_NONE, loop: -1, volume: 0.4});
 
 		watchRestart();
 	}
@@ -154,7 +188,7 @@
 		stage.removeChild(messageField);
 
 		// indicate the player is now on screen
-		createjs.Sound.play("begin");   
+		createjs.Sound.play("begin");
 
 		restart();
 	}
@@ -181,22 +215,22 @@
 		nextRock = nextBullet = 0;
 
 		//reset key presses
-		shootHeld =	lfHeld = rtHeld = fwdHeld = dnHeld = false;
+		shootHeld = lfHeld = rtHeld = fwdHeld = dnHeld = false;
 
 		//ensure stage is blank and add the ship
 		stage.clear();
 		stage.addChild(ship);
 
-		//start game timer   
-		if (!createjs.Ticker.hasEventListener("tick")) { 
+		//start game timer
+		if (!createjs.Ticker.hasEventListener("tick")) {
 			createjs.Ticker.addEventListener("tick", tick);
-		}                                               
+		}
 	}
 
 	function tick(event) {
 		//handle firing
-		if(nextBullet <= 0) {
-			if(alive && shootHeld){
+		if (nextBullet <= 0) {
+			if (alive && shootHeld) {
 				nextBullet = BULLET_TIME;
 				fireBullet();
 			}
@@ -205,64 +239,67 @@
 		}
 
 		//handle turning
-		if(alive && lfHeld){
+		if (alive && lfHeld) {
 			ship.rotation -= TURN_FACTOR;
-		} else if(alive && rtHeld) {
+		} else if (alive && rtHeld) {
 			ship.rotation += TURN_FACTOR;
 		}
 
 		//handle thrust
-		if(alive && fwdHeld){
+		if (alive && fwdHeld) {
 			ship.accelerate();
 		}
 
 		//handle new spaceRocks
-		if(nextRock <= 0) {
-			if(alive){
+		if (nextRock <= 0) {
+			if (alive) {
 				timeToRock -= DIFFICULTY;	//reduce spaceRock spacing slowly to increase difficulty with time
 				var index = getSpaceRock(SpaceRock.LRG_ROCK);
 				rockBelt[index].floatOnScreen(canvas.width, canvas.height);
-				nextRock = timeToRock + timeToRock*Math.random();
+				nextRock = timeToRock + timeToRock * Math.random();
 			}
 		} else {
 			nextRock--;
 		}
 
 		//handle ship looping
-		if(alive && outOfBounds(ship, ship.bounds)) {
+		if (alive && outOfBounds(ship, ship.bounds)) {
 			placeInBounds(ship, ship.bounds);
 		}
 
 		//handle bullet movement and looping
-		for(bullet in bulletStream) {
+		for (bullet in bulletStream) {
 			var o = bulletStream[bullet];
-			if(!o || !o.active) { continue; }
-			if(outOfBounds(o, ship.bounds)) {
+			if (!o || !o.active) {
+				continue;
+			}
+			if (outOfBounds(o, ship.bounds)) {
 				placeInBounds(o, ship.bounds);
 			}
-			o.x += Math.sin(o.rotation*(Math.PI/-180))*BULLET_SPEED;
-			o.y += Math.cos(o.rotation*(Math.PI/-180))*BULLET_SPEED;
+			o.x += Math.sin(o.rotation * (Math.PI / -180)) * BULLET_SPEED;
+			o.y += Math.cos(o.rotation * (Math.PI / -180)) * BULLET_SPEED;
 
-			if(--o.entropy <= 0) {
+			if (--o.entropy <= 0) {
 				stage.removeChild(o);
 				o.active = false;
 			}
 		}
 
 		//handle spaceRocks (nested in one loop to prevent excess loops)
-		for(spaceRock in rockBelt) {
+		for (spaceRock in rockBelt) {
 			var o = rockBelt[spaceRock];
-			if(!o || !o.active) { continue; }
+			if (!o || !o.active) {
+				continue;
+			}
 
 			//handle spaceRock movement and looping
-			if(outOfBounds(o, o.bounds)) {
+			if (outOfBounds(o, o.bounds)) {
 				placeInBounds(o, o.bounds);
 			}
 			o.tick(event);
 
-
 			//handle spaceRock ship collisions
-			if(alive && o.hitRadius(ship.x, ship.y, ship.hit)) {
+			if (alive && o.hitRadius(ship.x, ship.y, ship.hit)) {
 				alive = false;
 
 				stage.removeChild(ship);
@@ -276,35 +313,40 @@
 			}
 
 			//handle spaceRock bullet collisions
-			for(bullet in bulletStream) {
+			for (bullet in bulletStream) {
 				var p = bulletStream[bullet];
-				if(!p || !p.active) { continue; }
+				if (!p || !p.active) {
+					continue;
+				}
 
-				if(o.hitPoint(p.x, p.y)) {
+				if (o.hitPoint(p.x, p.y)) {
 					var newSize;
-					switch(o.size) {
-						case SpaceRock.LRG_ROCK: newSize = SpaceRock.MED_ROCK;
+					switch (o.size) {
+						case SpaceRock.LRG_ROCK:
+							newSize = SpaceRock.MED_ROCK;
 							break;
-						case SpaceRock.MED_ROCK: newSize = SpaceRock.SML_ROCK;
+						case SpaceRock.MED_ROCK:
+							newSize = SpaceRock.SML_ROCK;
 							break;
-						case SpaceRock.SML_ROCK: newSize = 0;
+						case SpaceRock.SML_ROCK:
+							newSize = 0;
 							break;
 					}
 
 					//score
-					if(alive) {
+					if (alive) {
 						addScore(o.score);
 					}
 
 					//create more
-					if(newSize > 0) {
+					if (newSize > 0) {
 						var i;
 						var index;
 						var offSet;
 
-						for(i=0; i < SUB_ROCK_COUNT; i++){
+						for (i = 0; i < SUB_ROCK_COUNT; i++) {
 							index = getSpaceRock(newSize);
-							offSet = (Math.random() * o.size*2) - o.size;
+							offSet = (Math.random() * o.size * 2) - o.size;
 							rockBelt[index].x = o.x + offSet;
 							rockBelt[index].y = o.y + offSet;
 						}
@@ -318,7 +360,7 @@
 					bulletStream[bullet].active = false;
 
 					// play sound
-					createjs.Sound.play("break", createjs.Sound.INTERUPT_LATE, 0, 0.8);
+					createjs.Sound.play("break", {interrupt: createjs.Sound.INTERUPT_LATE, offset: 0.8});
 				}
 			}
 		}
@@ -330,22 +372,22 @@
 
 	function outOfBounds(o, bounds) {
 		//is it visibly off screen
-		return o.x < bounds*-2 || o.y < bounds*-2 || o.x > canvas.width+bounds*2 || o.y > canvas.height+bounds*2;
+		return o.x < bounds * -2 || o.y < bounds * -2 || o.x > canvas.width + bounds * 2 || o.y > canvas.height + bounds * 2;
 	}
 
 	function placeInBounds(o, bounds) {
 		//if its visual bounds are entirely off screen place it off screen on the other side
-		if(o.x > canvas.width+bounds*2) {
-			o.x = bounds*-2;
-		} else if(o.x < bounds*-2) {
-			o.x = canvas.width+bounds*2;
+		if (o.x > canvas.width + bounds * 2) {
+			o.x = bounds * -2;
+		} else if (o.x < bounds * -2) {
+			o.x = canvas.width + bounds * 2;
 		}
 
 		//if its visual bounds are entirely off screen place it off screen on the other side
-		if(o.y > canvas.height+bounds*2) {
-			o.y = bounds*-2;
-		} else if(o.y < bounds*-2) {
-			o.y = canvas.height+bounds*2;
+		if (o.y > canvas.height + bounds * 2) {
+			o.y = bounds * -2;
+		} else if (o.y < bounds * -2) {
+			o.y = canvas.height + bounds * 2;
 		}
 	}
 
@@ -370,11 +412,11 @@
 		var len = rockBelt.length;
 
 		//pooling approach
-		while(i <= len){
-			if(!rockBelt[i]) {
+		while (i <= len) {
+			if (!rockBelt[i]) {
 				rockBelt[i] = new SpaceRock(size);
 				break;
-			} else if(!rockBelt[i].active) {
+			} else if (!rockBelt[i].active) {
 				rockBelt[i].activate(size);
 				break;
 			} else {
@@ -382,7 +424,7 @@
 			}
 		}
 
-		if(len == 0) {
+		if (len == 0) {
 			rockBelt[0] = new SpaceRock(size);
 		}
 
@@ -395,11 +437,11 @@
 		var len = bulletStream.length;
 
 		//pooling approach
-		while(i <= len){
-			if(!bulletStream[i]) {
+		while (i <= len) {
+			if (!bulletStream[i]) {
 				bulletStream[i] = new createjs.Shape();
 				break;
-			} else if(!bulletStream[i].active) {
+			} else if (!bulletStream[i].active) {
 				bulletStream[i].active = true;
 				break;
 			} else {
@@ -407,7 +449,7 @@
 			}
 		}
 
-		if(len == 0) {
+		if (len == 0) {
 			bulletStream[0] = new createjs.Shape();
 		}
 
@@ -418,30 +460,54 @@
 	//allow for WASD and arrow control scheme
 	function handleKeyDown(e) {
 		//cross browser issues exist
-		if(!e){ var e = window.event; }
-		switch(e.keyCode) {
-			case KEYCODE_SPACE:	shootHeld = true; return false;
+		if (!e) {
+			var e = window.event;
+		}
+		switch (e.keyCode) {
+			case KEYCODE_SPACE:
+				shootHeld = true;
+				return false;
 			case KEYCODE_A:
-			case KEYCODE_LEFT:	lfHeld = true; return false;
+			case KEYCODE_LEFT:
+				lfHeld = true;
+				return false;
 			case KEYCODE_D:
-			case KEYCODE_RIGHT: rtHeld = true; return false;
+			case KEYCODE_RIGHT:
+				rtHeld = true;
+				return false;
 			case KEYCODE_W:
-			case KEYCODE_UP:	fwdHeld = true; return false;
-			case KEYCODE_ENTER:	 if(canvas.onclick == handleClick){ handleClick(); }return false;
+			case KEYCODE_UP:
+				fwdHeld = true;
+				return false;
+			case KEYCODE_ENTER:
+				if (canvas.onclick == handleClick) {
+					handleClick();
+				}
+				return false;
 		}
 	}
 
 	function handleKeyUp(e) {
 		//cross browser issues exist
-		if(!e){ var e = window.event; }
-		switch(e.keyCode) {
-			case KEYCODE_SPACE:	shootHeld = false; break;
+		if (!e) {
+			var e = window.event;
+		}
+		switch (e.keyCode) {
+			case KEYCODE_SPACE:
+				shootHeld = false;
+				break;
 			case KEYCODE_A:
-			case KEYCODE_LEFT:	lfHeld = false; break;
+			case KEYCODE_LEFT:
+				lfHeld = false;
+				break;
 			case KEYCODE_D:
-			case KEYCODE_RIGHT: rtHeld = false; break;
+			case KEYCODE_RIGHT:
+				rtHeld = false;
+				break;
 			case KEYCODE_W:
-			case KEYCODE_UP:	fwdHeld = false; break;
+			case KEYCODE_UP:
+				fwdHeld = false;
+				break;
 		}
 	}
 
@@ -449,33 +515,7 @@
 		//trust the field will have a number and add the score
 		scoreField.text = (Number(scoreField.text) + Number(value)).toString();
 	}
-
-	</script>
-</head>
-
-<body onload="init();">
-
-	<header id="header" class="SoundJS">
-	    <h1>Space Rocks Game</h1>
-	    <p>Simple example game, built using SoundJS and EaselJS.
-	        Music Copyright &copy; 2010 <a href="http://machinaesupremacy.com" target="_blank">Machinae Supremacy</a> - Lord Krutors Dominion. Used with permission for non commercial use.</p>
-	</header>
-
-	<div id="content">
-		<canvas id="gameCanvas" width="960" height="400" style="background:black;"></canvas>
-	</div>
-
-	<div id="error">
-		<h1>Sorry!</h1>
-		<p>SoundJS is not currently supported in your browser.</p>
-		<p>We are currently working on support for iOS. Please <a href="http://github.com/CreateJS/SoundJS/issues" target="_blank">log a bug</a>
-			if you see this in any other browsers.</p>
-	</div>
-
-    <div id="mobile">
-        <h1>Sorry!</h1>
-        <p>This demo is currenly not supported on mobile devices.</p>
-    </div>
+</script>
 
 </body>
 </html>

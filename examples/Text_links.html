@@ -6,55 +6,57 @@
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
-		// define a new TextLink class that extends / subclasses Text, and handles drawing a hit area
-		// and implementing a hover color.
-		function TextLink(text, font, color, hoverColor) {
-			// this super class constructor reference is automatically created by createjs.extends:
-			this.Text_constructor(text, font, color); 
-			this.hoverColor = hoverColor;
-			this.hover = false;
-			this.hitArea = new createjs.Shape();
-			this.textBaseline = "top";
-			
-			this.addEventListener("rollover", this);
-			this.addEventListener("rollout", this);
+<script id="editable">
+	// define a new TextLink class that extends / subclasses Text, and handles drawing a hit area
+	// and implementing a hover color.
+	function TextLink(text, font, color, hoverColor) {
+		// this super class constructor reference is automatically created by createjs.extends:
+		this.Text_constructor(text, font, color);
+		this.hoverColor = hoverColor;
+		this.hover = false;
+		this.hitArea = new createjs.Shape();
+		this.textBaseline = "top";
+
+		this.addEventListener("rollover", this);
+		this.addEventListener("rollout", this);
+	}
+	createjs.extend(TextLink, createjs.Text);
+
+	// use the same approach with draw:
+	TextLink.prototype.draw = function (ctx, ignoreCache) {
+		// save default color, and overwrite it with the hover color if appropriate:
+		var color = this.color;
+		if (this.hover) {
+			this.color = this.hoverColor;
 		}
-		createjs.extend(TextLink, createjs.Text);
-		
-		// use the same approach with draw:
-		TextLink.prototype.draw = function(ctx, ignoreCache) {
-			// save default color, and overwrite it with the hover color if appropriate:
-			var color = this.color;
-			if (this.hover) { this.color = this.hoverColor; }
-			
-			// call Text's drawing method to do the real work of drawing to the canvas:
-			// this super class method reference is automatically created by createjs.extends for methods overridden in the subclass:
-			this.Text_draw(ctx, ignoreCache);
-			
-			// restore the default color value:
-			this.color = color;
-			
-			// update hit area so the full text area is clickable, not just the characters:
-			this.hitArea.graphics.clear().beginFill("#FFF").drawRect(0,0,this.getMeasuredWidth(), this.getMeasuredHeight());
-		};
 
-		// set up the handlers for mouseover / out:
-		TextLink.prototype.handleEvent = function(evt) {
-			this.hover = (evt.type == "rollover");
-		};
-		
-		// set up the inheritance relationship: TextLink extends Text.
-		createjs.promote(TextLink, "Text");
-	</script>
+		// call Text's drawing method to do the real work of drawing to the canvas:
+		// this super class method reference is automatically created by createjs.extends for methods overridden in the subclass:
+		this.Text_draw(ctx, ignoreCache);
 
+		// restore the default color value:
+		this.color = color;
 
-	<script>
+		// update hit area so the full text area is clickable, not just the characters:
+		this.hitArea.graphics.clear().beginFill("#FFF").drawRect(0, 0, this.getMeasuredWidth(), this.getMeasuredHeight());
+	};
+
+	// set up the handlers for mouseover / out:
+	TextLink.prototype.handleEvent = function (evt) {
+		this.hover = (evt.type == "rollover");
+	};
+
+	// set up the inheritance relationship: TextLink extends Text.
+	createjs.promote(TextLink, "Text");
+</script>
+
+<script>
 	var canvas;
 	var stage;
 
@@ -67,35 +69,38 @@
 
 		// Create some TextLinks:
 		var links = ["yellow", "blue", "green", "red", "purple", "orange"];
-		for (var i=0; i<links.length; i++) {
-			var link = new TextLink(links[i]+" link!", "36px Arial", links[i], "#FFF");
+		for (var i = 0; i < links.length; i++) {
+			var link = new TextLink(links[i] + " link!", "36px Arial", links[i], "#FFF");
 			link.x = 100;
-			link.y = 50+i*50;
+			link.y = 50 + i * 50;
 			link.addEventListener("click", handleClick);
-            link.cursor = "pointer";
+			link.cursor = "pointer";
 			stage.addChild(link);
 		}
 
 		createjs.Ticker.addEventListener("tick", stage);
 	}
 
-	
 	function handleClick(evt) {
-		alert("You clicked on: "+evt.target.text);
+		alert("You clicked on: " + evt.target.text);
 	}
 
-	</script>
+</script>
 </head>
-	
+
 <body onload="init();">
 
-	<header id="header" class="EaselJS">
-	    <h1>Text Sample</h1>
-	    <p>Example showing how you can simulate a <code>Text</code> link with hover states using <code>DisplayObject.hitArea</code>, <code>DisplayObject.cursor</code>, and <code>rollover</code> / <code>rollout</code> events.</p>
-	</header>
+<header class="EaselJS">
+	<h1>Text Sample</h1>
 
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400" style="background:#111"></canvas>
-	</div>
+	<p>Example showing how you can simulate a <code>Text</code> link with hover
+		states using <code>DisplayObject.hitArea</code>, <code>DisplayObject.cursor</code>,
+		and <code>rollover</code> / <code>rollout</code> events.</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"
+			style="background:#111"></canvas>
+</div>
 </body>
 </html>

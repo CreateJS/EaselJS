@@ -5,17 +5,20 @@
 	<title>EaselJS Example: SpriteSheetBuilder</title>
 
 	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/examples.css" rel="stylesheet"
+		  type="text/css"/>
+	<script src="../../_assets/js/examples.js"></script>
 
 	<script src="../../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script src="../../_assets/libs/tweenjs-NEXT.min.js"></script> <!-- required for MovieClip -->
+	<script src="../../_assets/libs/tweenjs-NEXT.min.js"></script>
+	<!-- required for MovieClip -->
 	<script src="../../lib/movieclip-NEXT.combined.js"></script>
 	<script src="gunnertron_g.js"></script>
 
-	<script>
+<script id="editable">
 	var canvas, stage, mc, w;
 	var scale = 0.4;
 
@@ -23,61 +26,66 @@
 		//find canvas and load images, wait for last image to load
 		canvas = document.getElementById("testCanvas");
 		stage = new createjs.Stage(canvas);
-		
+
 		mc = new lib.gunnertron();
-		w = mc.nominalBounds.width*scale;
-		mc.setTransform(100+w/2,100,scale,scale);
+		w = mc.nominalBounds.width * scale;
+		mc.setTransform(100 + w / 2, 100, scale, scale);
 		stage.addChild(mc);
-		
+
 		var label1 = stage.addChild(new createjs.Text("MovieClip (vector)", "14px Arial", "#111"));
 		label1.textAlign = "center";
-		label1.setTransform(mc.x,30);
-		
+		label1.setTransform(mc.x, 30);
+
 		var label2 = stage.addChild(label1.clone());
 		label2.text = "Sprite (raster)";
-		label2.x += w+50;
-		
+		label2.x += w + 50;
+
 		// create the sprite sheet builder:
 		var builder = new createjs.SpriteSheetBuilder();
 		builder.scale = scale;
 		builder.maxWidth = 1024;
 		builder.addMovieClip(mc);
-		builder.addEventListener("complete" ,buildComplete);
+		builder.addEventListener("complete", buildComplete);
 		builder.buildAsync();
-		
+
 		// append the generated spritesheet image for demo purposes:
 		document.body.appendChild(builder._data.images[0]);
-		
+
 		createjs.Ticker.setFPS(30);
 		createjs.Ticker.addEventListener("tick", stage);
 	}
-	
+
 	function buildComplete(event) {
 		var spriteSheet = event.target.spriteSheet;
 		var sprite = new createjs.Sprite(spriteSheet);
-        sprite.setTransform(mc.x+w+50|0, mc.y);
+		sprite.setTransform(mc.x + w + 50 | 0, mc.y);
 		stage.addChild(sprite);
-		
+
 		mc.gotoAndPlay(0);
-        sprite.gotoAndPlay(0);
+		sprite.gotoAndPlay(0);
 	}
 
-	</script>
+</script>
 </head>
-	
+
 <body onload="init();">
 
-	<header id="header" class="EaselJS">
-	    <h1>SpriteSheetBuilder & MovieClip</h1>
-	    <p>
-	    Using <code>SpriteSheetBuilder</code> to create <code>SpriteSheet</code> instances asynchronously at run time from a <code>MovieClip</code> instance.
-	    Note that a spritesheet of this animation (at scale=1) is 2.5MB, whereas the "over the wire" (gzipped) size of the movieclip is only 19kb, and it can
-	    be scaled dynamically at runtime.
-	    </p>
-	</header>
+<header class="EaselJS">
+	<h1>SpriteSheetBuilder & MovieClip</h1>
 
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="200"></canvas>
-	</div>
+	<p>
+		Using <code>SpriteSheetBuilder</code> to create <code>SpriteSheet</code>
+		instances asynchronously at run time from a <code>MovieClip</code>
+		instance.
+		Note that a spritesheet of this animation (at scale=1) is 2.5MB, whereas
+		the "over the wire" (gzipped) size of the movieclip is only 19kb, and it
+		can
+		be scaled dynamically at runtime.
+	</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="200"></canvas>
+</div>
 </body>
 </html>

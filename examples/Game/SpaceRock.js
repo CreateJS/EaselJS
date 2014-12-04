@@ -67,8 +67,8 @@
 
 		//pick a random direction to move in and base the rotation off of speed
 		var angle = Math.random() * (Math.PI * 2);
-		this.vX = Math.sin(angle) * (5 - size / 10);
-		this.vY = Math.cos(angle) * (5 - size / 10);
+		this.vX = Math.sin(angle) * (5 - size / 15);
+		this.vY = Math.cos(angle) * (5 - size / 15);
 		this.spin = (Math.random() + 0.2 ) * this.vX;
 
 		//associate score with size

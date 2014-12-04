@@ -2,16 +2,18 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>EaselJS Example: Displaying icons using Sprite and SpriteSheet</title>
+	<title>EaselJS Example: Displaying icons using Sprite and
+		SpriteSheet</title>
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
+<script id="editable">
 	var stage;
 
 	var iconSheet = new Image();
@@ -29,13 +31,13 @@
 
 		/*** FIRST: the "simple" approach ***/
 		// create a simple SpriteSheet using iconSheet with a frame size of 80x80:
-		var data = {images:[iconSheet], frames:{width:80, height:80}};
-		var spriteSheet  = new createjs.SpriteSheet(data);
+		var data = {images: [iconSheet], frames: {width: 80, height: 80}};
+		var spriteSheet = new createjs.SpriteSheet(data);
 
 		// create a Sprite to display frames from the sprite sheet:
 		var icon1 = new createjs.Sprite(spriteSheet);
-        icon1.x = 60;
-        icon1.y = 100;
+		icon1.x = 60;
+		icon1.y = 100;
 
 		// because we didn't specify any named animations, we have to reference frames by number:
 		icon1.gotoAndStop(2);
@@ -46,71 +48,73 @@
 		icon2.x += 150;
 		icon2.gotoAndStop(5);
 		stage.addChild(icon2);
-		
 
 		/*** Next: the more robust approach ***/
 		// define sprite sheet data describing the available icons:
 		// we can use the form {frameName:frameNumber} in animations because each "sequence" is only a single frame:
 		var data = {
-			images:[iconSheet],
-			frames:{width:80, height:80},
-			animations: {trash:0, male:1, wait:2, library:3, female:4, hanger:5, stairs:6, noparking:7}
+			images: [iconSheet],
+			frames: {width: 80, height: 80},
+			animations: {trash: 0, male: 1, wait: 2, library: 3, female: 4, hanger: 5, stairs: 6, noparking: 7}
 		}
 
 		// create a SpriteSheet using the data:
-	    spriteSheet = new createjs.SpriteSheet(data);
+		spriteSheet = new createjs.SpriteSheet(data);
 
-	    // we'll clone icon2, to preserve the x/y, and swap out the SpriteSheet:
-	    var icon3 = icon2.clone();
-	    icon3.spriteSheet = spriteSheet;
-	    icon3.x += 150;
+		// we'll clone icon2, to preserve the x/y, and swap out the SpriteSheet:
+		var icon3 = icon2.clone();
+		icon3.spriteSheet = spriteSheet;
+		icon3.x += 150;
 
-	    // we can reference frames by name now:
-	    icon3.gotoAndStop("male");
-	    stage.addChild(icon3);
+		// we can reference frames by name now:
+		icon3.gotoAndStop("male");
+		stage.addChild(icon3);
 
-	    var icon4 = icon3.clone();
-	    icon4.gotoAndStop("female");
-	    icon4.x += 150;
-	    stage.addChild(icon4);
+		var icon4 = icon3.clone();
+		icon4.gotoAndStop("female");
+		icon4.x += 150;
+		stage.addChild(icon4);
 
-	    var icon5 = icon4.clone();
-	    icon5.gotoAndStop("trash");
-	    icon5.x += 150;
-	    stage.addChild(icon5);
+		var icon5 = icon4.clone();
+		icon5.gotoAndStop("trash");
+		icon5.x += 150;
+		stage.addChild(icon5);
 
-	    // finally, we'll add one that just plays through:
-	    var icon6 = icon1.clone();
-	    icon6.x = icon5.x + 150;
-	    icon6.gotoAndPlay(0);
-	    stage.addChild(icon6);
+		// finally, we'll add one that just plays through:
+		var icon6 = icon1.clone();
+		icon6.x = icon5.x + 150;
+		icon6.gotoAndPlay(0);
+		stage.addChild(icon6);
 
 		createjs.Ticker.setFPS(3); // slow, so we can see the icons
 		createjs.Ticker.addEventListener("tick", stage);
 	}
+</script>
 
-	</script>
 	<style>
 		#content {
 			padding: 10px;
 		}
 	</style>
 </head>
-	
+
 <body onload="init();">
 
-	<header id="header" class="EaselJS">
-	    <h1>Spritesheet Icons</h1>
-	    <p>Shows two approaches to use <code>Sprite</code> to display individual frames from a <code>SpriteSheet</code>.</p>
-	</header>
+<header class="EaselJS">
+	<h1>Spritesheet Icons</h1>
 
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="270"></canvas>
-	</div>
+	<p>Shows two approaches to use <code>Sprite</code> to display individual
+		frames from a <code>SpriteSheet</code>.</p>
+</header>
 
-	<div id="content">
-	The original icons.png file, images from <a href="http://thenounproject.com/">the Noun project</a>:<br/>
+<div>
+	<canvas id="testCanvas" width="960" height="270"></canvas>
+</div>
+
+<div id="content">
+	The original icons.png file, images from <a
+		href="http://thenounproject.com/">the Noun project</a>:<br/>
 	<img src="../_assets/art/spritesheet_icons.png"/>
-	</div>
+</div>
 </body>
 </html>

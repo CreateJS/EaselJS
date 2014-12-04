@@ -2,93 +2,97 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-    <title>EaselJS: Curve To Demo</title>
+	<title>EaselJS: Curve To Demo</title>
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-    <script>
+<script id="editable">
+	var canvas, stage;
+	var drawingCanvas;
+	var oldPt;
+	var oldMidPt;
+	var title;
+	var color;
+	var stroke;
+	var colors;
+	var index;
 
-        var canvas, stage;
-        var drawingCanvas;
-        var oldPt;
-        var oldMidPt;
-        var title;
-        var color;
-        var stroke;
-        var colors;
-        var index;
+	function init() {
+		canvas = document.getElementById("myCanvas");
+		index = 0;
+		colors = ["#828b20", "#b0ac31", "#cbc53d", "#fad779", "#f9e4ad", "#faf2db", "#563512", "#9b4a0b", "#d36600", "#fe8a00", "#f9a71f"];
 
-        function init() {
-            if (window.top != window) {
-                document.getElementById("header").style.display = "none";
-            }
-            canvas = document.getElementById("myCanvas");
-            index = 0;
-            colors = ["#828b20", "#b0ac31", "#cbc53d", "#fad779", "#f9e4ad", "#faf2db", "#563512", "#9b4a0b", "#d36600", "#fe8a00", "#f9a71f"];
+		//check to see if we are running in a browser with touch support
+		stage = new createjs.Stage(canvas);
+		stage.autoClear = false;
+		stage.enableDOMEvents(true);
 
-            //check to see if we are running in a browser with touch support
-            stage = new createjs.Stage(canvas);
-            stage.autoClear = false;
-            stage.enableDOMEvents(true);
+		createjs.Touch.enable(stage);
+		createjs.Ticker.setFPS(24);
 
-            createjs.Touch.enable(stage);
-            createjs.Ticker.setFPS(24);
+		drawingCanvas = new createjs.Shape();
 
-            drawingCanvas = new createjs.Shape();
+		stage.addEventListener("stagemousedown", handleMouseDown);
+		stage.addEventListener("stagemouseup", handleMouseUp);
 
-            stage.addEventListener("stagemousedown", handleMouseDown);
-            stage.addEventListener("stagemouseup", handleMouseUp);
+		title = new createjs.Text("Click and Drag to draw", "36px Arial", "#777777");
+		title.x = 300;
+		title.y = 200;
+		stage.addChild(title);
 
-            title = new createjs.Text("Click and Drag to draw", "36px Arial", "#777777");
-            title.x = 300;
-            title.y = 200;
-            stage.addChild(title);
+		stage.addChild(drawingCanvas);
+		stage.update();
+	}
 
-            stage.addChild(drawingCanvas);
-            stage.update();
-        }
+	function stop() {
+	}
 
-        function stop() {}
+	function handleMouseDown(event) {
+		if (stage.contains(title)) {
+			stage.clear();
+			stage.removeChild(title);
+		}
+		color = colors[(index++) % colors.length];
+		stroke = Math.random() * 30 + 10 | 0;
+		oldPt = new createjs.Point(stage.mouseX, stage.mouseY);
+		oldMidPt = oldPt.clone();
+		stage.addEventListener("stagemousemove", handleMouseMove);
+	}
 
-        function handleMouseDown(event) {
-            if (stage.contains(title)) { stage.clear(); stage.removeChild(title); }
-            color = colors[(index++)%colors.length];
-            stroke = Math.random()*30 + 10 | 0;
-            oldPt = new createjs.Point(stage.mouseX, stage.mouseY);
-            oldMidPt = oldPt.clone();
-            stage.addEventListener("stagemousemove" , handleMouseMove);
-        }
+	function handleMouseMove(event) {
+		var midPt = new createjs.Point(oldPt.x + stage.mouseX >> 1, oldPt.y + stage.mouseY >> 1);
 
-        function handleMouseMove(event) {
-            var midPt = new createjs.Point(oldPt.x + stage.mouseX>>1, oldPt.y+stage.mouseY>>1);
+		drawingCanvas.graphics.clear().setStrokeStyle(stroke, 'round', 'round').beginStroke(color).moveTo(midPt.x, midPt.y).curveTo(oldPt.x, oldPt.y, oldMidPt.x, oldMidPt.y);
 
-            drawingCanvas.graphics.clear().setStrokeStyle(stroke, 'round', 'round').beginStroke(color).moveTo(midPt.x, midPt.y).curveTo(oldPt.x, oldPt.y, oldMidPt.x, oldMidPt.y);
+		oldPt.x = stage.mouseX;
+		oldPt.y = stage.mouseY;
 
-            oldPt.x = stage.mouseX;
-            oldPt.y = stage.mouseY;
+		oldMidPt.x = midPt.x;
+		oldMidPt.y = midPt.y;
 
-            oldMidPt.x = midPt.x;
-            oldMidPt.y = midPt.y;
+		stage.update();
+	}
 
-            stage.update();
-        }
+	function handleMouseUp(event) {
+		stage.removeEventListener("stagemousemove", handleMouseMove);
+	}
 
-        function handleMouseUp(event) {
-            stage.removeEventListener("stagemousemove" , handleMouseMove);
-        }
-
-    </script>
+</script>
 </head>
+
 <body onload="init();">
 
-<header id="header" class="EaselJS">
-    <h1>CurveTo</h1>
-    <p>This example demonstrates painting to the canvas using the <code>Graphics</code> vector drawing API in EaselJS</p>
+<header class="EaselJS">
+	<h1>CurveTo</h1>
+
+	<p>This example demonstrates painting to the canvas using the
+		<code>Graphics</code> vector drawing API in EaselJS</p>
 </header>
 
 <canvas id="myCanvas" width="960" height="400"></canvas>
