@@ -867,12 +867,12 @@ this.createjs = this.createjs||{};
 	 * @method localToGlobal
 	 * @param {Number} x The x position in the source display object to transform.
 	 * @param {Number} y The y position in the source display object to transform.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a new Point object with x/y properties will be returned. 
 	 * @return {Point} A Point instance with x and y properties correlating to the transformed coordinates
 	 * on the stage.
 	 **/
-	p.localToGlobal = function(x, y) {
-		var mtx = this.getConcatenatedMatrix(this._props.matrix).prepend(1, 0, 0, 1, x, y);
-		return new createjs.Point(mtx.tx, mtx.ty);
+	p.localToGlobal = function(x, y, pt) {
+		return this.getConcatenatedMatrix(this._props.matrix).transformPoint(x,y, pt||new createjs.Point());
 	};
 
 	/**
@@ -892,12 +892,12 @@ this.createjs = this.createjs||{};
 	 * @method globalToLocal
 	 * @param {Number} x The x position on the stage to transform.
 	 * @param {Number} y The y position on the stage to transform.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a new Point object with x/y properties will be returned. 
 	 * @return {Point} A Point instance with x and y properties correlating to the transformed position in the
 	 * display object's coordinate space.
 	 **/
-	p.globalToLocal = function(x, y) {
-		var mtx = this.getConcatenatedMatrix(this._props.matrix).invert().prepend(1, 0, 0, 1, x, y);
-		return new createjs.Point(mtx.tx, mtx.ty);
+	p.globalToLocal = function(x, y, pt) {
+		return this.getConcatenatedMatrix(this._props.matrix).invert().transformPoint(x,y, pt||new createjs.Point());
 	};
 
 	/**
@@ -913,12 +913,13 @@ this.createjs = this.createjs||{};
 	 * @param {Number} x The x position in the source display object to transform.
 	 * @param {Number} y The y position on the source display object to transform.
 	 * @param {DisplayObject} target The target display object to which the coordinates will be transformed.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a new Point object with x/y properties will be returned. 
 	 * @return {Point} Returns a Point instance with x and y properties correlating to the transformed position
 	 * in the target's coordinate space.
 	 **/
-	p.localToLocal = function(x, y, target) {
-		var pt = this.localToGlobal(x, y);
-		return target.globalToLocal(pt.x, pt.y);
+	p.localToLocal = function(x, y, target, pt) {
+		pt = this.localToGlobal(x, y, pt);
+		return target.globalToLocal(pt.x, pt.y, pt);
 	};
 
 	/**
@@ -964,7 +965,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.getMatrix = function(matrix) {
 		var o = this, mtx = matrix&&matrix.identity() || new createjs.Matrix2D();
-		return o.transformMatrix ?  mtx.copy(o.transformMatrix) : mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		return o.transformMatrix ?  mtx.copy(o.transformMatrix) : mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
 	};
 	
 	/**
@@ -980,7 +981,7 @@ this.createjs = this.createjs||{};
 	p.getConcatenatedMatrix = function(matrix) {
 		var o = this, mtx = this.getMatrix(matrix);
 		while (o = o.parent) {
-			mtx.appendMatrix(o.getMatrix(o._props.matrix));
+			mtx.prependMatrix(o.getMatrix(o._props.matrix));
 		}
 		return mtx;
 	};
@@ -997,11 +998,11 @@ this.createjs = this.createjs||{};
 		props = props ? props.identity() : new createjs.DisplayProps();
 		var o = this, mtx = o.getMatrix(props.matrix); 
 		do {
-			props.append(o.visible, o.alpha, o.shadow, o.compositeOperation);
+			props.prepend(o.visible, o.alpha, o.shadow, o.compositeOperation);
 			
 			// we do this to avoid problems with the matrix being used for both operations when o._props.matrix is passed in as the props param.
-			// this could be simplified (ie. just done as part of the append above) if we switched to using a pool.
-			if (o != this) { mtx.appendMatrix(o.getMatrix(o._props.matrix)); }
+			// this could be simplified (ie. just done as part of the prepend above) if we switched to using a pool.
+			if (o != this) { mtx.prependMatrix(o.getMatrix(o._props.matrix)); }
 		} while (o = o.parent);
 		return props;
 	};
@@ -1325,8 +1326,8 @@ this.createjs = this.createjs||{};
 		var x = bounds.x, y = bounds.y, width = bounds.width, height = bounds.height, mtx = this._props.matrix;
 		mtx = ignoreTransform ? mtx.identity() : this.getMatrix(mtx);
 		
-		if (x || y) { mtx.prependTransform(0,0,1,1,0,0,0,-x,-y); } // TODO: simplify this.
-		if (matrix) { mtx.appendMatrix(matrix); }
+		if (x || y) { mtx.appendTransform(0,0,1,1,0,0,0,-x,-y); } // TODO: simplify this.
+		if (matrix) { mtx.prependMatrix(matrix); }
 		
 		var x_a = width*mtx.a, x_b = width*mtx.b;
 		var y_c = height*mtx.c, y_d = height*mtx.d;

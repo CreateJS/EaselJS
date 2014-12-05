@@ -14,7 +14,7 @@ CRITICAL (may break existing content):
 	- renamed initialize on geom classes to "setValues()"
 - removed secondary properties (visible, alpha, compositeOperation, shadow) and related functionality from Matrix2D
 	- added DisplayProps to hold these properties + a matrix instance
-- Matrix2D append/prepend naming was reversed. It was previously backwards from a math perspective.
+- some matrix methods were fixed to work properly
 - renamed ColorMatrix.copyMatrix() to .copy() to reflect geom classes
 
 *****
@@ -84,6 +84,7 @@ OTHER:
 - mouse interactions and getObjectsUnderPoint now respect masks
 - added a mode param to getObjectsUnderPoint() to respect mouseEnabled/mouseChildren and event listeners
 - added Stage.preventSelection to block accidental selection of document elements
+- added `pt` param to DisplayObject.localToGlobal, globalToLocal, and localToLocal methods
 
 
 
