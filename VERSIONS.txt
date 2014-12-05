@@ -34,7 +34,7 @@ PERFORMANCE:
 - added performance tests to extras
 - significant performance improvements:
 	- vector graphics (especially in Graphics instances with large numbers of instructions)
-	- filters (thanks pfirpfel) (~2-4x faster)
+	- filters (thanks pfirpfel & quasimondo) (~2-4x faster)
 	- overall display list performance (~2x faster)
 	- display object property access (~2x faster)
 	- tick event propagation (~3x faster)
@@ -77,7 +77,7 @@ OTHER:
 - examples now all use the combined lib
 - SpriteSheet.getNumFrames() now returns 0 instead of null if images are not loaded.
 - added some initial unit tests for the library
-- added helper methods to Rectangle: union, intersects, extend, intersection, isEmpty, & contains.
+- added helper methods to Rectangle: union, intersects, extend, intersection, pad, isEmpty, & contains.
 - updated clone() method for all classes
 - added Matrix2D.equals() method
 - added DisplayObject.transformMatrix
@@ -85,6 +85,7 @@ OTHER:
 - added a mode param to getObjectsUnderPoint() to respect mouseEnabled/mouseChildren and event listeners
 - added Stage.preventSelection to block accidental selection of document elements
 - added `pt` param to DisplayObject.localToGlobal, globalToLocal, and localToLocal methods
+- BlurFilter provides higher quality results (thanks quasimondo)
 
 
 
@@ -184,7 +185,7 @@ OTHER:
 - improved BlurFilter performance and results (thanks to Mario Klingemann)
 - objects added to a MovieClip via addChild will now display over objects managed by the MovieClip
 - Fixed clone on AlphaMapFilter
-- Updated the build process to use NodeJS & Grunt.js. Please refer to the readme in the build folder.
+- Updated the build process to use NodeJS & Grunt.js. Please refer to the README in the build folder.
 
 
 Version 0.6.1 [May 14, 2013]

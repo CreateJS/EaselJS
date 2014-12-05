@@ -74,14 +74,13 @@ this.createjs = this.createjs||{};
 
 // public methods:
 	/**
-	 * Returns a rectangle with values indicating the margins required to draw the filter or null.
-	 * For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
-	 * (but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0).
+	 * Provides padding values for this filter. That is, how much the filter will extend the visual bounds of an object it is applied to.
 	 * @method getBounds
-	 * @return {Rectangle} a rectangle object indicating the margins required to draw the filter or null if the filter does not effect bounds.
+	 * @param {Rectangle} [rect] If specified, the provided Rectangle instance will be expanded by the padding amounts and returned.
+	 * @return {Rectangle} If a `rect` param was provided, it is returned. If not, either a new rectangle with the padding values, or null if no padding is required for this filter.
 	 **/
-	p.getBounds = function() {
-		return null;
+	p.getBounds = function(rect) {
+		return rect;
 	};
 
 	/**
