@@ -410,6 +410,22 @@ this.createjs = this.createjs||{};
 		this._cacheOffsetY = 0;
 		
 		/**
+		 * @property _filterOffsetX
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._filterOffsetX = 0;
+		
+		/**
+		 * @property _filterOffsetY
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._filterOffsetY = 0;
+		
+		/**
 		 * @property _cacheScale
 		 * @protected
 		 * @type {Number}
@@ -691,12 +707,8 @@ this.createjs = this.createjs||{};
 	p.draw = function(ctx, ignoreCache) {
 		var cacheCanvas = this.cacheCanvas;
 		if (ignoreCache || !cacheCanvas) { return false; }
-		var scale = this._cacheScale, offX = this._cacheOffsetX, offY = this._cacheOffsetY, fBounds;
-		if (fBounds = this._applyFilterBounds(offX, offY, 0, 0)) {
-			offX = fBounds.x;
-			offY = fBounds.y;
-		}
-		ctx.drawImage(cacheCanvas, offX, offY, cacheCanvas.width/scale, cacheCanvas.height/scale);
+		var scale = this._cacheScale;
+		ctx.drawImage(cacheCanvas, this._cacheOffsetX+this._filterOffsetX, this._cacheOffsetY+this._filterOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
 		return true;
 	};
 	
@@ -795,21 +807,17 @@ this.createjs = this.createjs||{};
 	 * whatwg spec on compositing</a>.
 	 **/
 	p.updateCache = function(compositeOperation) {
-		var cacheCanvas = this.cacheCanvas, scale = this._cacheScale, offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
-		var w = this._cacheWidth, h = this._cacheHeight, fBounds;
+		var cacheCanvas = this.cacheCanvas;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
-		var ctx = cacheCanvas.getContext("2d");
+		var scale = this._cacheScale, offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
+		var w = this._cacheWidth, h = this._cacheHeight, ctx = cacheCanvas.getContext("2d");
 		
-		// update bounds based on filters:
-		if (fBounds = this._applyFilterBounds(offX, offY, w, h)) {
-			offX = fBounds.x;
-			offY = fBounds.y;
-			w = fBounds.width;
-			h = fBounds.height;
-		}
+		var fBounds = this._getFilterBounds();
+		offX += (this._filterOffsetX = fBounds.x);
+		offY += (this._filterOffsetY = fBounds.y);
 		
-		w = Math.ceil(w*scale);
-		h = Math.ceil(h*scale);
+		w = Math.ceil(w*scale) + fBounds.width;
+		h = Math.ceil(h*scale) + fBounds.height;
 		if (w != cacheCanvas.width || h != cacheCanvas.height) {
 			// TODO: it would be nice to preserve the content if there is a compositeOperation.
 			cacheCanvas.width = w;
@@ -834,7 +842,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.uncache = function() {
 		this._cacheDataURL = this.cacheCanvas = null;
-		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = 0;
+		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = this._filterOffsetX = this._filterOffsetY = 0;
 		this._cacheScale = 1;
 	};
 	
@@ -1277,27 +1285,17 @@ this.createjs = this.createjs||{};
 	};
 	
 	/**
-	 * @method _applyFilterBounds
-	 * @param {Number} x
-	 * @param {Number} y
-	 * @param {Number} width
-	 * @param {Number} height
+	 * @method _getFilterBounds
 	 * @return {Rectangle}
 	 * @protected
 	 **/
-	p._applyFilterBounds = function(x, y, width, height) {
-		var bounds, l, filters = this.filters;
-		if (!filters || !(l=filters.length)) { return null; }
+	p._getFilterBounds = function(rect) {
+		var l, filters = this.filters, bounds = this._rectangle.setValues(0,0,0,0);
+		if (!filters || !(l=filters.length)) { return bounds; }
 		
 		for (var i=0; i<l; i++) {
 			var f = this.filters[i];
-			var fBounds = f.getBounds&&f.getBounds();
-			if (!fBounds) { continue; }
-			if (!bounds) { bounds = this._rectangle.setValues(x,y,width,height); }
-			bounds.x += fBounds.x;
-			bounds.y += fBounds.y;
-			bounds.width += fBounds.width;
-			bounds.height += fBounds.height;
+			f.getBounds&&f.getBounds(bounds);
 		}
 		return bounds;
 	};
