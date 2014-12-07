@@ -7,7 +7,7 @@ CRITICAL (may break existing content):
 - Sprite now properly displays the first frame of animations after calling gotoAndPlay() (thanks MannyC)
 - Moved Ticker into the "createjs" package since it will be included with TweenJS in future releases.
 - re-architected the class and inheritance model
-	- initialize methods removed, use SuperClass_constructor instead
+	- initialize methods removed, use MySuperClass_constructor instead
 	- helper methods: extend & promote (see the "Utility Methods" docs)
 	- property definitions are now instance level, and in the constructor (performance gains)
 	- the .constructor is now set correctly on all classes (thanks kaesve)

@@ -69,7 +69,8 @@ this.createjs = this.createjs||{};
 		
 	// public properties:
 		/**
-		 * The image to render. This can be an Image, a Canvas, or a Video.
+		 * The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially
+		 * mobile browsers) support drawing video to a canvas.
 		 * @property image
 		 * @type Image | HTMLCanvasElement | HTMLVideoElement
 		 **/
@@ -82,6 +83,7 @@ this.createjs = this.createjs||{};
 	
 		/**
 		 * Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
+		 * Note that video sources must have a width / height set to work correctly with `sourceRect`.
 		 * @property sourceRect
 		 * @type Rectangle
 		 * @default null
