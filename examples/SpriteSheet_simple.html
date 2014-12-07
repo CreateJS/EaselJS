@@ -21,15 +21,15 @@
 
 		// Define a spritesheet. Note that this data was exported by Zoë.
 		var spriteSheet = new createjs.SpriteSheet({
-													   framerate: 30,
-													   "images": ["../_assets/art/spritesheet_grant.png"],
-													   "frames": {"regX": 82, "height": 292, "count": 64, "regY": 0, "width": 165},
-													   // define two animations, run (loops, 1.5x speed) and jump (returns to run):
-													   "animations": {
-														   "run": [0, 25, "run", 1.5],
-														   "jump": [26, 63, "run"]
-													   }
-												   });
+				framerate: 30,
+				"images": ["../_assets/art/spritesheet_grant.png"],
+				"frames": {"regX": 82, "height": 292, "count": 64, "regY": 0, "width": 165},
+				// define two animations, run (loops, 1.5x speed) and jump (returns to run):
+				"animations": {
+					"run": [0, 25, "run", 1.5],
+					"jump": [26, 63, "run"]
+				}
+			});
 
 		var grant = new createjs.Sprite(spriteSheet, "run");
 		grant.x = stage.canvas.width / 2;
