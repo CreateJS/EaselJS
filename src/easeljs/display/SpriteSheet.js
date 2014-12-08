@@ -66,11 +66,13 @@ this.createjs = this.createjs||{};
 	 * <LI> when all of the frames are the same size (in a grid), use an object with `width`, `height`, `regX`, `regY`, and `count` properties.
 	 * `width` & `height` are required and specify the dimensions of the frames.
 	 * `regX` & `regY` indicate the registration point or "origin" of the frames.
+	 * `spacing` indicate the spacing between frames.
+	 * `margin` specify the margin of the images.
 	 * `count` allows you to specify the total number of frames in the spritesheet; if omitted, this will be calculated
 	 * based on the dimensions of the source images and the frames. Frames will be assigned indexes based on their position
 	 * in the source images (left to right, top to bottom).
 	 * 	
-	 * 	frames: {width:64, height:64, count:20, regX: 32, regY:64}
+	 * 	frames: {width:64, height:64, count:20, regX: 32, regY:64, spacing:0, margin:0}
 	 * 	
 	 * <LI> if the frames are of different sizes, use an array of frame definitions. Each definition is itself an array
 	 * with 4 required and 3 optional entries, in the order: `x`, `y`, `width`, `height`, `imageIndex`, `regX`, `regY`. The first
@@ -243,6 +245,17 @@ this.createjs = this.createjs||{};
 		 **/
 		this._regY = 0;
 		
+	    /**
+	     * @property _spacing
+	     * @protected
+	     **/
+	    this._spacing = 0;
+
+	    /**
+	     * @property _margin
+	     * @protected
+	     **/
+	    this._margin = 0;
 		
 	// setup:
 		this._parseData(data);
@@ -432,6 +445,8 @@ this.createjs = this.createjs||{};
 			this._frameHeight = o.height;
 			this._regX = o.regX||0;
 			this._regY = o.regY||0;
+			this._spacing = o.spacing||0;
+			this._margin = o.margin||0;
 			this._numFrames = o.count;
 			if (this._loadCount == 0) { this._calculateFrames(); }
 		}
@@ -488,22 +503,39 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._calculateFrames = function() {
-		if (this._frames || this._frameWidth == 0) { return; }
-		this._frames = [];
-		var ttlFrames = 0;
-		var fw = this._frameWidth;
-		var fh = this._frameHeight;
-		for (var i=0,imgs = this._images; i<imgs.length; i++) {
-			var img = imgs[i];
-			var cols = img.width/fw|0;
-			var rows = img.height/fh|0;
-			var ttl = this._numFrames>0 ? Math.min(this._numFrames-ttlFrames,cols*rows) : cols*rows;
-			for (var j=0;j<ttl;j++) {
-				this._frames.push({image:img, rect:new createjs.Rectangle(j%cols*fw,(j/cols|0)*fh,fw,fh), regX:this._regX, regY:this._regY });
-			}
-			ttlFrames += ttl;
-		}
-		this._numFrames = ttlFrames;
+        if (this._frames || this._frameWidth == 0) { return; }
+
+        this._frames = [];
+
+        var maxFrames = (this._numFrames)?this._numFrames:Infinity;
+        var frameCount = 0;
+        var frameWidth = this._frameWidth;
+        var frameHeight = this._frameHeight;
+        var spacing = this._spacing;
+        var margin = this._margin;
+
+        for (var i=0, imgs=this._images; i<imgs.length; i++) {
+            var img = imgs[i];
+            
+            var y = margin;
+            while (y <= (img.height-margin-frameHeight)) {
+                var x = margin;
+                while (x <= (img.width-margin-frameWidth)) {
+                    frameCount++;
+                    this._frames.push({
+                        image: img, 
+                        rect: new createjs.Rectangle(x, y, frameWidth, frameHeight), 
+                        regX: this._regX, 
+                        regY: this._regY
+                    });
+                    x += frameWidth+spacing;
+                    if (frameCount > maxFrames) { break; }
+                }
+                y += frameHeight+spacing;
+                if (frameCount > maxFrames) { break; }
+            }
+        }
+        this._numFrames = frameCount;
 	};
 
 

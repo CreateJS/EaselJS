@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EaselJS: Tileset SpriteSheet Example</title>
+
+    <link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+    <link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+
+    <script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+    <script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
+    <!-- We also provide hosted minified versions of all CreateJS libraries.
+      http://code.createjs.com -->
+
+    <script type="text/javascript">
+        var stage;
+        function init() {
+            // create a new stage and point it at our canvas:
+            stage = new createjs.Stage(document.getElementById("testCanvas"));
+
+            // Define a spritesheet. Note that this data was exported by Zoë.
+            var ss = new createjs.SpriteSheet({
+                "images": ["../_assets/art/tmw_desert_spacing.png"],
+                "frames": {"width":32, "height":32, "regX":0, "regY":0, "spacing":1, "margin":1}
+            });
+
+            var map = [
+                [ 1,  2,  2,  2,  2,  2,  2,  2,  2,  3], 
+                [ 9, 10, 10, 10, 10, 10, 10, 10, 10, 11], 
+                [ 9, 10, 10, 10, 20, 21, 10, 10, 10, 11], 
+                [17, 18, 18, 18, 19, 17, 18, 18, 18, 19], 
+                [30, 30, 31, 30,  6,  8, 46, 30, 40, 30],
+                [30, 30, 40, 32, 14, 16, 30, 30, 30, 30],
+                [30, 30, 30, 30, 14, 16, 48, 30, 31, 30],
+                [40, 30, 48, 31, 14, 16, 30, 40, 30, 30],
+                [30, 30, 30, 30, 14, 16, 30, 48, 32, 30],
+                [30, 30, 40, 30, 14, 16, 30, 30, 30, 30]
+            ]
+
+            for (var row=0; row<map.length; row++) {
+                for (var col=0; col<map[0].length; col++) {
+                    var idx = map[row][col] - 1;
+
+                    var tile = new createjs.Sprite(ss);
+                    tile.gotoAndStop(idx);
+                    tile.x = 32*col;
+                    tile.y = 32*row;
+                    stage.addChild(tile);
+                }
+            }
+
+            // Add Grant to the stage, and add it as a listener to Ticker to get updates each frame.
+            createjs.Ticker.addEventListener("tick", stage);
+        }
+
+    </script>
+</head>
+<body onload="init();">
+
+    <header id="header" class="EaselJS">
+        <h1><span class="text-product">Easel<strong>JS</strong></span> Simple SpriteSheet Example</h1>
+        <p>An example of a sprite sheet using <strong>Sprite</strong>. This demos shows the use of the margin and spacing option in the <strong>SpriteSheet</strong> initialization.</p>
+    </header>
+
+    <div class="canvasHolder">
+        <canvas id="testCanvas" width="960" height="400"></canvas>
+    </div>
+</body>
+</html>
