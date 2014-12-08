@@ -412,13 +412,15 @@ this.createjs = this.createjs||{};
 	/**
 	 * Draws only the path described for this Graphics instance, skipping any non-path instructions, including fill and
 	 * stroke descriptions. Used for <code>DisplayObject.mask</code> to draw the clipping path, for example.
+	 *
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method drawAsPath
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
 	 **/
 	p.drawAsPath = function(ctx) {
 		this._updateInstructions();
 		var instr, instrs = this._instructions;
-		for (var i=0, l=instrs.length; i<l; i++) {
+		for (var i=this._storeIndex, l=instrs.length; i<l; i++) {
 			// the first command is always a beginPath command.
 			if ((instr = instrs[i]).path !== false) { instr.exec(ctx); }
 		}
@@ -1039,11 +1041,11 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Stores all graphics commands so they won't be executed in future draws. Calling store() a second time adds to
-	 * the existing store.
+	 * the existing store. This also affects `drawAsPath()`.
 	 *
-	 * This is useful in cases where you are creating vector graphics in an iterative manner, so that only new
-	 * graphics need to be drawn (which can provide huge performance benefits), but you wish to retain all of
-	 * the vector instructions for later use (ex. scaling, modifying, or exporting).
+	 * This is useful in cases where you are creating vector graphics in an iterative manner (ex. generative art), so
+	 * that only new graphics need to be drawn (which can provide huge performance benefits), but you wish to retain all
+	 * of the vector instructions for later use (ex. scaling, modifying, or exporting).
 	 *
 	 * Note that calling store() will force the active path (if any) to be ended in a manner similar to changing
 	 * the fill or stroke.
