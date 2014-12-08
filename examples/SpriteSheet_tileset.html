@@ -7,7 +7,6 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
-	<script src="../src/easeljs/display/SpriteSheet.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -26,8 +25,8 @@
 		function handleLoad(evt) {
 			// define the spritesheet:
 			var ss = new createjs.SpriteSheet({
-					"images": [evt.target],
-					"frames": {"width":32, "height":32, "regX":0, "regY":0, "spacing":1, "margin":1}
+					images: [evt.target],
+					frames: {width:32, height:32, regX:0, regY:0, spacing:1, margin:1}
 				});
 
 			// define a tile map:
