@@ -522,7 +522,8 @@ this.createjs = this.createjs||{};
 		var maxFrames = this._numFrames || 100000; // if we go over this, something is wrong.
 		var frameCount = 0, frameWidth = this._frameWidth, frameHeight = this._frameHeight;
 		var spacing = this._spacing, margin = this._margin;
-
+		
+		imgLoop:
 		for (var i=0, imgs=this._images; i<imgs.length; i++) {
 			var img = imgs[i], imgW = img.width, imgH = img.height;
 
@@ -530,7 +531,7 @@ this.createjs = this.createjs||{};
 			while (y <= imgH-margin-frameHeight) {
 				var x = margin;
 				while (x <= imgW-margin-frameWidth) {
-					if (frameCount >= maxFrames) { break; }
+					if (frameCount >= maxFrames) { break imgLoop; }
 					frameCount++;
 					this._frames.push({
 							image: img,
