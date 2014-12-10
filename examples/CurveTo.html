@@ -50,10 +50,8 @@
 		stage.update();
 	}
 
-	function stop() {
-	}
-
 	function handleMouseDown(event) {
+		if (!event.primary) { return; }
 		if (stage.contains(title)) {
 			stage.clear();
 			stage.removeChild(title);
@@ -66,6 +64,7 @@
 	}
 
 	function handleMouseMove(event) {
+		if (!event.primary) { return; }
 		var midPt = new createjs.Point(oldPt.x + stage.mouseX >> 1, oldPt.y + stage.mouseY >> 1);
 
 		drawingCanvas.graphics.clear().setStrokeStyle(stroke, 'round', 'round').beginStroke(color).moveTo(midPt.x, midPt.y).curveTo(oldPt.x, oldPt.y, oldMidPt.x, oldMidPt.y);
@@ -80,6 +79,7 @@
 	}
 
 	function handleMouseUp(event) {
+		if (!event.primary) { return; }
 		stage.removeEventListener("stagemousemove", handleMouseMove);
 	}
 
