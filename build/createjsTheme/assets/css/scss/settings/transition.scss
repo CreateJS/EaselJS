@@ -1,0 +1,57 @@
+//*******************************************
+//
+//	TRANSITION SETTINGS
+//	Default transition settings used by gBootstrap
+//
+//	Contents
+//	1) DURATIONS
+//	2) EASING
+//	3) COMBINATIONS
+//
+//*******************************************
+
+
+
+//*******************************************
+//
+//	DURATIONS
+//
+//*******************************************
+$duration-short: 	0.1s;
+$duration-default: 	0.2s;
+$duration-long: 	0.4s;
+$duration-longer: 	0.6s;
+// $duration-longest: 	0.8s;
+
+
+//*******************************************
+//
+//	EASING
+//
+//*******************************************
+$ease-default: 	cubic-bezier(	0.6,	0.18,	0.32,	0.95	);
+$ease-inOut: 	cubic-bezier(	0.55,	0,		0.45,	1		);
+$ease-out: 		cubic-bezier(	0.4,	0.18,	0.32,	1		);
+
+
+
+//*******************************************
+//
+//	COMBINATIONS
+//
+//*******************************************
+$transition-short-default: 		$duration-short 	$ease-default;
+$transition-short-out: 			$duration-short 	$ease-out;
+$transition-short-inOut: 		$duration-short 	$ease-inOut;
+
+$transition-default-default: 	$duration-default 	$ease-default;
+$transition-default-inOut: 		$duration-default 	$ease-inOut;
+$transition-default-out: 		$duration-default 	$ease-out;
+
+$transition-long-default: 		$duration-long 		$ease-default;
+$transition-long-inOut: 		$duration-long		$ease-inOut;
+$transition-long-out: 			$duration-long		$ease-out;
+
+$transition-longer-default:		$duration-longer 	$ease_default;
+$transition-longer-out:			$duration-longer 	$ease_out;
+

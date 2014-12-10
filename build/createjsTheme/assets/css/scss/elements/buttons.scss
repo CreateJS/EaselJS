@@ -1,0 +1,148 @@
+//*******************************************
+//
+//	BUTTON ABSTRACT
+//
+//	Description
+//	- Global button properties common to every button
+//
+//	Contents
+//	1-4) gFramework
+//	5) BUTTON BASIC
+//	6) CUSTOM BUTTONS
+//
+//*******************************************
+
+
+
+//*******************************************
+//
+//	BUTTON BASIC
+//
+//*******************************************
+.button-default {
+	//	EXTEND
+	//	VARS (locally scoped)
+	//	LAYOUT
+		// Display, Positioning
+		display: inline-block;
+		// Box Model
+		min-width: 12rem;
+		padding: 0 1rem;
+		margin: 1rem;
+		// Type
+		text-align: center;
+	//	DISPLAY
+		// Visual Enhancement
+		background-color: $color_gray-dark;
+		color: $color_gray-lightest;
+		// Type
+	//	PSUEDO Elements & Classes
+		// Elements :: before, after, first-line, first-letter, selection
+		&:first-child {margin-left: 0;}
+		&:last-child {margin-right: 0;}
+		// Classes : http://css-tricks.com/almanac/
+	//	CHILDREN (Sass 3.3 Syntax Only, otherwise scope child outside this selector)
+		p {
+			//	EXTEND 
+			//	VARS (locally scoped)
+			//	LAYOUT
+				// Display, Positioning
+				position: relative;
+				// Box Model
+				max-width: none;
+				margin: 0;
+				padding: 0;
+				// Type
+				font-size: $fontSize-smaller;
+				line-height: 4.2rem;
+			//	DISPLAY
+				// Visual Enhancement
+				color: $color_gray-lightest;
+				// Type
+				font-family: $fontFamily-default;
+				font-weight: 700;
+				text-transform: uppercase;
+			//	PSUEDO Elements & Classes
+				// Elements :: before, after, first-line, first-letter, selection
+				&::before {
+					content: attr(data-label);
+				}
+				transition: transform $transition-default-inOut 0s;
+				&:hover {
+					@include bp($bp_width-600, min-) {
+						transform: scale(0.952380,0.952380); // 1/1.05
+					}
+				}
+		}
+
+	//	MODIFIERS
+		// Static
+		transform: scale(1,1) translateZ(0);
+		// Dynamic
+		cursor: pointer;
+		transition: background-color $transition-default-out 0s;
+		transition: background-color $transition-default-out 0s;
+		&:active {background-color: $color_gray-dark;}
+		&:focus,
+		&:hover {
+			background-color: $color_gray-darker;
+			@include bp($bp_width-600, min-) {
+				transform: scale(1.05,1.05);
+			}
+		}
+	//	BREAKPOINTS
+	@include bp($bp_width-500, max-) {
+		display: block;
+		margin: $gridUnit-smaller 0;
+	}
+	@include bp($bp_width-500, min-) {
+		display: inline-block;
+	}
+	@include bp($bp_width-600, min-) {
+		transition: 
+			background-color $transition-default-out 0s,
+			transform $transition-default-inOut 0s;
+	}
+}
+
+.button-default-large {
+	//	EXTEND
+	@extend .button-default;
+	//	VARS (locally scoped)
+	//	LAYOUT
+		// Display, Positioning
+		// Box Model
+		// Type
+	//	DISPLAY
+		// Visual Enhancement
+		// Type
+	//	PSUEDO Elements & Classes
+		// Elements :: before, after, first-line, first-letter, selection
+		// Classes : http://css-tricks.com/almanac/
+	//	CHILDREN (Sass 3.3 Syntax Only, otherwise scope child outside this selector)
+	p {
+		@include bp($bp_width-600, min-) {
+			font-size: $fontSize-default;
+			line-height: $gridUnit-larger;
+			margin-top: -0.1rem;
+			font-weight: 700;
+			font-variant:small-caps;
+			text-transform:lowercase;
+		}
+	}
+	//	MODIFIERS
+		// Static
+		// Dynamic
+		&:focus,
+		&:hover {
+			@include bp($bp_width-600, min-) {
+				padding: 0.5rem 2.2rem;
+			}
+		}
+	//	BREAKPOINTS
+	@include bp($bp_width-600, min-) {
+		font-size: $fontSize-small;
+		line-height: 4.5rem;
+		padding: 0.4rem 2rem;
+	}
+}

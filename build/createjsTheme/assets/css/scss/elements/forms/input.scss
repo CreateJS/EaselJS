@@ -1,0 +1,294 @@
+//*******************************************
+//
+//	INPUT ABSTRACT
+//
+//	Details
+//	- Styles for all input elements and types
+//
+//	Contents
+//	1) Markup
+//	2) Input
+//	3) Checkbox
+//	4) Drop Down List
+//	5) File Picker
+//	6) Password Field
+//	7) Radio Button
+//	8) Button
+//	9) Submit Button
+//	10) Text
+//	-- HTML5 Input Types --
+//	11) Color
+//	12) Date
+//	13)	Datetime
+//	14) Email
+//	15) Month
+//	16) Number
+//	17) Range
+//	18) Search
+//	19)	Telephone Number
+//	20) Time
+//	21) URL
+//	22) WEEK
+//
+//*******************************************
+
+
+
+
+//*******************************************
+//
+// Markup
+//
+//*******************************************
+/*	Markup:
+	<input type="text" name="username" placeholder="Username" tabindex="0" class="">
+*/
+
+
+
+//*******************************************
+//
+// Input
+//
+//*******************************************
+input {
+	@extend %transition-defaults !optional;
+	@include user-select(text);
+	padding: 0 $gridUnit-default;
+	border: none;
+	outline: none;
+	background-color: lighten($blue, 5%);
+	color: white;
+	@include style-placeholder {
+	color: lighten($blue, 20%);
+	}
+	&:focus {
+		@include style-placeholder {
+			color: lighten($blue, 50%);
+		}
+		background-color: lighten($blue, 10%);
+	}
+	&.error {
+	background-color: lighten($red, 10%);
+		@include style-placeholder {
+			color: lighten($red, 20%);
+		}
+	}
+//	BROWSER SPECIFIC
+	// Microsoft IE
+	// "Clear" Psuedo Element - http://msdn.microsoft.com/en-us/library/windows/apps/hh465740.aspx
+	&::-ms-clear {
+	    display: none; //Removes "X" if it looks "X" indicates error
+	}
+}
+
+
+
+//*******************************************
+//
+// Checkbox
+//
+//*******************************************
+input[type="checkbox"] {}
+input[type='checkbox']:checked {}
+
+
+
+//*******************************************
+//
+// Drop Down List
+//
+//*******************************************
+select {}
+option {}
+
+
+//*******************************************
+//
+// File Picker
+//
+//*******************************************
+/* Pops up an "open file" dialog */
+input[type="file"] {}
+
+
+
+//*******************************************
+//
+// Password Field
+//
+//*******************************************
+/* Uses dots instead of characters as you type */
+input[type="password"] {}
+
+
+
+//*******************************************
+//
+// Radio Button
+//
+//*******************************************
+/* Can be grouped with other inputs */
+input[type="radio"] {}
+
+
+
+//*******************************************
+//
+// Button
+//
+//*******************************************
+%input-button {
+	// Comment required when empty
+}
+
+input[type="button"] {
+	//@extend %input-button;
+}
+
+
+
+//*******************************************
+//
+// Submit Button
+//
+//*******************************************
+input[type="submit"] {
+	//@extend %input-button;
+}
+
+
+
+//*******************************************
+//
+// Text
+//
+//*******************************************
+/* the type attribute can be omitted) */
+input[type="text"] {}
+
+
+
+//*******************************************
+//	HTML5 Input Types
+//*******************************************
+
+
+
+//*******************************************
+//
+// Color
+//
+//*******************************************
+/* Select a color from a color picker */
+input[type="color"] {}
+
+
+
+//*******************************************
+//
+// Date
+//
+//*******************************************
+/* Define a date control */
+input[type="date"] {}
+
+
+
+//*******************************************
+//
+// Datetime
+//
+//*******************************************
+/* Define a date and time control (no time zone) */
+input[type="datetime-local"] {}
+
+
+
+//*******************************************
+//
+// Email
+//
+//*******************************************
+/* Automatically validates email address when submitted */
+input[type="email"] {}
+
+
+
+//*******************************************
+//
+// Month
+//
+//*******************************************
+/* Define a year and month */
+input[type="month"] {}
+
+
+
+//*******************************************
+//
+// Number
+//
+//*******************************************
+/* Define a numeric field */
+input[type="number"] {}
+
+
+
+//*******************************************
+//
+// Range
+//
+//*******************************************
+/* Like a slider control */
+input[type="range"] {}
+
+
+
+//*******************************************
+//
+// Search
+//
+//*******************************************
+/* Defines a search field */
+input[type="search"] {}
+
+
+
+//*******************************************
+//
+// Telphone Number
+//
+//*******************************************
+/* Defines a field for entering a telephone number */
+input[type="tel"] {}
+
+
+
+//*******************************************
+//
+// Time
+//
+//*******************************************
+/* Defines a control for entering a time (no time zone) */
+input[type="time"] {}
+
+
+
+//*******************************************
+//
+// URL
+//
+//*******************************************
+/* Defines a field for entering a url */
+input[type="url"] {}
+
+
+
+//*******************************************
+//
+// Week
+//
+//*******************************************
+/* Define a week and year control */
+input[type="week"] {}

@@ -1,0 +1,144 @@
+//*******************************************
+//
+//	BREAKPOINT UTILITY
+//
+//	Description
+//	- Utilities for creating breakpoints
+//
+//	Contents
+//	1) WIDTH
+//	2) HEIGHT
+//	3) ASPEECT RATIO
+//	4) ORIENTATION
+//	5) PIXEL DENSITY
+//
+//	Notes
+//	- Default prefix favors mobile and portrait first design principles.
+//
+//	Acknowledgements:
+//	Chris Coyier: http://css-tricks.com/media-queries-sass-3-2-and-codekit/
+//
+//*******************************************
+
+
+
+//*******************************************
+//
+//	WIDTH OR HEIGHT
+//
+//	Notes
+//	- also accepts orientation, and prefix params (min-, max-, min-device-, max-device-)
+//	- supports end range
+//
+//*******************************************
+
+@mixin bp ($bp, $prefix: min-, $bpEndRange: null, $orientation: null, $direction: width, $endRangePrefix: max-) {
+	
+	// Define focus direction of breakpoint statement (width or height)
+	@if $direction == "height" {
+		$prefix: $prefix + "height: ";
+	} @else {
+		$prefix: $prefix + "width: ";
+	}
+	
+	// Re-define orientation variable if value exists
+	@if $orientation != null {
+		$orientation: "orientation:" + $orientation;
+	}
+	
+	// Output statement for single condition value (includes orientation if applied)
+	@if $bpEndRange == null {
+	
+		@if $orientation == null { // Checks to see if there is an orientation value
+			@media ($prefix $bp) { @content };
+		} @else {
+			@media ($prefix $bp) and ($orientation) { @content; }
+		}
+		
+	// Output statement for end range condition value (includes orientation if applied)
+	} @else {
+		
+		// Define focus direction of breakpoint end range statement (width or height)
+		@if $direction == "height" {
+			$endRangePrefix: $endRangePrefix + "height: ";
+		} @else {
+			$endRangePrefix: $endRangePrefix + "width: ";
+		}
+	
+		@if $orientation == null { // Checks to see if there is an orientation value
+			@media ($prefix $bp) and ($endRangePrefix $bpEndRange) { @content };
+		} @else {
+			@media ($prefix $bp) and ($endRangePrefix $bpEndRange) and ($orientation) { @content; }
+		}
+		
+	}	
+}
+
+
+//*******************************************
+//
+//	ASPECT RATIO
+//
+//	Notes
+//	- $aspectRatio syntax '16/9'
+//
+//*******************************************
+//	Aspect Ratio with width limitation
+@mixin bpAspectRatio ($aspectRatio: null, $width: null) {
+	@if $aspectRatio != null {
+		@if $width == null {
+			@media (max-aspect-ratio: $aspectRatio) { @content; }
+		} @else {
+			@media (max-aspect-ratio: $aspectRatio) and (min-width: $width) { @content; }			
+		}
+	}
+}
+
+
+
+//*******************************************
+//
+//	ORIENTATION
+//
+//*******************************************
+@mixin bpOrientation ($orientation: portrait, $width: null, $prefix: min-) {
+	$width-prefix: $prefix + "width: ";
+	@if $width == null {
+		@media (orientation: $orientation) { @content; }
+	} @else {
+		@media (orientation: $orientation) and ($width-prefix $width) { @content; }			
+	}
+}
+
+
+
+//*******************************************
+//
+//	PIXEL DENSITIES
+//
+//	Common Device Pixel Ratios
+//	1.25, 1.3, 1.5, 2
+//
+//*******************************************
+@mixin bpPixelDensity ($pd: 2) {
+	// 1.25
+	@if $pd == 1.25 {
+		@media (-webkit-min-device-pixel-ratio: $pd),
+		(min-resolution: 120dpi) { @content; }	
+	}
+	// 1.3
+	@if $pd == 1.3 {
+		@media (-webkit-min-device-pixel-ratio: $pd),
+		(min-resolution: 124.8dpi) { @content; }	
+	}
+	// 1.5
+	@if $pd == 1.5 {
+		@media (-webkit-min-device-pixel-ratio: $pd),
+		(min-resolution: 144dpi) { @content; }	
+	}
+	// 2
+	@if $pd == 2 {
+		@media (-webkit-min-device-pixel-ratio: $pd),
+		(min-resolution: 192dpi) { @content; }	
+	}
+}

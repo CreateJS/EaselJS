@@ -1,0 +1,51 @@
+//*******************************************
+//
+//	BREAKPOINT SETTINGS
+//	Default breakpoint settings used by gBootstrap
+//
+//	Contents
+//	1) GENERIC WIDTHS
+//	2) MAX-WIDTH
+//
+//*******************************************
+
+
+
+//*******************************************
+//
+//	GENERIC WIDTHS
+//
+//*******************************************
+//	Small Devices i.e. "Phones"
+//$bp_width-320: 320px;
+$bp_width-480: 480px;
+$bp_width-500: 500px;
+$bp_width-600: 600px;
+
+//	Medium Devices i.e. "Tablets"
+//$bp_width-640: 640px;
+$bp_width-700: 700px;
+
+// iFrame width
+$bp_width-960: 960px;
+
+//	Standard Devices i.e. "Laptops or Desktops"
+$bp_width-1024: 1024px;
+
+//	Large Devices i.e. "Large Monitors"
+//$bp_width-1300: 1300px;
+//$bp_width-1400: 1400px;
+//$bp_width-1600: 1600px;
+//$bp_width-1700: 1700px;
+//$bp_width-2000: 2000px;
+
+
+
+//*******************************************
+//
+//	MAX-WIDTH
+//
+//*******************************************
+$bp_width-max: 1140px;
+$bp_width-1300: 1300px;
+$bp_width-1600: 1600px;

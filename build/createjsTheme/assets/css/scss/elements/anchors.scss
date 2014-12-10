@@ -1,0 +1,167 @@
+//*******************************************
+//
+//	ANCHORS/LINKS
+//
+//	Description
+//	- Styling for anchor buttons thoughout the project
+//
+//	Contents
+//	1) LINK STRUCTURE
+//	2) LINK STYLE
+//
+//*******************************************
+
+
+
+//*******************************************
+//
+//	LINK STRUCTURE
+//
+//*******************************************
+/*
+
+<a href="{{ROUTE_BASE}}{{ROUTE_PAGE}}" class="link-route link-default" data-route="{{ROUTE_PAGE}}" data-label="{{G_PAGE}}"></a>
+
+*/
+
+
+
+//*******************************************
+//
+//	LINK STYLE
+//
+//*******************************************
+.link-default:link,
+.link-default:visited {
+	//	EXTEND
+	//	VARS (locally scoped)
+	//	LAYOUT
+		// Display, Positioning
+		// Box Model
+		min-width: 12rem;
+		padding: 0 1rem;
+		margin: 1rem;
+		// Type
+		text-align: center;
+		font-size: $fontSize-smaller;
+		line-height: 4.2rem;
+	//	DISPLAY
+		// Visual Enhancement
+		background-color: $color_gray-dark;
+		color: $color_gray-lightest;
+		// Type
+		font-family: $fontFamily-default;
+		font-weight: 700;
+		text-transform: uppercase;
+	//	PSUEDO Elements & Classes
+		// Elements :: before, after, first-line, first-letter, selection
+		&:first-of-type {margin-left: 0;}
+		&:last-of-type {margin-right: 0;}
+		&::before {
+			@extend %fontSmoothing;
+			content: attr(data-label);
+			display: block;
+			transition: transform $transition-default-inOut 0s;
+		}
+		&:hover:before {
+			@include bp($bp_width-600, min-) {
+				transform: scale(0.952380,0.952380); // 1/1.05
+			}
+		}
+		// Classes : http://css-tricks.com/almanac/
+	//	CHILDREN (Sass 3.3 Syntax Only, otherwise scope child outside this selector)
+	//	MODIFIERS
+		// Static
+		transform: scale(1,1) translateZ(0);
+		// Dynamic
+		transition: background-color $transition-default-out 0s;
+		&:active {background-color: $color_gray-dark;}
+		&:focus,
+		&:hover {
+			background-color: $color_gray-darker;
+			@include bp($bp_width-600, min-) {
+				transform: scale(1.05,1.05);
+			}
+		}
+	//	BREAKPOINTS
+	@include bp($bp_width-500, max-) {
+		display: block;
+		margin: $gridUnit-smaller 0;
+	}
+	@include bp($bp_width-500, min-) {
+		display: inline-block;
+	}
+	@include bp($bp_width-600, min-) {
+		transition: 
+			background-color $transition-default-out 0s,
+			transform $transition-default-inOut 0s;
+	}
+}
+
+.link-large:link,
+.link-large:visited {
+	@extend .link-default;
+	@include bp($bp_width-600, min-) {
+		font-size: $fontSize-small;
+		line-height: 4.5rem;
+		padding: 0.4rem 2rem;
+	}
+}
+
+
+.link-inline:link,
+.link-inline:visited {
+	//	EXTEND
+	//	VARS (locally scoped)
+	//	LAYOUT
+		// Display, Positioning
+		display: inline-block;
+		// Box Model
+		min-width: 0;
+		margin:0;
+		padding: 0 3px;
+		// Type
+	//	DISPLAY
+		// Visual Enhancement
+		background-color: $color_gray-darker-transparent;
+		color: $color_gray-darker;
+		// Type
+	//	PSUEDO Elements & Classes
+		// Elements :: before, after, first-line, first-letter, selection
+		// Classes : http://css-tricks.com/almanac/
+	//	CHILDREN (Sass 3.3 Syntax Only, otherwise scope child outside this selector)
+	//	MODIFIERS
+		// Static
+		// Dynamic
+		&:hover {
+			@include bp($bp_width-max, max-) {
+				color: $color_gray-lightest;
+				background-color: $color_gray-darker;
+			}
+			@include bp($bp_width-max, min-) {
+				margin: 0 $gridUnit-smallest;
+				min-width: $gridUnit-largest;
+				color: $color_gray-lightest;
+				background: $color_gray-darker;
+				transition: //hover On 
+					margin $transition-default-inOut 0s,
+					min-width $transition-default-inOut 0s,
+					color $transition-default-out 75ms,
+					background-color $transition-default-out 150ms;
+			}
+		}
+	//	BREAKPOINTS
+	@include bp($bp_width-max, max-) {
+		color: $color_gray-dark;
+		padding: 0 2px;
+	}
+		@include bp($bp_width-max, min-) {
+			height: $gridUnit-large;
+			line-height: 3.5rem;
+			transition: // Hover Off
+				margin $transition-long-inOut 100ms,
+				min-width $transition-long-inOut 100ms,
+				color $transition-default-out 0s,
+				background-color $transition-default-out 0s;
+	}
+}

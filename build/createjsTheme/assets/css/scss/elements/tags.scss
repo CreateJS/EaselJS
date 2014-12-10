@@ -1,0 +1,355 @@
+//*******************************************
+//
+//	HTML TAGS
+//
+//	Description
+//	- Default styles for HTML tags e.g. <body>, <h1>, <sup>
+//
+//	Notes
+//	- Review normalize.scss for default tag styling
+//
+//	Contents
+//	1) BASE
+//	2) LINKS
+//	3) TYPE
+//	4) EMBEDDED CONTENT
+//	5) FIGURES
+//	6) FORMS
+//	7) TABLES
+//
+//*******************************************
+
+
+
+%fontSmoothing {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;    
+	-moz-font-smoothing: antialiased;
+	font-smoothing: antialiased;
+}
+
+
+
+//*******************************************
+//
+//	BASE
+//
+//*******************************************
+* {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+
+html { font-size: $fontSize-root; }
+
+
+body { 
+	@extend %fontSmoothing;
+	min-width: 320px;
+	background-color: $color_gray-lightest;
+	color: $color_gray-darker;
+	font-family: $fontFamily-default;
+	&.loading { display: none; }
+}
+section {  
+	@extend %clearfix;
+	max-width:$bp_width-max;
+	
+	margin: 0 auto;
+	@include bp($bp_width-480, max-) {
+		padding: $gridUnit-large $gridUnit-default;
+	}
+	@include bp($bp_width-480, min-) {
+		padding: $gridUnit-largest $gridUnit-default;
+	}
+}
+
+
+
+//*******************************************
+//
+//	LINKS
+//
+//*******************************************
+a:link,
+a:visited {
+	//	EXTEND
+	//	VARS (locally scoped)
+	//	LAYOUT
+		// Display, Positioning
+		// Box Model
+		padding: 0 2px;
+		position: relative;
+		// Type
+	//	DISPLAY
+		// Visual Enhancement
+		color: $color_gray-dark;
+		outline: none;
+		z-index: 0;
+		// Type
+		font-family: $fontFamily-default;
+		font-weight: 700;
+		text-decoration: none;
+		white-space: nowrap;
+	//	PSUEDO Elements & Classes
+		// Elements :: before, after, first-line, first-letter, selection
+		&::before {
+			@extend %fontSmoothing;
+			content: attr(data-label);
+		}
+		&::after {
+			content: '';
+			background-color: transparent;
+			z-index: -1;
+			position: absolute;
+			top:-0.3rem;
+			bottom:-0.3rem;
+			left: -$gridUnit-smallest / 2;
+			right: -$gridUnit-smallest / 2;
+		}
+		// Classes : http://css-tricks.com/almanac/
+	//	CHILDREN (Sass 3.3 Syntax Only, otherwise scope child outside this selector)
+	//	MODIFIERS
+		// Static
+		// Dynamic
+	//	BREAKPOINTS
+}
+a:active,
+a:hover {
+	color: $color_gray-lightest;
+	cursor: pointer;
+	&::after {
+		background-color: $color_gray-darker;
+	}
+}
+
+::selection {color:$color_gray-darkest;background:$color_createjs-default;}
+
+
+
+//*******************************************
+//
+//	TYPE
+//
+//*******************************************
+h1 { 
+	//	EXTEND 
+	@extend %fontSmoothing;
+	//	VARS (locally scoped)
+	//	LAYOUT
+		// Display, Positioning
+		// Box Model
+		margin:0 0 $gridUnit-default 0;
+		// Type
+		font-size: $fontSize-large;
+	//	DISPLAY
+		// Visual Enhancement
+		// Type
+		font-weight: 700;
+		text-transform:uppercase;
+	//	PSUEDO Elements & Classes
+		// Elements :: before, after, first-line, first-letter, selection
+		// Classes : http://css-tricks.com/almanac/
+	//	CHILDREN
+		// Sass 3.3 Syntax Only (otherwise scope child outside this selector)
+	//	MODIFIERS
+		// Static
+		// Dynamic
+	//	BREAKPOINTS	
+  	@include bp($bp_width-600, min-) {
+		font-size: $fontSize-larger;
+		line-height: $gridUnit-larger;
+  	}
+}
+
+h2 {
+	@extend h1;
+	@include bp($bp_width-600, max-) {
+		font-size: $fontSize-default;
+		line-height: $gridUnit-default;
+  	}
+  	@include bp($bp_width-600, min-) {
+		font-size: $fontSize-large;
+  		line-height: $gridUnit-large;
+  	}
+}
+
+h3 {
+	@extend h1;
+	font-weight: 400;
+	@include bp($bp_width-600, max-) {
+		font-size: $fontSize-small;
+  	}
+  	@include bp($bp_width-600, min-) {
+		font-size: $fontSize-default;
+  	}
+}
+
+h4 {
+	@extend h1;
+	font-variant: normal;
+	text-transform: uppercase;
+	line-height: $gridUnit-large;
+	@include bp($bp_width-600, max-) {
+		font-size: $fontSize-small;
+	}
+	@include bp($bp_width-600, min-) {
+		font-size: $fontSize-default;
+	}
+}
+
+h5 {
+	@extend h1;
+	font-size: $fontSize-small;
+	line-height: 2.5rem;
+}
+
+h6 {
+	@extend h1;
+	font-size: $fontSize-smaller;
+	line-height: $gridUnit-small;
+	margin: 0 0 0.6rem 0;
+}
+
+p {
+	//	EXTEND 
+	@extend %fontSmoothing;
+	//	VARS (locally scoped)
+	//	LAYOUT
+		// Display, Positioning
+		// Box Model
+		margin: 0 0 $gridUnit-default 0;
+		// Type
+		font-size: $fontSize-smallest;
+		line-height: 2.4rem;
+	//	DISPLAY
+		// Visual Enhancement
+		color: $color_gray-dark;
+		// Type
+		font-family: $fontFamily-secondary;
+		font-weight: 400;
+	//	PSUEDO Elements & Classes
+		// Elements :: before, after, first-line, first-letter, selection
+		// Classes : http://css-tricks.com/almanac/
+	//	CHILDREN
+		// Sass 3.3 Syntax Only (otherwise scope child outside this selector)
+	//	MODIFIERS
+		// Static
+		// Dynamic
+	//	BREAKPOINTS	
+	@include bp($bp_width-600) {
+		font-size: $fontSize-smaller;
+	}
+}
+
+// abbr[title] {}
+// b {}
+strong {font-weight:400;} // assumes the font is 'effra' weight: 700
+// dfn {}
+
+hr {
+	//	EXTEND
+	//	VARS (locally scoped)
+	//	LAYOUT
+		// Display, Positioning
+		clear: both;
+		// Box Model
+		border: none;
+		height: $gridUnit-smallest;
+		width: 100%;
+		padding: 0;
+		margin: 0;
+		// Type
+	//	DISPLAY
+		// Visual Enhancement
+		color: transparent;
+		outline: none;
+		background-color: $color_gray-darkest;
+		-webkit-backface-visibility: hidden;
+		// Type
+	//	PSUEDO Elements & Classes
+		// Elements :: before, after, first-line, first-letter, selection
+		// Classes : http://css-tricks.com/almanac/
+	//	CHILDREN (Sass 3.3 Syntax Only, otherwise scope child outside this selector)
+	//	MODIFIERS
+		// Static
+		// Dynamic
+	//	BREAKPOINTS
+}
+
+// mark {}
+
+code {
+	@extend %fontSmoothing;
+	font-size: $fontSize-smaller;
+	font-weight: 400;
+	font-family: $fontFamily-monospace;
+}
+
+// kbd {}
+pre {
+	@extend %fontSmoothing;
+	white-space:pre;
+}
+// q {}
+// small {}
+// sub {}
+// sup {}
+// sub {}
+ul {
+	padding: 0;
+	margin: 0;
+}
+li {
+	@extend %fontSmoothing;
+}
+
+
+
+//*******************************************
+//
+//	EMBEDDED CONTENT
+//
+//*******************************************
+img {max-width:100%;}
+canvas {display: block;}
+
+
+
+//*******************************************
+//
+//	FIGURES
+//
+//*******************************************
+// figure {}
+
+
+
+//*******************************************
+//
+//	FORMS
+//
+//*******************************************
+// fieldset {}
+// legend {}
+// button {}
+// input {}
+// select {}
+// textarea {}
+// html input[type="button"] {}
+// input[type="reset"] {}
+// input[type="submit"] {}
+// input[type="checkbox"] {}
+// input[type="radio"] {}
+// input[type="search"] {}
+
+
+
+//*******************************************
+//
+//	TABLES
+//
+//*******************************************
+// table {}

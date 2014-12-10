@@ -1,0 +1,28 @@
+//*******************************************
+//
+//	CLEAR FIX UTILITIES
+//
+//	Details
+//	- Utility for clearing floats
+//
+//	Contents
+//	1) CLEARFIX
+//
+//*******************************************
+
+
+
+//*******************************************
+//
+//	CLEARFIX
+//
+//*******************************************
+%clearfix {
+	zoom: 1; // For IE 6/7 (trigger hasLayout)
+	&::before,
+	&::after {
+		content: "";
+		display: table;
+	}
+	&::after { clear: both; }
+}
