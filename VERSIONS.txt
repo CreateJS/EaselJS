@@ -86,6 +86,7 @@ OTHER:
 - added Stage.preventSelection to block accidental selection of document elements
 - added `pt` param to DisplayObject.localToGlobal, globalToLocal, and localToLocal methods
 - BlurFilter provides higher quality results (thanks quasimondo)
+- added MouseEvent.isTouch
 
 
 
