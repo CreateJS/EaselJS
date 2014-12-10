@@ -226,6 +226,20 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadTasks('tasks/');
 
+	grunt.registerTask('exportScriptTags', function() {
+		var source = grunt.option("path") || "";
+
+		var config = getBuildConfig();
+		var scripts = config.easel_source;
+		var tags = [];
+		for (var i = 0; i < scripts.length; i++) {
+			var script = '<script src="<%=src %>"></script>';
+			var realPath = scripts[i].replace("../src/", "");
+			tags.push(grunt.template.process(script, {data: {src: source + realPath}}));
+		}
+		console.log(tags.join("\n"));
+	});
+
 	grunt.registerTask('setDocsBase', "Internal utility task to set a correct base for YUIDocs.", function() {
 		grunt.file.setBase('../src');
 		grunt.config.set('docsFolder', "../build/output/<%= docsName %>/");
