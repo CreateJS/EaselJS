@@ -87,6 +87,7 @@ OTHER:
 - added `pt` param to DisplayObject.localToGlobal, globalToLocal, and localToLocal methods
 - BlurFilter provides higher quality results (thanks quasimondo)
 - added MouseEvent.isTouch
+- added support for margin and spacing in sprite sheet data (thanks renatopp)
 
 
 

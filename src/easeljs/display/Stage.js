@@ -603,13 +603,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p._getPointerData = function(id) {
 		var data = this._pointerData[id];
-		if (!data) {
-			data = this._pointerData[id] = {x:0,y:0};
-			// if it's the first new touch, then make it the primary pointer id:
-			if (this._primaryPointerID == null) { this._primaryPointerID = id; }
-			// if it's the mouse (id == -1) or the first new touch, then make it the primary pointer id:
-		    if (this._primaryPointerID == null || this._primaryPointerID == -1) { this._primaryPointerID = id; }
-		}
+		if (!data) { data = this._pointerData[id] = {x:0,y:0}; }
 		return data;
 	};
 
@@ -640,7 +634,7 @@ this.createjs = this.createjs||{};
 		var inBounds = o.inBounds;
 		this._updatePointerPosition(id, e, pageX, pageY);
 		if (inBounds || o.inBounds || this.mouseMoveOutside) {
-			if (id == -1 && o.inBounds == !inBounds) {
+			if (id === -1 && o.inBounds == !inBounds) {
 				this._dispatchMouseEvent(this, (inBounds ? "mouseleave" : "mouseenter"), false, id, o, e);
 			}
 			
@@ -681,7 +675,7 @@ this.createjs = this.createjs||{};
 		o.rawX = pageX;
 		o.rawY = pageY;
 
-		if (id == this._primaryPointerID) {
+		if (id === this._primaryPointerID || id === -1) {
 			this.mouseX = o.x;
 			this.mouseY = o.y;
 			this.mouseInBounds = o.inBounds;
@@ -745,6 +739,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p._handlePointerDown = function(id, e, pageX, pageY, owner) {
 		if (this.preventSelection) { e.preventDefault(); }
+		if (this._primaryPointerID == null || id === -1) { this._primaryPointerID = id; } // mouse always takes over.
 		
 		if (pageY != null) { this._updatePointerPosition(id, e, pageX, pageY); }
 		var target = null, nextStage = this._nextStage, o = this._getPointerData(id);
@@ -775,11 +770,11 @@ this.createjs = this.createjs||{};
 			nextStage&&nextStage._testMouseOver(clear, owner, eventTarget);
 			return;
 		}
-		
+		var o = this._getPointerData(-1);
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
-		if (this._primaryPointerID != -1 || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
+		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
 		
-		var o = this._getPointerData(-1), e = o.posEvtObj;
+		var e = o.posEvtObj;
 		var isEventTarget = eventTarget || e&&(e.target == this.canvas);
 		var target=null, common = -1, cursor="", t, i, l;
 		
@@ -857,12 +852,12 @@ this.createjs = this.createjs||{};
 		// TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
 		if (!target || (!bubbles && !target.hasEventListener(type))) { return; }
 		/*
-		// TODO: account for stage transformations:
+		// TODO: account for stage transformations?
 		this._mtx = this.getConcatenatedMatrix(this._mtx).invert();
 		var pt = this._mtx.transformPoint(o.x, o.y);
-		var evt = new createjs.MouseEvent(type, bubbles, false, pt.x, pt.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
+		var evt = new createjs.MouseEvent(type, bubbles, false, pt.x, pt.y, nativeEvent, pointerId, pointerId==this._primaryPointerID || pointerId==-1, o.rawX, o.rawY);
 		*/
-		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
+		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId === this._primaryPointerID || pointerId === -1, o.rawX, o.rawY);
 		target.dispatchEvent(evt);
 	};
 
