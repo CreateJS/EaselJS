@@ -1966,8 +1966,8 @@ this.createjs = this.createjs||{};
 	}).prototype;
 	p.exec = function(ctx) {
 		ctx.lineWidth = (this.width == null ? "1" : this.width);
-		ctx.lineCap = (this.caps == null ? "butt" : Graphics.STROKE_CAPS_MAP[this.caps]);
-		ctx.lineJoin = (this.joints == null ? "miter" : Graphics.STROKE_JOINTS_MAP[this.joints]);
+		ctx.lineCap = (this.caps == null ? "butt" : (isNaN(this.caps) ? this.caps : Graphics.STROKE_CAPS_MAP[this.caps]));
+		ctx.lineJoin = (this.joints == null ? "miter" : (isNaN(this.joints) ? this.joints : Graphics.STROKE_JOINTS_MAP[this.joints]));
 		ctx.miterLimit = (this.miterLimit == null ? "10" : this.miterLimit);
 	};
 	p.path = false;
