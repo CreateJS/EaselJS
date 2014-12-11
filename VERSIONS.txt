@@ -11,7 +11,7 @@ CRITICAL (may break existing content):
 	- helper methods: extend & promote (see the "Utility Methods" docs)
 	- property definitions are now instance level, and in the constructor (performance gains)
 	- the .constructor is now set correctly on all classes (thanks kaesve)
-	- renamed initialize on geom classes to "setValues()"
+- renamed initialize on geom classes to "setValues()"
 - removed secondary properties (visible, alpha, compositeOperation, shadow) and related functionality from Matrix2D
 	- added DisplayProps to hold these properties + a matrix instance
 - some matrix methods were fixed to work properly
