@@ -141,7 +141,7 @@ h1 {
 	//	LAYOUT
 		// Display, Positioning
 		// Box Model
-		margin:0 0 $gridUnit-default 0;
+		margin:$gridUnit-default 0 0 0;
 		// Type
 		font-size: $fontSize-large;
 	//	DISPLAY
@@ -179,6 +179,7 @@ h2 {
 h3 {
 	@extend h1;
 	font-weight: 400;
+	text-transform: none;
 	@include bp($bp_width-600, max-) {
 		font-size: $fontSize-small;
   	}
@@ -210,7 +211,7 @@ h6 {
 	@extend h1;
 	font-size: $fontSize-smaller;
 	line-height: $gridUnit-small;
-	margin: 0 0 0.6rem 0;
+	margin: $gridUnit-smaller 0 0 0;
 }
 
 p {
@@ -220,7 +221,7 @@ p {
 	//	LAYOUT
 		// Display, Positioning
 		// Box Model
-		margin: 0 0 $gridUnit-default 0;
+		margin: $gridUnit-smaller 0 $gridUnit-smaller 0;
 		// Type
 		font-size: $fontSize-smallest;
 		line-height: 2.4rem;
@@ -300,7 +301,7 @@ pre {
 // sub {}
 ul {
 	padding: 0;
-	margin: 0;
+	margin: $gridUnit-smaller 0 $gridUnit-smaller 0;
 }
 li {
 	@extend %fontSmoothing;
