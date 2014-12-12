@@ -148,7 +148,7 @@ h1 {
 		// Visual Enhancement
 		// Type
 		font-weight: 700;
-		text-transform:uppercase;
+		// text-transform:uppercase;
 	//	PSUEDO Elements & Classes
 		// Elements :: before, after, first-line, first-letter, selection
 		// Classes : http://css-tricks.com/almanac/
@@ -191,7 +191,7 @@ h3 {
 h4 {
 	@extend h1;
 	font-variant: normal;
-	text-transform: uppercase;
+	//text-transform: uppercase;
 	line-height: $gridUnit-large;
 	@include bp($bp_width-600, max-) {
 		font-size: $fontSize-small;
