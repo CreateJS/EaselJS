@@ -1,4 +1,4 @@
-Version NEXT [Not Released]
+Version 0.8.0
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - modified behaviour of SpriteSheetBuilder.addFrame setupFunction, setupParams & setupScope params
