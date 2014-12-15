@@ -50,7 +50,7 @@ this.createjs = this.createjs||{};
  * 	console.log(foo instanceof MySuperClass); // true
  * 	console.log(foo.prototype.constructor === MySubClass); // true
  *
- * @method extends
+ * @method extend
  * @param {Function} subclass The subclass.
  * @param {Function} superclass The superclass to extend.
  * @return {Function} Returns the subclass's new prototype.
