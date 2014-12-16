@@ -1,4 +1,9 @@
-Version 0.8.0
+Version NEXT [not yet released]
+****************************************************************************************************
+
+
+
+Version 0.8.0 [December 12, 2014]
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - modified behaviour of SpriteSheetBuilder.addFrame setupFunction, setupParams & setupScope params
@@ -88,7 +93,6 @@ OTHER:
 - BlurFilter provides higher quality results (thanks quasimondo)
 - added MouseEvent.isTouch
 - added support for margin and spacing in sprite sheet data (thanks renatopp)
-
 
 
 Version 0.7.1 [December 12, 2013]
