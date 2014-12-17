@@ -178,27 +178,27 @@ h2 {
 
 h3 {
 	@extend h1;
+	font-size: $fontSize-smaller;
 	font-weight: 400;
 	text-transform: none;
-	@include bp($bp_width-600, max-) {
-		font-size: $fontSize-small;
-  	}
-  	@include bp($bp_width-600, min-) {
-		font-size: $fontSize-default;
-  	}
+}
+
+.args code,
+h3 code {
+	font-family: "effra", sans-serif;
+}
+h3 code {
+	font-weight: bold;
+}
+.paren {
+	font-size: $fontSize-smaller;
+	margin: auto 5px;
 }
 
 h4 {
-	@extend h1;
 	font-variant: normal;
-	//text-transform: uppercase;
-	line-height: $gridUnit-large;
-	@include bp($bp_width-600, max-) {
-		font-size: $fontSize-small;
-	}
-	@include bp($bp_width-600, min-) {
-		font-size: $fontSize-default;
-	}
+	line-height: $gridUnit-smallest;
+	font-size: $fontSize-smaller;
 }
 
 h5 {
@@ -284,7 +284,7 @@ hr {
 
 code {
 	@extend %fontSmoothing;
-	font-size: $fontSize-smaller;
+	//font-size: $fontSize-smaller;
 	font-weight: 400;
 	font-family: $fontFamily-monospace;
 }

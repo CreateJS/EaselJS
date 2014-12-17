@@ -108,7 +108,7 @@ kbd,
 pre,
 samp {
   font-family: $fontFamily-monospace;
-  font-size: $fontSize-smaller;
+  font-size: $fontSize-smallest;
   line-height: $gridUnit-default;
 }
 p code,
@@ -523,6 +523,7 @@ specific tabview, see the other sections below.
 /* Comma-separated list. */
 .apidocs ul.commas li:after {
   content: ',';
+  font-size: $fontSize-smaller;
 }
 .apidocs ul.commas li:last-child:after {
   content: '';
@@ -631,6 +632,9 @@ kbd .cmd {
 .apidocs .item pre.code {
   margin: 1em 0 0;
 }
+.apidocs .item .description {
+  font-size: $fontSize-smaller;
+}
 .apidocs .item .meta {
   background: none;
   border: none;
@@ -665,6 +669,12 @@ kbd .cmd {
 .apidocs .param {
   margin-bottom: 1em;
 }
+.apidocs .param-description {
+  font-size: $fontSize-smaller;
+  code {
+    font-size: $fontSize-smallest
+  }
+}
 .apidocs .param .type,
 .apidocs .param .type a {
   color: $color_gray-default;
@@ -684,7 +694,7 @@ kbd .cmd {
 /* -- Item "Returns" block -------------------------------------------------- */
 .apidocs .item .returns .type,
 .apidocs .item .returns .type a {
-  font-size: 100%;
+  font-size: 11px;
   margin: 0;
 }
 /* -- Class Constructor block ----------------------------------------------- */
