@@ -1161,8 +1161,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} height The height of the bounds.
 	 **/
 	p.setBounds = function(x, y, width, height) {
-		if (x == null) { this._bounds = x; }
-		this._bounds = (this._bounds || new createjs.Rectangle()).setValues(x, y, width, height);
+		this._bounds = x != null ? (this._bounds || new createjs.Rectangle()).setValues(x, y, width, height) : null;
 	};
 
 	/**
