@@ -80,7 +80,7 @@ a:visited {
 	//	LAYOUT
 		// Display, Positioning
 		// Box Model
-		padding: 0 2px;
+		//padding: 0 2px;
 		position: relative;
 		// Type
 	//	DISPLAY
@@ -90,8 +90,8 @@ a:visited {
 		z-index: 0;
 		// Type
 		font-family: $fontFamily-default;
-		font-weight: 700;
-		text-decoration: none;
+		font-weight: 400;
+		text-decoration: underline;
 		white-space: nowrap;
 	//	PSUEDO Elements & Classes
 		// Elements :: before, after, first-line, first-letter, selection
@@ -179,7 +179,7 @@ h2 {
 h3 {
 	@extend h1;
 	font-size: $fontSize-smaller;
-	font-weight: 400;
+	font-weight: 700;
 	text-transform: none;
 }
 
@@ -190,6 +190,8 @@ h3 code {
 h3 code {
 	font-weight: bold;
 }
+
+
 .paren {
 	font-size: $fontSize-smaller;
 	margin: auto 5px;
@@ -247,7 +249,7 @@ p {
 
 // abbr[title] {}
 // b {}
-strong {font-weight:400;} // assumes the font is 'effra' weight: 700
+strong {font-weight:700;} // assumes the font is 'effra' weight: 700
 // dfn {}
 
 hr {

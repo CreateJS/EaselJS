@@ -31,26 +31,23 @@
 @import "elements/tags.scss";
 
 
-
 //*******************************************
 //
 //  LIBRARY SPECIFIC COLORS
 //
 //*******************************************
-.header {
-  @extend %color_easeljs-gradient;
-}
+@import "library-specific.scss";
+
 .yui3-skin-sam .yui3-tab-selected .yui3-tab-label,
 .yui3-skin-sam .yui3-tab-selected .yui3-tab-label:focus,
 .yui3-skin-sam .yui3-tab-selected .yui3-tab-label:hover {
   background: none !important;
   border: none !important;
-  background-color: $color_easeljs-default !important;
+  background-color: $library-color !important;
 }
 .yui3-skin-sam .yui3-tabview-list {
-  border-bottom: 5px solid $color_easeljs-default !important;
+  border-bottom: 5px solid $library-color !important;
 }
-
 
 
 //*******************************************
@@ -106,7 +103,8 @@ td p:first-child {
 code,
 kbd,
 pre,
-samp {
+samp,
+A.crosslink {
   font-family: $fontFamily-monospace;
   font-size: $fontSize-smallest;
   line-height: $gridUnit-default;
@@ -148,6 +146,17 @@ pre.code {
   border-left: $gridUnit-smallest solid $color_gray-dark;
   margin: $gridUnit-large 0;
 }
+
+.description,
+.box.intro,
+.param-description,
+.returns-description {
+  code {
+    background-color: $color-gray-lighter;
+  }
+}
+pre code { background-color: transparent !important; }
+
 
 
 /* Used to denote text that shouldn't be selectable, such as line numbers or
@@ -312,7 +321,7 @@ th {
 }
 .header {
   padding: 1em 0 0 0 !important;
-  background-color: $color_gray-dark; 
+  background-color: $color_gray-dark;
   a:hover {
     background: transparent;
   }
@@ -393,6 +402,7 @@ ul li p {
 .apidocs .events .extends .inherited {
   font-weight: normal;
 }
+
 #hd {
   padding: 0 15px 1px 20px;
 }
@@ -557,7 +567,7 @@ kbd .cmd {
   border-bottom: 1px solid $color_gray-light;
   color: $color_gray-darker;
   font-size: 13px;
-  margin: 2em 0 0.6em;
+  margin: 1em 0 0.6em;
   padding-bottom: 2px;
 }
 .apidocs .index .no-visible-items {
@@ -647,11 +657,13 @@ kbd .cmd {
 .apidocs .item .type,
 .apidocs .item .type a,
 .apidocs .returns-inline {
-  color: $color_gray-default;
+  //color: $color_gray-default;
+  text-decoration: none;
+  font-size: 12px;
 }
 .apidocs .item .type,
 .apidocs .returns-inline {
-  font-size: 11px;
+  font-size: 12px;
   margin: 0 0 0 0;
 }
 .apidocs .item .type a {
@@ -677,7 +689,7 @@ kbd .cmd {
 }
 .apidocs .param .type,
 .apidocs .param .type a {
-  color: $color_gray-default;
+  //color: $color_gray-default;
 }
 .apidocs .param .type {
   margin: 0 0 0 0.5em;
@@ -694,7 +706,7 @@ kbd .cmd {
 /* -- Item "Returns" block -------------------------------------------------- */
 .apidocs .item .returns .type,
 .apidocs .item .returns .type a {
-  font-size: 11px;
+  font-size: 12px;
   margin: 0;
 }
 /* -- Class Constructor block ----------------------------------------------- */
@@ -890,7 +902,7 @@ ol.linenums {
   .file-line {
     position: relative;
     z-index: 2;
-    color:$color_gray-darkest; 
+    color:$color_gray-darkest;
   }
 }
 
