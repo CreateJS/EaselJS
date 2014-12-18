@@ -78,6 +78,9 @@ this.createjs = this.createjs || {};
 		this.mask = mask;
 	}
 	var p = createjs.extend(AlphaMaskFilter, createjs.Filter);
+
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 	
 
 // public methods:

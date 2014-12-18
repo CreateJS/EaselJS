@@ -117,6 +117,9 @@ this.createjs = this.createjs||{};
 		this.primary = !!primary;
 	}
 	var p = createjs.extend(MouseEvent, createjs.Event);
+
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 	
 	
 // getter / setters:

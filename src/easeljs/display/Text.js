@@ -148,6 +148,9 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(Text, createjs.DisplayObject);
 
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+
 	
 // static properties:
 	/**

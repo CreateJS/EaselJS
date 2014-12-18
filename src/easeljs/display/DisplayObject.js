@@ -474,7 +474,9 @@ this.createjs = this.createjs||{};
 		this._bounds = null;
 	}
 	var p = createjs.extend(DisplayObject, createjs.EventDispatcher);
-	
+
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 	
 // static properties:
 	/**
@@ -1030,7 +1032,7 @@ this.createjs = this.createjs||{};
 	 * @method hitTest
 	 * @param {Number} x The x position to check in the display object's local coordinates.
 	 * @param {Number} y The y position to check in the display object's local coordinates.
-	 * @return {Boolean} A Boolean indicting whether a visible portion of the DisplayObject intersect the specified
+	 * @return {Boolean} A Boolean indicating whether a visible portion of the DisplayObject intersect the specified
 	 * local Point.
 	*/
 	p.hitTest = function(x, y) {

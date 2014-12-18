@@ -274,6 +274,9 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(SpriteSheet, createjs.EventDispatcher);
 
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+
 
 // events:
 	/**

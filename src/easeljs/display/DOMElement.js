@@ -99,7 +99,10 @@ this.createjs = this.createjs||{};
 		this._oldProps = null;
 	}
 	var p = createjs.extend(DOMElement, createjs.DisplayObject);
-	
+
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+
 
 // public methods:
 	/**

@@ -132,6 +132,9 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(ColorFilter, createjs.Filter);
 
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+
 
 // public methods:
 	/** docced in super class **/
