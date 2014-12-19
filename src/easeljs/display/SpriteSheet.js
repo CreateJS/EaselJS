@@ -1,30 +1,30 @@
 /*
-* SpriteSheet
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2010 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
+ * SpriteSheet
+ * Visit http://createjs.com/ for documentation, updates and examples.
+ *
+ * Copyright (c) 2010 gskinner.com, inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 /**
  * @module EaselJS
@@ -35,8 +35,8 @@ this.createjs = this.createjs||{};
 
 (function() {
 	"use strict";
-	
-	
+
+
 // constructor:
 	/**
 	 * Encapsulates the properties and methods associated with a sprite sheet. A sprite sheet is a series of images (usually
@@ -51,66 +51,68 @@ this.createjs = this.createjs||{};
 	 * </OL>
 	 *
 	 * <h3>SpriteSheet Format</h3>
-	 * 
+	 *
 	 * SpriteSheets are an object with two required properties (`images` and `frames`), and two optional properties
 	 * (`framerate` and `animations`). This makes them easy to define in javascript code, or in JSON.
-	 * 
+	 *
 	 * <h4>images</h4>
 	 * An array of source images. Images can be either an HTMLImage
 	 * instance, or a uri to an image. The former is recommended to control preloading.
-	 * 
+	 *
 	 * 	images: [image1, "path/to/image2.png"],
-	 * 
+	 *
 	 * <h4>frames</h4>
 	 * Defines the individual frames. There are two supported formats for frame data:<OL>
 	 * <LI> when all of the frames are the same size (in a grid), use an object with `width`, `height`, `regX`, `regY`, and `count` properties.
 	 * `width` & `height` are required and specify the dimensions of the frames.
 	 * `regX` & `regY` indicate the registration point or "origin" of the frames.
+	 * `spacing` indicate the spacing between frames.
+	 * `margin` specify the margin around the image(s).
 	 * `count` allows you to specify the total number of frames in the spritesheet; if omitted, this will be calculated
 	 * based on the dimensions of the source images and the frames. Frames will be assigned indexes based on their position
 	 * in the source images (left to right, top to bottom).
-	 * 	
-	 * 	frames: {width:64, height:64, count:20, regX: 32, regY:64}
-	 * 	
+	 *
+	 * 	frames: {width:64, height:64, count:20, regX: 32, regY:64, spacing:0, margin:0}
+	 *
 	 * <LI> if the frames are of different sizes, use an array of frame definitions. Each definition is itself an array
 	 * with 4 required and 3 optional entries, in the order: `x`, `y`, `width`, `height`, `imageIndex`, `regX`, `regY`. The first
 	 * four entries are required and define the frame rectangle. The fifth specifies the index of the source image (defaults to 0). The
 	 * last two specify the registration point of the frame.
-	 * 	
+	 *
 	 * 	frames: [
 	 * 		// x, y, width, height, imageIndex*, regX*, regY*
 	 * 		[64, 0, 96, 64],
 	 * 		[0, 0, 64, 64, 1, 32, 32]
 	 * 		// etc.
 	 * 	]
-	 * 	
+	 *
 	 * </OL>
-	 * 
+	 *
 	 * <h4>animations</h4>
 	 * Optional. An object defining sequences of frames to play as named animations. Each property corresponds to an
-	 * animation of the same name. Each animation must specify the frames to play, and may 
+	 * animation of the same name. Each animation must specify the frames to play, and may
 	 * also include a relative playback `speed` (ex. 2 would playback at double speed, 0.5 at half), and
 	 * the name of the `next` animation to sequence to after it completes.
-	 * 
+	 *
 	 * There are three formats supported for defining the frames in an animation, which can be mixed and matched as appropriate:<OL>
 	 * <LI> for a single frame animation, you can simply specify the frame index
-	 * 
+	 *
 	 * 	animations: {
 	 * 		sit: 7
 	 * 	}
-	 * 
+	 *
 	 * <LI> for an animation of consecutive frames, you can use an array with two required, and two optional entries
 	 * in the order: `start`, `end`, `next`, and `speed`. This will play the frames from start to end inclusive.
-	 * 
+	 *
 	 * 	animations: {
 	 * 		// start, end, next*, speed*
 	 * 		run: [0, 8],
 	 * 		jump: [9, 12, "run", 2]
 	 * 	}
-	 * 
+	 *
 	 * <LI> for non-consecutive frames, you can use an object with a `frames` property defining an array of frame indexes to
 	 * play in order. The object can also specify `next` and `speed` properties.
-	 * 
+	 *
 	 * 	animations: {
 	 * 		walk: {
 	 * 			frames: [1,2,3,3,2,1]
@@ -121,16 +123,16 @@ this.createjs = this.createjs||{};
 	 * 			speed: 0.5
 	 * 		}
 	 * 	}
-	 * 
+	 *
 	 * </OL>
 	 * <strong>Note:</strong> the `speed` property was added in EaselJS 0.7.0. Earlier versions had a `frequency`
 	 * property instead, which was the inverse of `speed`. For example, a value of "4" would be 1/4 normal speed in earlier
 	 * versions, but is 4x normal speed in 0.7.0+.
-	 * 
+	 *
 	 * <h4>framerate</h4>
 	 * Optional. Indicates the default framerate to play this spritesheet at in frames per second.
 	 * See {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} for more information.
-	 * 
+	 *
 	 * 	framerate: 20
 	 *
 	 * <h4>Example</h4>
@@ -161,9 +163,9 @@ this.createjs = this.createjs||{};
 	 **/
 	function SpriteSheet(data) {
 		this.EventDispatcher_constructor();
-	
-	
-	// public properties:
+
+
+		// public properties:
 		/**
 		 * Indicates whether all images are finished loading.
 		 * @property complete
@@ -171,7 +173,7 @@ this.createjs = this.createjs||{};
 		 * @readonly
 		 **/
 		this.complete = true;
-	
+
 		/**
 		 * Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See
 		 * Sprite.framerate for more information.
@@ -179,75 +181,101 @@ this.createjs = this.createjs||{};
 		 * @type Number
 		 **/
 		this.framerate = 0;
-	
-	
-	// private properties:
+
+
+		// private properties:
 		/**
 		 * @property _animations
 		 * @protected
+		 * @type Array
 		 **/
 		this._animations = null;
-	
+
 		/**
 		 * @property _frames
 		 * @protected
+		 * @type Array
 		 **/
 		this._frames = null;
-	
+
 		/**
 		 * @property _images
 		 * @protected
+		 * @type Array
 		 **/
 		this._images = null;
-	
+
 		/**
 		 * @property _data
 		 * @protected
+		 * @type Object
 		 **/
 		this._data = null;
-	
+
 		/**
 		 * @property _loadCount
 		 * @protected
+		 * @type Number
 		 **/
 		this._loadCount = 0;
-	
+
 		// only used for simple frame defs:
 		/**
 		 * @property _frameHeight
 		 * @protected
+		 * @type Number
 		 **/
 		this._frameHeight = 0;
-	
+
 		/**
 		 * @property _frameWidth
 		 * @protected
+		 * @type Number
 		 **/
 		this._frameWidth = 0;
-	
+
 		/**
 		 * @property _numFrames
 		 * @protected
+		 * @type Number
 		 **/
 		this._numFrames = 0;
-	
+
 		/**
 		 * @property _regX
 		 * @protected
+		 * @type Number
 		 **/
 		this._regX = 0;
-	
+
 		/**
 		 * @property _regY
 		 * @protected
+		 * @type Number
 		 **/
 		this._regY = 0;
-		
-		
-	// setup:
+
+		/**
+		 * @property _spacing
+		 * @protected
+		 * @type Number
+		 **/
+		this._spacing = 0;
+
+		/**
+		 * @property _margin
+		 * @protected
+		 * @type Number
+		 **/
+		this._margin = 0;
+
+		// setup:
 		this._parseData(data);
 	}
 	var p = createjs.extend(SpriteSheet, createjs.EventDispatcher);
+
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
 
 // events:
@@ -255,19 +283,19 @@ this.createjs = this.createjs||{};
 	 * Dispatched when all images are loaded.  Note that this only fires if the images
 	 * were not fully loaded when the sprite sheet was initialized. You should check the complete property
 	 * to prior to adding a listener. Ex.
-	 * 
+	 *
 	 * 	var sheet = new SpriteSheet(data);
 	 * 	if (!sheet.complete) {
 	 * 		// not preloaded, listen for the complete event:
 	 * 		sheet.addEventListener("complete", handler);
 	 * 	}
-	 * 	
+	 *
 	 * @event complete
 	 * @param {Object} target The object that dispatched the event.
 	 * @param {String} type The event type.
 	 * @since 0.6.0
 	 */
-	 
+
 	/**
 	 * Dispatched when getFrame is called with a valid frame index. This is primarily intended for use by {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}}
 	 * when doing on-demand rendering.
@@ -275,8 +303,8 @@ this.createjs = this.createjs||{};
 	 * @param {Number} index The frame index.
 	 * @param {Object} frame The frame object that getFrame will return.
 	 */
-	
-	
+
+
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "SpriteSheet/animations:property"}}{{/crossLink}} property instead.
@@ -309,7 +337,7 @@ this.createjs = this.createjs||{};
 	 * @method getNumFrames
 	 * @param {String} animation The name of the animation to get a frame count for.
 	 * @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
-	*/
+	 */
 	p.getNumFrames = function(animation) {
 		if (animation == null) {
 			return this._frames ? this._frames.length : this._numFrames || 0;
@@ -432,10 +460,12 @@ this.createjs = this.createjs||{};
 			this._frameHeight = o.height;
 			this._regX = o.regX||0;
 			this._regY = o.regY||0;
+			this._spacing = o.spacing||0;
+			this._margin = o.margin||0;
 			this._numFrames = o.count;
 			if (this._loadCount == 0) { this._calculateFrames(); }
 		}
-		
+
 		// parse animations:
 		this._animations = [];
 		if ((o=data.animations) != null) {
@@ -489,21 +519,35 @@ this.createjs = this.createjs||{};
 	 **/
 	p._calculateFrames = function() {
 		if (this._frames || this._frameWidth == 0) { return; }
+
 		this._frames = [];
-		var ttlFrames = 0;
-		var fw = this._frameWidth;
-		var fh = this._frameHeight;
-		for (var i=0,imgs = this._images; i<imgs.length; i++) {
-			var img = imgs[i];
-			var cols = img.width/fw|0;
-			var rows = img.height/fh|0;
-			var ttl = this._numFrames>0 ? Math.min(this._numFrames-ttlFrames,cols*rows) : cols*rows;
-			for (var j=0;j<ttl;j++) {
-				this._frames.push({image:img, rect:new createjs.Rectangle(j%cols*fw,(j/cols|0)*fh,fw,fh), regX:this._regX, regY:this._regY });
+
+		var maxFrames = this._numFrames || 100000; // if we go over this, something is wrong.
+		var frameCount = 0, frameWidth = this._frameWidth, frameHeight = this._frameHeight;
+		var spacing = this._spacing, margin = this._margin;
+		
+		imgLoop:
+		for (var i=0, imgs=this._images; i<imgs.length; i++) {
+			var img = imgs[i], imgW = img.width, imgH = img.height;
+
+			var y = margin;
+			while (y <= imgH-margin-frameHeight) {
+				var x = margin;
+				while (x <= imgW-margin-frameWidth) {
+					if (frameCount >= maxFrames) { break imgLoop; }
+					frameCount++;
+					this._frames.push({
+							image: img,
+							rect: new createjs.Rectangle(x, y, frameWidth, frameHeight),
+							regX: this._regX,
+							regY: this._regY
+						});
+					x += frameWidth+spacing;
+				}
+				y += frameHeight+spacing;
 			}
-			ttlFrames += ttl;
 		}
-		this._numFrames = ttlFrames;
+		this._numFrames = frameCount;
 	};
 
 

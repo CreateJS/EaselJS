@@ -12,7 +12,7 @@ describe("Graphics", function () {
 		this.g.beginFill(this.fColor);
 		this.g.moveTo(120, 100).arc(100, 100, 20, 0, Math.PI);
 
-		this.compareBaseLine("assets/arc.png", done, expect);
+		this.compareBaseLine("assets/arc.png", done, expect, 0.01);
 	});
 
 	it("arcTo()", function (done) {
@@ -204,7 +204,7 @@ describe("Graphics", function () {
 	});
 
 	it("setStrokeStyle()", function (done) {
-		this.g.setStrokeStyle(25, 1, 1, 0, true).beginStroke(this.sColor).rect(30, 30, 100, 100);
+		this.g.setStrokeStyle(25, 1, 1, 0, true).beginStroke(this.sColor, 1).moveTo(25, 25).lineTo(150, 150);
 
 		this.compareBaseLine("assets/setStrokeStyle.png", done, expect);
 	});

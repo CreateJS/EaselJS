@@ -75,6 +75,9 @@ this.createjs = this.createjs||{};
 		this.matrix = matrix;
 	}
 	var p = createjs.extend(ColorMatrixFilter, createjs.Filter);
+
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 	
 
 // public methods:

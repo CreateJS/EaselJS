@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta charset="utf-8">
 	<title>EaselJS Example: Event bubbling</title>
 
-	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
-	var stage,text;
-	
+<script id="editable">
+	var stage, text;
+
 	function init() {
 		// create a stage object to work with the canvas. This is the top level node in the display list:
 		stage = new createjs.Stage("testCanvas");
@@ -20,67 +22,81 @@
 		stage.enableMouseOver(10);
 
 		// Create a simple hierarchy:
-		var container = stage.addChild(new createjs.Container()).set({name:"container"});
-		var shape = container.addChild(new createjs.Shape()).set({name:"shape", x:100, y:100});
-		shape.graphics.beginFill("#F00").drawRect(0,0,100,100);
-		
+		var container = stage.addChild(new createjs.Container()).set({name: "container"});
+		var shape = container.addChild(new createjs.Shape()).set({name: "shape", x: 100, y: 100});
+		shape.graphics.beginFill("#F00").drawRect(0, 0, 100, 100);
+
 		// Add listeners to capture phase:
 		stage.addEventListener("click", handleClick, true);
 		container.addEventListener("click", handleClick, true);
 		shape.addEventListener("click", handleClick, true);
 		// note that the capture phase does not trigger on the target instance
 		// so the last listener will never be fired when shape is clicked.
-		
+
 		// add listeners to the bubble phase:
 		stage.addEventListener("click", handleClick);
 		container.addEventListener("click", handleClick);
 		shape.addEventListener("click", handleClick);
 		// the "target" phase is a non-capture phase, so this listener on shape will trigger.
-		
+
 		//container.mouseChildren = false;
-		stage.addEventListener("pressmove", function(evt) { console.log("move!"); });
-		stage.addEventListener("pressup", function(evt) { console.log("up!", evt); });
-		
-		
+		stage.addEventListener("pressmove", function (evt) {
+			console.log("move!");
+		});
+		stage.addEventListener("pressup", function (evt) {
+			console.log("up!", evt);
+		});
+
 		container.cursor = "pointer";
-		
-		// text object to output the 
-		text = stage.addChild(new createjs.Text("Click the shape.", "14px monospace", "#FFF")).set({x:250, y:20, lineHeight:20});
+
+		// text object to output the
+		text = stage.addChild(new createjs.Text("Click the shape.", "14px monospace", "#111")).set({x: 250, y: 20, lineHeight: 20});
 
 		// call update on the stage to make it render the current display list to the canvas:
 		createjs.Ticker.addEventListener("tick", stage);
 	}
-	
+
 	var lastPhase = 0;
 	function handleClick(evt) {
 		// clear the text if this is the first listener:
-		if (evt.currentTarget == stage && (evt.eventPhase == 1 || evt.eventPhase == 2)) { text.text = ""; }
+		if (evt.currentTarget == stage && (evt.eventPhase == 1 || evt.eventPhase == 2)) {
+			text.text = "";
+		}
 		if (evt.eventPhase != lastPhase) {
-			text.text += ">> "+["capture", "target", "bubble"][evt.eventPhase-1]+" phase:\n";
+			text.text += ">> " + ["capture", "target", "bubble"][evt.eventPhase - 1] + " phase:\n";
 			lastPhase = evt.eventPhase;
 		}
-		text.text += "type="+evt.type+" target="+evt.target.name+" eventPhase="+evt.eventPhase+" currentTarget="+evt.currentTarget.name+"\n";
+		text.text += "type=" + evt.type + " target=" + evt.target.name + " eventPhase=" + evt.eventPhase + " currentTarget=" + evt.currentTarget.name + "\n";
 	}
-	</script>
+</script>
 </head>
-	
+
 <body onload="init();">
 
-	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Event bubbling</h1>
-	    <p>This example demonstrates event bubbling phases. The red Shape is a child of a Container, which is a child
-	    of the Stage. Event listeners have been added for the capture and bubble phase of the click event for all three
-	    objects. Clicking on the Shape outputs the event details, and demonstrates how the <strong>target</strong>, <strong>eventPhase</strong>, and
-		<strong>currentTarget</strong> properties work.</p>
-		<p>Note how in the initial capture phase (eventPhase=1), the event moves from the stage down to the target,
-		is dispatched from the target in the target phase (eventPhase=2), and then bubbles back up to the stage in
-		the bubble phase (eventPhase=3).</p>
-		<p>Also note how the target property is always the Shape that was clicked on, while the currentTarget points to
-		the object that is currently dispatching the event.</p>
-	</header>
+<header class="EaselJS">
+	<h1>Event bubbling</h1>
 
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+	<p>This example demonstrates event bubbling phases. The red Shape is a child
+		of a Container, which is a child
+		of the Stage. Event listeners have been added for the capture and bubble
+		phase of the click event for all three
+		objects. Clicking on the Shape outputs the event details, and
+		demonstrates how the <code>target</code>, <code>eventPhase</code>, and
+		<code>currentTarget</code> properties work.</p>
+
+	<p>Note how in the initial capture phase (eventPhase=1), the event moves
+		from the stage down to the target,
+		is dispatched from the target in the target phase (eventPhase=2), and
+		then bubbles back up to the stage in
+		the bubble phase (eventPhase=3).</p>
+
+	<p>Also note how the target property is always the Shape that was clicked
+		on, while the currentTarget points to
+		the object that is currently dispatching the event.</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

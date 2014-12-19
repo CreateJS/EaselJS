@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta charset="utf-8">
 	<title>EaselJS Example: Using globalToLocal #1</title>
 
-	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
 	<!-- Note: All core EaselJS classes are listed here: -->
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
+<script id="editable">
 	var canvas;
 	var stage;
 
@@ -38,13 +40,14 @@
 		// attach mouse handlers directly to the source canvas
 		// better than calling from canvas tag for cross browser
 
-        stage.enableDOMEvents(true);
-        stage.addEventListener("stagemousemove", mouseMove);
-        stage.addEventListener("stagemousedown", mouseDown);
-        stage.addEventListener("stagemouseup", mouseUp);
+		stage.enableDOMEvents(true);
+		stage.addEventListener("stagemousemove", mouseMove);
+		stage.addEventListener("stagemousedown", mouseDown);
+		stage.addEventListener("stagemouseup", mouseUp);
 
 		text = new createjs.Text("Click and Drag", "36px Arial", "#777777");
-		text.x = 360; text.y = 200;
+		text.x = 360;
+		text.y = 200;
 		stage.addChild(text);
 
 		// shape to draw vector data into:
@@ -62,8 +65,8 @@
 		spin1.addChild(spin2);
 
 		// center it on the stage:
-		spin1.x = canvas.width/2;
-		spin1.y = canvas.height/2;
+		spin1.x = canvas.width / 2;
+		spin1.y = canvas.height / 2;
 		stage.addChild(spin1);
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
@@ -77,24 +80,24 @@
 		spin2.rotation += -7;
 		shape.rotation += 3;
 
-		if(_mouseIsDown) {
+		if (_mouseIsDown) {
 			var color = createjs.Graphics.getHSL(
-				Math.cos((count++)*0.01) * 180,
-				100,
-				50,
-				1.0);
+							Math.cos((count++) * 0.01) * 180,
+							100,
+							50,
+							1.0);
 
 			// set up our drawing properties:
-			graphics.setStrokeStyle(Math.random()*20+2,"round").beginStroke(color);
+			graphics.setStrokeStyle(Math.random() * 20 + 2, "round").beginStroke(color);
 
 			// start the line at the last position:
-			graphics.moveTo(lastPt.x,lastPt.y);
+			graphics.moveTo(lastPt.x, lastPt.y);
 
 			// calculate the new position in the shape's local coordinate space:
-			lastPt = shape.globalToLocal(_mouseX,_mouseY);
+			lastPt = shape.globalToLocal(_mouseX, _mouseY);
 
 			// draw the line, and close the path:
-			graphics.lineTo(lastPt.x,lastPt.y);
+			graphics.lineTo(lastPt.x, lastPt.y);
 		}
 
 		// update the stage:
@@ -108,7 +111,7 @@
 		_mouseIsDown = true;
 
 		// set up the first point in the new draw, and choose a random color:
-		lastPt = shape.globalToLocal(event.nativeEvent.pageX-canvas.offsetLeft,event.nativeEvent.pageY-canvas.offsetTop);
+		lastPt = shape.globalToLocal(event.nativeEvent.pageX - canvas.offsetLeft, event.nativeEvent.pageY - canvas.offsetTop);
 		//color = "#"+(Math.random()*0xFFFFFF|0).toString(16);
 
 		// clear the cache, so the vector data is drawn each tick:
@@ -120,29 +123,35 @@
 		_mouseIsDown = false;
 
 		// cache the vector data to a saved canvas, so we don't have to render it each tick:
-		shape.cache(-800,-800,1600,1600);
+		shape.cache(-800, -800, 1600, 1600);
 	}
 
 	//update mouse positions
 	function mouseMove(e) {
 		//if(!e){ e = window.event; }
-		_mouseX = e.nativeEvent.pageX-canvas.offsetLeft;
-		_mouseY = e.nativeEvent.pageY-canvas.offsetTop;
+		_mouseX = e.nativeEvent.pageX - canvas.offsetLeft;
+		_mouseY = e.nativeEvent.pageY - canvas.offsetTop;
 	}
 
-
-	</script>
+</script>
 </head>
-	
-<body onload="init();">
-	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Global to Local</h1>
-	    <p>Example of <strong>CoordTransform.globalToLocal()</strong> and <strong>DisplayObject.cache()</strong> usage. Click to begin drawing. If you draw a large number of line segments, the animation will start to slow down or stutter due to the amount of vector data being rendered each tick. When you release the mouse, the vector Shape is cached, and it will animate quickly again. When you click again, it will turn off caching in order to draw new line segments.
-	    </p>
-	</header>
 
-    <div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+<body onload="init();">
+<header class="EaselJS">
+	<h1>GlobalToLocal</h1>
+
+	<p>Example of <code>DisplayObject.globalToLocal()</code> and <code>DisplayObject.cache()</code>
+		usage. Click to begin drawing. If you draw a large number of line
+		segments, the animation will start to slow down or stutter due to the
+		amount of vector data being rendered each tick. When you release the
+		mouse, the vector Shape is cached, and it will animate quickly again.
+		When you click again, it will turn off caching in order to draw new line
+		segments.
+	</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

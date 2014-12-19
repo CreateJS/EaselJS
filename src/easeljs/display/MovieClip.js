@@ -116,7 +116,7 @@ this.createjs = this.createjs||{};
 		 * @type Boolean
 		 * @default true
 		 */
-		this.loop = true;
+		this.loop = loop;
 	
 		/**
 		 * The current frame of the movieclip.

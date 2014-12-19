@@ -1,0 +1,51 @@
+//*******************************************
+//
+//	CODEBOX
+//
+//	- Style for mid paragraph code windows
+//
+//	Contents
+//	1) CONTAINER
+//
+//*******************************************
+
+
+
+//*******************************************
+//
+//	CONTAINER
+//
+//*******************************************
+.codeBox {
+	//	EXTEND 
+	@extend %util-scroll-x;
+	//	VARS (locally scoped)
+	//	LAYOUT
+		// Display, Positioning
+		overflow-y: scroll;
+		// Box Model
+		max-width: $gridUnit-largest * 10;
+		margin: $gridUnit-large  0;
+		border-left: $gridUnit-smallest solid $color_createjs-default;
+		padding: $gridUnit-small $gridUnit-smallest;
+		// Type
+		text-align: left;
+		line-height: $gridUnit-default;
+	//	DISPLAY
+		// Visual Enhancement
+		background: $color_gray-lightest;
+		color: $color_gray-dark;
+		// Type
+	//	PSUEDO Elements & Classes
+		// Elements :: before, after, first-line, first-letter, selection
+		// Classes : http://css-tricks.com/almanac/
+	//	CHILDREN
+		// Sass 3.3 Syntax Only (otherwise scope child outside this selector)
+		code {
+			white-space:pre;
+		}
+	//	MODIFIERS
+		// Static
+		// Dynamic
+	//	BREAKPOINTS
+}

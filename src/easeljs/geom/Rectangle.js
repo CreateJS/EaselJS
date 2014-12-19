@@ -84,6 +84,19 @@ this.createjs = this.createjs||{};
 	}
 	var p = Rectangle.prototype;
 
+	/**
+	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	 * for details.
+	 *
+	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	 *
+	 * @method initialize
+	 * @protected
+	 * @deprecated
+	 */
+	// p.initialize = function() {}; // searchable for devs wondering where it is.
+
 
 // public methods:
 	/** 
@@ -122,6 +135,24 @@ this.createjs = this.createjs||{};
 		if (y+height > this.y+this.height) { this.height = y+height-this.y; }
 		if (x < this.x) { this.width += this.x-x; this.x = x; }
 		if (y < this.y) { this.height += this.y-y; this.y = y; }
+		return this;
+	};
+	
+	/** 
+	 * Adds the specified padding to the rectangle's bounds.
+	 * @method extend
+	 * @param {Number} [top=0]
+	 * @param {Number} [left=0]
+	 * @param {Number} [right=0]
+	 * @param {Number} [bottom=0]
+	 * @return {Rectangle} This instance. Useful for chaining method calls.
+	 * @chainable
+	*/
+	p.pad = function(top, left, bottom, right) {
+		this.x -= top;
+		this.y -= left;
+		this.width += top+bottom;
+		this.height += left+right;
 		return this;
 	};
 	

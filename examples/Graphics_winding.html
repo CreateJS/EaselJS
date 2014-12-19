@@ -1,57 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>EaselJS Example: Graphics Winding</title>
+	<meta charset="utf-8">
+	<title>EaselJS Example: Graphics Winding</title>
 
-    <link href="assets/demoStyles.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-    <script type="text/javascript">
+<script id="editable">
+	function init() {
+		var stage = new createjs.Stage("testCanvas");
 
-        function init() {
-            var stage = new createjs.Stage("testCanvas");
+		var shape = new createjs.Shape();
+		stage.addChild(shape);
+		shape.graphics.beginFill("#000");
+		shape.x = 0;
 
-            var shape = new createjs.Shape();
-            stage.addChild(shape);
-            shape.graphics.beginFill("#006699");
+		// Draw the initial shape
+		shape.graphics.drawRect(20, 20, 450, 360);
 
-            // Draw the initial shape
-            shape.graphics.drawRect(20, 20, 450, 360);
+		// Additional draw calls are made to the same shape, but using reverse winding.
+		// Change the winding to vary the results.
+		shape.graphics.arc(160, 160, 110, 0, Math.PI * 2, true).closePath(); // Subtracts from the square
+		shape.graphics.arc(330, 240, 110, 0, Math.PI * 2, true).closePath(); // Subtracts from the square, but ADDs to the first circle
 
-            // Additional draw calls are made to the same shape, but using reverse winding.
-            // Change the winding to vary the results.
-            shape.graphics.arc(160, 160, 140, 0, Math.PI * 2, true).closePath(); // Subtracts from the square
-            shape.graphics.arc(330, 240, 140, 0, Math.PI * 2, true).closePath(); // Subtracts from the square, but ADDs to the first circle
+		// Use the same graphics to make another Shape
+		var mask = new createjs.Shape(shape.graphics);
+		// Create a bitmap, and mask it using the compound shape
+		var bmp = new createjs.Bitmap("../_assets/art/flowers.jpg");
+		bmp.mask = mask;
+		stage.addChild(bmp);
 
-            // Use the same graphics to make another Shape
-            var mask = new createjs.Shape(shape.graphics);
-            // Create a bitmap, and mask it using the compound shape
-            var bmp = new createjs.Bitmap("assets/photo-hires.jpg");
-            bmp.mask = mask;
-            stage.addChild(bmp);
+		// Move them over so we can see them
+		bmp.x = 470;
+		mask.x = 470;
 
-            // Move them over so we can see them
-            bmp.x = 400;
-            mask.x = 480;
-
-            createjs.Ticker.addEventListener("tick", stage);
-        }
-    </script>
+		createjs.Ticker.addEventListener("tick", stage);
+	}
+</script>
 </head>
 
 <body onload="init();">
-<header id="header" class="EaselJS">
-    <h1><span class="text-product">Easel<strong>JS</strong></span> Graphics Winding</h1>
+<header class="EaselJS">
+	<h1>Graphics Winding</h1>
 
-    <p>Demonstrates how to draw compound shapes using Graphics to create "holes" in the shape. This approach is
-        useful for masks.</p>
+	<p>Demonstrates how to draw compound shapes using winding to create "holes"
+		in the shape. This approach is also
+		useful for masks.</p>
 </header>
 
-<div class="canvasHolder">
-    <canvas id="testCanvas" width="960" height="400"></canvas>
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
 </div>
 </body>
 

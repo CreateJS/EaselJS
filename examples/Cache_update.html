@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta charset="utf-8">
 	<title>EaselJS Example: Using Stage.autoClear</title>
 
-	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
-	<!-- We also provide hosted minified versions of all CreateJS libraries.
-	  http://code.createjs.com -->
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
 
-	<script>
+<script id="editable">
 	var canvas;
 	var stage;
 	var starfield
@@ -18,16 +18,13 @@
 	var sky;
 
 	function init() {
-		if (window.top != window) {
-			document.getElementById("header").style.display = "none";
-		}
 		// create a new stage and point it at our canvas:
 		canvas = document.getElementById("testCanvas");
 		stage = new createjs.Stage(canvas);
 
 		// draw the sky:
 		sky = new createjs.Shape();
-		sky.graphics.beginLinearGradientFill(["#204","#003","#000"], [0,0.15,0.6], 0, canvas.height, 0, 0);
+		sky.graphics.beginLinearGradientFill(["#204", "#003", "#000"], [0, 0.15, 0.6], 0, canvas.height, 0, 0);
 		sky.graphics.drawRect(0, 0, canvas.width, canvas.height);
 		stage.addChild(sky);
 
@@ -36,12 +33,12 @@
 		stage.addChild(starfield);
 
 		// set up the cache for the star field shape, and make it the same size as the canvas:
-		starfield.cache(0,0,canvas.width,canvas.height);
+		starfield.cache(0, 0, canvas.width, canvas.height);
 
 		// draw the moon in a separate shape, so it isn't part of the generative caching:
 		moon = new createjs.Shape();
-		moon.graphics.beginFill("#CCF").drawCircle(0,0,60);
-		moon.graphics.beginFill("#000").drawEllipse(-35,-57,96,114);
+		moon.graphics.beginFill("#CCF").drawCircle(0, 0, 60);
+		moon.graphics.beginFill("#000").drawEllipse(-35, -57, 96, 114);
 		moon.rotation = -30;
 		stage.addChild(moon);
 
@@ -56,7 +53,7 @@
 
 	function tick(event) {
 		// draw a vector star at a random location:
-		starfield.graphics.beginFill(createjs.Graphics.getRGB(0xFFFFFF,Math.random())).drawPolyStar(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*4+1, 5, 0.93, Math.random()*360);
+		starfield.graphics.beginFill(createjs.Graphics.getRGB(0xFFFFFF, Math.random())).drawPolyStar(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 4 + 1, 5, 0.93, Math.random() * 360);
 
 		// draw the new vector onto the existing cache, compositing it with the "source-overlay" composite operation:
 		starfield.updateCache("source-overlay");
@@ -72,29 +69,33 @@
 		sky.alpha -= 0.0005;
 
 		// move the moon across the sky:
-		var w = canvas.width+200;
-		moon.x = (moon.x+100+1+w)%w-100;
-		moon.y = 250-Math.sin(moon.x/w*Math.PI)*150;
+		var w = canvas.width + 200;
+		moon.x = (moon.x + 100 + 1 + w) % w - 100;
+		moon.y = 250 - Math.sin(moon.x / w * Math.PI) * 150;
 
 		// draw the updates to stage:
 		stage.update(event);
 	}
 
-	</script>
+</script>
 </head>
-	
+
 <body onload="init();">
 
-	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Update Cache</h1>
-	    <p>This example draws a single vector star each tick, then composites it onto an existing cache using <strong>DisplayObject.updateCache();</strong> to avoid the cost of rendering the vectors each frame.
-	    	This provides a similar result as setting <strong>stage.autoclear</strong> to false, but can be managed on a per instance basis.
-	    </p>
-	</header>
+<header class="EaselJS">
+	<h1>updateCache</h1>
 
-	<!-- background isn't set to black to demonstrate how the darkening applies -->
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400" style="background-color:#000"></canvas>
-	</div>
+	<p>This example draws a single vector star each tick, then composites it
+		onto an existing cache using <code>DisplayObject.updateCache()</code> to
+		avoid the cost of rendering the vectors each frame.
+		This is similar to setting <code>stage.autoclear</code> to false, but
+		can be managed on a per instance basis.
+	</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"
+			style="background:#000"></canvas>
+</div>
 </body>
 </html>

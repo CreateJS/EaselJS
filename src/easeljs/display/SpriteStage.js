@@ -265,6 +265,9 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(SpriteStage, createjs.Stage);
 
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+
 
 // constants:
 	/**
@@ -838,7 +841,7 @@ this.createjs = this.createjs||{};
 			mtx = kid._props.matrix;
 
 			// Get the kid's global matrix (relative to the stage):
-			mtx = (parentMVMatrix ? mtx.copy(parentMVMatrix) : mtx.identity()).prependTransform(kid.x, kid.y, kid.scaleX, kid.scaleY, kid.rotation, kid.skewX, kid.skewY, kid.regX, kid.regY);
+			mtx = (parentMVMatrix ? mtx.copy(parentMVMatrix) : mtx.identity()).appendTransform(kid.x, kid.y, kid.scaleX, kid.scaleY, kid.rotation, kid.skewX, kid.skewY, kid.regX, kid.regY);
 
 			// Set default texture coordinates:
 			var uStart = 0, uEnd = 1,

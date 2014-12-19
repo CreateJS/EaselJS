@@ -146,6 +146,25 @@ module.exports = function (grunt) {
 					}
 				},
 
+
+				sass: {
+					docs: {
+						options: {
+							style: 'compressed',
+							sourcemap:"none"
+						},
+						files: {
+							'createjsTheme/assets/css/main.css': 'createjsTheme/assets/scss/main.scss'
+						}
+					}
+				},
+
+				clean: {
+				  docs: {
+					src: ["<%= docsFolder %>/assets/scss"]
+				  }
+				},
+
 				copy: {
 					docsZip: {
 						files: [
@@ -257,9 +276,25 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-yuidoc');
 	grunt.loadNpmTasks('grunt-contrib-compress');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-contrib-sass');
+	grunt.loadNpmTasks('grunt-contrib-clean')
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadTasks('tasks/');
+
+	grunt.registerTask('exportScriptTags', function() {
+		var source = grunt.option("path") || "";
+
+		var config = getBuildConfig();
+		var scripts = config.easel_source;
+		var tags = [];
+		for (var i = 0; i < scripts.length; i++) {
+			var script = '<script src="<%=src %>"></script>';
+			var realPath = scripts[i].replace("../src/", "");
+			tags.push(grunt.template.process(script, {data: {src: source + realPath}}));
+		}
+		console.log(tags.join("\n"));
+	});
 
 	grunt.registerTask('setDocsBase', "Internal utility task to set a correct base for YUIDocs.", function() {
 		grunt.file.setBase('../src');
@@ -275,7 +310,7 @@ module.exports = function (grunt) {
 	 * Build the docs using YUIdocs.
 	 */
 	grunt.registerTask('docs', [
-		"setDocsBase", "yuidoc", "resetBase", "compress", "copy:docsZip"
+		"sass", "setDocsBase", "yuidoc", "resetBase", "clean:docs", "compress", "copy:docsZip"
 	]);
 
 	/**

@@ -1,4 +1,9 @@
-Version NEXT [Not Released]
+Version NEXT [not yet released]
+****************************************************************************************************
+
+
+
+Version 0.8.0 [December 12, 2014]
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - modified behaviour of SpriteSheetBuilder.addFrame setupFunction, setupParams & setupScope params
@@ -7,14 +12,14 @@ CRITICAL (may break existing content):
 - Sprite now properly displays the first frame of animations after calling gotoAndPlay() (thanks MannyC)
 - Moved Ticker into the "createjs" package since it will be included with TweenJS in future releases.
 - re-architected the class and inheritance model
-	- initialize methods removed, use SuperClass_constructor instead
+	- initialize methods removed, use MySuperClass_constructor instead
 	- helper methods: extend & promote (see the "Utility Methods" docs)
 	- property definitions are now instance level, and in the constructor (performance gains)
 	- the .constructor is now set correctly on all classes (thanks kaesve)
-	- renamed initialize on geom classes to "setValues()"
+- renamed initialize on geom classes to "setValues()"
 - removed secondary properties (visible, alpha, compositeOperation, shadow) and related functionality from Matrix2D
 	- added DisplayProps to hold these properties + a matrix instance
-- Matrix2D append/prepend naming was reversed. It was previously backwards from a math perspective.
+- some matrix methods were fixed to work properly
 - renamed ColorMatrix.copyMatrix() to .copy() to reflect geom classes
 
 *****
@@ -34,7 +39,7 @@ PERFORMANCE:
 - added performance tests to extras
 - significant performance improvements:
 	- vector graphics (especially in Graphics instances with large numbers of instructions)
-	- filters (thanks pfirpfel) (~2-4x faster)
+	- filters (thanks pfirpfel & quasimondo) (~2-4x faster)
 	- overall display list performance (~2x faster)
 	- display object property access (~2x faster)
 	- tick event propagation (~3x faster)
@@ -77,13 +82,17 @@ OTHER:
 - examples now all use the combined lib
 - SpriteSheet.getNumFrames() now returns 0 instead of null if images are not loaded.
 - added some initial unit tests for the library
-- added helper methods to Rectangle: union, intersects, extend, intersection, isEmpty, & contains.
+- added helper methods to Rectangle: union, intersects, extend, intersection, pad, isEmpty, & contains.
 - updated clone() method for all classes
 - added Matrix2D.equals() method
 - added DisplayObject.transformMatrix
 - mouse interactions and getObjectsUnderPoint now respect masks
 - added a mode param to getObjectsUnderPoint() to respect mouseEnabled/mouseChildren and event listeners
-
+- added Stage.preventSelection to block accidental selection of document elements
+- added `pt` param to DisplayObject.localToGlobal, globalToLocal, and localToLocal methods
+- BlurFilter provides higher quality results (thanks quasimondo)
+- added MouseEvent.isTouch
+- added support for margin and spacing in sprite sheet data (thanks renatopp)
 
 
 Version 0.7.1 [December 12, 2013]
@@ -182,7 +191,7 @@ OTHER:
 - improved BlurFilter performance and results (thanks to Mario Klingemann)
 - objects added to a MovieClip via addChild will now display over objects managed by the MovieClip
 - Fixed clone on AlphaMapFilter
-- Updated the build process to use NodeJS & Grunt.js. Please refer to the readme in the build folder.
+- Updated the build process to use NodeJS & Grunt.js. Please refer to the README in the build folder.
 
 
 Version 0.6.1 [May 14, 2013]

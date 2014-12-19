@@ -167,6 +167,9 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(Sprite, createjs.DisplayObject);
 
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+
 
 // events:
 	/**

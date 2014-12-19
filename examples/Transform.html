@@ -1,176 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>EaselJS Example: Transform</title>
+	<meta charset="utf-8">
+	<title>EaselJS Example: Transform</title>
 
-	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
-    <script src="./assets/preloadjs-NEXT.min.js"></script>
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<!-- We also provide hosted minified versions of all CreateJS libraries. http://code.createjs.com -->
+	<script src="../_assets/js/Slider.js"></script>
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
-	<!-- We also provide hosted minified versions of all CreateJS libraries.
-	  http://code.createjs.com -->
+<script id="editable">
+	var stage, sliceContainer, sliceWidth, degToRad = Math.PI / 180;
 
+	function init() {
+		examples.showDistractor();
 
-    <link type="text/css" href="./assets/css/dark-hive/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-    <script src="./js/SimpleScroller.js"></script>
+		stage = new createjs.Stage("testCanvas");
+		stage.enableMouseOver();
+		createjs.Touch.enable(stage);
+		stage.mouseMoveOutside = true;
 
-    <script type="text/javascript">
-        var manifest;
-        var stage;
-        var canvas;
-        var imageContainer;
-        var images;
-        var loader;
-        var image_width;
-        var image_height;
-        var slider;
+		var img = new Image();
+		img.onload = handleImageLoad;
+		img.src = "../_assets/art/flowers.jpg";
+	}
 
-        function init() {
-        	if (window.top != window) {
-        		document.getElementById("header").style.display = "none";
-        	}
+	function handleImageLoad(evt) {
+		examples.hideDistractor();
 
-	        document.getElementById("loader").className = "loader";
+		var img = evt.target, imgWidth = img.width, imgHeight = img.height, sliceCount = 6;
 
-           canvas = document.getElementById('testCanvas');
-           stage = new createjs.Stage(canvas);
-           imageContainer = new createjs.Container();
+		sliceWidth = imgWidth / sliceCount;
+		sliceContainer = new createjs.Container();
+		sliceContainer.x = stage.canvas.width / 2;
 
-           images = [];
+		for (var i = 0; i < sliceCount; i++) {
+			var slice = new createjs.Bitmap(img);
+			slice.sourceRect = new createjs.Rectangle(sliceWidth * i, 0, sliceWidth, imgHeight);
+			slice.cache(0, 0, sliceWidth, imgHeight);
+			slice.filters = [new createjs.ColorMatrixFilter(new createjs.ColorMatrix())];
+			sliceContainer.addChild(slice);
+		}
 
-           image_width = 149;
-           image_height = 370;
+		var slider = new Slider(0, 50, 200, 50).set({x: 20, y: 330, value: 25});
+		slider.on("change", handleSliderChange, this);
 
-            slider = new SimpleScroller(200, 50, "Amount");
-            slider.x = canvas.width - slider.width;
-            slider.max = 30;
-            slider.min = -30;
-            slider.addEventListener("change", handleChange);
+		stage.addChild(sliceContainer, slider);
+		updateEffect(slider.value);
+	}
 
-            manifest = [
-                {src:"./assets/image_1_1.png", id:"image0"},
-                {src:"./assets/image_1_2.png", id:"image1"},
-                {src:"./assets/image_1_3.png", id:"image2"},
-                {src:"./assets/image_1_4.png", id:"image3"}
+	function handleSliderChange(evt) {
+		updateEffect(evt.target.value);
+	}
 
-            ];
+	function updateEffect(value) {
+		var l = sliceContainer.getNumChildren();
 
-            loader = new createjs.LoadQueue(false);
-            loader.addEventListener("fileload", handleFileLoad);
-			loader.addEventListener("complete", handleComplete);
-            loader.loadManifest(manifest);
-
-            stage.addChild(imageContainer);
-            stage.addChild(slider);
-            createjs.Ticker.addEventListener("tick", tick);
-        }
-
-        function stop() {
-	        createjs.Ticker.removeEventListener("tick", tick);
-        }
-
-        function handleFileLoad(event) {
-            images.push(event.item);
-        }
-
-        function handleComplete() {
-	        document.getElementById("loader").className = "";
-            var l = images.length;
-            for(var i=0;i<l;i++) {
-                var id = images[i].id;
-                var bmp = new createjs.Bitmap(loader.getResult(id));
-                imageContainer.addChild(bmp);
-            }
-            displayImages();
-        }
-
-        function displayImages() {
-            var l = images.length;
-            for(var i=0;i<l;i++) {
-                var bmp = imageContainer.getChildAt(i);
-                bmp.cache(0,0, image_width, image_height);
-                bmp.x = (image_width) * i;
-                bmp.snapToPixel = true;
-            }
-
-            imageContainer.x = canvas.width - (image_width*l) >> 1;
-            imageContainer.y = canvas.height - image_height >> 1;
-
-            stage.update();
-        }
-
-        function show(value) {
-
-        }
-
-        function transformImage(value) {
-            if (value == 0) { return; }
-            var l = images.length;
-            for(var i=0;i<l;i++) {
-                var bmp1 = imageContainer.getChildAt(i);
-
-                if (i%2) {
-                    bmp1.skewY = value;
-                } else {
-                    bmp1.skewY = -1*value;
-                    bmp1.y = -(150) * Math.sin(bmp1.skewY/180*Math.PI)
-                }
-
-                bmp1.x = ((image_width - 1)*i) * Math.cos(bmp1.skewY/180*Math.PI);
-                bmp1.filters = [getColorMatrixFilter(bmp1.skewY)];
-                bmp1.snapToPixel = true;
-                bmp1.updateCache();
-            }
-
-            var _scale = (value > 0) ? 1/value * 20 : -1*(1/value * 20);
-            imageContainer.rotation = (value > 0) ? value>>1 : - 1*value>>1;
-            imageContainer.scaleX = imageContainer.scaleY = (_scale <= 1) ? _scale : 1;
-
-            imageContainer.x = canvas.width - (image_width*l) >> 1;
-            imageContainer.y = canvas.height - image_height >> 1;
-
-            stage.update();
-        }
-
-        function getColorMatrixFilter(value) {
-            var cm = new createjs.ColorMatrix();
-            cm.adjustBrightness(value*0.75);
-            return new createjs.ColorMatrixFilter(cm);
-        }
-
-        function handleChange(event) {
-            var target = event.target;
-            transformImage(target.value);
-        }
-
-        function tick(event) {
-            stage.update(event);
-        }
-
-        function touchstart(event) {
-            //alert(event);
-
-            if (event.target.localName != "select") {
-                event.preventDefault();
-            }
-
-        }
-
-    </script>
-	<link rel="stylesheet" href="assets/demoStyles.css"/>
+		for (var i = 0; i < l; i++) {
+			var slice = sliceContainer.getChildAt(i);
+			slice.y = Math.sin(value * degToRad) * -sliceWidth / 2;
+			if (i % 2) {
+				slice.skewY = value;
+			} else {
+				slice.skewY = -value;
+				slice.y -= sliceWidth * Math.sin(slice.skewY * degToRad);
+			}
+			slice.x = sliceWidth * (i - l / 2) * Math.cos(slice.skewY * degToRad);
+			slice.filters[0].matrix.setColor(Math.sin(slice.skewY * degToRad) * -80);
+			slice.updateCache();
+		}
+		stage.update();
+	}
+</script>
 
 </head>
-<body onload="init()" ontouchstart="touchstart(this)" style="-webkit-tap-highlight-color: rgba(0,0,0,0);">
+<body onload="init()">
+<header>
+	<h1>Fold Effect 5</h1>
 
-	<div id="loader"></div>
+	<p>Uses <code>DisplayObject.skewY</code>, <code>Bitmap.sourceRect</code>,
+		and <code>ColorMatrixFilter</code> to create a folding effect. Adjust
+		the strength of the effect with the slider.</p>
+</header>
 
-	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Transformation</h1>
-	    <p>This sample shows transformations, including skews. Drag the slider to affect the skew amount.</p>
-	</header>
+<div>
 	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

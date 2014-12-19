@@ -1,141 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+	<meta charset="utf-8">
 	<title>EaselJS: Reusing Graphics</title>
 
-	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script type="text/javascript">
+<script id="editable">
 	var canvas;
 	var stage;
 	var headRadius;
 	var g;
 
 	function init() {
-		if (window.top != window) {
-			document.getElementById("header").style.display = "none";
-		}
+		canvas = document.getElementById('myCanvas');
+		width = canvas.width;
+		height = canvas.height;
+		stage = new createjs.Stage(canvas);
 
-	    canvas = document.getElementById('myCanvas');
-	    width = canvas.width;
-	    height = canvas.height;
-	    stage = new createjs.Stage(canvas);
+		layoutSmiley();
 
-	    layoutSmiley();
-
-	    stage.addEventListener("stagemousedown", handlePress);
-	    stage.update();
+		stage.addEventListener("stagemousedown", handlePress);
+		stage.update();
 
 	}
 
 	function layoutSmiley() {
-	    drawSmiley(createjs.Graphics.getRGB(Math.random()*255|0,Math.random()*255|0,Math.random()*255|0), createjs.Graphics.getRGB(Math.random()*255|0,Math.random()*255|0,Math.random()*255|0));
-	    for(var i=0;i<100;i++) {
-	        var shape = new createjs.Shape(g);
-	        shape.scaleX = shape.scaleY = Math.random() * 0.05 + 0.15;
-	        shape.x = Math.random()*(960 - (350 * shape.scaleX));
-	        shape.y = Math.random()*(400 - (350 * shape.scaleX));
-	        shape.rotation = (Math.random()*90)-45;
-	        stage.addChild(shape);
-	    }
+		// get a single Graphics instance.
+		g = drawSmiley(createjs.Graphics.getHSL(Math.random() * 360, 100, Math.random() * 50 + 30));
 
-	    stage.update();
+		for (var i = 0; i < 141; i++) {
+			// share the Graphics instance between all of the shapes:
+			var shape = new createjs.Shape(g);
+			shape.scaleX = shape.scaleY = i / 400 + 0.4;
+			shape.x = Math.cos(i / 4) * i * 3.75 + canvas.width / 2;
+			shape.y = Math.sin(i / 4) * i * 3.75 + canvas.height / 2;
+			shape.rotation = Math.random() * 360;
+			stage.addChild(shape);
+		}
+
+		stage.update();
 	}
 
 	function handlePress() {
-	    stage.removeAllChildren();
+		stage.removeAllChildren();
 		layoutSmiley();
 	}
 
-	function drawSmiley(fillColor, lineColor) {
-		var Point = createjs.Point; // temporary shortcut to the class
-	    g = new createjs.Graphics();
-	    var pt1 = new Point(138, 350);
-	    var pt2 = new Point(309, 350);
-	    var pt3 = new Point(337, 170);
-	    var pt4 = new Point(360, 170);
-	    var pt5 = new Point(374, 234);
-	    var pt6 = new Point(388, 220);
-	    var pt7 = new Point(75, 240);
-	    var pt8 = new Point(63, 230);
-	    var pt9 = new Point(100, 178);
-	    var pt10 = new Point(115, 181);
+	function drawSmiley(fillColor) {
+		var g = new createjs.Graphics();
 
-	    //Left Eye
-	    var pt11 = new Point(169, 105);
-	    var pt12 = new Point(188, 100);
-	    var pt13 = new Point(183, 173);
-	    var pt14 = new Point(205, 169);
+		//Head
+		g.setStrokeStyle(10, 'round', 'round');
+		g.beginStroke("#000");
+		g.beginFill(fillColor);
+		g.drawCircle(0, 0, 100); //55,53
 
-	    //Right Eye
-	    var pt15 = new Point(261, 97);
-	    var pt16 = new Point(272, 99);
-	    var pt17 = new Point(249, 166);
-	    var pt18 = new Point(263, 168);
+		//Mouth
+		g.beginFill(); // no fill
+		g.arc(0, 0, 60, 0, Math.PI);
 
-	    //Head
-	    g.setStrokeStyle(20);
-	    g.beginStroke(lineColor);
-	    g.beginFill(fillColor);
-	    g.drawCircle(225, 223, 200);
-	    g.endFill();
+		//Right eye
+		g.beginStroke(); // no stroke
+		g.beginFill("#000");
+		g.drawCircle(-30, -30, 15);
 
-	    //Left Eye
-	    g.setStrokeStyle(1, 'round', 'round');
-	    g.beginStroke(lineColor);
-	    g.beginFill(lineColor);
-	    g.moveTo(169,119);
-	    g.lineTo(175,153);
-	    g.bezierCurveTo(pt13.x, pt13.y, pt14.x, pt14.y, 205, 148);
-	    g.lineTo(198,115);
-	    g.bezierCurveTo(pt12.x, pt12.y, pt11.x, pt11.y, 169, 119);
-	    g.endFill();
+		//Left eye
+		g.drawCircle(30, -30, 15);
 
-	    //Right Eye
-	    g.setStrokeStyle(1, 'round', 'round');
-	    g.beginFill(lineColor);
-	    g.beginStroke(lineColor);
-	    g.moveTo(251,109);
-	    g.lineTo(244, 148);
-	    g.bezierCurveTo(pt17.x, pt17.y, pt18.x, pt18.y, 273, 152);
-	    g.lineTo(279, 115);
-	    g.bezierCurveTo(pt16.x, pt16.y, pt15.x, pt15.y, 251, 109);
-	    g.endFill();
-
-	    //Mouth
-	    g.setStrokeStyle(1, 'round', 'round');
-	    g.beginStroke(lineColor);
-	    g.beginFill(lineColor);
-	    g.moveTo(100, 210);
-	    g.bezierCurveTo(pt1.x, pt1.y, pt2.x, pt2.y, 351, 205);
-	    g.lineTo(340, 187);
-	    g.bezierCurveTo(pt3.x, pt3.y, pt4.x, pt4.y, 360, 178);
-	    g.lineTo(383, 210);
-	    g.bezierCurveTo(pt6.x, pt6.y, pt5.x, pt5.y, 365, 222);
-	    g.bezierCurveTo(pt2.x-30, pt2.y+30, pt1.x+30, pt1.y+30, 90, 228);
-	    g.bezierCurveTo(pt7.x, pt7.y, pt8.x, pt8.y, 73, 210);
-	    g.lineTo(93, 182);
-	    g.bezierCurveTo(pt9.x, pt9.y, pt10.x, pt10.y, 109, 197);
-	    g.lineTo(100, 210);
-	    g.endFill();
+		return g;
 	}
 
-	</script>
+</script>
 
 </head>
 <body onload="init()">
 
-	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Graphics Re-use</h1>
-	    <p>This example shows how a single <strong>Graphics</strong> object can be reused between multiple <strong>Shape</strong> instances.
-		    Click to redraw.</p>
-	</header>
+<header class="EaselJS">
+	<h1>Graphics Re-use</h1>
 
-	<canvas id="myCanvas" width="960" height="400"></canvas>
+	<p>This example shows how a single <code>Graphics</code> object can be
+		reused between multiple <code>Shape</code> instances.
+		Click to redraw.</p>
+</header>
+
+<canvas id="myCanvas" width="960" height="400"></canvas>
 
 </body>
 </html>

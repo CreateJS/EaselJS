@@ -47,7 +47,7 @@ this.createjs = this.createjs||{};
 	 * There are two approaches to working with Graphics object: calling methods on a Graphics instance (the "Graphics API"), or
 	 * instantiating Graphics command objects and adding them to the graphics queue via {{#crossLink "Graphics/append"}}{{/crossLink}}.
 	 * The former abstracts the latter, simplifying beginning and ending paths, fills, and strokes.
-	 * 
+	 *
 	 *      var g = new createjs.Graphics();
 	 *      g.setStrokeStyle(1);
 	 *      g.beginStroke("#000000");
@@ -58,36 +58,36 @@ this.createjs = this.createjs||{};
 	 * the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill:
 	 *
 	 *      myGraphics.beginStroke("red").beginFill("blue").drawRect(20, 20, 100, 50);
-	 *      
+	 *
 	 * Each graphics API call generates a command object (see below). The last command to be created can be accessed via
 	 * {{#crossLink "Graphics/command:property"}}{{/crossLink}}:
-	 * 
+	 *
 	 *      var fillCommand = myGraphics.beginFill("red").command;
 	 *      // ... later, update the fill style/color:
 	 *      fillCommand.style = "blue";
 	 *      // or change it to a bitmap fill:
 	 *      fillCommand.bitmap(myImage);
-	 *      
+	 *
 	 * For more direct control of rendering, you can instantiate and append command objects to the graphics queue directly. In this case, you
 	 * need to manage path creation manually, and ensure that fill/stroke is applied to a defined path:
-	 * 
-	 *      // start a new path. Graphics.beginPath is a reusable BeginPath instance:
-	 *      myGraphics.append(Graphics.beginPath);
+	 *
+	 *      // start a new path. Graphics.beginCmd is a reusable BeginPath instance:
+	 *      myGraphics.append(createjs.Graphics.beginCmd);
 	 *      // we need to define the path before applying the fill:
-	 *      var circle = new Graphics.Circle(0,0,30);
+	 *      var circle = new createjs.Graphics.Circle(0,0,30);
 	 *      myGraphics.append(circle);
 	 *      // fill the path we just defined:
-	 *      var fill = new Graphics.Fill("red");
+	 *      var fill = new createjs.Graphics.Fill("red");
 	 *      myGraphics.append(fill);
-	 *      
+	 *
 	 * These approaches can be used together, for example to insert a custom command:
-	 * 
+	 *
 	 *      myGraphics.beginFill("red");
 	 *      var customCommand = new CustomSpiralCommand(etc);
 	 *      myGraphics.append(customCommand);
 	 *      myGraphics.beginFill("blue");
 	 *      myGraphics.drawCircle(0, 0, 30);
-	 *      
+	 *
 	 * See {{#crossLink "Graphics/append"}}{{/crossLink}} for more info on creating custom commands.
 	 *
 	 * <h4>Tiny API</h4>
@@ -134,8 +134,8 @@ this.createjs = this.createjs||{};
 	 * @constructor
 	 **/
 	function Graphics() {
-		
-		
+
+
 	// public properties
 		/**
 		 * Holds a reference to the last command that was created or appended. For example, you could retain a reference
@@ -147,8 +147,8 @@ this.createjs = this.createjs||{};
 		 * @type Object
 		 **/
 		this.command = null;
-	
-	
+
+
 	// private properties
 		/**
 		 * @property _stroke
@@ -156,35 +156,35 @@ this.createjs = this.createjs||{};
 		 * @type {Array}
 		 **/
 		this._stroke = null;
-	
+
 		/**
 		 * @property _strokeStyle
 		 * @protected
 		 * @type {Array}
 		 **/
 		this._strokeStyle = null;
-	
+
 		/**
 		 * @property _strokeIgnoreScale
 		 * @protected
 		 * @type Boolean
 		 **/
 		this._strokeIgnoreScale = false;
-	
+
 		/**
 		 * @property _fill
 		 * @protected
 		 * @type {Array}
 		 **/
 		this._fill = null;
-	
+
 		/**
 		 * @property _instructions
 		 * @protected
 		 * @type {Array}
 		 **/
 		this._instructions = [];
-		
+
 		/**
 		 * Indicates the last instruction index that was committed.
 		 * @property _commitIndex
@@ -192,7 +192,7 @@ this.createjs = this.createjs||{};
 		 * @type {Number}
 		 **/
 		this._commitIndex = 0;
-	
+
 		/**
 		 * Uncommitted instructions.
 		 * @property _activeInstructions
@@ -200,7 +200,7 @@ this.createjs = this.createjs||{};
 		 * @type {Array}
 		 **/
 		this._activeInstructions = [];
-	
+
 		/**
 		 * This indicates that there have been changes to the activeInstruction list since the last updateInstructions call.
 		 * @property _dirty
@@ -209,7 +209,7 @@ this.createjs = this.createjs||{};
 		 * @default false
 		 **/
 		this._dirty = false;
-		
+
 		/**
 		 * Index to draw from if a store operation has happened.
 		 * @property _storeIndex
@@ -218,12 +218,25 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 **/
 		this._storeIndex = 0;
-		
+
 	// setup:
 		this.clear();
 	}
 	var p = Graphics.prototype;
 	var G = Graphics; // shortcut
+
+	/**
+	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	 * for details.
+	 *
+	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	 *
+	 * @method initialize
+	 * @protected
+	 * @deprecated
+	 */
+	// p.initialize = function() {}; // searchable for devs wondering where it is.
 
 
 // static public methods:
@@ -353,7 +366,7 @@ this.createjs = this.createjs||{};
 		canvas.width = canvas.height = 1;
 	}
 
-	
+
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
@@ -369,7 +382,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect)
 	 * Modifying the returned array directly is not recommended, and is likely to result in unexpected behaviour.
-	 * 
+	 *
 	 * This property is mainly intended for introspection of the instructions (ex. for graphics export).
 	 * @property instructions
 	 * @type {Array}
@@ -380,8 +393,8 @@ this.createjs = this.createjs||{};
 			instructions: { get: p.getInstructions }
 		});
 	} catch (e) {}
-	
-	
+
+
 // public methods:
 	/**
 	 * Returns true if this Graphics instance has no drawing commands.
@@ -412,13 +425,15 @@ this.createjs = this.createjs||{};
 	/**
 	 * Draws only the path described for this Graphics instance, skipping any non-path instructions, including fill and
 	 * stroke descriptions. Used for <code>DisplayObject.mask</code> to draw the clipping path, for example.
+	 *
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method drawAsPath
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
 	 **/
 	p.drawAsPath = function(ctx) {
 		this._updateInstructions();
 		var instr, instrs = this._instructions;
-		for (var i=0, l=instrs.length; i<l; i++) {
+		for (var i=this._storeIndex, l=instrs.length; i<l; i++) {
 			// the first command is always a beginPath command.
 			if ((instr = instrs[i]).path !== false) { instr.exec(ctx); }
 		}
@@ -689,7 +704,7 @@ this.createjs = this.createjs||{};
 	p.setStrokeStyle = function(thickness, caps, joints, miterLimit, ignoreScale) {
 		this._updateInstructions(true);
 		this._strokeStyle = this.command = new G.StrokeStyle(thickness, caps, joints, miterLimit, ignoreScale);
-		
+
 		// ignoreScale lives on Stroke, not StrokeStyle, so we do a little trickery:
 		if (this._stroke) { this._stroke.ignoreScale = ignoreScale; }
 		this._strokeIgnoreScale = ignoreScale;
@@ -805,7 +820,7 @@ this.createjs = this.createjs||{};
 	p.curveTo = p.quadraticCurveTo;
 
 	/**
-	 * 
+	 *
 	 * Maps the familiar ActionScript <code>drawRect()</code> method to the functionally similar {{#crossLink "Graphics/rect"}}{{/crossLink}}
 	 * method.
 	 * @method drawRect
@@ -930,28 +945,28 @@ this.createjs = this.createjs||{};
 	 * @method inject
 	 * @deprecated
 	 **/
-	
+
 	/**
 	 * Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
 	 * that accepts two parameters: the Context2D to operate on, and an arbitrary data object passed into
 	 * {{#crossLink "Graphics/draw"}}{{/crossLink}}. The latter will usually be the Shape instance that called draw.
-	 * 
+	 *
 	 * This method is used internally by Graphics methods, such as drawCircle, but can also be used directly to insert
 	 * built-in or custom graphics commands. For example:
-	 * 
+	 *
 	 * 		// attach data to our shape, so we can access it during the draw:
 	 * 		myShape.color = "red";
-	 * 		
+	 *
 	 * 		// append a Circle command object:
 	 * 		myShape.graphics.append(new Graphics.Circle(50, 50, 30));
-	 * 		
+	 *
 	 * 		// append a custom command object with an exec method that sets the fill style
 	 * 		// based on the shape's data, and then fills the circle.
 	 * 		myShape.graphics.append({exec:function(ctx, shape) {
 	 * 			ctx.fillStyle = shape.color;
 	 * 			ctx.fill();
 	 * 		}});
-	 * 
+	 *
 	 * @method append
 	 * @param {Object} command A graphics command object exposing an "exec" method.
 	 * @param {boolean} clean The clean param is primarily for internal use. A value of true indicates that a command does not generate a path that should be stroked or filled.
@@ -1036,32 +1051,32 @@ this.createjs = this.createjs||{};
 		}
 		return this;
 	};
-	
+
 	/**
 	 * Stores all graphics commands so they won't be executed in future draws. Calling store() a second time adds to
-	 * the existing store.
-	 * 
-	 * This is useful in cases where you are creating vector graphics in an iterative manner, so that only new
-	 * graphics need to be drawn (which can provide huge performance benefits), but you wish to retain all of
-	 * the vector instructions for later use (ex. scaling, modifying, or exporting).
-	 * 
+	 * the existing store. This also affects `drawAsPath()`.
+	 *
+	 * This is useful in cases where you are creating vector graphics in an iterative manner (ex. generative art), so
+	 * that only new graphics need to be drawn (which can provide huge performance benefits), but you wish to retain all
+	 * of the vector instructions for later use (ex. scaling, modifying, or exporting).
+	 *
 	 * Note that calling store() will force the active path (if any) to be ended in a manner similar to changing
 	 * the fill or stroke.
-	 * 
+	 *
 	 * For example, consider a application where the user draws lines with the mouse. As each line segment (or collection of
-	 * segments) are added to a Shape, it can be rasterized using {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}, 
+	 * segments) are added to a Shape, it can be rasterized using {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}},
 	 * and then stored, so that it can be redrawn at a different scale when the application is resized, or exported to SVG.
-	 * 
+	 *
 	 * 	// set up cache:
 	 * 	myShape.cache(0,0,500,500,scale);
-	 * 	
+	 *
 	 * 	// when the user drags, draw a new line:
 	 * 	myShape.graphics.moveTo(oldX,oldY).lineTo(newX,newY);
 	 * 	// then draw it into the existing cache:
 	 * 	myShape.updateCache("source-over");
 	 * 	// store the new line, so it isn't redrawn next time:
 	 * 	myShape.store();
-	 * 	
+	 *
 	 * 	// then, when the window resizes, we can re-render at a different scale:
 	 * 	// first, unstore all our lines:
 	 * 	myShape.unstore();
@@ -1069,7 +1084,7 @@ this.createjs = this.createjs||{};
 	 * 	myShape.cache(0,0,500,500,newScale);
 	 * 	// finally, store the existing commands again:
 	 * 	myShape.store();
-	 * 
+	 *
 	 * @method store
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 * @chainable
@@ -1079,11 +1094,11 @@ this.createjs = this.createjs||{};
 		this._storeIndex = this._instructions.length;
 		return this;
 	};
-	
+
 	/**
 	 * Unstores any graphics commands that were previously stored using {{#crossLink "Graphics/store"}}{{/crossLink}}
 	 * so that they will be executed in subsequent draw calls.
-	 * 
+	 *
 	 * @method unstore
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 * @chainable
@@ -1124,220 +1139,373 @@ this.createjs = this.createjs||{};
 
 
 // tiny API:
-	// TODO: update these with params and such for code hinting and meta data generation:
 	/**
 	 * Shortcut to moveTo.
 	 * @method mt
+	 * @param {Number} x The x coordinate the drawing point should move to.
+	 * @param {Number} y The y coordinate the drawing point should move to.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls).
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.mt = p.moveTo;
 
 	/**
 	 * Shortcut to lineTo.
 	 * @method lt
+	 * @param {Number} x The x coordinate the drawing point should draw to.
+	 * @param {Number} y The y coordinate the drawing point should draw to.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.lt = p.lineTo;
 
 	/**
 	 * Shortcut to arcTo.
 	 * @method at
+	 * @param {Number} x1
+	 * @param {Number} y1
+	 * @param {Number} x2
+	 * @param {Number} y2
+	 * @param {Number} radius
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.at = p.arcTo;
 
 	/**
 	 * Shortcut to bezierCurveTo.
 	 * @method bt
+	 * @param {Number} cp1x
+	 * @param {Number} cp1y
+	 * @param {Number} cp2x
+	 * @param {Number} cp2y
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.bt = p.bezierCurveTo;
 
 	/**
 	 * Shortcut to quadraticCurveTo / curveTo.
 	 * @method qt
+	 * @param {Number} cpx
+	 * @param {Number} cpy
+	 * @param {Number} x
+	 * @param {Number} y
 	 * @protected
-	 * @type {Function}
+	 * @chainable
 	 **/
 	p.qt = p.quadraticCurveTo;
 
 	/**
 	 * Shortcut to arc.
 	 * @method a
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} radius
+	 * @param {Number} startAngle Measured in radians.
+	 * @param {Number} endAngle Measured in radians.
+	 * @param {Boolean} anticlockwise
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
 	 * @protected
-	 * @type {Function}
+	 * @chainable
 	 **/
 	p.a = p.arc;
 
 	/**
 	 * Shortcut to rect.
 	 * @method r
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} w Width of the rectangle
+	 * @param {Number} h Height of the rectangle
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.r = p.rect;
 
 	/**
 	 * Shortcut to closePath.
 	 * @method cp
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.cp = p.closePath;
 
 	/**
 	 * Shortcut to clear.
 	 * @method c
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.c = p.clear;
 
 	/**
 	 * Shortcut to beginFill.
 	 * @method f
+	 * @param {String} color A CSS compatible color value (ex. "red", "#FF0000", or "rgba(255,0,0,0.5)"). Setting to
+	 * null will result in no fill.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.f = p.beginFill;
 
 	/**
 	 * Shortcut to beginLinearGradientFill.
 	 * @method lf
+	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient
+	 * drawing from red to blue.
+	 * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw
+	 * the first color to 10% then interpolating to the second color at 90%.
+	 * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
+	 * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
+	 * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
+	 * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.lf = p.beginLinearGradientFill;
 
 	/**
 	 * Shortcut to beginRadialGradientFill.
 	 * @method rf
+	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+	 * a gradient drawing from red to blue.
+	 * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+	 * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+	 * @param {Number} x0 Center position of the inner circle that defines the gradient.
+	 * @param {Number} y0 Center position of the inner circle that defines the gradient.
+	 * @param {Number} r0 Radius of the inner circle that defines the gradient.
+	 * @param {Number} x1 Center position of the outer circle that defines the gradient.
+	 * @param {Number} y1 Center position of the outer circle that defines the gradient.
+	 * @param {Number} r1 Radius of the outer circle that defines the gradient.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.rf = p.beginRadialGradientFill;
 
 	/**
 	 * Shortcut to beginBitmapFill.
 	 * @method bf
+	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
+	 * as the pattern.
+	 * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
+	 * "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat". Note that Firefox does not support "repeat-x" or
+	 * "repeat-y" (latest tests were in FF 20.0), and will default to "repeat".
+	 * @param {Matrix2D} matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation
+	 * will be applied relative to the parent transform.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.bf = p.beginBitmapFill;
 
 	/**
 	 * Shortcut to endFill.
 	 * @method ef
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.ef = p.endFill;
 
 	/**
 	 * Shortcut to setStrokeStyle.
 	 * @method ss
+	 * @param {Number} thickness The width of the stroke.
+	 * @param {String | Number} [caps=0] Indicates the type of caps to use at the end of lines. One of butt,
+	 * round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with
+	 * the tiny API.
+	 * @param {String | Number} [joints=0] Specifies the type of joints that should be used where two lines meet.
+	 * One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel)
+	 * for use with the tiny API.
+	 * @param {Number} [miterLimit=10] If joints is set to "miter", then you can specify a miter limit ratio which
+	 * controls at what point a mitered joint will be clipped.
+	 * @param {Boolean} [ignoreScale=false] If true, the stroke will be drawn at the specified thickness regardless
+	 * of active transformations.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.ss = p.setStrokeStyle;
 
 	/**
 	 * Shortcut to beginStroke.
 	 * @method s
+	 * @param {String} color A CSS compatible color value (ex. "#FF0000", "red", or "rgba(255,0,0,0.5)"). Setting to
+	 * null will result in no stroke.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.s = p.beginStroke;
 
 	/**
 	 * Shortcut to beginLinearGradientStroke.
 	 * @method ls
+	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+	 * a gradient drawing from red to blue.
+	 * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+	 * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+	 * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
+	 * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
+	 * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
+	 * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.ls = p.beginLinearGradientStroke;
 
 	/**
 	 * Shortcut to beginRadialGradientStroke.
 	 * @method rs
+	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+	 * a gradient drawing from red to blue.
+	 * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+	 * 0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color
+	 * to 100%.
+	 * @param {Number} x0 Center position of the inner circle that defines the gradient.
+	 * @param {Number} y0 Center position of the inner circle that defines the gradient.
+	 * @param {Number} r0 Radius of the inner circle that defines the gradient.
+	 * @param {Number} x1 Center position of the outer circle that defines the gradient.
+	 * @param {Number} y1 Center position of the outer circle that defines the gradient.
+	 * @param {Number} r1 Radius of the outer circle that defines the gradient.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.rs = p.beginRadialGradientStroke;
 
 	/**
 	 * Shortcut to beginBitmapStroke.
 	 * @method bs
+	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
+	 * as the pattern.
+	 * @param {String} [repetition=repeat] Optional. Indicates whether to repeat the image in the fill area. One of
+	 * "repeat", "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.bs = p.beginBitmapStroke;
 
 	/**
 	 * Shortcut to endStroke.
 	 * @method es
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.es = p.endStroke;
 
 	/**
 	 * Shortcut to drawRect.
 	 * @method dr
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} w Width of the rectangle
+	 * @param {Number} h Height of the rectangle
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.dr = p.drawRect;
 
 	/**
 	 * Shortcut to drawRoundRect.
 	 * @method rr
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} w
+	 * @param {Number} h
+	 * @param {Number} radius Corner radius.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.rr = p.drawRoundRect;
 
 	/**
 	 * Shortcut to drawRoundRectComplex.
 	 * @method rc
+	 * @param {Number} x The horizontal coordinate to draw the round rect.
+	 * @param {Number} y The vertical coordinate to draw the round rect.
+	 * @param {Number} w The width of the round rect.
+	 * @param {Number} h The height of the round rect.
+	 * @param {Number} radiusTL Top left corner radius.
+	 * @param {Number} radiusTR Top right corner radius.
+	 * @param {Number} radiusBR Bottom right corner radius.
+	 * @param {Number} radiusBL Bottom left corner radius.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.rc = p.drawRoundRectComplex;
 
 	/**
 	 * Shortcut to drawCircle.
 	 * @method dc
+	 * @param {Number} x x coordinate center point of circle.
+	 * @param {Number} y y coordinate center point of circle.
+	 * @param {Number} radius Radius of circle.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.dc = p.drawCircle;
 
 	/**
 	 * Shortcut to drawEllipse.
 	 * @method de
+	 * @param {Number} x The left coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+	 * which draws from center.
+	 * @param {Number} y The top coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+	 * which draws from the center.
+	 * @param {Number} w The height (horizontal diameter) of the ellipse. The horizontal radius will be half of this
+	 * number.
+	 * @param {Number} h The width (vertical diameter) of the ellipse. The vertical radius will be half of this number.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.de = p.drawEllipse;
 
 	/**
 	 * Shortcut to drawPolyStar.
 	 * @method dp
+	 * @param {Number} x Position of the center of the shape.
+	 * @param {Number} y Position of the center of the shape.
+	 * @param {Number} radius The outer radius of the shape.
+	 * @param {Number} sides The number of points on the star or sides on the polygon.
+	 * @param {Number} pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular
+	 * polygon (no points), a pointSize of 1 will draw nothing because the points are infinitely pointy.
+	 * @param {Number} angle The angle of the first point / corner. For example a value of 0 will draw the first point
+	 * directly to the right of the center.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type {Function}
 	 **/
 	p.dp = p.drawPolyStar;
 
 	/**
 	 * Shortcut to decodePath.
 	 * @method p
+	 * @param {String} str The path string to decode.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
 	 * @protected
-	 * @type Function
 	 **/
 	p.p = p.decodePath;
 
@@ -1345,31 +1513,36 @@ this.createjs = this.createjs||{};
 // private methods:
 	/**
 	 * @method _updateInstructions
+	 * @param commit
 	 * @protected
 	 **/
 	p._updateInstructions = function(commit) {
 		var instr = this._instructions, active = this._activeInstructions, commitIndex = this._commitIndex;
-		
+
 		if (this._dirty && active.length) {
 			instr.length = commitIndex; // remove old, uncommitted commands
 			instr.push(Graphics.beginCmd);
-			instr.push.apply(instr, active);
-			
+
+			var l = active.length, ll = instr.length;
+			instr.length = ll+l;
+			for (var i=0; i<l; i++) { instr[i+ll] = active[i]; }
+
 			if (this._fill) { instr.push(this._fill); }
 			if (this._stroke && this._strokeStyle) { instr.push(this._strokeStyle); }
 			if (this._stroke) { instr.push(this._stroke); }
-			
+
 			this._dirty = false;
 		}
-		
+
 		if (commit) {
 			active.length = 0;
 			this._commitIndex = instr.length;
 		}
 	};
-	
+
 	/**
 	 * @method _setFill
+	 * @param fill
 	 * @protected
 	 **/
 	p._setFill = function(fill) {
@@ -1377,9 +1550,10 @@ this.createjs = this.createjs||{};
 		if (this._fill = fill) { this.command = fill; }
 		return this;
 	};
-	
+
 	/**
 	 * @method _setStroke
+	 * @param stroke
 	 * @protected
 	 **/
 	p._setStroke = function(stroke) {
@@ -1390,7 +1564,7 @@ this.createjs = this.createjs||{};
 		}
 		return this;
 	};
-	
+
 // Command Objects:
 	/**
 	 * @namespace Graphics
@@ -1413,7 +1587,7 @@ this.createjs = this.createjs||{};
 	(G.LineTo = function(x, y) {
 		this.x = x; this.y = y;
 	}).prototype.exec = function(ctx) { ctx.lineTo(this.x,this.y); };
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class LineTo
@@ -1469,7 +1643,7 @@ this.createjs = this.createjs||{};
 		this.x2 = x2; this.y2 = y2;
 		this.radius = radius;
 	}).prototype.exec = function(ctx) { ctx.arcTo(this.x1, this.y1, this.x2, this.y2, this.radius); };
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class Arc
@@ -1508,10 +1682,10 @@ this.createjs = this.createjs||{};
 	(G.Arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		this.x = x; this.y = y;
 		this.radius = radius;
-		this.startAngle = startAngle; this.endAngle = endAngle; 
-		this.anticlockwise = !!anticlockwise; 
+		this.startAngle = startAngle; this.endAngle = endAngle;
+		this.anticlockwise = !!anticlockwise;
 	}).prototype.exec = function(ctx) { ctx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle, this.anticlockwise); };
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class QuadraticCurveTo
@@ -1541,7 +1715,7 @@ this.createjs = this.createjs||{};
 		this.cpx = cpx; this.cpy = cpy;
 		this.x = x; this.y = y;
 	}).prototype.exec = function(ctx) { ctx.quadraticCurveTo(this.cpx, this.cpy, this.x, this.y); };
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class BezierCurveTo
@@ -1582,7 +1756,7 @@ this.createjs = this.createjs||{};
 		this.cp2x = cp2x; this.cp2y = cp2y;
 		this.x = x; this.y = y;
 	}).prototype.exec = function(ctx) { ctx.bezierCurveTo(this.cp1x, this.cp1y, this.cp2x, this.cp2y, this.x, this.y); };
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class Rect
@@ -1612,7 +1786,7 @@ this.createjs = this.createjs||{};
 		this.x = x; this.y = y;
 		this.w = w; this.h = h;
 	}).prototype.exec = function(ctx) { ctx.rect(this.x, this.y, this.w, this.h); };
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class ClosePath
@@ -1620,15 +1794,15 @@ this.createjs = this.createjs||{};
 	 **/
 	(G.ClosePath = function() {
 	}).prototype.exec = function(ctx) { ctx.closePath(); };
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class BeginPath
 	 * @constructor
 	 **/
 	(G.BeginPath = function() {
-	}).prototype.exec = function(ctx) { ctx.beginPath(); };	
-	
+	}).prototype.exec = function(ctx) { ctx.beginPath(); };
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class Fill
@@ -1706,7 +1880,7 @@ this.createjs = this.createjs||{};
 		return this;
 	};
 	p.path = false;
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class Stroke
@@ -1769,7 +1943,7 @@ this.createjs = this.createjs||{};
 	 */
 	p.bitmap = G.Fill.prototype.bitmap;
 	p.path = false;
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class StrokeStyle
@@ -1805,12 +1979,12 @@ this.createjs = this.createjs||{};
 	}).prototype;
 	p.exec = function(ctx) {
 		ctx.lineWidth = (this.width == null ? "1" : this.width);
-		ctx.lineCap = (this.caps == null ? "butt" : this.caps);
-		ctx.lineJoin = (this.joints == null ? "miter" : this.joints);
+		ctx.lineCap = (this.caps == null ? "butt" : (isNaN(this.caps) ? this.caps : Graphics.STROKE_CAPS_MAP[this.caps]));
+		ctx.lineJoin = (this.joints == null ? "miter" : (isNaN(this.joints) ? this.joints : Graphics.STROKE_JOINTS_MAP[this.joints]));
 		ctx.miterLimit = (this.miterLimit == null ? "10" : this.miterLimit);
 	};
 	p.path = false;
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class RoundRect
@@ -1866,7 +2040,7 @@ this.createjs = this.createjs||{};
 		var mTL=0, mTR=0, mBR=0, mBL=0;
 		var x = this.x, y = this.y, w = this.w, h = this.h;
 		var rTL = this.radiusTL, rTR = this.radiusTR, rBR = this.radiusBR, rBL = this.radiusBL;
-		
+
 		if (rTL < 0) { rTL *= (mTL=-1); }
 		if (rTL > max) { rTL = max; }
 		if (rTR < 0) { rTR *= (mTR=-1); }
@@ -1886,7 +2060,7 @@ this.createjs = this.createjs||{};
 		ctx.arcTo(x-rTL*mTL, y-rTL*mTL, x+rTL, y, rTL);
 		ctx.closePath();
 	};
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class Circle
@@ -1911,14 +2085,14 @@ this.createjs = this.createjs||{};
 		this.x = x; this.y = y;
 		this.radius = radius;
 	}).prototype.exec = function(ctx) { ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2); };
-	
+
 	(G.Ellipse = function(x, y, w, h) {
 		this.x = x; this.y = y;
 		this.w = w; this.h = h;
 	}).prototype.exec = function(ctx) {
 		var x = this.x, y = this.y;
 		var w = this.w, h = this.h;
-		
+
 		var k = 0.5522848;
 		var ox = (w / 2) * k;
 		var oy = (h / 2) * k;
@@ -1933,7 +2107,7 @@ this.createjs = this.createjs||{};
 		ctx.bezierCurveTo(xe, ym+oy, xm+ox, ye, xm, ye);
 		ctx.bezierCurveTo(xm-ox, ye, x, ym+oy, x, ym);
 	};
-	
+
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class PolyStar
@@ -1982,7 +2156,7 @@ this.createjs = this.createjs||{};
 		var sides = this.sides;
 		var ps = 1-(this.pointSize||0);
 		var a = Math.PI/sides;
-		
+
 		ctx.moveTo(x+Math.cos(angle)*radius, y+Math.sin(angle)*radius);
 		for (var i=0; i<sides; i++) {
 			angle += a;
@@ -1994,10 +2168,10 @@ this.createjs = this.createjs||{};
 		}
 		ctx.closePath();
 	};
-	
+
 	// docced above.
 	Graphics.beginCmd = new G.BeginPath(); // so we don't have to instantiate multiple instances.
-	
-	
+
+
 	createjs.Graphics = Graphics;
 }());

@@ -69,7 +69,8 @@ this.createjs = this.createjs||{};
 		
 	// public properties:
 		/**
-		 * The image to render. This can be an Image, a Canvas, or a Video.
+		 * The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially
+		 * mobile browsers) support drawing video to a canvas.
 		 * @property image
 		 * @type Image | HTMLCanvasElement | HTMLVideoElement
 		 **/
@@ -82,6 +83,7 @@ this.createjs = this.createjs||{};
 	
 		/**
 		 * Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
+		 * Note that video sources must have a width / height set to work correctly with `sourceRect`.
 		 * @property sourceRect
 		 * @type Rectangle
 		 * @default null
@@ -92,6 +94,14 @@ this.createjs = this.createjs||{};
 	
 	
 // public methods:
+	/**
+	 * Constructor alias for backwards compatibility. This method will be removed in future versions.
+	 * Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
+	 * @method initialize
+	 * @deprecated in favour of `createjs.promote()`
+	 **/
+	p.initialize = Bitmap; // TODO: deprecated.
+
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.

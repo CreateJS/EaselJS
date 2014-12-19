@@ -1,69 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>EaselJS: Simple Transform Example</title>
+	<meta charset="utf-8">
+	<title>EaselJS: Simple Transform Example</title>
 
-	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-    <script type="text/javascript">
-        var img;
-        var stage;
-        var angle;
+<script id="editable">
+	var img;
+	var stage;
+	var angle;
 
-        function init() {
-        	if (window.top != window) {
-        		document.getElementById("header").style.display = "none";
-        	}
+	function init() {
+		angle = 0;
+		img = new Image();
+		img.onload = handleImageLoad;
+		img.src = "../_assets/art/robot.png";
+	}
 
-            angle = 0;
-            img = new Image();
-            img.onload = handleImageLoad;
-            img.src = "assets/rotateDemoBot.png";
-        }
+	function stop() {
+		createjs.Ticker.removeEventListener("tick", tick);
+	}
 
-        function stop() {
-			createjs.Ticker.removeEventListener("tick", tick);
-        }
+	function handleImageLoad() {
+		var canvas = document.getElementById("testCanvas");
+		stage = new createjs.Stage(canvas);
+		stage.autoClear = true;
+		bmp = new createjs.Bitmap(img);
+		bmp.regX = img.width >> 1;
+		bmp.regY = img.height >> 1;
+		bmp.x = canvas.width >> 1;
+		bmp.y = canvas.height >> 1;
+		bmp.scaleX = bmp.scaleY = 0.1;
+		stage.addChild(bmp);
+		stage.update();
 
-        function handleImageLoad() {
-            var canvas = document.getElementById("testCanvas");
-            stage = new createjs.Stage(canvas);
-            stage.autoClear = true;
-            bmp = new createjs.Bitmap(img);
-            bmp.regX = img.width >> 1;
-            bmp.regY = img.height >> 1;
-            bmp.x = canvas.width - (img.width/2)>>1;
-            bmp.y = 140+canvas.height - (img.height/2)>>1;
-            bmp.scaleX = bmp.scaleY = 0.1;
-            stage.addChild(bmp);
-            stage.update();
+		createjs.Ticker.timingMode = createjs.Ticker.RAF;
+		createjs.Ticker.addEventListener("tick", tick);
+	}
 
-			createjs.Ticker.addEventListener("tick", tick);
-        }
+	function tick(event) {
+		angle += 0.01;
+		var value = Math.sin(angle) * 360;
 
-        function tick(event) {
-            angle += 0.025;
-            var value = (Math.sin(angle) * 360);
+		bmp.rotation = value;
+		bmp.scaleX = bmp.scaleY = value / 360;
+		stage.update(event);
+	}
 
-            bmp.setTransform (bmp.x , bmp.y , bmp.scaleX , bmp.scaleY , value/2 , bmp.skewX , bmp.skewY , bmp.regX , bmp.regY );
-            bmp.scaleX = bmp.scaleY = ((value)/360) + 0.25;
-            stage.update(event);
-        }
-
-    </script>
+</script>
 </head>
+
 <body onload="init()">
 
-	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Simple Transform Example</h1>
-	    <p>A simple example of EaselJS transformations.</p>
-	</header>
+<header class="EaselJS">
+	<h1>Simple Transform Example</h1>
 
-    <canvas id="testCanvas" width="960" height="400"></canvas>
+	<p>A simple example of EaselJS transformations, such as
+		<code>rotation</code>, <code>scaleX</code>, and <code>scaleY</code>.</p>
+</header>
+
+<canvas id="testCanvas" width="960" height="400"></canvas>
 
 </body>
 </html>

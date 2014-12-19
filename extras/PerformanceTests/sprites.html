@@ -9,7 +9,7 @@
 	<script src="perfFramework.js"></script>
 	
 	<!-- this test will use PreloadJS to load required assets -->
-	<script src="../../examples/assets/preloadjs-NEXT.min.js"></script>
+	<script src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
 	<script>
 		// runTest is a special method called by the performance framework
 		// it passes the version array (ex. [0,7,1]) and a hash of all the query string values
@@ -17,8 +17,8 @@
 			var queue = new createjs.LoadQueue();
 			queue.on("complete", assetsLoaded);
 			queue.loadManifest([
-				{id:"bmpfont", src:"BitmapFont.png"}
-			], true, "../../examples/assets/");
+				{id:"bmpfont", src:"spritesheet_font.png"}
+			], true, "../../_assets/art/");
 		}
 		
 		function assetsLoaded(evt) {

@@ -1,167 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>EaselJS: Simple Graphics (Tiny)</title>
-	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
+	<meta charset="utf-8">
+	<title>EaselJS: Simple Graphics (Tiny)</title>
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
+	<script src="../_assets/js/examples.js"></script>
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-    <script type="text/javascript">
+<script id="editable">
+	var canvas, stage, img, w, h;
 
-		var canvas, stage, img, w, h;
+	function init() {
+		canvas = document.getElementById("testCanvas");
+		// create a new stage and point it at our canvas:
+		stage = new createjs.Stage(canvas);
 
-        function init() {
-        	if (window.top != window) {
-        		document.getElementById("header").style.display = "none";
-        	}
+		// grab canvas width and height for later calculations:
+		w = canvas.width;
+		h = canvas.height;
+		img = new Image();
+		img.onload = layout;
+		img.src = "../_assets/art/daisy.png";
+	}
 
-            canvas = document.getElementById("testCanvas");
-            // create a new stage and point it at our canvas:
-            stage = new createjs.Stage(canvas);
+	function layout() {
+		var arr = [createStar, createHex, createLineTo, createRadialGradientFill, createEllipse, createRectGradientFill, createBitmapFill, createRoundRect];
+		var padding = 5;
+		var _width = 155;
+		var _height = 155;
+		var cols = 4;
+		var space = 0;
+		var l = arr.length;
 
-            // grab canvas width and height for later calculations:
-            w = canvas.width;
-            h = canvas.height;
-            img = new Image();
-            img.onload = layout;
-            img.src = "./assets/daisy.png";
-        }
+		var border = createBorder();
 
-        function layout() {
-            var arr = [createStar, createHex, createLineTo, createRadialGradientFill, createEllipse, createRectGradientFill, createBitmapFill, createRoundRect];
-            var padding = 5;
-            var _width = 155;
-            var _height = 155;
-            var cols = 4;
-            var space = 0;
-            var l = arr.length;
-
-            var border = createBorder();
-
-            for(var i=0;i<l;i++) {
-                var tile = arr[i]();
-                tile.x = 42+(_width + padding) *(i%cols);
-                tile.y = 42+(i/cols | 0) * (_height+padding);
-                stage.addChild(tile);
-            }
-            stage.addChild(border);
-            stage.update();
-        }
-
-        function createBorder() {
-            var container = new createjs.Container();
-            var s = new createjs.Shape();
-            s.graphics.bs(img).ss(32).dr(20,20,920,360);
-            container.addChild(s);
-            return container;
-        }
-
-        function createBitmapFill() {
-            var container = createTile();
-            var s = new createjs.Shape();
-            s.graphics.bf(img).ss(8).rs(["#FFF","#000"],[0,1],0,0,0,0,30,130).dr(0, 0, 130, 130);
-            s.x = 12;
-            s.y = 10;
-            container.addChild(s);
-            return container;
-        }
-
-        function createRectGradientFill() {
-            var container = createTile();
-            var s = new createjs.Shape();
-            s.graphics.lf(["#FFF","#000"],[0,1],0,0,0,130).dr(0,0,130,130);
-            s.x = 12;
-            s.y = 10;
-            container.addChild(s);
-            return container;
-        }
-
-        function createEllipse() {
-            var container = createTile();
-            var s = new createjs.Shape();
-            s.graphics.f(createjs.Graphics.getRGB(0,0x66,0x99,0.5)).ss(4).ls(["#F00","#000"],[0,1],0,0,70,140).de(0,0,70,140,8);
-            s.x = 40;
-            s.y = 10;
-            container.addChild(s);
-            return container;
-        }
-
-        function createRadialGradientFill() {
-            var container = createTile();
-            var s = new createjs.Shape();
-            s.graphics.ss(8).s("#f0f").rf(["#FFF","#0FF"],[0,1],0,0,0,0,0,40).dc(0,0,40);
-            s.x = s.y = 80;
-            container.addChild(s);
-            return container;
-        }
-
-        function createLineTo() {
-            var container = createTile();
-            var s = new createjs.Shape();
-            s.graphics.ss(16, "round", "round").s("#f90").mt(20,10).lt(90,90).lt(90,140);
-            container.addChild(s);
-            return container;
-        }
-
-        function createHex() {
-            var container = createTile();
-            var s = new createjs.Shape();
-            s.graphics.f("#0F0").dp(0,0,40,6).dp(0,75,40,6);
-            s.x = 80
-            s.y = 40;
-
-            container.addChild(s);
-            return container;
-        }
-
-        function createStar() {
-            var container = createTile();
-            var s = new createjs.Shape();
-            s.graphics.ss(1).s(createjs.Graphics.getRGB(255, 255, 0)).f("#FF0").es().dp(0,0,80,5,0.6,-90);
-            s.x = 80
-            s.y = 85;
-
-            container.addChild(s);
-            return container;
-        }
-        
-		function createRoundRect() {
-			var container = createTile();
-			var s = new createjs.Shape();
-			s.graphics.ss(6).s("red").f("green").rr(0,0,130,130,30);
-			s.x = s.y = 12;
-			
-			container.addChild(s);
-			return container;
+		for (var i = 0; i < l; i++) {
+			var tile = arr[i]();
+			tile.x = 42 + (_width + padding) * (i % cols);
+			tile.y = 42 + (i / cols | 0) * (_height + padding);
+			stage.addChild(tile);
 		}
+		stage.addChild(border);
+		stage.update();
+	}
 
-        function createTile() {
-            var container = new createjs.Container();
-            var bg = new createjs.Shape();
-            bg.graphics.f('#CCCCCC').dr(0, 0, 155, 155).ef();
-            bg.alpha = 0.25;
-            container.addChild(bg);
-            return container;
-        }
+	function createBorder() {
+		var container = new createjs.Container();
+		var s = new createjs.Shape();
+		s.graphics.bs(img).ss(32).dr(20, 20, 920, 360);
+		container.addChild(s);
+		return container;
+	}
 
+	function createBitmapFill() {
+		var container = createTile();
+		var s = new createjs.Shape();
+		s.graphics.bf(img).ss(8).rs(["#FFF", "#000"], [0, 1], 0, 0, 0, 0, 30, 130).dr(0, 0, 130, 130);
+		s.x = 12;
+		s.y = 10;
+		container.addChild(s);
+		return container;
+	}
 
-    </script>
+	function createRectGradientFill() {
+		var container = createTile();
+		var s = new createjs.Shape();
+		s.graphics.lf(["#FFF", "#000"], [0, 1], 0, 0, 0, 130).dr(0, 0, 130, 130);
+		s.x = 12;
+		s.y = 10;
+		container.addChild(s);
+		return container;
+	}
+
+	function createEllipse() {
+		var container = createTile();
+		var s = new createjs.Shape();
+		s.graphics.f(createjs.Graphics.getRGB(0, 0x66, 0x99, 0.5)).ss(4).ls(["#F00", "#000"], [0, 1], 0, 0, 70, 140).de(0, 0, 70, 140, 8);
+		s.x = 40;
+		s.y = 10;
+		container.addChild(s);
+		return container;
+	}
+
+	function createRadialGradientFill() {
+		var container = createTile();
+		var s = new createjs.Shape();
+		s.graphics.ss(8).s("#f0f").rf(["#FFF", "#0FF"], [0, 1], 0, 0, 0, 0, 0, 40).dc(0, 0, 40);
+		s.x = s.y = 80;
+		container.addChild(s);
+		return container;
+	}
+
+	function createLineTo() {
+		var container = createTile();
+		var s = new createjs.Shape();
+		s.graphics.ss(16, "round", "round").s("#f90").mt(20, 10).lt(90, 90).lt(90, 140);
+		container.addChild(s);
+		return container;
+	}
+
+	function createHex() {
+		var container = createTile();
+		var s = new createjs.Shape();
+		s.graphics.f("#0F0").dp(0, 0, 40, 6).dp(0, 75, 40, 6);
+		s.x = 80
+		s.y = 40;
+
+		container.addChild(s);
+		return container;
+	}
+
+	function createStar() {
+		var container = createTile();
+		var s = new createjs.Shape();
+		s.graphics.ss(1).s(createjs.Graphics.getRGB(255, 255, 0)).f("#FF0").es().dp(0, 0, 80, 5, 0.6, -90);
+		s.x = 80
+		s.y = 85;
+
+		container.addChild(s);
+		return container;
+	}
+
+	function createRoundRect() {
+		var container = createTile();
+		var s = new createjs.Shape();
+		s.graphics.ss(6).s("red").f("green").rr(0, 0, 130, 130, 30);
+		s.x = s.y = 12;
+
+		container.addChild(s);
+		return container;
+	}
+
+	function createTile() {
+		var container = new createjs.Container();
+		var bg = new createjs.Shape();
+		bg.graphics.f('#CCCCCC').dr(0, 0, 155, 155).ef();
+		bg.alpha = 0.25;
+		container.addChild(bg);
+		return container;
+	}
+
+</script>
 </head>
+
 <body onload="init();">
 
-	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Graphics Test (tiny)</h1>
-	    <p>This demo is identical to the graphicsTest demo, except that it uses the tiny interface on <strong>Graphics</strong>
-		    to compact the drawing commands. It's possible to have even more compact drawing instructions using the <strong>Graphics.decodePath()</strong> method, but
-		    that format is not human readable.</p>
-	</header>
+<header class="EaselJS">
+	<h1>Graphics Tiny API</h1>
 
-	<div class="canvasHolder">
-	    <canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+	<p>This demo is identical to the graphicsTest demo, except that it uses the
+		tiny API on <code>Graphics</code>
+		to compact the drawing commands. It's possible to have even more compact
+		drawing instructions using the <code>Graphics.decodePath()</code>
+		method, but
+		that format is not designed to be human readable.</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 
 </body>
 </html>

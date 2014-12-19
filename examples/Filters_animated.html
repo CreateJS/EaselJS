@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EaselJS Example: Animated filters example.</title>
+
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
+
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../_assets/libs/tweenjs-NEXT.min.js"></script>
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+
+<script id="editable">
+	var img;
+
+	function init() {
+		//wait for the image to load
+		img = new Image();
+		img.onload = handleImageLoad;
+		img.src = "../_assets/art/spritesheet_grant.png";
+	}
+
+	function handleImageLoad(evt) {
+		// create a new stage and point it at our canvas:
+		stage = new createjs.Stage("testCanvas");
+
+		// create a new Bitmap, and slice out one image from the sprite sheet:
+		var bmp = new createjs.Bitmap(evt.target).set({x:50, y:30});
+		bmp.sourceRect = new createjs.Rectangle(0, 0, 165, 292);
+		
+		// red monochrome tint effect:
+		var filters = [new createjs.ColorMatrixFilter([
+				0.3, 0.3, 0.3, 0, 25, // red
+				0, 0, 0, 0, 0, // green
+				0, 0, 0, 0, 0, // blue
+				0, 0, 0, 1, 0])]; // alpha
+		var fx = getFXBitmap(bmp, filters, 0, 0, 165, 292);
+		createjs.Tween.get(fx, {loop:true}).to({alpha:1}, 1000).to({alpha:0}, 1000);
+		stage.addChild(bmp, fx);
+		
+		
+		// glow (blur + tint):
+		bmp = bmp.clone();
+		bmp.x += 230;
+		filters = [new createjs.BlurFilter(16,16,1), new createjs.ColorFilter(0,0,0,1.5,0,150,255)];
+		fx = getFXBitmap(bmp, filters, 0, 0, 165, 292);
+		createjs.Tween.get(fx, {loop:true}).to({alpha:1}, 5000).to({alpha:0}, 1000);
+		stage.addChild(fx, bmp);
+		
+		
+		// shadow (tint + blur + offset):
+		bmp = bmp.clone();
+		bmp.x += 230;
+		filters = [new createjs.ColorFilter(0,0,0,0.6), new createjs.BlurFilter(8,8,1)];
+		fx = getFXBitmap(bmp, filters, 0, 0, 165, 292);
+		createjs.Tween.get(fx, {loop:true}).to({alpha:1, x:fx.x+12, y:fx.y+12}, 4000).to({alpha:0, x:fx.x, y:fx.y}, 2000);
+		stage.addChild(fx, bmp);
+		
+		
+		// blur:
+		bmp = bmp.clone();
+		bmp.x += 230;
+		filters = [new createjs.BlurFilter(16,16,2)];
+		fx = getFXBitmap(bmp, filters, 0, 0, 165, 292);
+		var tween = createjs.Tween.get(fx, {loop:true}).to({alpha:1}, 2500).wait(1000).to({alpha:0}, 2500);
+		// we also need to counter fade the original bitmap:
+		tween.on("change", function() { bmp.alpha = 1-Math.pow(fx.alpha,3); });
+		stage.addChild(bmp, fx);
+		
+		createjs.Ticker.on("tick", stage);
+	}
+	
+	function getFXBitmap(source, filters, x, y, w, h) {
+		// cache the source, so we can grab a rasterized image of it:
+		source.cache(x, y, w, h);
+		
+		// create a new Bitmap, using the source's cacheCanvas:
+		var bmp = new createjs.Bitmap(source.cacheCanvas);
+		
+		// add the filters, and cache to apply them
+		bmp.filters = filters;
+		bmp.cache(0, 0, w, h);
+		
+		// offset the bmp's registration to account for the cache offset:
+		bmp.regX = -x;
+		bmp.regY = -y;
+		bmp.x = source.x;
+		bmp.y = source.y;
+		bmp.alpha = 0;
+		
+		// uncache the source:
+		source.uncache();
+		
+		return bmp;
+	}
+
+</script>
+</head>
+
+<body onload="init();">
+<header class="EaselJS">
+	<h1>Animating Filters</h1>
+
+	<p>Demonstrates a high performance approach to animating filter effects. Filters are applied once to a visual copy
+	of the target object, then faded in to create the effect. This is MUCH more efficient than updating
+	the filter and re-applying it each tick. Shows monochrome tint, glow, shadow, and blur effects.</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
+</body>
+</html>

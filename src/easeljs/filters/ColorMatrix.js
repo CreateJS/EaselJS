@@ -60,6 +60,19 @@ this.createjs = this.createjs||{};
 	}
 	var p = ColorMatrix.prototype;
 
+	/**
+	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	 * for details.
+	 *
+	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	 *
+	 * @method initialize
+	 * @protected
+	 * @deprecated
+	 */
+	// p.initialize = function() {}; // searchable for devs wondering where it is.
+
 
 // constants:
 	/**
@@ -130,7 +143,7 @@ this.createjs = this.createjs||{};
 	 * @chainable
 	 */
 	p.reset = function() {
-		return this.copyMatrix(ColorMatrix.IDENTITY_MATRIX);
+		return this.copy(ColorMatrix.IDENTITY_MATRIX);
 	};
 
 	/**
@@ -277,7 +290,7 @@ this.createjs = this.createjs||{};
 	 * @return {ColorMatrix} A clone of this ColorMatrix.
 	 **/
 	p.clone = function() {
-		return (new ColorMatrix()).copyMatrix(this);
+		return (new ColorMatrix()).copy(this);
 	};
 
 	/**

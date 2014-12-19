@@ -1,257 +1,252 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 
 <title>EaselJS: API Test</title>
 
-<link href="assets/tricolore.css" rel="stylesheet" type="text/css"/>
-<link href="assets/demoStyles.css" rel="stylesheet" type="text/css"/>
+<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.4.min.js"></script>
-<script src="assets/rainbow-custom.min.js"></script>
 
-<script type="text/javascript" src="assets/StringUtils.js"></script>
-
-<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+<script src="../lib/easeljs-NEXT.combined.js"></script>
 <!-- We also provide hosted minified versions of all CreateJS libraries.
   http://code.createjs.com -->
+<script src="../_assets/js/Slider.js"></script>
 
-<script type="text/javascript">
+<script id="editable">
+	var canvasDiv;
+	var img;
+	var demos;
+	var STROKE_COLOR = 'red';
+	var FILL_COLOR = 'blue';
 
-var canvas;
-var img;
-var demos;
-var STROKE_COLOR = 'rgba(255,255,255,1)';
-var FILL_COLOR = 'rgba(255,255,255,1)';
+	function init() {
+		img = new Image();
+		img.onload = layout;
+		img.src = "../_assets/art/daisy.png";
 
-function init() {
-    if (window.top != window) {
-        document.getElementById("header").style.display = "none";
-    }
+		canvasDiv = document.getElementById("canvasDiv");
 
-    img = new Image();
-    img.onload = layout;
-    img.src = "./assets/daisy.png";
+		var Graphics = createjs.Graphics;
+		demos = [
+			{label: 'lineTo();', graphics: function () {
+				return new Graphics().beginStroke(STROKE_COLOR).moveTo(5, 35).lineTo(110, 75).endStroke();
+			}},
+			{label: 'arcTo();', graphics: function () {
+				return new Graphics().beginStroke(STROKE_COLOR).moveTo(50, 20).arcTo(150, 20, 150, 70, 50).endStroke();
+			}},
+			{label: 'quadraticCurveTo();', graphics: function () {
+				return new Graphics().beginStroke(STROKE_COLOR).moveTo(0, 25).quadraticCurveTo(45, 50, 35, 25).endStroke();
+			}},
+			{label: 'bezierCurveTo();', graphics: function () {
+				return new Graphics().beginStroke(STROKE_COLOR).moveTo(5, 75).bezierCurveTo(45, 90, 75, 75, -25, -25).endStroke();
+			}},
+			{label: 'beginLinearGradientStroke();', graphics: function () {
+				return new Graphics().beginLinearGradientStroke([STROKE_COLOR, FILL_COLOR], [0, 1], 5, 0, 110, 0).moveTo(5, 25).lineTo(110, 25);
+			}},
+			{label: 'drawRect();', graphics: function () {
+				return new Graphics().beginFill(FILL_COLOR).rect(5, 5, 80, 80);
+			}},
+			{label: 'drawRoundRect();', graphics: function () {
+				return new Graphics().beginFill(FILL_COLOR).drawRoundRect(0, 0, 120, 120, 5);
+			}},
+			{label: 'beginLinearGradientFill() with drawRoundRect();', graphics: function () {
+				return new Graphics().beginLinearGradientFill([FILL_COLOR, STROKE_COLOR], [0, 1], 0, 0, 0, 130).drawRoundRect(0, 0, 120, 120, 5);
+			}},
+			{label: 'drawCircle();', graphics: function () {
+				return new Graphics().beginFill(FILL_COLOR).drawCircle(40, 40, 40);
+			}},
+			{label: 'beginRadialGradientFill() with drawCircle();', graphics: function () {
+				return new Graphics().beginRadialGradientFill([FILL_COLOR, STROKE_COLOR], [0, 1], 40, 40, 0, 40, 40, 40).drawCircle(40, 40, 40);
+			}},
+			{label: 'drawEllipse();', graphics: function () {
+				return new Graphics().beginFill(FILL_COLOR).drawEllipse(5, 5, 60, 120);
+			}},
+			{label: 'Draw Hexagon using drawPolyStar();', graphics: function () {
+				return new Graphics().beginFill(FILL_COLOR).drawPolyStar(60, 60, 60, 6, 0, 45);
+			}},
+			{label: 'Draw a star using drawPolyStar();', graphics: function () {
+				return new Graphics().beginFill(FILL_COLOR).drawPolyStar(80, 80, 70, 5, 0.6, -90);
+			}},
+			{label: 'beginBitmapStroke() with drawRect();', graphics: function () {
+				return new Graphics().setStrokeStyle(25).beginBitmapStroke(img).rect(5, 5, 100, 100);
+			}},
+			{label: 'drawRoundRectComplex();', graphics: function () {
+				return new Graphics().beginFill(FILL_COLOR).drawRoundRectComplex(5, 5, 70, 70, 5, 10, 15, 25);
+			}},
+			{label: 'drawCircle(); with beginBitmapFill();', graphics: function () {
+				return new Graphics().beginStroke(STROKE_COLOR).beginBitmapFill(img).drawCircle(30, 30, 30).endStroke();
+			}},
+			{label: 'Text', code: textDemo },
+			{label: 'Sprite', code: spriteDemo },
+			{label: 'Blur Filter', code: blurFilter },
+			{label: 'Remove Red Color Filter', code: colorFilter },
+			{label: 'ColorMatrixFilter', code: colorMatrixFilter },
+			{label: 'Mouse Interaction ', code: mouseDemo},
+			{label: 'Mask', code: maskDemo }
+		];
+	}
 
-    canvasHolder = document.getElementsByClassName('canvasHolder')[0];
+	function mouseDemo(stage) {
+		//Click one of the shapes.
+		var sprite = new createjs.Shape();
+		sprite.graphics.beginFill(FILL_COLOR).drawCircle(30, 30, 20).moveTo(50, 50).drawRect(50, 50, 25, 25);
+		sprite.addEventListener("click", function (event) {
+			alert('Click!');
+		});
 
-    var Graphics = createjs.Graphics;
-    demos = [
-        {label:'lineTo();', graphics:function () {
-            return new Graphics().beginStroke(STROKE_COLOR).moveTo(5, 35).lineTo(110, 75).endStroke();
-        }},
-        {label:'arcTo();', graphics:function () {
-            return new Graphics().beginStroke(STROKE_COLOR).moveTo(50, 20).arcTo(150, 20, 150, 70, 50).endStroke();
-        }},
-        {label:'quadraticCurveTo();', graphics:function () {
-            return new Graphics().beginStroke(STROKE_COLOR).moveTo(0, 25).quadraticCurveTo(45, 50, 35, 25).endStroke();
-        }},
-        {label:'bezierCurveTo();', graphics:function () {
-            return new Graphics().beginStroke(STROKE_COLOR).moveTo(5, 75).bezierCurveTo(45, 90, 75, 75, -25, -25).endStroke();
-        }},
-        {label:'beginLinearGradientStroke();', graphics:function () {
-            return new Graphics().beginLinearGradientStroke([STROKE_COLOR, "rgba(50, 50, 50, 1)"], [0, .4], 0, 0, 70, 140).moveTo(5, 25).lineTo(110, 25).endStroke();
-        }},
-        {label:'drawRect();', graphics:function () {
-            return new Graphics().beginFill(FILL_COLOR).rect(5, 5, 80, 80);
-        }},
-        {label:'drawRoundRect();', graphics:function () {
-            return new Graphics().beginFill(FILL_COLOR).drawRoundRect(0, 0, 120, 120, 5);
-        }},
-        {label:'beginLinearGradientFill() with drawRoundRect();', graphics:function () {
-            return new Graphics().beginLinearGradientFill([FILL_COLOR, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 130).drawRoundRect(0, 0, 120, 120, 5);
-        }},
-        {label:'drawCircle();', graphics:function () {
-            return new Graphics().beginFill(FILL_COLOR).drawCircle(40, 40, 40);
-        }},
-        {label:'beginRadialGradientFill() with drawCircle();', graphics:function () {
-            return new Graphics().beginRadialGradientFill([FILL_COLOR, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 0, 0, 60).drawCircle(40, 40, 40);
-        }},
-        {label:'drawEllipse();', graphics:function () {
-            return new Graphics().beginFill(FILL_COLOR).drawEllipse(5, 5, 60, 120);
-        }},
-        {label:'Draw Hexagon using drawPolyStar();', graphics:function () {
-            return new Graphics().beginFill(FILL_COLOR).drawPolyStar(60, 60, 60, 6, 0, 45);
-        }},
-        {label:'Draw a star using drawPolyStar();', graphics:function () {
-            return new Graphics().beginFill(FILL_COLOR).drawPolyStar(80, 80, 70, 5, 0.6, -90);
-        }},
-        {label:'beginBitmapStroke() with drawRect();', graphics:function () {
-            return new Graphics().setStrokeStyle(25).beginBitmapStroke(img).rect(5, 5, 100, 100);
-        }},
-        {label:'drawRoundRectComplex();', graphics:function () {
-            return new Graphics().beginFill(FILL_COLOR).drawRoundRectComplex(5, 5, 70, 70, 5, 10, 15, 25);
-        }},
-        {label:'drawCircle(); with beginBitmapFill();', graphics:function () {
-            return new Graphics().beginStroke(STROKE_COLOR).beginBitmapFill(img).drawCircle(30, 30, 30).endStroke();
-        }},
-        {label:'Text', code:textDemo },
-        {label:'Sprite', code:spriteDemo },
-        {label:'Blur Filter', code:blurFilter },
-        {label:'Remove Red Color Filter', code:colorFilter },
-        {label:'ColorMatrixFilter', code:colorMatrixFilter },
-        {label:'Mouse Interaction ', code:mouseDemo},
-        {label:'Mask', code:maskDemo }
-    ];
-}
+		stage.addChild(sprite);
+	}
 
-function mouseDemo(stage) {
-    //Click one of the shapes.
-    var sprite = new createjs.Shape();
-    sprite.graphics.beginFill(FILL_COLOR).drawCircle(30, 30, 20).moveTo(50, 50).drawRect(50, 50, 25, 25);
-    sprite.addEventListener("click", function (event) {
-        alert('Click!');
-    });
+	function maskDemo(stage) {
+		var shape = new createjs.Shape();
+		shape.graphics = new createjs.Graphics().beginStroke(STROKE_COLOR).beginBitmapFill(img).drawCircle(35, 25, 20).endStroke();
+		var image = new createjs.Bitmap(img);
+		image.mask = shape;
 
-    stage.addChild(sprite);
-}
+		stage.addChild(image);
+	}
 
-function maskDemo(stage) {
-    var shape = new createjs.Shape();
-    shape.graphics = new createjs.Graphics().beginStroke(STROKE_COLOR).beginBitmapFill(img).drawCircle(35, 25, 20).endStroke();
-    var image = new createjs.Bitmap(img);
-    image.mask = shape;
+	function colorMatrixFilter(stage) {
+		var greyScaleFilter = new createjs.ColorMatrixFilter([
+																 0.33, 0.33, 0.33, 0, 0, // red
+																 0.33, 0.33, 0.33, 0, 0, // green
+																 0.33, 0.33, 0.33, 0, 0, // blue
+																 0, 0, 0, 1, 0  // alpha
+															 ]);
 
-    stage.addChild(image);
-}
+		var image = new createjs.Bitmap(img);
+		image.filters = [greyScaleFilter];
+		image.cache(0, 0, img.width, img.height);
+		stage.addChild(image);
+	}
 
-function colorMatrixFilter(stage) {
-    var greyScaleFilter = new createjs.ColorMatrixFilter([
-        0.33, 0.33, 0.33, 0, 0, // red
-        0.33, 0.33, 0.33, 0, 0, // green
-        0.33, 0.33, 0.33, 0, 0, // blue
-        0, 0, 0, 1, 0  // alpha
-    ]);
+	function blurFilter(stage) {
+		var blurFilter = new createjs.BlurFilter(5, 2, 2);
+		var margins = blurFilter.getBounds();
+		var image = new createjs.Bitmap(img);
+		image.filters = [blurFilter];
+		// filters are only displayed when the display object is cached
+		// later, you can call updateCache() to update changes to your filters
+		image.cache(margins.x, margins.y, img.width + margins.width, img.height + margins.height);
+		image.x += image.x + image.width;
+		stage.addChild(image);
+	}
 
-    var image = new createjs.Bitmap(img);
-    image.filters = [greyScaleFilter];
-    image.cache(0, 0, img.width, img.height);
-    stage.addChild(image);
-}
+	function colorFilter(stage) {
+		var removeRedFilter = new createjs.ColorFilter(0, 1, 1, 1);
+		var image = new createjs.Bitmap(img);
+		image.filters = [removeRedFilter];
+		image.cache(0, 0, img.width, img.height);
+		stage.addChild(image);
+	}
 
-function blurFilter(stage) {
-    var blurFilter = new createjs.BlurFilter(5, 2, 2);
-    var margins = blurFilter.getBounds();
-    var image = new createjs.Bitmap(img);
-    image.filters = [blurFilter];
-    // filters are only displayed when the display object is cached
-    // later, you can call updateCache() to update changes to your filters
-    image.cache(margins.x, margins.y, img.width + margins.width, img.height + margins.height);
-    image.x += image.x + image.width;
-    stage.addChild(image);
-}
+	function textDemo(stage) {
+		var txt = new createjs.Text("Hello CreateJS!", "24px Arial", FILL_COLOR);
+		txt.lineWidth = 150;
+		stage.addChild(txt);
+	}
 
-function colorFilter(stage) {
-    var removeRedFilter = new createjs.ColorFilter(0, 1, 1, 1);
-    var image = new createjs.Bitmap(img);
-    image.filters = [removeRedFilter];
-    image.cache(0, 0, img.width, img.height);
-    stage.addChild(image);
-}
+	function spriteDemo(stage) {
+		var ss = new createjs.SpriteSheet({ "animations": {
+			"run": [0, 25, "jump", 2],
+			"jump": [26, 63, "run"]},
+											  "images": ["../_assets/art/spritesheet_grant.png"],
+											  "frames": {
+												  "regX": 0,
+												  "regY": 0,
+												  "height": 293,
+												  "width": 166,
+												  "count": 64
+											  }
+										  });
 
-function textDemo(stage) {
-    var txt = new createjs.Text("Hello CreateJS!", "15px Arial", "#FFF");
-    txt.y = 45;
-    stage.addChild(txt);
-}
+		var sprite = new createjs.Sprite(ss, "run");
+		sprite.scaleY = sprite.scaleX = 0.4;
+		stage.addChild(sprite);
 
-function spriteDemo(stage) {
-    var ss = new createjs.SpriteSheet({ "animations":{
-        "run":[0, 25],
-        "jump":[26, 63]},
-        "images":["assets/runningGrant.png"],
-        "frames":{
-            "regX":0,
-            "regY":0,
-            "height":292.5,
-            "width":165.75,
-            "count":64
-        }
-    });
+		createjs.Ticker.addEventListener("tick", stage);
+	}
 
-    ss.getAnimation("run").speed = 2;
-    ss.getAnimation("run").next = "jump";
-    ss.getAnimation("jump").next = "run";
+	function layout() {
+		while (demos.length) {
+			var demo = demos.shift();
 
-    var sprite = new createjs.Sprite(ss, "run");
-    sprite.scaleY = sprite.scaleX = 0.4;
+			var demoWrap = $('<table width="100%"><tr><td width="50" valign="top"></td><td valign="top"></td></tr></table>');
+			var canvas = $('<canvas width="150" height="150" style="clear: left;" />');
 
-    createjs.Ticker.setFPS(60);
-    createjs.Ticker.addEventListener("tick", stage);
-    stage.addChild(sprite);
-}
+			demoWrap.prepend($('<h2 style="visibility: collapse; width: 1px; height: 1px;" id="' + demos.length + '">' + demo.label + '</h1>'))
 
-function layout() {
-    while(demos.length) {
-        var demo = demos.shift();
+			var codeString;
 
-        var demoWrap = $('<table width="100%"><tr><td width="50" valign="top"></td><td valign="top"></td></tr></table>');
-        var canvas = $('<canvas width="150" height="150" style="clear: left;" />');
+			if (demo.graphics) {
+				codeString = demo.graphics.toString();
+				codeString = codeString.substring(codeString.indexOf('return ') + 7, codeString.lastIndexOf('}'));
+			} else {
+				codeString = demo.code.toString();
+				codeString = codeString.substring(codeString.indexOf('{') + 1, codeString.lastIndexOf('}'));
+			}
 
-        demoWrap.prepend($('<h2 style="visibility: collapse; width: 1px; height: 1px;" id="' + demos.length + '">' + demo.label + '</h1>'))
+			codeString = codeString.split('STROKE_COLOR').join('"' + STROKE_COLOR + '"').split('FILL_COLOR').join('"' + FILL_COLOR + '"');
+			codeString = '//' + demo.label + '\n' + codeString;
 
-        var codeString;
+			var code = $('<div style="width:750px">' +
+								 '<pre>' +
+								 '<code data-language="javascript">' + codeString + '</code>' +
+								 '</pre>' +
+								 '</div>');
 
-        if (demo.graphics) {
-            codeString = demo.graphics.toString();
-            codeString = codeString.substring(codeString.indexOf('return ') + 7, codeString.lastIndexOf('}'));
-        } else {
-            codeString = demo.code.toString();
-            codeString = codeString.substring(codeString.indexOf('{') + 1, codeString.lastIndexOf('}'));
-        }
+			$(demoWrap.find('td')[0]).append(canvas);
+			$(demoWrap.find('td')[1]).append(code);
 
-        codeString = codeString.split('STROKE_COLOR').join('"' + STROKE_COLOR + '"').split('FILL_COLOR').join('"' + FILL_COLOR + '"');
-        codeString = codeString.trim();
-        codeString = '//' + demo.label + '\n' + codeString;
+			canvasDiv.appendChild(demoWrap.get(0));
 
-        var code = $('<div style="width:750px">' +
-                       '<pre>' +
-                            '<code data-language="javascript">'+codeString+'</code>' +
-                       '</pre>' +
-                     '</div>');
+			drawToCanvas(canvas, demo);
+		}
 
-        $(demoWrap.find('td')[0]).append(canvas);
-        $(demoWrap.find('td')[1]).append(code);
+		$('#toc').toc();
+	}
 
-        canvasHolder.appendChild(demoWrap.get(0));
+	function drawToCanvas(canvas, data) {
+		var stage = new createjs.Stage(canvas.get(0));
 
-        drawToCanvas(canvas, demo);
-    }
+		if (data.graphics) {
+			var shape = new createjs.Shape(data.graphics());
+			stage.addChild(shape);
+		} else {
+			data.code(stage, canvas.get(0));
+		}
 
-    $('#toc').toc();
-}
+		stage.update();
+	}
 
-function drawToCanvas(canvas, data) {
-    var stage = new createjs.Stage(canvas.get(0));
-
-    if (data.graphics) {
-        var shape = new createjs.Shape(data.graphics());
-        stage.addChild(shape);
-    } else {
-        data.code(stage, canvas.get(0));
-    }
-
-    stage.update();
-}
-
-$(init);
+	$(init);
 </script>
+
+<style>
+	code {
+		background: none;
+	}
+
+	canvas {
+		border: 1px solid #DDD;
+	}
+</style>
 </head>
 <body>
 
-<header id="header" class="EaselJS">
-    <h1><span class="text-product">Easel<strong>JS</strong></span> API Test</h1>
+<header class="EaselJS">
+	<h1>API Test</h1>
 
-    <p>This demo shows the usage of many of the visual APIs.</p>
+	<p>Demonstrates many of the visual APIs.</p>
 </header>
 
-<div style="width: 960px; height: 400px; overflow: scroll; position: relative;"
-     id="wrap">
-    <div id="toc"></div>
+<div style="overflow: scroll;" class="content" id="wrap">
+	<div id="toc"></div>
 
-    <div class="canvasHolder"
-         style=" padding-left:25px; float: left; height: 150px">
-    </div>
+	<div id="canvasDiv" style=" padding-left:25px; float: left; height: 150px">
+	</div>
 </div>
 
 </body>

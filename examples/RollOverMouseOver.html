@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta charset="utf-8">
 	<title>EaselJS Example: rollover and mouseover</title>
 
-	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
-	var stage,text;
-	
+<script id="editable">
+	var stage, text;
+
 	function init() {
 		// create a stage object to work with the canvas. This is the top level node in the display list:
 		stage = new createjs.Stage("testCanvas");
@@ -20,53 +22,62 @@
 		stage.enableMouseOver(20);
 
 		// Create a simple hierarchy:
-		var container = stage.addChild(new createjs.Container()).set({name:"container"});
-		
-		var blue = container.addChild(new createjs.Shape()).set({name:"blue", x:50, y:50});
-		blue.graphics.beginFill("#00F").drawRect(0,0,200,200);
-		var red = container.addChild(new createjs.Shape()).set({name:"red", x:100, y:100});
-		red.graphics.beginFill("#F00").drawRect(0,0,100,100);
-		
+		var container = stage.addChild(new createjs.Container()).set({name: "container"});
+
+		var blue = container.addChild(new createjs.Shape()).set({name: "blue", x: 50, y: 100});
+		blue.graphics.beginFill("#00F").drawRect(0, 0, 200, 200);
+		var red = container.addChild(new createjs.Shape()).set({name: "red", x: 100, y: 150});
+		red.graphics.beginFill("#F00").drawRect(0, 0, 100, 100);
+
 		container.addEventListener("mouseover", handleEvt);
 		container.addEventListener("mouseout", handleEvt);
 		container.addEventListener("rollover", handleEvt);
 		container.addEventListener("rollout", handleEvt);
-		
+
 		container.cursor = "pointer";
 		red.cursor = "";
-		
-		// text object to output the 
-		text = stage.addChild(new createjs.Text("", "14px monospace", "#FFF")).set({x:260, y:20, lineHeight:20});
+
+		// text object to output the
+		text = stage.addChild(new createjs.Text("", "14px monospace", "#111")).set({x: 280, y: 100, lineHeight: 20});
 
 		// call update on the stage to make it render the current display list to the canvas:
 		createjs.Ticker.addEventListener("tick", stage);
 	}
-	
+
 	var log = [];
 	function handleEvt(evt) {
-		log.push("type="+evt.type+" target="+evt.target.name+" currentTarget="+evt.currentTarget.name);
-		while (log.length > 12) { log.shift(); }
+		log.push("type=" + evt.type + " target=" + evt.target.name + " currentTarget=" + evt.currentTarget.name);
+		while (log.length > 10) {
+			log.shift();
+		}
 		text.text = log.join("\n");
 	}
-	</script>
+</script>
 </head>
-	
+
 <body onload="init();">
 
-	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> rollover and mouseover</h1>
-	    <p>This example demonstrates the difference between rollover/out and mouseover/out events. The red and blue squares
-	    are separate Shape instances within a parent Container. The Container has both rollover/rollout and
-	    mouseover/mouseout events.</p>
-	    <p>
-		Note how the mouseover/mouseout events are triggered whenever you move between different display objects
-		(ex. moving from the blue to red shape), but the rollover/rollout events are only triggered when you leave the
-		Container's aggregate contents.
-	    </p>
-	</header>
+<header class="EaselJS">
+	<h1>rollover and mouseover</h1>
 
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400"></canvas>
-	</div>
+	<p>This example demonstrates the difference between <code>rollover</code> /
+		<code>rollout</code> and <code>mouseover</code> / <code>mouseout</code>
+		events. The red and blue squares
+		are separate Shape instances within a parent Container. The Container
+		has both rollover/rollout and
+		mouseover/mouseout events.</p>
+
+	<p>
+		Note how the mouseover/mouseout events are triggered whenever you move
+		between different display objects
+		(ex. moving from the blue to red shape), but the rollover/rollout events
+		are only triggered when you leave the
+		Container's aggregate contents.
+	</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
 </body>
 </html>

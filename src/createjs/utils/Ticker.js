@@ -411,7 +411,7 @@ this.createjs = this.createjs||{};
 		}
 		Ticker.removeAllEventListeners("tick");
 		Ticker._timerId = Ticker._times = Ticker._tickTimes = null;
-		Ticker._startTime = Ticker._lastTime = 0;
+		Ticker._startTime = Ticker._lastTime = Ticker._ticks = 0;
 		Ticker._inited = false;
 	};
 

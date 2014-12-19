@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta charset="utf-8">
 	<title>EaselJS Example: Infinite Hearts</title>
 
-	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
 
-	<script type="text/javascript" src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<script>
+<script id="editable">
 	var canvas;
 	var stage;
 	var container;
@@ -32,11 +34,11 @@
 		captureIndex = 0;
 
 		// create a large number of slightly complex vector shapes, and give them random positions and velocities:
-		for (var i=0; i<100; i++) {
+		for (var i = 0; i < 100; i++) {
 			var heart = new createjs.Shape();
-			heart.graphics.beginFill(createjs.Graphics.getHSL(Math.random()*30-45, 100, 50+Math.random()*30));
-			heart.graphics.moveTo(0,-12).curveTo(1,-20,8,-20).curveTo(16,-20,16,-10).curveTo(16,0,0,12);
-			heart.graphics.curveTo(-16,0,-16,-10).curveTo(-16,-20,-8,-20).curveTo(-1,-20,0,-12);
+			heart.graphics.beginFill(createjs.Graphics.getHSL(Math.random() * 30 - 45, 100, 50 + Math.random() * 30));
+			heart.graphics.moveTo(0, -12).curveTo(1, -20, 8, -20).curveTo(16, -20, 16, -10).curveTo(16, 0, 0, 12);
+			heart.graphics.curveTo(-16, 0, -16, -10).curveTo(-16, -20, -8, -20).curveTo(-1, -20, 0, -12);
 			heart.y = -100;
 
 			container.addChild(heart);
@@ -44,13 +46,13 @@
 
 		var text = new createjs.Text("the longer I'm with you\nthe more I love you", "bold 24px Arial", "#312");
 		text.textAlign = "center";
-		text.x = w/2;
-		text.y = h/2;
+		text.x = w / 2;
+		text.y = h / 2 - text.getMeasuredLineHeight();
 		stage.addChild(text);
 
-		for (i=0; i<100; i++) {
+		for (i = 0; i < 100; i++) {
 			var captureContainer = new createjs.Container();
-			captureContainer.cache(0,0,w,h);
+			captureContainer.cache(0, 0, w, h);
 			captureContainers.push(captureContainer);
 		}
 
@@ -64,31 +66,31 @@
 		var h = canvas.height;
 		var l = container.getNumChildren();
 
-		captureIndex = (captureIndex+1)%captureContainers.length;
+		captureIndex = (captureIndex + 1) % captureContainers.length;
 		stage.removeChildAt(0);
 		var captureContainer = captureContainers[captureIndex];
-		stage.addChildAt(captureContainer,0);
+		stage.addChildAt(captureContainer, 0);
 		captureContainer.addChild(container);
 
 		// iterate through all the children and move them according to their velocity:
-		for (var i=0; i<l; i++) {
+		for (var i = 0; i < l; i++) {
 			var heart = container.getChildAt(i);
 			if (heart.y < -50) {
-				heart._x = Math.random()*w;
-				heart.y = h*(1+Math.random())+50;
-				heart.perX = (1+Math.random()*2)*h;
-				heart.offX = Math.random()*h;
-				heart.ampX = heart.perX*0.1*(0.15+Math.random());
-				heart.velY = -Math.random()*2-1;
-				heart.scaleX = heart.scaleY = Math.random()*2+1;
-				heart._rotation = Math.random()*40-20;
-				heart.alpha = Math.random()*0.75+0.05;
+				heart._x = Math.random() * w;
+				heart.y = h * (1 + Math.random()) + 50;
+				heart.perX = (1 + Math.random() * 2) * h;
+				heart.offX = Math.random() * h;
+				heart.ampX = heart.perX * 0.1 * (0.15 + Math.random());
+				heart.velY = -Math.random() * 2 - 1;
+				heart.scaleX = heart.scaleY = Math.random() * 2 + 1;
+				heart._rotation = Math.random() * 40 - 20;
+				heart.alpha = Math.random() * 0.75 + 0.05;
 				heart.compositeOperation = Math.random() < 0.33 ? "lighter" : "source-over";
 			}
-			var int = (heart.offX+heart.y)/heart.perX*Math.PI*2;
-			heart.y += heart.velY*heart.scaleX/2;
-			heart.x = heart._x + Math.cos(int)*heart.ampX;
-			heart.rotation = heart._rotation + Math.sin(int)*30;
+			var int = (heart.offX + heart.y) / heart.perX * Math.PI * 2;
+			heart.y += heart.velY * heart.scaleX / 2;
+			heart.x = heart._x + Math.cos(int) * heart.ampX;
+			heart.rotation = heart._rotation + Math.sin(int) * 30;
 		}
 
 		captureContainer.updateCache("source-over");
@@ -97,20 +99,23 @@
 		stage.update(event);
 	}
 
-	</script>
+</script>
 </head>
-	
+
 <body onload="init();">
 
-	<header id="header" class="EaselJS">
-	    <h1><span class="text-product">Easel<strong>JS</strong></span> Infinte Hearts</h1>
-	    <p>Infinte hearts: code poetry for Valentine's day.
-	    </p>
-	</header>
-	<!-- background isn't set to black to demonstrate how the darkening applies -->
+<header class="EaselJS">
+	<h1>Infinte Hearts</h1>
 
-	<div class="canvasHolder">
-		<canvas id="testCanvas" width="960" height="400" style="background-color:#312"></canvas>
-	</div>
+	<p>Infinte hearts: code poetry for Valentine's day. Uses
+		<code>updateCache()</code> with multiple caches to
+		create an "infinite bobs" effect.
+	</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"
+			style="background:#312"></canvas>
+</div>
 </body>
 </html>

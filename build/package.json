@@ -1,6 +1,6 @@
 {
 	"name": "EaselJS",
-	"version": "0.7.1",
+	"version": "0.8.0",
 	"description": "EaselJS Docs",
 	"url": "http://www.createjs.com/#!/EaselJS",
 	"logo": "assets/docs-icon-EaselJS.png",
@@ -12,9 +12,11 @@
 		"grunt-contrib-yuidoc": "~0.5.2",
 		"grunt-contrib-compress": "~0.12.0",
 		"grunt-contrib-copy": "~0.7.0",
-		"lodash": "~2.4.1",
-    	"grunt-contrib-connect": "~0.8.0",
-    	"grunt-contrib-watch": "~0.6.1"
+		"grunt-contrib-sass": "^0.8.1",
+		"grunt-contrib-clean":"^0.4.0",
+		"grunt-contrib-connect": "~0.8.0",
+    	"grunt-contrib-watch": "~0.6.1",
+		"lodash": "~0.9.2"
 	},
 	"engine": "node >= 0.10.22"
 }

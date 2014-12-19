@@ -410,6 +410,22 @@ this.createjs = this.createjs||{};
 		this._cacheOffsetY = 0;
 		
 		/**
+		 * @property _filterOffsetX
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._filterOffsetX = 0;
+		
+		/**
+		 * @property _filterOffsetY
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._filterOffsetY = 0;
+		
+		/**
 		 * @property _cacheScale
 		 * @protected
 		 * @type {Number}
@@ -458,7 +474,9 @@ this.createjs = this.createjs||{};
 		this._bounds = null;
 	}
 	var p = createjs.extend(DisplayObject, createjs.EventDispatcher);
-	
+
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 	
 // static properties:
 	/**
@@ -691,12 +709,8 @@ this.createjs = this.createjs||{};
 	p.draw = function(ctx, ignoreCache) {
 		var cacheCanvas = this.cacheCanvas;
 		if (ignoreCache || !cacheCanvas) { return false; }
-		var scale = this._cacheScale, offX = this._cacheOffsetX, offY = this._cacheOffsetY, fBounds;
-		if (fBounds = this._applyFilterBounds(offX, offY, 0, 0)) {
-			offX = fBounds.x;
-			offY = fBounds.y;
-		}
-		ctx.drawImage(cacheCanvas, offX, offY, cacheCanvas.width/scale, cacheCanvas.height/scale);
+		var scale = this._cacheScale;
+		ctx.drawImage(cacheCanvas, this._cacheOffsetX+this._filterOffsetX, this._cacheOffsetY+this._filterOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
 		return true;
 	};
 	
@@ -795,21 +809,17 @@ this.createjs = this.createjs||{};
 	 * whatwg spec on compositing</a>.
 	 **/
 	p.updateCache = function(compositeOperation) {
-		var cacheCanvas = this.cacheCanvas, scale = this._cacheScale, offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
-		var w = this._cacheWidth, h = this._cacheHeight, fBounds;
+		var cacheCanvas = this.cacheCanvas;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
-		var ctx = cacheCanvas.getContext("2d");
+		var scale = this._cacheScale, offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
+		var w = this._cacheWidth, h = this._cacheHeight, ctx = cacheCanvas.getContext("2d");
 		
-		// update bounds based on filters:
-		if (fBounds = this._applyFilterBounds(offX, offY, w, h)) {
-			offX = fBounds.x;
-			offY = fBounds.y;
-			w = fBounds.width;
-			h = fBounds.height;
-		}
+		var fBounds = this._getFilterBounds();
+		offX += (this._filterOffsetX = fBounds.x);
+		offY += (this._filterOffsetY = fBounds.y);
 		
-		w = Math.ceil(w*scale);
-		h = Math.ceil(h*scale);
+		w = Math.ceil(w*scale) + fBounds.width;
+		h = Math.ceil(h*scale) + fBounds.height;
 		if (w != cacheCanvas.width || h != cacheCanvas.height) {
 			// TODO: it would be nice to preserve the content if there is a compositeOperation.
 			cacheCanvas.width = w;
@@ -834,7 +844,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.uncache = function() {
 		this._cacheDataURL = this.cacheCanvas = null;
-		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = 0;
+		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = this._filterOffsetX = this._filterOffsetY = 0;
 		this._cacheScale = 1;
 	};
 	
@@ -867,12 +877,12 @@ this.createjs = this.createjs||{};
 	 * @method localToGlobal
 	 * @param {Number} x The x position in the source display object to transform.
 	 * @param {Number} y The y position in the source display object to transform.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a new Point object with x/y properties will be returned. 
 	 * @return {Point} A Point instance with x and y properties correlating to the transformed coordinates
 	 * on the stage.
 	 **/
-	p.localToGlobal = function(x, y) {
-		var mtx = this.getConcatenatedMatrix(this._props.matrix).prepend(1, 0, 0, 1, x, y);
-		return new createjs.Point(mtx.tx, mtx.ty);
+	p.localToGlobal = function(x, y, pt) {
+		return this.getConcatenatedMatrix(this._props.matrix).transformPoint(x,y, pt||new createjs.Point());
 	};
 
 	/**
@@ -892,12 +902,12 @@ this.createjs = this.createjs||{};
 	 * @method globalToLocal
 	 * @param {Number} x The x position on the stage to transform.
 	 * @param {Number} y The y position on the stage to transform.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a new Point object with x/y properties will be returned. 
 	 * @return {Point} A Point instance with x and y properties correlating to the transformed position in the
 	 * display object's coordinate space.
 	 **/
-	p.globalToLocal = function(x, y) {
-		var mtx = this.getConcatenatedMatrix(this._props.matrix).invert().prepend(1, 0, 0, 1, x, y);
-		return new createjs.Point(mtx.tx, mtx.ty);
+	p.globalToLocal = function(x, y, pt) {
+		return this.getConcatenatedMatrix(this._props.matrix).invert().transformPoint(x,y, pt||new createjs.Point());
 	};
 
 	/**
@@ -913,12 +923,13 @@ this.createjs = this.createjs||{};
 	 * @param {Number} x The x position in the source display object to transform.
 	 * @param {Number} y The y position on the source display object to transform.
 	 * @param {DisplayObject} target The target display object to which the coordinates will be transformed.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a new Point object with x/y properties will be returned. 
 	 * @return {Point} Returns a Point instance with x and y properties correlating to the transformed position
 	 * in the target's coordinate space.
 	 **/
-	p.localToLocal = function(x, y, target) {
-		var pt = this.localToGlobal(x, y);
-		return target.globalToLocal(pt.x, pt.y);
+	p.localToLocal = function(x, y, target, pt) {
+		pt = this.localToGlobal(x, y, pt);
+		return target.globalToLocal(pt.x, pt.y, pt);
 	};
 
 	/**
@@ -964,7 +975,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.getMatrix = function(matrix) {
 		var o = this, mtx = matrix&&matrix.identity() || new createjs.Matrix2D();
-		return o.transformMatrix ?  mtx.copy(o.transformMatrix) : mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		return o.transformMatrix ?  mtx.copy(o.transformMatrix) : mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
 	};
 	
 	/**
@@ -980,7 +991,7 @@ this.createjs = this.createjs||{};
 	p.getConcatenatedMatrix = function(matrix) {
 		var o = this, mtx = this.getMatrix(matrix);
 		while (o = o.parent) {
-			mtx.appendMatrix(o.getMatrix(o._props.matrix));
+			mtx.prependMatrix(o.getMatrix(o._props.matrix));
 		}
 		return mtx;
 	};
@@ -997,11 +1008,11 @@ this.createjs = this.createjs||{};
 		props = props ? props.identity() : new createjs.DisplayProps();
 		var o = this, mtx = o.getMatrix(props.matrix); 
 		do {
-			props.append(o.visible, o.alpha, o.shadow, o.compositeOperation);
+			props.prepend(o.visible, o.alpha, o.shadow, o.compositeOperation);
 			
 			// we do this to avoid problems with the matrix being used for both operations when o._props.matrix is passed in as the props param.
-			// this could be simplified (ie. just done as part of the append above) if we switched to using a pool.
-			if (o != this) { mtx.appendMatrix(o.getMatrix(o._props.matrix)); }
+			// this could be simplified (ie. just done as part of the prepend above) if we switched to using a pool.
+			if (o != this) { mtx.prependMatrix(o.getMatrix(o._props.matrix)); }
 		} while (o = o.parent);
 		return props;
 	};
@@ -1021,7 +1032,7 @@ this.createjs = this.createjs||{};
 	 * @method hitTest
 	 * @param {Number} x The x position to check in the display object's local coordinates.
 	 * @param {Number} y The y position to check in the display object's local coordinates.
-	 * @return {Boolean} A Boolean indicting whether a visible portion of the DisplayObject intersect the specified
+	 * @return {Boolean} A Boolean indicating whether a visible portion of the DisplayObject intersect the specified
 	 * local Point.
 	*/
 	p.hitTest = function(x, y) {
@@ -1276,27 +1287,17 @@ this.createjs = this.createjs||{};
 	};
 	
 	/**
-	 * @method _applyFilterBounds
-	 * @param {Number} x
-	 * @param {Number} y
-	 * @param {Number} width
-	 * @param {Number} height
+	 * @method _getFilterBounds
 	 * @return {Rectangle}
 	 * @protected
 	 **/
-	p._applyFilterBounds = function(x, y, width, height) {
-		var bounds, l, filters = this.filters;
-		if (!filters || !(l=filters.length)) { return null; }
+	p._getFilterBounds = function(rect) {
+		var l, filters = this.filters, bounds = this._rectangle.setValues(0,0,0,0);
+		if (!filters || !(l=filters.length)) { return bounds; }
 		
 		for (var i=0; i<l; i++) {
 			var f = this.filters[i];
-			var fBounds = f.getBounds&&f.getBounds();
-			if (!fBounds) { continue; }
-			if (!bounds) { bounds = this._rectangle.setValues(x,y,width,height); }
-			bounds.x += fBounds.x;
-			bounds.y += fBounds.y;
-			bounds.width += fBounds.width;
-			bounds.height += fBounds.height;
+			f.getBounds&&f.getBounds(bounds);
 		}
 		return bounds;
 	};
@@ -1325,8 +1326,8 @@ this.createjs = this.createjs||{};
 		var x = bounds.x, y = bounds.y, width = bounds.width, height = bounds.height, mtx = this._props.matrix;
 		mtx = ignoreTransform ? mtx.identity() : this.getMatrix(mtx);
 		
-		if (x || y) { mtx.prependTransform(0,0,1,1,0,0,0,-x,-y); } // TODO: simplify this.
-		if (matrix) { mtx.appendMatrix(matrix); }
+		if (x || y) { mtx.appendTransform(0,0,1,1,0,0,0,-x,-y); } // TODO: simplify this.
+		if (matrix) { mtx.prependMatrix(matrix); }
 		
 		var x_a = width*mtx.a, x_b = width*mtx.b;
 		var y_c = height*mtx.c, y_d = height*mtx.d;
