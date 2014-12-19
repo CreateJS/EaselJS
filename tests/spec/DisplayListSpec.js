@@ -582,4 +582,25 @@ describe("DisplayList", function () {
 		this.stage.update();
 		this.compareBaseLine("assets/mask.png", done, expect, 0.01);
 	});
+
+	describe("PrelaodJS can be used to load image assets", function() {
+		beforeEach(function(done) {
+			this.loader = new createjs.LoadQueue(true);
+			this.loader.addEventListener("complete", function() {
+				done();
+			});
+			this.loader.loadFile({id:"image", src:"art/daisy.png"});
+		});
+
+		it("loaded pngs should work", function(done) {
+			var a = new createjs.Bitmap(this.loader.getResult('image'));
+			var b = new createjs.Bitmap(this.loader.getResult('image'));
+			b.x = 80;
+
+			this.stage.addChild(a, b);
+			this.stage.update();
+
+			this.compareBaseLine("assets/PrelaodJSLoadedBitmap.png", done, expect);
+		});
+	});
 });
