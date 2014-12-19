@@ -19,7 +19,8 @@ CRITICAL (may break existing content):
 - renamed initialize on geom classes to "setValues()"
 - removed secondary properties (visible, alpha, compositeOperation, shadow) and related functionality from Matrix2D
 	- added DisplayProps to hold these properties + a matrix instance
-- some matrix methods were fixed to work properly
+- Matrix2D was updated to be internally consistent with regards to matrix orientation
+	- Matrix2D transform methods (ex. translate, rotate) now behave as append instead of prepend operations
 - renamed ColorMatrix.copyMatrix() to .copy() to reflect geom classes
 
 *****
