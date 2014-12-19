@@ -395,12 +395,18 @@ ul li p {
 .apidocs .attrs .extends .attr,
 .apidocs .events .extends .event {
   font-weight: bold;
+  a {
+    font-weight: bold;
+  }
 }
 .apidocs .methods .extends .inherited,
 .apidocs .properties .extends .inherited,
 .apidocs .attrs .extends .inherited,
 .apidocs .events .extends .inherited {
   font-weight: normal;
+  a {
+    font-weight: normal;
+  }
 }
 
 #hd {
