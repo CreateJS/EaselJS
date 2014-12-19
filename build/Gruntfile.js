@@ -17,8 +17,11 @@ module.exports = function (grunt) {
 				// Setup watch to watch the source and rebuild when it changes.  Also livereload
 				watch: {
 					js: {
-						files: [getConfigValue('easel_source'), getConfigValue('movieclip_source')],
-						tasks: ['coreBuild:next'],
+						files: [getConfigValue('easel_source'),
+							getConfigValue('movieclip_source'),
+							getConfigValue('watch_exclude_files')
+						],
+						tasks: ['sourceBuild'],
 						options: {
 							livereload: '<%= connect.options.livereload %>'
 						}
@@ -335,7 +338,7 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('nextlib', [
-		"updateversion", "combine", "uglify", "clearversion", "copy:src"
+		"sourceBuild"
 	]);
 
 	/**
@@ -357,8 +360,17 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('coreBuild', [
-		"updateversion", "combine", "uglify", "clearversion", "docs", "copy:src"
+		"docs", "sourceBuild"
 	]);
+
+	/**
+	 * Main source build task
+	 *
+	 */
+	grunt.registerTask('sourceBuild', [
+		"updateversion", "combine", "uglify", "clearversion",  "copy:src"
+	]);
+	
 
 	/**
 	 * Task for exporting combined view.
@@ -373,7 +385,7 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('serve', 'Start a webserver and watch the source files for changes.', [
-		"coreBuild:next",
+		"sourceBuild",
 		"connect:test",
 		"watch"
 	]);

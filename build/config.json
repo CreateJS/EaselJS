@@ -49,5 +49,9 @@
 
 	"livereload_watch": [
         "../{examples,extras}/{,*/}*.{png,jpg,jpeg,gif,webp,svg,ogg,mp3,js,css,html}"
+	],
+
+	"watch_exclude_files": [
+		"!../src/easeljs/version*.js"
 	]
 }
