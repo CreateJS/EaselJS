@@ -62,13 +62,13 @@ describe("Graphics", function () {
 	it("bezierCurveTo()", function (done) {
 		this.g.beginFill(this.fColor).beginStroke(this.sColor).moveTo(25, 25).bezierCurveTo(45, 175, 125, 75, 25, 25);
 
-		this.compareBaseLine("assets/bezierCurveTo.png", done, expect);
+		this.compareBaseLine("assets/bezierCurveTo.png", done, expect, 0.008);
 	});
 
 	it("quadraticCurveTo() / curveTo()", function (done) {
 		this.g.beginFill(this.fColor).beginStroke(this.sColor).moveTo(5, 5).quadraticCurveTo(200, 20, 190, 190).endStroke();
 
-		this.compareBaseLine("assets/quadraticCurveTo.png", done, expect);
+		this.compareBaseLine("assets/quadraticCurveTo.png", done, expect, 0.008 );
 	});
 
 	it("decodePath()", function (done) {

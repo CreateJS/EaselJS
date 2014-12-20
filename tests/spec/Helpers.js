@@ -1,5 +1,5 @@
 beforeEach(function (done) {
-	this.assetsBasePath = "art/";
+	this.assetsBasePath = "_assets/art/";
 
 	this.sColor = "#000";
 	this.fColor = "#ff0000";
@@ -8,11 +8,19 @@ beforeEach(function (done) {
 
 	jasmine.addMatchers(imagediff.jasmine);
 
-	this.img = new Image();
-	this.img.onload = function () {
+	var img = this.img = new Image();
+
+	img.onload = function () {
 		done();
-	}
-	this.img.src = this.assetsBasePath+"daisy.png";
+	};
+
+	img.onerror = function () {
+		fail(img.src + ' failed to load');
+		done();
+	};
+
+	img.src = this.assetsBasePath + "daisy.png";
+
 	/**
 	 * Compare each drawing to a pre-saved base line image.
 	 * Need to has a small tolerance (100),
@@ -30,11 +38,15 @@ beforeEach(function (done) {
 		img.src = path;
 		img.onload = function () {
 			var pixels = this.width * this.height;
-			var tolerance = pixels * (pixelTolerance == null ? .005 : pixelTolerance);
+			var tolerance = pixels * (typeof pixelTolerance === 'undefined' ? 0.005 : pixelTolerance);
 			expect(stage.canvas).toImageDiffEqual(this, tolerance);
 			done();
-		}
-	}
+		};
+		img.onerror = function(){
+			fail(img.src + ' failed to load');
+			done();
+		};
+	};
 
 	var customMatchers = {
 		toBeInRange: function(util, customEqualityTesters) {
@@ -50,7 +62,7 @@ beforeEach(function (done) {
 					}
 					return result;
 				}
-			}
+			};
 		}
 	};
 
