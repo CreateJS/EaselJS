@@ -14,6 +14,42 @@ module.exports = function (grunt) {
 				docsName: '<%= pkg.name %>_docs-<%= version %>',
 				docsZip: "<%= docsName %>.zip",
 
+				// Setup watch to watch the source and rebuild when it changes.  Also livereload
+				watch: {
+					js: {
+						files: [getConfigValue('easel_source'),
+							getConfigValue('movieclip_source'),
+							getConfigValue('watch_exclude_files')
+						],
+						tasks: ['sourceBuild'],
+						options: {
+							livereload: '<%= connect.options.livereload %>'
+						}
+					},
+					livereload: {
+						files: getConfigValue('livereload_watch'),
+						options: {
+							livereload: '<%= connect.options.livereload %>'
+						}
+					}
+				},
+
+				// Setup the connect webserver with livereload
+				connect: {
+					options: {
+						port: 9000,
+						// Change this to '0.0.0.0' for non-local access.
+						hostname: '127.0.0.1',
+						livereload: 35729
+					},
+					test: {
+						options: {
+							base: getConfigValue('connect_root'),
+							open: true
+						}
+					}
+				},
+
 				// Setup Uglify for JS minification.
 				uglify: {
 					options: {
@@ -245,6 +281,8 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-clean')
+	grunt.loadNpmTasks('grunt-contrib-connect');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadTasks('tasks/');
 
 	grunt.registerTask('exportScriptTags', function() {
@@ -300,7 +338,7 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('nextlib', [
-		"updateversion", "combine", "uglify", "clearversion", "copy:src"
+		"sourceBuild"
 	]);
 
 	/**
@@ -322,8 +360,17 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('coreBuild', [
-		"updateversion", "combine", "uglify", "clearversion", "docs", "copy:src"
+		"docs", "sourceBuild"
 	]);
+
+	/**
+	 * Main source build task
+	 *
+	 */
+	grunt.registerTask('sourceBuild', [
+		"updateversion", "combine", "uglify", "clearversion",  "copy:src"
+	]);
+	
 
 	/**
 	 * Task for exporting combined view.
@@ -331,6 +378,16 @@ module.exports = function (grunt) {
 	 */
 	grunt.registerTask('combine', 'Combine all source into a single, un-minified file.', [
 		"concat"
+	]);
+
+	/**
+	 * Task for starting a webserver, watching source files and livereloading.
+	 *
+	 */
+	grunt.registerTask('serve', 'Start a webserver and watch the source files for changes.', [
+		"sourceBuild",
+		"connect:test",
+		"watch"
 	]);
 
 };
