@@ -1,6 +1,8 @@
 .DS_Store
 build/output/
 build/tmp/
+tests/_SpecRunner.html
+tests/.grunt/
 docs/**/
 *TMP*
 node_modules/

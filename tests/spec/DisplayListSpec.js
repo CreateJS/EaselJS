@@ -429,8 +429,11 @@ describe("DisplayList", function () {
 		var image = new Image();
 		image.onload = function () {
 			done();
-		}
-
+		};
+		image.onerror = function() {
+			fail(url + ' failed to load');
+			done();
+		};
 		image.src = url;
 		expect(image.src).not.toBe(null);
 	});
@@ -480,6 +483,10 @@ describe("DisplayList", function () {
 				_this.stage.update();
 				_this.compareBaseLine("assets/BitmapText.png", done, expect);
 			}, 5);
+		};
+		img.onerror = function() {
+			fail(img.src + ' failed to load');
+			done();
 		};
 
 		img.src = this.assetsBasePath+"spritesheet_font.png";
@@ -586,10 +593,14 @@ describe("DisplayList", function () {
 	describe("PrelaodJS can be used to load image assets", function() {
 		beforeEach(function(done) {
 			this.loader = new createjs.LoadQueue(true);
-			this.loader.addEventListener("complete", function() {
+			this.loader.on("complete", function() {
 				done();
 			});
-			this.loader.loadFile({id:"image", src:"art/daisy.png"});
+			this.loader.on("error", function(e) {
+				fail('error loading asset ' + e.message );
+				done();
+			});
+			this.loader.loadFile({id:"image", src:this.assetsBasePath + "daisy.png"});
 		});
 
 		it("loaded pngs should work", function(done) {
