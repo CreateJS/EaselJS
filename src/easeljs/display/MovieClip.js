@@ -90,6 +90,7 @@ this.createjs = this.createjs||{};
 	 **/
 	function MovieClip(mode, startPosition, loop, labels) {
 		this.Container_constructor();
+		!MovieClip.inited&&MovieClip.init(); // static init
 		
 		
 	// public properties:
@@ -285,6 +286,19 @@ this.createjs = this.createjs||{};
 	 * @readonly
 	 **/
 	MovieClip.SYNCHED = "synched";
+	
+	
+// static properties:
+	MovieClip.inited = false;
+	
+	
+// static methods:
+	MovieClip.init = function() {
+		if (MovieClip.inited) { return; }
+		// plugins introduce some overhead to Tween, so we only install this if an MC is instantiated.
+		MovieClipPlugin.install();
+		MovieClip.inited = true;
+	};
 	
 	
 // getter / setters:
@@ -657,5 +671,4 @@ this.createjs = this.createjs||{};
 		return (ratio == 1 ? endValues[prop] : startValues[prop]);
 	};
 
-	MovieClipPlugin.install();
 }());
