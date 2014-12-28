@@ -1,8 +1,8 @@
 ## Setup and run tests ##
 * Run via Grunt
-    * Install dependencies; npm install;
-    * Run tests in browser: grunt;
-    * Run headless: grunt jasmine;
+    * Install dependencies: `npm install`
+    * Run tests in browser: `grunt`
+    * Run headless: `grunt headless`
     
 ### Install headless version ###
 * node-canvas is required for headless testing.
