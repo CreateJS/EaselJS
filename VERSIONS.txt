@@ -1,5 +1,7 @@
 Version NEXT [not yet released]
 ****************************************************************************************************
+- added Graphics.StrokeDash and Graphics.setStrokeDash()
+- Graphics no longer appends redundant StrokeStyle commands
 
 
 

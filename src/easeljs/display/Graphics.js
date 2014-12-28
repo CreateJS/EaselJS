@@ -111,7 +111,7 @@ this.createjs = this.createjs||{};
 	 *     <tr><td>rf</td><td>{{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} </td>
 	 *     <td>bf</td><td>{{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} </td></tr>
 	 *     <tr><td>ef</td><td>{{#crossLink "Graphics/endFill"}}{{/crossLink}} </td>
-	 *     <td>ss</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} </td></tr>
+	 *     <td>ss / sd</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} / {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} </td></tr>
 	 *     <tr><td>s</td><td>{{#crossLink "Graphics/beginStroke"}}{{/crossLink}} </td>
 	 *     <td>ls</td><td>{{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} </td></tr>
 	 *     <tr><td>rs</td><td>{{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} </td>
@@ -153,16 +153,37 @@ this.createjs = this.createjs||{};
 		/**
 		 * @property _stroke
 		 * @protected
-		 * @type {Array}
+		 * @type {Stroke}
 		 **/
 		this._stroke = null;
 
 		/**
 		 * @property _strokeStyle
 		 * @protected
-		 * @type {Array}
+		 * @type {StrokeStyle}
 		 **/
 		this._strokeStyle = null;
+		
+		/**
+		 * @property _oldStrokeStyle
+		 * @protected
+		 * @type {StrokeStyle}
+		 **/
+		this._oldStrokeStyle = null;
+		
+		/**
+		 * @property _strokeDash
+		 * @protected
+		 * @type {StrokeDash}
+		 **/
+		this._strokeDash = null;
+		
+		/**
+		 * @property _oldStrokeDash
+		 * @protected
+		 * @type {StrokeDash}
+		 **/
+		this._oldStrokeDash = null;
 
 		/**
 		 * @property _strokeIgnoreScale
@@ -174,7 +195,7 @@ this.createjs = this.createjs||{};
 		/**
 		 * @property _fill
 		 * @protected
-		 * @type {Array}
+		 * @type {Fill}
 		 **/
 		this._fill = null;
 
@@ -320,7 +341,6 @@ this.createjs = this.createjs||{};
 	 * @type {Object}
 	 **/
 	Graphics.BASE_64 = {"A":0,"B":1,"C":2,"D":3,"E":4,"F":5,"G":6,"H":7,"I":8,"J":9,"K":10,"L":11,"M":12,"N":13,"O":14,"P":15,"Q":16,"R":17,"S":18,"T":19,"U":20,"V":21,"W":22,"X":23,"Y":24,"Z":25,"a":26,"b":27,"c":28,"d":29,"e":30,"f":31,"g":32,"h":33,"i":34,"j":35,"k":36,"l":37,"m":38,"n":39,"o":40,"p":41,"q":42,"r":43,"s":44,"t":45,"u":46,"v":47,"w":48,"x":49,"y":50,"z":51,"0":52,"1":53,"2":54,"3":55,"4":56,"5":57,"6":58,"7":59,"8":60,"9":61,"+":62,"/":63};
-
 
 	/**
 	 * Maps numeric values for the caps parameter of {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} to
@@ -584,7 +604,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clear = function() {
 		this._instructions.length = this._activeInstructions.length = this._commitIndex = 0;
-		this._strokeStyle = this._stroke = this._fill = null;
+		this._strokeStyle = this._stroke = this._fill = this._strokeDash = null;
 		this._dirty = this._strokeIgnoreScale = false;
 		return this;
 	};
@@ -680,10 +700,10 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Sets the stroke style for the current sub-path. Like all drawing methods, this can be chained, so you can define
+	 * Sets the stroke style. Like all drawing methods, this can be chained, so you can define
 	 * the stroke style and color in a single line of code like so:
 	 *
-	 *      myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
+	 * 	myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
 	 *
 	 * A tiny API method "ss" also exists.
 	 * @method setStrokeStyle
@@ -708,6 +728,26 @@ this.createjs = this.createjs||{};
 		// ignoreScale lives on Stroke, not StrokeStyle, so we do a little trickery:
 		if (this._stroke) { this._stroke.ignoreScale = ignoreScale; }
 		this._strokeIgnoreScale = ignoreScale;
+		return this;
+	};
+	
+	/**
+	 * Sets or clears the stroke dash pattern.
+	 *
+	 * 	myGraphics.setStrokeDash([20, 10], 0);
+	 *
+	 * A tiny API method `sd` also exists.
+	 * @method setStrokeDash
+	 * @param {Array} [segments] An array specifying the dash pattern, alternating between line and gap.
+	 * For example, `[20,10]` would create a pattern of 20 pixel lines with 10 pixel gaps between them.
+	 * Passing null or an empty array will clear the existing stroke dash.
+	 * @param {Number} [offset=0] The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	 **/
+	p.setStrokeDash = function(segments, offset) {
+		this._updateInstructions(true);
+		this._strokeDash = this.command = new G.StrokeDash(segments, offset);
 		return this;
 	};
 
@@ -803,8 +843,6 @@ this.createjs = this.createjs||{};
 	p.endStroke = function() {
 		return this.beginStroke();
 	};
-
-
 
 	/**
 	 * Maps the familiar ActionScript <code>curveTo()</code> method to the functionally similar {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}}
@@ -1118,6 +1156,7 @@ this.createjs = this.createjs||{};
 		o.command = this.command;
 		o._stroke = this._stroke;
 		o._strokeStyle = this._strokeStyle;
+		o._strokeDash = this._strokeDash;
 		o._strokeIgnoreScale = this._strokeIgnoreScale;
 		o._fill = this._fill;
 		o._instructions = this._instructions.slice();
@@ -1339,6 +1378,19 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p.ss = p.setStrokeStyle;
+	
+	/**
+	 * Shortcut to setStrokeDash.
+	 * @method sd
+	 * @param {Array} [segments] An array specifying the dash pattern, alternating between line and gap.
+	 * For example, [20,10] would create a pattern of 20 pixel lines with 10 pixel gaps between them.
+	 * Passing null or an empty array will clear any existing dash.
+	 * @param {Number} [offset=0] The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	 * @protected
+	 **/
+	p.sd = p.setStrokeDash;
 
 	/**
 	 * Shortcut to beginStroke.
@@ -1528,8 +1580,18 @@ this.createjs = this.createjs||{};
 			for (var i=0; i<l; i++) { instr[i+ll] = active[i]; }
 
 			if (this._fill) { instr.push(this._fill); }
-			if (this._stroke && this._strokeStyle) { instr.push(this._strokeStyle); }
-			if (this._stroke) { instr.push(this._stroke); }
+			if (this._stroke) {
+				// doesn't need to be re-applied if it hasn't changed.
+				if (this._strokeDash !== this._oldStrokeDash) {
+					this._oldStrokeDash = this._strokeDash;
+					instr.push(this._strokeDash);
+				}
+				if (this._strokeStyle !== this._oldStrokeStyle) {
+					this._oldStrokeStyle = this._strokeStyle;
+					instr.push(this._strokeStyle);
+				}
+				instr.push(this._stroke);
+			}
 
 			this._dirty = false;
 		}
@@ -1949,9 +2011,9 @@ this.createjs = this.createjs||{};
 	 * @class StrokeStyle
 	 * @constructor
 	 * @param {Number} width
-	 * @param {String} caps
-	 * @param {String} joints
-	 * @param {Number} miterLimit
+	 * @param {String} [caps]
+	 * @param {String} [joints]
+	 * @param {Number} [miterLimit]
 	 **/
 	/**
 	 * @property width
@@ -1984,6 +2046,45 @@ this.createjs = this.createjs||{};
 		ctx.miterLimit = (this.miterLimit == null ? "10" : this.miterLimit);
 	};
 	p.path = false;
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class StrokeDash
+	 * @constructor
+	 * @param {Array} [segments]
+	 * @param {Number} [offset=0]
+	 **/
+	/**
+	 * @property segments
+	 * @type Array
+	 */
+	/**
+	 * @property offset
+	 * @type Number
+	 */
+	/**
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx
+	 */
+	(G.StrokeDash = function(segments, offset) {
+		this.segments = segments;
+		this.offset = offset||0;
+	}).prototype.exec = function(ctx) {
+		if (ctx.setLineDash) { // feature detection.
+			ctx.setLineDash(this.segments|| G.StrokeDash.EMPTY_SEGMENTS); // instead of [] to reduce churn.
+			ctx.lineDashOffset = this.offset||0;
+		}
+	};
+	/**
+	 * The default value for segments (ie. no dash).
+	 * @property EMPTY_SEGMENTS
+	 * @static
+	 * @final
+	 * @readonly
+	 * @protected
+	 * @type {Array}
+	 **/
+	G.StrokeDash.EMPTY_SEGMENTS = [];
 
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.

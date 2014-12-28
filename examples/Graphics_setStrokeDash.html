@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EaselJS: Marching Ants</title>
+
+	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../_assets/js/examples.js"></script>
+
+	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+
+<script id="editable">
+	var stage, dashCmd;
+	function init() {
+		stage = new createjs.Stage("myCanvas");
+		
+		var shape = new createjs.Shape();
+		stage.addChild(shape);
+		
+		// set a stroke dash, and save the command object:
+		dashCmd = shape.graphics.setStrokeDash([7,3]).command;
+		// draw a couple of rectangles with the stroke dash:
+		shape.graphics.setStrokeStyle(2).beginStroke("black").rect(20,20,100,100);
+		// this rectangle is drawn backwards, which will reverse the direction of the effect:
+		shape.graphics.setStrokeStyle(4).beginStroke("blue").rect(240,20,-100,100);
+		
+		// reset the stroke dash, and draw a red rectangle:
+		shape.graphics.setStrokeDash();
+		shape.graphics.setStrokeStyle(4).beginStroke("red").rect(260,20,100,100);
+		
+		// dotted dash:
+		shape.graphics.setStrokeDash([2,2]);
+		shape.graphics.setStrokeStyle(2).beginStroke("green").rect(380,20,100,100);
+		
+		createjs.Ticker.timingMode = createjs.Ticker.RAF;
+		createjs.Ticker.on("tick", tick, this);
+	}
+
+	function tick(evt) {
+		// increment the offset to animate the marching ants:
+		dashCmd.offset++;
+		// update the stage:
+		stage.update(evt);
+	}
+
+</script>
+
+</head>
+<body onload="init()">
+
+<header class="EaselJS">
+	<h1>Marching Ants</h1>
+
+	<p>This example uses <code>Graphics.setStrokeDash()</code> and <code>Graphics.command</code> to create a marching ants effect.</p>
+</header>
+
+<canvas id="myCanvas" width="960" height="400"></canvas>
+
+</body>
+</html>
