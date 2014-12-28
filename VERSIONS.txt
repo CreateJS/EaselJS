@@ -1,5 +1,10 @@
 Version NEXT [not yet released]
 ****************************************************************************************************
+CRITICAL (may break existing content):
+- Graphics.command now returns null after empty fill / stroke calls.
+
+*****
+OTHER:
 - added Graphics.StrokeDash and Graphics.setStrokeDash()
 - Graphics no longer appends redundant StrokeStyle commands
 

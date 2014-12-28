@@ -1609,7 +1609,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p._setFill = function(fill) {
 		this._updateInstructions(true);
-		if (this._fill = fill) { this.command = fill; }
+		this.command = this._fill = fill;
 		return this;
 	};
 
@@ -1620,8 +1620,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p._setStroke = function(stroke) {
 		this._updateInstructions(true);
-		if (this._stroke = stroke) {
-			this.command = stroke;
+		if (this.command = this._stroke = stroke) {
 			stroke.ignoreScale = this._strokeIgnoreScale;
 		}
 		return this;
