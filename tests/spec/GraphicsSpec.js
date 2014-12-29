@@ -209,6 +209,12 @@ describe("Graphics", function () {
 		this.compareBaseLine("assets/setStrokeStyle.png", done, expect);
 	});
 
+	it("setStrokeDash()", function(done) {
+		this.g.setStrokeDash([7, 3]);
+		this.g.setStrokeStyle(5).beginStroke("black").rect(10, 10, 150, 150);
+		this.compareBaseLine("assets/setStrokeDash.png", done, expect, 0.008);
+	});
+
 	describe("tiny api", function () {
 		it('moveTo should equal mt', function () {
 			expect(this.g['moveTo']).toBe(this.g['mt']);
