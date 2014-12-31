@@ -350,7 +350,7 @@ this.createjs = this.createjs||{};
 		 * or {{#crossLink "updateCache"}}{{/crossLink}} is called on the display object, and only apply to the area that is
 		 * cached.
 		 * @property filters
-		 * @type {Array}
+		 * @type {Filter[]}
 		 * @default null
 		 **/
 		this.filters = null;

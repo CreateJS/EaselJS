@@ -64,7 +64,7 @@ this.createjs = this.createjs || {};
 	 * @class AlphaMaskFilter
 	 * @extends Filter
 	 * @constructor
-	 * @param {Image} mask
+	 * @param {HTMLImageElement|HTMLCanvasElement} mask
 	 **/
 	function AlphaMaskFilter(mask) {
 	
@@ -73,7 +73,7 @@ this.createjs = this.createjs || {};
 		/**
 		 * The image (or canvas) to use as the mask.
 		 * @property mask
-		 * @type Image
+		 * @type HTMLImageElement|HTMLCanvasElement
 		 **/
 		this.mask = mask;
 	}

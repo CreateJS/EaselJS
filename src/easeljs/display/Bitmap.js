@@ -59,7 +59,7 @@ this.createjs = this.createjs||{};
 	 * @class Bitmap
 	 * @extends DisplayObject
 	 * @constructor
-	 * @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to
+	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to
 	 * display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use.
 	 * If it is a URI, a new Image object will be constructed and assigned to the .image property.
 	 **/
@@ -72,7 +72,7 @@ this.createjs = this.createjs||{};
 		 * The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially
 		 * mobile browsers) support drawing video to a canvas.
 		 * @property image
-		 * @type Image | HTMLCanvasElement | HTMLVideoElement
+		 * @type HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
 		 **/
 		if (typeof imageOrUri == "string") {
 			this.image = document.createElement("img");

@@ -354,7 +354,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @final
 	 * @readonly
-	 * @type {Array}
+	 * @type {String[]}
 	 **/
 	Graphics.STROKE_CAPS_MAP = ["butt", "round", "square"];
 
@@ -370,7 +370,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @final
 	 * @readonly
-	 * @type {Array}
+	 * @type {String[]}
 	 **/
 	Graphics.STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
 
@@ -391,7 +391,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
 	 * @method getInstructions
-	 * @return {Array}
+	 * @return {Object[]}
 	 * @deprecated
 	 **/
 	p.getInstructions = function() {
@@ -405,7 +405,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * This property is mainly intended for introspection of the instructions (ex. for graphics export).
 	 * @property instructions
-	 * @type {Array}
+	 * @type {Object[]}
 	 * @readonly
 	 **/
 	try {
@@ -630,9 +630,9 @@ this.createjs = this.createjs||{};
 	 *
 	 * A tiny API method "lf" also exists.
 	 * @method beginLinearGradientFill
-	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient
+	 * @param {String[]} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient
 	 * drawing from red to blue.
-	 * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw
+	 * @param {Number[]} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw
 	 * the first color to 10% then interpolating to the second color at 90%.
 	 * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
 	 * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
@@ -653,9 +653,9 @@ this.createjs = this.createjs||{};
 	 *
 	 * A tiny API method "rf" also exists.
 	 * @method beginRadialGradientFill
-	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+	 * @param {String[]} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
 	 * a gradient drawing from red to blue.
-	 * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+	 * @param {Number[]} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
 	 * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
 	 * @param {Number} x0 Center position of the inner circle that defines the gradient.
 	 * @param {Number} y0 Center position of the inner circle that defines the gradient.
@@ -773,9 +773,9 @@ this.createjs = this.createjs||{};
 	 *
 	 * A tiny API method "ls" also exists.
 	 * @method beginLinearGradientStroke
-	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+	 * @param {String[]} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
 	 * a gradient drawing from red to blue.
-	 * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+	 * @param {Number[]} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
 	 * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
 	 * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
 	 * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
@@ -798,9 +798,9 @@ this.createjs = this.createjs||{};
 	 *
 	 * A tiny API method "rs" also exists.
 	 * @method beginRadialGradientStroke
-	 * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+	 * @param {String[]} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
 	 * a gradient drawing from red to blue.
-	 * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+	 * @param {Number[]} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
 	 * 0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color
 	 * to 100%.
 	 * @param {Number} x0 Center position of the inner circle that defines the gradient.
@@ -1936,8 +1936,8 @@ this.createjs = this.createjs||{};
 	 * Creates a linear gradient style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
 	 * See {{#crossLink "Graphics/beginLinearGradientFill"}}{{/crossLink}} for more information.
 	 * @method linearGradient
-	 * @param {Array} colors
-	 * @param {Array} ratios
+	 * @param {Number[]} colors
+	 * @param {Number[]} ratios
 	 * @param {Number} x0
 	 * @param {Number} y0
 	 * @param {Number} x1
@@ -1954,8 +1954,8 @@ this.createjs = this.createjs||{};
 	 * Creates a radial gradient style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
 	 * See {{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} for more information.
 	 * @method radialGradient
-	 * @param {Array} colors
-	 * @param {Array} ratios
+	 * @param {Number[]} colors
+	 * @param {Number[]} ratios
 	 * @param {Number} x0
 	 * @param {Number} y0
 	 * @param {Number} r0
@@ -1974,7 +1974,7 @@ this.createjs = this.createjs||{};
 	 * Creates a bitmap fill style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
 	 * See {{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} for more information.
 	 * @method bitmap
-	 * @param {Image} image
+	 * @param {HTMLImageElement} image
 	 * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
 	 * @return {Fill} Returns this Fill object for chaining or assignment.
 	 */
@@ -2020,8 +2020,8 @@ this.createjs = this.createjs||{};
 	 * Creates a linear gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
 	 * See {{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} for more information.
 	 * @method linearGradient
-	 * @param {Array} colors
-	 * @param {Array} ratios
+	 * @param {Number[]} colors
+	 * @param {Number[]} ratios
 	 * @param {Number} x0
 	 * @param {Number} y0
 	 * @param {Number} x1
@@ -2033,8 +2033,8 @@ this.createjs = this.createjs||{};
 	 * Creates a radial gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
 	 * See {{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} for more information.
 	 * @method radialGradient
-	 * @param {Array} colors
-	 * @param {Array} ratios
+	 * @param {Number[]} colors
+	 * @param {Number[]} ratios
 	 * @param {Number} x0
 	 * @param {Number} y0
 	 * @param {Number} r0
@@ -2048,7 +2048,7 @@ this.createjs = this.createjs||{};
 	 * Creates a bitmap fill style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
 	 * See {{#crossLink "Graphics/beginBitmapStroke"}}{{/crossLink}} for more information.
 	 * @method bitmap
-	 * @param {Image} image
+	 * @param {HTMLImageElement} image
 	 * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
 	 * @return {Fill} Returns this Stroke object for chaining or assignment.
 	 */

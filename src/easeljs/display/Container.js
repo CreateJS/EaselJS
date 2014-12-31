@@ -65,7 +65,7 @@ this.createjs = this.createjs||{};
 		 * {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is
 		 * included for advanced uses.
 		 * @property children
-		 * @type Array
+		 * @type DisplayObject[]
 		 * @default null
 		 **/
 		this.children = [];
@@ -180,7 +180,7 @@ this.createjs = this.createjs||{};
 	 * 		container.addChild(bitmapInstance, shapeInstance, textInstance);
 	 *
 	 * @method addChild
-	 * @param {DisplayObject} child The display object to add.
+	 * @param {DisplayObject|...DisplayObject} child The display object to add.
 	 * @return {DisplayObject} The child that was added, or the last child if multiple children were added.
 	 **/
 	p.addChild = function(child) {
@@ -217,7 +217,7 @@ this.createjs = this.createjs||{};
 	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
 	 *
 	 * @method addChildAt
-	 * @param {DisplayObject} child The display object to add.
+	 * @param {DisplayObject|...DisplayObject} child The display object to add.
 	 * @param {Number} index The index to add the child at.
 	 * @return {DisplayObject} Returns the last child that was added, or the last child if multiple children were added.
 	 **/
@@ -250,7 +250,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * Returns true if the child (or children) was removed, or false if it was not in the display list.
 	 * @method removeChild
-	 * @param {DisplayObject} child The child to remove.
+	 * @param {DisplayObject|...DisplayObject} child The child to remove.
 	 * @return {Boolean} true if the child (or children) was removed, or false if it was not in the display list.
 	 **/
 	p.removeChild = function(child) {
@@ -276,7 +276,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * Returns true if the child (or children) was removed, or false if any index was out of range.
 	 * @method removeChildAt
-	 * @param {Number} index The index of the child to remove.
+	 * @param {Number|...Number} index The index of the child to remove.
 	 * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
 	 **/
 	p.removeChildAt = function(index) {
@@ -523,7 +523,7 @@ this.createjs = this.createjs||{};
 	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are
 	 * reverted to their defaults (for example .parent).
 	 * @method clone
-	 * @param {Boolean} recursive If true, all of the descendants of this container will be cloned recursively. If false, the
+	 * @param {Boolean} [recursive=false] If true, all of the descendants of this container will be cloned recursively. If false, the
 	 * properties of the container will be cloned, but the new instance will not have any children.
 	 * @return {Container} A clone of the current Container instance.
 	 **/

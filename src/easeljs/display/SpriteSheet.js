@@ -309,7 +309,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Use the {{#crossLink "SpriteSheet/animations:property"}}{{/crossLink}} property instead.
 	 * @method getAnimations
-	 * @return {Array}
+	 * @return {String[]}
 	 * @deprecated
 	 **/
 	p.getAnimations = function() {
@@ -319,7 +319,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Returns an array of all available animation names available on this sprite sheet as strings.
 	 * @property animations
-	 * @type {Array}
+	 * @type {String[]}
 	 * @readonly
 	 **/
 	try {

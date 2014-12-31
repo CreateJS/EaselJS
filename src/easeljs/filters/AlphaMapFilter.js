@@ -64,7 +64,7 @@ this.createjs = this.createjs || {};
 	 * @class AlphaMapFilter
 	 * @extends Filter
 	 * @constructor
-	 * @param {Image|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
+	 * @param {HTMLImageElement|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
 	 * result. This should be exactly the same dimensions as the target.
 	 **/
 	function AlphaMapFilter(alphaMap) {
@@ -75,7 +75,7 @@ this.createjs = this.createjs || {};
 		 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
 		 * dimensions as the target.
 		 * @property alphaMap
-		 * @type Image|HTMLCanvasElement
+		 * @type HTMLImageElement|HTMLCanvasElement
 		 **/
 		this.alphaMap = alphaMap;
 		
@@ -84,7 +84,7 @@ this.createjs = this.createjs || {};
 		/**
 		 * @property _alphaMap
 		 * @protected
-		 * @type Image|HTMLCanvasElement
+		 * @type HTMLImageElement|HTMLCanvasElement
 		 **/
 		this._alphaMap = null;
 		
