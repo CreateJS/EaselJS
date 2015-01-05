@@ -65,7 +65,7 @@ this.createjs = this.createjs||{};
 		 * {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is
 		 * included for advanced uses.
 		 * @property children
-		 * @type DisplayObject[]
+		 * @type Array
 		 * @default null
 		 **/
 		this.children = [];

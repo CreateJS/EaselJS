@@ -187,7 +187,7 @@ this.createjs = this.createjs||{};
 		/**
 		 * An array of bounds for each frame in the MovieClip. This is mainly intended for tool output.
 		 * @property frameBounds
-		 * @type Rectangle[]
+		 * @type Array
 		 * @default null
 		 */
 		this.frameBounds = this.frameBounds||null; // TODO: Deprecated. This is for backwards support of FlashCC
@@ -305,7 +305,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
 	 * @method getLabels
-	 * @return {Object[]}
+	 * @return {Array}
 	 * @deprecated
 	 **/
 	p.getLabels = function() {
@@ -327,7 +327,7 @@ this.createjs = this.createjs||{};
 	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
 	 * Shortcut to TweenJS: Timeline.getLabels();
 	 * @property labels
-	 * @type {Object[]}
+	 * @type {Array}
 	 * @readonly
 	 **/
 	 
