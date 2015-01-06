@@ -370,7 +370,7 @@ this.createjs = this.createjs||{};
 	 *      container.addChild(bitmapInstance, shapeInstance, textInstance);
 	 *
 	 * @method addChild
-	 * @param {DisplayObject|...DisplayObject} child The display object to add.
+	 * @param {DisplayObject} child The display object to add.
 	 * @return {DisplayObject} The child that was added, or the last child if multiple children were added.
 	 **/
 	p.addChild = function(child) {
@@ -404,7 +404,7 @@ this.createjs = this.createjs||{};
 	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
 	 *
 	 * @method addChildAt
-	 * @param {DisplayObject|...DisplayObject} child The display object to add.
+	 * @param {DisplayObject} child The display object to add.
 	 * @param {Number} index The index to add the child at.
 	 * @return {DisplayObject} Returns the last child that was added, or the last child if multiple children were added.
 	 **/
