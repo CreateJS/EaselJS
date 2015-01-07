@@ -1974,7 +1974,7 @@ this.createjs = this.createjs||{};
 	 * Creates a bitmap fill style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
 	 * See {{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} for more information.
 	 * @method bitmap
-	 * @param {Image} image
+	 * @param {HTMLImageElement} image
 	 * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
 	 * @return {Fill} Returns this Fill object for chaining or assignment.
 	 */
@@ -2048,7 +2048,7 @@ this.createjs = this.createjs||{};
 	 * Creates a bitmap fill style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
 	 * See {{#crossLink "Graphics/beginBitmapStroke"}}{{/crossLink}} for more information.
 	 * @method bitmap
-	 * @param {Image} image
+	 * @param {HTMLImageElement} image
 	 * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
 	 * @return {Fill} Returns this Stroke object for chaining or assignment.
 	 */

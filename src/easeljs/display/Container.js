@@ -523,7 +523,7 @@ this.createjs = this.createjs||{};
 	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are
 	 * reverted to their defaults (for example .parent).
 	 * @method clone
-	 * @param {Boolean} recursive If true, all of the descendants of this container will be cloned recursively. If false, the
+	 * @param {Boolean} [recursive=false] If true, all of the descendants of this container will be cloned recursively. If false, the
 	 * properties of the container will be cloned, but the new instance will not have any children.
 	 * @return {Container} A clone of the current Container instance.
 	 **/

@@ -77,7 +77,7 @@ this.createjs = this.createjs || {};
 		 *
 		 * See SpriteSheet for more information on defining sprite sheet data.
 		 * @property spriteSheet
-		 * @type String
+		 * @type SpriteSheet
 		 * @default null
 		 **/
 		this.spriteSheet = spriteSheet;

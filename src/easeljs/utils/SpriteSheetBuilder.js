@@ -434,7 +434,7 @@ this.createjs = this.createjs||{};
 	 * @method _fillRow
 	 * @param {Array} frames
 	 * @param {Number} y
-	 * @param {Image} img
+	 * @param {HTMLImageElement} img
 	 * @param {Object} dataFrames
 	 * @param {Number} pad
 	 * @protected

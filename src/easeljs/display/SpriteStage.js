@@ -523,7 +523,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Clears an image's texture to free it up for garbage collection.
 	 * @method clearImageTexture
-	 * @param  {Image} image
+	 * @param  {HTMLImageElement} image
 	 **/
 	p.clearImageTexture = function(image) {
 		image.__easeljs_texture = null;
