@@ -702,7 +702,7 @@ this.createjs = this.createjs||{};
 	 * @param {MouseEvent} e
 	 **/
 	p._handleMouseUp = function(e) {
-		this._handlePointerUp(-1, e, false);
+		this._handlePointerUp(event.button, e, false);
 	};
 
 	/**
@@ -739,7 +739,7 @@ this.createjs = this.createjs||{};
 	 * @param {MouseEvent} e
 	 **/
 	p._handleMouseDown = function(e) {
-		this._handlePointerDown(-1, e, e.pageX, e.pageY);
+		this._handlePointerDown(event.button, e, e.pageX, e.pageY);
 	};
 
 	/**
