@@ -299,19 +299,24 @@ this.createjs = this.createjs||{};
 	 * @method dispatchEvent
 	 * @param {Object | String | Event} eventObj An object with a "type" property, or a string type.
 	 * While a generic object will work, it is recommended to use a CreateJS Event instance. If a string is used,
-	 * dispatchEvent will construct an Event instance with the specified type.
-	 * @return {Boolean} Returns the value of eventObj.defaultPrevented.
+	 * dispatchEvent will construct an Event instance if necessary with the specified type. This latter approach can
+	 * be used to avoid event object instantiation for non-bubbling events that may not have any listeners.
+	 * @param {Boolean} [bubbles] Specifies the `bubbles` value when a string was passed to eventObj.
+	 * @param {Boolean} [cancelable] Specifies the `cancelable` value when a string was passed to eventObj.
+	 * @return {Boolean} Returns false if `preventDefault()` was called on a cancelable event, true otherwise.
 	 **/
-	p.dispatchEvent = function(eventObj) {
+	p.dispatchEvent = function(eventObj, bubbles, cancelable) {
 		if (typeof eventObj == "string") {
-			// won't bubble, so skip everything if there's no listeners:
+			// skip everything if there's no listeners and it doesn't bubble:
 			var listeners = this._listeners;
-			if (!listeners || !listeners[eventObj]) { return false; }
-			eventObj = new createjs.Event(eventObj);
+			if (!bubbles && (!listeners || !listeners[eventObj])) { return true; }
+			eventObj = new createjs.Event(eventObj, bubbles, cancelable);
 		} else if (eventObj.target && eventObj.clone) {
 			// redispatching an active event object, so clone it:
 			eventObj = eventObj.clone();
 		}
+		
+		// TODO: it would be nice to eliminate this. Maybe in favour of evtObj instanceof Event? Or !!evtObj.createEvent
 		try { eventObj.target = this; } catch (e) {} // try/catch allows redispatching of native events
 
 		if (!eventObj.bubbles || !this.parent) {
@@ -330,7 +335,7 @@ this.createjs = this.createjs||{};
 				list[i]._dispatchEvent(eventObj, 3);
 			}
 		}
-		return eventObj.defaultPrevented;
+		return !eventObj.defaultPrevented;
 	};
 
 	/**
