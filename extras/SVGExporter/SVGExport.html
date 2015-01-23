@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<title></title>
 	<script type="text/javascript" src="../../lib/easeljs-NEXT.combined.js"></script>
-	<script type="text/javascript" src="../../examples/assets/preloadjs-NEXT.min.js"></script>
+	<script type="text/javascript" src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
 	<script type="text/javascript" src="SVGExporter.js"></script>
 	<script type="text/javascript" src="../../src/easeljs/display/Graphics.js"></script>
 </head>
@@ -91,8 +91,8 @@
 		queue.on("complete", setup);
 		queue.loadManifest([
 			{id:"daisy", src:"daisy.png"},
-			{id:"bmpfont", src:"BitmapFont.png"}
-		], true, "../../examples/assets/");
+			{id:"bmpfont", src:"spritesheet_font.png"}
+		], true, "../../_assets/art/");
 		
 		function setup() {
 			stage = new c.Stage("test");
