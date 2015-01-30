@@ -167,8 +167,13 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(Sprite, createjs.DisplayObject);
 
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+	/**
+	 * Constructor alias for backwards compatibility. This method will be removed in future versions.
+	 * Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
+	 * @method initialize
+	 * @deprecated in favour of `createjs.promote()`
+	 **/
+	p.initialize = Sprite; // TODO: Deprecated. This is for backwards support of FlashCC spritesheet export.
 
 
 // events:
