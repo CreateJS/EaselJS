@@ -784,25 +784,34 @@ this.createjs = this.createjs||{};
 	 * Sets up a kid's WebGL texture.
 	 * @method _setUpKidTexture
 	 * @param {WebGLRenderingContext} ctx The canvas WebGL context object to draw into.
-	 * @param {Object} kid                The list of kids to draw.
-	 * @return {WebGLTexture}
+	 * @param {Object} kid
 	 * @protected
 	 **/
 	p._setUpKidTexture = function (ctx, kid) {
 		if (!ctx) { return null; }
 
-		var image,
-			texture = null;
+		var image;
 
 		if (kid._spritestage_compatibility === 4) {
 			image = kid.image;
 		} else if (kid._spritestage_compatibility <= 3 && kid.spriteSheet && kid.spriteSheet._images) {
 			image = kid.spriteSheet._images[0];
 		}
-
-		if (image) {
+		this._setupImageTexture(ctx, image);
+	};
+	
+	/**
+	 * Sets up an image's WebGL texture.
+	 * @method _setupImageTexture
+	 * @param {WebGLRenderingContext} ctx The canvas WebGL context object to draw into.
+	 * @param {Object} image
+	 * @return {WebGLTexture}
+	 * @protected
+	 **/
+	p._setupImageTexture = function(ctx, image) {
+		if (image && (image.complete || image.getContext || image.readyState >= 2)) {
 			// Create and use a new texture for this image if it doesn't already have one:
-			texture = image.__easeljs_texture;
+			var texture = image.__easeljs_texture;
 			if (!texture) {
 				texture = image.__easeljs_texture = ctx.createTexture();
 				ctx.bindTexture(ctx.TEXTURE_2D, texture);
@@ -812,9 +821,8 @@ this.createjs = this.createjs||{};
 				ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_WRAP_S, ctx.CLAMP_TO_EDGE);
 				ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_WRAP_T, ctx.CLAMP_TO_EDGE);
 			}
+			return texture;
 		}
-
-		return texture;
 	};
 
 	/**
@@ -838,6 +846,11 @@ this.createjs = this.createjs||{};
 		for (var i = 0, l = kids.length; i < l; i++) {
 			kid = kids[i];
 			if (!kid.isVisible()) { continue; }
+			
+			// Get the texture for this display branch:
+			var img = kid.image || (kid.spriteSheet && kid.spriteSheet._images[0]), texture = img.__easeljs_texture;
+			if (!texture && !(texture = this._setupImageTexture(ctx, img))) { continue; } // no texture available (ex. may not be loaded yet).
+			
 			mtx = kid._props.matrix;
 
 			// Get the kid's global matrix (relative to the stage):
@@ -882,8 +895,6 @@ this.createjs = this.createjs||{};
 
 			// Detect if this kid is a new display branch:
 			if (!parentMVMatrix && kid._spritestage_compatibility <= 4) {
-				// Get the texture for this display branch:
-				var texture = (image || kid.spriteSheet._images[0]).__easeljs_texture;
 
 				// Only use a new texture in the current draw call:
 				if (texture !== this._drawTexture) {
