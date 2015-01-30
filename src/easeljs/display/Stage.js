@@ -371,7 +371,7 @@ this.createjs = this.createjs||{};
 	p.update = function(props) {
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
-		if (this.dispatchEvent("drawstart")) { return; }
+		if (this.dispatchEvent("drawstart", false, true) === false) { return; }
 		createjs.DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
 		var r = this.drawRect, ctx = this.canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -422,7 +422,7 @@ this.createjs = this.createjs||{};
 	 * @param {Object} [props] An object with properties that should be copied to the event object. Should usually be a Ticker event object, or similar object with a delta property.
 	 **/
 	p.tick = function(props) {
-		if (!this.tickEnabled || this.dispatchEvent("tickstart")) { return; }
+		if (!this.tickEnabled || this.dispatchEvent("tickstart", false, true) === false) { return; }
 		var evtObj = new createjs.Event("tick");
 		if (props) {
 			for (var n in props) {

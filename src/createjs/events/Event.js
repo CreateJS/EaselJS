@@ -186,8 +186,9 @@ this.createjs = this.createjs||{};
 
 // public methods:
 	/**
-	 * Sets {{#crossLink "Event/defaultPrevented"}}{{/crossLink}} to true.
-	 * Mirrors the DOM event standard.
+	 * Sets {{#crossLink "Event/defaultPrevented"}}{{/crossLink}} to true if the event is cancelable.
+	 * Mirrors the DOM level 2 event standard. In general, cancelable events that have `preventDefault()` called will
+	 * cancel the default behaviour associated with the event.
 	 * @method preventDefault
 	 **/
 	p.preventDefault = function() {
