@@ -2,11 +2,15 @@ Version NEXT [not yet released]
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - Graphics.command now returns null after empty fill / stroke calls.
+- dispatchEvent now returns false instead of true to indicate an event had preventDefault called (DOM level 2 compatibility)
 
 *****
 OTHER:
 - added Graphics.StrokeDash and Graphics.setStrokeDash()
 - Graphics no longer appends redundant StrokeStyle commands
+- fixed an issue with preventDefault not working with drawstart and tickstart events
+- added bubbles and cancelable params to EventDispatcher.dispatchEvent()
+- reintroduced Sprite.initialize() for now, to support FlashCC spritesheet export
 
 
 
