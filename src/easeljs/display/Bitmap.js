@@ -111,7 +111,8 @@ this.createjs = this.createjs||{};
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	 **/
 	p.isVisible = function() {
-		var hasContent = this.cacheCanvas || (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
+		var image = this.image;
+		var hasContent = this.cacheCanvas || (image && (image.complete || image.getContext || image.readyState >= 2));
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	};
 
