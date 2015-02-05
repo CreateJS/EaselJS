@@ -163,7 +163,7 @@ this.createjs = this.createjs||{};
 		this._skipAdvance = false;
 		
 		
-		if (frameOrAnimation) { this.gotoAndPlay(frameOrAnimation); }
+		if (frameOrAnimation != null) { this.gotoAndPlay(frameOrAnimation); }
 	}
 	var p = createjs.extend(Sprite, createjs.DisplayObject);
 
