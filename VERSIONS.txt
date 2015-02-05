@@ -11,6 +11,9 @@ OTHER:
 - fixed an issue with preventDefault not working with drawstart and tickstart events
 - added bubbles and cancelable params to EventDispatcher.dispatchEvent()
 - reintroduced Sprite.initialize() for now, to support FlashCC spritesheet export
+- fixed an issue with stroke dash not being reset properly on Graphics.clear()
+- bitmap fills no longer throw RTEs when targeting an unloaded image
+- Sprite constructor now accepts 0 as frameOrAnimation param
 
 
 
