@@ -170,13 +170,11 @@
 
 		// Bitmap Text header.
 		// Again, the children must all share the SpriteSheet specified by the container.
-		var textContainer = new createjs.SpriteContainer(textSS);
 		var topText = new createjs.BitmapText("CLICK THE RUNNERS!", textSS);
 		topText.setTransform(10, 10);
 		var bottomText = new createjs.BitmapText("THEY WILL EXPLODE!!", textSS);
 		bottomText.setTransform(400, 350);
 
-		textContainer.addChild(topText);
 		stage.addChild(hill1, hill2, runnerContainer, bottomText, topText, sparkleContainer);
 	}
 

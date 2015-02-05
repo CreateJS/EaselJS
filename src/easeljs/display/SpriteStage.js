@@ -429,7 +429,6 @@ this.createjs = this.createjs||{};
 		if (child.parent) { child.parent.removeChild(child); }
 		child.parent = this;
 		this.children.splice(index, 0, child);
-		this._setUpKidTexture(this._webGLContext, child);
 		return child;
 	};
 
@@ -487,12 +486,6 @@ this.createjs = this.createjs||{};
 	p.draw = function(ctx, ignoreCache) {
 		if (typeof WebGLRenderingContext !== 'undefined' && (ctx === this._webGLContext || ctx instanceof WebGLRenderingContext)) {		
 			this._drawWebGLKids(this.children, ctx);
-
-			// If there is a remaining texture, draw it:
-			if (this._drawTexture) {
-				this._drawToGPU(ctx);
-			}
-
 			return true;
 		} else {
 			return this.Stage_draw(ctx, ignoreCache);
@@ -779,26 +772,6 @@ this.createjs = this.createjs||{};
 		ctx.bindBuffer(ctx.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
 		ctx.bufferData(ctx.ELEMENT_ARRAY_BUFFER, this._indices, ctx.STATIC_DRAW);
 	};
-
-	/**
-	 * Sets up a kid's WebGL texture.
-	 * @method _setUpKidTexture
-	 * @param {WebGLRenderingContext} ctx The canvas WebGL context object to draw into.
-	 * @param {Object} kid
-	 * @protected
-	 **/
-	p._setUpKidTexture = function (ctx, kid) {
-		if (!ctx) { return null; }
-
-		var image;
-
-		if (kid._spritestage_compatibility === 4) {
-			image = kid.image;
-		} else if (kid._spritestage_compatibility <= 3 && kid.spriteSheet && kid.spriteSheet._images) {
-			image = kid.spriteSheet._images[0];
-		}
-		this._setupImageTexture(ctx, image);
-	};
 	
 	/**
 	 * Sets up an image's WebGL texture.
@@ -848,8 +821,8 @@ this.createjs = this.createjs||{};
 			if (!kid.isVisible()) { continue; }
 			
 			// Get the texture for this display branch:
-			var img = kid.image || (kid.spriteSheet && kid.spriteSheet._images[0]), texture = img.__easeljs_texture;
-			if (!texture && !(texture = this._setupImageTexture(ctx, img))) { continue; } // no texture available (ex. may not be loaded yet).
+			var image = kid.image || (kid.spriteSheet && kid.spriteSheet._images[0]), texture = image.__easeljs_texture;
+			if (!texture && !(texture = this._setupImageTexture(ctx, image))) { continue; } // no texture available (ex. may not be loaded yet).
 			
 			mtx = kid._props.matrix;
 
@@ -862,8 +835,6 @@ this.createjs = this.createjs||{};
 
 			// Define the untransformed bounding box sides and get the kid's image to use for textures:
 			if (kid._spritestage_compatibility === 4) {
-				image = kid.image;
-
 				leftSide = 0;
 				topSide = 0;
 				rightSide = image.width;
@@ -871,8 +842,6 @@ this.createjs = this.createjs||{};
 			} else if (kid._spritestage_compatibility === 2) {
 				var frame = kid.spriteSheet.getFrame(kid.currentFrame),
 					rect = frame.rect;
-
-				image = frame.image;
 
 				leftSide = -frame.regX;
 				topSide = -frame.regY;
@@ -894,22 +863,10 @@ this.createjs = this.createjs||{};
 			}
 
 			// Detect if this kid is a new display branch:
-			if (!parentMVMatrix && kid._spritestage_compatibility <= 4) {
-
-				// Only use a new texture in the current draw call:
-				if (texture !== this._drawTexture) {
-
-					// Draw to the GPU if a texture is already in use:
-					if (this._drawTexture) {
-						this._drawToGPU(ctx);
-					}
-
-					this._drawTexture = texture;
-
-					ctx.activeTexture(ctx.TEXTURE0);
-					ctx.bindTexture(ctx.TEXTURE_2D, texture);
-					ctx.uniform1i(this._shaderProgram.sampler0uniform, 0);
-				}
+			if (!parentMVMatrix && kid._spritestage_compatibility <= 4 && texture !== this._drawTexture) {
+				// Draw to the GPU if a texture is already in use:
+				this._drawToGPU(ctx);
+				this._drawTexture = texture;
 			}
 
 			if (image !== null) {
@@ -950,12 +907,7 @@ this.createjs = this.createjs||{};
 				// Draw to the GPU if the maximum number of boxes per a draw has been reached:
 				if (this._currentBoxIndex === maxBoxIndex) {
 					this._drawToGPU(ctx);
-
-					// Set the draw texture again:
-					this._drawTexture = image.__easeljs_texture;
-					ctx.activeTexture(ctx.TEXTURE0);
-					ctx.bindTexture(ctx.TEXTURE_2D, this._drawTexture);
-					ctx.uniform1i(this._shaderProgram.sampler0uniform, 0);
+					this._drawTexture = texture;
 
 					// If possible, increase the amount of boxes that can be used per draw call:
 					if (this._maxBoxesPointsPerDraw < maxIndexSize) {
@@ -971,6 +923,7 @@ this.createjs = this.createjs||{};
 				maxBoxIndex = this._maxBoxesPerDraw - 1;
 			}
 		}
+		this._drawToGPU(ctx);
 	};
 
 	/**
@@ -980,7 +933,12 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._drawToGPU = function(ctx) {
+		if (!this._drawTexture) { return; }
 		var numBoxes = this._currentBoxIndex + 1;
+		
+		ctx.activeTexture(ctx.TEXTURE0);
+		ctx.bindTexture(ctx.TEXTURE_2D, this._drawTexture);
+		ctx.uniform1i(this._shaderProgram.sampler0uniform, 0);
 
 		ctx.bindBuffer(ctx.ARRAY_BUFFER, this._verticesBuffer);
 
