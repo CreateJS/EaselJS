@@ -604,7 +604,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clear = function() {
 		this._instructions.length = this._activeInstructions.length = this._commitIndex = 0;
-		this._strokeStyle = this._stroke = this._fill = this._strokeDash = null;
+		this._strokeStyle = this._oldStrokeStyle = this._stroke = this._fill = this._strokeDash = this._oldStrokeDash = null;
 		this._dirty = this._strokeIgnoreScale = false;
 		return this;
 	};
