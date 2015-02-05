@@ -675,7 +675,7 @@ this.createjs = this.createjs||{};
 	 * exists.
 	 * @method beginBitmapFill
 	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
-	 * as the pattern.
+	 * as the pattern. Must be loaded prior to creating a bitmap fill, or the fill will be empty.
 	 * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
 	 * "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat". Note that Firefox does not support "repeat-x" or
 	 * "repeat-y" (latest tests were in FF 20.0), and will default to "repeat".
@@ -822,7 +822,7 @@ this.createjs = this.createjs||{};
 	 * also exists.
 	 * @method beginBitmapStroke
 	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
-	 * as the pattern.
+	 * as the pattern. Must be loaded prior to creating a bitmap fill, or the fill will be empty.
 	 * @param {String} [repetition=repeat] Optional. Indicates whether to repeat the image in the fill area. One of
 	 * "repeat", "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
@@ -1971,16 +1971,18 @@ this.createjs = this.createjs||{};
 		return this;
 	};
 	/**
-	 * Creates a bitmap fill style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+	 * Creates a bitmap fill style and assigns it to the {{#crossLink "Fill/style:property"}}{{/crossLink}}.
 	 * See {{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} for more information.
 	 * @method bitmap
-	 * @param {HTMLImageElement} image
+	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image  Must be loaded prior to creating a bitmap fill, or the fill will be empty.
 	 * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
 	 * @return {Fill} Returns this Fill object for chaining or assignment.
 	 */
 	p.bitmap = function(image, repetition) {
-		var o = this.style = Graphics._ctx.createPattern(image, repetition||"");
-		o.props = {image:image, repetition:repetition, type:"bitmap"};
+		if (image.complete || image.getContext || image.readyState >= 2) {
+			var o = this.style = Graphics._ctx.createPattern(image, repetition || "");
+			o.props = {image: image, repetition: repetition, type: "bitmap"};
+		}
 		return this;
 	};
 	p.path = false;
