@@ -923,7 +923,9 @@ this.createjs = this.createjs||{};
 				maxBoxIndex = this._maxBoxesPerDraw - 1;
 			}
 		}
-		this._drawToGPU(ctx);
+		
+		// draw anything remaining, if this is the stage:
+		if (!parentMVMatrix) { this._drawToGPU(ctx); }
 	};
 
 	/**
