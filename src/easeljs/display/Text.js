@@ -253,7 +253,7 @@ this.createjs = this.createjs||{};
 	p.getBounds = function() {
 		var rect = this.DisplayObject_getBounds();
 		if (rect) { return rect; }
-		if (this.text == null || this.text == "") { return null; }
+		if (this.text == null || this.text === "") { return null; }
 		var o = this._drawText(null, {});
 		var w = (this.maxWidth && this.maxWidth < o.width) ? this.maxWidth : o.width;
 		var x = w * Text.H_OFFSETS[this.textAlign||"left"];
