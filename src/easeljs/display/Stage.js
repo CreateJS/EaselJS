@@ -717,11 +717,11 @@ this.createjs = this.createjs||{};
 		var nextStage = this._nextStage, o = this._getPointerData(id);
 		if (this._prevStage && owner === undefined) { return; } // redundant listener.
 		
-		if (o.down) { this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e); }
-		o.down = false;
-		
 		var target=null, oTarget = o.target;
 		if (!owner && (oTarget || nextStage)) { target = this._getObjectsUnderPoint(o.x, o.y, null, true); }
+		
+		if (o.down) { this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e, target); o.down = false; }
+		
 		if (target == oTarget) { this._dispatchMouseEvent(oTarget, "click", true, id, o, e); }
 		this._dispatchMouseEvent(oTarget, "pressup", true, id, o, e);
 		
@@ -757,14 +757,11 @@ this.createjs = this.createjs||{};
 		
 		if (pageY != null) { this._updatePointerPosition(id, e, pageX, pageY); }
 		var target = null, nextStage = this._nextStage, o = this._getPointerData(id);
+		if (!owner) { target = o.target = this._getObjectsUnderPoint(o.x, o.y, null, true); }
 
-		if (o.inBounds) { this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e); o.down = true; }
+		if (o.inBounds) { this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e, target); o.down = true; }
+		this._dispatchMouseEvent(target, "mousedown", true, id, o, e);
 		
-		if (!owner) {
-			target = o.target = this._getObjectsUnderPoint(o.x, o.y, null, true);
-			this._dispatchMouseEvent(o.target, "mousedown", true, id, o, e);
-		}
-
 		nextStage&&nextStage._handlePointerDown(id, e, pageX, pageY, owner || target && this);
 	};
 
@@ -819,19 +816,19 @@ this.createjs = this.createjs||{};
 		}
 
 		if (oldTarget != target) {
-			this._dispatchMouseEvent(oldTarget, "mouseout", true, -1, o, e);
+			this._dispatchMouseEvent(oldTarget, "mouseout", true, -1, o, e, target);
 		}
 
 		for (i=oldList.length-1; i>common; i--) {
-			this._dispatchMouseEvent(oldList[i], "rollout", false, -1, o, e);
+			this._dispatchMouseEvent(oldList[i], "rollout", false, -1, o, e, target);
 		}
 
 		for (i=list.length-1; i>common; i--) {
-			this._dispatchMouseEvent(list[i], "rollover", false, -1, o, e);
+			this._dispatchMouseEvent(list[i], "rollover", false, -1, o, e, oldTarget);
 		}
 
 		if (oldTarget != target) {
-			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e);
+			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e, oldTarget);
 		}
 		
 		nextStage&&nextStage._testMouseOver(clear, owner || target && this, eventTarget || isEventTarget && this);
@@ -861,8 +858,9 @@ this.createjs = this.createjs||{};
 	 * @param {Number} pointerId
 	 * @param {Object} o
 	 * @param {MouseEvent} [nativeEvent]
+	 * @param {DisplayObject} [relatedTarget]
 	 **/
-	p._dispatchMouseEvent = function(target, type, bubbles, pointerId, o, nativeEvent) {
+	p._dispatchMouseEvent = function(target, type, bubbles, pointerId, o, nativeEvent, relatedTarget) {
 		// TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
 		if (!target || (!bubbles && !target.hasEventListener(type))) { return; }
 		/*
@@ -871,7 +869,7 @@ this.createjs = this.createjs||{};
 		var pt = this._mtx.transformPoint(o.x, o.y);
 		var evt = new createjs.MouseEvent(type, bubbles, false, pt.x, pt.y, nativeEvent, pointerId, pointerId==this._primaryPointerID || pointerId==-1, o.rawX, o.rawY);
 		*/
-		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId === this._primaryPointerID || pointerId === -1, o.rawX, o.rawY);
+		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId === this._primaryPointerID || pointerId === -1, o.rawX, o.rawY, relatedTarget);
 		target.dispatchEvent(evt);
 	};
 

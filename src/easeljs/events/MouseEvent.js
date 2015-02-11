@@ -52,10 +52,11 @@ this.createjs = this.createjs||{};
 	 * @param {Boolean} primary Indicates whether this is the primary pointer in a multitouch environment.
 	 * @param {Number} rawX The raw x position relative to the stage.
 	 * @param {Number} rawY The raw y position relative to the stage.
+	 * @param {DisplayObject} relatedTarget The secondary target for the event.
 	 * @extends Event
 	 * @constructor
 	 **/
-	function MouseEvent(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY) {
+	function MouseEvent(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY, relatedTarget) {
 		this.Event_constructor(type, bubbles, cancelable);
 		
 		
@@ -115,6 +116,18 @@ this.createjs = this.createjs||{};
 		 * @type {Boolean}
 		 */
 		this.primary = !!primary;
+		
+		/**
+		 * The secondary target for the event, if applicable. This is used for mouseout/rollout
+		 * events to indicate the object that the mouse entered from, mouseover/rollover for the object the mouse exited,
+		 * and stagemousedown/stagemouseup events for the object that was the target of the
+		 * related mousedown/pressup event, if any.
+		 * 
+		 * Only mouse opaque objects will be returned (ie. those with mouse listeners or a cursor set).
+		 * @property relatedTarget
+		 * @type {DisplayObject}
+		 */
+		this.relatedTarget = relatedTarget;
 	}
 	var p = createjs.extend(MouseEvent, createjs.Event);
 

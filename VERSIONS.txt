@@ -3,6 +3,7 @@ Version NEXT [not yet released]
 CRITICAL (may break existing content):
 - Graphics.command now returns null after empty fill / stroke calls.
 - dispatchEvent now returns false instead of true to indicate an event had preventDefault called (DOM level 2 compatibility)
+- cursor is now inherited properly (cursors on children override parents)
 
 *****
 OTHER:
@@ -14,6 +15,7 @@ OTHER:
 - fixed an issue with stroke dash not being reset properly on Graphics.clear()
 - bitmap fills no longer throw RTEs when targeting an unloaded image
 - Sprite constructor now accepts 0 as frameOrAnimation param
+- added MouseEvent.relatedTarget
 
 
 
