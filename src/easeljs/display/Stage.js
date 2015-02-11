@@ -806,7 +806,7 @@ this.createjs = this.createjs||{};
 		t = target;
 		while (t) {
 			list.unshift(t);
-			if (t.cursor != null) { cursor = t.cursor; }
+			if (!cursor) { cursor = t.cursor; }
 			t = t.parent;
 		}
 		this.canvas.style.cursor = cursor;
