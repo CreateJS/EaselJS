@@ -120,10 +120,9 @@ this.createjs = this.createjs||{};
 		/**
 		 * The secondary target for the event, if applicable. This is used for mouseout/rollout
 		 * events to indicate the object that the mouse entered from, mouseover/rollover for the object the mouse exited,
-		 * and stagemousedown/stagemouseup events for the object that was the target of the
-		 * related mousedown/pressup event, if any.
+		 * and stagemousedown/stagemouseup events for the object that was the under the cursor, if any.
 		 * 
-		 * Only mouse opaque objects will be returned (ie. those with mouse listeners or a cursor set).
+		 * Only valid interaction targets will be returned (ie. objects with mouse listeners or a cursor set).
 		 * @property relatedTarget
 		 * @type {DisplayObject}
 		 */
