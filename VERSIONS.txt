@@ -17,6 +17,7 @@ OTHER:
 - Sprite constructor now accepts 0 as frameOrAnimation param
 - added MouseEvent.relatedTarget
 - improved handling of Bitmap load errors
+- fixed Rectangle.pad
 
 
 

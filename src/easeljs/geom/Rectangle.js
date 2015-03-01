@@ -149,10 +149,10 @@ this.createjs = this.createjs||{};
 	 * @chainable
 	*/
 	p.pad = function(top, left, bottom, right) {
-		this.x -= top;
-		this.y -= left;
-		this.width += top+bottom;
-		this.height += left+right;
+		this.x -= left;
+		this.y -= top;
+		this.width += left+right;
+		this.height += top+bottom;
 		return this;
 	};
 	
