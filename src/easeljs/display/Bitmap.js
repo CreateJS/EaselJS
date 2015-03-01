@@ -112,7 +112,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.isVisible = function() {
 		var image = this.image;
-		var hasContent = this.cacheCanvas || (image && (image.complete || image.getContext || image.readyState >= 2));
+		var hasContent = this.cacheCanvas || (image && (image.naturalWidth || image.getContext || image.readyState >= 2));
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	};
 

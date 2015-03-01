@@ -16,6 +16,7 @@ OTHER:
 - bitmap fills no longer throw RTEs when targeting an unloaded image
 - Sprite constructor now accepts 0 as frameOrAnimation param
 - added MouseEvent.relatedTarget
+- improved handling of Bitmap load errors
 
 
 
