@@ -59,28 +59,28 @@ this.createjs = this.createjs||{};
 	// public properties:
 		/** 
 		 * The color of the shadow. This can be any valid CSS color value.
-		 * property color
+		 * @property color
 		 * @type String
 		 * @default null
 		 */
 		this.color = color||"black";
 	
 		/** The x offset of the shadow.
-		 * property offsetX
+		 * @property offsetX
 		 * @type Number
 		 * @default 0
 		 */
 		this.offsetX = offsetX||0;
 	
 		/** The y offset of the shadow.
-		 * property offsetY
+		 * @property offsetY
 		 * @type Number
 		 * @default 0
 		 */
 		this.offsetY = offsetY||0;
 	
 		/** The blur of the shadow.
-		 * property blur
+		 * @property blur
 		 * @type Number
 		 * @default 0
 		 */
