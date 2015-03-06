@@ -468,8 +468,8 @@ specific tabview, see the other sections below.
    indicate private and protected items, item return types, etc. in an
    attractive and unobtrusive way. */
    .apidocs .flag {
-    background: $color_gray-darker;
-    color: $color_gray-lightest;
+	background: transparentize($color_gray-darker, 0.9);
+    color: $color_gray-darker;
     font-size: 11px;
     margin: 0 0.5em;
     padding: 4px;
