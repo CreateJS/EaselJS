@@ -23,7 +23,7 @@
 
 %fontSmoothing {
 	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;    
+	-moz-osx-font-smoothing: grayscale;
 	-moz-font-smoothing: antialiased;
 	font-smoothing: antialiased;
 }
@@ -45,7 +45,7 @@
 html { font-size: $fontSize-root; }
 
 
-body { 
+body {
 	@extend %fontSmoothing;
 	min-width: 320px;
 	background-color: $color_gray-lightest;
@@ -53,7 +53,7 @@ body {
 	font-family: $fontFamily-default;
 	&.loading { display: none; }
 }
-section {  
+section {
 	@extend %clearfix;
 	max-width:$bp_width-max;
 	
@@ -95,20 +95,10 @@ a:visited {
 		white-space: nowrap;
 	//	PSUEDO Elements & Classes
 		// Elements :: before, after, first-line, first-letter, selection
-		&::before {
-			@extend %fontSmoothing;
-			content: attr(data-label);
-		}
-		&::after {
-			content: '';
-			background-color: transparent;
-			z-index: -1;
-			position: absolute;
-			top:-0.3rem;
-			bottom:-0.3rem;
-			left: -$gridUnit-smallest / 2;
-			right: -$gridUnit-smallest / 2;
-		}
+		// &::before {
+		// 	@extend %fontSmoothing;
+		// 	content: attr(data-label);
+		// }
 		// Classes : http://css-tricks.com/almanac/
 	//	CHILDREN (Sass 3.3 Syntax Only, otherwise scope child outside this selector)
 	//	MODIFIERS
@@ -118,14 +108,9 @@ a:visited {
 }
 a:active,
 a:hover {
-	color: $color_gray-lightest;
+	color: $color_gray-darkest;
 	cursor: pointer;
-	&::after {
-		background-color: $color_gray-darker;
-	}
 }
-
-::selection {color:$color_gray-darkest;background:$color_createjs-default;}
 
 
 
@@ -134,8 +119,8 @@ a:hover {
 //	TYPE
 //
 //*******************************************
-h1 { 
-	//	EXTEND 
+h1 {
+	//	EXTEND
 	@extend %fontSmoothing;
 	//	VARS (locally scoped)
 	//	LAYOUT
@@ -157,11 +142,11 @@ h1 {
 	//	MODIFIERS
 		// Static
 		// Dynamic
-	//	BREAKPOINTS	
-  	@include bp($bp_width-600, min-) {
+	//	BREAKPOINTS
+	@include bp($bp_width-600, min-) {
 		font-size: $fontSize-larger;
 		line-height: $gridUnit-larger;
-  	}
+	}
 }
 
 h2 {
@@ -169,11 +154,11 @@ h2 {
 	@include bp($bp_width-600, max-) {
 		font-size: $fontSize-default;
 		line-height: $gridUnit-default;
-  	}
-  	@include bp($bp_width-600, min-) {
+	}
+	@include bp($bp_width-600, min-) {
 		font-size: $fontSize-large;
-  		line-height: $gridUnit-large;
-  	}
+		line-height: $gridUnit-large;
+	}
 }
 
 h3 {
@@ -217,7 +202,7 @@ h6 {
 }
 
 p {
-	//	EXTEND 
+	//	EXTEND
 	@extend %fontSmoothing;
 	//	VARS (locally scoped)
 	//	LAYOUT
@@ -241,7 +226,7 @@ p {
 	//	MODIFIERS
 		// Static
 		// Dynamic
-	//	BREAKPOINTS	
+	//	BREAKPOINTS
 	@include bp($bp_width-600) {
 		font-size: $fontSize-smaller;
 	}
@@ -302,8 +287,8 @@ pre {
 // sup {}
 // sub {}
 ul {
-	padding: 0;
-	margin: $gridUnit-smaller 0 $gridUnit-smaller 0;
+	padding:  0 0 0 $gridUnit-small;
+	margin: $gridUnit-smaller;
 }
 li {
 	@extend %fontSmoothing;
