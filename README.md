@@ -8,32 +8,35 @@ It has no external dependencies, and should be compatible with virtually any fra
 
 ## Simple Example
 
-	//Draw a square on screen.
-	var stage = new createjs.Stage('myCanvas');
-	var shape = new createjs.Shape();
-	shape.graphics.beginFill('red').drawRect(0, 0, 120, 120);
-	stage.addChild(shape);
-	stage.update();
+```javascript
+//Draw a square on screen.
+var stage = new createjs.Stage('myCanvas');
+var shape = new createjs.Shape();
+shape.graphics.beginFill('red').drawRect(0, 0, 120, 120);
+stage.addChild(shape);
+stage.update();
+```
 
 ## Sprite Animation Example
-	var ss = new createjs.SpriteSheet({
-		frames: {
-			width: 32,
-			height: 64,
-			numFrames: 19
-		},
-		animations: {run: [0, 25], jump: [26, 63, "run"]},
-		images: ["./assets/runningGrant.png"]
-	});
+```javascript
+var ss = new createjs.SpriteSheet({
+	frames: {
+		width: 32,
+		height: 64,
+		numFrames: 19
+	},
+	animations: {run: [0, 25], jump: [26, 63, "run"]},
+	images: ["./assets/runningGrant.png"]
+});
 	
-	var sprite = new createjs.Sprite(ss, "run");
-	sprite.scaleY = sprite.scaleX = 0.4;
-	stage.addChild(sprite);
+var sprite = new createjs.Sprite(ss, "run");
+sprite.scaleY = sprite.scaleX = 0.4;
+stage.addChild(sprite);
 	
-	sprite.on("click", function() { sprite.gotoAndPlay("jump"); });
+sprite.on("click", function() { sprite.gotoAndPlay("jump"); });
 	
-	createjs.Ticker.on("tick", stage);
-
+createjs.Ticker.on("tick", stage);
+```
 
 ## Support and Resources
 * Find examples and more information at the [EaselJS web site](http://easeljs.com/)
