@@ -64,7 +64,7 @@ body {
   margin: 0;
   padding: 0;
 }
- 
+
 
 /* -- Links ----------------------------------------------------------------- */
 h1 a {
@@ -78,7 +78,7 @@ h1 a {
 }
 
 /* "Jump to Table of Contents" link is shown to assistive tools, but hidden from
-   sight until it's focused. */
+sight until it's focused. */
 .jump {
   position: absolute;
   padding: 3px 6px;
@@ -107,7 +107,6 @@ samp,
 A.crosslink {
   font-family: $fontFamily-monospace;
   font-size: $fontSize-smallest;
-  line-height: $gridUnit-default;
 }
 p code,
 p kbd,
@@ -160,7 +159,7 @@ pre code { background-color: transparent !important; }
 
 
 /* Used to denote text that shouldn't be selectable, such as line numbers or
-   shell prompts. Guess which browser this doesn't work in. */
+shell prompts. Guess which browser this doesn't work in. */
 .noselect {
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
@@ -237,7 +236,7 @@ th {
 }
 /* -- Table of Contents ----------------------------------------------------- */
 /* The #toc id refers to the single global table of contents, while the .toc
-   class refers to generic TOC lists that could be used throughout the page. */
+class refers to generic TOC lists that could be used throughout the page. */
 .toc code,
 .toc kbd,
 .toc samp {
@@ -267,7 +266,7 @@ th {
 */
 /* -- Other Styles ---------------------------------------------------------- */
 /* These are probably YUI-specific, and should be moved out of Selleck's default
-   theme. */
+theme. */
 .button {
   border: 1px solid $color_gray-lighter;
   -moz-border-radius: 3px;
@@ -420,7 +419,7 @@ ul li p {
   img {
     display: inline-block;
     height: 60px;
-    margin-top: $gridUnit-small;
+    margin-bottom: $gridUnit-small;
   }
 }
 #hd a:hover {
@@ -468,201 +467,201 @@ specific tabview, see the other sections below.
 /* A flag is a compact, capsule-like indicator of some kind. It's used to
    indicate private and protected items, item return types, etc. in an
    attractive and unobtrusive way. */
-.apidocs .flag {
-  background: $color_gray-darker;
-  color: $color_gray-lightest;
-  font-size: 11px;
-  margin: 0 0.5em;
-  padding: 4px;
-  position: relative;
-  top: -2px;
-}
-/* Class/module metadata such as "Uses", "Extends", "Defined in", etc. */
-.apidocs .meta {
-  color: $color_gray-default;
-  font-size: $fontSize-smallest;
-  padding: 1em 0;
-}
-.apidocs .meta p {
-  margin: 0;
-}
-.module-class {
-  font-size: $fontSize-smaller;
-}
-/* Deprecation warning. */
-.apidocs .box.deprecated,
-.apidocs .flag.deprecated {
-  background: $color_tweenjs-default-transparent;
-  border: 1px solid #fd7775;
-  p {
-    color: $color_gray-darkest;
+   .apidocs .flag {
+	background: transparentize($color_gray-darker, 0.9);
+    color: $color_gray-darker;
+    font-size: 11px;
+    margin: 0 0.5em;
+    padding: 4px;
+    position: relative;
+    top: 0;
   }
-}
-.apidocs .box.deprecated p {
-  margin: 0.5em 0;
-}
-.apidocs .flag.deprecated {
-  color: $color_gray-darker;
-}
-/* Module/Class intro description. */
-.apidocs .intro {
+  /* Class/module metadata such as "Uses", "Extends", "Defined in", etc. */
+  .apidocs .meta {
+    color: $color_gray-default;
+    font-size: $fontSize-smallest;
+    padding: 1em 0;
+  }
+  .apidocs .meta p {
+    margin: 0;
+  }
+  .module-class {
+    font-size: $fontSize-smaller;
+  }
+  /* Deprecation warning. */
+  .apidocs .box.deprecated,
+  .apidocs .flag.deprecated {
+    background: $color_tweenjs-default-transparent;
+    border: 1px solid #fd7775;
+    p {
+      color: $color_gray-darkest;
+    }
+  }
+  .apidocs .box.deprecated p {
+    margin: 0.5em 0;
+  }
+  .apidocs .flag.deprecated {
+    color: $color_gray-darker;
+  }
+  /* Module/Class intro description. */
+  .apidocs .intro {
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
     border: medium none;
     font-family: $fontFamily-secondary;
     font-size: $fontSize-smaller;
     line-height: $gridUnit-small;
     padding: 0 !important;
-}
-/* Loading spinners. */
-#bd.loading .apidocs,
-#api-list.loading .yui3-tabview-panel {
-  background: $color_gray-lightest url(../img/spinner.gif) no-repeat center 70px;
-  min-height: 150px;
-}
-#bd.loading .apidocs .content,
-#api-list.loading .yui3-tabview-panel .apis {
-  display: none;
-}
-.apidocs .no-visible-items {
-  color: $color_gray-default;
-}
-/* Generic inline list. */
-.apidocs ul.inline {
-  display: inline;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.apidocs ul.inline li {
-  display: inline;
-}
-/* Comma-separated list. */
-.apidocs ul.commas li:after {
-  content: ',';
-  font-size: $fontSize-smaller;
-}
-.apidocs ul.commas li:last-child:after {
-  content: '';
-}
-/* Keyboard shortcuts. */
-kbd .cmd {
-  font-family: $fontFamily-monospace;
-}
-/* -- Generic Access Level styles ------------------------------------------- */
-.apidocs .item.protected,
-.apidocs .item.private,
-.apidocs .index-item.protected,
-.apidocs .index-item.deprecated,
-.apidocs .index-item.private {
-  display: none;
-}
-.show-deprecated .item.deprecated,
-.show-deprecated .index-item.deprecated,
-.show-protected .item.protected,
-.show-protected .index-item.protected,
-.show-private .item.private,
-.show-private .index-item.private {
-  display: block;
-}
-.hide-inherited .item.inherited,
-.hide-inherited .index-item.inherited {
-  display: none;
-}
-/* -- Generic Item Index styles --------------------------------------------- */
-.apidocs .index h3 {
-  border-bottom: 1px solid $color_gray-light;
-  color: $color_gray-darker;
-  font-size: 13px;
-  margin: 1em 0 0.6em;
-  padding-bottom: 2px;
-}
-.apidocs .index .no-visible-items {
-  margin-top: 2em;
-}
-.apidocs .index-list {
-  border-color: $color_gray-lighter;
-  font-size: 12px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  -moz-column-count: 4;
-  -moz-column-gap: 10px;
-  -moz-column-width: 170px;
-  -ms-column-count: 4;
-  -ms-column-gap: 10px;
-  -ms-column-width: 170px;
-  -o-column-count: 4;
-  -o-column-gap: 10px;
-  -o-column-width: 170px;
-  -webkit-column-count: 4;
-  -webkit-column-gap: 10px;
-  -webkit-column-width: 170px;
-  column-count: 4;
-  column-gap: 10px;
-  column-width: 170px;
-}
-.apidocs .no-columns .index-list {
-  -moz-column-count: 1;
-  -ms-column-count: 1;
-  -o-column-count: 1;
-  -webkit-column-count: 1;
-  column-count: 1;
-}
-.apidocs .index-item {
-  white-space: nowrap;
-}
-.apidocs .index-item .flag {
-  background: none;
-  border: none;
-  color: #afafaf;
-  display: inline;
-  margin: 0 0 0 0.2em;
-  padding: 0;
-}
-/* -- Generic API item styles ----------------------------------------------- */
-.apidocs .args {
-  display: inline;
-  margin: 0 0.5em;
-}
-.apidocs .flag.chainable {
-  background: #46ca3b;
-}
-.apidocs .flag.protected {
-  background: #9b86fc;
-}
-.apidocs .flag.private {
-  background: #fd6b1b;
-}
-.apidocs .flag.async {
-  background: $color_gray-darker;
-}
-.apidocs .flag.required {
-  background: #e60923;
-}
-.apidocs .item {
-  border-bottom: 1px solid $color_gray-lighter;
-  margin: 1.5em 0 2em;
-  padding-bottom: 2em;
-}
-.apidocs .item .description p,
-.apidocs .item pre.code {
-  margin: 1em 0 0;
-}
-.apidocs .item .description {
-  font-size: $fontSize-smaller;
-}
-.apidocs .item .meta {
-  background: none;
-  border: none;
-  padding: 0;
-}
-.apidocs .item .name {
-  display: inline;
-  font-size: 14px;
-}
-.apidocs .item .type,
-.apidocs .item .type a,
-.apidocs .returns-inline {
+  }
+  /* Loading spinners. */
+  #bd.loading .apidocs,
+  #api-list.loading .yui3-tabview-panel {
+    background: $color_gray-lightest url(../img/spinner.gif) no-repeat center 70px;
+    min-height: 150px;
+  }
+  #bd.loading .apidocs .content,
+  #api-list.loading .yui3-tabview-panel .apis {
+    display: none;
+  }
+  .apidocs .no-visible-items {
+    color: $color_gray-default;
+  }
+  /* Generic inline list. */
+  .apidocs ul.inline {
+    display: inline;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .apidocs ul.inline li {
+    display: inline;
+  }
+  /* Comma-separated list. */
+  .apidocs ul.commas li:after {
+    content: ',';
+    font-size: $fontSize-smaller;
+  }
+  .apidocs ul.commas li:last-child:after {
+    content: '';
+  }
+  /* Keyboard shortcuts. */
+  kbd .cmd {
+    font-family: $fontFamily-monospace;
+  }
+  /* -- Generic Access Level styles ------------------------------------------- */
+  .apidocs .item.protected,
+  .apidocs .item.private,
+  .apidocs .index-item.protected,
+  .apidocs .index-item.deprecated,
+  .apidocs .index-item.private {
+    display: none;
+  }
+  .show-deprecated .item.deprecated,
+  .show-deprecated .index-item.deprecated,
+  .show-protected .item.protected,
+  .show-protected .index-item.protected,
+  .show-private .item.private,
+  .show-private .index-item.private {
+    display: block;
+  }
+  .hide-inherited .item.inherited,
+  .hide-inherited .index-item.inherited {
+    display: none;
+  }
+  /* -- Generic Item Index styles --------------------------------------------- */
+  .apidocs .index h3 {
+    border-bottom: 1px solid $color_gray-light;
+    color: $color_gray-darker;
+    font-size: 13px;
+    margin: 1em 0 0.6em;
+    padding-bottom: 2px;
+  }
+  .apidocs .index .no-visible-items {
+    margin-top: 2em;
+  }
+  .apidocs .index-list {
+    border-color: $color_gray-lighter;
+    font-size: 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    -moz-column-count: 4;
+    -moz-column-gap: 10px;
+    -moz-column-width: 170px;
+    -ms-column-count: 4;
+    -ms-column-gap: 10px;
+    -ms-column-width: 170px;
+    -o-column-count: 4;
+    -o-column-gap: 10px;
+    -o-column-width: 170px;
+    -webkit-column-count: 4;
+    -webkit-column-gap: 10px;
+    -webkit-column-width: 170px;
+    column-count: 4;
+    column-gap: 10px;
+    column-width: 170px;
+  }
+  .apidocs .no-columns .index-list {
+    -moz-column-count: 1;
+    -ms-column-count: 1;
+    -o-column-count: 1;
+    -webkit-column-count: 1;
+    column-count: 1;
+  }
+  .apidocs .index-item {
+    white-space: nowrap;
+  }
+  .apidocs .index-item .flag {
+    background: none;
+    border: none;
+    color: #afafaf;
+    display: inline;
+    margin: 0 0 0 0.2em;
+    padding: 0;
+  }
+  /* -- Generic API item styles ----------------------------------------------- */
+  .apidocs .args {
+    display: inline;
+    margin: 0 0.5em;
+  }
+  .apidocs .flag.chainable {
+    background: #46ca3b;
+  }
+  .apidocs .flag.protected {
+    background: #9b86fc;
+  }
+  .apidocs .flag.private {
+    background: #fd6b1b;
+  }
+  .apidocs .flag.async {
+    background: $color_gray-darker;
+  }
+  .apidocs .flag.required {
+    background: #e60923;
+  }
+  .apidocs .item {
+    border-bottom: 1px solid $color_gray-lighter;
+    margin: 1.5em 0 2em;
+    padding-bottom: 2em;
+  }
+  .apidocs .item .description p,
+  .apidocs .item pre.code {
+    margin: 1em 0 0;
+  }
+  .apidocs .item .description {
+    font-size: $fontSize-smaller;
+  }
+  .apidocs .item .meta {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .apidocs .item .name {
+    display: inline;
+    font-size: 14px;
+  }
+  .apidocs .item .type,
+  .apidocs .item .type a,
+  .apidocs .returns-inline {
   //color: $color_gray-default;
   text-decoration: none;
   font-size: 12px;
@@ -811,12 +810,12 @@ pre.prettyprint {
   padding: 0 0 0 0.4em;
 }
 .apis a {
-    display: block;
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin: 0 0 0 -4px;
-    padding: 0.1rem 1.4em;
-    text-decoration: none;
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0 -4px;
+  padding: 0.1rem 1.4em;
+  text-decoration: none;
 }
 #api-modules.apis a {
   font-size: $fontSize-smaller;

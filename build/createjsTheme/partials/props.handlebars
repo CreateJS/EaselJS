@@ -18,6 +18,10 @@
         <span class="flag static">static</span>
     {{/if}}
 
+    {{#if readonly}}
+        <span class="flag readonly">readonly</span>
+    {{/if}}
+
     <div class="meta">
         {{#if overwritten_from}}
             <p>Inherited from
