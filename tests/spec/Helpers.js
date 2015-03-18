@@ -48,6 +48,13 @@ beforeEach(function (done) {
 		};
 	};
 
+	this.merge = function(dest, src) {
+		for (var n in src) {
+			dest[n] = src[n];
+		}
+		return dest;
+	}
+
 	var customMatchers = {
 		toBeInRange: function(util, customEqualityTesters) {
 			return {
