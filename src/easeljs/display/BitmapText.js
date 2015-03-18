@@ -223,7 +223,7 @@ this.createjs = this.createjs || {};
 	 * @protected
 	 **/
 	p._cloneProps = function(o) {
-		this.DisplayObject__cloneProps(o);
+		this.Container__cloneProps(o);
 		o.lineHeight = this.lineHeight;
 		o.letterSpacing = this.letterSpacing;
 		o.spaceWidth = this.spaceWidth;
