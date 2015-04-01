@@ -185,6 +185,8 @@ this.createjs = this.createjs||{};
 	 * 
 	 * This method works by creating an anonymous wrapper function and subscribing it with addEventListener.
 	 * The created anonymous function is returned for use with .removeEventListener (or .off).
+	 * <b>To remove a listener added with `on`, you must pass in the returned wrapper function as the listener, or use
+	 * {{#crossLink "Event/remove"}}{{/crossLink}}</b>
 	 * 
 	 * <h4>Example</h4>
 	 * 
@@ -254,6 +256,9 @@ this.createjs = this.createjs||{};
 	/**
 	 * A shortcut to the removeEventListener method, with the same parameters and return value. This is a companion to the
 	 * .on method.
+	 * 
+	 * <b>To remove a listener added with `on`, you must pass in the returned wrapper function as the listener. See 
+	 * {{#crossLink "EventDispatcher/on"}}{{/crossLink}} for an example.</b>
 	 *
 	 * @method off
 	 * @param {String} type The string type of the event.
