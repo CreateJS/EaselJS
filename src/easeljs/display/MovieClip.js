@@ -499,8 +499,8 @@ this.createjs = this.createjs||{};
 	 **/
 	p._reset = function() {
 		this._prevPos = -1;
-		this._t = 0;
-		this.currentFrame = 0;
+		this._t = this.currentFrame = 0;
+		this.paused = false;
 	};
 	
 	/**
