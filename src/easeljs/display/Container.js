@@ -302,7 +302,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * <h4>Example</h4>
 	 *
-	 *      container.removeAlLChildren();
+	 * 	container.removeAllChildren();
 	 *
 	 * @method removeAllChildren
 	 **/
