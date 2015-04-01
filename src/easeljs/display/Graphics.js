@@ -1979,7 +1979,7 @@ this.createjs = this.createjs||{};
 	 * @return {Fill} Returns this Fill object for chaining or assignment.
 	 */
 	p.bitmap = function(image, repetition) {
-		if (image.complete || image.getContext || image.readyState >= 2) {
+		if (image.naturalWidth || image.getContext || image.readyState >= 2) {
 			var o = this.style = Graphics._ctx.createPattern(image, repetition || "");
 			o.props = {image: image, repetition: repetition, type: "bitmap"};
 		}

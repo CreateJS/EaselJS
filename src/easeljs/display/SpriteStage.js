@@ -782,7 +782,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._setupImageTexture = function(ctx, image) {
-		if (image && (image.complete || image.getContext || image.readyState >= 2)) {
+		if (image && (image.naturalWidth || image.getContext || image.readyState >= 2)) {
 			// Create and use a new texture for this image if it doesn't already have one:
 			var texture = image.__easeljs_texture;
 			if (!texture) {

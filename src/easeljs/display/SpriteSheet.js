@@ -437,7 +437,7 @@ this.createjs = this.createjs||{};
 					img.src = src;
 				}
 				a.push(img);
-				if (!img.getContext && !img.complete) {
+				if (!img.getContext && !img.naturalWidth) {
 					this._loadCount++;
 					this.complete = false;
 					(function(o) { img.onload = function() { o._handleImageLoad(); } })(this);

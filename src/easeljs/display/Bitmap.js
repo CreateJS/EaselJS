@@ -184,8 +184,8 @@ this.createjs = this.createjs||{};
 	p.getBounds = function() {
 		var rect = this.DisplayObject_getBounds();
 		if (rect) { return rect; }
-		var o = this.sourceRect || this.image;
-		var hasContent = (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
+		var image = this.image, o = this.sourceRect || image;
+		var hasContent = (image && (image.naturalWidth || image.getContext || image.readyState >= 2));
 		return hasContent ? this._rectangle.setValues(0, 0, o.width, o.height) : null;
 	};
 	
