@@ -19,6 +19,7 @@ module.exports = function (grunt) {
 					js: {
 						files: [getConfigValue('easel_source'),
 							getConfigValue('movieclip_source'),
+							getConfigValue('gl_source'),
 							getConfigValue('watch_exclude_files')
 						],
 						tasks: ['sourceBuild'],
@@ -64,7 +65,8 @@ module.exports = function (grunt) {
 					build: {
 						files: {
 							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.min.js': getConfigValue('easel_source'),
-							'output/movieclip-<%= version %>.min.js': getConfigValue('movieclip_source')
+							'output/movieclip-<%= version %>.min.js': getConfigValue('movieclip_source'),
+							'output/webgl-<%= version %>.min.js': getConfigValue('gl_source')
 						}
 					}
 				},
@@ -111,6 +113,11 @@ module.exports = function (grunt) {
 							'output/movieclip-<%= version %>.combined.js': combineSource(
 									[
 										{cwd: '', config:'config.json', source:'movieclip_source'}
+									]
+							),
+							'output/webgl-<%= version %>.combined.js': combineSource(
+									[
+										{cwd: '', config:'config.json', source:'gl_source'}
 									]
 							),
 						}
@@ -370,7 +377,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('sourceBuild', [
 		"updateversion", "combine", "uglify", "clearversion",  "copy:src"
 	]);
-	
+
 
 	/**
 	 * Task for exporting combined view.
