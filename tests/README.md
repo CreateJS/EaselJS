@@ -10,7 +10,7 @@
     * Please check https://github.com/Automattic/node-canvas for install details.
 
 #### Gotchas when installing node-canvas ####
-	# Is you receive this error: 
+	# If you receive this error: 
 	Error "Package xcb-shm was not found in the pkg-config search path." ...
 	
 	# Run this
