@@ -39,9 +39,11 @@ createjs.Ticker.on("tick", stage);
 ```
 
 ## Support and Resources
-* Find examples and more information at the [EaselJS web site](http://easeljs.com/)
-* Read the [documentation](http://createjs.com/Docs/EaselJS)
-* Post questions and interact with other users at our [Community](http://community.createjs.com) site.
+* Find examples and more information at the [EaselJS web site](http://easeljs.com/).
+* Read the [documentation](http://createjs.com/Docs/EaselJS).
+* Discuss, share projects, and interact with other users on [reddit](http://www.reddit.com/r/createjs/).
+* Ask technical questions on [Stack Overflow](http://stackoverflow.com/questions/tagged/easeljs).
+* File verified bugs or formal feature requests using Issues on [GitHub](https://github.com/createjs/EaselJS/issues).
 * There is a [Google Group](http://groups.google.com/group/createjs-discussion) for discussions and support.
 * Have a look at the included [examples](https://github.com/CreateJS/EaselJS/tree/master/examples) and [API documentation](http://createjs.com/Docs/EaselJS/) for more in-depth information.
 
