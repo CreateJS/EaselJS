@@ -147,6 +147,8 @@ this.createjs = this.createjs||{};
 	/** docced in super class **/
 	p._applyFilter = function (imageData) {
 
+		premultiplyAlpha(imageData);
+
 		var radiusX = this.blurX >> 1;
 		if (isNaN(radiusX) || radiusX < 0) return false;
 		var radiusY = this.blurY >> 1;
@@ -296,15 +298,10 @@ this.createjs = this.createjs||{};
 					for ( y = 0; y < h; y++ )
 					{
 						p = yi << 2;
-						px[p+3] = pa =(a * ms) >>> ss;
-						if ( pa > 0 )
-						{
-							px[p]   = ((r * ms) >>> ss );
-							px[p+1] = ((g * ms) >>> ss );
-							px[p+2] = ((b * ms) >>> ss );
-						} else {
-							px[p] = px[p+1] = px[p+2] = 0
-						}
+						px[p]   = (r * ms) >>> ss;
+						px[p+1] = (g * ms) >>> ss;
+						px[p+2] = (b * ms) >>> ss;
+						px[p+3] = (a * ms) >>> ss;
 
 						p = ( x + (( ( p = y + ryp1) < h1 ? p : h1 ) * w )) << 2;
 
@@ -321,16 +318,10 @@ this.createjs = this.createjs||{};
 					for ( y = 0; y < h; y++ )
 					{
 						p = yi << 2;
-						px[p+3] = pa =(a * ms) >>> ss;
-						if ( pa > 0 )
-						{
-							pa = 255 / pa;
-							px[p]   = ((r * ms) >>> ss ) * pa;
-							px[p+1] = ((g * ms) >>> ss ) * pa;
-							px[p+2] = ((b * ms) >>> ss ) * pa;
-						} else {
-							px[p] = px[p+1] = px[p+2] = 0
-						}
+						px[p]   = (r * ms) >>> ss;
+						px[p+1] = (g * ms) >>> ss;
+						px[p+2] = (b * ms) >>> ss;
+						px[p+3] = (a * ms) >>> ss;
 
 						p = ( x + (( ( p = y + ryp1) < h1 ? p : h1 ) * w )) << 2;
 
@@ -347,8 +338,43 @@ this.createjs = this.createjs||{};
 			}
 
 		}
+		
+		unpremultiplyAlpha(imageData);
+		
 		return true;
 	};
-
+	
+	function premultiplyAlpha(imageData)
+	{
+		var pixels = imageData.data;
+		var size = imageData.width * imageData.height * 4;
+		
+		for (var i=0; i<size; i+=4)
+		{
+			var a = pixels[i+3] / 255;
+			pixels[i  ] *= a;
+			pixels[i+1] *= a;
+			pixels[i+2] *= a;
+		}
+	}
+	
+	function unpremultiplyAlpha(imageData)
+	{
+		var pixels = imageData.data;
+		var size = imageData.width * imageData.height * 4;
+		
+		for (var i=0; i<size; i+=4)
+		{
+			var a = pixels[i+3];
+			if (a != 0)
+			{
+				a = 255 / a;
+				pixels[i  ] *= a;
+				pixels[i+1] *= a;
+				pixels[i+2] *= a;
+			}
+		}
+	} 
+	
 	createjs.BlurFilter = createjs.promote(BlurFilter, "Filter");
 }());
