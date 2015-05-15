@@ -112,7 +112,7 @@
 			return;
 		}
 
-		if (createjs.Sound.BrowserDetect.isIOS || createjs.Sound.BrowserDetect.isAndroid || createjs.Sound.BrowserDetect.isBlackberry) {
+		if (createjs.BrowserDetect.isIOS || createjs.BrowserDetect.isAndroid || createjs.BrowserDetect.isBlackberry) {
 			document.getElementById("mobile").style.display = "block";
 			document.getElementById("content").style.display = "none";
 			return;
