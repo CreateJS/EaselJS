@@ -205,7 +205,7 @@ this.createjs = this.createjs||{};
 		 * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
 		 * @property framerate
 		 * @type {Number}
-		 * @default 0
+		 * @default null
 		 **/
 		this.framerate = null;
 		
