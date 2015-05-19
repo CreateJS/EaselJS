@@ -329,7 +329,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
+	 * Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
 	 * @method getInterval
 	 * @static
 	 * @return {Number}
@@ -351,7 +351,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
+	 * Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
 	 * @method getFPS
 	 * @static
 	 * @return {Number}
@@ -503,7 +503,8 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Similar to getTime(), but returns the time on the most recent tick event object.
+	 * Similar to the {{#crossLink "Ticker/getTime"}}{{/crossLink}} method, but returns the time on the most recent {{#crossLink "Ticker/tick:event"}}{{/crossLink}}
+	 * event object.
 	 * @method getEventTime
 	 * @static
 	 * @param runTime {Boolean} [runTime=false] If true, the runTime property will be returned instead of time.
