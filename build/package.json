@@ -1,8 +1,8 @@
 {
 	"name": "EaselJS",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"description": "EaselJS Docs",
-	"url": "http://www.createjs.com/#!/EaselJS",
+	"url": "http://www.createjs.com/easeljs",
 	"logo": "assets/docs-icon-EaselJS.png",
 	"repository": "git@github.com:CreateJS/EaselJS.git",
 	"devDependencies": {
