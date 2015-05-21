@@ -322,6 +322,16 @@ this.createjs = this.createjs||{};
 		this._updateTimeline();
 		return this.timeline.getCurrentLabel();
 	};
+	
+	/**
+	 * Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
+	 * @method getDuration
+	 * @return {Number}
+	 * @protected
+	 **/
+	p.getDuration = function() {
+		return this.timeline.duration;
+	};
 
 	/**
 	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
@@ -330,7 +340,7 @@ this.createjs = this.createjs||{};
 	 * @type {Array}
 	 * @readonly
 	 **/
-	 
+	
 	/**
 	 * Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
 	 * for more information.
@@ -338,10 +348,27 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 **/
+	
+	/**
+	 * Returns the duration of this MovieClip in seconds or ticks. Identical to {{#crossLink "MovieClip/duration:property"}}{{/crossLink}}
+	 * and provided for Flash API compatibility.
+	 * @property totalFrames
+	 * @type {Number}
+	 * @readonly
+	 **/
+	
+	/**
+	 * Returns the duration of this MovieClip in seconds or ticks.
+	 * @property duration
+	 * @type {Number}
+	 * @readonly
+	 **/
 	try {
 		Object.defineProperties(p, {
 			labels: { get: p.getLabels },
-			currentLabel: { get: p.getCurrentLabel }
+			currentLabel: { get: p.getCurrentLabel },
+			totalFrames: { get: p.getDuration },
+			duration: { get: p.getDuration }
 		});
 	} catch (e) {}
 
@@ -511,13 +538,15 @@ this.createjs = this.createjs||{};
 		var tl = this.timeline;
 		var synched = this.mode != MovieClip.INDEPENDENT;
 		tl.loop = (this.loop==null) ? true : this.loop;
-
+		
+		var pos = synched ? this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset) : (this._prevPos < 0 ? 0 : this._prevPosition);
+		var mode = synched || !this.actionsEnabled ? createjs.Tween.NONE : null;
+		
+		// pre-assign currentFrame so it is available to frame scripts:
+		this.currentFrame = tl._calcPosition(pos);
+		
 		// update timeline position, ignoring actions if this is a graphic.
-		if (synched) {
-			tl.setPosition(this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset), createjs.Tween.NONE);
-		} else {
-			tl.setPosition(this._prevPos < 0 ? 0 : this._prevPosition, this.actionsEnabled ? null : createjs.Tween.NONE);
-		}
+		tl.setPosition(pos, mode);
 
 		this._prevPosition = tl._prevPosition;
 		if (this._prevPos == tl._prevPos) { return; }
