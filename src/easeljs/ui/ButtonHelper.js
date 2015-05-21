@@ -135,7 +135,6 @@ this.createjs = this.createjs||{};
 		 * @protected
 		 **/
 		this._enabled = false;
-	
 		
 	// setup:
 		target.mouseChildren = false; // prevents issues when children are removed from the display list when state changes.
@@ -182,12 +181,14 @@ this.createjs = this.createjs||{};
 			o.addEventListener("rollout", this);
 			o.addEventListener("mousedown", this);
 			o.addEventListener("pressup", this);
+			if (o._reset) { o.__reset = o._reset; o._reset = this._reset;}
 		} else {
 			o.cursor = null;
 			o.removeEventListener("rollover", this);
 			o.removeEventListener("rollout", this);
 			o.removeEventListener("mousedown", this);
 			o.removeEventListener("pressup", this);
+			if (o.__reset) { o._reset = o.__reset; delete(o.__reset); }
 		}
 	};
 	/**
@@ -249,6 +250,18 @@ this.createjs = this.createjs||{};
 		} else {
 			t.gotoAndStop&&t.gotoAndStop(label);
 		}
+	};
+	
+	/**
+	 * Injected into target. Preserves the paused state through a reset.
+	 * @method _reset
+	 * @protected
+	 **/
+	p._reset = function() {
+		// TODO: explore better ways to handle this issue. This is hacky & disrupts object signatures.
+		var p = this.paused;
+		this.__reset();
+		this.paused = p;
 	};
 
 
