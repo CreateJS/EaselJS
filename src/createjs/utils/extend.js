@@ -44,7 +44,7 @@ this.createjs = this.createjs||{};
  *
  * 	function MySubClass() {}
  * 	createjs.extend(MySubClass, MySuperClass);
- * 	ClassB.prototype.doSomething = function() { }
+ * 	MySubClass.prototype.doSomething = function() { }
  *
  * 	var foo = new MySubClass();
  * 	console.log(foo instanceof MySuperClass); // true
