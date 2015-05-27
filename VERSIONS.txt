@@ -1,4 +1,8 @@
-Version NEXT [not yet released]
+Version NEXT [Not Released]
+****************************************************************************************************
+
+
+Version 0.8.1 [May 21, 2015]
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - Graphics.command now returns null after empty fill / stroke calls.
@@ -18,7 +22,8 @@ OTHER:
 - added MouseEvent.relatedTarget
 - improved handling of Bitmap load errors
 - fixed Rectangle.pad
-
+- fixed issues with buttons playing on reset
+- added totalframes property and getDuration method to MovieClip
 
 
 Version 0.8.0 [December 12, 2014]
