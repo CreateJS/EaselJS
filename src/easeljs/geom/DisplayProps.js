@@ -40,7 +40,7 @@ this.createjs = this.createjs||{};
 	 * Used for calculating and encapsulating display related properties.
 	 * @class DisplayProps
 	 * @param {Number} [visible=true] Visible value.
-	 * @param {Number} [alpha=0] Alpha value.
+	 * @param {Number} [alpha=1] Alpha value.
 	 * @param {Number} [shadow=null] A Shadow instance or null.
 	 * @param {Number} [compositeOperation=null] A compositeOperation value or null.
 	 * @param {Number} [matrix] A transformation matrix. Defaults to a new identity matrix.
