@@ -101,7 +101,7 @@ this.createjs = this.createjs||{};
 		this.visible = visible == null ? true : !!visible;
 		this.alpha = alpha == null ? 1 : alpha;
 		this.shadow = shadow;
-		this.compositeOperation = shadow;
+		this.compositeOperation = compositeOperation;
 		this.matrix = matrix || (this.matrix&&this.matrix.identity()) || new createjs.Matrix2D();
 		return this;
 	};
