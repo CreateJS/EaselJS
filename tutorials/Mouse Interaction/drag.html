@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,34 +7,42 @@
 	<script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
 	<script>
 		var stage, output;
-		
+
 		function init() {
 			stage = new createjs.Stage("demoCanvas");
-			
+            stage.enableMouseOver(30); // enable mouse over so we can control mouse cursor
+
 			// this lets our drag continue to track the mouse even when it leaves the canvas:
 			// play with commenting this out to see the difference.
-			stage.mouseMoveOutside = true; 
-			
+			stage.mouseMoveOutside = true;
+
 			var circle = new createjs.Shape();
 			circle.graphics.beginFill("red").drawCircle(0, 0, 50);
-			
+
 			var label = new createjs.Text("drag me", "bold 14px Arial", "#FFFFFF");
 			label.textAlign = "center";
 			label.y = -7;
-			
+
 			var dragger = new createjs.Container();
 			dragger.x = dragger.y = 100;
+            dragger.cursor = "move";
 			dragger.addChild(circle, label);
 			stage.addChild(dragger);
-			
+
+
+            dragger.on("mousedown", function(evt) {
+                // note where the drag initiated on the shape
+                evt.currentTarget.dragOffset = evt.currentTarget.globalToLocal(evt.stageX, evt.stageY);
+            });
+
 			dragger.on("pressmove",function(evt) {
 				// currentTarget will be the container that the event listener was added to:
-				evt.currentTarget.x = evt.stageX;
-				evt.currentTarget.y = evt.stageY;
+				evt.currentTarget.x = evt.stageX - evt.currentTarget.dragOffset.x;
+				evt.currentTarget.y = evt.stageY - evt.currentTarget.dragOffset.y;
 				// make sure to redraw the stage to show the change:
-				stage.update();   
+				stage.update();
 			});
-			
+
 			stage.update();
 		}
 	</script>
