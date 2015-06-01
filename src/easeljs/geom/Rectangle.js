@@ -140,11 +140,11 @@ this.createjs = this.createjs||{};
 	
 	/** 
 	 * Adds the specified padding to the rectangle's bounds.
-	 * @method extend
-	 * @param {Number} [top=0]
-	 * @param {Number} [left=0]
-	 * @param {Number} [right=0]
-	 * @param {Number} [bottom=0]
+	 * @method pad
+	 * @param {Number} top
+	 * @param {Number} left
+	 * @param {Number} right
+	 * @param {Number} bottom
 	 * @return {Rectangle} This instance. Useful for chaining method calls.
 	 * @chainable
 	*/
