@@ -871,7 +871,7 @@ this.createjs = this.createjs||{};
 	 *      displayObject.x = 300;
 	 *      displayObject.y = 200;
 	 *      stage.addChild(displayObject);
-	 *      var point = myDisplayObject.localToGlobal(100, 100);
+	 *      var point = displayObject.localToGlobal(100, 100);
 	 *      // Results in x=400, y=300
 	 *
 	 * @method localToGlobal
@@ -896,7 +896,7 @@ this.createjs = this.createjs||{};
 	 *      displayObject.x = 300;
 	 *      displayObject.y = 200;
 	 *      stage.addChild(displayObject);
-	 *      var point = myDisplayObject.globalToLocal(100, 100);
+	 *      var point = displayObject.globalToLocal(100, 100);
 	 *      // Results in x=-200, y=-100
 	 *
 	 * @method globalToLocal
