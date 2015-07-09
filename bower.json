@@ -23,7 +23,6 @@
 		"_assets",
 		"node_modules",
 		"bower_components",
-		"bower.json",
 		".bower.json",
 		"build",
 		"docs",
