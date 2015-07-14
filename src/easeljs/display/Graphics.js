@@ -475,7 +475,8 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Draws a line from the current drawing point to the specified position, which become the new current drawing
-	 * point. A tiny API method "lt" also exists.
+	 * point. Note that you *must* call {{#crossLink "Graphics/moveTo"}}{{/crossLink}} before the first `lineTo()`.
+	 * A tiny API method "lt" also exists.
 	 *
 	 * For detailed information, read the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
