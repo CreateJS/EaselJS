@@ -1,55 +1,55 @@
 /*
- * ScaleBitmap
- * Visit http://createjs.com/ for documentation, updates and examples.
- *
- * Copyright (c) 2010 gskinner.com, inc.
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- */
+* ScaleBitmap
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2010 gskinner.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 // namespace:
 this.createjs = this.createjs||{};
 
 (function() {
 
-	/**
-	 * A ScaleBitmap represents an Image, Canvas, or Video in the display list and is split into nine separate regions
-	 * to allow independent scaling of each region. This display object can be used to create scaling UI skins, such as
-	 * buttons and backgrounds with rounded corners. A ScaleBitmap can be instantiated using an existing HTML element,
-	 * or a string, similar to a Bitmap.
-	 *
-	 * <h4>Example</h4>
-	 *      var bitmap = new createjs.ScaleBitmap("imagePath.jpg", new createjs.Rectangle(14, 14, 3, 3));
-	 *      bitmap.setDrawSize(100, 100);
-	 *
-	 * Note: When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
-	 * will be displayed.
-	 *
-	 * @class ScaleBitmap
-	 * @extends DisplayObject
-	 * @constructor
-	 * @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use. If it is a URI, a new Image object will be constructed and assigned to the .image property.
-	 * @param {Rectangle} scale9Grid The inner rectangle of the nine region grid.
-	 **/
+/**
+ * A ScaleBitmap represents an Image, Canvas, or Video in the display list and is split into nine separate regions
+ * to allow independent scaling of each region. This display object can be used to create scaling UI skins, such as
+ * buttons and backgrounds with rounded corners. A ScaleBitmap can be instantiated using an existing HTML element,
+ * or a string, similar to a Bitmap.
+ *
+ * <h4>Example</h4>
+ *      var bitmap = new createjs.ScaleBitmap("imagePath.jpg", new createjs.Rectangle(14, 14, 3, 3));
+ *      bitmap.setDrawSize(100, 100);
+ *
+ * Note: When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
+ * will be displayed.
+ *
+ * @class ScaleBitmap
+ * @extends DisplayObject
+ * @constructor
+ * @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use. If it is a URI, a new Image object will be constructed and assigned to the .image property.
+ * @param {Rectangle} scale9Grid The inner rectangle of the nine region grid.
+ **/
 	function ScaleBitmap (imageOrUri, scale9Grid) {
 		this.DisplayObject_constructor();
 		// public properties:
