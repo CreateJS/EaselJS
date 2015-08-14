@@ -50,11 +50,32 @@ this.createjs = this.createjs||{};
  * @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use. If it is a URI, a new Image object will be constructed and assigned to the .image property.
  * @param {Rectangle} scale9Grid The inner rectangle of the nine region grid.
  **/
-var ScaleBitmap = function(imageOrUri, scale9Grid) {
-  this.initialize(imageOrUri, scale9Grid);
-}
-var p = ScaleBitmap.prototype = new createjs.DisplayObject();
-ScaleBitmap.prototype.constructor = ScaleBitmap;
+	function ScaleBitmap (imageOrUri, scale9Grid) {
+		this.DisplayObject_constructor();
+		// public properties:
+		/**
+		 * The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially
+		 * mobile browsers) support drawing video to a canvas.
+		 * @property image
+		 * @type HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
+		 *
+		 * The inner rectangle of the nine region grid.
+		 * @property rectangle
+		 * @type Rectangle
+		 **/
+
+		if (typeof imageOrUri == "string") {
+			this.image = new Image();
+			this.image.src = imageOrUri;
+		} else {
+			this.image = imageOrUri;
+		}
+		this.drawWidth = this.image.width;
+		this.drawHeight = this.image.height;
+		this.scale9Grid = scale9Grid;
+
+	}
+	var p = createjs.extend(ScaleBitmap, createjs.DisplayObject);
 
 // public properties:
 
@@ -96,32 +117,12 @@ ScaleBitmap.prototype.constructor = ScaleBitmap;
 	 */
 	p.drawHeight = 0;
 
-	// constructor:
-
-	/**
-	 * @property DisplayObject_initialize
-	 * @type Function
-	 * @private
-	 **/
-	p.DisplayObject_initialize = p.initialize;
-
 	/**
 	 * Initialization method.
 	 * @method initialize
 	 * @protected
 	 **/
-	p.initialize = function(imageOrUri, scale9Grid) {
-		this.DisplayObject_initialize();
-		if (typeof imageOrUri == "string") {
-			this.image = new Image();
-			this.image.src = imageOrUri;
-		} else {
-			this.image = imageOrUri;
-		}
-		this.drawWidth = this.image.width;
-		this.drawHeight = this.image.height;
-		this.scale9Grid = scale9Grid;
-	}
+	p.initialize =  ScaleBitmap; // TODO: deprecated.
 
 // public methods:
 
@@ -135,7 +136,7 @@ ScaleBitmap.prototype.constructor = ScaleBitmap;
 	p.setDrawSize = function(newWidth, newHeight) {
 		this.drawWidth = newWidth;
 		this.drawHeight = newHeight;
-	}
+	};
 
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
@@ -147,7 +148,7 @@ ScaleBitmap.prototype.constructor = ScaleBitmap;
 	p.isVisible = function() {
 		var hasContent = this.cacheCanvas || (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
-	}
+	};
 
 	/**
 	 * @property DisplayObject_draw
@@ -226,7 +227,7 @@ ScaleBitmap.prototype.constructor = ScaleBitmap;
 		}
 
 		return true;
-	}
+	};
 
 	/**
 	 * Returns a clone of the ScaleBitmap instance.
@@ -238,7 +239,7 @@ ScaleBitmap.prototype.constructor = ScaleBitmap;
 		if (this.sourceRect) { o.sourceRect = this.sourceRect.clone(); }
 		this.cloneProps(o);
 		return o;
-	}
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -247,9 +248,9 @@ ScaleBitmap.prototype.constructor = ScaleBitmap;
 	 **/
 	p.toString = function() {
 		return "[ScaleBitmap (name="+  this.name +")]";
-	}
+	};
 
 // private methods:
 
-createjs.ScaleBitmap = ScaleBitmap;
+	createjs.ScaleBitmap = createjs.promote(ScaleBitmap, "DisplayObject");
 }());
