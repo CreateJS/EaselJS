@@ -117,15 +117,6 @@ this.createjs = this.createjs||{};
 	 */
 	p.drawHeight = 0;
 
-	// constructor:
-
-	/**
-	 * @property DisplayObject_initialize
-	 * @type Function
-	 * @private
-	 **/
-	//p.DisplayObject_initialize = p.initialize;
-
 	/**
 	 * Initialization method.
 	 * @method initialize
