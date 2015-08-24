@@ -51,9 +51,18 @@ this.createjs = this.createjs||{};
  * @param {Rectangle} scale9Grid The inner rectangle of the nine region grid.
  **/
 var ScaleBitmap = function(imageOrUri, scale9Grid) {
-  this.initialize(imageOrUri, scale9Grid);
+	this.DisplayObject_constructor();
+	if (typeof imageOrUri == "string") {
+		this.image = new Image();
+		this.image.src = imageOrUri;
+	} else {
+		this.image = imageOrUri;
+	}
+	this.drawWidth = this.image.width;
+	this.drawHeight = this.image.height;
+	this.scale9Grid = scale9Grid;
 }
-var p = ScaleBitmap.prototype = new createjs.DisplayObject();
+var p = createjs.extend(ScaleBitmap, createjs.DisplayObject);
 ScaleBitmap.prototype.constructor = ScaleBitmap;
 
 // public properties:
@@ -96,33 +105,6 @@ ScaleBitmap.prototype.constructor = ScaleBitmap;
 	 */
 	p.drawHeight = 0;
 
-	// constructor:
-
-	/**
-	 * @property DisplayObject_initialize
-	 * @type Function
-	 * @private
-	 **/
-	p.DisplayObject_initialize = p.initialize;
-
-	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @protected
-	 **/
-	p.initialize = function(imageOrUri, scale9Grid) {
-		this.DisplayObject_initialize();
-		if (typeof imageOrUri == "string") {
-			this.image = new Image();
-			this.image.src = imageOrUri;
-		} else {
-			this.image = imageOrUri;
-		}
-		this.drawWidth = this.image.width;
-		this.drawHeight = this.image.height;
-		this.scale9Grid = scale9Grid;
-	}
-
 // public methods:
 
 	/**
@@ -148,13 +130,6 @@ ScaleBitmap.prototype.constructor = ScaleBitmap;
 		var hasContent = this.cacheCanvas || (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	}
-
-	/**
-	 * @property DisplayObject_draw
-	 * @type Function
-	 * @private
-	 **/
-	p.DisplayObject_draw = p.draw;
 
 	/**
 	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
@@ -251,5 +226,5 @@ ScaleBitmap.prototype.constructor = ScaleBitmap;
 
 // private methods:
 
-createjs.ScaleBitmap = ScaleBitmap;
+createjs.ScaleBitmap = createjs.promote(ScaleBitmap, "DisplayObject");
 }());
