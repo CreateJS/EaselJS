@@ -30,80 +30,76 @@
 this.createjs = this.createjs||{};
 
 (function() {
+	"use strict";
 
-/**
- * A ScaleBitmap represents an Image, Canvas, or Video in the display list and is split into nine separate regions
- * to allow independent scaling of each region. This display object can be used to create scaling UI skins, such as
- * buttons and backgrounds with rounded corners. A ScaleBitmap can be instantiated using an existing HTML element,
- * or a string, similar to a Bitmap.
- *
- * <h4>Example</h4>
- *      var bitmap = new createjs.ScaleBitmap("imagePath.jpg", new createjs.Rectangle(14, 14, 3, 3));
- *      bitmap.setDrawSize(100, 100);
- *
- * Note: When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
- * will be displayed.
- *
- * @class ScaleBitmap
- * @extends DisplayObject
- * @constructor
- * @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use. If it is a URI, a new Image object will be constructed and assigned to the .image property.
- * @param {Rectangle} scale9Grid The inner rectangle of the nine region grid.
- **/
-var ScaleBitmap = function(imageOrUri, scale9Grid) {
-	this.DisplayObject_constructor();
-	if (typeof imageOrUri == "string") {
-		this.image = new Image();
-		this.image.src = imageOrUri;
-	} else {
-		this.image = imageOrUri;
+// constructor:
+	/**
+	 * A ScaleBitmap represents an Image, Canvas, or Video in the display list and is split into nine separate regions
+	 * to allow independent scaling of each region. This display object can be used to create scaling UI skins, such as
+	 * buttons and backgrounds with rounded corners. A ScaleBitmap can be instantiated using an existing HTML element,
+	 * or a string, similar to a Bitmap.
+	 *
+	 * <h4>Example</h4>
+	 *      var bitmap = new createjs.ScaleBitmap("imagePath.jpg", new createjs.Rectangle(14, 14, 3, 3));
+	 *      bitmap.setDrawSize(100, 100);
+	 *
+	 * Note: When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
+	 * will be displayed.
+	 *
+	 * @class ScaleBitmap
+	 * @extends DisplayObject
+	 * @constructor
+	 * @param {Image | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use. If it is a URI, a new Image object will be constructed and assigned to the .image property.
+	 * @param {Rectangle} scale9Grid The inner rectangle of the nine region grid.
+	 **/
+	function ScaleBitmap(imageOrUri, scale9Grid) {
+		this.DisplayObject_constructor();
+
+	// public properties:
+		/**
+		 * The image to render. This can be an Image, a Canvas, or a Video.
+		 * @property image
+		 * @type Image | HTMLCanvasElement | HTMLVideoElement
+		 **/
+		if (typeof imageOrUri == "string") {
+			this.image = new Image();
+			this.image.src = imageOrUri;
+		} else {
+			this.image = imageOrUri;
+		}
+	
+		/**
+		 * Specifies the width of the drawn ScaleBitmap.
+		 * @property drawWidth
+		 * @type Number
+		 * @default The original width of the image.
+		 */
+		this.drawWidth = this.image.width;
+	
+		/**
+		 * Specifies the height of the drawn ScaleBitmap.
+		 * @property drawHeight
+		 * @type Number
+		 * @default The original height of the image.
+		 */
+		this.drawHeight = this.image.height;
+		/**
+		 * Specifies the inner rectangle of the nine region scaling grid.
+		 * @property scale9Grid
+		 * @type Rectangle
+		 */
+		this.scale9Grid = scale9Grid;
+	
+		/**
+		 * Whether or not the ScaleBitmap should be draw to the canvas at whole pixel coordinates.
+		 * @property snapToPixel
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.snapToPixel = true;
 	}
-	this.drawWidth = this.image.width;
-	this.drawHeight = this.image.height;
-	this.scale9Grid = scale9Grid;
-}
-var p = createjs.extend(ScaleBitmap, createjs.DisplayObject);
-ScaleBitmap.prototype.constructor = ScaleBitmap;
-
-// public properties:
-
-	/**
-	 * The image to render. This can be an Image, a Canvas, or a Video.
-	 * @property image
-	 * @type Image | HTMLCanvasElement | HTMLVideoElement
-	 **/
-	p.image = null;
-
-	/**
-	 * Whether or not the ScaleBitmap should be draw to the canvas at whole pixel coordinates.
-	 * @property snapToPixel
-	 * @type Boolean
-	 * @default true
-	 **/
-	p.snapToPixel = true;
-
-	/**
-	 * Specifies the inner rectangle of the nine region scaling grid.
-	 * @property scale9Grid
-	 * @type Rectangle
-	 */
-	p.scale9Grid = null;
-
-	/**
-	 * Specifies the width of the drawn ScaleBitmap.
-	 * @property drawWidth
-	 * @type Number
-	 * @default The original width of the image.
-	 */
-	p.drawWidth = 0;
-
-	/**
-	 * Specifies the height of the drawn ScaleBitmap.
-	 * @property drawHeight
-	 * @type Number
-	 * @default The original height of the image.
-	 */
-	p.drawHeight = 0;
+	var p = createjs.extend(ScaleBitmap, createjs.DisplayObject);
+	ScaleBitmap.prototype.constructor = ScaleBitmap;
 
 // public methods:
 
@@ -224,7 +220,6 @@ ScaleBitmap.prototype.constructor = ScaleBitmap;
 		return "[ScaleBitmap (name="+  this.name +")]";
 	}
 
-// private methods:
 
-createjs.ScaleBitmap = createjs.promote(ScaleBitmap, "DisplayObject");
+	createjs.ScaleBitmap = createjs.promote(ScaleBitmap, "DisplayObject");
 }());
