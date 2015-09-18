@@ -49,10 +49,12 @@ this.createjs = this.createjs||{};
 	 * Note that the "images" used in the generated sprite sheet are actually canvas elements, and that they will be sized
 	 * to the nearest power of 2 up to the value of <code>maxWidth</code> or <code>maxHeight</code>.
 	 * @class SpriteSheetBuilder
+	 * @param {Number} [framerate=0] The {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} of
+	 * {{#crossLink "SpriteSheet"}}{{/crossLink}} instances that are created.
 	 * @extends EventDispatcher
 	 * @constructor
 	 **/
-	function SpriteSheetBuilder() {
+	function SpriteSheetBuilder(framerate) {
 		this.EventDispatcher_constructor();
 		
 	// public properties:
@@ -121,6 +123,16 @@ this.createjs = this.createjs||{};
 		 * @readonly
 		 **/
 		this.progress = -1;
+
+		/**
+		 * A {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} value that will be passed to new {{#crossLink "SpriteSheet"}}{{/crossLink}} instances that are
+		 * created. If no framerate is specified (or it is 0), then SpriteSheets will use the {{#crossLink "Ticker"}}{{/crossLink}}
+		 * framerate.
+		 * @property framerate
+		 * @type Number
+		 * @default 0
+		 */
+		this.framerate = framerate || 0;
 	
 	
 	// private properties:
@@ -249,12 +261,13 @@ this.createjs = this.createjs||{};
 	 * that played frame indexes 3, 6, and 5 in that order.
 	 * @param {String} [next] Specifies the name of the animation to continue to after this animation ends. You can
 	 * also pass false to have the animation stop when it ends. By default it will loop to the start of the same animation.
-	 * @param {Number} [frequency] Specifies a frame advance frequency for this animation. For example, a value
-	 * of 2 would cause the animation to advance every second tick.
+	 * @param {Number} [speed] Specifies a frame advance speed for this animation. For example, a value of 0.5 would
+	 * cause the animation to advance every second tick. Note that earlier versions used `frequency` instead, which had
+	 * the opposite effect.
 	 **/
-	p.addAnimation = function(name, frames, next, frequency) {
+	p.addAnimation = function(name, frames, next, speed) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
-		this._animations[name] = {frames:frames, next:next, frequency:frequency};
+		this._animations[name] = {frames:frames, next:next, speed:speed};
 	};
 
 	/**
@@ -380,6 +393,7 @@ this.createjs = this.createjs||{};
 		this._data = {
 			images: [],
 			frames: dataFrames,
+			framerate: this.framerate,
 			animations: this._animations // TODO: should we "clone" _animations in case someone adds more animations after a build?
 		};
 
