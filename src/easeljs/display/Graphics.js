@@ -2066,6 +2066,7 @@ this.createjs = this.createjs||{};
 	 * @param {String} [caps]
 	 * @param {String} [joints]
 	 * @param {Number} [miterLimit]
+	 * @param {Boolean} [ignoreScale=false]
 	 **/
 	/**
 	 * @property width
@@ -2089,17 +2090,19 @@ this.createjs = this.createjs||{};
 	 * @method exec
 	 * @param {CanvasRenderingContext2D} ctx
 	 */
-	p = (G.StrokeStyle = function(width, caps, joints, miterLimit) {
+	p = (G.StrokeStyle = function(width, caps, joints, miterLimit, ignoreScale) {
 		this.width = width;
 		this.caps = caps;
 		this.joints = joints;
 		this.miterLimit = miterLimit;
+		this.ignoreScale = ignoreScale;
 	}).prototype;
 	p.exec = function(ctx) {
 		ctx.lineWidth = (this.width == null ? "1" : this.width);
 		ctx.lineCap = (this.caps == null ? "butt" : (isNaN(this.caps) ? this.caps : Graphics.STROKE_CAPS_MAP[this.caps]));
 		ctx.lineJoin = (this.joints == null ? "miter" : (isNaN(this.joints) ? this.joints : Graphics.STROKE_JOINTS_MAP[this.joints]));
 		ctx.miterLimit = (this.miterLimit == null ? "10" : this.miterLimit);
+		ctx.ignoreScale = (this.ignoreScale == null ? false : this.ignoreScale);
 	};
 	p.path = false;
 	

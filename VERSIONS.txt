@@ -3,6 +3,7 @@ Version NEXT [Not Released]
 - fixed compositeOperation value in DisplayProps.setValues (thanks @fumio)
 - documentation updates
 - fixed the SpriteSheetBuilder to support both SpriteSheet framerate and speed (instead of frequency)
+- fixed ignoreScale support in Graphic StrokeStyle command
 
 
 Version 0.8.1 [May 21, 2015]
