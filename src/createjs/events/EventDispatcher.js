@@ -81,7 +81,12 @@ this.createjs = this.createjs||{};
 	 *          console.log(instance == this); // true, "on" uses dispatcher scope by default.
 	 *      });
 	 * 
-	 * If you want to use addEventListener instead, you may want to use function.bind() or a similar proxy to manage scope.
+	 * If you want to use addEventListener instead, you may want to use function.bind() or a similar proxy to manage
+	 * scope.
+	 *
+	 * <b>Browser support</b>
+	 * The event model in CreateJS can be used separately from the suite in any project, however the inheritance model
+	 * requires modern browsers (IE9+).
 	 *      
 	 *
 	 * @class EventDispatcher
