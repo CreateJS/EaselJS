@@ -1938,6 +1938,7 @@ this.createjs = this.createjs||{};
 	 * See {{#crossLink "Graphics/beginLinearGradientFill"}}{{/crossLink}} for more information.
 	 * @method linearGradient
 	 * @param {Array} colors
+	 *
 	 * @param {Array} ratios
 	 * @param {Number} x0
 	 * @param {Number} y0
@@ -2063,9 +2064,9 @@ this.createjs = this.createjs||{};
 	 * @class StrokeStyle
 	 * @constructor
 	 * @param {Number} width
-	 * @param {String} [caps]
-	 * @param {String} [joints]
-	 * @param {Number} [miterLimit]
+	 * @param {String} [caps=butt]
+	 * @param {String} [joints=miter]
+	 * @param {Number} [miterLimit=10]
 	 * @param {Boolean} [ignoreScale=false]
 	 **/
 	/**
