@@ -39,15 +39,16 @@ this.createjs = this.createjs||{};
 
 // constructor:
 	/**
-	 * The SpriteSheetBuilder allows you to generate sprite sheets at run time from any display object. This can allow
-	 * you to maintain your assets as vector graphics (for low file size), and render them at run time as sprite sheets
-	 * for better performance.
+	 * The SpriteSheetBuilder allows you to generate {{#crossLink "SpriteSheet"}}{{/crossLink}} instances at run time
+	 * from any display object. This can allow you to maintain your assets as vector graphics (for low file size), and
+	 * render them at run time as SpriteSheets for better performance.
 	 *
-	 * Sprite sheets can be built either synchronously, or asynchronously, so that large sprite sheets can be generated
+	 * SpriteSheets can be built either synchronously, or asynchronously, so that large SpriteSheets can be generated
 	 * without locking the UI.
 	 *
-	 * Note that the "images" used in the generated sprite sheet are actually canvas elements, and that they will be sized
-	 * to the nearest power of 2 up to the value of <code>maxWidth</code> or <code>maxHeight</code>.
+	 * Note that the "images" used in the generated SpriteSheet are actually canvas elements, and that they will be
+	 * sized to the nearest power of 2 up to the value of {{#crossLink "SpriteSheetBuilder/maxWidth:property"}}{{/crossLink}}
+	 * or {{#crossLink "SpriteSheetBuilder/maxHeight:property"}}{{/crossLink}}.
 	 * @class SpriteSheetBuilder
 	 * @param {Number} [framerate=0] The {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} of
 	 * {{#crossLink "SpriteSheet"}}{{/crossLink}} instances that are created.
@@ -59,9 +60,9 @@ this.createjs = this.createjs||{};
 		
 	// public properties:
 		/**
-		 * The maximum width for the images (not individual frames) in the generated sprite sheet. It is recommended to use
-		 * a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max dimensions, then
-		 * additional images will be created as needed.
+		 * The maximum width for the images (not individual frames) in the generated SpriteSheet. It is recommended to
+		 * use a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max
+		 * dimensions, then additional images will be created as needed.
 		 * @property maxWidth
 		 * @type Number
 		 * @default 2048
@@ -69,9 +70,9 @@ this.createjs = this.createjs||{};
 		this.maxWidth = 2048;
 	
 		/**
-		 * The maximum height for the images (not individual frames) in the generated sprite sheet. It is recommended to use
-		 * a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max dimensions, then
-		 * additional images will be created as needed.
+		 * The maximum height for the images (not individual frames) in the generated SpriteSheet. It is recommended to
+		 * use a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max
+		 * dimensions, then additional images will be created as needed.
 		 * @property maxHeight
 		 * @type Number
 		 * @default 2048
@@ -79,16 +80,16 @@ this.createjs = this.createjs||{};
 		this.maxHeight = 2048;
 	
 		/**
-		 * The sprite sheet that was generated. This will be null before a build is completed successfully.
+		 * The SpriteSheet that was generated. This will be null before a build is completed successfully.
 		 * @property spriteSheet
 		 * @type SpriteSheet
 		 **/
 		this.spriteSheet = null;
 	
 		/**
-		 * The scale to apply when drawing all frames to the sprite sheet. This is multiplied against any scale specified
-		 * in the addFrame call. This can be used, for example, to generate a sprite sheet at run time that is tailored to
-		 * the a specific device resolution (ex. tablet vs mobile).
+		 * The scale to apply when drawing all frames to the SpriteSheet. This is multiplied against any scale specified
+		 * in the addFrame call. This can be used, for example, to generate a SpriteSheet at run time that is tailored
+		 * to the a specific device resolution (ex. tablet vs mobile).
 		 * @property scale
 		 * @type Number
 		 * @default 1
@@ -121,7 +122,7 @@ this.createjs = this.createjs||{};
 		 * @type Number
 		 * @default -1
 		 * @readonly
-		 **/
+		 */
 		this.progress = -1;
 
 		/**
@@ -232,13 +233,13 @@ this.createjs = this.createjs||{};
 	 * times, but manipulate it or its children to change it to generate different frames.
 	 *
 	 * Note that the source's transformations (x, y, scale, rotate, alpha) will be ignored, except for regX/Y. To apply
-	 * transforms to a source object and have them captured in the sprite sheet, simply place it into a {{#crossLink "Container"}}{{/crossLink}}
+	 * transforms to a source object and have them captured in the SpriteSheet, simply place it into a {{#crossLink "Container"}}{{/crossLink}}
 	 * and pass in the Container as the source.
 	 * @method addFrame
 	 * @param {DisplayObject} source The source {{#crossLink "DisplayObject"}}{{/crossLink}}  to draw as the frame.
 	 * @param {Rectangle} [sourceRect] A {{#crossLink "Rectangle"}}{{/crossLink}} defining the portion of the
-	 * source to draw to the frame. If not specified, it will look for a <code>getBounds</code> method, bounds property,
-	 * or <code>nominalBounds</code> property on the source to use. If one is not found, the frame will be skipped.
+	 * source to draw to the frame. If not specified, it will look for a `getBounds` method, bounds property, or
+	 * `nominalBounds` property on the source to use. If one is not found, the frame will be skipped.
 	 * @param {Number} [scale=1] Optional. The scale to draw this frame at. Default is 1.
 	 * @param {Function} [setupFunction] A function to call immediately before drawing this frame. It will be called with two parameters: the source, and setupData.
 	 * @param {Object} [setupData] Arbitrary setup data to pass to setupFunction as the second parameter.
@@ -254,7 +255,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Adds an animation that will be included in the created sprite sheet.
+	 * Adds an animation that will be included in the created {{#crossLink "SpriteSheet"}}{{/crossLink}}.
 	 * @method addAnimation
 	 * @param {String} name The name for the animation.
 	 * @param {Array} frames An array of frame indexes that comprise the animation. Ex. [3,6,5] would describe an animation
@@ -271,22 +272,27 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * This will take a MovieClip instance, and add its frames and labels to this builder. Labels will be added as an animation
-	 * running from the label index to the next label. For example, if there is a label named "foo" at frame 0 and a label
-	 * named "bar" at frame 10, in a MovieClip with 15 frames, it will add an animation named "foo" that runs from frame
-	 * index 0 to 9, and an animation named "bar" that runs from frame index 10 to 14.
+	 * This will take a {{#crossLink "MovieClip"}}{{/crossLink}} instance, and add its frames and labels to this
+	 * builder. Labels will be added as an animation running from the label index to the next label. For example, if
+	 * there is a label named "foo" at frame 0 and a label named "bar" at frame 10, in a MovieClip with 15 frames, it
+	 * will add an animation named "foo" that runs from frame index 0 to 9, and an animation named "bar" that runs from
+	 * frame index 10 to 14.
 	 *
-	 * Note that this will iterate through the full MovieClip with actionsEnabled set to false, ending on the last frame.
+	 * Note that this will iterate through the full MovieClip with {{#crossLink "MovieClip/actionsEnabled:property"}}{{/crossLink}}
+	 * set to `false`, ending on the last frame.
 	 * @method addMovieClip
-	 * @param {MovieClip} source The source MovieClip instance to add to the sprite sheet.
+	 * @param {MovieClip} source The source MovieClip instance to add to the SpriteSheet.
 	 * @param {Rectangle} [sourceRect] A {{#crossLink "Rectangle"}}{{/crossLink}} defining the portion of the source to
-	 * draw to the frame. If not specified, it will look for a <code>getBounds</code> method, <code>frameBounds</code>
-	 * Array, <code>bounds</code> property, or <code>nominalBounds</code> property on the source to use. If one is not
+	 * draw to the frame. If not specified, it will look for a {{#crossLink "DisplayObject/getBounds"}}{{/crossLink}}
+	 * method, `frameBounds` Array, `bounds` property, or `nominalBounds` property on the source to use. If one is not
 	 * found, the MovieClip will be skipped.
 	 * @param {Number} [scale=1] The scale to draw the movie clip at.
-	 * @param {Function} [setupFunction] A function to call immediately before drawing each frame. It will be called with three parameters: the source, setupData, and the frame index.
+	 * @param {Function} [setupFunction] A function to call immediately before drawing each frame. It will be called
+	 * with three parameters: the source, setupData, and the frame index.
 	 * @param {Object} [setupData] Arbitrary setup data to pass to setupFunction as the second parameter.
-	 * @param {Function} [labelFunction] This method will be called for each movieclip label that is added with four parameters: the label name, the source movieclip instance, the starting frame index (in the movieclip timeline) and the end index. It must return a new name for the label/animation, or false to exclude the label.
+	 * @param {Function} [labelFunction] This method will be called for each MovieClip label that is added with four
+	 * parameters: the label name, the source MovieClip instance, the starting frame index (in the movieclip timeline)
+	 * and the end index. It must return a new name for the label/animation, or `false` to exclude the label.
 	 **/
 	p.addMovieClip = function(source, sourceRect, scale, setupFunction, setupData, labelFunction) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
@@ -324,9 +330,10 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Builds a SpriteSheet instance based on the current frames.
+	 * Builds a {{#crossLink "SpriteSheet"}}{{/crossLink}} instance based on the current frames.
 	 * @method build
-	 * @return {SpriteSheet} The created SpriteSheet instance, or null if a build is already running or an error occurred.
+	 * @return {SpriteSheet} The created SpriteSheet instance, or null if a build is already running or an error
+	 * occurred.
 	 **/
 	p.build = function() {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
@@ -338,8 +345,8 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Asynchronously builds a {{#crossLink "SpriteSheet"}}{{/crossLink}} instance based on the current frames. It will
-	 * run 20 times per second, using an amount of time defined by <code>timeSlice</code>. When it is complete it will
-	 * call the specified callback.
+	 * run 20 times per second, using an amount of time defined by `timeSlice`. When it is complete it will call the
+	 * specified callback.
 	 * @method buildAsync
 	 * @param {Number} [timeSlice] Sets the timeSlice property on this instance.
 	 **/
