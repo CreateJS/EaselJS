@@ -45,7 +45,7 @@
 	"../src/easeljs/display/SpriteContainer.js",
 	"../src/easeljs/display/SpriteStage.js"
   ],
-  "docs_out_path": "./output/EaselJSDocs/",
+  "docs_out_path": "../../createjs-com_version2/docs/easeljs/",
   "connect_root": "../",
   "livereload_watch": [
 	"../{examples,extras}/{,*/}*.{png,jpg,jpeg,gif,webp,svg,ogg,mp3,js,css,html}"

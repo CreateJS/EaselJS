@@ -4,6 +4,8 @@ Version NEXT [Not Released]
 - documentation updates
 - fixed the SpriteSheetBuilder to support both SpriteSheet framerate and speed (instead of frequency)
 - fixed ignoreScale support in Graphic StrokeStyle command
+- bower updates
+- updated additional classes to the new extend/promote approach
 
 
 Version 0.8.1 [May 21, 2015]

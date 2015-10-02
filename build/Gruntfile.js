@@ -348,6 +348,9 @@ module.exports = function (grunt) {
 		"sourceBuild"
 	]);
 
+	/** Aliased task for WebStorm quick-run */
+	grunt.registerTask('_next_easel', ["next"]);
+
 	/**
 	 * Task for exporting a release build (version based on package.json)
 	 *
