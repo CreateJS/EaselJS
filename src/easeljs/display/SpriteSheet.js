@@ -447,7 +447,7 @@ this.createjs = this.createjs||{};
 
 		// parse frames:
 		if (data.frames == null) { // nothing
-		} else if (data.frames instanceof Array) {
+		} else if (Array.isArray(data.frames)) {
 			this._frames = [];
 			a = data.frames;
 			for (i=0,l=a.length;i<l;i++) {
@@ -476,7 +476,7 @@ this.createjs = this.createjs||{};
 				var obj = o[name];
 				if (typeof obj == "number") { // single frame
 					a = anim.frames = [obj];
-				} else if (obj instanceof Array) { // simple
+				} else if (Array.isArray(obj)) { // simple
 					if (obj.length == 1) { anim.frames = [obj[0]]; }
 					else {
 						anim.speed = obj[3];
@@ -525,7 +525,7 @@ this.createjs = this.createjs||{};
 		var maxFrames = this._numFrames || 100000; // if we go over this, something is wrong.
 		var frameCount = 0, frameWidth = this._frameWidth, frameHeight = this._frameHeight;
 		var spacing = this._spacing, margin = this._margin;
-		
+
 		imgLoop:
 		for (var i=0, imgs=this._images; i<imgs.length; i++) {
 			var img = imgs[i], imgW = img.width, imgH = img.height;
