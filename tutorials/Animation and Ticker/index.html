@@ -21,12 +21,14 @@
 			<h1>EaselJS <em>Animation and Ticker</em></h1>
 			<p>
 				<strong>Synopsis:</strong> Create a simple programmatic animation, and learn about the Ticker class.<br>
-				<strong>Topics:</strong> animation, Ticker, setFPS, timingMode, getTime, setPaused, requestAnimationFrame, Stage.update, time based animation<br>
+				<strong>Topics:</strong> animation, Ticker, setFPS, timingMode, getTime, setPaused,
+				requestAnimationFrame, Stage.update, time based animation<br/>
 				<strong>Target:</strong> EaselJS v0.6.0 and above
 			</p>
 		</header>
 		<p class="highlight">
-			This tutorial is part of the <a href="https://github.com/CreateJS/EaselJS/" target="_blank">EaselJS GitHub repository</a>.<br />
+			This tutorial is part of the <a href="https://github.com/CreateJS/EaselJS/" target="_blank">EaselJS GitHub
+			repository</a>.<br />
 			Check out the repository for more tutorials and a handful of helpful samples.
 		</p>
 
@@ -36,7 +38,9 @@
 				<h2>Animation Basics</h2>
 			</header>
 			<p>
-				Animation is simply changing the visual properties of an object over time. There are a number of tweening classes that can make this easy (such as TweenJS and TweenLite), but in this tutorial we will explore the basic concepts without using one.
+				Animation is simply changing the visual properties of an object over time. There are a number of
+				tweening classes that can make this easy (such as TweenJS and TweenLite), but in this tutorial we will
+				explore the basic concepts without using one.
 			</p>
 			<p>
 				If you run the following code on a regular interval, the circle will animate moving to the right:
@@ -46,10 +50,14 @@ circle.x = circle.x + 3;
 if (circle.x > stage.canvas.width) { circle.x = 0; }
 			</textarea>
 			<p>
-				Simple, but what's the best way to set up that regular interval? You could use your own implementation with setInterval, setTimeout, or requestAnimationFrame, and EaselJS would work perfectly, as long as you remember to call <code>stage.update()</code> after updating your display list.
+				Simple, but what's the best way to set up that regular interval? You could use your own implementation
+				with setInterval, setTimeout, or requestAnimationFrame, and EaselJS would work perfectly, as long as you
+				remember to call <code>stage.update()</code> after updating your display list.
 			</p>
 			<p>
-				To make things easy, EaselJS comes with the <code>Ticker</code> class, which provides a regular heartbeat (tick) for your application, provides pause and time deltas, and wraps both setTimeout and requestAnimationFrame so you can use them interchangeably.
+				To make things easy, EaselJS comes with the <code>Ticker</code> class, which provides a regular
+				heartbeat (tick) for your application, provides pause and time deltas, and wraps both setTimeout and
+				requestAnimationFrame so you can use them interchangeably.
 			</p>
 		</section>
 		
@@ -58,16 +66,21 @@ if (circle.x > stage.canvas.width) { circle.x = 0; }
 				<h2>Ticker</h2>
 			</header>
 			<p>
-				The <code>Ticker</code> class provides a simple static interface (meaning, you don't ever create a <code>new Ticker()</code>) to propagate a tick to various objects. To use it we just add a event listener with <code>addEventListener("tick", handler)</code>. The listener can be a function, or an object with a <code>handleEvent</code> function defined.
+				The <code>Ticker</code> class provides a simple static interface (meaning, you don't ever create a
+				<code>new createjs.Ticker()</code>) to propagate a tick to various objects. To use it we just add an
+				event listener with <code>addEventListener("tick", handler)</code>. The listener can be a function, or
+				an object with a <code>handleEvent</code> function defined.
 			</p>
 			<p>
-				The code below adds the window as a listener, and defines a tick function that will be called 20 times per second (<code>Ticker</code>'s default framerate):
+				The code below adds the window as a listener, and defines a tick function that will be called 20 times
+				per second (<code>Ticker</code>'s default framerate):
 			<textarea class="brush: js;" readonly>
-createjs.Ticker.addEventListener("tick", tick);
+createjs.Ticker.on("tick", tick);
 function tick() { console.log("TICK!!!"); }
 			</textarea>
 			<p>
-				You can easily change the default framerate by either setting an interval (the time between ticks) or a framerate (the number of ticks per second).
+				You can easily change the default framerate by either setting an interval (the time between ticks) or a
+			framerate (the number of ticks per second).
 			</p>
 			<textarea class="brush: js;" readonly>
 // these are equivalent, 1000ms / 40fps = 25ms
@@ -75,7 +88,9 @@ createjs.Ticker.setInterval(25);
 createjs.Ticker.setFPS(40);
 			</textarea>
 			<p>
-				Let's combine all of that to make a circle move across the stage at 30 frames per second. And don't forget to call <code>stage.update()</code> at the end of each tick to draw the changes to the canvas! Check out the source for simple.html for the complete code.
+				Let's combine all of that to make a circle move across the stage at 30 frames per second. And don't
+				forget to call <code>stage.update()</code> at the end of each tick to draw the changes to the canvas!
+				Check out the source for simple.html for the complete code.
 			</p>
 			<iframe src="simple.html" class="demo" data-description="animating a circle with Ticker" width="100%" height="120px"></iframe>
 		</section>
@@ -85,12 +100,17 @@ createjs.Ticker.setFPS(40);
 				<h2>Time based animation</h2>
 			</header>
 			<p>
-				For many applications, it's a good idea to make your animations independent of your frame rate. This allows you to change the framerate dynamically, and ensures your animations run for the same amount of time, even if they are running on a slow device that isn't maintaining the target framerate.
+				For many applications, it's a good idea to make your animations independent of your frame rate. This
+				allows you to change the framerate dynamically, and ensures your animations run for the same amount of
+				time, even if they are running on a slow device that isn't maintaining the target framerate.
 			</p>
 			<p>
-				<code>Ticker</code> makes time based animations easy, by passing your listener a parameter that indicates the amount of time that has elapsed since the previous tick. It also exposes a <code>getTime</code> method which provides you with the total time elapsed since <code>Ticker</code> initialized.
+				<code>Ticker</code> makes time based animations easy, by passing your listener a parameter that
+				indicates the amount of time that has elapsed since the previous tick. It also exposes a <code>getTime</code>
+				method which provides you with the total time elapsed since <code>Ticker</code> initialized.
 			</p>
-				You can make your animation time based by simply factoring in the elapsed time when we make our property changes.
+				You can make your animation time based by simply factoring in the elapsed time when we make our property
+			changes.
 			<textarea class="brush: js;" readonly>
 function tick(event) {
 	// move 100 pixels per second (elapsedTimeInMS / 1000msPerSecond * pixelsPerSecond):
@@ -100,14 +120,29 @@ function tick(event) {
 }
 			</textarea>
 			<p>
-				Now you can change the framerate, and the circle will take the same amount of time to cross the canvas (give or take a few milliseconds).
+				Now you can change the framerate, and the circle will take the same amount of time to cross the canvas
+				(give or take a few milliseconds).
 			</p>
 			<iframe src="timeBased.html" class="demo" data-description="time based animation, the red circle is using time based animation" width="100%" height="250px"></iframe>
 			<p>
-				Notice in the above demo how when you change the FPS, the red circle still moves at the same velocity, whereas the blue circle's velocity is relative to the framerate. Also note how at 20fps, the red circle moves very slightly faster than the blue circle, because it accounts for frames that take slightly longer than the expected 50ms.
+				Notice in the above demo how when you change the FPS, the red circle still moves at the same velocity,
+				whereas the blue circle's velocity is relative to the framerate. Also note how at 20fps, the red circle
+				moves very slightly faster than the blue circle, because it accounts for frames that take slightly
+				longer than the expected 50ms.
 			</p>
 			<p>
-				It's also worth noting that sprite sheet animations in EaselJS also support time-based playback via the <code>Sprite.framerate</code> and <code>SpriteSheet.framerate</code> properties. See the API docs for more information.
+				It's also worth noting that sprite sheet animations in EaselJS also support time-based playback via the
+				<code>Sprite.framerate</code> and <code>SpriteSheet.framerate</code> properties. See the API docs for
+				more information.
+			</p>
+			<p>
+				<em>Note: The <code>framerate</code> property of Sprite and SpriteSheet will only work if the <code>stage.update()</code>
+				method is passed the <code>event</code> object that is generated by the Ticker:</em>
+				<textarea class="brush: js;" readonly>
+				function tick(event) {
+					stage.update(event);
+				}
+				</textarea>
 			</p>
 		</section>
 		
@@ -116,16 +151,28 @@ function tick(event) {
 				<h2>Timing Modes</h2>
 			</header>
 			<p>
-				Most modern browsers support a new animation related API called <code>requestAnimationFrame</code>. It provides the benefit of synching programmatic changes with screen redraws which can result in smoother looking content. It will also throttle the framerate of background content (such as an unfocused tab) to reduce CPU and battery use.
+				Most modern browsers support a new animation related API called <code>requestAnimationFrame</code>. It
+				provides the benefit of syncing programmatic changes with screen redraws which can result in smoother
+				looking content. It will also throttle the framerate of background content (such as an unfocused tab) to
+				reduce CPU and battery use.
 			</p>
 			<p>
-				The <code>Ticker.timingMode</code> allows you to choose what API to use to drive the heartbeat. By default, it uses <code>Ticker.TIMEOUT</code> and the setTimeout API. This is supported in all browsers, and provides a predictable, elastic framerate but without the benefits of requestAnimationFrame. It also allows you to reduce CPU/GPU load by reducing framerate.
+				The <code>Ticker.timingMode</code> allows you to choose what API to use to drive the heartbeat. By
+				default, it uses <code>Ticker.TIMEOUT</code> and the setTimeout API. This is supported in all browsers,
+				and provides a predictable, elastic framerate but without the benefits of requestAnimationFrame. It also
+				allows you to reduce CPU/GPU load by reducing framerate.
 			</p>
 			<p>
-				There are two modes for using requestAnimationFrame, which will automatically fall back to using setTimeout if the browser does not support the API. <code>Ticker.RAF</code> simply passes through the RAF heartbeat, ignoring the specified framerate completely. Because RAF frequency is indeterminate, your content should be time based when using this mode.
+				There are two modes for using requestAnimationFrame, which will automatically fall back to using
+				setTimeout if the browser does not support the API. <code>Ticker.RAF</code> simply passes through the
+				RAF heartbeat, ignoring the specified framerate completely. Because RAF frequency is indeterminate, your
+				content should be time based when using this mode.
 			</p>
 			<p>
-				The <code>Ticker.RAF_SYNCHED</code> mode attempts to match up the requestAnimationFrame heartbeat to your specified framerate. This mode provides many of the benefits of the <code>TIMEOUT</code> and <code>RAF</code> modes, but will generally have the highest variance in frame times. It typically works best when the framerate is set to a divisor of 60 (ex. 10, 12, 15, 20, 30).
+				The <code>Ticker.RAF_SYNCHED</code> mode attempts to match up the requestAnimationFrame heartbeat to
+				your specified framerate. This mode provides many of the benefits of the <code>TIMEOUT</code> and
+				<code>RAF</code> modes, but will generally have the highest variance in frame times. It typically works
+				best when the framerate is set to a divisor of 60 (ex. 10, 12, 15, 20, 30).
 			</p>
 			<textarea class="brush: js;" readonly>
 createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
@@ -138,13 +185,18 @@ createjs.Ticker.setFPS(30);
 				<h2>Pausing</h2>
 			</header>
 			<p>
-				<code>Ticker</code> also provides the ability to pause all of your animations. All listener you add to Ticker are "pauseable". Calling <code>Ticker.setPaused(true);</code> will stop <code>Ticker</code> from calling <code>tick</code> on all pauseable listeners.
+				<code>Ticker</code> also provides the ability to pause all of your animations. All listener you add to
+				Ticker are "pauseable". Calling <code>Ticker.setPaused(true);</code> will stop <code>Ticker</code> from
+				calling <code>tick</code> on all pauseable listeners.
 			</p>
 			<p>
-				The <code>getTime</code> method accepts a <code>pauseable</code> parameter, and will return the appropriate time total based on it.
+				The <code>getTime</code> method accepts a <code>pauseable</code> parameter, and will return the
+				appropriate time total based on it.
 			</p>
 			<p>
-				In the following demo, play with toggling pause, and see how the red "pauseable" circle stops, where the green "unpauseable" circle does not. You can also see how the total pauseable time stops updating when <code>Ticker</code> is paused.
+				In the following demo, play with toggling pause, and see how the red "pauseable" circle stops, where the
+				green "unpauseable" circle does not. You can also see how the total pauseable time stops updating when
+				<code>Ticker</code> is paused.
 			</p>
 			<iframe src="pausing.html" class="demo" data-description="showing Ticker.setPaused() at work. Click to toggle pause." width="100%" height="245px"></iframe>
 		</section>
@@ -154,9 +206,10 @@ createjs.Ticker.setFPS(30);
 				<h2>Tick</h2>
 			</header>
 			<p>
-				When you call <code>stage.update()</code>, it will tick any descendants exposing a tick method and render
-                its entire display list to the canvas. Any parameters passed to <code>update()</code> will be passed on to
-                <code>tick()</code> handlers. This lets you handle your animation in the context of your display object.
+				When you call <code>stage.update()</code>, it will tick any descendants exposing a tick method and
+				render its entire display list to the canvas. Any parameters passed to <code>update()</code> will be
+				passed on to <code>tick()</code> handlers. This lets you handle your animation in the context of your
+				display object.
 			</p>
 			<textarea class="brush: js;" readonly>
 circle.addEventListener("tick", function() { this.x += 5; });
@@ -164,7 +217,7 @@ circle.addEventListener("tick", function() { this.x += 5; });
 			<p>
 				You can also add your stage directly as a listener to <code>Ticker</code>, because <code>Stage</code>
                 has a <code>handleEvent</code> method that shortcuts to <code>update</code>. It's rare that you would
-                want to use this, but it can be handy for quick tests.
+                want to use this in a larger application, but it can be handy for quick tests.
 			</p>
 			<textarea class="brush: js;" readonly>
 createjs.Ticker.addEventListener("tick", myStage);
@@ -176,10 +229,13 @@ createjs.Ticker.addEventListener("tick", myStage);
 				<h2>Performance</h2>
 			</header>
 			<p>
-				Remember that a higher framerate doesn't always result in smoother animation. A lower framerate uses less CPU, and can provide more consistent performance. Try to find the right balance for your project.
+				Remember that a higher framerate doesn't always result in smoother animation. A lower framerate uses
+				less CPU, and can provide more consistent performance. Try to find the right balance for your project.
 			</p>
 			<p>
-				If you'd like to check what your real framerate is, you can call <code>Ticker.getMeasuredFPS()</code> to get the average real framerate for the past 1 second. You can also use <code>Ticker.getMeasuredTickTime()</code> to get the average time spent within the entire tick event stack.
+				If you'd like to check what your real framerate is, you can call <code>Ticker.getMeasuredFPS()</code> to
+				get the average real framerate for the past 1 second. You can also use <code>Ticker.getMeasuredTickTime()</code>
+				to get the average time spent within the entire tick event stack.
 			</p>
 		</section>
 		
@@ -188,7 +244,9 @@ createjs.Ticker.addEventListener("tick", myStage);
 				<h2>TweenJS</h2>
 			</header>
 			<p>
-				If you're planning to do a lot of animation, you might want to check out <a href="http://tweenjs.com"/>TweenJS</a> or another tweening library. You can use simple commands to tween properties over time and create sequences of animations.
+				If you're planning to do a lot of animation, you might want to check out <a href="http://tweenjs.com"/>TweenJS</a>
+				or another tweening library such as <a href="http://greensock.com/gsap">GSAP</a>. You can use simple
+				commands to tween properties over time and create sequences of animations.
 			</p>
 			<textarea class="brush: js;" readonly>
 createjs.TweenJS.get(circle).to({x:300}, 1000).to({x:0}, 0).call(onAnimationComplete);
