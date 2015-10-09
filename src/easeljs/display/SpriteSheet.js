@@ -176,7 +176,7 @@ this.createjs = this.createjs||{};
 	 * coordinates manually, however there are a number of tools that facilitate this.
 	 * <ul>
 	 *     <li>Exporting SpriteSheets or HTML5 content from Flash Pro supports the EaselJS SpriteSheet format.</li>
-	 *     <li>The popular <a href="https://www.codeandweb.com/texturepacker" target="_blank">Texture Packer</a> has
+	 *     <li>The popular <a href="https://www.codeandweb.com/texturepacker/easeljs" target="_blank">Texture Packer</a> has
 	 *     EaselJS support.
 	 *     <li>SWF animations in Flash can be exported to SpriteSheets using <a href="http://createjs.com/zoe" target="_blank"></a></li>
 	 * </ul>
