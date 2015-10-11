@@ -494,7 +494,7 @@ this.createjs = this.createjs||{};
 		var skewX = Math.atan2(-this.c, this.d);
 		var skewY = Math.atan2(this.b, this.a);
 
-		var delta = Math.abs(1-skewX/skewY);
+		var delta = isNaN(skewX/skewY) ? 0 : Math.abs(1-skewX/skewY);
 		if (delta < 0.00001) { // effectively identical, can use rotation:
 			target.rotation = skewY/Matrix2D.DEG_TO_RAD;
 			if (this.a < 0 && this.d >= 0) {
