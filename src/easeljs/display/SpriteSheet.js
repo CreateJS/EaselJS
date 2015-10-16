@@ -492,7 +492,7 @@ this.createjs = this.createjs||{};
 
 		// parse frames:
 		if (data.frames == null) { // nothing
-		} else if (data.frames instanceof Array) {
+		} else if (Array.isArray(data.frames)) {
 			this._frames = [];
 			a = data.frames;
 			for (i=0,l=a.length;i<l;i++) {
@@ -521,7 +521,7 @@ this.createjs = this.createjs||{};
 				var obj = o[name];
 				if (typeof obj == "number") { // single frame
 					a = anim.frames = [obj];
-				} else if (obj instanceof Array) { // simple
+				} else if (Array.isArray(obj)) { // simple
 					if (obj.length == 1) { anim.frames = [obj[0]]; }
 					else {
 						anim.speed = obj[3];

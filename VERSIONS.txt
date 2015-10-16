@@ -6,6 +6,7 @@ Version NEXT [Not Released]
 - fixed ignoreScale support in Graphic StrokeStyle command
 - bower updates
 - updated additional classes to the new extend/promote approach
+- Changed SpriteSheet Array checks from instanceof to Array.isArray()
 
 
 Version 0.8.1 [May 21, 2015]
