@@ -98,6 +98,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this.snapToPixel = true;
 	}
+
 	var p = createjs.extend(ScaleBitmap, createjs.DisplayObject);
 	ScaleBitmap.prototype.constructor = ScaleBitmap;
 
@@ -113,7 +114,7 @@ this.createjs = this.createjs||{};
 	p.setDrawSize = function(newWidth, newHeight) {
 		this.drawWidth = newWidth;
 		this.drawHeight = newHeight;
-	}
+	};
 
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
@@ -125,7 +126,7 @@ this.createjs = this.createjs||{};
 	p.isVisible = function() {
 		var hasContent = this.cacheCanvas || (this.image && (this.image.complete || this.image.getContext || this.image.readyState >= 2));
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
-	}
+	};
 
 	/**
 	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
@@ -197,7 +198,7 @@ this.createjs = this.createjs||{};
 		}
 
 		return true;
-	}
+	};
 
 	/**
 	 * Returns a clone of the ScaleBitmap instance.
@@ -209,7 +210,7 @@ this.createjs = this.createjs||{};
 		if (this.sourceRect) { o.sourceRect = this.sourceRect.clone(); }
 		this.cloneProps(o);
 		return o;
-	}
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -218,8 +219,8 @@ this.createjs = this.createjs||{};
 	 **/
 	p.toString = function() {
 		return "[ScaleBitmap (name="+  this.name +")]";
-	}
-
+	};
 
 	createjs.ScaleBitmap = createjs.promote(ScaleBitmap, "DisplayObject");
+
 }());
