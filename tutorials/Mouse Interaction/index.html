@@ -21,7 +21,7 @@
 			<p>
 				<strong>Synopsis:</strong> Learn about mouse events on display objects and the stage.<br>
 				<strong>Topics:</strong> MouseEvent, addEventListener, on, click, dblclick, mouseover, mouseout,
-				mousemove, mousedown, mouseup, enableMouseOver, drag and drop, mouseMoveOutside<br>
+				mousemove, mousedown, enableMouseOver, drag and drop, mouseMoveOutside<br>
 				<strong>Target:</strong> EaselJS v0.7.0
 			</p>
 		</header>
@@ -45,7 +45,7 @@ circle.addEventListener("click", function(event) { alert("clicked"); })
 			<iframe src="basic.html" class="demo" data-description="the onClick handler" width="100%" height="220px"></iframe>
 			<p>
 				There are a number of events you can listen for on display objects: <code>click</code>,
-				<code>mousedown</code>, <code>mouseup</code>, <code>dblclick</code>, <code>pressmove</code>,
+				<code>mousedown</code>, <code>dblclick</code>, <code>pressmove</code>,
 				<code>pressup</code>, <code>mouseover</code> / <code>mouseout</code>, and <code>rollover</code> /
 				<code>rollout</code>.
 			</p>
@@ -54,6 +54,11 @@ circle.addEventListener("click", function(event) { alert("clicked"); })
 				<code>stage.enableMouseOver(frequency)</code>. The <code>frequency</code> parameter indicates how many
 				times per second EaselJS should calculate what is currently under the pointer. A higher number is more
 				responsive, but also more computationally expensive. It defaults to 20 times per second.
+			</p>
+			<p>
+				Note that there is no <code>mouseup</code> event. Instead use <code>click</code> (when the mouse is
+				pressed and released on the same target, or <code>pressup</code> if you need to know when the mouse
+				is pressed on a target, but released anywhere.
 			</p>
 			<p>
 				The <code>on</code> method provides a shortcut to <code>addEventListener</code>, and adds additional
