@@ -140,9 +140,11 @@ this.createjs = this.createjs||{};
 		/**
 		 * Holds a reference to the last command that was created or appended. For example, you could retain a reference
 		 * to a Fill command in order to dynamically update the color later by using:
-		 * 		myFill = myGraphics.beginFill("red").command;
+		 *
+		 * 		var myFill = myGraphics.beginFill("red").command;
 		 * 		// update color later:
 		 * 		myFill.style = "yellow";
+		 *
 		 * @property command
 		 * @type Object
 		 **/
