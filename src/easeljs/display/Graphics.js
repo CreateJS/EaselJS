@@ -999,7 +999,7 @@ this.createjs = this.createjs||{};
 	 * 		myShape.color = "red";
 	 *
 	 * 		// append a Circle command object:
-	 * 		myShape.graphics.append(new Graphics.Circle(50, 50, 30));
+	 * 		myShape.graphics.append(new createjs.Graphics.Circle(50, 50, 30));
 	 *
 	 * 		// append a custom command object with an exec method that sets the fill style
 	 * 		// based on the shape's data, and then fills the circle.

@@ -329,7 +329,7 @@ this.createjs = this.createjs||{};
 	 * were not fully loaded when the sprite sheet was initialized. You should check the complete property
 	 * to prior to adding a listener. Ex.
 	 *
-	 * 	var sheet = new SpriteSheet(data);
+	 * 	var sheet = new createjs.SpriteSheet(data);
 	 * 	if (!sheet.complete) {
 	 * 		// not preloaded, listen for the complete event:
 	 * 		sheet.addEventListener("complete", handler);

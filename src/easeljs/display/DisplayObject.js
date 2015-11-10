@@ -1052,7 +1052,7 @@ this.createjs = this.createjs||{};
 	 * <h4>Example</h4>
 	 *
 	 *      var myGraphics = new createjs.Graphics().beginFill("#ff0000").drawCircle(0, 0, 25);
-	 *      var shape = stage.addChild(new Shape()).set({graphics:myGraphics, x:100, y:100, alpha:0.5});
+	 *      var shape = stage.addChild(new createjs.Shape()).set({graphics:myGraphics, x:100, y:100, alpha:0.5});
 	 *
 	 * @method set
 	 * @param {Object} props A generic object containing properties to copy to the DisplayObject instance.
