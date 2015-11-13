@@ -1649,8 +1649,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.LineTo = function(x, y) {
 		this.x = x; this.y = y;
@@ -1711,8 +1712,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.ArcTo = function(x1, y1, x2, y2, radius) {
 		this.x1 = x1; this.y1 = y1;
@@ -1756,8 +1758,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.Arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		this.x = x; this.y = y;
@@ -1792,8 +1795,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.QuadraticCurveTo = function(cpx, cpy, x, y) {
 		this.cpx = cpx; this.cpy = cpy;
@@ -1836,8 +1840,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.BezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
 		this.cp1x = cp1x; this.cp1y = cp1y;
@@ -1871,8 +1876,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.Rect = function(x, y, w, h) {
 		this.x = x; this.y = y;
@@ -1885,8 +1891,9 @@ this.createjs = this.createjs||{};
 	 * @constructor
 	 **/
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.ClosePath = function() {
 	}).prototype.exec = function(ctx) { ctx.closePath(); };
@@ -1897,8 +1904,9 @@ this.createjs = this.createjs||{};
 	 * @constructor
 	 **/
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.BeginPath = function() {
 	}).prototype.exec = function(ctx) { ctx.beginPath(); };
@@ -1920,8 +1928,9 @@ this.createjs = this.createjs||{};
 	 * @type Matrix2D
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	p = (G.Fill = function(style, matrix) {
 		this.style = style;
@@ -2008,8 +2017,9 @@ this.createjs = this.createjs||{};
 	 * @type Boolean
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	p = (G.Stroke = function(style, ignoreScale) {
 		this.style = style;
@@ -2090,8 +2100,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	p = (G.StrokeStyle = function(width, caps, joints, miterLimit, ignoreScale) {
 		this.width = width;
@@ -2125,8 +2136,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.StrokeDash = function(segments, offset) {
 		this.segments = segments;
@@ -2194,8 +2206,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.RoundRect = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
 		this.x = x; this.y = y;
@@ -2249,8 +2262,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.Circle = function(x, y, radius) {
 		this.x = x; this.y = y;
@@ -2283,8 +2297,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.Ellipse = function(x, y, w, h) {
 		this.x = x; this.y = y;
@@ -2344,8 +2359,9 @@ this.createjs = this.createjs||{};
 	 * @type Number
 	 */
 	/**
+	 * Execute the Graphics command in the provided Canvas context.
 	 * @method exec
-	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.PolyStar = function(x, y, radius, sides, pointSize, angle) {
 		this.x = x; this.y = y;
