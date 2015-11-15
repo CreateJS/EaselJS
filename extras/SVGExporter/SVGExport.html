@@ -174,7 +174,7 @@
 			
 			// scale invariant strokes (aka ignoreScale):
 			var shape2 = new c.Shape();
-			shape2.graphics.f().s("green").ss(4, null, null, null, true).drawRect(0,0,10,10);
+			shape2.graphics.f().s("green").ss(4, null, null, null, true).setStrokeDash([5,2,10,2]).drawRect(0,0,10,10);
 			shape2.scaleX = shape2.scaleY = 10;
 			shape2.x = 350;
 			shape2.y = 50;
