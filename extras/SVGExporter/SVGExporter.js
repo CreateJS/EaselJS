@@ -426,7 +426,9 @@
 			else if (cmd instanceof G.ClosePath && path) { subPath = "Z"; }
 			
 			// SVG doesn't like missing moveTos, canvas simply treats it as a move:
-			if (subPath && !path && subPath[0] != "M") { subPath = "M "+(cmd.x||cmd.x2)+" "+(cmd.y||cmd.y2); }
+			if (subPath && !path && subPath[0] != "M") {
+				subPath = "M "+(isNaN(cmd.x)?cmd.x2:cmd.x)+" "+(isNaN(cmd.y)?cmd.y2:cmd.y);
+			}
 			if (subPath) { path += subPath; }
 
 			if (path && (!subPath || i==l-1)) {
