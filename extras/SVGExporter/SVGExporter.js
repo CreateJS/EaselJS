@@ -363,7 +363,7 @@
 	
 	p.exportShapeElements = function(o, maskmode) {
 		var q = o.graphics.getInstructions(), G = c.Graphics;
-		var active = [], fill=null, stroke=null, strokeStyle=null, closed = false, els = [];
+		var active = [], fill=null, stroke=null, strokeStyle=null, strokeDash=null, closed = false, els = [];
 		
 		for (var i= 0, l= q.length; i<l; i++) {
 			var cmd = q[i], isStrokeOrPath = false;
@@ -377,6 +377,9 @@
 			} else if (cmd instanceof G.StrokeStyle) {
 				strokeStyle = cmd;
 				isStrokeOrPath = closed = true;
+			} else if (cmd instanceof G.StrokeDash) {
+				strokeDash = cmd;
+				isStrokeOrPath = closed = true;
 			}
 			
 			if ((closed && !isStrokeOrPath) || i == l-1) {
@@ -389,7 +392,7 @@
 				} else if (subElements.length > 1) {
 					el = this.appendChildren(this.createNode("g"), subElements);
 				}
-				this.applyFillAndStroke(el, fill, stroke, strokeStyle);
+				this.applyFillAndStroke(el, fill, stroke, strokeStyle, strokeDash);
 				if (el) { els.push(el); }
 				active.length = 0;
 				closed = false; 
@@ -506,12 +509,12 @@
 		return str;
 	};
 	
-	p.applyFillAndStroke = function(el, fill, stroke, strokeStyle) {
+	p.applyFillAndStroke = function(el, fill, stroke, strokeStyle, strokeDash) {
 		if (stroke && stroke.ignoreScale) { this.setAttribute(el, "vector-effect", "non-scaling-stroke"); }
-		return this.setAttribute(el, "style", this.getFillAndStrokeStyle(fill, stroke, strokeStyle));
+		return this.setAttribute(el, "style", this.getFillAndStrokeStyle(fill, stroke, strokeStyle, strokeDash));
 	};
 	
-	p.getFillAndStrokeStyle = function(fill, stroke, strokeStyle) {
+	p.getFillAndStrokeStyle = function(fill, stroke, strokeStyle, strokeDash) {
 		var style = "";
 		style += this._getFill(fill); // "fill:"+this._getFill(fill)+";";
 		style += this._getFill(stroke, true); //"stroke:"+this._getFill(stroke, true)+";";
@@ -521,7 +524,12 @@
 			if (caps != "none") { style += "stroke-linecap:"+caps+";" }
 			if (strokeStyle.joints && strokeStyle.joints != "miter") { style += "stroke-linejoin:"+strokeStyle.joints+";"; }
 			else if (strokeStyle.miterLimit != 4) { style += "stroke-miterlimit:"+(strokeStyle.miterLimit?strokeStyle.miterLimit:10)+";"; }
-			
+			if (strokeDash) {
+				style += "stroke-dasharray:" + strokeDash.segments.join(",") + ";";
+				if (strokeDash.offset != 0) {
+					style += "stroke-dashoffset:" + strokeDash.offset + ";";
+				}
+			}
 		}
 		return style;
 	};
