@@ -1018,17 +1018,29 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Tests whether the display object intersects the specified point in local coordinates (ie. draws a pixel with alpha > 0 at
-	 * the specified position). This ignores the alpha, shadow, hitArea, mask, and compositeOperation of the display object.
+	 * Tests whether the display object intersects the specified point in <em>local</em> coordinates (ie. draws a pixel
+	 * with alpha > 0 at the specified position). This ignores the alpha, shadow, hitArea, mask, and compositeOperation
+	 * of the display object.
 	 *
 	 * <h4>Example</h4>
 	 *
+	 * 		var myShape = new createjs.Shape();
+	 * 		myShape.graphics.beginFill("red").drawRect(100, 100, 20, 50);
+	 *
+	 * 		console.log(myShape.hitTest(10,10); // false
+	 * 		console.log(myShape.hitTest(110, 25); // true
+	 *
+	 * Note that to use Stage coordinates (such as {{#crossLink "Stage/mouseX:property"}}{{/crossLink}}), they must
+	 * first be converted to local coordinates:
+	 *
 	 *      stage.addEventListener("stagemousedown", handleMouseDown);
 	 *      function handleMouseDown(event) {
-	 *          var hit = myShape.hitTest(event.stageX, event.stageY);
+	 *      	var p = myShape.globalToLocal(stage.mouseX, stage.mouseY);
+	 *          var hit = myShape.hitTest(p.x, p.y);
 	 *      }
 	 *
-	 * Please note that shape-to-shape collision is not currently supported by EaselJS.
+	 * Shape-to-shape collision is not currently supported by EaselJS.
+	 *
 	 * @method hitTest
 	 * @param {Number} x The x position to check in the display object's local coordinates.
 	 * @param {Number} y The y position to check in the display object's local coordinates.
