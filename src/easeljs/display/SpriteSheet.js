@@ -486,6 +486,7 @@ this.createjs = this.createjs||{};
 					this._loadCount++;
 					this.complete = false;
 					(function(o) { img.onload = function() { o._handleImageLoad(); } })(this);
+					(function(o) { img.onerror = function() { o._handleImageError(); } })(this);
 				}
 			}
 		}
@@ -556,6 +557,15 @@ this.createjs = this.createjs||{};
 			this.complete = true;
 			this.dispatchEvent("complete");
 		}
+	};
+
+	/**
+	 * @method _handleImageError
+	 * @protected
+	 **/
+	p._handleImageError = function() {
+    this.complete = true;
+    this.dispatchEvent("error");
 	};
 
 	/**
