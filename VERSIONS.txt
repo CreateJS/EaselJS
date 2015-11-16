@@ -9,6 +9,7 @@ Version NEXT [Not Released]
 - Changed SpriteSheet Array checks from instanceof to Array.isArray()
 - Added StrokeDash support to SVGExporter
 - Fixed issue with SVGExporter when the first lineTo has a zero-value for x or y
+- Added image error handling to SpriteSheet
 
 
 Version 0.8.1 [May 21, 2015]

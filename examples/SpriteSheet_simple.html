@@ -31,6 +31,14 @@
 				}
 			});
 
+		// Events from SpriteSheet (not required for the demo)
+		spriteSheet.on("complete", function(event) {
+			console.log("Complete", event);
+		});
+		spriteSheet.on("error", function(event) {
+			console.log("Error", event);
+		});
+
 		var grant = new createjs.Sprite(spriteSheet, "run");
 		grant.x = stage.canvas.width / 2;
 		grant.y = 22;

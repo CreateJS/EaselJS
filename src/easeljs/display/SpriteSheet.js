@@ -349,6 +349,15 @@ this.createjs = this.createjs||{};
 	 * @param {Object} frame The frame object that getFrame will return.
 	 */
 
+	/**
+	 * Dispatched when an image encounters an error. A SpriteSheet will dispatch an error event for each image that
+	 * encounters an error, and will still dispatch a {{#crossLink "SpriteSheet/complete:event"}}{{/crossLink}}
+	 * event once all images are finished processing, even if an error is encountered.
+	 * @event error
+	 * @param {String} src The source of the image that failed to load.
+	 * @since 0.8.2
+	 */
+
 
 // getter / setters:
 	/**
@@ -485,7 +494,8 @@ this.createjs = this.createjs||{};
 				if (!img.getContext && !img.naturalWidth) {
 					this._loadCount++;
 					this.complete = false;
-					(function(o) { img.onload = function() { o._handleImageLoad(); } })(this);
+					(function(o, src) { img.onload = function() { o._handleImageLoad(src); } })(this, src);
+					(function(o, src) { img.onerror = function() { o._handleImageError(src); } })(this, src);
 				}
 			}
 		}
@@ -550,10 +560,25 @@ this.createjs = this.createjs||{};
 	 * @method _handleImageLoad
 	 * @protected
 	 **/
-	p._handleImageLoad = function() {
+	p._handleImageLoad = function(src) {
 		if (--this._loadCount == 0) {
 			this._calculateFrames();
 			this.complete = true;
+			this.dispatchEvent("complete");
+		}
+	};
+
+	/**
+	 * @method _handleImageError
+	 * @protected
+	 */
+	p._handleImageError = function (src) {
+		var errorEvent = new createjs.Event("error");
+		errorEvent.src = src;
+		this.dispatchEvent(errorEvent);
+
+		// Complete is still dispatched.
+		if (--this._loadCount == 0) {
 			this.dispatchEvent("complete");
 		}
 	};
