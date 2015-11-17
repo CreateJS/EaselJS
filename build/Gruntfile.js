@@ -18,7 +18,6 @@ module.exports = function (grunt) {
 				watch: {
 					js: {
 						files: [getConfigValue('easel_source'),
-							getConfigValue('movieclip_source'),
 							getConfigValue('gl_source'),
 							getConfigValue('watch_exclude_files')
 						],
@@ -65,7 +64,6 @@ module.exports = function (grunt) {
 					build: {
 						files: {
 							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.min.js': getConfigValue('easel_source'),
-							'output/movieclip-<%= version %>.min.js': getConfigValue('movieclip_source'),
 							'output/webgl-<%= version %>.min.js': getConfigValue('gl_source')
 						}
 					}
@@ -108,11 +106,6 @@ module.exports = function (grunt) {
 							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.combined.js': combineSource(
 									[
 										{cwd: '', config:'config.json', source:'easel_source'}
-									]
-							),
-							'output/movieclip-<%= version %>.combined.js': combineSource(
-									[
-										{cwd: '', config:'config.json', source:'movieclip_source'}
 									]
 							),
 							'output/webgl-<%= version %>.combined.js': combineSource(
@@ -197,19 +190,12 @@ module.exports = function (grunt) {
 					easel: {
 						file: '../src/easeljs/version.js',
 						version: '<%= version %>'
-					},
-					movieclip: {
-						file: '../src/easeljs/version_movieclip.js',
-						version: '<%= version %>'
 					}
 				},
 
 				clearversion: {
 					easel: {
 						file: '../src/easeljs/version.js'
-					},
-					movieclip: {
-						file: '../src/easeljs/version_movieclip.js'
 					}
 				}
 			}

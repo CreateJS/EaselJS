@@ -24,6 +24,7 @@
 	"../src/easeljs/display/Shape.js",
 	"../src/easeljs/display/Text.js",
 	"../src/easeljs/display/BitmapText.js",
+	"../src/easeljs/display/MovieClip.js",
 	"../src/easeljs/utils/SpriteSheetUtils.js",
 	"../src/easeljs/utils/SpriteSheetBuilder.js",
 	"../src/easeljs/display/DOMElement.js",
@@ -36,10 +37,6 @@
 	"../src/easeljs/filters/ColorMatrixFilter.js",
 	"../src/easeljs/ui/Touch.js",
 	"../src/easeljs/version.js"
-  ],
-  "movieclip_source": [
-	"../src/easeljs/display/MovieClip.js",
-	"../src/easeljs/version_movieclip.js"
   ],
   "gl_source": [
 	"../src/easeljs/display/SpriteContainer.js",

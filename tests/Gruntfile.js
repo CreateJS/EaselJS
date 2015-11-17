@@ -6,8 +6,7 @@ module.exports = function (grunt) {
 			jasmine: {
 				run: {
 					src: [
-						'../lib/easeljs-NEXT.combined.js',
-						'../lib/movieclip-NEXT.combined.js',
+						'../lib/easeljs-NEXT.combined.js'
 					],
 					
 					options: {

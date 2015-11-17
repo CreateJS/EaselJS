@@ -1,5 +1,10 @@
 Version NEXT [Not Released]
 ****************************************************************************************************
+CRITICAL (may break existing content):
+- MovieClip has been added to the minified EaselJS source. The movieclip minified script has been removed.
+
+*****
+OTHER:
 - fixed compositeOperation value in DisplayProps.setValues (thanks @fumio)
 - documentation updates
 - fixed the SpriteSheetBuilder to support both SpriteSheet framerate and speed (instead of frequency)
