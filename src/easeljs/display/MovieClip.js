@@ -81,12 +81,15 @@ this.createjs = this.createjs||{};
 	 * @main MovieClip
 	 * @extends Container
 	 * @constructor
-	 * @param {String} [mode=independent] Initial value for the mode property. One of MovieClip.INDEPENDENT,
-	 * MovieClip.SINGLE_FRAME, or MovieClip.SYNCHED. The default is MovieClip.INDEPENDENT.
-	 * @param {Number} [startPosition=0] Initial value for the startPosition property.
-	 * @param {Boolean} [loop=true] Initial value for the loop property. The default is true.
-	 * @param {Object} [labels=null] A hash of labels to pass to the timeline instance associated with this MovieClip.
-	 * Labels only need to be passed if they need to be used.
+	 * @param {String} [mode=independent] Initial value for the mode property. One of {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}},
+	 * {{#crossLink "MovieClip/SINGLE_FRAME:property"}}{{/crossLink}}, or {{#crossLink "MovieClip/SYNCHED:property"}}{{/crossLink}}.
+	 * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
+	 * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
+	 * property.
+	 * @param {Boolean} [loop=true] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
+	 * property. The default is `true`.
+	 * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
+	 * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
 	 **/
 	function MovieClip(mode, startPosition, loop, labels) {
 		this.Container_constructor();
