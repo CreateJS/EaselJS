@@ -11,10 +11,11 @@ OTHER:
 - fixed ignoreScale support in Graphic StrokeStyle command
 - bower updates
 - updated additional classes to the new extend/promote approach
-- Changed SpriteSheet Array checks from instanceof to Array.isArray()
-- Added StrokeDash support to SVGExporter
-- Fixed issue with SVGExporter when the first lineTo has a zero-value for x or y
-- Added image error handling to SpriteSheet
+- changed SpriteSheet Array checks from instanceof to Array.isArray()
+- added StrokeDash support to SVGExporter
+- fixed issue with SVGExporter when the first lineTo has a zero-value for x or y
+- added image error handling to SpriteSheet
+- bug fixes
 
 
 Version 0.8.1 [May 21, 2015]
