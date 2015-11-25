@@ -102,28 +102,29 @@ this.createjs = this.createjs||{};
 	 *     <td>lt</td> <td>{{#crossLink "Graphics/lineTo"}}{{/crossLink}}</td></tr>
 	 *     <tr><td>a/at</td><td>{{#crossLink "Graphics/arc"}}{{/crossLink}} / {{#crossLink "Graphics/arcTo"}}{{/crossLink}} </td>
 	 *     <td>bt</td><td>{{#crossLink "Graphics/bezierCurveTo"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>qt</td><td>{{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} (also curveTo)</td>
+     *     <tr><td>ea</td><td>{{#crossLink "Graphics/ellipticalArc"}}{{/crossLink}} </td>
 	 *     <td>r</td><td>{{#crossLink "Graphics/rect"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>cp</td><td>{{#crossLink "Graphics/closePath"}}{{/crossLink}} </td>
+	 *     <tr><td>qt</td><td>{{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} (also curveTo)</td>
 	 *     <td>c</td><td>{{#crossLink "Graphics/clear"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>f</td><td>{{#crossLink "Graphics/beginFill"}}{{/crossLink}} </td>
+	 *     <tr><td>cp</td><td>{{#crossLink "Graphics/closePath"}}{{/crossLink}} </td>
 	 *     <td>lf</td><td>{{#crossLink "Graphics/beginLinearGradientFill"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>rf</td><td>{{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} </td>
+	 *     <tr><td>f</td><td>{{#crossLink "Graphics/beginFill"}}{{/crossLink}} </td>
 	 *     <td>bf</td><td>{{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>ef</td><td>{{#crossLink "Graphics/endFill"}}{{/crossLink}} </td>
+	 *     <tr><td>rf</td><td>{{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} </td>
 	 *     <td>ss / sd</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} / {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>s</td><td>{{#crossLink "Graphics/beginStroke"}}{{/crossLink}} </td>
+	 *     <tr><td>ef</td><td>{{#crossLink "Graphics/endFill"}}{{/crossLink}} </td>
 	 *     <td>ls</td><td>{{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>rs</td><td>{{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} </td>
+	 *     <tr><td>s</td><td>{{#crossLink "Graphics/beginStroke"}}{{/crossLink}} </td>
 	 *     <td>bs</td><td>{{#crossLink "Graphics/beginBitmapStroke"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>es</td><td>{{#crossLink "Graphics/endStroke"}}{{/crossLink}} </td>
+	 *     <tr><td>rs</td><td>{{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} </td>
 	 *     <td>dr</td><td>{{#crossLink "Graphics/drawRect"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>rr</td><td>{{#crossLink "Graphics/drawRoundRect"}}{{/crossLink}} </td>
+	 *     <tr><td>es</td><td>{{#crossLink "Graphics/endStroke"}}{{/crossLink}} </td>
 	 *     <td>rc</td><td>{{#crossLink "Graphics/drawRoundRectComplex"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>dc</td><td>{{#crossLink "Graphics/drawCircle"}}{{/crossLink}} </td>
+	 *     <tr><td>rr</td><td>{{#crossLink "Graphics/drawRoundRect"}}{{/crossLink}} </td>
 	 *     <td>de</td><td>{{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} </td></tr>
-	 *     <tr><td>dp</td><td>{{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} </td>
+	 *     <tr><td>dc</td><td>{{#crossLink "Graphics/drawCircle"}}{{/crossLink}} </td>
 	 *     <td>p</td><td>{{#crossLink "Graphics/decodePath"}}{{/crossLink}} </td></tr>
+	 *     <tr><td>dp</td><td>{{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} </td></tr>
 	 * </table>
 	 *
 	 * Here is the above example, using the tiny API instead.
@@ -532,6 +533,27 @@ this.createjs = this.createjs||{};
 	p.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		return this.append(new G.Arc(x, y, radius, startAngle, endAngle, anticlockwise));
 	};
+
+	/**
+	 * Draws an elliptical arc defined by the radii rx and ry, startAngle and endAngle arguments, centered at the position (x, y). 
+	 * 
+	 * A tiny API method "ea" also exists.
+	 * @method ellipticalArc
+	 * @param {Number} x center X
+	 * @param {Number} y center Y
+	 * @param {Number} rx horizontal radius
+	 * @param {Number} ry vertical radius
+	 * @param {Number} startAngle Measured in radians.
+	 * @param {Number} endAngle Measured in radians.
+	 * @param {Boolean} anticlockwise if true, clockwise if false
+	 * @param {String} closure omit for no closure (just an arc), 'radii' (makes a sector), 'chord' (makes a segment)
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	 **/
+	p.ellipticalArc = function(x, y, rx, ry, startAngle, endAngle, anticlockwise, closure) {
+		return this.append(new G.EllipticalArc(x, y, rx, ry, startAngle, endAngle, anticlockwise, closure));
+	}
+
 
 	/**
 	 * Draws a quadratic curve from the current drawing point to (x, y) using the control point (cpx, cpy). For detailed
@@ -1260,6 +1282,23 @@ this.createjs = this.createjs||{};
 	p.a = p.arc;
 
 	/**
+	 * Shortcut to ellipticalArc.
+	 * @method ea
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} rx
+	 * @param {Number} ry
+	 * @param {Number} startAngle Measured in radians.
+	 * @param {Number} endAngle Measured in radians.
+	 * @param {Boolean} anticlockwise
+	 * @param {String} closure omit for no closure (just an arc), 'radii' (makes a sector), 'chord' (makes a segment)
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @protected
+	 * @chainable
+	 **/
+    p.ea = p.ellipticalArc;
+
+	/**
 	 * Shortcut to rect.
 	 * @method r
 	 * @param {Number} x
@@ -1768,6 +1807,289 @@ this.createjs = this.createjs||{};
 		this.startAngle = startAngle; this.endAngle = endAngle;
 		this.anticlockwise = !!anticlockwise;
 	}).prototype.exec = function(ctx) { ctx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle, this.anticlockwise); };
+
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class EllipticalArc
+	 * @constructor
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} rx
+     * @param {Number} ry
+	 * @param {Number} startAngle
+	 * @param {Number} endAngle
+	 * @param {Boolean} anticlockwise
+     * @param {String} closure
+	 **/
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	/**
+	 * @property rx
+	 * @type Number
+	 */
+    /**
+     * @property ry
+     * @Type Number
+	/**
+	 * @property startAngle
+	 * @type Number
+	 */
+	/**
+	 * @property endAngle
+	 * @type Number
+	 */
+	/**
+	 * @property anticlockwise
+	 * @type Boolean
+	 */
+	/**
+	 * @property closure
+	 * @type String
+	 */
+	(G.EllipticalArc = function(x, y, rx, ry, startAngle, endAngle, anticlockwise, closure) {
+		this.x = x; this.y = y;
+		this.rx = rx; this.ry = ry;
+		this.anticlockwise = !!anticlockwise;
+		this.closure = closure;
+		
+		// Map negative angles into positive range
+		if (startAngle < 0 || endAngle < 0)
+		{
+			if (startAngle < -2 * Math.PI)
+			{
+				var s = startAngle / (2 * Math.PI);
+				startAngle = (s + Math.floor(Math.abs(s))) * 2 * Math.PI + 2 * Math.PI;
+			}
+			else if (startAngle < 0)
+			{
+				startAngle += 2 * Math.PI;
+			}
+			
+			if (endAngle < -2 * Math.PI)
+			{
+				var e = endAngle / (2 * Math.PI);
+				endAngle = (e + Math.floor(Math.abs(e))) * 2 * Math.PI + 2 * Math.PI;
+			}
+			else if (endAngle < 0)
+			{
+				endAngle += 2 * Math.PI;
+			}
+		}
+		
+		
+		// Normalize the angles
+		if (startAngle <= endAngle)
+		{
+			if (this.anticlockwise === true)
+			{
+				this.start = -startAngle;
+				this.end = -endAngle;
+			}
+			else
+			{
+				this.start = -endAngle;
+				this.end = -startAngle - 2 * Math.PI;
+			}
+		}
+		else
+		{
+			if (this.anticlockwise === true)
+			{
+				this.start = -startAngle;
+				this.end = -endAngle - 2 * Math.PI;
+			}
+			else
+			{
+				this.start = -endAngle;
+				this.end = -startAngle;
+			}
+		}
+		
+	}).prototype.exec = function(ctx) {
+		// x, y - top left
+		// xe, ye - bottom right
+		// xm, ym - center
+		var x = this.x - this.rx;
+		var y = this.y - this.ry;
+		var rx = this.rx;
+		var ry = this.ry;
+		var start = this.start;
+		var end = this.end;
+		var xe = this.x + rx;
+		var ye = this.y - ry;
+		var xm = this.x;
+		var ym = this.y;
+		var closure = this.closure;
+
+		var quadrantIncrement = Math.PI / 2;
+		var quadrantStart = Math.floor(2 * Math.abs(start) / Math.PI);
+
+		// How long is the arc
+		var span = Math.abs(end);
+
+		// Array of intermediate angles for 
+		// breaking up the arc into segments <= PI/2
+		var ia = [0];
+
+		for (var i = 1; i <= 4; i++)
+		{
+			ia[i - 1] = (quadrantStart + i) * Math.PI / 2;
+		}
+		
+		var startPoint;
+		var chordMidX;
+		var chordMidY;
+				
+		if (closure === 'radii')
+		{
+			ctx.moveTo(xm, ym);
+		}
+		else if (closure === 'chord')
+		{
+			var startEA = eccentricAnomalyFromPolarAngle(start, rx, ry);
+			var endEA = eccentricAnomalyFromPolarAngle(end, rx, ry);
+			
+			chordMidX = xm + rx * (Math.cos(startEA) + Math.cos(endEA)) / 2;
+			chordMidY = ym + ry * (Math.sin(startEA) + Math.sin(endEA)) / 2;
+			
+			ctx.moveTo(chordMidX, chordMidY);
+		}
+		
+		if (span <= ia[0])              // 1 segment
+		{
+			startPoint = elarcseg(ctx, xm, ym, rx, ry, start, end, closure);
+		}
+		else if (span <= ia[1])         // 2 segments
+		{
+			startPoint = elarcseg(ctx, xm, ym, rx, ry, start, -ia[0], closure);
+			elarcseg(ctx, xm, ym, rx, ry, -ia[0], end, closure);
+		}
+		else if (span <= ia[2])         // 3 segments
+		{
+			startPoint = elarcseg(ctx, xm, ym, rx, ry, start, -ia[0], closure);
+			elarcseg(ctx, xm, ym, rx, ry, -ia[0], -ia[1], closure);
+			elarcseg(ctx, xm, ym, rx, ry, -ia[1], end, closure);
+		}
+		else if (span <= ia[3])         // 4 segments
+		{
+			startPoint = elarcseg(ctx, xm, ym, rx, ry, start, -ia[0], closure);
+			elarcseg(ctx, xm, ym, rx, ry, -ia[0], -ia[1], closure);
+			elarcseg(ctx, xm, ym, rx, ry, -ia[1], -ia[2], closure);
+			elarcseg(ctx, xm, ym, rx, ry, -ia[2], end, closure);
+		}
+		else                            // 5 segments
+		{
+			startPoint = elarcseg(ctx, xm, ym, rx, ry, start, -ia[0], closure);
+			elarcseg(ctx, xm, ym, rx, ry, -ia[0], -ia[1], closure);
+			elarcseg(ctx, xm, ym, rx, ry, -ia[1], -ia[2], closure);
+			elarcseg(ctx, xm, ym, rx, ry, -ia[2], -ia[3], closure);
+			elarcseg(ctx, xm, ym, rx, ry, -ia[3], end, closure);
+		}
+		
+		if (closure === 'radii')
+		{
+			ctx.lineTo(xm, ym);
+			ctx.closePath();
+		}
+		else if (closure === 'chord')
+		{
+			ctx.lineTo(chordMidX, chordMidY);
+			
+			ctx.closePath();
+		}
+	};
+
+	// Elliptical arc segment
+	function elarcseg(ctx, xm, ym, rx, ry, start, end, closure) {
+		var startEA = eccentricAnomalyFromPolarAngle(start, rx, ry);
+		var endEA = eccentricAnomalyFromPolarAngle(end, rx, ry);
+		
+		// From parametric equation by L. Maisonobe
+		var k = -Math.sin(endEA - startEA) * (Math.sqrt(4 + 3 * Math.pow(Math.tan((endEA - startEA) / 2), 2)) - 1) / 3;
+		
+		// Starting point of the curve
+		var r1 = rx * ry / Math.sqrt(Math.pow(ry * Math.cos(start), 2) + Math.pow(rx * Math.sin(start), 2));
+		var x1 = xm + r1 * Math.cos(start);
+		var y1 = ym + r1 * Math.sin(start);
+		
+		// End point of the curve
+		var r2 = rx * ry / Math.sqrt(Math.pow(ry * Math.cos(end), 2) + Math.pow(rx * Math.sin(end), 2));
+		var x2 = xm + r2 * Math.cos(end);
+		var y2 = ym + r2 * Math.sin(end);
+		
+		// Control point 1
+		var x3 = x1 - k * Math.sin(-startEA) * rx;
+		var y3 = y1 - k * Math.cos(-startEA) * ry;
+
+		// Control point 2
+		var x4 = x2 + k * Math.sin(-endEA) * rx;
+		var y4 = y2 + k * Math.cos(-endEA) * ry;
+		
+		if (closure === 'radii' || closure === 'chord')
+		{
+			ctx.lineTo(x1, y1);
+		}
+		else
+		{
+			ctx.moveTo(x1, y1);
+		}
+		
+		ctx.bezierCurveTo(x3, y3, x4, y4, x2, y2);
+		
+		var startPoint = { x: x1, y: y1 };
+				
+		return startPoint;
+	}
+	
+	// Maps from polar angle into the angle used in ellipse
+	// parametric equations (this angle is called "eccentricAnomaly")
+	// it is the same as polar angle when the ellipse is a circle
+	// E = atan((rx/ry)*tan(A))
+	// where A is the polar angle and E is the eccentricAnomaly angle
+	function eccentricAnomalyFromPolarAngle(angle, rx, ry)
+	{
+		var sign = 1;
+		var retval;
+		var e = 0.00001;
+		
+		var cosa = Math.cos(angle);
+		var sina = Math.sin(angle);
+		
+		// circle or near extremeties -- polar angle and 
+		// eccentricAnomaly are the same
+		if (rx == ry || Math.abs(cosa) < e || Math.abs(sina) < e)
+		{
+			return angle;
+		}
+		
+		var tana = rx * Math.tan(angle) / ry;
+		
+		// branches of arctan function
+		if (cosa > 0 && sina > 0)
+		{
+			retval = Math.atan(tana);
+		}
+		else if (cosa < 0 && sina > 0)
+		{
+			retval = Math.PI + Math.atan(tana);
+		}
+		else if (cosa < 0 && sina < 0)
+		{
+			retval = Math.PI + Math.atan(tana);
+		}
+		else if (cosa > 0 && sina < 0)
+		{
+			retval = 2 * Math.PI + Math.atan(tana);
+		}
+		
+		return retval;
+	}
 
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
