@@ -1,5 +1,9 @@
 Version NEXT [Not Released]
 ****************************************************************************************************
+
+
+Version 0.8.2 [November 26, 2015]
+****************************************************************************************************
 CRITICAL (may break existing content):
 - MovieClip has been added to the minified EaselJS source. The movieclip minified script has been removed.
 
