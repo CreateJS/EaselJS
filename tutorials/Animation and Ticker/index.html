@@ -21,7 +21,7 @@
 			<h1>EaselJS <em>Animation and Ticker</em></h1>
 			<p>
 				<strong>Synopsis:</strong> Create a simple programmatic animation, and learn about the Ticker class.<br>
-				<strong>Topics:</strong> animation, Ticker, setFPS, timingMode, getTime, setPaused,
+				<strong>Topics:</strong> animation, Ticker, framerate, timingMode, getTime, paused,
 				requestAnimationFrame, Stage.update, time based animation<br/>
 				<strong>Target:</strong> EaselJS v0.6.0 and above
 			</p>
@@ -84,8 +84,8 @@ function tick() { console.log("TICK!!!"); }
 			</p>
 			<textarea class="brush: js;" readonly>
 // these are equivalent, 1000ms / 40fps = 25ms
-createjs.Ticker.setInterval(25);
-createjs.Ticker.setFPS(40);
+createjs.Ticker.interval = 25;
+createjs.Ticker.framerate = 40;
 			</textarea>
 			<p>
 				Let's combine all of that to make a circle move across the stage at 30 frames per second. And don't
@@ -176,7 +176,7 @@ function tick(event) {
 			</p>
 			<textarea class="brush: js;" readonly>
 createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-createjs.Ticker.setFPS(30);
+createjs.Ticker.framerate = 30;
 			</textarea>
 		</section>
 			
@@ -186,7 +186,7 @@ createjs.Ticker.setFPS(30);
 			</header>
 			<p>
 				<code>Ticker</code> also provides the ability to pause all of your animations. All listener you add to
-				Ticker are "pauseable". Calling <code>Ticker.setPaused(true);</code> will stop <code>Ticker</code> from
+				Ticker are "pauseable". Calling <code>Ticker.paused = true;</code> will stop <code>Ticker</code> from
 				calling <code>tick</code> on all pauseable listeners.
 			</p>
 			<p>
@@ -198,7 +198,7 @@ createjs.Ticker.setFPS(30);
 				green "unpauseable" circle does not. You can also see how the total pauseable time stops updating when
 				<code>Ticker</code> is paused.
 			</p>
-			<iframe src="pausing.html" class="demo" data-description="showing Ticker.setPaused() at work. Click to toggle pause." width="100%" height="245px"></iframe>
+			<iframe src="pausing.html" class="demo" data-description="showing Ticker.paused at work. Click to toggle pause." width="100%" height="245px"></iframe>
 		</section>
 		
 		<section>
