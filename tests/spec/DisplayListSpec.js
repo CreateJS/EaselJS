@@ -402,9 +402,33 @@ describe("DisplayList", function () {
 		expect(dot.isVisible()).toBe(true);
 	});
 
-	it("localToGlobal() should work.", function () {
+	it("localToGlobal() should work on stage.", function () {
 		var pt = this.stage.localToGlobal(0, 0);
+
 		expect(pt.x).toBe(0);
+		expect(pt.y).toBe(0);
+	});
+
+	it("localToGlobal() should work on nested containers.", function () {
+		var c = new createjs.Container();
+		c.set({x:50, y:50});
+
+		var c2 = new createjs.Container();
+		c2.set({x:25, y:25});
+
+		var c3 = new createjs.Container();
+		c3.set({x:-5, y:-5});
+
+		c.addChild(c2);
+		c2.addChild(c3);
+
+		expect(c.localToGlobal(0, 0).x).toBe(50);
+		expect(c2.localToGlobal(0, 0).x).toBe(75);
+		expect(c3.localToGlobal(0, 0).x).toBe(70);
+		
+		expect(c.localToGlobal(0, 0).y).toBe(50);
+		expect(c2.localToGlobal(0, 0).y).toBe(75);
+		expect(c3.localToGlobal(0, 0).y).toBe(70);
 	});
 
 	it("localToLocal() should work.", function () {
