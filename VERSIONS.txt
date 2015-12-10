@@ -11,15 +11,16 @@ CRITICAL (may break existing content):
 OTHER:
 - fixed compositeOperation value in DisplayProps.setValues (thanks @fumio)
 - documentation updates
+- upgraded tutorials to the latest EaselJS version, including content updates
 - fixed the SpriteSheetBuilder to support both SpriteSheet framerate and speed (instead of frequency)
 - fixed ignoreScale support in Graphic StrokeStyle command
-- bower updates
-- updated additional classes to the new extend/promote approach
+- bower updates: Removed bower.json from excludes
+- updated ScaleBitmap extra to the new extend/promote approach
 - changed SpriteSheet Array checks from instanceof to Array.isArray()
 - added StrokeDash support to SVGExporter
 - fixed issue with SVGExporter when the first lineTo has a zero-value for x or y
 - added image error handling to SpriteSheet
-- bug fixes
+- Grunt updates: Added shortcut "next" task
 
 
 Version 0.8.1 [May 21, 2015]
