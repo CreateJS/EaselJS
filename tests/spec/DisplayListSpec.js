@@ -586,6 +586,14 @@ describe("DisplayList", function () {
 		this.compareBaseLine("assets/Text.png", done, expect, 0.01);
 	});
 
+	it("Text.getBounds() should allow 0 as a value", function () {
+		var txt = new createjs.Text("", "12px Arial", "#dd0000");
+		txt.text = 0;
+		this.stage.addChild(txt);
+
+		expect(txt.getBounds()).not.toBe(null);
+	});
+
 	it("BitmapText", function (done) {
 		var _this = this;
 
