@@ -88,6 +88,10 @@ this.createjs = this.createjs||{};
 	function SpriteStage(canvas, preserveDrawingBuffer, antialias) {
 		this.Stage_constructor(canvas);
 
+		// public properties:
+		///////////////////////////////////////////////////////
+		this.vocalDebug = false;
+
 		// private properties:
 		///////////////////////////////////////////////////////
 		/**
@@ -245,15 +249,25 @@ this.createjs = this.createjs||{};
 		 * @type {WebGLTexture}
 		 * @default null
 		 **/
-		this._textureDictionary = {};
+		this._textureDictionary = [];
+		this._textureIDs = {};
 
 		this._batchTextures = [];
 
-		this._batchTextureCount = 16;
+		/**
+		 * Get this value from WebGL, 8 is lowest guarenteed but it could be higher.
+		 * Users may over-ride this value after init, but they should do it through a function
+		 * @property _indices
+		 * @protected
+		 * @type {Uint16Array}
+		 * @default null
+		 */
+		this._batchTextureCount = 8;
 
-		this.lookTexture = 0;
+		this._lastTextureInsert = -1;
 
-		this.batchIndex = 0;
+		this._batchID = 0;
+		this._drawID = 0;
 
 		// and begin
 		this._initializeWebGL();
@@ -293,7 +307,7 @@ this.createjs = this.createjs||{};
 	 * @type {Number}
 	 * @readonly
 	 **/
-	SpriteStage.DEFAULT_MAX_BATCH_SIZE = 6000;
+	SpriteStage.DEFAULT_MAX_BATCH_SIZE = 8000;
 
 	/**
 	 * The maximum size WebGL allows for element index numbers: 16 bit unsigned integer.
@@ -418,6 +432,7 @@ this.createjs = this.createjs||{};
 
 		var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
 
+		this._batchTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 		this._shaderProgram = this._fetchShaderProgram(gl);
 		this._createBuffers(gl);
 		this._initTextures(gl);
@@ -709,6 +724,19 @@ this.createjs = this.createjs||{};
 		var groupCount = this._maxCardsPerBatch * SpriteStage.INDICIES_PER_CARD;
 		var groupSize, i;
 
+		var vertexBuffer = this._vertexBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+		groupSize = 2 + 2 + 1 + 1; //x/y, u/v, index, alpha
+		var vertexData = this._vertexData = new Float32Array(groupCount * groupSize);
+		for(i=0; i<vertexData.length; i+=groupSize) {
+			vertexData[i+0] = vertexData[i+1] = 0;
+			vertexData[i+2] = vertexData[i+3] = 0.5;
+			vertexData[i+4] = 0;
+			vertexData[i+5] = 1;
+		}
+		vertexBuffer.itemSize = groupSize;
+		vertexBuffer.numItems = groupCount;
+
 		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
 		groupSize = 2;
@@ -746,18 +774,30 @@ this.createjs = this.createjs||{};
 	};
 
 	p._loadTextureImage = function(gl, index, src) {
-		this._textureDictionary[src] = this._batchTextures[index];
+		var storeID = this._textureIDs[src];
+		if(storeID === undefined) {
+			storeID = this._textureDictionary.length;
+			this._textureIDs[src] = storeID;
+		}
+		if(this._textureDictionary[storeID] === undefined){
+			this._textureDictionary[storeID] = this.getBaseTexture();
+		}
+
 		var texture = this._batchTextures[index];
+		texture._batchID = this._batchID;
+		texture._activeIndex = index;
+		texture._storeID = storeID;
+
 		var image = texture._image = new Image();
+		image._storeID = storeID;
 		image.onload = this._handleImageLoaded.bind(this, gl, image);
-		image._batchIndex = index;
 		image.src = src;
 
 		return texture;
 	};
 
 	p._handleImageLoaded = function(gl, image) {
-		var texture = this._batchTextures[image._batchIndex];
+		var texture = this._textureDictionary[image._storeID];
 
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -768,20 +808,28 @@ this.createjs = this.createjs||{};
 
 		texture._w = image.width;
 		texture._h = image.height;
+
+		if(this.vocalDebug) {
+			if((image.width & image.width-1) || (image.height & image.height-1)) {
+				console.warn("NPOT(Non Power of Two) Texture: "+ image.src);
+			}
+			if(image.width > gl.MAX_TEXTURE_SIZE || image.height > gl.MAX_TEXTURE_SIZE){
+				console.error("Oversized Texture: "+ image.width+"x"+image.height +" vs "+ gl.MAX_TEXTURE_SIZE +"max");
+			}
+		}
 	};
 
 	p._batchDraw = function(sceneGraph, gl) {
-		//console.log("startBatch");
+		this._drawID++;
+
 		this.batchCardCount = 0;
-		this.lookTexture = 0;
 		this.depth = 0;
 
 		var mtx = new createjs.Matrix2D();
 		this._appendToBatchGroup(sceneGraph, gl, mtx);
 
-		//console.log("endBatch");
-		this._drawToGPU(gl);
-		//console.log("=================================");
+		this.batchReason = "drawFinish";
+		this._drawToGPU(gl);								// <--------------------------------------------------------
 	};
 
 	p._appendToBatchGroup = function(container, gl, concatMtx) {
@@ -796,11 +844,7 @@ this.createjs = this.createjs||{};
 			container.regX, container.regY
 		);
 
-		var tlX, tlY, trX, trY, blX, blY, brX, brY;
-		//var tl = {x:0, y:0};
-		//var tr = {x:0, y:0};
-		//var bl = {x:0, y:0};
-		//var br = {x:0, y:0};
+		var tlX = 0, tlY = 0, trX = 0, trY = 0, blX = 0, blY = 0, brX = 0, brY = 0;
 
 		// actually apply its data to the buffers
 		for (var i = 0, l = container.children.length; i < l; i++) {
@@ -810,13 +854,12 @@ this.createjs = this.createjs||{};
 			if (item.children) {
 				this._appendToBatchGroup(item, gl, cMtx);
 			} else {
-				// check to see if we can render this
+				// check for overflowing batch, if yes then force a render
 				if(this.batchCardCount+1 > this._maxCardsPerBatch) {
-					this._drawToGPU(gl);
+					this.batchReason = "vertexOverflow";
+					this._drawToGPU(gl);					// <--------------------------------------------------------
 					this.batchCardCount = 0;
 				}
-
-				// check for overflowing batch, if yes then force a render
 
 				// actually apply its data to the buffers
 				if(!item._glMtx) { item._glMtx = new createjs.Matrix2D(); }
@@ -829,7 +872,7 @@ this.createjs = this.createjs||{};
 					item.regX, item.regY
 				);
 
-				var uvRect, texIndex;
+				var uvRect, texIndex, combinedAlpha;
 
 				var uvs = this.uvs;
 				var vertices = this.vertices;
@@ -837,47 +880,76 @@ this.createjs = this.createjs||{};
 				var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;
 				var loc = (offset/2)|0;
 
-				switch(item._webGLRenderStyle) {
-					case 1 : // Sprite
-						var spr = item.spriteSheet;
-						var frame = spr.getFrame(item.currentFrame);
-						var rect = frame.rect;
-						uvRect = frame.uvRect;
-						var image = frame.image;
-						if(!uvRect) {
-							uvRect = this.buildUVRects(item.spriteSheet, item.currentFrame, false);
+				if(item._webGLRenderStyle == 1) {
+					var frame = item.spriteSheet.getFrame(item.currentFrame);
+					var rect = frame.rect;
+					var image = frame.image;
+
+					uvRect = frame.uvRect;
+					if(!uvRect) {
+						uvRect = this.buildUVRects(item.spriteSheet, item.currentFrame, false);
+					}
+
+					var texture;
+					if(image._storeID === undefined) {
+						texture = this._loadTextureImage(gl, this.lastTexture++, image.src);
+						image._storeID = texture._storeID;
+					} else {
+						texture = this._textureDictionary[image._storeID];
+					}
+
+					// this texture hasn't been used this batch.
+					if(texture._batchID != this._batchID) {
+						// if it wasn't used last batch
+						if(this._batchTextures[texture._activeIndex] !== texture) {
+							// we've got to find it a a spot.
+							var found = -1;
+							var start = this._lastTextureInsert+1;
+							var look = (start+1) % this._batchTextureCount;
+							do {
+								if(this._batchTextures[look]._batchID != this._batchID) {
+									found = look;
+									break;
+								}
+								look = (look+1) % this._batchTextureCount;
+							} while(look != start);
+
+							// we couldn't find anywhere for it go, meaning we're maxed out
+							if(found == -1) {
+								this.batchReason = "textureOverflow";
+								this._drawToGPU(gl);	// <--------------------------------------------------------
+								this.batchCardCount = 0;
+								found = start;
+							}
+
+							// lets put it into that spot
+							this._batchTextures[found] = texture;
+							texture._activeIndex = found;
+							gl.activeTexture(gl.TEXTURE0 + found);
+							gl.bindTexture(gl.TEXTURE_2D, texture);
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 						}
-						//this.lookTexture
-						//this.batchTextures
-						var texture = this._textureDictionary[image.src];
-						if(!texture) {
-							texture = this._loadTextureImage(gl, this.lastTexture++, image.src);
-						}
 
-						texIndex = 0;
+						texture._drawID = this._drawID;
+						texture._batchID = this._batchID;
+					}
+					texIndex = texture._activeIndex;
 
-						//iMtx.transformPoint(0,					0,					tl);
-						//iMtx.transformPoint(rect.width,			0,					tr);
-						//iMtx.transformPoint(0,					rect.height,		bl);
-						//iMtx.transformPoint(rect.width,			rect.height,		br);
+					combinedAlpha = 1;
 
-						//tl.x = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
-						//tl.y = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
-						//tr.x = rect.width *iMtx.a		/*+ 0 *iMtx.c*/				+iMtx.tx;
-						//tr.y = rect.width *iMtx.b		/*+ 0 *iMtx.d*/				+iMtx.ty;
-						//bl.x = /*0 *iMtx.a				+*/ rect.height *iMtx.c		+iMtx.tx;
-						//bl.y = /*0 *iMtx.b				+*/ rect.height *iMtx.d		+iMtx.ty;
-						//br.x = rect.width *iMtx.a		+ rect.height *iMtx.c		+iMtx.tx;
-						//br.y = rect.width *iMtx.b		+ rect.height *iMtx.d		+iMtx.ty;
-						tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
-						tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
-						trX = rect.width *iMtx.a		/*+ 0 *iMtx.c*/				+iMtx.tx;
-						trY = rect.width *iMtx.b		/*+ 0 *iMtx.d*/				+iMtx.ty;
-						blX = /*0 *iMtx.a				+*/ rect.height *iMtx.c		+iMtx.tx;
-						blY = /*0 *iMtx.b				+*/ rect.height *iMtx.d		+iMtx.ty;
-						brX = rect.width *iMtx.a		+ rect.height *iMtx.c		+iMtx.tx;
-						brY = rect.width *iMtx.b		+ rect.height *iMtx.d		+iMtx.ty;
-
+					//Matrix2D.transformPoint
+					tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
+					tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
+					trX = rect.width *iMtx.a		/*+ 0 *iMtx.c*/				+iMtx.tx;
+					trY = rect.width *iMtx.b		/*+ 0 *iMtx.d*/				+iMtx.ty;
+					blX = /*0 *iMtx.a				+*/ rect.height *iMtx.c		+iMtx.tx;
+					blY = /*0 *iMtx.b				+*/ rect.height *iMtx.d		+iMtx.ty;
+					brX = rect.width *iMtx.a		+ rect.height *iMtx.c		+iMtx.tx;
+					brY = rect.width *iMtx.b		+ rect.height *iMtx.d		+iMtx.ty;
+				}/*
 						break;
 					case 2 : // BitmapText
 						console.log("todo");
@@ -890,23 +962,25 @@ this.createjs = this.createjs||{};
 					case 4 : // DOMElement
 						continue;
 						break;
-				}
+				}*/
 
-				vertices[offset] = tlX;			vertices[offset+1] = tlY;
+				//*
+				vertices[offset] = tlX;				vertices[offset+1] = tlY;
 				vertices[offset+2] = blX;			vertices[offset+3] = blY;
 				vertices[offset+4] = trX;			vertices[offset+5] = trY;
 				vertices[offset+6] = blX;			vertices[offset+7] = blY;
-				//vertices[offset+8] = tr.x;			vertices[offset+9] = tr.y;
-				//vertices[offset+10] = br.x;			vertices[offset+11] = br.y;
+				vertices[offset+8] = trX;			vertices[offset+9] = trY;
+				vertices[offset+10] = brX;			vertices[offset+11] = brY;
 
 				uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
 				uvs[offset+2] = uvRect.l;			uvs[offset+3] = uvRect.b;
 				uvs[offset+4] = uvRect.r;			uvs[offset+5] = uvRect.t;
 				uvs[offset+6] = uvRect.l;			uvs[offset+7] = uvRect.b;
-				//uvs[offset+8] = uvRect.r;			uvs[offset+9] = uvRect.t;
-				//uvs[offset+10] = uvRect.r;			uvs[offset+11] = uvRect.b;
+				uvs[offset+8] = uvRect.r;			uvs[offset+9] = uvRect.t;
+				uvs[offset+10] = uvRect.r;			uvs[offset+11] = uvRect.b;
 
-				texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = /*texI[loc+4] = texI[loc+5] =*/ texIndex;
+				texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = texI[loc+4] = texI[loc+5] = texIndex;
+				//*/
 
 				this.batchCardCount++;
 			}
@@ -920,6 +994,10 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._drawToGPU = function(gl) {
+		//return;
+		if(this.vocalDebug) {
+			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
+		}
 		//console.log("DRAW batch:", this.batchCardCount*SpriteStage.INDICIES_PER_CARD);
 		var shaderProgram = this._shaderProgram;
 		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer;
@@ -939,8 +1017,7 @@ this.createjs = this.createjs||{};
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
 		//gl.uniformMatrix1i(shaderProgram.flagUniform, gl.FALSE, this.flags);
 
-		//DHG: sometimes this was needed. Apparently not all the time
-		/*for (var j = 0; j < 16; j++) {
+		for (var j = 0; j < this._batchTextureCount; j++) {
 			var texture = this._batchTextures[j];
 			gl.activeTexture(gl.TEXTURE0 + j);
 			gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -948,10 +1025,10 @@ this.createjs = this.createjs||{};
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		}*/
+		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*SpriteStage.INDICIES_PER_CARD);
-		this.batchIndex++;
+		this._batchID++;
 		//drawElements
 	};
 
@@ -967,7 +1044,7 @@ this.createjs = this.createjs||{};
 		candidates.forEach(function(_class, index) {
 			_class.prototype._webGLRenderStyle = index + 1;
 		});
-		createjs.Container.prototype._webGLRenderStyle = createjs.SpriteContainer.prototype._webGLRenderStyle;
+		//createjs.Container.prototype._webGLRenderStyle = createjs.SpriteContainer.prototype._webGLRenderStyle;
 	})();
 
 	createjs.SpriteStage = createjs.promote(SpriteStage, "Stage");
