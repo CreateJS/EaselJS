@@ -57,9 +57,8 @@ this.createjs = this.createjs||{};
 	 * On devices or browsers that don't support WebGL, content will automatically be rendered via canvas 2D.
 	 *
 	 * Complications:
-	 *     - BUG: if you only call render once the first item to use a texture instance may not render (to fix, call render twice or have a 0 alpha entry to suck it up).
-																														//TODO: fix before release, issue requires fiddling with whole texture fill system
 	 *     - only Sprite, Container, BitmapText, Bitmap, and DOMElement are rendered when added to the display list.
+	 																													//TODO: fix DOMElement
 	 *     - you must call updateViewport in order to properly size the 3D context stored in memory, this won't affect the DOM.
 	 *     - when you call cache on an object it will use the regular stage 2D context rendering not webGL. WebGL will however use the cached result, but this counts as an image.
 	 *     - images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
@@ -372,7 +371,7 @@ this.createjs = this.createjs||{};
 		"varying lowp float indexPicker;" +
 
 		"void main(void) {" +
-			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix... bypass for now
+			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix see js... bypass for now
 			//vertexPosition, round if flag
 			//"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
 			"gl_Position = vec4("+
@@ -650,6 +649,15 @@ this.createjs = this.createjs||{};
 		return texture;
 	};
 
+	/**
+	 * Calculate the U/V co-ordinate based info for sprite frames. Instead of pixels a 0-1 space.
+	 * Also includes the ability to get info back for a specific frame or only calculate that one frame.
+	 * @param  {SpriteSheet} spritesheet The spritesheet to process
+	 * @param  {frame} target The frame we're most worried about
+	 * @param  {Boolean} onlyTarget The DOM canvas element to attach to
+	 * @method buildUVRects
+	 * @return {UVRect} the target frame or a generic frame
+	 */
 	p.buildUVRects = function(spritesheet, target, onlyTarget) {
 		if(!spritesheet || !spritesheet._frames){ return result; }
 		if(target === undefined) { target = -1; }
@@ -675,7 +683,9 @@ this.createjs = this.createjs||{};
 	// private methods:
 	///////////////////////////////////////////////////////
 	/**
-	 *
+	 * Sets up and returns the webgl context for the canvas
+	 * @param  {Canvas} canvas The DOM canvas element to attach to
+	 * @param  {Object} options The options to be handed into the WebGL object, see WebGL spec
 	 * @method _fetchWebGLContext
 	 * @protected
 	 */
@@ -699,7 +709,8 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 *
+	 * Create the completed Sahder Program from the vertex and fragment shaders
+	 * @param  {WebGLRenderingContext} gl
 	 * @method _fetchShaderProgram
 	 * @protected
 	 */
@@ -749,8 +760,8 @@ this.createjs = this.createjs||{};
 	 * Creates a shader from the specified string.
 	 * @method _createShader
 	 * @param  {WebGLRenderingContext} gl
-	 * @param  {Number} type               The type of shader to create.
-	 * @param  {String} str                The definition for the shader.
+	 * @param  {Number} type The type of shader to create.
+	 * @param  {String} str The definition for the shader.
 	 * @return {WebGLShader}
 	 * @protected
 	 **/
@@ -806,6 +817,7 @@ this.createjs = this.createjs||{};
 		// track the sizes on the buffer object
 
 		/* DHG: a single buffer may be optimal in some situations and would be approached like this
+		DHG: currently not implemented due to lack of need
 		var vertexBuffer = this._vertexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 		groupSize = 2 + 2 + 1 + 1; //x/y, u/v, index, alpha
@@ -904,11 +916,12 @@ this.createjs = this.createjs||{};
 		if(image.complete || image.naturalWidth) {
 			this._updateTextureImageData(gl, image);
 		} else if(image._isCanvas) {
-			var self = this;
+			this._updateTextureImageData(gl, image);
+			/*var self = this;
 			setTimeout(function() {
 				image.parent.updateCache();
 				self._updateTextureImageData(gl, image);
-			}, 30);
+			}, 30);*/
 		} else  {
 			image.onload = this._updateTextureImageData.bind(this, gl, image);
 		}
@@ -918,11 +931,14 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Neccesary to upload the actual image data to the gpu. Without this the texture will be blank.
+	 * @param {WebGLRenderingContext} gl
+	 * @param {Image | Canvas} image The image data to be uploaded
+	 * @method _updateTextureImageData
 	 */
 	p._updateTextureImageData = function(gl, image) {
 		var texture = this._textureDictionary[image._storeID];
 
-		//gl.activeTexture(gl.TEXTURE0 + found); //TODO DHG: shouldn't this be in here?
+		gl.activeTexture(gl.TEXTURE0 + texture._activeIndex); //TODO DHG: shouldn't this be in here?
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -946,6 +962,9 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Begin the drawing process
+	 * @param {WebGLRenderingContext} gl
+	 * @param {Stage || Container} sceneGraph Container object with all that needs to rendered, prefferably a stage
+	 * @method _batchDraw
 	 */
 	p._batchDraw = function(sceneGraph, gl) {
 		this._drawID++;
@@ -986,40 +1005,51 @@ this.createjs = this.createjs||{};
 			var item = container.children[i];
 
 			if(!item.visible) { continue; }
-			if(item.cacheCanvas) {																						//TODO: rework this so we actually leverage not copy paste the bitmap code, my first attempts broke things
-				var image = item.cacheCanvas;
+			if(!item.cacheCanvas) {
+				if(item._webGLRenderStyle === 3) {							// BITMAP TEXT SETUP
+					item._updateText();																					//TODO: DHG: Make this a more generic API like a "pre webgl render" function
+				}
+				if(item.children) {											// CONTAINER
+					this._appendToBatchGroup(item, gl, cMtx);
+					continue;
+				}
+			}
+
+			// check for overflowing batch, if yes then force a render
+			if(this.batchCardCount+1 > this._maxCardsPerBatch) {														//TODO: DHG: consider making this polygon count dependant for things like vector draws
+				this.batchReason = "vertexOverflow";
+				this._drawToGPU(gl);					// <------------------------------------------------------------
+				this.batchCardCount = 0;
+			}
+
+			// actually apply its data to the buffers
+			if(!item._glMtx) { item._glMtx = new createjs.Matrix2D(); }
+			var iMtx = item._glMtx;
+			iMtx.copy(cMtx);
+			iMtx.appendTransform(
+				item.x, item.y,
+				item.scaleX, item.scaleY,
+				item.rotation, item.skewX, item.skewY,
+				item.regX, item.regY
+			);
+
+			var uvRect, texIndex, combinedAlpha;
+
+			var uvs = this.uvs;
+			var vertices = this.vertices;
+			var texI = this.indecies;
+			var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;
+			var loc = (offset/2)|0;
+
+			if(item._webGLRenderStyle === 2 || item.cacheCanvas) {			// BITMAP / Cached Canvas
+				var w,h;
+				var image = item.image || item.cacheCanvas;
 				if(!image.src){
+					// one time canvas property setup
 					image._isCanvas = true;
 					image.parent = item;
 					image.src = "canvas_" + Math.random();
 				}
-
-				if(this.batchCardCount+1 > this._maxCardsPerBatch) {
-					this.batchReason = "vertexOverflow";
-					this._drawToGPU(gl);					// <--------------------------------------------------------
-					this.batchCardCount = 0;
-				}
-
-				// actually apply its data to the buffers
-				if(!item._glMtx) { item._glMtx = new createjs.Matrix2D(); }
-				var iMtx = item._glMtx;
-				iMtx.copy(cMtx);
-				iMtx.appendTransform(
-					item.x, item.y,
-					item.scaleX, item.scaleY,
-					item.rotation, item.skewX, item.skewY,
-					item.regX, item.regY
-				);
-
-				var uvRect, texIndex, combinedAlpha;
-
-				var uvs = this.uvs;
-				var vertices = this.vertices;
-				var texI = this.indecies;
-				var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;
-				var loc = (offset/2)|0;
-
-				var w,h;
 
 				// calculate texture
 				var texture;
@@ -1036,11 +1066,24 @@ this.createjs = this.createjs||{};
 				}
 				texIndex = texture._activeIndex;
 
-				// calculate uvs
-				uvRect = SpriteStage.UV_RECT;
-				w = image.width;			h = image.height;
+				if(item.sourceRect) {
+					// calculate uvs
+					if(!item._uvRect) { item._uvRect = {}; }
+					var src = item.sourceRect;
+					uvRect = item._uvRect;
+					uvRect.t = (src.x)/image.width;
+					uvRect.l = (src.y)/image.height;
+					uvRect.b = (src.x + src.width)/image.width;
+					uvRect.r = (src.y + src.height)/image.height;
 
-				// calculate vertices (whole equation kept to demonstrate optimizations, please leave comments in)
+					w = src.width;			h = src.height;
+				} else {
+					// calculate uvs
+					uvRect = SpriteStage.UV_RECT;
+					w = image.width;			h = image.height;
+				}
+
+				// calculate vertices
 				tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
 				tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
 				trX = w *iMtx.a					/*+ 0 *iMtx.c*/				+iMtx.tx;
@@ -1050,181 +1093,80 @@ this.createjs = this.createjs||{};
 				brX = w *iMtx.a					+ h *iMtx.c					+iMtx.tx;
 				brY = w *iMtx.b					+ h *iMtx.d					+iMtx.ty;
 
-				// apply vertices
-				vertices[offset] = tlX;				vertices[offset+1] = tlY;
-				vertices[offset+2] = blX;			vertices[offset+3] = blY;
-				vertices[offset+4] = trX;			vertices[offset+5] = trY;
-				vertices[offset+6] = blX;			vertices[offset+7] = blY;
-				vertices[offset+8] = trX;			vertices[offset+9] = trY;
-				vertices[offset+10] = brX;			vertices[offset+11] = brY;
+				// calculate alpha
+			} else if(item._webGLRenderStyle === 1) {						// SPRITE
+				var frame = item.spriteSheet.getFrame(item.currentFrame);
+				var rect = frame.rect;
+				var image = frame.image;
 
-				// apply uvs
-				uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
-				uvs[offset+2] = uvRect.l;			uvs[offset+3] = uvRect.b;
-				uvs[offset+4] = uvRect.r;			uvs[offset+5] = uvRect.t;
-				uvs[offset+6] = uvRect.l;			uvs[offset+7] = uvRect.b;
-				uvs[offset+8] = uvRect.r;			uvs[offset+9] = uvRect.t;
-				uvs[offset+10] = uvRect.r;			uvs[offset+11] = uvRect.b;
+				// calculate uvs
+				uvRect = frame.uvRect;
+				if(!uvRect) {
+					uvRect = this.buildUVRects(item.spriteSheet, item.currentFrame, false);
+				}
 
-				// apply texture
-				texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = texI[loc+4] = texI[loc+5] = texIndex;
+				// calculate texture
+				var texture;
+				if(image._storeID === undefined) {
+					// this texture is new to us so load it and add it to the batch
+					texture = this._loadTextureImage(gl, image);
+					this._insertTextureInBatch(gl, texture);
+				} else {
+					// fetch the texture and put it in the batch if needed
+					texture = this._textureDictionary[image._storeID];
+					if(texture._batchID !== this._batchID) {
+						this._insertTextureInBatch(gl, texture);
+					}
+				}
+				texIndex = texture._activeIndex;
 
+				// calculate alpha
+				combinedAlpha = 1;
+
+				// calculate vertices
+				//DHG: See Matrix2D.transformPoint for why this math specifically
+				tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
+				tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
+				trX = rect.width *iMtx.a		/*+ 0 *iMtx.c*/				+iMtx.tx;
+				trY = rect.width *iMtx.b		/*+ 0 *iMtx.d*/				+iMtx.ty;
+				blX = /*0 *iMtx.a				+*/ rect.height *iMtx.c		+iMtx.tx;
+				blY = /*0 *iMtx.b				+*/ rect.height *iMtx.d		+iMtx.ty;
+				brX = rect.width *iMtx.a		+ rect.height *iMtx.c		+iMtx.tx;
+				brY = rect.width *iMtx.b		+ rect.height *iMtx.d		+iMtx.ty;
+
+			} else  if(item._webGLRenderStyle === 4) {						// DOM										//TODO: DHG this should be in, it's just calling its stage render isn't it?
+				//debugger;
+				// calculate vertices
+				// calculate uvs
+				// calculate texture
+				// calculate alpha
+				continue;
+			} else {														// MISC
 				continue;
 			}
 
-			if(item._webGLRenderStyle === 3) {		// BITMAP TEXT
-				item._updateText();
-			}
+			// apply vertices
+			vertices[offset] = tlX;				vertices[offset+1] = tlY;
+			vertices[offset+2] = blX;			vertices[offset+3] = blY;
+			vertices[offset+4] = trX;			vertices[offset+5] = trY;
+			vertices[offset+6] = blX;			vertices[offset+7] = blY;
+			vertices[offset+8] = trX;			vertices[offset+9] = trY;
+			vertices[offset+10] = brX;			vertices[offset+11] = brY;
 
-			if(item.children) {		// CONTAINER
-				this._appendToBatchGroup(item, gl, cMtx);
-			} else {
-				// check for overflowing batch, if yes then force a render
-				if(this.batchCardCount+1 > this._maxCardsPerBatch) {
-					this.batchReason = "vertexOverflow";
-					this._drawToGPU(gl);					// <--------------------------------------------------------
-					this.batchCardCount = 0;
-				}
+			// apply uvs
+			uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
+			uvs[offset+2] = uvRect.l;			uvs[offset+3] = uvRect.b;
+			uvs[offset+4] = uvRect.r;			uvs[offset+5] = uvRect.t;
+			uvs[offset+6] = uvRect.l;			uvs[offset+7] = uvRect.b;
+			uvs[offset+8] = uvRect.r;			uvs[offset+9] = uvRect.t;
+			uvs[offset+10] = uvRect.r;			uvs[offset+11] = uvRect.b;
 
-				// actually apply its data to the buffers
-				if(!item._glMtx) { item._glMtx = new createjs.Matrix2D(); }
-				var iMtx = item._glMtx;
-				iMtx.copy(cMtx);
-				iMtx.appendTransform(
-					item.x, item.y,
-					item.scaleX, item.scaleY,
-					item.rotation, item.skewX, item.skewY,
-					item.regX, item.regY
-				);
+			// apply texture
+			texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = texI[loc+4] = texI[loc+5] = texIndex;
 
-				var uvRect, texIndex, combinedAlpha;
+			// apply alpha																								//TODO: DHG: add in compound alpha
 
-				var uvs = this.uvs;
-				var vertices = this.vertices;
-				var texI = this.indecies;
-				var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;
-				var loc = (offset/2)|0;
-
-				if(item._webGLRenderStyle === 1) {		// SPRITE
-					var frame = item.spriteSheet.getFrame(item.currentFrame);
-					var rect = frame.rect;
-					var image = frame.image;
-
-					// calculate uvs
-					uvRect = frame.uvRect;
-					if(!uvRect) {
-						uvRect = this.buildUVRects(item.spriteSheet, item.currentFrame, false);
-					}
-
-					// calculate texture
-					var texture;
-					if(image._storeID === undefined) {
-						// this texture is new to us so load it and add it to the batch
-						texture = this._loadTextureImage(gl, image);
-						this._insertTextureInBatch(gl, texture);
-					} else {
-						// fetch the texture and put it in the batch if needed
-						texture = this._textureDictionary[image._storeID];
-						if(texture._batchID !== this._batchID) {
-							this._insertTextureInBatch(gl, texture);
-						}
-					}
-					texIndex = texture._activeIndex;
-
-					// calculate alpha
-					combinedAlpha = 1;
-
-					// calculate vertices
-					//DHG: See Matrix2D.transformPoint for why this math specifically
-					tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
-					tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
-					trX = rect.width *iMtx.a		/*+ 0 *iMtx.c*/				+iMtx.tx;
-					trY = rect.width *iMtx.b		/*+ 0 *iMtx.d*/				+iMtx.ty;
-					blX = /*0 *iMtx.a				+*/ rect.height *iMtx.c		+iMtx.tx;
-					blY = /*0 *iMtx.b				+*/ rect.height *iMtx.d		+iMtx.ty;
-					brX = rect.width *iMtx.a		+ rect.height *iMtx.c		+iMtx.tx;
-					brY = rect.width *iMtx.b		+ rect.height *iMtx.d		+iMtx.ty;
-
-				} else if(item._webGLRenderStyle === 2) { // BITMAP
-					var w,h;
-					var image = item.image;
-
-					// calculate texture
-					var texture;
-					if(image._storeID === undefined) {
-						// this texture is new to us so load it and add it to the batch
-						texture = this._loadTextureImage(gl, image);
-						this._insertTextureInBatch(gl, texture);
-					} else {
-						// fetch the texture and put it in the batch if needed
-						texture = this._textureDictionary[image._storeID];
-						if(texture._batchID !== this._batchID) {
-							this._insertTextureInBatch(gl, texture);
-						}
-					}
-					texIndex = texture._activeIndex;
-
-					if(item.sourceRect) {
-						// calculate uvs
-						if(!item._uvRect) { item._uvRect = {}; }
-						var src = item.sourceRect;
-						uvRect = item._uvRect;
-						uvRect.t = (src.x)/image.width;
-						uvRect.l = (src.y)/image.height;
-						uvRect.b = (src.x + src.width)/image.width;
-						uvRect.r = (src.y + src.height)/image.height;
-
-						w = src.width;			h = src.height;
-					} else {
-						// calculate uvs
-						uvRect = SpriteStage.UV_RECT;
-						w = image.width;			h = image.height;
-					}
-
-					// calculate vertices
-					tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
-					tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
-					trX = w *iMtx.a					/*+ 0 *iMtx.c*/				+iMtx.tx;
-					trY = w *iMtx.b					/*+ 0 *iMtx.d*/				+iMtx.ty;
-					blX = /*0 *iMtx.a				+*/ h *iMtx.c				+iMtx.tx;
-					blY = /*0 *iMtx.b				+*/ h *iMtx.d				+iMtx.ty;
-					brX = w *iMtx.a					+ h *iMtx.c					+iMtx.tx;
-					brY = w *iMtx.b					+ h *iMtx.d					+iMtx.ty;
-
-					// calculate alpha
-				} else if(item._webGLRenderStyle === 4) { // DOM
-					//debugger;
-					// calculate vertices
-					// calculate uvs
-					// calculate texture
-					// calculate alpha
-				} else {
-					continue;
-				}
-
-				// apply vertices
-				vertices[offset] = tlX;				vertices[offset+1] = tlY;
-				vertices[offset+2] = blX;			vertices[offset+3] = blY;
-				vertices[offset+4] = trX;			vertices[offset+5] = trY;
-				vertices[offset+6] = blX;			vertices[offset+7] = blY;
-				vertices[offset+8] = trX;			vertices[offset+9] = trY;
-				vertices[offset+10] = brX;			vertices[offset+11] = brY;
-
-				// apply uvs
-				uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
-				uvs[offset+2] = uvRect.l;			uvs[offset+3] = uvRect.b;
-				uvs[offset+4] = uvRect.r;			uvs[offset+5] = uvRect.t;
-				uvs[offset+6] = uvRect.l;			uvs[offset+7] = uvRect.b;
-				uvs[offset+8] = uvRect.r;			uvs[offset+9] = uvRect.t;
-				uvs[offset+10] = uvRect.r;			uvs[offset+11] = uvRect.b;
-
-				// apply texture
-				texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = texI[loc+4] = texI[loc+5] = texIndex;
-
-				// apply alpha																							//TODO: DHG: add in compound alpha
-
-				this.batchCardCount++;
-			}
+			this.batchCardCount++;
 		}
 	};
 
