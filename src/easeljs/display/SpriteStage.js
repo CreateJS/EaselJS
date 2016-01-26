@@ -249,6 +249,12 @@ this.createjs = this.createjs||{};
 
 		this._batchTextures = [];
 
+		this._batchTextureCount = 16;
+
+		this.lookTexture = 0;
+
+		this.batchIndex = 0;
+
 		// and begin
 		this._initializeWebGL();
 	}
@@ -287,7 +293,7 @@ this.createjs = this.createjs||{};
 	 * @type {Number}
 	 * @readonly
 	 **/
-	SpriteStage.DEFAULT_MAX_BATCH_SIZE = 20000;
+	SpriteStage.DEFAULT_MAX_BATCH_SIZE = 6000;
 
 	/**
 	 * The maximum size WebGL allows for element index numbers: 16 bit unsigned integer.
@@ -316,6 +322,7 @@ this.createjs = this.createjs||{};
 
 		"void main(void) {" +
 			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix... bypass for now
+			//vertexPosition, round if flag
 			//"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
 			"gl_Position = vec4("+
 				"(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
@@ -332,27 +339,12 @@ this.createjs = this.createjs||{};
 	 *
 	 */
 	SpriteStage.FRAG_SHADER = (
-	/*
-		"precision mediump float;" +
-
-		//"uniform sampler2D uSampler0;" +
-
-		//"varying vec4 vTextureData;" +
-
-		"void main(void) {" +
-			//"vec4 color = texture2D(uSampler0, vTextureData.st);" +		//vTextureData.p
-			//"vec4 color = texture2D(uSampler0, vec2(0.25, 0.25));" +		//vTextureData.p
-			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
-			//"if (color.a == 0.0) discard;" +
-			//"gl_FragColor = vec4(color.rgb, color.a * vTextureData.a);" +
-			"gl_FragColor = color;" +
-		"}"*/
 		"precision mediump float;" +
 
 		"varying highp vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
 
-		"uniform sampler2D uSampler[16];" +
+		"uniform sampler2D uSampler[{{count}}];" +
 		//"uniform int flagData;" +
 
 		"void main(void) {" +
@@ -361,39 +353,11 @@ this.createjs = this.createjs||{};
 
 			"if(src == 0) {" +
 				"color = texture2D(uSampler[0], vTextureCoord);" +
-			"} else if(src == 1) {" +
-				"color = texture2D(uSampler[1], vTextureCoord);" +
-			"} else if(src == 2) {" +
-				"color = texture2D(uSampler[2], vTextureCoord);" +
-			"} else if(src == 3) {" +
-				"color = texture2D(uSampler[3], vTextureCoord);" +
-			"} else if(src == 4) {" +
-				"color = texture2D(uSampler[4], vTextureCoord);" +
-			"} else if(src == 5) {" +
-				"color = texture2D(uSampler[5], vTextureCoord);" +
-			"} else if(src == 6) {" +
-				"color = texture2D(uSampler[6], vTextureCoord);" +
-			"} else if(src == 7) {" +
-				"color = texture2D(uSampler[7], vTextureCoord);" +
-			"} else if(src == 8) {" +
-				"color = texture2D(uSampler[8], vTextureCoord);" +
-			"} else if(src == 9) {" +
-				"color = texture2D(uSampler[9], vTextureCoord);" +
-			"} else if(src == 10) {" +
-				"color = texture2D(uSampler[10], vTextureCoord);" +
-			"} else if(src == 11) {" +
-				"color = texture2D(uSampler[11], vTextureCoord);" +
-			"} else if(src == 12) {" +
-				"color = texture2D(uSampler[12], vTextureCoord);" +
-			"} else if(src == 13) {" +
-				"color = texture2D(uSampler[13], vTextureCoord);" +
-			"} else if(src == 14) {" +
-				"color = texture2D(uSampler[14], vTextureCoord);" +
-			"} else if(src == 15) {" +
-				"color = texture2D(uSampler[15], vTextureCoord);" +
+			"{{alternates}}" +
 			"}" +
 
 			"gl_FragColor = color;" +
+			//"gl_FragColor = vec4(color.rgb, color.a * vTextureData.a);" +
 		"}"
 	);
 
@@ -409,7 +373,7 @@ this.createjs = this.createjs||{};
 	p._get_isWebGL = function() {
 		return !!this._webGLContext;
 	};
-	
+
 	try {
 		Object.defineProperties(p, {
 			isWebGL: { get: p._get_isWebGL }
@@ -478,7 +442,7 @@ this.createjs = this.createjs||{};
 		//if (this.autoClear) { this.clear(); }
 		if (this._webGLContext) {
 			// Use WebGL.
-			this.draw(this._webGLContext, false);
+			this._batchDraw(this, this._webGLContext);
 		} else {
 			// Use 2D.
 			//var ctx = this.canvas.getContext("2d");
@@ -592,10 +556,32 @@ this.createjs = this.createjs||{};
 			gl.RGBA,			// format (match internal format)
 			gl.UNSIGNED_BYTE,	// type of texture(pixel color depth)
 			new Uint8Array([0.1, 0.2, 0.3, 1.0]	// image data
-			));
+		));
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		return texture;
+	};
+
+	p.buildUVRects = function(spritesheet, target, onlyTarget) {
+		if(!spritesheet || !spritesheet._frames){ return result; }
+		if(target === undefined) { target = -1; }
+		if(onlyTarget === undefined) { onlyTarget = false; }
+
+		var start = (target != -1 && onlyTarget)?(target):(0);
+		var end = (target != -1 && onlyTarget)?(target+1):(spritesheet._frames.length);
+		for(var i=start; i<end; i++) {
+			var f = spritesheet._frames[i];
+			if(f.uvRect) { continue; }
+			if(f.image.width <= 0 || f.image.height <= 0) { continue; }
+
+			var r = f.rect;
+			f.uvRect = {
+				t: r.y / f.image.height,					l: r.x / f.image.width,
+				b: (r.y + r.height) / f.image.height,		r: (r.x + r.width) / f.image.width
+			};
+		}
+
+		return spritesheet._frames[(target != -1)?(target):(0)].uvRect || {t:0, l:0, b:1, r:1};
 	};
 
 	// private methods:
@@ -659,7 +645,12 @@ this.createjs = this.createjs||{};
 		shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
 		//shaderProgram.flagUniform = gl.getUniformLocation(shaderProgram, "flagData");
 
-		var samplers = shaderProgram.samplerData = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+		var samplers = [];
+		for(var i = 0; i < this._batchTextureCount; i++) {
+			samplers[i] = i;
+		}
+
+		shaderProgram.samplerData = samplers;
 		shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
 		gl.uniform1iv(shaderProgram.samplerUniform, samplers);
 
@@ -688,6 +679,14 @@ this.createjs = this.createjs||{};
 				throw(type + " : Invalid");
 				return null;
 		}
+
+		str = str.replace("{{count}}", this._batchTextureCount);
+
+		var insert = "";
+		for(var i=1; i<this._batchTextureCount; i++) {
+			insert += "} else if(src == "+ i +") { color = texture2D(uSampler["+ i +"], vTextureCoord);";
+		}
+		str = str.replace("{{alternates}}", insert);
 
 		gl.shaderSource(shader, str);
 		gl.compileShader(shader);
@@ -739,10 +738,9 @@ this.createjs = this.createjs||{};
 	};
 
 	p._initTextures = function(gl) {
-		var count = 16;
 		this.lastTexture = 0;
 
-		for(var i=0; i<count;i++) {
+		for(var i=0; i<this._batchTextureCount;i++) {
 			this._batchTextures[i] = this.getBaseTexture();
 		}
 	};
@@ -772,139 +770,147 @@ this.createjs = this.createjs||{};
 		texture._h = image.height;
 	};
 
-	/**
-	 *
-	 */
 	p._batchDraw = function(sceneGraph, gl) {
-		console.log("startBatch");
-		this.batchIndex++;
-		this.batchCount = 0;
+		//console.log("startBatch");
+		this.batchCardCount = 0;
+		this.lookTexture = 0;
 		this.depth = 0;
 
 		var mtx = new createjs.Matrix2D();
 		this._appendToBatchGroup(sceneGraph, gl, mtx);
 
-		console.log("endBatch");
+		//console.log("endBatch");
 		this._drawToGPU(gl);
-		console.log("=================================");
+		//console.log("=================================");
 	};
 
 	p._appendToBatchGroup = function(container, gl, concatMtx) {
-		// check to see if we can render this
-
 		// sort out shared properties
-		var backupMtx = container._glMtx = container._glMtx || new createjs.Matrix2D();
-		backupMtx.copy(concatMtx);
-		concatMtx.appendTransform(
+		if(!container._glMtx) { container._glMtx = new createjs.Matrix2D(); }
+		var cMtx = container._glMtx;
+		cMtx.copy(concatMtx);
+		cMtx.appendTransform(
 			container.x, container.y,
 			container.scaleX, container.scaleY,
 			container.rotation, container.skewX, container.skewY,
 			container.regX, container.regY
 		);
 
+		var tlX, tlY, trX, trY, blX, blY, brX, brY;
+		//var tl = {x:0, y:0};
+		//var tr = {x:0, y:0};
+		//var bl = {x:0, y:0};
+		//var br = {x:0, y:0};
+
 		// actually apply its data to the buffers
 		for (var i = 0, l = container.children.length; i < l; i++) {
 			var item = container.children[i];
-			if (!item.isVisible()) { continue; }
+			if (!item.visible) { continue; }
 
 			if (item.children) {
-				this._appendToBatchGroup(item, gl, concatMtx);
+				this._appendToBatchGroup(item, gl, cMtx);
 			} else {
-				this._appendToBatchItem(item, gl, concatMtx);
-			}
-		}
-
-		// reset
-		concatMtx.copy(backupMtx);
-	};
-
-	p._appendToBatchItem = function(item, gl, concatMtx) {
-		// check to see if we can render this
-		if(this.batchCount+1 > this._maxCardsPerBatch) {
-			this._drawToGPU(gl);
-			this.batchCount = 0;
-		}
-
-		// check for overflowing batch, if yes then force a render
-
-		// actually apply its data to the buffers
-		var backupMtx = item._glMtx = item._glMtx || new createjs.Matrix2D();
-		backupMtx.copy(concatMtx);
-		concatMtx.appendTransform(
-			item.x, item.y,
-			item.scaleX, item.scaleY,
-			item.rotation, item.skewX, item.skewY,
-			item.regX, item.regY
-		);
-
-		var tl = item._glTL || {x:0, y:0};
-		var tr = item._glTR || {x:0, y:0};
-		var bl = item._glBL || {x:0, y:0};
-		var br = item._glTR || {x:0, y:0};
-
-		var uvs = this.uvs;
-		var vertices = this.vertices;
-		var indecies = this.indecies;
-		var offset = this.batchCount*SpriteStage.INDICIES_PER_CARD*2;
-
-		switch(item._webGLRenderStyle) {
-			case 1 : // SpriteContainer
-				break;
-			case 2 : // Sprite
-				var spr = item.spriteSheet;
-				var frame = spr.getFrame(item.currentFrame);
-				var rect = frame.rect;
-				var uvRect = frame.uvRect;
-				var image = frame.image;
-
-				var texture = this._textureDictionary[image.src];
-				if(!texture) {
-					texture = this._loadTextureImage(gl, this.lastTexture++, image.src);
+				// check to see if we can render this
+				if(this.batchCardCount+1 > this._maxCardsPerBatch) {
+					this._drawToGPU(gl);
+					this.batchCardCount = 0;
 				}
 
-				concatMtx.transformPoint(0,					0,					tl);
-				concatMtx.transformPoint(rect.width,		0,					tr);
-				concatMtx.transformPoint(0,					rect.height,		bl);
-				concatMtx.transformPoint(rect.width,		rect.height,		br);
+				// check for overflowing batch, if yes then force a render
 
-				vertices[offset] = tl.x;			vertices[offset+1] = tl.y;
-				vertices[offset+2] = bl.x;			vertices[offset+3] = bl.y;
-				vertices[offset+4] = tr.x;			vertices[offset+5] = tr.y;
-				vertices[offset+6] = bl.x;			vertices[offset+7] = bl.y;
-				vertices[offset+8] = tr.x;			vertices[offset+9] = tr.y;
-				vertices[offset+10] = br.x;			vertices[offset+11] = br.y;
+				// actually apply its data to the buffers
+				if(!item._glMtx) { item._glMtx = new createjs.Matrix2D(); }
+				var iMtx = item._glMtx;
+				iMtx.copy(cMtx);
+				iMtx.appendTransform(
+					item.x, item.y,
+					item.scaleX, item.scaleY,
+					item.rotation, item.skewX, item.skewY,
+					item.regX, item.regY
+				);
 
-				//*
-				uvs[offset] = (rect.x)/texture._w;					uvs[offset+1] = (rect.y)/texture._h;
-				uvs[offset+2] = (rect.x)/texture._w;				uvs[offset+3] = (rect.y+rect.height)/texture._h;
-				uvs[offset+4] = (rect.x+rect.width)/texture._w;		uvs[offset+5] = (rect.y)/texture._h;
-				uvs[offset+6] = (rect.x)/texture._w;				uvs[offset+7] = (rect.y+rect.height)/texture._h;
-				uvs[offset+8] = (rect.x+rect.width)/texture._w;		uvs[offset+9] = (rect.y)/texture._h;
-				uvs[offset+10] = (rect.x+rect.width)/texture._w;	uvs[offset+11] = (rect.y+rect.height)/texture._h;
-				/*/
-				uvs[offset] = uvRect.x;							uvs[offset+1] = uvRect.y;
-				uvs[offset+2] = uvRect.x;						uvs[offset+3] = uvRect.y+uvRect.height;
-				uvs[offset+4] = uvRect.x+uvRect.width;			uvs[offset+5] = uvRect.y;
-				uvs[offset+6] = uvRect.x;						uvs[offset+7] = uvRect.y+uvRect.height;
-				uvs[offset+8] = uvRect.x+uvRect.width;			uvs[offset+9] = uvRect.y;
-				uvs[offset+10] = uvRect.x+uvRect.width;			uvs[offset+11] = uvRect.y+uvRect.height;
-				//*/
+				var uvRect, texIndex;
 
+				var uvs = this.uvs;
+				var vertices = this.vertices;
+				var texI = this.indecies;
+				var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;
 				var loc = (offset/2)|0;
-				indecies[loc] = indecies[loc+1] = indecies[loc+2] = indecies[loc+3] = indecies[loc+4] = indecies[loc+5] = 0;
-				break;
-			case 3 : // BitmapText
-				console.log("todo");
-				break;
-			case 4 : // Bitmap
-				console.log("todo");
-				break;
-			case 5 : // DOMElement
-				break;
-		}
 
-		this.batchCount++;
-		concatMtx.copy(backupMtx);
+				switch(item._webGLRenderStyle) {
+					case 1 : // Sprite
+						var spr = item.spriteSheet;
+						var frame = spr.getFrame(item.currentFrame);
+						var rect = frame.rect;
+						uvRect = frame.uvRect;
+						var image = frame.image;
+						if(!uvRect) {
+							uvRect = this.buildUVRects(item.spriteSheet, item.currentFrame, false);
+						}
+						//this.lookTexture
+						//this.batchTextures
+						var texture = this._textureDictionary[image.src];
+						if(!texture) {
+							texture = this._loadTextureImage(gl, this.lastTexture++, image.src);
+						}
+
+						texIndex = 0;
+
+						//iMtx.transformPoint(0,					0,					tl);
+						//iMtx.transformPoint(rect.width,			0,					tr);
+						//iMtx.transformPoint(0,					rect.height,		bl);
+						//iMtx.transformPoint(rect.width,			rect.height,		br);
+
+						//tl.x = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
+						//tl.y = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
+						//tr.x = rect.width *iMtx.a		/*+ 0 *iMtx.c*/				+iMtx.tx;
+						//tr.y = rect.width *iMtx.b		/*+ 0 *iMtx.d*/				+iMtx.ty;
+						//bl.x = /*0 *iMtx.a				+*/ rect.height *iMtx.c		+iMtx.tx;
+						//bl.y = /*0 *iMtx.b				+*/ rect.height *iMtx.d		+iMtx.ty;
+						//br.x = rect.width *iMtx.a		+ rect.height *iMtx.c		+iMtx.tx;
+						//br.y = rect.width *iMtx.b		+ rect.height *iMtx.d		+iMtx.ty;
+						tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
+						tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
+						trX = rect.width *iMtx.a		/*+ 0 *iMtx.c*/				+iMtx.tx;
+						trY = rect.width *iMtx.b		/*+ 0 *iMtx.d*/				+iMtx.ty;
+						blX = /*0 *iMtx.a				+*/ rect.height *iMtx.c		+iMtx.tx;
+						blY = /*0 *iMtx.b				+*/ rect.height *iMtx.d		+iMtx.ty;
+						brX = rect.width *iMtx.a		+ rect.height *iMtx.c		+iMtx.tx;
+						brY = rect.width *iMtx.b		+ rect.height *iMtx.d		+iMtx.ty;
+
+						break;
+					case 2 : // BitmapText
+						console.log("todo");
+						continue;
+						break;
+					case 3 : // Bitmap
+						console.log("todo");
+						continue;
+						break;
+					case 4 : // DOMElement
+						continue;
+						break;
+				}
+
+				vertices[offset] = tlX;			vertices[offset+1] = tlY;
+				vertices[offset+2] = blX;			vertices[offset+3] = blY;
+				vertices[offset+4] = trX;			vertices[offset+5] = trY;
+				vertices[offset+6] = blX;			vertices[offset+7] = blY;
+				//vertices[offset+8] = tr.x;			vertices[offset+9] = tr.y;
+				//vertices[offset+10] = br.x;			vertices[offset+11] = br.y;
+
+				uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
+				uvs[offset+2] = uvRect.l;			uvs[offset+3] = uvRect.b;
+				uvs[offset+4] = uvRect.r;			uvs[offset+5] = uvRect.t;
+				uvs[offset+6] = uvRect.l;			uvs[offset+7] = uvRect.b;
+				//uvs[offset+8] = uvRect.r;			uvs[offset+9] = uvRect.t;
+				//uvs[offset+10] = uvRect.r;			uvs[offset+11] = uvRect.b;
+
+				texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = /*texI[loc+4] = texI[loc+5] =*/ texIndex;
+
+				this.batchCardCount++;
+			}
+		}
 	};
 
 	/**
@@ -914,7 +920,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._drawToGPU = function(gl) {
-		console.log("DRAW batch:", this.batchCount*SpriteStage.INDICIES_PER_CARD);
+		//console.log("DRAW batch:", this.batchCardCount*SpriteStage.INDICIES_PER_CARD);
 		var shaderProgram = this._shaderProgram;
 		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer;
 		var triangleTextureIndexBuffer = this._triangleTextureIndexBuffer;
@@ -944,7 +950,8 @@ this.createjs = this.createjs||{};
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		}*/
 
-		gl.drawArrays(gl.TRIANGLES, 0, this.batchCount*SpriteStage.INDICIES_PER_CARD);
+		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*SpriteStage.INDICIES_PER_CARD);
+		this.batchIndex++;
 		//drawElements
 	};
 
@@ -956,7 +963,7 @@ this.createjs = this.createjs||{};
 	(function _injectProperties() {
 		// Set which classes are compatible with SpriteStage. The order is important!!!
 		// Reflect any changes to the drawing loop
-		var candidates = [createjs.SpriteContainer, createjs.Sprite, createjs.BitmapText, createjs.Bitmap, createjs.DOMElement];
+		var candidates = [createjs.Sprite, createjs.BitmapText, createjs.Bitmap, createjs.DOMElement];
 		candidates.forEach(function(_class, index) {
 			_class.prototype._webGLRenderStyle = index + 1;
 		});
