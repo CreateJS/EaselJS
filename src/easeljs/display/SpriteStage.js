@@ -30,18 +30,10 @@
  * @module EaselJS
  */
 
-// namespace:
 this.createjs = this.createjs||{};
 
 (function() {
 	"use strict";
-
-	// Set which classes are compatible with SpriteStage.
-	// The order is important!!! If it's changed/appended, make sure that any logic that 
-	// checks _spritestage_compatibility accounts for it!
-	[createjs.SpriteContainer, createjs.Sprite, createjs.BitmapText, createjs.Bitmap, createjs.DOMElement].forEach(function(_class, index) {
-		_class.prototype._spritestage_compatibility = index + 1;
-	});
 
 	/** 
 	 * README IF EDITING:
@@ -59,7 +51,6 @@ this.createjs = this.createjs||{};
 	 * 
 	**/
 
-// constructor:
 	/**
 	 * A sprite stage is the root level {{#crossLink "Container"}}{{/crossLink}} for an aggressively optimized display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
 	 * method is called, it will render its display list to its target canvas. WebGL content is fully compatible with the existing Context2D renderer.
@@ -97,7 +88,8 @@ this.createjs = this.createjs||{};
 	function SpriteStage(canvas, preserveDrawingBuffer, antialias) {
 		this.Stage_constructor(canvas);
 
-	// private properties:
+		// private properties:
+		///////////////////////////////////////////////////////
 		/**
 		 * Specifies whether or not the canvas is auto-cleared by WebGL. Spec discourages true.
 		 * If true, the canvas is NOT auto-cleared by WebGL. Value is ignored if `_alphaEnabled` is false.
@@ -257,15 +249,14 @@ this.createjs = this.createjs||{};
 
 		this._batchTextures = [];
 
-	// setup:
+		// and begin
 		this._initializeWebGL();
 	}
 	var p = createjs.extend(SpriteStage, createjs.Stage);
 
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
-// constants:
+	// constants:
+	///////////////////////////////////////////////////////
 	/**
 	 * The number of properties defined per vertex.
 	 * x, y, textureU, textureV, textureIndex, alpha
@@ -467,108 +458,36 @@ this.createjs = this.createjs||{};
 		this._createBuffers(gl);
 		this._initTextures(gl);
 
-		gl.clearColor(0.25, 0.25, 0.25, 1.0);
-		gl.enable(gl.DEPTH_TEST);
+		//gl.clearColor(0.25, 0.25, 0.25, 1.0);
+		//gl.disable(gl.DEPTH_TEST);
+		gl.enable(gl.BLEND);
+		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 
 		this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
 	};
 
 	// public methods:
 	///////////////////////////////////////////////////////
-	/**
-	 * Adds a child to the top of the display list.
-	 * Only children of type SpriteContainer, Sprite, Bitmap, BitmapText, or DOMElement are allowed.
-	 * Children also MUST have either an image or spriteSheet defined on them (unless it's a DOMElement).
-	 *
-	 * <h4>Example</h4>
-	 *      container.addChild(bitmapInstance);
-	 *
-	 *  You can also add multiple children at once:
-	 *
-	 *      container.addChild(bitmapInstance, shapeInstance, textInstance);
-	 *
-	 * @method addChild
-	 * @param {DisplayObject} child The display object to add.
-	 * @return {DisplayObject} The child that was added, or the last child if multiple children were added.
-	 **/
-	p.addChild = function(child) {
-		if (child == null) { return child; }
-		if (arguments.length > 1) {
-			return this.addChildAt.apply(this, Array.prototype.slice.call(arguments).concat([this.children.length]));
-		} else {
-			return this.addChildAt(child, this.children.length);
-		}
-	};
-
-	/**
-	 * Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and
-	 * setting its parent to this Container.
-	 * Only children of type SpriteContainer, Sprite, Bitmap, BitmapText, or DOMElement are allowed.
-	 * Children also MUST have either an image or spriteSheet defined on them (unless it's a DOMElement).
-	 *
-	 * <h4>Example</h4>
-	 *
-	 *      addChildAt(child1, index);
-	 *
-	 * You can also add multiple children, such as:
-	 *
-	 *      addChildAt(child1, child2, ..., index);
-	 *
-	 * The index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list,
-	 * you could use:
-	 *
-	 *      container.addChildAt(myShape, container.getChildIndex(otherShape));
-	 *
-	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
-	 *
-	 * @method addChildAt
-	 * @param {DisplayObject} child The display object to add.
-	 * @param {Number} index The index to add the child at.
-	 * @return {DisplayObject} Returns the last child that was added, or the last child if multiple children were added.
-	 **/
-	p.addChildAt = function(child, index) {
-		var l = arguments.length;
-		var indx = arguments[l-1]; // can't use the same name as the index param or it replaces arguments[1]
-		if (indx < 0 || indx > this.children.length) { return arguments[l-2]; }
-		if (l > 2) {
-			for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i], indx+i); }
-			return arguments[l-2];
-		}
-		if (child._spritestage_compatibility >= 1) {
-			// The child is compatible with SpriteStage.
-		} else {
-			console && console.log("Error: You can only add children of type SpriteContainer, Sprite, Bitmap, BitmapText, or DOMElement. [" + child.toString() + "]");
-			return child;
-		}
-		if (!child.image && !child.spriteSheet && child._spritestage_compatibility <= 4) {
-			console && console.log("Error: You can only add children that have an image or spriteSheet defined on them. [" + child.toString() + "]");
-			return child;
-		}
-		if (child.parent) { child.parent.removeChild(child); }
-		child.parent = this;
-		this.children.splice(index, 0, child);
-		return child;
-	};
-
 	/** docced in super class **/
 	p.update = function(props) {
 		//DHG TODO: test context swapping and re-acqusition
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
-		this.dispatchEvent("drawstart"); // TODO: make cancellable?
-		if (this.autoClear) { this.clear(); }
+		//this.dispatchEvent("drawstart"); // TODO: make cancellable?
+		//if (this.autoClear) { this.clear(); }
 		if (this._webGLContext) {
 			// Use WebGL.
 			this.draw(this._webGLContext, false);
 		} else {
 			// Use 2D.
-			var ctx = this.canvas.getContext("2d");
-			ctx.save();
-			this.updateContext(ctx);
-			this.draw(ctx, false);
-			ctx.restore();
+			//var ctx = this.canvas.getContext("2d");
+			//ctx.save();
+			//this.updateContext(ctx);
+			//this.draw(ctx, false);
+			//ctx.restore();
 		}
-		this.dispatchEvent("drawend");
+		//this.dispatchEvent("drawend");
 	};
 
 	/**
@@ -583,9 +502,9 @@ this.createjs = this.createjs||{};
 			//gl.clear(gl.COLOR_BUFFER_BIT);
 		} else {
 			// Use 2D.
-			var ctx = this.canvas.getContext("2d");
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
+			//var ctx = this.canvas.getContext("2d");
+			//ctx.setTransform(1, 0, 0, 1, 0, 0);
+			//ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
 		}
 	};
 
@@ -669,9 +588,7 @@ this.createjs = this.createjs||{};
 			gl.TEXTURE_2D,		// target
 			0,					// level of detail
 			gl.RGBA,			// internalformat
-			1,					// width (only for array texture)
-			1,					// height (only for array texture)
-			0,					// border (only for array texture)
+			1,	1,	0,			// width, height, border (only for array sourced textures)
 			gl.RGBA,			// format (match internal format)
 			gl.UNSIGNED_BYTE,	// type of texture(pixel color depth)
 			new Uint8Array([0.1, 0.2, 0.3, 1.0]	// image data
@@ -790,18 +707,14 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._createBuffers = function(gl) {
-		var passes = 16;
-		var groupCount = this._maxCardsPerBatch;
+		var groupCount = this._maxCardsPerBatch * SpriteStage.INDICIES_PER_CARD;
 		var groupSize, i;
 
 		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
 		groupSize = 2;
 		var vertices = this.vertices = new Float32Array(groupCount * groupSize);
-		for(i=0; i<vertices.length; i+=groupSize) {
-			vertices[i+0] = Math.random() * this._viewportWidth;
-			vertices[i+1] = Math.random() * this._viewportHeight;
-		}
+		for(i=0; i<vertices.length; i+=groupSize) { vertices[i+0] = vertices[i+1] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
 		triangleVertexPositionBuffer.itemSize = groupSize;
 		triangleVertexPositionBuffer.numItems = groupCount;
@@ -810,9 +723,7 @@ this.createjs = this.createjs||{};
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleTextureIndexBuffer);
 		groupSize = 1;
 		var indecies = this.indecies = new Float32Array(groupCount);
-		for(i=0; i<indecies.length; i++) {
-			indecies[i] = i%passes;
-		}
+		for(i=0; i<indecies.length; i++) { indecies[i] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, indecies, gl.DYNAMIC_DRAW);
 		triangleTextureIndexBuffer.itemSize = groupSize;
 		triangleTextureIndexBuffer.numItems = groupCount;
@@ -821,9 +732,7 @@ this.createjs = this.createjs||{};
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleUVPositionBuffer);
 		groupSize = 2;
 		var uvs = this.uvs = new Float32Array(groupCount * groupSize);
-		for(i=0; i<uvs.length; i++) {
-			uvs[i] = Math.random();
-		}
+		for(i=0; i<vertices.length; i+=groupSize) { uvs[i+0] = uvs[i+1] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
 		triangleUVPositionBuffer.itemSize = groupSize;
 		triangleUVPositionBuffer.numItems = groupCount;
@@ -832,94 +741,52 @@ this.createjs = this.createjs||{};
 	p._initTextures = function(gl) {
 		var count = 16;
 		this.lastTexture = 0;
-		this.loadedTextures = 0;
 
-		//////
-		/* for(var i=0; i<count;i++) {
-		 this._textureDictionary[this._batchTextures[i] = "_"+i] = this.getBaseTexture();
-		 }*/
-		for(var i=0; i<16;i++) {
-			var texture = this._batchTextures[i] = gl.createTexture();
-			gl.bindTexture(gl.TEXTURE_2D, texture);
-			gl.texImage2D(
-				gl.TEXTURE_2D,		// target
-				0,					// level of detail
-				gl.RGBA,			// internalformat
-				1,					// width (only for array texture)
-				1,					// height (only for array texture)
-				0,					// border (only for array texture)
-				gl.RGBA,			// format (match internal format)
-				gl.UNSIGNED_BYTE,	// type of texture(pixel color depth)
-				new Uint8Array([0, 0, 0, 1.0])	// image data
-			);
+		for(var i=0; i<count;i++) {
+			this._batchTextures[i] = this.getBaseTexture();
 		}
 	};
 
-	/**
-	 * Sets up an image's WebGL texture.
-	 * @method _setupImageTexture
-	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-	 * @param {Object} image
-	 * @return {WebGLTexture}
-	 * @protected
-	 **/
-	p._setupImageTexture = function(gl, src) {
-		var image = new Image();
-		var texture = this.getBaseTexture();
-		//this._textureDictionary[src] = texture;
-		//this._batchTextures[0] = src;
-
-		image._glTexture = texture;
-		image.addEventListener("load", this._handleLoadedImage.bind(this, gl, image), false);
+	p._loadTextureImage = function(gl, index, src) {
+		this._textureDictionary[src] = this._batchTextures[index];
+		var texture = this._batchTextures[index];
+		var image = texture._image = new Image();
+		image.onload = this._handleImageLoaded.bind(this, gl, image);
+		image._batchIndex = index;
 		image.src = src;
 
 		return texture;
 	};
 
-	p._handleLoadedImage = function(gl, image) {
-		image._glTexture._loaded = true;
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, image._glTexture);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+	p._handleImageLoaded = function(gl, image) {
+		var texture = this._batchTextures[image._batchIndex];
+
+		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-		//DHG: this may be unwise for things like bitmap fills
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+		texture._w = image.width;
+		texture._h = image.height;
 	};
 
 	/**
 	 *
 	 */
 	p._batchDraw = function(sceneGraph, gl) {
-		var shaderProgram = this._shaderProgram;
-		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer;
-		var triangleTextureIndexBuffer = this._triangleTextureIndexBuffer;
-		var triangleUVPositionBuffer = this._triangleUVPositionBuffer;
-
+		console.log("startBatch");
 		this.batchIndex++;
 		this.batchCount = 0;
 		this.depth = 0;
 
-		var uvs = this.uvs;
-		for(var i=0; i<uvs.length; i++) {
-			uvs[i] = Math.random();
-		}
-		var indecies = this.indecies; var offset = (Math.random()*16)|0;
-		for(var i=0; i<indecies.length; i++) {
-			//indecies[i] = (i + offset)%16;
-			indecies[i] = 0;
-		}
-		var vertices = this.vertices;
-		for(i=0; i<vertices.length; i+=triangleVertexPositionBuffer.itemSize) {
-			vertices[i+0] = (Math.random() * 25) + (this._viewportWidth-(5+25));
-			vertices[i+1] = (Math.random() * 25) + (5);
-		}
-
 		var mtx = new createjs.Matrix2D();
 		this._appendToBatchGroup(sceneGraph, gl, mtx);
 
+		console.log("endBatch");
 		this._drawToGPU(gl);
+		console.log("=================================");
 	};
 
 	p._appendToBatchGroup = function(container, gl, concatMtx) {
@@ -953,6 +820,10 @@ this.createjs = this.createjs||{};
 
 	p._appendToBatchItem = function(item, gl, concatMtx) {
 		// check to see if we can render this
+		if(this.batchCount+1 > this._maxCardsPerBatch) {
+			this._drawToGPU(gl);
+			this.batchCount = 0;
+		}
 
 		// check for overflowing batch, if yes then force a render
 
@@ -973,26 +844,23 @@ this.createjs = this.createjs||{};
 
 		var uvs = this.uvs;
 		var vertices = this.vertices;
+		var indecies = this.indecies;
 		var offset = this.batchCount*SpriteStage.INDICIES_PER_CARD*2;
 
-		switch(item._spritestage_compatibility) {
+		switch(item._webGLRenderStyle) {
 			case 1 : // SpriteContainer
 				break;
 			case 2 : // Sprite
 				var spr = item.spriteSheet;
 				var frame = spr.getFrame(item.currentFrame);
 				var rect = frame.rect;
-				//var image = frame.image;
-				/*var image = frame.image;
-				var texture = this._textureDictionary[image.src];
-				if(!texture){
-					texture = this._setupImageTexture(gl, image.src || image);
-				}
-				if(!texture._loaded) {
-					console.warn("image not rendered due to unloaded textures");
-				}*/
-				var texture = {width:30, height:203};
+				var uvRect = frame.uvRect;
+				var image = frame.image;
 
+				var texture = this._textureDictionary[image.src];
+				if(!texture) {
+					texture = this._loadTextureImage(gl, this.lastTexture++, image.src);
+				}
 
 				concatMtx.transformPoint(0,					0,					tl);
 				concatMtx.transformPoint(rect.width,		0,					tr);
@@ -1006,16 +874,30 @@ this.createjs = this.createjs||{};
 				vertices[offset+8] = tr.x;			vertices[offset+9] = tr.y;
 				vertices[offset+10] = br.x;			vertices[offset+11] = br.y;
 
-				uvs[offset] = (rect.x)/texture.width;					uvs[offset+1] = (rect.y)/texture.height;
-				uvs[offset+2] = (rect.x)/texture.width;					uvs[offset+3] = (rect.y+rect.height)/texture.height;
-				uvs[offset+4] = (rect.x+rect.width)/texture.width;		uvs[offset+5] = (rect.y)/texture.height;
-				uvs[offset+6] = (rect.x)/texture.width;					uvs[offset+7] = (rect.y+rect.height)/texture.height;
-				uvs[offset+8] = (rect.x+rect.width)/texture.width;		uvs[offset+9] = (rect.y)/texture.height;
-				uvs[offset+10] = (rect.x+rect.width)/texture.width;		uvs[offset+11] = (rect.y+rect.height)/texture.height;
+				//*
+				uvs[offset] = (rect.x)/texture._w;					uvs[offset+1] = (rect.y)/texture._h;
+				uvs[offset+2] = (rect.x)/texture._w;				uvs[offset+3] = (rect.y+rect.height)/texture._h;
+				uvs[offset+4] = (rect.x+rect.width)/texture._w;		uvs[offset+5] = (rect.y)/texture._h;
+				uvs[offset+6] = (rect.x)/texture._w;				uvs[offset+7] = (rect.y+rect.height)/texture._h;
+				uvs[offset+8] = (rect.x+rect.width)/texture._w;		uvs[offset+9] = (rect.y)/texture._h;
+				uvs[offset+10] = (rect.x+rect.width)/texture._w;	uvs[offset+11] = (rect.y+rect.height)/texture._h;
+				/*/
+				uvs[offset] = uvRect.x;							uvs[offset+1] = uvRect.y;
+				uvs[offset+2] = uvRect.x;						uvs[offset+3] = uvRect.y+uvRect.height;
+				uvs[offset+4] = uvRect.x+uvRect.width;			uvs[offset+5] = uvRect.y;
+				uvs[offset+6] = uvRect.x;						uvs[offset+7] = uvRect.y+uvRect.height;
+				uvs[offset+8] = uvRect.x+uvRect.width;			uvs[offset+9] = uvRect.y;
+				uvs[offset+10] = uvRect.x+uvRect.width;			uvs[offset+11] = uvRect.y+uvRect.height;
+				//*/
+
+				var loc = (offset/2)|0;
+				indecies[loc] = indecies[loc+1] = indecies[loc+2] = indecies[loc+3] = indecies[loc+4] = indecies[loc+5] = 0;
 				break;
 			case 3 : // BitmapText
+				console.log("todo");
 				break;
 			case 4 : // Bitmap
+				console.log("todo");
 				break;
 			case 5 : // DOMElement
 				break;
@@ -1032,6 +914,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._drawToGPU = function(gl) {
+		console.log("DRAW batch:", this.batchCount*SpriteStage.INDICIES_PER_CARD);
 		var shaderProgram = this._shaderProgram;
 		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer;
 		var triangleTextureIndexBuffer = this._triangleTextureIndexBuffer;
@@ -1046,50 +929,39 @@ this.createjs = this.createjs||{};
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleUVPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, triangleUVPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.uvs);
+
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
 		//gl.uniformMatrix1i(shaderProgram.flagUniform, gl.FALSE, this.flags);
 
-		if(this.lastTexture < 16) {
-			this.COPYloadTexture(gl, this.lastTexture++);
-		}
-
-		for (var j = 0; j < 16; j++) {
-			//var texture = this._textureDictionary[this._batchTextures[0]];
-			//if(!texture) { continue; }
+		//DHG: sometimes this was needed. Apparently not all the time
+		/*for (var j = 0; j < 16; j++) {
+			var texture = this._batchTextures[j];
 			gl.activeTexture(gl.TEXTURE0 + j);
-			this.COPYsetTextureProperties(gl, j);
-		}
+			gl.bindTexture(gl.TEXTURE_2D, texture);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		}*/
 
 		gl.drawArrays(gl.TRIANGLES, 0, this.batchCount*SpriteStage.INDICIES_PER_CARD);
+		//drawElements
 	};
 
-	p.COPYloadTexture = function(gl, i) {
-		var texture = this._batchTextures[i];
-		var image = texture._image = new Image();
-		image.onload = this.COPYhandleTextureLoaded.bind(this, gl, image);
-		image._batchIndex = i;
-		//image.src = "images/UV-Debug"+ i +".png";
-		image.src = "images/bunnys.png";
-	};
-
-	p.COPYhandleTextureLoaded = function(gl, image) {
-		this.COPYsetTextureProperties(gl, image._batchIndex);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-		this.loadedTextures++;
-
-		//if(!--loading) {
-		//requestAnimationFrame(drawProxy);
-		//}
-	};
-
-	p.COPYsetTextureProperties = function(gl, index) {
-		var texture = this._batchTextures[index];
-		gl.bindTexture(gl.TEXTURE_2D, texture);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	};
+	// Injections
+	///////////////////////////////////////////////////////
+	/**
+	 * We need to modify other classes, do this during our class initialization
+	 */
+	(function _injectProperties() {
+		// Set which classes are compatible with SpriteStage. The order is important!!!
+		// Reflect any changes to the drawing loop
+		var candidates = [createjs.SpriteContainer, createjs.Sprite, createjs.BitmapText, createjs.Bitmap, createjs.DOMElement];
+		candidates.forEach(function(_class, index) {
+			_class.prototype._webGLRenderStyle = index + 1;
+		});
+		createjs.Container.prototype._webGLRenderStyle = createjs.SpriteContainer.prototype._webGLRenderStyle;
+	})();
 
 	createjs.SpriteStage = createjs.promote(SpriteStage, "Stage");
 }());
