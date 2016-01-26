@@ -270,11 +270,6 @@ this.createjs = this.createjs||{};
 		this._lastTextureID = -1;
 
 		/**
-		 * @deprecated
-		 */
-		this.lastTexture = 0;
-
-		/**
 		 * Current batch being drawn, a batch consists of a call to "drawElements" on the GPU. mnay may occur per draw.
 		 * @protected
 		 * @type {Number}
@@ -289,6 +284,8 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 */
 		this._drawID = 0;
+
+		this._isDrawing = 0;
 
 		// and begin
 		this._initializeWebGL();
@@ -416,6 +413,64 @@ this.createjs = this.createjs||{};
 		"}"
 	);
 
+	/**
+	 * Pre-processing shader code, will be parsed before being fed in.
+	 * @property VTX_SHADER
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	SpriteStage.VTX_SHADER_TEST = (
+		"attribute vec2 vertexPosition;" +
+		"attribute vec2 uvPosition;" +
+		"attribute float textureIndex;" +
+
+		"uniform mat4 pMatrix;" +
+		"uniform int testVar;" +
+
+		"varying highp vec2 vTextureCoord;" +
+		"varying lowp float indexPicker;" +
+
+		"void main(void) {" +
+		"gl_Position = vec4("+
+		"(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
+		"(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1]," +
+		"pMatrix[3][2]," +
+		"1.0" +
+		");" +
+		"indexPicker = textureIndex;" +
+		"vTextureCoord = uvPosition;" +
+		"}"
+	);
+
+	/**
+	 * Pre-processing shader code, will be parsed before being fed in.
+	 * @property FRAG_SHADER_TEST
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	SpriteStage.FRAG_SHADER_TEST = (
+		"precision mediump float;" +
+
+		"varying highp vec2 vTextureCoord;" +
+		"varying lowp float indexPicker;" +
+
+		"uniform sampler2D uSampler;" +
+		"uniform int testVar;" +
+
+		"void main(void) {" +
+		"int src = int(indexPicker);" +
+		"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
+
+		"color = texture2D(uSampler, vTextureCoord);" +
+
+		"gl_FragColor = color;" +
+		"}"
+	);
+
 	// getter / setters:
 	///////////////////////////////////////////////////////
 	/**
@@ -427,6 +482,17 @@ this.createjs = this.createjs||{};
 	 **/
 	p._get_isWebGL = function() {
 		return !!this._webGLContext;
+	};
+
+	/**
+	 * Indicates whether WebGL is being used for rendering. For example, this would be false if WebGL is not
+	 * supported in the browser.
+	 * @readonly
+	 * @property contextWebGL
+	 * @type {WebGLRenderingContext}
+	 **/
+	p._get_contextWebGL = function() {
+		return this._webGLContext;
 	};
 
 	try {
@@ -552,6 +618,24 @@ this.createjs = this.createjs||{};
 		} else {
 			return this.Stage_draw(gl, ignoreCache);
 		}
+	};
+
+	/**
+	 * Draws the stage into the specified context (using WebGL) ignoring its visible, alpha, shadow, and transform.
+	 * If WebGL is not supported in the browser, it will default to a 2D context.
+	 * Returns true if the draw was handled (useful for overriding functionality).
+	 *
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method filterDraw
+	 * @param {CanvasRenderingContext2D} gl The canvas 2D context object to draw into.
+	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
+	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+	 * into itself).
+	 **/
+	p.filterDraw = function(target) {
+		this.addChild(target);
+
+		//this._batchDraw(this, this._webGLContext);
 	};
 
 	/**
@@ -714,10 +798,22 @@ this.createjs = this.createjs||{};
 	 * @method _fetchShaderProgram
 	 * @protected
 	 */
-	p._fetchShaderProgram = function(gl) {
-		//DHG might need to pre-process shader code
-		var vertexShader = this._createShader(gl, 0, SpriteStage.VTX_SHADER);
-		var fragmentShader = this._createShader(gl, 1, SpriteStage.FRAG_SHADER);
+	p._fetchShaderProgram = function(gl, shader) {
+		var targetFrag, targetVtx;
+		switch(shader) {
+			case "test":
+				targetVtx = SpriteStage.VTX_SHADER_TEST;
+				targetFrag = SpriteStage.FRAG_SHADER_TEST;
+				break;
+			default:
+				targetVtx = SpriteStage.VTX_SHADER;
+				targetFrag = SpriteStage.FRAG_SHADER;
+				break;
+		}
+
+		//DHG might need to pre-process shader code so get the result
+		var vertexShader = this._createShader(gl, gl.VERTEX_SHADER, targetVtx);
+		var fragmentShader = this._createShader(gl, gl.FRAGMENT_SHADER, targetFrag);
 
 		var shaderProgram = gl.createProgram();
 		gl.attachShader(shaderProgram, vertexShader);
@@ -732,26 +828,38 @@ this.createjs = this.createjs||{};
 
 		// get the places in memory the shader is stored so we can feed information into them
 		// then save it off on the shader because it's so tied to the shader itself
-		shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-		gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+		switch(shader) {
+			case "test":
+				shaderProgram.testVarUniform = gl.getAttribLocation(shaderProgram, "testVar");
+			default:
+				shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
+				gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
-		shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
-		gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
+				shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
+				gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
 
-		shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
-		gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
-
-		shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
-		//shaderProgram.flagUniform = gl.getUniformLocation(shaderProgram, "flagData");
-
-		var samplers = [];
-		for(var i = 0; i < this._batchTextureCount; i++) {
-			samplers[i] = i;
+				shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
+				//shaderProgram.flagUniform = gl.getUniformLocation(shaderProgram, "flagData");
+				break;
 		}
 
-		shaderProgram.samplerData = samplers;
-		shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-		gl.uniform1iv(shaderProgram.samplerUniform, samplers);
+		switch(shader) {
+			case "test":
+				break;
+			default:
+				shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
+				gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
+
+				var samplers = [];
+				for(var i = 0; i < this._batchTextureCount; i++) {
+					samplers[i] = i;
+				}
+
+				shaderProgram.samplerData = samplers;
+				shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+				gl.uniform1iv(shaderProgram.samplerUniform, samplers);
+				break;
+		}
 
 		return shaderProgram;
 	};
@@ -760,27 +868,18 @@ this.createjs = this.createjs||{};
 	 * Creates a shader from the specified string.
 	 * @method _createShader
 	 * @param  {WebGLRenderingContext} gl
-	 * @param  {Number} type The type of shader to create.
+	 * @param  {Number} type The type of shader to create. gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
 	 * @param  {String} str The definition for the shader.
 	 * @return {WebGLShader}
 	 * @protected
 	 **/
 	p._createShader = function(gl, type, str) {
-		var shader;
-		switch (type) {
-			case 0:
-				shader = gl.createShader(gl.VERTEX_SHADER);
-				break;
-			case 1:
-				shader = gl.createShader(gl.FRAGMENT_SHADER);
-				break;
-			default:
-				throw(type + " : Invalid");
-				return null;
-		}
+		var shader = gl.createShader(type);
 
+		// inject the static number
 		str = str.replace("{{count}}", this._batchTextureCount);
 
+		// add in arbitrary line count
 		var insert = "";
 		for(var i=1; i<this._batchTextureCount; i++) {
 			insert += "} else if(src == "+ i +") { color = texture2D(uSampler["+ i +"], vTextureCoord);";
@@ -967,6 +1066,10 @@ this.createjs = this.createjs||{};
 	 * @method _batchDraw
 	 */
 	p._batchDraw = function(sceneGraph, gl) {
+		if(this._isDrawing > 0) {
+			this._drawToGPU(gl);
+		}
+		this._isDrawing++;
 		this._drawID++;
 
 		this.batchCardCount = 0;
@@ -977,6 +1080,7 @@ this.createjs = this.createjs||{};
 
 		this.batchReason = "drawFinish";
 		this._drawToGPU(gl);								// <--------------------------------------------------------
+		this._isDrawing--;
 	};
 
 	/**
@@ -1006,12 +1110,16 @@ this.createjs = this.createjs||{};
 
 			if(!item.visible) { continue; }
 			if(!item.cacheCanvas) {
-				if(item._webGLRenderStyle === 3) {							// BITMAP TEXT SETUP
-					item._updateText();																					//TODO: DHG: Make this a more generic API like a "pre webgl render" function
-				}
-				if(item.children) {											// CONTAINER
-					this._appendToBatchGroup(item, gl, cMtx);
-					continue;
+				if(item.filters && item.filters.length){
+					console.log("I NEED A CACHE! me love you long time?");
+				} else {
+					if(item._webGLRenderStyle === 3) {							// BITMAP TEXT SETUP
+						item._updateText();																				//TODO: DHG: Make this a more generic API like a "pre webgl render" function
+					}
+					if(item.children) {											// CONTAINER
+						this._appendToBatchGroup(item, gl, cMtx);
+						continue;
+					}
 				}
 			}
 
@@ -1043,7 +1151,7 @@ this.createjs = this.createjs||{};
 
 			if(item._webGLRenderStyle === 2 || item.cacheCanvas) {			// BITMAP / Cached Canvas
 				var w,h;
-				var image = item.image || item.cacheCanvas;
+				var image = item.cacheCanvas || item.image;
 				if(!image.src){
 					// one time canvas property setup
 					image._isCanvas = true;
