@@ -35,10 +35,10 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-	/** 
+	/**
 	 * README IF EDITING:
 	 * Terminology for developers:
-	 * 
+	 *
 	 * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
 	 * Vertex Property: a piece of information attached to the vertex like x,y,z
 	 * Index/Indecies: used in groups of 3 to define a triangle, points to vertecies by their index in an array (some render modes do not use these)
@@ -48,7 +48,7 @@ this.createjs = this.createjs||{};
 	 * Buffer: WebGL array data
 	 * Program/Shader: For every vertex we run the Vertex shader, this information is then passed to a paired Fragment shader. When combined and paired these are a shader "program"
 	 * Texture: WebGL representation of image data and associated extra information
-	 * 
+	 *
 	**/
 
 	/**
@@ -57,10 +57,12 @@ this.createjs = this.createjs||{};
 	 * On devices or browsers that don't support WebGL, content will automatically be rendered via canvas 2D.
 	 *
 	 * Complications:
-	 *     - BUG: you must render twice due to image loading event started in the first pass not finishing before rendering.
+	 *     - BUG: if you only call render once the first item to use a texture instance may not render (to fix, call render twice or have a 0 alpha entry to suck it up).
+																														//TODO: fix before release, issue requires fiddling with whole texture fill system
 	 *     - only Sprite, Container, BitmapText, Bitmap, and DOMElement are rendered when added to the display list.
 	 *     - you must call updateViewport in order to properly size the 3D context stored in memory, this won't affect the DOM.
-	 *     - images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance.
+	 *     - when you call cache on an object it will use the regular stage 2D context rendering not webGL. WebGL will however use the cached result, but this counts as an image.
+	 *     - images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
 	 *     - if new images are continually added and removed from the display list it will leak memory due to WebGL Texture wrappers being made.
 																														//TODO: add in a hook so that people can easily clear old texture memory
 	 *
@@ -251,13 +253,27 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * Location at which the last texture was inserted into a GPU slot in _batchTextures.
-		 * Manual control of this variable could yield improvements in performance by intelligently replacing textures in batches.
-		 * Impossible to write automated code for as it requires display list inspection to attempt as in content sensitive.
+		 * Manual control of this variable could yield improvements in performance by intelligently replacing textures inside a batch.
+		 * Impossible to write automated general use code for as it requires display list inspection/foreknowledge to attempt due to content knowledge.
 		 * @protected
 		 * @type {Number}
 		 * @default -1
 		 */
 		this._lastTextureInsert = -1;
+
+		/**
+		 * Location at which the last texture was inserted into the texture dictionary.
+		 * Do not confuse with _lastTextureInsert location, this variable is for ensuring unique ids and unrelated.
+		 * @protected
+		 * @type {Number}
+		 * @default -1
+		 */
+		this._lastTextureID = -1;
+
+		/**
+		 * @deprecated
+		 */
+		this.lastTexture = 0;
 
 		/**
 		 * Current batch being drawn, a batch consists of a call to "drawElements" on the GPU. mnay may occur per draw.
@@ -458,8 +474,7 @@ this.createjs = this.createjs||{};
 
 		var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
 
-		this._batchTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
-		this._shaderProgram = this._fetchShaderProgram(gl);
+		this.updateSimultaneousTextureCount(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
 		this._createBuffers(gl);
 		this._initTextures(gl);
 
@@ -541,10 +556,42 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
+	 * Try to set the max textures the system can handle, should default to the hardware max.
+	 * @method updateViewport
+	 * @param {Number} count
+	 */
+	p.updateSimultaneousTextureCount = function(count) {
+		//TODO: DHG: make sure API works in all instances, may be some issues with buffers etc I haven't forseen
+		var gl = this._webGLContext;
+		var success = false;
+
+		this._batchTextureCount = count;
+		if(this._batchTextureCount < 1){ this._batchTextureCount = 1; }
+
+		while(!success) {
+			try{
+				this._shaderProgram = this._fetchShaderProgram(gl);
+				success = true;
+			} catch(e) {
+				if(count == 1){
+					throw("Cannot compile shader "+ e);
+				}
+
+				this._batchTextureCount -= 4;
+				if(this._batchTextureCount < 1){ this._batchTextureCount = 1; }
+
+				if(this.vocalDebug){
+					console.log("Reducing desired texture count due to errors: " + this._batchTextureCount);
+				}
+			}
+		}
+	};
+
+	/**
 	 * Update the WebGL viewport. Note that this does NOT update the canvas element's width/height.
 	 * @method updateViewport
-	 * @param {Number} width
-	 * @param {Number} height
+	 * @param {Number} width Integer pixel size of render surface.
+	 * @param {Number} height Integer pixel size of render surface.
 	 **/
 	p.updateViewport = function (width, height) {
 		this._viewportWidth = width;
@@ -667,7 +714,7 @@ this.createjs = this.createjs||{};
 		gl.linkProgram(shaderProgram);
 
 		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-			throw("Could not initialise shaders");
+			throw(gl.getShaderInfoLog(shaderProgram));
 		}
 
 		gl.useProgram(shaderProgram);
@@ -750,6 +797,15 @@ this.createjs = this.createjs||{};
 		var groupCount = this._maxCardsPerBatch * SpriteStage.INDICIES_PER_CARD;
 		var groupSize, i;
 
+		// DHG, all buffers are created using this pattern
+		// create a webGL buffer
+		// attach it to WebGL
+		// figure out how many parts it has to an entry
+		// fill it with empty data to reserve the memory
+		// attach the empty data to the GPU
+		// track the sizes on the buffer object
+
+		/* DHG: a single buffer may be optimal in some situations and would be approached like this
 		var vertexBuffer = this._vertexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 		groupSize = 2 + 2 + 1 + 1; //x/y, u/v, index, alpha
@@ -762,7 +818,9 @@ this.createjs = this.createjs||{};
 		}
 		vertexBuffer.itemSize = groupSize;
 		vertexBuffer.numItems = groupCount;
+		*/
 
+		// the actual position information
 		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
 		groupSize = 2;
@@ -772,6 +830,7 @@ this.createjs = this.createjs||{};
 		triangleVertexPositionBuffer.itemSize = groupSize;
 		triangleVertexPositionBuffer.numItems = groupCount;
 
+		// what texture it should use
 		var triangleTextureIndexBuffer = this._triangleTextureIndexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleTextureIndexBuffer);
 		groupSize = 1;
@@ -781,6 +840,7 @@ this.createjs = this.createjs||{};
 		triangleTextureIndexBuffer.itemSize = groupSize;
 		triangleTextureIndexBuffer.numItems = groupCount;
 
+		// where on the texture it gets its information
 		var triangleUVPositionBuffer = this._triangleUVPositionBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleUVPositionBuffer);
 		groupSize = 2;
@@ -791,15 +851,39 @@ this.createjs = this.createjs||{};
 		triangleUVPositionBuffer.numItems = groupCount;
 	};
 
+	/**
+	 * Do all the setup work for loading textures.
+	 * @method _initTextures
+	 * @param {WebGLRenderingContext} gl
+	 * @protected
+	 */
 	p._initTextures = function(gl) {
-		this.lastTexture = 0;
+		//TODO: DHG: add a cleanup routine in here in case this happens mid stream
 
+		// reset counters
+		this._lastTextureInsert = -1;
+		this._lastTextureID = -1;
+
+		// clear containers
+		this._textureDictionary = [];
+		this._textureIDs = {};
+		this._batchTextures = [];
+
+		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for saftey code
 		for(var i=0; i<this._batchTextureCount;i++) {
 			this._batchTextures[i] = this.getBaseTexture();
 		}
 	};
 
-	p._loadTextureImage = function(gl, index, image) {
+	/**
+	 * Load a specific texture, accounting for potential delay as it might not be preloaded
+	 * @method _loadTextureImage
+	 * @param {WebGLRenderingContext} gl
+	 * @param {Image} image Actual image to be loaded
+	 * @protected
+	 */
+	p._loadTextureImage = function(gl, image) {
+		var index = ++this._lastTextureID;
 		var src = image.src;
 
 		var storeID = this._textureIDs[src];
@@ -811,24 +895,34 @@ this.createjs = this.createjs||{};
 			this._textureDictionary[storeID] = this.getBaseTexture();
 		}
 
-		var texture = this._batchTextures[index];
+		var texture = this._textureDictionary[storeID];
 		texture._batchID = this._batchID;
-		texture._activeIndex = index;
 		texture._storeID = storeID;
+		this._insertTextureInBatch(gl, texture);
 
 		image._storeID = storeID;
-		if(!image.complete || !image.naturalWidth) {
-			image.onload = this._handleImageLoaded.bind(this, gl, image);
-		} else {
-			this._handleImageLoaded(gl, image);
+		if(image.complete || image.naturalWidth) {
+			this._updateTextureImageData(gl, image);
+		} else if(image._isCanvas) {
+			var self = this;
+			setTimeout(function() {
+				image.parent.updateCache();
+				self._updateTextureImageData(gl, image);
+			}, 30);
+		} else  {
+			image.onload = this._updateTextureImageData.bind(this, gl, image);
 		}
 
 		return texture;
 	};
 
-	p._handleImageLoaded = function(gl, image) {
+	/**
+	 * Neccesary to upload the actual image data to the gpu. Without this the texture will be blank.
+	 */
+	p._updateTextureImageData = function(gl, image) {
 		var texture = this._textureDictionary[image._storeID];
 
+		//gl.activeTexture(gl.TEXTURE0 + found); //TODO DHG: shouldn't this be in here?
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -840,6 +934,7 @@ this.createjs = this.createjs||{};
 		texture._h = image.height;
 
 		if(this.vocalDebug) {
+			// the bitwise & is intentional, cheap exponent 2 check
 			if((image.width & image.width-1) || (image.height & image.height-1)) {
 				console.warn("NPOT(Non Power of Two) Texture: "+ image.src);
 			}
@@ -849,6 +944,9 @@ this.createjs = this.createjs||{};
 		}
 	};
 
+	/**
+	 * Begin the drawing process
+	 */
 	p._batchDraw = function(sceneGraph, gl) {
 		this._drawID++;
 
@@ -888,7 +986,91 @@ this.createjs = this.createjs||{};
 			var item = container.children[i];
 
 			if(!item.visible) { continue; }
-			if(item.cacheCanvas) { /*debugger;*/ }
+			if(item.cacheCanvas) {																						//TODO: rework this so we actually leverage not copy paste the bitmap code, my first attempts broke things
+				var image = item.cacheCanvas;
+				if(!image.src){
+					image._isCanvas = true;
+					image.parent = item;
+					image.src = "canvas_" + Math.random();
+				}
+
+				if(this.batchCardCount+1 > this._maxCardsPerBatch) {
+					this.batchReason = "vertexOverflow";
+					this._drawToGPU(gl);					// <--------------------------------------------------------
+					this.batchCardCount = 0;
+				}
+
+				// actually apply its data to the buffers
+				if(!item._glMtx) { item._glMtx = new createjs.Matrix2D(); }
+				var iMtx = item._glMtx;
+				iMtx.copy(cMtx);
+				iMtx.appendTransform(
+					item.x, item.y,
+					item.scaleX, item.scaleY,
+					item.rotation, item.skewX, item.skewY,
+					item.regX, item.regY
+				);
+
+				var uvRect, texIndex, combinedAlpha;
+
+				var uvs = this.uvs;
+				var vertices = this.vertices;
+				var texI = this.indecies;
+				var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;
+				var loc = (offset/2)|0;
+
+				var w,h;
+
+				// calculate texture
+				var texture;
+				if(image._storeID === undefined) {
+					// this texture is new to us so load it and add it to the batch
+					texture = this._loadTextureImage(gl, image);
+					this._insertTextureInBatch(gl, texture);
+				} else {
+					// fetch the texture and put it in the batch if needed
+					texture = this._textureDictionary[image._storeID];
+					if(texture._batchID !== this._batchID) {
+						this._insertTextureInBatch(gl, texture);
+					}
+				}
+				texIndex = texture._activeIndex;
+
+				// calculate uvs
+				uvRect = SpriteStage.UV_RECT;
+				w = image.width;			h = image.height;
+
+				// calculate vertices (whole equation kept to demonstrate optimizations, please leave comments in)
+				tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
+				tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
+				trX = w *iMtx.a					/*+ 0 *iMtx.c*/				+iMtx.tx;
+				trY = w *iMtx.b					/*+ 0 *iMtx.d*/				+iMtx.ty;
+				blX = /*0 *iMtx.a				+*/ h *iMtx.c				+iMtx.tx;
+				blY = /*0 *iMtx.b				+*/ h *iMtx.d				+iMtx.ty;
+				brX = w *iMtx.a					+ h *iMtx.c					+iMtx.tx;
+				brY = w *iMtx.b					+ h *iMtx.d					+iMtx.ty;
+
+				// apply vertices
+				vertices[offset] = tlX;				vertices[offset+1] = tlY;
+				vertices[offset+2] = blX;			vertices[offset+3] = blY;
+				vertices[offset+4] = trX;			vertices[offset+5] = trY;
+				vertices[offset+6] = blX;			vertices[offset+7] = blY;
+				vertices[offset+8] = trX;			vertices[offset+9] = trY;
+				vertices[offset+10] = brX;			vertices[offset+11] = brY;
+
+				// apply uvs
+				uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
+				uvs[offset+2] = uvRect.l;			uvs[offset+3] = uvRect.b;
+				uvs[offset+4] = uvRect.r;			uvs[offset+5] = uvRect.t;
+				uvs[offset+6] = uvRect.l;			uvs[offset+7] = uvRect.b;
+				uvs[offset+8] = uvRect.r;			uvs[offset+9] = uvRect.t;
+				uvs[offset+10] = uvRect.r;			uvs[offset+11] = uvRect.b;
+
+				// apply texture
+				texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = texI[loc+4] = texI[loc+5] = texIndex;
+
+				continue;
+			}
 
 			if(item._webGLRenderStyle === 3) {		// BITMAP TEXT
 				item._updateText();
@@ -937,13 +1119,15 @@ this.createjs = this.createjs||{};
 					// calculate texture
 					var texture;
 					if(image._storeID === undefined) {
-						texture = this._loadTextureImage(gl, this.lastTexture++, image);
+						// this texture is new to us so load it and add it to the batch
+						texture = this._loadTextureImage(gl, image);
+						this._insertTextureInBatch(gl, texture);
 					} else {
+						// fetch the texture and put it in the batch if needed
 						texture = this._textureDictionary[image._storeID];
-					}
-					if(texture._batchID !== this._batchID) {
-						// this texture hasn't been used this batch.
-						this._updateTexture(gl, texture);
+						if(texture._batchID !== this._batchID) {
+							this._insertTextureInBatch(gl, texture);
+						}
 					}
 					texIndex = texture._activeIndex;
 
@@ -968,13 +1152,15 @@ this.createjs = this.createjs||{};
 					// calculate texture
 					var texture;
 					if(image._storeID === undefined) {
-						texture = this._loadTextureImage(gl, this.lastTexture++, image);
+						// this texture is new to us so load it and add it to the batch
+						texture = this._loadTextureImage(gl, image);
+						this._insertTextureInBatch(gl, texture);
 					} else {
+						// fetch the texture and put it in the batch if needed
 						texture = this._textureDictionary[image._storeID];
-					}
-					if(texture._batchID !== this._batchID) {
-						// this texture hasn't been used this batch.
-						this._updateTexture(gl, texture);
+						if(texture._batchID !== this._batchID) {
+							this._insertTextureInBatch(gl, texture);
+						}
 					}
 					texIndex = texture._activeIndex;
 
@@ -1086,13 +1272,20 @@ this.createjs = this.createjs||{};
 		//drawElements
 	};
 
-	p._updateTexture = function(gl, texture) {
+	/**
+	 * Adds the texture to a spot in the current batch, forcing a draw if no spots are free.
+	 * @method _insertTextureInBatch
+	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
+	 * @param {WebGLTexture} gl The canvas WebGL context object to draw into.
+	 * @protected
+	 */
+	p._insertTextureInBatch = function(gl, texture) {
 		// if it wasn't used last batch
 		if(this._batchTextures[texture._activeIndex] !== texture) {
 			// we've got to find it a a spot.
 			var found = -1;
-			var start = this._lastTextureInsert+1;
-			var look = (start+1) % this._batchTextureCount;
+			var start = (this._lastTextureInsert+1) % this._batchTextureCount;
+			var look = start;
 			do {
 				if(this._batchTextures[look]._batchID != this._batchID) {
 					found = look;
@@ -1118,6 +1311,7 @@ this.createjs = this.createjs||{};
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+			this._lastTextureInsert = found;
 		}
 
 		texture._drawID = this._drawID;
@@ -1129,7 +1323,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * We need to modify other classes, do this during our class initialization
 	 */
-	(function _injectProperties() {
+	(function _injectRenderStyles() {
 		// Set which classes are compatible with SpriteStage. The order is important!!!
 		// Reflect any changes to the drawing loop
 		var candidates = [createjs.Sprite, createjs.Bitmap, createjs.BitmapText, createjs.DOMElement];
