@@ -782,13 +782,28 @@ this.createjs = this.createjs||{};
 	p.cache = function(x, y, width, height, scale, webGL) {
 		// draw to canvas.
 		scale = scale||1;
-		if (!this.cacheCanvas) { this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
+		if(webGL && createjs.SpriteStage) {
+			if(this._webGLCache !== webGL) {
+				if(webGL === true) {
+					this.cacheCanvas = document.createElement("canvas");
+					this._webGLCache = new createjs.SpriteStage(this.cacheCanvas);
+				} else {
+					this._webGLCache = webGL;
+					this.cacheCanvas = webGL.canvas;
+				}
+			}
+		} else {
+			if(!this.cacheCanvas || this._webGLCache) {
+				this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+				this._webGLCache = null;
+			}
+		}
 		this._cacheWidth = width;
 		this._cacheHeight = height;
 		this._cacheOffsetX = x;
 		this._cacheOffsetY = y;
 		this._cacheScale = scale;
-		this.updateCache(undefined, webGL);
+		this.updateCache();
 	};
 
 	/**
@@ -812,7 +827,50 @@ this.createjs = this.createjs||{};
 	 * If rendering in WebGL already use the same webGL context for best performance.
 	 * whatwg spec on compositing</a>.
 	 **/
-	p.updateCache = function(compositeOperation, webGL) {
+	p.updateCache = function(compositeOperation) {
+		//TODO: this does not do anything for WebGL canvases ATM
+		//*
+		var cacheCanvas = this.cacheCanvas;
+		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
+		var scale = this._cacheScale;
+		var offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
+		var w = this._cacheWidth, h = this._cacheHeight;
+
+		var fBounds = createjs.MasterFilter.getFilterBounds(this);
+		offX += (this._filterOffsetX = fBounds.x);
+		offY += (this._filterOffsetY = fBounds.y);
+
+		cacheCanvas._invalid = true;																					//TODO: DHG: maybe there's a way for it to keep its spot yet get refreshed?
+
+		if(this._webGLCache) {
+
+			this._webGLCache.cacheDraw(this);
+		} else {
+			var ctx = cacheCanvas.getContext("2d");
+
+			w = Math.ceil(w*scale) + fBounds.width;
+			h = Math.ceil(h*scale) + fBounds.height;
+
+			if (w != cacheCanvas.width || h != cacheCanvas.height) {
+				cacheCanvas.width = w;
+				cacheCanvas.height = h;
+			} else if (!compositeOperation) {
+				ctx.clearRect(0, 0, w+1, h+1);
+			}
+
+			ctx.save();
+			ctx.globalCompositeOperation = compositeOperation;
+			ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
+			this.draw(ctx, true);
+			if (!this.filters || this.filters.length == 0) { return; }
+			var master = createjs.MasterFilter.get(canvas);
+			master.applyFilters(this);
+			ctx.restore();
+
+			this.cacheID = DisplayObject._nextCacheID++;
+		}
+		/*/
+
 		var cacheCanvas = this.cacheCanvas;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
 		var scale = this._cacheScale, offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
@@ -839,14 +897,21 @@ this.createjs = this.createjs||{};
 			ctx.globalCompositeOperation = compositeOperation;
 			ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
 			this.draw(ctx, true);
-			this._applyFilters(cacheCanvas, webGL);
+			//this._applyFilters(cacheCanvas, webGL);
+			if (!this.filters || this.filters.length == 0 || !this.cacheCanvas) { return; }
+			var master = createjs.MasterFilter.get(canvas);
+			master.applyFilters(this, webGL);
 			ctx.restore();
 		} else {
-			this._applyFilters(cacheCanvas, webGL);
+			//this._applyFilters(cacheCanvas, webGL);
+			if (!this.filters || this.filters.length == 0 || !this.cacheCanvas) { return; }
+			var master = createjs.MasterFilter.get(canvas);
+			master.applyFilters(this, webGL);
 		}
 
 		console.log(this._filterOffsetX, this._filterOffsetY);
 		this.cacheID = DisplayObject._nextCacheID++;
+		//*/
 	};
 
 	/**
@@ -1307,6 +1372,7 @@ this.createjs = this.createjs||{};
 	 * @method _getFilterBounds
 	 * @return {Rectangle}
 	 * @protected
+	 * @deprecated
 	 **/
 	p._getFilterBounds = function(rect) {
 		var l, filters = this.filters, bounds = this._rectangle.setValues(0,0,0,0);

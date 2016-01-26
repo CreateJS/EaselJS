@@ -59,11 +59,11 @@ this.createjs = this.createjs||{};
 	 * Complications:
 	 *     - only Sprite, Container, BitmapText, Bitmap, and DOMElement are rendered when added to the display list.
 	 																													//TODO: fix DOMElement
-	 *     - you must call updateViewport in order to properly size the 3D context stored in memory, this won't affect the DOM.
-	 *     - when you call cache on an object it will use the regular stage 2D context rendering not webGL. WebGL will however use the cached result, but this counts as an image.
+	  *    - to display something SpriteStage cannot normally render, cache the object. A cached object is the same to the renderer as a new image regardless of its contents.
 	 *     - images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
 	 *     - if new images are continually added and removed from the display list it will leak memory due to WebGL Texture wrappers being made.
 																														//TODO: add in a hook so that people can easily clear old texture memory
+	 *     - you must call updateViewport if you resize your canvas after making a SpriteStage, this will properly size the 3D context stored in memory, this won't affect the DOM.
 	 *
 	 * <h4>How to use Example</h4>
 	 * This example creates a sprite stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
@@ -192,7 +192,7 @@ this.createjs = this.createjs||{};
 		this._shaderProgram = null;
 
 		/**
-		 * The vertices data for the current draw call.
+		 * The vertex position data for the current draw call.
 		 * @property _vertices
 		 * @protected
 		 * @type {Float32Array}
@@ -202,12 +202,66 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * The WebGL buffer attached to _vertecies.
-		 * @property _verticesBuffer
+		 * @property _vertexPositionBuffer
 		 * @protected
 		 * @type {WebGLBuffer}
 		 * @default null
 		 **/
-		this._verticesBuffer = null;
+		this._vertexPositionBuffer = null;
+
+		/**
+		 * The vertices data for the current draw call.
+		 * @property _uvs
+		 * @protected
+		 * @type {Float32Array}
+		 * @default null
+		 **/
+		this._uvs = null;
+
+		/**
+		 * The WebGL buffer attached to _uvs.
+		 * @property _uvPositionBuffer
+		 * @protected
+		 * @type {WebGLBuffer}
+		 * @default null
+		 **/
+		this._uvPositionBuffer = null;
+
+		/**
+		 * The vertices data for the current draw call.
+		 * @property _indecies
+		 * @protected
+		 * @type {Float32Array}
+		 * @default null
+		 **/
+		this._indecies = null;
+
+		/**
+		 * The WebGL buffer attached to _indecies.
+		 * @property _textureIndexBuffer
+		 * @protected
+		 * @type {WebGLBuffer}
+		 * @default null
+		 **/
+		this._textureIndexBuffer = null;
+
+		/**
+		 * The vertices data for the current draw call.
+		 * @property _alphas
+		 * @protected
+		 * @type {Float32Array}
+		 * @default null
+		 **/
+		this._alphas = null;
+
+		/**
+		 * The WebGL buffer attached to _alphas.
+		 * @property _alphaBuffer
+		 * @protected
+		 * @type {WebGLBuffer}
+		 * @default null
+		 **/
+		this._alphaBuffer = null;
 
 		/**
 		 * An index based lookup of every WebGL Texture currently in use.
@@ -287,6 +341,8 @@ this.createjs = this.createjs||{};
 
 		this._isDrawing = 0;
 
+		this._cacheContainer = new createjs.Container();
+
 		// and begin
 		this._initializeWebGL();
 	}
@@ -360,12 +416,13 @@ this.createjs = this.createjs||{};
 		"attribute vec2 vertexPosition;" +
 		"attribute vec2 uvPosition;" +
 		"attribute float textureIndex;" +
+		"attribute float objectAlpha;" +
 
 		"uniform mat4 pMatrix;" +
-		//"uniform int flagData;" +
 
 		"varying highp vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
+		"varying lowp float alphaValue;" +
 
 		"void main(void) {" +
 			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix see js... bypass for now
@@ -377,6 +434,7 @@ this.createjs = this.createjs||{};
 				"pMatrix[3][2]," +
 				"1.0" +
 			");" +
+			"alphaValue = objectAlpha;" +
 			"indexPicker = textureIndex;" +
 			"vTextureCoord = uvPosition;" +
 		"}"
@@ -395,9 +453,9 @@ this.createjs = this.createjs||{};
 
 		"varying highp vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
+		"varying lowp float alphaValue;" +
 
 		"uniform sampler2D uSampler[{{count}}];" +
-		//"uniform int flagData;" +
 
 		"void main(void) {" +
 			"int src = int(indexPicker);" +
@@ -408,8 +466,8 @@ this.createjs = this.createjs||{};
 			"{{alternates}}" +
 			"}" +
 
-			"gl_FragColor = color;" +
-			//"gl_FragColor = vec4(color.rgb, color.a * vTextureData.a);" +
+			//"gl_FragColor = color;" +
+			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
 		"}"
 	);
 
@@ -425,22 +483,25 @@ this.createjs = this.createjs||{};
 		"attribute vec2 vertexPosition;" +
 		"attribute vec2 uvPosition;" +
 		"attribute float textureIndex;" +
+		"attribute float objectAlpha;" +
 
 		"uniform mat4 pMatrix;" +
 		"uniform int testVar;" +
 
 		"varying highp vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
+		"varying lowp float alphaValue;" +
 
 		"void main(void) {" +
-		"gl_Position = vec4("+
-		"(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
-		"(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1]," +
-		"pMatrix[3][2]," +
-		"1.0" +
-		");" +
-		"indexPicker = textureIndex;" +
-		"vTextureCoord = uvPosition;" +
+			"gl_Position = vec4("+
+				"(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
+				"(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1]," +
+				"pMatrix[3][2]," +
+				"1.0" +
+			");" +
+			"alphaValue = objectAlpha;" +
+			"indexPicker = textureIndex;" +
+			"vTextureCoord = uvPosition;" +
 		"}"
 	);
 
@@ -457,17 +518,19 @@ this.createjs = this.createjs||{};
 
 		"varying highp vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
+		"varying lowp float alphaValue;" +
 
 		"uniform sampler2D uSampler;" +
 		"uniform int testVar;" +
 
 		"void main(void) {" +
-		"int src = int(indexPicker);" +
-		"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
+			"int src = int(indexPicker);" +
+			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
 
-		"color = texture2D(uSampler, vTextureCoord);" +
+			"color = texture2D(uSampler, vTextureCoord);" +
 
-		"gl_FragColor = color;" +
+			//"gl_FragColor = color;" +
+			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
 		"}"
 	);
 
@@ -559,20 +622,20 @@ this.createjs = this.createjs||{};
 		//DHG TODO: test context swapping and re-acqusition
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
-		//this.dispatchEvent("drawstart"); // TODO: make cancellable?
-		//if (this.autoClear) { this.clear(); }
+		this.dispatchEvent("drawstart"); // TODO: make cancellable?
 		if (this._webGLContext) {
 			// Use WebGL.
 			this._batchDraw(this, this._webGLContext);
 		} else {
 			// Use 2D.
-			//var ctx = this.canvas.getContext("2d");
-			//ctx.save();
-			//this.updateContext(ctx);
-			//this.draw(ctx, false);
-			//ctx.restore();
+			if (this.autoClear) { this.clear(); }
+			var ctx = this.canvas.getContext("2d");
+			ctx.save();
+			this.updateContext(ctx);
+			this.draw(ctx, false);
+			ctx.restore();
 		}
-		//this.dispatchEvent("drawend");
+		this.dispatchEvent("drawend");
 	};
 
 	/**
@@ -587,9 +650,9 @@ this.createjs = this.createjs||{};
 			//gl.clear(gl.COLOR_BUFFER_BIT);
 		} else {
 			// Use 2D.
-			//var ctx = this.canvas.getContext("2d");
-			//ctx.setTransform(1, 0, 0, 1, 0, 0);
-			//ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
+			var ctx = this.canvas.getContext("2d");
+			ctx.setTransform(1, 0, 0, 1, 0, 0);
+			ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
 		}
 	};
 
@@ -632,10 +695,9 @@ this.createjs = this.createjs||{};
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
-	p.filterDraw = function(target) {
-		this.addChild(target);
-
-		//this._batchDraw(this, this._webGLContext);
+	p.cacheDraw = function(target) {
+		this._cacheContainer.children = [target];
+		this._batchDraw(this._cacheContainer, this._webGLContext);
 	};
 
 	/**
@@ -830,7 +892,7 @@ this.createjs = this.createjs||{};
 		// then save it off on the shader because it's so tied to the shader itself
 		switch(shader) {
 			case "test":
-				shaderProgram.testVarUniform = gl.getAttribLocation(shaderProgram, "testVar");
+				//shaderProgram.testVarUniform = gl.getAttribLocation(shaderProgram, "testVar");
 			default:
 				shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 				gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
@@ -839,7 +901,6 @@ this.createjs = this.createjs||{};
 				gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
 
 				shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
-				//shaderProgram.flagUniform = gl.getUniformLocation(shaderProgram, "flagData");
 				break;
 		}
 
@@ -849,6 +910,9 @@ this.createjs = this.createjs||{};
 			default:
 				shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
 				gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
+
+				shaderProgram.alphaAttribute = gl.getAttribLocation(shaderProgram, "objectAlpha");
+				gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
 
 				var samplers = [];
 				for(var i = 0; i < this._batchTextureCount; i++) {
@@ -932,34 +996,44 @@ this.createjs = this.createjs||{};
 		*/
 
 		// the actual position information
-		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
+		var vertexPositionBuffer = this._vertexPositionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 		groupSize = 2;
-		var vertices = this.vertices = new Float32Array(groupCount * groupSize);
+		var vertices = this._vertices = new Float32Array(groupCount * groupSize);
 		for(i=0; i<vertices.length; i+=groupSize) { vertices[i+0] = vertices[i+1] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
-		triangleVertexPositionBuffer.itemSize = groupSize;
-		triangleVertexPositionBuffer.numItems = groupCount;
-
-		// what texture it should use
-		var triangleTextureIndexBuffer = this._triangleTextureIndexBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, triangleTextureIndexBuffer);
-		groupSize = 1;
-		var indecies = this.indecies = new Float32Array(groupCount);
-		for(i=0; i<indecies.length; i++) { indecies[i] = 0; }
-		gl.bufferData(gl.ARRAY_BUFFER, indecies, gl.DYNAMIC_DRAW);
-		triangleTextureIndexBuffer.itemSize = groupSize;
-		triangleTextureIndexBuffer.numItems = groupCount;
+		vertexPositionBuffer.itemSize = groupSize;
+		vertexPositionBuffer.numItems = groupCount;
 
 		// where on the texture it gets its information
-		var triangleUVPositionBuffer = this._triangleUVPositionBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, triangleUVPositionBuffer);
+		var uvPositionBuffer = this._uvPositionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
 		groupSize = 2;
-		var uvs = this.uvs = new Float32Array(groupCount * groupSize);
-		for(i=0; i<vertices.length; i+=groupSize) { uvs[i+0] = uvs[i+1] = 0; }
+		var uvs = this._uvs = new Float32Array(groupCount * groupSize);
+		for(i=0; i<uvs.length; i+=groupSize) { uvs[i+0] = uvs[i+1] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
-		triangleUVPositionBuffer.itemSize = groupSize;
-		triangleUVPositionBuffer.numItems = groupCount;
+		uvPositionBuffer.itemSize = groupSize;
+		uvPositionBuffer.numItems = groupCount;
+
+		// what texture it should use
+		var textureIndexBuffer = this._textureIndexBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
+		groupSize = 1;
+		var indecies = this._indecies = new Float32Array(groupCount * groupSize);
+		for(i=0; i<indecies.length; i++) { indecies[i] = 0; }
+		gl.bufferData(gl.ARRAY_BUFFER, indecies, gl.DYNAMIC_DRAW);
+		textureIndexBuffer.itemSize = groupSize;
+		textureIndexBuffer.numItems = groupCount;
+
+		// what alpha it should have
+		var alphaBuffer = this._alphaBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
+		groupSize = 1;
+		var alphas = this._alphas = new Float32Array(groupCount * groupSize);
+		for(i=0; i<alphas.length; i++) { alphas[i] = 1; }
+		gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
+		alphaBuffer.itemSize = groupSize;
+		alphaBuffer.numItems = groupCount;
 	};
 
 	/**
@@ -997,6 +1071,12 @@ this.createjs = this.createjs||{};
 		var index = ++this._lastTextureID;
 		var src = image.src;
 
+		if(!src){
+			// one time canvas property setup
+			image._isCanvas = true;
+			src = image.src = "canvas_" + Math.random();																//TODO: make index based not random
+		}
+
 		var storeID = this._textureIDs[src];
 		if(storeID === undefined) {
 			storeID = this._textureDictionary.length;
@@ -1009,18 +1089,12 @@ this.createjs = this.createjs||{};
 		var texture = this._textureDictionary[storeID];
 		texture._batchID = this._batchID;
 		texture._storeID = storeID;
+		texture._imageData = image;
 		this._insertTextureInBatch(gl, texture);
 
 		image._storeID = storeID;
-		if(image.complete || image.naturalWidth) {
+		if(image.complete || image.naturalWidth || image._isCanvas) {
 			this._updateTextureImageData(gl, image);
-		} else if(image._isCanvas) {
-			this._updateTextureImageData(gl, image);
-			/*var self = this;
-			setTimeout(function() {
-				image.parent.updateCache();
-				self._updateTextureImageData(gl, image);
-			}, 30);*/
 		} else  {
 			image.onload = this._updateTextureImageData.bind(this, gl, image);
 		}
@@ -1076,7 +1150,7 @@ this.createjs = this.createjs||{};
 		this.depth = 0;
 
 		var mtx = new createjs.Matrix2D();
-		this._appendToBatchGroup(sceneGraph, gl, mtx);
+		this._appendToBatchGroup(sceneGraph, gl, mtx, 1);																//TODO: DHG: isn't there a global alpha or something?
 
 		this.batchReason = "drawFinish";
 		this._drawToGPU(gl);								// <--------------------------------------------------------
@@ -1090,7 +1164,7 @@ this.createjs = this.createjs||{};
 	 * @param {Matrix2D} concatMtx Cumulative offset so far
 	 * @method _appendToBatchGroup
 	 */
-	p._appendToBatchGroup = function(container, gl, concatMtx) {
+	p._appendToBatchGroup = function(container, gl, concatMtx, concatAlpha) {
 		// sort out shared properties
 		if(!container._glMtx) { container._glMtx = new createjs.Matrix2D(); }
 		var cMtx = container._glMtx;
@@ -1101,6 +1175,7 @@ this.createjs = this.createjs||{};
 			container.rotation, container.skewX, container.skewY,
 			container.regX, container.regY
 		);
+		concatAlpha *= this.alpha;
 
 		var tlX = 0, tlY = 0, trX = 0, trY = 0, blX = 0, blY = 0, brX = 0, brY = 0;
 
@@ -1108,16 +1183,16 @@ this.createjs = this.createjs||{};
 		for(var i = 0, l = container.children.length; i < l; i++) {
 			var item = container.children[i];
 
-			if(!item.visible) { continue; }
+			if(!(item.visible && concatAlpha)) { continue; }
 			if(!item.cacheCanvas) {
 				if(item.filters && item.filters.length){
-					console.log("I NEED A CACHE! me love you long time?");
+					console.log("I NEED A CACHE!");
 				} else {
 					if(item._webGLRenderStyle === 3) {							// BITMAP TEXT SETUP
 						item._updateText();																				//TODO: DHG: Make this a more generic API like a "pre webgl render" function
 					}
 					if(item.children) {											// CONTAINER
-						this._appendToBatchGroup(item, gl, cMtx);
+						this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
 						continue;
 					}
 				}
@@ -1141,23 +1216,18 @@ this.createjs = this.createjs||{};
 				item.regX, item.regY
 			);
 
-			var uvRect, texIndex, combinedAlpha;
+			var uvRect, texIndex;
 
-			var uvs = this.uvs;
-			var vertices = this.vertices;
-			var texI = this.indecies;
+			var uvs = this._uvs;
+			var vertices = this._vertices;
+			var texI = this._indecies;
+			var alphas = this._alphas;
 			var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;
 			var loc = (offset/2)|0;
 
 			if(item._webGLRenderStyle === 2 || item.cacheCanvas) {			// BITMAP / Cached Canvas
 				var w,h;
 				var image = item.cacheCanvas || item.image;
-				if(!image.src){
-					// one time canvas property setup
-					image._isCanvas = true;
-					image.parent = item;
-					image.src = "canvas_" + Math.random();
-				}
 
 				// calculate texture
 				var texture;
@@ -1192,16 +1262,15 @@ this.createjs = this.createjs||{};
 				}
 
 				// calculate vertices
-				tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
-				tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
-				trX = w *iMtx.a					/*+ 0 *iMtx.c*/				+iMtx.tx;
-				trY = w *iMtx.b					/*+ 0 *iMtx.d*/				+iMtx.ty;
-				blX = /*0 *iMtx.a				+*/ h *iMtx.c				+iMtx.tx;
-				blY = /*0 *iMtx.b				+*/ h *iMtx.d				+iMtx.ty;
-				brX = w *iMtx.a					+ h *iMtx.c					+iMtx.tx;
-				brY = w *iMtx.b					+ h *iMtx.d					+iMtx.ty;
-
-				// calculate alpha
+				//TODO: DHG: optimize?
+				tlX = (-item.regX) *iMtx.a				+ (-item.regY) *iMtx.c				+iMtx.tx;
+				tlY = (-item.regX) *iMtx.b				+ (-item.regY) *iMtx.d				+iMtx.ty;
+				trX = (w-item.regX) *iMtx.a				+ (-item.regY) *iMtx.c				+iMtx.tx;
+				trY = (w-item.regX) *iMtx.b				+ (-item.regY) *iMtx.d				+iMtx.ty;
+				blX = (-item.regX) *iMtx.a				+ (h-item.regY) *iMtx.c				+iMtx.tx;
+				blY = (-item.regX) *iMtx.b				+ (h-item.regY) *iMtx.d				+iMtx.ty;
+				brX = (w-item.regX) *iMtx.a				+ (h-item.regY) *iMtx.c				+iMtx.tx;
+				brY = (w-item.regX) *iMtx.b				+ (h-item.regY) *iMtx.d				+iMtx.ty;
 			} else if(item._webGLRenderStyle === 1) {						// SPRITE
 				var frame = item.spriteSheet.getFrame(item.currentFrame);
 				var rect = frame.rect;
@@ -1228,19 +1297,17 @@ this.createjs = this.createjs||{};
 				}
 				texIndex = texture._activeIndex;
 
-				// calculate alpha
-				combinedAlpha = 1;
-
 				// calculate vertices
 				//DHG: See Matrix2D.transformPoint for why this math specifically
-				tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
-				tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
-				trX = rect.width *iMtx.a		/*+ 0 *iMtx.c*/				+iMtx.tx;
-				trY = rect.width *iMtx.b		/*+ 0 *iMtx.d*/				+iMtx.ty;
-				blX = /*0 *iMtx.a				+*/ rect.height *iMtx.c		+iMtx.tx;
-				blY = /*0 *iMtx.b				+*/ rect.height *iMtx.d		+iMtx.ty;
-				brX = rect.width *iMtx.a		+ rect.height *iMtx.c		+iMtx.tx;
-				brY = rect.width *iMtx.b		+ rect.height *iMtx.d		+iMtx.ty;
+				//TODO: DHG: optimize?
+				tlX = (-frame.regX) *iMtx.a					+ (-frame.regY) *iMtx.c					+iMtx.tx;
+				tlY = (-frame.regX) *iMtx.b					+ (-frame.regY) *iMtx.d					+iMtx.ty;
+				trX = (rect.width-frame.regX) *iMtx.a		+ (-frame.regY) *iMtx.c					+iMtx.tx;
+				trY = (rect.width-frame.regX) *iMtx.b		+ (-frame.regY) *iMtx.d					+iMtx.ty;
+				blX = (-frame.regX) *iMtx.a					+ (rect.height-frame.regY) *iMtx.c		+iMtx.tx;
+				blY = (-frame.regX) *iMtx.b					+ (rect.height-frame.regY) *iMtx.d		+iMtx.ty;
+				brX = (rect.width-frame.regX) *iMtx.a		+ (rect.height-frame.regY) *iMtx.c		+iMtx.tx;
+				brY = (rect.width-frame.regX) *iMtx.b		+ (rect.height-frame.regY) *iMtx.d		+iMtx.ty;
 
 			} else  if(item._webGLRenderStyle === 4) {						// DOM										//TODO: DHG this should be in, it's just calling its stage render isn't it?
 				//debugger;
@@ -1261,6 +1328,15 @@ this.createjs = this.createjs||{};
 			vertices[offset+8] = trX;			vertices[offset+9] = trY;
 			vertices[offset+10] = brX;			vertices[offset+11] = brY;
 
+			/*if(this.vocalDebug){
+				var p = item.localToGlobal(-item.regX,-item.regY);
+				console.log(
+					tlX.toFixed(2), tlY.toFixed(2), ":",
+					p.x.toFixed(2), p.y.toFixed(2), "=",
+					(p.x-tlX).toFixed(2), (p.y-tlY).toFixed(2)
+				);
+			}*/
+
 			// apply uvs
 			uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
 			uvs[offset+2] = uvRect.l;			uvs[offset+3] = uvRect.b;
@@ -1272,7 +1348,8 @@ this.createjs = this.createjs||{};
 			// apply texture
 			texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = texI[loc+4] = texI[loc+5] = texIndex;
 
-			// apply alpha																								//TODO: DHG: add in compound alpha
+			// apply alpha
+			alphas[loc] = alphas[loc+1] = alphas[loc+2] = alphas[loc+3] = alphas[loc+4] = alphas[loc+5] = item.alpha * concatAlpha;
 
 			this.batchCardCount++;
 		}
@@ -1290,19 +1367,27 @@ this.createjs = this.createjs||{};
 			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
 		}
 		var shaderProgram = this._shaderProgram;
-		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer;
-		var triangleTextureIndexBuffer = this._triangleTextureIndexBuffer;
-		var triangleUVPositionBuffer = this._triangleUVPositionBuffer;
+		var vertexPositionBuffer = this._vertexPositionBuffer;
+		var textureIndexBuffer = this._textureIndexBuffer;
+		var uvPositionBuffer = this._uvPositionBuffer;
+		var alphaBuffer = this._alphaBuffer;
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.vertices);
-		gl.bindBuffer(gl.ARRAY_BUFFER, triangleTextureIndexBuffer);
-		gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, triangleTextureIndexBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.indecies);
-		gl.bindBuffer(gl.ARRAY_BUFFER, triangleUVPositionBuffer);
-		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, triangleUVPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.uvs);
+		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._vertices);
+		gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
+		gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, textureIndexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._indecies);
+		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._uvs);
+		gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
+		gl.vertexAttribPointer(shaderProgram.alphaAttribute, alphaBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._alphas);
+
+		if(this.vocalDebug) {
+			console.log(this._alphas);
+		}
 
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
 		//gl.uniformMatrix1i(shaderProgram.flagUniform, gl.FALSE, this.flags);
@@ -1362,6 +1447,11 @@ this.createjs = this.createjs||{};
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 			this._lastTextureInsert = found;
+		} else {
+			var image = texture._imageData;
+			if(image._invalid) {
+				this._updateTextureImageData(gl, image);
+			}
 		}
 
 		texture._drawID = this._drawID;
