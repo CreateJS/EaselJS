@@ -52,16 +52,19 @@ this.createjs = this.createjs||{};
 	**/
 
 	/**
-	 * A sprite stage is the root level {{#crossLink "Container"}}{{/crossLink}} for an aggressively optimized display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
-	 * method is called, it will render its display list to its target canvas. WebGL content is fully compatible with the existing Context2D renderer.
+	 * A Sprite Stage is the root level {{#crossLink "Container"}}{{/crossLink}} for an webGL optimized display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
+	 * method is called, it will render its display list to its target canvas ignoring non webGL compatible Display Objects.
 	 * On devices or browsers that don't support WebGL, content will automatically be rendered via canvas 2D.
 	 *
-	 * Restrictions:
-	 *     - only Sprite, SpriteContainer, BitmapText, Bitmap and DOMElement are allowed to be added to the display list.
-	 *     - a child being added (with the exception of DOMElement) MUST have an image or spriteSheet defined on it.
-	 *     - a child's image/spriteSheet MUST never change while being on the display list.
+	 * Complications:
+	 *     - BUG: you must render twice due to image loading event started in the first pass not finishing before rendering.
+	 *     - only Sprite, Container, BitmapText, Bitmap, and DOMElement are rendered when added to the display list.
+	 *     - you must call updateViewport in order to properly size the 3D context stored in memory, this won't affect the DOM.
+	 *     - images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance.
+	 *     - if new images are continually added and removed from the display list it will leak memory due to WebGL Texture wrappers being made.
+																														//TODO: add in a hook so that people can easily clear old texture memory
 	 *
-	 * <h4>Example</h4>
+	 * <h4>How to use Example</h4>
 	 * This example creates a sprite stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
 	 * and redraw the stage using {{#crossLink "SpriteStage/update"}}{{/crossLink}}.
 	 *
@@ -76,6 +79,7 @@ this.createjs = this.createjs||{};
 	 *      }
 	 *
 	 * <strong>Note:</strong> SpriteStage is not included in the minified version of EaselJS.
+	 * <strong>Note:</strong> SpriteContainer was required by previous versions but is deprecated.
 	 *
 	 * @class SpriteStage
 	 * @extends Stage
@@ -90,20 +94,27 @@ this.createjs = this.createjs||{};
 
 		// public properties:
 		///////////////////////////////////////////////////////
+		/**
+		 * Console log potential issues and problems, this is designed to have -minimal- performance impact so
+		 * if you're looking for more extensive debugging information this may be inadequate.
+		 * @property vocalDebug
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.vocalDebug = false;
 
 		// private properties:
 		///////////////////////////////////////////////////////
 		/**
+		 * Used when the canvas context is created, requires context re-creation to update.
 		 * Specifies whether or not the canvas is auto-cleared by WebGL. Spec discourages true.
-		 * If true, the canvas is NOT auto-cleared by WebGL. Value is ignored if `_alphaEnabled` is false.
-		 * Useful if you want to use `autoClear = false`.
+		 * If true, the canvas is NOT auto-cleared by WebGL. WebGL replacement for `autoClear = false`.
 		 * @property _preserveDrawingBuffer
 		 * @protected
 		 * @type {Boolean}
 		 * @default false
 		 **/
-		this._preserveDrawingBuffer = preserveDrawingBuffer||false;
+		this._preserveDrawingBuffer = preserveDrawingBuffer||false;														//TODO: DHG: look at turning this into autoClear directly
 
 		/**
 		 * Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
@@ -112,10 +123,10 @@ this.createjs = this.createjs||{};
 		 * @type {Boolean}
 		 * @default false
 		 **/
-		this._antialias = antialias||false;
+		this._antialias = antialias||false;																				//TODO: DHG: ensure this does something
 
 		/**
-		 * The width of the canvas element.
+		 * The width of the drawing surface used in memory.
 		 * @property _viewportWidth
 		 * @protected
 		 * @type {Number}
@@ -124,7 +135,7 @@ this.createjs = this.createjs||{};
 		this._viewportWidth = 0;
 
 		/**
-		 * The height of the canvas element.
+		 * The height of the drawing surface used in memory.
 		 * @property _viewportHeight
 		 * @protected
 		 * @type {Number}
@@ -133,7 +144,8 @@ this.createjs = this.createjs||{};
 		this._viewportHeight = 0;
 
 		/**
-		 * A 2D projection matrix used to convert WebGL's clipspace into normal pixels.
+		 * A 2D projection matrix used to convert WebGL's viewspace into canvas co-ordinates.
+		 * Regular canvas display uses a Top-Left = 0,0 where WebGL uses a Center 0,0 Top-Right 1,1 system.
 		 * @property _projectionMatrix
 		 * @protected
 		 * @type {Float32Array}
@@ -142,7 +154,7 @@ this.createjs = this.createjs||{};
 		this._projectionMatrix = null;
 
 		/**
-		 * The current WebGL canvas context.
+		 * The current WebGL canvas context. Often shorthanded to just "gl" in many parts of the code.
 		 * @property _webGLContext
 		 * @protected
 		 * @type {WebGLRenderingContext}
@@ -151,45 +163,26 @@ this.createjs = this.createjs||{};
 		this._webGLContext = null;
 
 		/**
-		 * Indicates whether or not an error has been detected when dealing with WebGL.
-		 * If the is true, the behavior should be to use Canvas 2D rendering instead.
-		 * @property _webGLErrorDetected
-		 * @protected
-		 * @type {Boolean}
-		 * @default false
-		 **/
-		this._webGLErrorDetected = false;
-
-		/**
 		 * The color to use when the WebGL canvas has been cleared.
 		 * @property _clearColor
 		 * @protected
 		 * @type {Object}
-		 * @default null
+		 * @default black
 		 **/
-		this._clearColor = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
+		this._clearColor = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };															//TODO: formalize this approach into regular canvases
 
 		/**
-		 * The maximum total number of boxes points that can be defined per draw call.
-		 * @property _maxBoxesPointsPerDraw
-		 * @protected
-		 * @type {Number}
-		 * @default null
-		 **/
-		this._maxBoxesPointsPerDraw = null;
-
-		/**
-		 * The maximum number of cards (sprites) that can be drawn in one draw call.
-		 * Use getter/setters to modify otherwise buffers may be incorrect sizes.
+		 * The maximum number of cards (aka a single sprite) that can be drawn in one draw call.
+		 * Use getter/setters to modify otherwise internal buffers may be incorrect sizes.
 		 * @property _maxCardsPerBatch
 		 * @protected
 		 * @type {Number}
-		 * @default null
+		 * @default SpriteStage.DEFAULT_MAX_BATCH_SIZE
 		 **/
-		this._maxCardsPerBatch = SpriteStage.DEFAULT_MAX_BATCH_SIZE;
+		this._maxCardsPerBatch = SpriteStage.DEFAULT_MAX_BATCH_SIZE;													//TODO: write getter/setters for this
 
 		/**
-		 * The shader program used to draw everything.
+		 * The shader program used to draw the current batch.
 		 * @property _shaderProgram
 		 * @protected
 		 * @type {WebGLProgram}
@@ -207,7 +200,7 @@ this.createjs = this.createjs||{};
 		this._vertices = null;
 
 		/**
-		 * The buffer that contains all the vertices data.
+		 * The WebGL buffer attached to _vertecies.
 		 * @property _verticesBuffer
 		 * @protected
 		 * @type {WebGLBuffer}
@@ -216,57 +209,70 @@ this.createjs = this.createjs||{};
 		this._verticesBuffer = null;
 
 		/**
-		 * The indices to the vertices defined in this._vertices.
-		 * @property _indices
-		 * @protected
-		 * @type {Uint16Array}
-		 * @default null
-		 **/
-		this._indices = null;
-
-		/**
-		 * The buffer that contains all the indices data.
-		 * @property _indicesBuffer
-		 * @protected
-		 * @type {WebGLBuffer}
-		 * @default null
-		 **/
-		this._indicesBuffer = null;
-
-		/**
-		 * The current card being processed for drawing.
-		 * @property _currentCardIndex
-		 * @protected
-		 * @type {Number}
-		 * @default -1
-		 **/
-		this._currentCardIndex = -1;
-
-		/**
-		 * The current texture that will be used to draw into the GPU.
+		 * An index based lookup of every WebGL Texture currently in use.
 		 * @property _drawTexture
 		 * @protected
-		 * @type {WebGLTexture}
+		 * @type {Array}
 		 * @default null
 		 **/
 		this._textureDictionary = [];
+
+		/**
+		 * A string based lookup hash of what index a texture is stored at in the dictionary.
+		 * The lookup string is often the src url.
+		 * @property _textureIDs
+		 * @protected
+		 * @type {Object}
+		 * @default null
+		 **/
 		this._textureIDs = {};
 
+		/**
+		 * An array of all the textures currently loaded into the GPU, index in array matches GPU index.
+		 * @property _batchTextures
+		 * @protected
+		 * @type {Array}
+		 * @default null
+		 */
 		this._batchTextures = [];
 
 		/**
-		 * Get this value from WebGL, 8 is lowest guarenteed but it could be higher.
-		 * Users may over-ride this value after init, but they should do it through a function
-		 * @property _indices
+		 * How many concurrent textures the gpu can handle. Dynamically Get this value from WebGL during initilization.
+		 * Spec states 8 is lowest guaranteed value but it could be higher.
+		 * Do not set higher than the value returned by the GPU, and setting it lower will potentially reduce performance.
+		 *      gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)
+		 * Can also act as a length for _batchTextures
+		 * @property _batchTextureCount
 		 * @protected
-		 * @type {Uint16Array}
-		 * @default null
+		 * @type {Number}
+		 * @default 8
 		 */
 		this._batchTextureCount = 8;
 
+		/**
+		 * Location at which the last texture was inserted into a GPU slot in _batchTextures.
+		 * Manual control of this variable could yield improvements in performance by intelligently replacing textures in batches.
+		 * Impossible to write automated code for as it requires display list inspection to attempt as in content sensitive.
+		 * @protected
+		 * @type {Number}
+		 * @default -1
+		 */
 		this._lastTextureInsert = -1;
 
+		/**
+		 * Current batch being drawn, a batch consists of a call to "drawElements" on the GPU. mnay may occur per draw.
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
 		this._batchID = 0;
+
+		/**
+		 * Current draw being performed, may contain multiple batches. Comparing to _batchID can reveal batching efficiency.
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
 		this._drawID = 0;
 
 		// and begin
@@ -321,7 +327,22 @@ this.createjs = this.createjs||{};
 	SpriteStage.WEBGL_MAX_INDEX_NUM = Math.pow(2, 16);
 
 	/**
-	 *
+	 * Default U/V rect for dealing with full coverage from an image source.
+	 * @property UV_RECT
+	 * @static
+	 * @final
+	 * @type {Object}
+	 * @readonly
+	 */
+	SpriteStage.UV_RECT = {t:0, l:0, b:1, r:1};
+
+	/**
+	 * Pre-processing shader code, will be parsed before being fed in.
+	 * @property VTX_SHADER
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
 	 */
 	SpriteStage.VTX_SHADER = (
 		"attribute vec2 vertexPosition;" +
@@ -350,7 +371,12 @@ this.createjs = this.createjs||{};
 	);
 
 	/**
-	 *
+	 * Pre-processing shader code, will be parsed before being fed in.
+	 * @property FRAG_SHADER
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
 	 */
 	SpriteStage.FRAG_SHADER = (
 		"precision mediump float;" +
@@ -773,7 +799,9 @@ this.createjs = this.createjs||{};
 		}
 	};
 
-	p._loadTextureImage = function(gl, index, src) {
+	p._loadTextureImage = function(gl, index, image) {
+		var src = image.src;
+
 		var storeID = this._textureIDs[src];
 		if(storeID === undefined) {
 			storeID = this._textureDictionary.length;
@@ -788,10 +816,12 @@ this.createjs = this.createjs||{};
 		texture._activeIndex = index;
 		texture._storeID = storeID;
 
-		var image = texture._image = new Image();
 		image._storeID = storeID;
-		image.onload = this._handleImageLoaded.bind(this, gl, image);
-		image.src = src;
+		if(!image.complete || !image.naturalWidth) {
+			image.onload = this._handleImageLoaded.bind(this, gl, image);
+		} else {
+			this._handleImageLoaded(gl, image);
+		}
 
 		return texture;
 	};
@@ -832,6 +862,13 @@ this.createjs = this.createjs||{};
 		this._drawToGPU(gl);								// <--------------------------------------------------------
 	};
 
+	/**
+	 * Add all the contents of a container to the display list, called recurssivley on each
+	 * @param {Container} container
+	 * @param {WebGLRenderingContext} gl
+	 * @param {Matrix2D} concatMtx Cumulative offset so far
+	 * @method _appendToBatchGroup
+	 */
 	p._appendToBatchGroup = function(container, gl, concatMtx) {
 		// sort out shared properties
 		if(!container._glMtx) { container._glMtx = new createjs.Matrix2D(); }
@@ -847,11 +884,17 @@ this.createjs = this.createjs||{};
 		var tlX = 0, tlY = 0, trX = 0, trY = 0, blX = 0, blY = 0, brX = 0, brY = 0;
 
 		// actually apply its data to the buffers
-		for (var i = 0, l = container.children.length; i < l; i++) {
+		for(var i = 0, l = container.children.length; i < l; i++) {
 			var item = container.children[i];
-			if (!item.visible) { continue; }
 
-			if (item.children) {
+			if(!item.visible) { continue; }
+			if(item.cacheCanvas) { /*debugger;*/ }
+
+			if(item._webGLRenderStyle === 3) {		// BITMAP TEXT
+				item._updateText();
+			}
+
+			if(item.children) {		// CONTAINER
 				this._appendToBatchGroup(item, gl, cMtx);
 			} else {
 				// check for overflowing batch, if yes then force a render
@@ -880,67 +923,35 @@ this.createjs = this.createjs||{};
 				var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;
 				var loc = (offset/2)|0;
 
-				if(item._webGLRenderStyle == 1) {
+				if(item._webGLRenderStyle === 1) {		// SPRITE
 					var frame = item.spriteSheet.getFrame(item.currentFrame);
 					var rect = frame.rect;
 					var image = frame.image;
 
+					// calculate uvs
 					uvRect = frame.uvRect;
 					if(!uvRect) {
 						uvRect = this.buildUVRects(item.spriteSheet, item.currentFrame, false);
 					}
 
+					// calculate texture
 					var texture;
 					if(image._storeID === undefined) {
-						texture = this._loadTextureImage(gl, this.lastTexture++, image.src);
-						image._storeID = texture._storeID;
+						texture = this._loadTextureImage(gl, this.lastTexture++, image);
 					} else {
 						texture = this._textureDictionary[image._storeID];
 					}
-
-					// this texture hasn't been used this batch.
-					if(texture._batchID != this._batchID) {
-						// if it wasn't used last batch
-						if(this._batchTextures[texture._activeIndex] !== texture) {
-							// we've got to find it a a spot.
-							var found = -1;
-							var start = this._lastTextureInsert+1;
-							var look = (start+1) % this._batchTextureCount;
-							do {
-								if(this._batchTextures[look]._batchID != this._batchID) {
-									found = look;
-									break;
-								}
-								look = (look+1) % this._batchTextureCount;
-							} while(look != start);
-
-							// we couldn't find anywhere for it go, meaning we're maxed out
-							if(found == -1) {
-								this.batchReason = "textureOverflow";
-								this._drawToGPU(gl);	// <--------------------------------------------------------
-								this.batchCardCount = 0;
-								found = start;
-							}
-
-							// lets put it into that spot
-							this._batchTextures[found] = texture;
-							texture._activeIndex = found;
-							gl.activeTexture(gl.TEXTURE0 + found);
-							gl.bindTexture(gl.TEXTURE_2D, texture);
-							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-						}
-
-						texture._drawID = this._drawID;
-						texture._batchID = this._batchID;
+					if(texture._batchID !== this._batchID) {
+						// this texture hasn't been used this batch.
+						this._updateTexture(gl, texture);
 					}
 					texIndex = texture._activeIndex;
 
+					// calculate alpha
 					combinedAlpha = 1;
 
-					//Matrix2D.transformPoint
+					// calculate vertices
+					//DHG: See Matrix2D.transformPoint for why this math specifically
 					tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
 					tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
 					trX = rect.width *iMtx.a		/*+ 0 *iMtx.c*/				+iMtx.tx;
@@ -949,22 +960,63 @@ this.createjs = this.createjs||{};
 					blY = /*0 *iMtx.b				+*/ rect.height *iMtx.d		+iMtx.ty;
 					brX = rect.width *iMtx.a		+ rect.height *iMtx.c		+iMtx.tx;
 					brY = rect.width *iMtx.b		+ rect.height *iMtx.d		+iMtx.ty;
-				}/*
-						break;
-					case 2 : // BitmapText
-						console.log("todo");
-						continue;
-						break;
-					case 3 : // Bitmap
-						console.log("todo");
-						continue;
-						break;
-					case 4 : // DOMElement
-						continue;
-						break;
-				}*/
 
-				//*
+				} else if(item._webGLRenderStyle === 2) { // BITMAP
+					var w,h;
+					var image = item.image;
+
+					// calculate texture
+					var texture;
+					if(image._storeID === undefined) {
+						texture = this._loadTextureImage(gl, this.lastTexture++, image);
+					} else {
+						texture = this._textureDictionary[image._storeID];
+					}
+					if(texture._batchID !== this._batchID) {
+						// this texture hasn't been used this batch.
+						this._updateTexture(gl, texture);
+					}
+					texIndex = texture._activeIndex;
+
+					if(item.sourceRect) {
+						// calculate uvs
+						if(!item._uvRect) { item._uvRect = {}; }
+						var src = item.sourceRect;
+						uvRect = item._uvRect;
+						uvRect.t = (src.x)/image.width;
+						uvRect.l = (src.y)/image.height;
+						uvRect.b = (src.x + src.width)/image.width;
+						uvRect.r = (src.y + src.height)/image.height;
+
+						w = src.width;			h = src.height;
+					} else {
+						// calculate uvs
+						uvRect = SpriteStage.UV_RECT;
+						w = image.width;			h = image.height;
+					}
+
+					// calculate vertices
+					tlX = /*0 *iMtx.a				+ 0 *iMtx.c					+*/iMtx.tx;
+					tlY = /*0 *iMtx.b				+ 0 *iMtx.d					+*/iMtx.ty;
+					trX = w *iMtx.a					/*+ 0 *iMtx.c*/				+iMtx.tx;
+					trY = w *iMtx.b					/*+ 0 *iMtx.d*/				+iMtx.ty;
+					blX = /*0 *iMtx.a				+*/ h *iMtx.c				+iMtx.tx;
+					blY = /*0 *iMtx.b				+*/ h *iMtx.d				+iMtx.ty;
+					brX = w *iMtx.a					+ h *iMtx.c					+iMtx.tx;
+					brY = w *iMtx.b					+ h *iMtx.d					+iMtx.ty;
+
+					// calculate alpha
+				} else if(item._webGLRenderStyle === 4) { // DOM
+					//debugger;
+					// calculate vertices
+					// calculate uvs
+					// calculate texture
+					// calculate alpha
+				} else {
+					continue;
+				}
+
+				// apply vertices
 				vertices[offset] = tlX;				vertices[offset+1] = tlY;
 				vertices[offset+2] = blX;			vertices[offset+3] = blY;
 				vertices[offset+4] = trX;			vertices[offset+5] = trY;
@@ -972,6 +1024,7 @@ this.createjs = this.createjs||{};
 				vertices[offset+8] = trX;			vertices[offset+9] = trY;
 				vertices[offset+10] = brX;			vertices[offset+11] = brY;
 
+				// apply uvs
 				uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
 				uvs[offset+2] = uvRect.l;			uvs[offset+3] = uvRect.b;
 				uvs[offset+4] = uvRect.r;			uvs[offset+5] = uvRect.t;
@@ -979,8 +1032,10 @@ this.createjs = this.createjs||{};
 				uvs[offset+8] = uvRect.r;			uvs[offset+9] = uvRect.t;
 				uvs[offset+10] = uvRect.r;			uvs[offset+11] = uvRect.b;
 
+				// apply texture
 				texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = texI[loc+4] = texI[loc+5] = texIndex;
-				//*/
+
+				// apply alpha																							//TODO: DHG: add in compound alpha
 
 				this.batchCardCount++;
 			}
@@ -998,7 +1053,6 @@ this.createjs = this.createjs||{};
 		if(this.vocalDebug) {
 			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
 		}
-		//console.log("DRAW batch:", this.batchCardCount*SpriteStage.INDICIES_PER_CARD);
 		var shaderProgram = this._shaderProgram;
 		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer;
 		var triangleTextureIndexBuffer = this._triangleTextureIndexBuffer;
@@ -1032,6 +1086,44 @@ this.createjs = this.createjs||{};
 		//drawElements
 	};
 
+	p._updateTexture = function(gl, texture) {
+		// if it wasn't used last batch
+		if(this._batchTextures[texture._activeIndex] !== texture) {
+			// we've got to find it a a spot.
+			var found = -1;
+			var start = this._lastTextureInsert+1;
+			var look = (start+1) % this._batchTextureCount;
+			do {
+				if(this._batchTextures[look]._batchID != this._batchID) {
+					found = look;
+					break;
+				}
+				look = (look+1) % this._batchTextureCount;
+			} while(look !== start);
+
+			// we couldn't find anywhere for it go, meaning we're maxed out
+			if(found === -1) {
+				this.batchReason = "textureOverflow";
+				this._drawToGPU(gl);		// <--------------------------------------------------------
+				this.batchCardCount = 0;
+				found = start;
+			}
+
+			// lets put it into that spot
+			this._batchTextures[found] = texture;
+			texture._activeIndex = found;
+			gl.activeTexture(gl.TEXTURE0 + found);
+			gl.bindTexture(gl.TEXTURE_2D, texture);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		}
+
+		texture._drawID = this._drawID;
+		texture._batchID = this._batchID;
+	};
+
 	// Injections
 	///////////////////////////////////////////////////////
 	/**
@@ -1040,7 +1132,7 @@ this.createjs = this.createjs||{};
 	(function _injectProperties() {
 		// Set which classes are compatible with SpriteStage. The order is important!!!
 		// Reflect any changes to the drawing loop
-		var candidates = [createjs.Sprite, createjs.BitmapText, createjs.Bitmap, createjs.DOMElement];
+		var candidates = [createjs.Sprite, createjs.Bitmap, createjs.BitmapText, createjs.DOMElement];
 		candidates.forEach(function(_class, index) {
 			_class.prototype._webGLRenderStyle = index + 1;
 		});
