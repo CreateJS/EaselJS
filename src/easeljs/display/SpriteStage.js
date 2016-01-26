@@ -36,14 +36,28 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-
 	// Set which classes are compatible with SpriteStage.
 	// The order is important!!! If it's changed/appended, make sure that any logic that 
 	// checks _spritestage_compatibility accounts for it!
 	[createjs.SpriteContainer, createjs.Sprite, createjs.BitmapText, createjs.Bitmap, createjs.DOMElement].forEach(function(_class, index) {
 		_class.prototype._spritestage_compatibility = index + 1;
 	});
-	
+
+	/** 
+	 * README IF EDITING:
+	 * Terminology for developers:
+	 * 
+	 * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
+	 * Vertex Property: a piece of information attached to the vertex like x,y,z
+	 * Index/Indecies: used in groups of 3 to define a triangle, points to vertecies by their index in an array (some render modes do not use these)
+	 * Card: a group of 2 triangles used to display a rectangular image
+	 * U/V: common names for the [0-1] texture co-ordinates on an image
+	 * Batch: a single call to the renderer, best done as little as possible so multiple cards are put into a single batch
+	 * Buffer: WebGL array data
+	 * Program/Shader: For every vertex we run the Vertex shader, this information is then passed to a paired Fragment shader. When combined and paired these are a shader "program"
+	 * Texture: WebGL representation of image data and associated extra information
+	 * 
+	**/
 
 // constructor:
 	/**
@@ -82,8 +96,7 @@ this.createjs = this.createjs||{};
 	 **/
 	function SpriteStage(canvas, preserveDrawingBuffer, antialias) {
 		this.Stage_constructor(canvas);
-		
-		
+
 	// private properties:
 		/**
 		 * Specifies whether or not the canvas is auto-cleared by WebGL. Spec discourages true.
@@ -95,7 +108,7 @@ this.createjs = this.createjs||{};
 		 * @default false
 		 **/
 		this._preserveDrawingBuffer = preserveDrawingBuffer||false;
-	
+
 		/**
 		 * Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
 		 * @property _antialias
@@ -104,7 +117,7 @@ this.createjs = this.createjs||{};
 		 * @default false
 		 **/
 		this._antialias = antialias||false;
-	
+
 		/**
 		 * The width of the canvas element.
 		 * @property _viewportWidth
@@ -113,7 +126,7 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 **/
 		this._viewportWidth = 0;
-	
+
 		/**
 		 * The height of the canvas element.
 		 * @property _viewportHeight
@@ -122,7 +135,7 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 **/
 		this._viewportHeight = 0;
-	
+
 		/**
 		 * A 2D projection matrix used to convert WebGL's clipspace into normal pixels.
 		 * @property _projectionMatrix
@@ -131,7 +144,7 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this._projectionMatrix = null;
-	
+
 		/**
 		 * The current WebGL canvas context.
 		 * @property _webGLContext
@@ -140,7 +153,7 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this._webGLContext = null;
-	
+
 		/**
 		 * Indicates whether or not an error has been detected when dealing with WebGL.
 		 * If the is true, the behavior should be to use Canvas 2D rendering instead.
@@ -150,7 +163,7 @@ this.createjs = this.createjs||{};
 		 * @default false
 		 **/
 		this._webGLErrorDetected = false;
-	
+
 		/**
 		 * The color to use when the WebGL canvas has been cleared.
 		 * @property _clearColor
@@ -158,17 +171,8 @@ this.createjs = this.createjs||{};
 		 * @type {Object}
 		 * @default null
 		 **/
-		this._clearColor = null;
-		
-		/**
-		 * The maximum number of textures WebGL can work with per draw call.
-		 * @property _maxTexturesPerDraw
-		 * @protected
-		 * @type {Number}
-		 * @default 1
-		 **/
-		this._maxTexturesPerDraw = 1; // TODO: this is currently unused.
-	
+		this._clearColor = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
+
 		/**
 		 * The maximum total number of boxes points that can be defined per draw call.
 		 * @property _maxBoxesPointsPerDraw
@@ -177,25 +181,17 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this._maxBoxesPointsPerDraw = null;
-	
+
 		/**
-		 * The maximum number of boxes (sprites) that can be drawn in one draw call.
-		 * @property _maxBoxesPerDraw
+		 * The maximum number of cards (sprites) that can be drawn in one draw call.
+		 * Use getter/setters to modify otherwise buffers may be incorrect sizes.
+		 * @property _maxCardsPerBatch
 		 * @protected
 		 * @type {Number}
 		 * @default null
 		 **/
-		this._maxBoxesPerDraw = null;
-	
-		/**
-		 * The maximum number of indices that can be drawn in one draw call.
-		 * @property _maxIndicesPerDraw
-		 * @protected
-		 * @type {Number}
-		 * @default null
-		 **/
-		this._maxIndicesPerDraw = null;
-	
+		this._maxCardsPerBatch = SpriteStage.DEFAULT_MAX_BATCH_SIZE;
+
 		/**
 		 * The shader program used to draw everything.
 		 * @property _shaderProgram
@@ -204,7 +200,7 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this._shaderProgram = null;
-	
+
 		/**
 		 * The vertices data for the current draw call.
 		 * @property _vertices
@@ -213,7 +209,7 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this._vertices = null;
-	
+
 		/**
 		 * The buffer that contains all the vertices data.
 		 * @property _verticesBuffer
@@ -222,7 +218,7 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this._verticesBuffer = null;
-	
+
 		/**
 		 * The indices to the vertices defined in this._vertices.
 		 * @property _indices
@@ -231,7 +227,7 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this._indices = null;
-	
+
 		/**
 		 * The buffer that contains all the indices data.
 		 * @property _indicesBuffer
@@ -240,16 +236,16 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this._indicesBuffer = null;
-	
+
 		/**
-		 * The current box index being defined for drawing.
-		 * @property _currentBoxIndex
+		 * The current card being processed for drawing.
+		 * @property _currentCardIndex
 		 * @protected
 		 * @type {Number}
 		 * @default -1
 		 **/
-		this._currentBoxIndex = -1;
-	
+		this._currentCardIndex = -1;
+
 		/**
 		 * The current texture that will be used to draw into the GPU.
 		 * @property _drawTexture
@@ -257,9 +253,10 @@ this.createjs = this.createjs||{};
 		 * @type {WebGLTexture}
 		 * @default null
 		 **/
-		this._drawTexture = null;
-		
-		
+		this._textureDictionary = {};
+
+		this._batchTextures = [];
+
 	// setup:
 		this._initializeWebGL();
 	}
@@ -268,76 +265,149 @@ this.createjs = this.createjs||{};
 	// TODO: deprecated
 	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
-
 // constants:
 	/**
-	 * The number of properties defined per vertex in p._verticesBuffer.
-	 * x, y, textureU, textureV, alpha
+	 * The number of properties defined per vertex.
+	 * x, y, textureU, textureV, textureIndex, alpha
 	 * @property NUM_VERTEX_PROPERTIES
 	 * @static
 	 * @final
 	 * @type {Number}
 	 * @readonly
 	 **/
-	SpriteStage.NUM_VERTEX_PROPERTIES = 5;
+	SpriteStage.VERTEX_PROPERTY_COUNT = 6;
 
 	/**
-	 * The number of points in a box...obviously :)
-	 * @property POINTS_PER_BOX
+	 * The number of traingle indicies it takes to form a Card. 3 per triangles, 2 triangles.
+	 * @property NUM_VERTEX_PROPERTIES
 	 * @static
 	 * @final
 	 * @type {Number}
 	 * @readonly
 	 **/
-	SpriteStage.POINTS_PER_BOX = 4;
+	SpriteStage.INDICIES_PER_CARD = 6;
 
 	/**
-	 * The number of vertex properties per box.
-	 * @property NUM_VERTEX_PROPERTIES_PER_BOX
+	 * Default value for the maximum number of cards we want to process in a batch.
+	 * See WEBGL_MAX_INDEX_NUM for a hard limit.
+	 * @property DEFAULT_MAX_BATCH_SIZE
 	 * @static
 	 * @final
 	 * @type {Number}
 	 * @readonly
 	 **/
-	SpriteStage.NUM_VERTEX_PROPERTIES_PER_BOX = SpriteStage.POINTS_PER_BOX * SpriteStage.NUM_VERTEX_PROPERTIES;
+	SpriteStage.DEFAULT_MAX_BATCH_SIZE = 20000;
 
 	/**
-	 * The number of indices needed to define a box using triangles.
-	 * 6 indices = 2 triangles = 1 box
-	 * @property INDICES_PER_BOX
-	 * @static
-	 * @final
-	 * @type {Number}
-	 * @readonly
-	 **/
-	SpriteStage.INDICES_PER_BOX = 6;
-
-	/**
-	 * The maximum size WebGL allows for element index numbers: 16 bit unsigned integer
+	 * The maximum size WebGL allows for element index numbers: 16 bit unsigned integer.
+	 * It takes 6 indcies to make a unique card
 	 * @property MAX_INDEX_SIZE
 	 * @static
 	 * @final
 	 * @type {Number}
 	 * @readonly
 	 **/
-	SpriteStage.MAX_INDEX_SIZE = Math.pow(2, 16);
+	SpriteStage.WEBGL_MAX_INDEX_NUM = Math.pow(2, 16);
 
 	/**
-	 * The amount used to increment p._maxBoxesPointsPerDraw when the maximum has been reached.
-	 * If the maximum size of element index WebGL allows for (SpriteStage.MAX_INDEX_SIZE) was used,
-	 * the array size for p._vertices would equal 1280kb and p._indices 192kb. But since mobile phones
-	 * with less memory need to be accounted for, the maximum size is somewhat arbitrarily divided by 4,
-	 * reducing the array sizes to 320kb and 48kb respectively.
-	 * @property MAX_BOXES_POINTS_INCREMENT
-	 * @static
-	 * @final
-	 * @type {Number}
-	 * @readonly
-	 **/
-	SpriteStage.MAX_BOXES_POINTS_INCREMENT = SpriteStage.MAX_INDEX_SIZE / 4;
+	 *
+	 */
+	SpriteStage.VTX_SHADER = (
+		"attribute vec2 vertexPosition;" +
+		"attribute vec2 uvPosition;" +
+		"attribute float textureIndex;" +
 
+		"uniform mat4 pMatrix;" +
+		//"uniform int flagData;" +
 
-// getter / setters:
+		"varying highp vec2 vTextureCoord;" +
+		"varying lowp float indexPicker;" +
+
+		"void main(void) {" +
+			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix... bypass for now
+			//"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
+			"gl_Position = vec4("+
+				"(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
+				"(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1]," +
+				"pMatrix[3][2]," +
+				"1.0" +
+			");" +
+			"indexPicker = textureIndex;" +
+			"vTextureCoord = uvPosition;" +
+		"}"
+	);
+
+	/**
+	 *
+	 */
+	SpriteStage.FRAG_SHADER = (
+	/*
+		"precision mediump float;" +
+
+		//"uniform sampler2D uSampler0;" +
+
+		//"varying vec4 vTextureData;" +
+
+		"void main(void) {" +
+			//"vec4 color = texture2D(uSampler0, vTextureData.st);" +		//vTextureData.p
+			//"vec4 color = texture2D(uSampler0, vec2(0.25, 0.25));" +		//vTextureData.p
+			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
+			//"if (color.a == 0.0) discard;" +
+			//"gl_FragColor = vec4(color.rgb, color.a * vTextureData.a);" +
+			"gl_FragColor = color;" +
+		"}"*/
+		"precision mediump float;" +
+
+		"varying highp vec2 vTextureCoord;" +
+		"varying lowp float indexPicker;" +
+
+		"uniform sampler2D uSampler[16];" +
+		//"uniform int flagData;" +
+
+		"void main(void) {" +
+			"int src = int(indexPicker);" +
+			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
+
+			"if(src == 0) {" +
+				"color = texture2D(uSampler[0], vTextureCoord);" +
+			"} else if(src == 1) {" +
+				"color = texture2D(uSampler[1], vTextureCoord);" +
+			"} else if(src == 2) {" +
+				"color = texture2D(uSampler[2], vTextureCoord);" +
+			"} else if(src == 3) {" +
+				"color = texture2D(uSampler[3], vTextureCoord);" +
+			"} else if(src == 4) {" +
+				"color = texture2D(uSampler[4], vTextureCoord);" +
+			"} else if(src == 5) {" +
+				"color = texture2D(uSampler[5], vTextureCoord);" +
+			"} else if(src == 6) {" +
+				"color = texture2D(uSampler[6], vTextureCoord);" +
+			"} else if(src == 7) {" +
+				"color = texture2D(uSampler[7], vTextureCoord);" +
+			"} else if(src == 8) {" +
+				"color = texture2D(uSampler[8], vTextureCoord);" +
+			"} else if(src == 9) {" +
+				"color = texture2D(uSampler[9], vTextureCoord);" +
+			"} else if(src == 10) {" +
+				"color = texture2D(uSampler[10], vTextureCoord);" +
+			"} else if(src == 11) {" +
+				"color = texture2D(uSampler[11], vTextureCoord);" +
+			"} else if(src == 12) {" +
+				"color = texture2D(uSampler[12], vTextureCoord);" +
+			"} else if(src == 13) {" +
+				"color = texture2D(uSampler[13], vTextureCoord);" +
+			"} else if(src == 14) {" +
+				"color = texture2D(uSampler[14], vTextureCoord);" +
+			"} else if(src == 15) {" +
+				"color = texture2D(uSampler[15], vTextureCoord);" +
+			"}" +
+
+			"gl_FragColor = color;" +
+		"}"
+	);
+
+	// getter / setters:
+	///////////////////////////////////////////////////////
 	/**
 	 * Indicates whether WebGL is being used for rendering. For example, this would be false if WebGL is not
 	 * supported in the browser.
@@ -355,8 +425,56 @@ this.createjs = this.createjs||{};
 		});
 	} catch (e) {} // TODO: use Log
 
+	// ctor:
+	///////////////////////////////////////////////////////
+	/**
+	 *
+	 * @method _initializeWebGL
+	 * @protected
+	 */
+	p._initializeWebGL = function() {
+		if (this.canvas) {
+			if (!this._webGLContext || this._webGLContext.canvas !== this.canvas) {
+				// A context hasn't been defined yet,
+				// OR the defined context belongs to a different canvas, so reinitialize.
+				this._createWebGL();
+			}
+		} else {
+			this._webGLContext = null;
+		}
+		return this._webGLContext;
+	};
 
-// public methods:
+	/**
+	 *
+	 * @method _createWebGL
+	 * @protected
+	 */
+	p._createWebGL = function() {
+		// defaults and options
+		var options = {
+			//depth: false, // Disable the depth buffer as it isn't used.
+			alpha: false, // Make the canvas background transparent.
+			stencil: true,
+			antialias: this._antialias,
+			preserveDrawingBuffer: this._preserveDrawingBuffer,
+			premultipliedAlpha: true // Assume the drawing buffer contains colors with premultiplied alpha.
+		};
+
+		var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
+
+		this._shaderProgram = this._fetchShaderProgram(gl);
+		this._createBuffers(gl);
+		this._initTextures(gl);
+
+		gl.clearColor(0.25, 0.25, 0.25, 1.0);
+		gl.enable(gl.DEPTH_TEST);
+
+		this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
+	};
+
+	// public methods:
+	///////////////////////////////////////////////////////
 	/**
 	 * Adds a child to the top of the display list.
 	 * Only children of type SpriteContainer, Sprite, Bitmap, BitmapText, or DOMElement are allowed.
@@ -387,7 +505,7 @@ this.createjs = this.createjs||{};
 	 * setting its parent to this Container.
 	 * Only children of type SpriteContainer, Sprite, Bitmap, BitmapText, or DOMElement are allowed.
 	 * Children also MUST have either an image or spriteSheet defined on them (unless it's a DOMElement).
-	 * 
+	 *
 	 * <h4>Example</h4>
 	 *
 	 *      addChildAt(child1, index);
@@ -434,17 +552,17 @@ this.createjs = this.createjs||{};
 
 	/** docced in super class **/
 	p.update = function(props) {
+		//DHG TODO: test context swapping and re-acqusition
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
 		this.dispatchEvent("drawstart"); // TODO: make cancellable?
 		if (this.autoClear) { this.clear(); }
-		var ctx = this._setWebGLContext();
-		if (ctx) {
+		if (this._webGLContext) {
 			// Use WebGL.
-			this.draw(ctx, false);
+			this.draw(this._webGLContext, false);
 		} else {
 			// Use 2D.
-			ctx = this.canvas.getContext("2d");
+			var ctx = this.canvas.getContext("2d");
 			ctx.save();
 			this.updateContext(ctx);
 			this.draw(ctx, false);
@@ -459,16 +577,22 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clear = function() {
 		if (!this.canvas) { return; }
-		var ctx = this._setWebGLContext();
-		if (ctx) {
+		if (this.isWebGLActive(this._webGLContext)) {
+			var gl = this._webGLContext;
 			// Use WebGL.
-			ctx.clear(ctx.COLOR_BUFFER_BIT);
+			//gl.clear(gl.COLOR_BUFFER_BIT);
 		} else {
 			// Use 2D.
-			ctx = this.canvas.getContext("2d");
+			var ctx = this.canvas.getContext("2d");
 			ctx.setTransform(1, 0, 0, 1, 0, 0);
 			ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
 		}
+	};
+
+	p.isWebGLActive = function(ctx) {
+		return ctx &&
+			ctx instanceof WebGLRenderingContext &&
+			typeof WebGLRenderingContext !== 'undefined';
 	};
 
 	/**
@@ -478,17 +602,17 @@ this.createjs = this.createjs||{};
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
-	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	 * @param {CanvasRenderingContext2D} gl The canvas 2D context object to draw into.
 	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
-	p.draw = function(ctx, ignoreCache) {
-		if (typeof WebGLRenderingContext !== 'undefined' && (ctx === this._webGLContext || ctx instanceof WebGLRenderingContext)) {		
-			this._drawWebGLKids(this.children, ctx);
+	p.draw = function(gl, ignoreCache) {
+		if (this.isWebGLActive(gl)) {
+			this._batchDraw(this, gl);
 			return true;
 		} else {
-			return this.Stage_draw(ctx, ignoreCache);
+			return this.Stage_draw(gl, ignoreCache);
 		}
 	};
 
@@ -501,15 +625,20 @@ this.createjs = this.createjs||{};
 	p.updateViewport = function (width, height) {
 		this._viewportWidth = width;
 		this._viewportHeight = height;
+		var gl = this._webGLContext;
 
-		if (this._webGLContext) {
-			this._webGLContext.viewport(0, 0, this._viewportWidth, this._viewportHeight);
+		if (gl) {
+			gl.viewport(0, 0, this._viewportWidth, this._viewportHeight);
 
-			if (!this._projectionMatrix) {
-				this._projectionMatrix = new Float32Array([0, 0, 0, 0, 0, 1, -1, 1, 1]);
-			}
-			this._projectionMatrix[0] = 2 / width;
-			this._projectionMatrix[4] = -2 / height;
+			// openGL works with a -1,1 space on its screen. It also follows Y-Up
+			// we need to flip the y, scale and then translate the co-ordinates to match this
+			// additionally we offset into they Y so the polygons are inside the camera's "clipping" plane
+			this._projectionMatrix = new Float32Array([
+				2 / width,		0,					0,				0,
+				0,				-2 / height,		1,				0,
+				0,				0,					1,				0,
+				-1,				1,					0.1,			0
+			]);
 		}
 	};
 
@@ -531,189 +660,123 @@ this.createjs = this.createjs||{};
 		return "[SpriteStage (name="+  this.name +")]";
 	};
 
+	p.getBaseTexture = function() {
+		var gl = this._webGLContext;
+		var texture = gl.createTexture();
+		gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texImage2D(
+			gl.TEXTURE_2D,		// target
+			0,					// level of detail
+			gl.RGBA,			// internalformat
+			1,					// width (only for array texture)
+			1,					// height (only for array texture)
+			0,					// border (only for array texture)
+			gl.RGBA,			// format (match internal format)
+			gl.UNSIGNED_BYTE,	// type of texture(pixel color depth)
+			new Uint8Array([0.1, 0.2, 0.3, 1.0]	// image data
+			));
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		return texture;
+	};
+
 	// private methods:
-
+	///////////////////////////////////////////////////////
 	/**
-	 * Initializes rendering with WebGL using the current canvas element.
-	 * @method _initializeWebGL
+	 *
+	 * @method _fetchWebGLContext
 	 * @protected
-	 **/
-	p._initializeWebGL = function() {
-		this._clearColor = { r: 0.0, g: 0.0, b: 0.0, a: 0.0 };
+	 */
+	p._fetchWebGLContext = function(canvas, options) {
+		var gl;
 
-		this._setWebGLContext();
-	};
+		try {
+			gl = canvas.getContext("webgl", options) || canvas.getContext("experimental-webgl", options);
+		} catch (e) {
+			// don't do anything in catch null will handle it and we may get false positives given the || operation
+		}
 
-	/**
-	 * Sets the WebGL context to use for future draws.
-	 * @method _setWebGLContext
-	 * @return {WebGLRenderingContext}   The newly created context.
-	 * @protected
-	 **/
-	p._setWebGLContext = function() {
-		if (this.canvas) {
-			if (!this._webGLContext || this._webGLContext.canvas !== this.canvas) {
-				// A context hasn't been defined yet,
-				// OR the defined context belongs to a different canvas, so reinitialize.
-				this._initializeWebGLContext();
-			}
+		if (!gl) {
+			alert("Could not initialize WebGL");
 		} else {
-			this._webGLContext = null;
+			gl.viewportWidth = canvas.width;
+			gl.viewportHeight = canvas.height;
 		}
-		return this._webGLContext;
+
+		return gl;
 	};
 
 	/**
-	 * Sets up the WebGL context for rendering.
-	 * @method _initializeWebGLContext
+	 *
+	 * @method _fetchShaderProgram
 	 * @protected
-	 **/
-	p._initializeWebGLContext = function() {
-		var options = {
-			depth: false, // Disable the depth buffer as it isn't used.
-			alpha: true, // Make the canvas background transparent.
-			preserveDrawingBuffer: this._preserveDrawingBuffer,
-			antialias: this._antialias,
-			premultipliedAlpha: true // Assume the drawing buffer contains colors with premultiplied alpha.
-		};
-		var ctx = this._webGLContext = this.canvas.getContext("webgl", options) || this.canvas.getContext("experimental-webgl", options);
+	 */
+	p._fetchShaderProgram = function(gl) {
+		//DHG might need to pre-process shader code
+		var vertexShader = this._createShader(gl, 0, SpriteStage.VTX_SHADER);
+		var fragmentShader = this._createShader(gl, 1, SpriteStage.FRAG_SHADER);
 
-		if (!ctx) {
-			// WebGL is not supported in this browser.
-			return;
+		var shaderProgram = gl.createProgram();
+		gl.attachShader(shaderProgram, vertexShader);
+		gl.attachShader(shaderProgram, fragmentShader);
+		gl.linkProgram(shaderProgram);
+
+		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+			throw("Could not initialise shaders");
 		}
 
-		// Enforcing 1 texture per draw for now until an optimized implementation for multiple textures is made:
-		this._maxTexturesPerDraw = 1; // ctx.getParameter(ctx.MAX_TEXTURE_IMAGE_UNITS);
+		gl.useProgram(shaderProgram);
 
-		// Set the default color the canvas should render when clearing:
-		this._setClearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
+		// get the places in memory the shader is stored so we can feed information into them
+		// then save it off on the shader because it's so tied to the shader itself
+		shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
+		gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
-		// Enable blending and set the blending functions that work with the premultiplied alpha settings:
-		ctx.enable(ctx.BLEND);
-		ctx.blendFuncSeparate(ctx.SRC_ALPHA, ctx.ONE_MINUS_SRC_ALPHA, ctx.ONE, ctx.ONE_MINUS_SRC_ALPHA);
+		shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
+		gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
 
-		// Do not premultiply textures' alpha channels when loading them in:
-		ctx.pixelStorei(ctx.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+		shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
+		gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
 
-		// Create the shader program that will be used for drawing:
-		this._createShaderProgram(ctx);
+		shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
+		//shaderProgram.flagUniform = gl.getUniformLocation(shaderProgram, "flagData");
 
-		if (this._webGLErrorDetected) {
-			// Error detected during this._createShaderProgram().
-			this._webGLContext = null;
-			return;
-		}
+		var samplers = shaderProgram.samplerData = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+		shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+		gl.uniform1iv(shaderProgram.samplerUniform, samplers);
 
-		// Create the vertices and indices buffers.
-		this._createBuffers(ctx);
-
-		// Update the viewport with the initial canvas dimensions:
-		this.updateViewport(this._viewportWidth || this.canvas.width || 0, this._viewportHeight || this.canvas.height || 0);
-	};
-
-	/**
-	 * Sets the color to use when the WebGL canvas has been cleared.
-	 * @method _setClearColor
-	 * @param {Number} r A number between 0 and 1.
-	 * @param {Number} g A number between 0 and 1.
-	 * @param {Number} b A number between 0 and 1.
-	 * @param {Number} a A number between 0 and 1.
-	 * @protected
-	 **/
-	p._setClearColor = function (r, g, b, a) {
-		this._clearColor.r = r;
-		this._clearColor.g = g;
-		this._clearColor.b = b;
-		this._clearColor.a = a;
-
-		if (this._webGLContext) {
-			this._webGLContext.clearColor(r, g, b, a);
-		}
-	};
-
-	/**
-	 * Creates the shader program that's going to be used to draw everything.
-	 * @method _createShaderProgram
-	 * @param {WebGLRenderingContext} ctx
-	 * @protected
-	 **/
-	p._createShaderProgram = function(ctx) {
-
-
-		var fragmentShader = this._createShader(ctx, ctx.FRAGMENT_SHADER,
-			"precision mediump float;" +
-
-			"uniform sampler2D uSampler0;" +
-
-			"varying vec3 vTextureCoord;" +
-
-			"void main(void) {" +
-				"vec4 color = texture2D(uSampler0, vTextureCoord.st);" +
-				"gl_FragColor = vec4(color.rgb, color.a * vTextureCoord.z);" +
-			"}"
-		);
-
-		var vertexShader = this._createShader(ctx, ctx.VERTEX_SHADER,
-			"attribute vec2 aVertexPosition;" +
-			"attribute vec3 aTextureCoord;" +
-
-			"uniform mat3 uPMatrix;" +
-
-			"varying vec3 vTextureCoord;" +
-
-			"void main(void) {" +
-				"vTextureCoord = aTextureCoord;" +
-
-				"gl_Position = vec4((uPMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);" +
-			"}"
-		);
-
-		if (this._webGLErrorDetected || !fragmentShader || !vertexShader) { return; }
-
-		var program = ctx.createProgram();
-		ctx.attachShader(program, fragmentShader);
-		ctx.attachShader(program, vertexShader);
-		ctx.linkProgram(program);
-
-		if(!ctx.getProgramParameter(program, ctx.LINK_STATUS)) {
-			// alert("Could not link program. " + ctx.getProgramInfoLog(program));
-			this._webGLErrorDetected = true;
-			return;
-		}
-
-		program.vertexPositionAttribute = ctx.getAttribLocation(program, "aVertexPosition");
-		program.textureCoordAttribute = ctx.getAttribLocation(program, "aTextureCoord");
-
-		program.sampler0uniform = ctx.getUniformLocation(program, "uSampler0");
-
-		ctx.enableVertexAttribArray(program.vertexPositionAttribute);
-		ctx.enableVertexAttribArray(program.textureCoordAttribute);
-
-		program.pMatrixUniform = ctx.getUniformLocation(program, "uPMatrix");
-
-		ctx.useProgram(program);
-
-		this._shaderProgram = program;
+		return shaderProgram;
 	};
 
 	/**
 	 * Creates a shader from the specified string.
 	 * @method _createShader
-	 * @param  {WebGLRenderingContext} ctx
+	 * @param  {WebGLRenderingContext} gl
 	 * @param  {Number} type               The type of shader to create.
 	 * @param  {String} str                The definition for the shader.
 	 * @return {WebGLShader}
 	 * @protected
 	 **/
-	p._createShader = function(ctx, type, str) {
-		var shader = ctx.createShader(type);
-		ctx.shaderSource(shader, str);
-		ctx.compileShader(shader);
+	p._createShader = function(gl, type, str) {
+		var shader;
+		switch (type) {
+			case 0:
+				shader = gl.createShader(gl.VERTEX_SHADER);
+				break;
+			case 1:
+				shader = gl.createShader(gl.FRAGMENT_SHADER);
+				break;
+			default:
+				throw(type + " : Invalid");
+				return null;
+		}
 
-		if (!ctx.getShaderParameter(shader, ctx.COMPILE_STATUS)) {
-			// alert("Could not compile shader. " + ctx.getShaderInfoLog(shader));
-			this._webGLErrorDetected = true;
+		gl.shaderSource(shader, str);
+		gl.compileShader(shader);
+
+		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+			throw(gl.getShaderInfoLog(shader));
 			return null;
 		}
 
@@ -723,239 +786,310 @@ this.createjs = this.createjs||{};
 	/**
 	 * Sets up the necessary vertices and indices buffers.
 	 * @method _createBuffers
-	 * @param {WebGLRenderingContext} ctx
+	 * @param {WebGLRenderingContext} gl
 	 * @protected
 	 **/
-	p._createBuffers = function(ctx) {
-		this._verticesBuffer = ctx.createBuffer();
-		ctx.bindBuffer(ctx.ARRAY_BUFFER, this._verticesBuffer);
+	p._createBuffers = function(gl) {
+		var passes = 16;
+		var groupCount = this._maxCardsPerBatch;
+		var groupSize, i;
 
-		var byteCount = SpriteStage.NUM_VERTEX_PROPERTIES * 4; // ctx.FLOAT = 4 bytes
-		ctx.vertexAttribPointer(this._shaderProgram.vertexPositionAttribute, 2, ctx.FLOAT, ctx.FALSE, byteCount, 0);
-		ctx.vertexAttribPointer(this._shaderProgram.textureCoordAttribute, 3, ctx.FLOAT, ctx.FALSE, byteCount, 2 * 4);
-
-		this._indicesBuffer = ctx.createBuffer();
-
-		this._setMaxBoxesPoints(ctx, SpriteStage.MAX_BOXES_POINTS_INCREMENT);
-	};
-
-	/**
-	 * Updates the maximum total number of boxes points that can be defined per draw call,
-	 * and updates the buffers with the new array length sizes.
-	 * @method _setMaxBoxesPoints
-	 * @param {WebGLRenderingContext} ctx
-	 * @param {Number} value              The new this._maxBoxesPointsPerDraw value.
-	 * @protected
-	 **/
-	p._setMaxBoxesPoints = function (ctx, value) {
-		this._maxBoxesPointsPerDraw = value;
-		this._maxBoxesPerDraw = (this._maxBoxesPointsPerDraw / SpriteStage.POINTS_PER_BOX) | 0;
-		this._maxIndicesPerDraw = this._maxBoxesPerDraw * SpriteStage.INDICES_PER_BOX;
-
-		ctx.bindBuffer(ctx.ARRAY_BUFFER, this._verticesBuffer);
-		this._vertices = new Float32Array(this._maxBoxesPerDraw * SpriteStage.NUM_VERTEX_PROPERTIES_PER_BOX);
-		ctx.bufferData(ctx.ARRAY_BUFFER, this._vertices, ctx.DYNAMIC_DRAW);
-
-		// Set up indices for multiple boxes:
-		this._indices = new Uint16Array(this._maxIndicesPerDraw); // Indices are set once and reused.
-		for (var i = 0, l = this._indices.length; i < l; i += SpriteStage.INDICES_PER_BOX) {
-			var j = i * SpriteStage.POINTS_PER_BOX / SpriteStage.INDICES_PER_BOX;
-
-			// Indices for the 2 triangles that make the box:
-			this._indices[i]     = j;
-			this._indices[i + 1] = j + 1;
-			this._indices[i + 2] = j + 2;
-			this._indices[i + 3] = j;
-			this._indices[i + 4] = j + 2;
-			this._indices[i + 5] = j + 3;
+		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
+		groupSize = 2;
+		var vertices = this.vertices = new Float32Array(groupCount * groupSize);
+		for(i=0; i<vertices.length; i+=groupSize) {
+			vertices[i+0] = Math.random() * this._viewportWidth;
+			vertices[i+1] = Math.random() * this._viewportHeight;
 		}
-		ctx.bindBuffer(ctx.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-		ctx.bufferData(ctx.ELEMENT_ARRAY_BUFFER, this._indices, ctx.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
+		triangleVertexPositionBuffer.itemSize = groupSize;
+		triangleVertexPositionBuffer.numItems = groupCount;
+
+		var triangleTextureIndexBuffer = this._triangleTextureIndexBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, triangleTextureIndexBuffer);
+		groupSize = 1;
+		var indecies = this.indecies = new Float32Array(groupCount);
+		for(i=0; i<indecies.length; i++) {
+			indecies[i] = i%passes;
+		}
+		gl.bufferData(gl.ARRAY_BUFFER, indecies, gl.DYNAMIC_DRAW);
+		triangleTextureIndexBuffer.itemSize = groupSize;
+		triangleTextureIndexBuffer.numItems = groupCount;
+
+		var triangleUVPositionBuffer = this._triangleUVPositionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, triangleUVPositionBuffer);
+		groupSize = 2;
+		var uvs = this.uvs = new Float32Array(groupCount * groupSize);
+		for(i=0; i<uvs.length; i++) {
+			uvs[i] = Math.random();
+		}
+		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
+		triangleUVPositionBuffer.itemSize = groupSize;
+		triangleUVPositionBuffer.numItems = groupCount;
 	};
-	
+
+	p._initTextures = function(gl) {
+		var count = 16;
+		this.lastTexture = 0;
+		this.loadedTextures = 0;
+
+		//////
+		/* for(var i=0; i<count;i++) {
+		 this._textureDictionary[this._batchTextures[i] = "_"+i] = this.getBaseTexture();
+		 }*/
+		for(var i=0; i<16;i++) {
+			var texture = this._batchTextures[i] = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, texture);
+			gl.texImage2D(
+				gl.TEXTURE_2D,		// target
+				0,					// level of detail
+				gl.RGBA,			// internalformat
+				1,					// width (only for array texture)
+				1,					// height (only for array texture)
+				0,					// border (only for array texture)
+				gl.RGBA,			// format (match internal format)
+				gl.UNSIGNED_BYTE,	// type of texture(pixel color depth)
+				new Uint8Array([0, 0, 0, 1.0])	// image data
+			);
+		}
+	};
+
 	/**
 	 * Sets up an image's WebGL texture.
 	 * @method _setupImageTexture
-	 * @param {WebGLRenderingContext} ctx The canvas WebGL context object to draw into.
+	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param {Object} image
 	 * @return {WebGLTexture}
 	 * @protected
 	 **/
-	p._setupImageTexture = function(ctx, image) {
-		if (image && (image.naturalWidth || image.getContext || image.readyState >= 2)) {
-			// Create and use a new texture for this image if it doesn't already have one:
-			var texture = image.__easeljs_texture;
-			if (!texture) {
-				texture = image.__easeljs_texture = ctx.createTexture();
-				ctx.bindTexture(ctx.TEXTURE_2D, texture);
-				ctx.texImage2D(ctx.TEXTURE_2D, 0, ctx.RGBA, ctx.RGBA, ctx.UNSIGNED_BYTE, image);
-				ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MIN_FILTER, ctx.NEAREST);
-				ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MAG_FILTER, ctx.LINEAR);
-				ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_WRAP_S, ctx.CLAMP_TO_EDGE);
-				ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_WRAP_T, ctx.CLAMP_TO_EDGE);
-			}
-			return texture;
-		}
+	p._setupImageTexture = function(gl, src) {
+		var image = new Image();
+		var texture = this.getBaseTexture();
+		//this._textureDictionary[src] = texture;
+		//this._batchTextures[0] = src;
+
+		image._glTexture = texture;
+		image.addEventListener("load", this._handleLoadedImage.bind(this, gl, image), false);
+		image.src = src;
+
+		return texture;
+	};
+
+	p._handleLoadedImage = function(gl, image) {
+		image._glTexture._loaded = true;
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, image._glTexture);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		//DHG: this may be unwise for things like bitmap fills
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	};
 
 	/**
-	 * Draw all the kids into the WebGL context.
-	 * @method _drawWebGLKids
-	 * @param {Array} kids                The list of kids to draw.
-	 * @param {WebGLRenderingContext} ctx The canvas WebGL context object to draw into.
-	 * @param {Matrix2D} parentMVMatrix   The parent's global transformation matrix.
-	 * @protected
-	 **/
-	p._drawWebGLKids = function(kids, ctx, parentMVMatrix) {
-		var kid, mtx,
-			snapToPixelEnabled = this.snapToPixelEnabled,
-			image = null,
-			leftSide = 0, topSide = 0, rightSide = 0, bottomSide = 0,
-			vertices = this._vertices,
-			numVertexPropertiesPerBox = SpriteStage.NUM_VERTEX_PROPERTIES_PER_BOX,
-			maxIndexSize = SpriteStage.MAX_INDEX_SIZE,
-			maxBoxIndex = this._maxBoxesPerDraw - 1;
+	 *
+	 */
+	p._batchDraw = function(sceneGraph, gl) {
+		var shaderProgram = this._shaderProgram;
+		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer;
+		var triangleTextureIndexBuffer = this._triangleTextureIndexBuffer;
+		var triangleUVPositionBuffer = this._triangleUVPositionBuffer;
 
-		for (var i = 0, l = kids.length; i < l; i++) {
-			kid = kids[i];
-			if (!kid.isVisible()) { continue; }
-			
-			// Get the texture for this display branch:
-			var image = kid.image || (kid.spriteSheet && kid.spriteSheet._images[0]);
-			if (!image) { continue; } // kid that doesn't have image (ex. DOMElement).
-			var texture = image.__easeljs_texture;
-			if (!texture && !(texture = this._setupImageTexture(ctx, image))) { continue; } // no texture available (ex. may not be loaded yet).
-			
-			mtx = kid._props.matrix;
+		this.batchIndex++;
+		this.batchCount = 0;
+		this.depth = 0;
 
-			// Get the kid's global matrix (relative to the stage):
-			mtx = (parentMVMatrix ? mtx.copy(parentMVMatrix) : mtx.identity()).appendTransform(kid.x, kid.y, kid.scaleX, kid.scaleY, kid.rotation, kid.skewX, kid.skewY, kid.regX, kid.regY);
+		var uvs = this.uvs;
+		for(var i=0; i<uvs.length; i++) {
+			uvs[i] = Math.random();
+		}
+		var indecies = this.indecies; var offset = (Math.random()*16)|0;
+		for(var i=0; i<indecies.length; i++) {
+			//indecies[i] = (i + offset)%16;
+			indecies[i] = 0;
+		}
+		var vertices = this.vertices;
+		for(i=0; i<vertices.length; i+=triangleVertexPositionBuffer.itemSize) {
+			vertices[i+0] = (Math.random() * 25) + (this._viewportWidth-(5+25));
+			vertices[i+1] = (Math.random() * 25) + (5);
+		}
 
-			// Set default texture coordinates:
-			var uStart = 0, uEnd = 1,
-				vStart = 0, vEnd = 1;
+		var mtx = new createjs.Matrix2D();
+		this._appendToBatchGroup(sceneGraph, gl, mtx);
 
-			// Define the untransformed bounding box sides and get the kid's image to use for textures:
-			if (kid._spritestage_compatibility === 4) {
-				leftSide = 0;
-				topSide = 0;
-				rightSide = image.width;
-				bottomSide = image.height;
-			} else if (kid._spritestage_compatibility === 2) {
-				var frame = kid.spriteSheet.getFrame(kid.currentFrame),
-					rect = frame.rect;
+		this._drawToGPU(gl);
+	};
 
-				leftSide = -frame.regX;
-				topSide = -frame.regY;
-				rightSide = leftSide + rect.width;
-				bottomSide = topSide + rect.height;
+	p._appendToBatchGroup = function(container, gl, concatMtx) {
+		// check to see if we can render this
 
-				uStart = rect.x / image.width;
-				vStart = rect.y / image.height;
-				uEnd = uStart + (rect.width / image.width);
-				vEnd = vStart + (rect.height / image.height);
+		// sort out shared properties
+		var backupMtx = container._glMtx = container._glMtx || new createjs.Matrix2D();
+		backupMtx.copy(concatMtx);
+		concatMtx.appendTransform(
+			container.x, container.y,
+			container.scaleX, container.scaleY,
+			container.rotation, container.skewX, container.skewY,
+			container.regX, container.regY
+		);
+
+		// actually apply its data to the buffers
+		for (var i = 0, l = container.children.length; i < l; i++) {
+			var item = container.children[i];
+			if (!item.isVisible()) { continue; }
+
+			if (item.children) {
+				this._appendToBatchGroup(item, gl, concatMtx);
 			} else {
-				image = null;
-
-				// Update BitmapText instances:
-				if (kid._spritestage_compatibility === 3) {
-					// TODO: this might change in the future to use a more general approach.
-					kid._updateText();
-				}
-			}
-
-			// Detect if this kid is a new display branch:
-			if (!parentMVMatrix && kid._spritestage_compatibility <= 4 && texture !== this._drawTexture) {
-				// Draw to the GPU if a texture is already in use:
-				this._drawToGPU(ctx);
-				this._drawTexture = texture;
-			}
-
-			if (image !== null) {
-				// Set vertices' data:
-
-				var offset = ++this._currentBoxIndex * numVertexPropertiesPerBox,
-					a = mtx.a,
-					b = mtx.b,
-					c = mtx.c,
-					d = mtx.d,
-					tx = mtx.tx,
-					ty = mtx.ty;
-
-				if (snapToPixelEnabled && kid.snapToPixel) {
-					tx = tx + (tx < 0 ? -0.5 : 0.5) | 0;
-					ty = ty + (ty < 0 ? -0.5 : 0.5) | 0;
-				}
-
-				// Positions (calculations taken from Matrix2D.transformPoint):
-				vertices[offset]      = leftSide  * a + topSide    * c + tx;
-				vertices[offset + 1]  = leftSide  * b + topSide    * d + ty;
-				vertices[offset + 5]  = leftSide  * a + bottomSide * c + tx;
-				vertices[offset + 6]  = leftSide  * b + bottomSide * d + ty;
-				vertices[offset + 10] = rightSide * a + bottomSide * c + tx;
-				vertices[offset + 11] = rightSide * b + bottomSide * d + ty;
-				vertices[offset + 15] = rightSide * a + topSide    * c + tx;
-				vertices[offset + 16] = rightSide * b + topSide    * d + ty;
-
-				// Texture coordinates:
-				vertices[offset + 2]  = vertices[offset + 7]  = uStart;
-				vertices[offset + 12] = vertices[offset + 17] = uEnd;
-				vertices[offset + 3]  = vertices[offset + 18] = vStart;
-				vertices[offset + 8]  = vertices[offset + 13] = vEnd;
-
-				// Alphas:
-				vertices[offset + 4] = vertices[offset + 9] = vertices[offset + 14] = vertices[offset + 19] = kid.alpha;
-
-				// Draw to the GPU if the maximum number of boxes per a draw has been reached:
-				if (this._currentBoxIndex === maxBoxIndex) {
-					this._drawToGPU(ctx);
-					this._drawTexture = texture;
-
-					// If possible, increase the amount of boxes that can be used per draw call:
-					if (this._maxBoxesPointsPerDraw < maxIndexSize) {
-						this._setMaxBoxesPoints(ctx, this._maxBoxesPointsPerDraw + SpriteStage.MAX_BOXES_POINTS_INCREMENT);
-						maxBoxIndex = this._maxBoxesPerDraw - 1;
-					}
-				}
-			}
-
-			// Draw children:
-			if (kid.children) {
-				this._drawWebGLKids(kid.children, ctx, mtx);
-				maxBoxIndex = this._maxBoxesPerDraw - 1;
+				this._appendToBatchItem(item, gl, concatMtx);
 			}
 		}
-		
-		// draw anything remaining, if this is the stage:
-		if (!parentMVMatrix) { this._drawToGPU(ctx); }
+
+		// reset
+		concatMtx.copy(backupMtx);
+	};
+
+	p._appendToBatchItem = function(item, gl, concatMtx) {
+		// check to see if we can render this
+
+		// check for overflowing batch, if yes then force a render
+
+		// actually apply its data to the buffers
+		var backupMtx = item._glMtx = item._glMtx || new createjs.Matrix2D();
+		backupMtx.copy(concatMtx);
+		concatMtx.appendTransform(
+			item.x, item.y,
+			item.scaleX, item.scaleY,
+			item.rotation, item.skewX, item.skewY,
+			item.regX, item.regY
+		);
+
+		var tl = item._glTL || {x:0, y:0};
+		var tr = item._glTR || {x:0, y:0};
+		var bl = item._glBL || {x:0, y:0};
+		var br = item._glTR || {x:0, y:0};
+
+		var uvs = this.uvs;
+		var vertices = this.vertices;
+		var offset = this.batchCount*SpriteStage.INDICIES_PER_CARD*2;
+
+		switch(item._spritestage_compatibility) {
+			case 1 : // SpriteContainer
+				break;
+			case 2 : // Sprite
+				var spr = item.spriteSheet;
+				var frame = spr.getFrame(item.currentFrame);
+				var rect = frame.rect;
+				//var image = frame.image;
+				/*var image = frame.image;
+				var texture = this._textureDictionary[image.src];
+				if(!texture){
+					texture = this._setupImageTexture(gl, image.src || image);
+				}
+				if(!texture._loaded) {
+					console.warn("image not rendered due to unloaded textures");
+				}*/
+				var texture = {width:30, height:203};
+
+
+				concatMtx.transformPoint(0,					0,					tl);
+				concatMtx.transformPoint(rect.width,		0,					tr);
+				concatMtx.transformPoint(0,					rect.height,		bl);
+				concatMtx.transformPoint(rect.width,		rect.height,		br);
+
+				vertices[offset] = tl.x;			vertices[offset+1] = tl.y;
+				vertices[offset+2] = bl.x;			vertices[offset+3] = bl.y;
+				vertices[offset+4] = tr.x;			vertices[offset+5] = tr.y;
+				vertices[offset+6] = bl.x;			vertices[offset+7] = bl.y;
+				vertices[offset+8] = tr.x;			vertices[offset+9] = tr.y;
+				vertices[offset+10] = br.x;			vertices[offset+11] = br.y;
+
+				uvs[offset] = (rect.x)/texture.width;					uvs[offset+1] = (rect.y)/texture.height;
+				uvs[offset+2] = (rect.x)/texture.width;					uvs[offset+3] = (rect.y+rect.height)/texture.height;
+				uvs[offset+4] = (rect.x+rect.width)/texture.width;		uvs[offset+5] = (rect.y)/texture.height;
+				uvs[offset+6] = (rect.x)/texture.width;					uvs[offset+7] = (rect.y+rect.height)/texture.height;
+				uvs[offset+8] = (rect.x+rect.width)/texture.width;		uvs[offset+9] = (rect.y)/texture.height;
+				uvs[offset+10] = (rect.x+rect.width)/texture.width;		uvs[offset+11] = (rect.y+rect.height)/texture.height;
+				break;
+			case 3 : // BitmapText
+				break;
+			case 4 : // Bitmap
+				break;
+			case 5 : // DOMElement
+				break;
+		}
+
+		this.batchCount++;
+		concatMtx.copy(backupMtx);
 	};
 
 	/**
 	 * Draws all the currently defined boxes to the GPU.
 	 * @method _drawToGPU
-	 * @param {WebGLRenderingContext} ctx The canvas WebGL context object to draw into.
+	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @protected
 	 **/
-	p._drawToGPU = function(ctx) {
-		if (!this._drawTexture) { return; }
-		var numBoxes = this._currentBoxIndex + 1;
-		
-		ctx.activeTexture(ctx.TEXTURE0);
-		ctx.bindTexture(ctx.TEXTURE_2D, this._drawTexture);
-		ctx.uniform1i(this._shaderProgram.sampler0uniform, 0);
+	p._drawToGPU = function(gl) {
+		var shaderProgram = this._shaderProgram;
+		var triangleVertexPositionBuffer = this._triangleVertexPositionBuffer;
+		var triangleTextureIndexBuffer = this._triangleTextureIndexBuffer;
+		var triangleUVPositionBuffer = this._triangleUVPositionBuffer;
 
-		ctx.bindBuffer(ctx.ARRAY_BUFFER, this._verticesBuffer);
+		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.vertices);
+		gl.bindBuffer(gl.ARRAY_BUFFER, triangleTextureIndexBuffer);
+		gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, triangleTextureIndexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.indecies);
+		gl.bindBuffer(gl.ARRAY_BUFFER, triangleUVPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, triangleUVPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.uvs);
+		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
+		//gl.uniformMatrix1i(shaderProgram.flagUniform, gl.FALSE, this.flags);
 
-		ctx.bindBuffer(ctx.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-		ctx.uniformMatrix3fv(this._shaderProgram.pMatrixUniform, false, this._projectionMatrix);
-		ctx.bufferSubData(ctx.ARRAY_BUFFER, 0, this._vertices);
-		ctx.drawElements(ctx.TRIANGLES, numBoxes * SpriteStage.INDICES_PER_BOX, ctx.UNSIGNED_SHORT, 0);
+		if(this.lastTexture < 16) {
+			this.COPYloadTexture(gl, this.lastTexture++);
+		}
 
-		// Reset draw vars:
-		this._currentBoxIndex = -1;
-		this._drawTexture = null;
+		for (var j = 0; j < 16; j++) {
+			//var texture = this._textureDictionary[this._batchTextures[0]];
+			//if(!texture) { continue; }
+			gl.activeTexture(gl.TEXTURE0 + j);
+			this.COPYsetTextureProperties(gl, j);
+		}
+
+		gl.drawArrays(gl.TRIANGLES, 0, this.batchCount*SpriteStage.INDICIES_PER_CARD);
 	};
 
+	p.COPYloadTexture = function(gl, i) {
+		var texture = this._batchTextures[i];
+		var image = texture._image = new Image();
+		image.onload = this.COPYhandleTextureLoaded.bind(this, gl, image);
+		image._batchIndex = i;
+		//image.src = "images/UV-Debug"+ i +".png";
+		image.src = "images/bunnys.png";
+	};
+
+	p.COPYhandleTextureLoaded = function(gl, image) {
+		this.COPYsetTextureProperties(gl, image._batchIndex);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+		this.loadedTextures++;
+
+		//if(!--loading) {
+		//requestAnimationFrame(drawProxy);
+		//}
+	};
+
+	p.COPYsetTextureProperties = function(gl, index) {
+		var texture = this._batchTextures[index];
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	};
 
 	createjs.SpriteStage = createjs.promote(SpriteStage, "Stage");
 }());
