@@ -58,7 +58,6 @@ this.createjs = this.createjs||{};
 	 *
 	 * Complications:
 	 *     - only Sprite, Container, BitmapText, Bitmap, and DOMElement are rendered when added to the display list.
-	 																													//TODO: fix DOMElement
 	  *    - to display something SpriteStage cannot normally render, cache the object. A cached object is the same to the renderer as a new image regardless of its contents.
 	 *     - images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
 	 *     - if new images are continually added and removed from the display list it will leak memory due to WebGL Texture wrappers being made.
@@ -341,6 +340,7 @@ this.createjs = this.createjs||{};
 
 		this._isDrawing = 0;
 
+		this.isCacheControlled = false;
 		this._cacheContainer = new createjs.Container();
 
 		// and begin
@@ -663,7 +663,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Draws the stage into the specified context (using WebGL) ignoring its visible, alpha, shadow, and transform.
+	 * Draws the stage into the specified context (using WebGL) ignoring its shadow.
 	 * If WebGL is not supported in the browser, it will default to a 2D context.
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 *
@@ -684,20 +684,23 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Draws the stage into the specified context (using WebGL) ignoring its visible, alpha, shadow, and transform.
+	 * Draws the stage into the specified context (using WebGL) ignoring its shadow.
 	 * If WebGL is not supported in the browser, it will default to a 2D context.
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method filterDraw
-	 * @param {CanvasRenderingContext2D} gl The canvas 2D context object to draw into.
-	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
+	 * @param {DisplayObject} target The object we're drawing into cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
 	p.cacheDraw = function(target) {
-		this._cacheContainer.children = [target];
-		this._batchDraw(this._cacheContainer, this._webGLContext);
+		var mtx = target.getMatrix();
+		mtx = mtx.clone().invert();
+		var container = this._cacheContainer;
+		container.children = [target];
+		container.transformMatrix = mtx;
+		this._batchDraw(container, this._webGLContext);
 	};
 
 	/**
@@ -1169,15 +1172,22 @@ this.createjs = this.createjs||{};
 		if(!container._glMtx) { container._glMtx = new createjs.Matrix2D(); }
 		var cMtx = container._glMtx;
 		cMtx.copy(concatMtx);
-		cMtx.appendTransform(
-			container.x, container.y,
-			container.scaleX, container.scaleY,
-			container.rotation, container.skewX, container.skewY,
-			container.regX, container.regY
-		);
+		if(container.transformMatrix) {
+			cMtx.appendMatrix(
+				container.transformMatrix
+			);
+		} else {
+			cMtx.appendTransform(
+				container.x, container.y,
+				container.scaleX, container.scaleY,
+				container.rotation, container.skewX, container.skewY,
+				container.regX, container.regY
+			);
+		}
 		concatAlpha *= this.alpha;
 
-		var tlX = 0, tlY = 0, trX = 0, trY = 0, blX = 0, blY = 0, brX = 0, brY = 0;
+		//var tlX = 0, tlY = 0, trX = 0, trY = 0, blX = 0, blY = 0, brX = 0, brY = 0;
+		var subL, subT, subR, subB;
 
 		// actually apply its data to the buffers
 		for(var i = 0, l = container.children.length; i < l; i++) {
@@ -1209,12 +1219,18 @@ this.createjs = this.createjs||{};
 			if(!item._glMtx) { item._glMtx = new createjs.Matrix2D(); }
 			var iMtx = item._glMtx;
 			iMtx.copy(cMtx);
-			iMtx.appendTransform(
-				item.x, item.y,
-				item.scaleX, item.scaleY,
-				item.rotation, item.skewX, item.skewY,
-				item.regX, item.regY
-			);
+			if(item.transformMatrix) {
+				iMtx.appendMatrix(
+					item.transformMatrix
+				);
+			} else {
+				iMtx.appendTransform(
+					item.x, item.y,
+					item.scaleX, item.scaleY,
+					item.rotation, item.skewX, item.skewY,
+					item.regX, item.regY
+				);
+			}
 
 			var uvRect, texIndex;
 
@@ -1254,15 +1270,26 @@ this.createjs = this.createjs||{};
 					uvRect.b = (src.x + src.width)/image.width;
 					uvRect.r = (src.y + src.height)/image.height;
 
-					w = src.width;			h = src.height;
+					// calculate vertices
+					//w = src.width;			h = src.height;
+					subL = -item.regX;									subT = -item.regY;
+					subR = src.width+subL;								subB = src.height+subT;
 				} else {
-					// calculate uvs
-					uvRect = SpriteStage.UV_RECT;
-					w = image.width;			h = image.height;
+					//TODO: make better cache canvas / filter co-ordinates system
+					if(item.cacheCanvas) {
+						uvRect = SpriteStage.UV_RECT;
+
+						subL = item._cacheOffsetX;							subT = item._cacheOffsetY;
+					} else {
+						uvRect = SpriteStage.UV_RECT;
+
+						subL = (-item.regX);								subT = (-item.regY);
+					}
+					subR = image.width+subL;							subB = image.height+subT;
 				}
 
 				// calculate vertices
-				//TODO: DHG: optimize?
+				/*
 				tlX = (-item.regX) *iMtx.a				+ (-item.regY) *iMtx.c				+iMtx.tx;
 				tlY = (-item.regX) *iMtx.b				+ (-item.regY) *iMtx.d				+iMtx.ty;
 				trX = (w-item.regX) *iMtx.a				+ (-item.regY) *iMtx.c				+iMtx.tx;
@@ -1271,6 +1298,10 @@ this.createjs = this.createjs||{};
 				blY = (-item.regX) *iMtx.b				+ (h-item.regY) *iMtx.d				+iMtx.ty;
 				brX = (w-item.regX) *iMtx.a				+ (h-item.regY) *iMtx.c				+iMtx.tx;
 				brY = (w-item.regX) *iMtx.b				+ (h-item.regY) *iMtx.d				+iMtx.ty;
+				/*/
+				//subL = -item.regX;								subT = -item.regY;
+				//subR = w-item.regX;								subB = h-item.regY;
+				//*/
 			} else if(item._webGLRenderStyle === 1) {						// SPRITE
 				var frame = item.spriteSheet.getFrame(item.currentFrame);
 				var rect = frame.rect;
@@ -1300,6 +1331,7 @@ this.createjs = this.createjs||{};
 				// calculate vertices
 				//DHG: See Matrix2D.transformPoint for why this math specifically
 				//TODO: DHG: optimize?
+				/*
 				tlX = (-frame.regX) *iMtx.a					+ (-frame.regY) *iMtx.c					+iMtx.tx;
 				tlY = (-frame.regX) *iMtx.b					+ (-frame.regY) *iMtx.d					+iMtx.ty;
 				trX = (rect.width-frame.regX) *iMtx.a		+ (-frame.regY) *iMtx.c					+iMtx.tx;
@@ -1308,18 +1340,16 @@ this.createjs = this.createjs||{};
 				blY = (-frame.regX) *iMtx.b					+ (rect.height-frame.regY) *iMtx.d		+iMtx.ty;
 				brX = (rect.width-frame.regX) *iMtx.a		+ (rect.height-frame.regY) *iMtx.c		+iMtx.tx;
 				brY = (rect.width-frame.regX) *iMtx.b		+ (rect.height-frame.regY) *iMtx.d		+iMtx.ty;
+				/*/
+				subL = -frame.regX;								subT = -frame.regY;
+				subR = rect.width-frame.regX;					subB = rect.height-frame.regY;
+				//*/
 
-			} else  if(item._webGLRenderStyle === 4) {						// DOM										//TODO: DHG this should be in, it's just calling its stage render isn't it?
-				//debugger;
-				// calculate vertices
-				// calculate uvs
-				// calculate texture
-				// calculate alpha
-				continue;
-			} else {														// MISC
+			} else {														// MISC (DOM objects render themselves later)
 				continue;
 			}
 
+			/*/
 			// apply vertices
 			vertices[offset] = tlX;				vertices[offset+1] = tlY;
 			vertices[offset+2] = blX;			vertices[offset+3] = blY;
@@ -1327,15 +1357,14 @@ this.createjs = this.createjs||{};
 			vertices[offset+6] = blX;			vertices[offset+7] = blY;
 			vertices[offset+8] = trX;			vertices[offset+9] = trY;
 			vertices[offset+10] = brX;			vertices[offset+11] = brY;
-
-			/*if(this.vocalDebug){
-				var p = item.localToGlobal(-item.regX,-item.regY);
-				console.log(
-					tlX.toFixed(2), tlY.toFixed(2), ":",
-					p.x.toFixed(2), p.y.toFixed(2), "=",
-					(p.x-tlX).toFixed(2), (p.y-tlY).toFixed(2)
-				);
-			}*/
+			/*/
+			vertices[offset] = subL *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+1] = subL *iMtx.b + subT *iMtx.d +iMtx.ty;
+			vertices[offset+2] = subL *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+3] = subL *iMtx.b + subB *iMtx.d +iMtx.ty;
+			vertices[offset+4] = subR *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+5] = subR *iMtx.b + subT *iMtx.d +iMtx.ty;
+			vertices[offset+6] = subL *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+7] = subL *iMtx.b + subB *iMtx.d +iMtx.ty;
+			vertices[offset+8] = subR *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+9] = subR *iMtx.b + subT *iMtx.d +iMtx.ty;
+			vertices[offset+10] = subR *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+11] = subR *iMtx.b + subB *iMtx.d +iMtx.ty;
+			//*/
 
 			// apply uvs
 			uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
@@ -1384,10 +1413,6 @@ this.createjs = this.createjs||{};
 		gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
 		gl.vertexAttribPointer(shaderProgram.alphaAttribute, alphaBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._alphas);
-
-		if(this.vocalDebug) {
-			console.log(this._alphas);
-		}
 
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
 		//gl.uniformMatrix1i(shaderProgram.flagUniform, gl.FALSE, this.flags);

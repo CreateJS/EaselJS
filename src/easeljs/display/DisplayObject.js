@@ -787,6 +787,8 @@ this.createjs = this.createjs||{};
 				if(webGL === true) {
 					this.cacheCanvas = document.createElement("canvas");
 					this._webGLCache = new createjs.SpriteStage(this.cacheCanvas);
+					this._webGLCache.isCacheControlled = true;
+					document.body.appendChild(this.cacheCanvas);
 				} else {
 					this._webGLCache = webGL;
 					this.cacheCanvas = webGL.canvas;
@@ -831,25 +833,32 @@ this.createjs = this.createjs||{};
 		//TODO: this does not do anything for WebGL canvases ATM
 		//*
 		var cacheCanvas = this.cacheCanvas;
+		var webGL = this._webGLCache;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
 		var scale = this._cacheScale;
 		var offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
-		var w = this._cacheWidth, h = this._cacheHeight;
 
 		var fBounds = createjs.MasterFilter.getFilterBounds(this);
 		offX += (this._filterOffsetX = fBounds.x);
 		offY += (this._filterOffsetY = fBounds.y);
 
+		var w = this._cacheWidth, h = this._cacheHeight;
+		w = Math.ceil(w*scale) + fBounds.width;
+		h = Math.ceil(h*scale) + fBounds.height;
+
 		cacheCanvas._invalid = true;																					//TODO: DHG: maybe there's a way for it to keep its spot yet get refreshed?
 
-		if(this._webGLCache) {
-
+		if (webGL) {
+			if (webGL.isCacheControlled) {
+				if (w != cacheCanvas.width || h != cacheCanvas.height) {
+					cacheCanvas.width = w;
+					cacheCanvas.height = h;
+					webGL.updateViewport(w, h);
+				}
+			}
 			this._webGLCache.cacheDraw(this);
 		} else {
 			var ctx = cacheCanvas.getContext("2d");
-
-			w = Math.ceil(w*scale) + fBounds.width;
-			h = Math.ceil(h*scale) + fBounds.height;
 
 			if (w != cacheCanvas.width || h != cacheCanvas.height) {
 				cacheCanvas.width = w;
@@ -869,49 +878,6 @@ this.createjs = this.createjs||{};
 
 			this.cacheID = DisplayObject._nextCacheID++;
 		}
-		/*/
-
-		var cacheCanvas = this.cacheCanvas;
-		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
-		var scale = this._cacheScale, offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
-		var w = this._cacheWidth, h = this._cacheHeight;
-		var ctx = webGL?null:cacheCanvas.getContext("2d");
-
-		var fBounds = this._getFilterBounds();
-		offX += (this._filterOffsetX = fBounds.x);
-		offY += (this._filterOffsetY = fBounds.y);
-
-		w = Math.ceil(w*scale) + fBounds.width;
-		h = Math.ceil(h*scale) + fBounds.height;
-		if (w != cacheCanvas.width || h != cacheCanvas.height) {
-			// TODO: it would be nice to preserve the content if there is a compositeOperation.
-			cacheCanvas.width = w;
-			cacheCanvas.height = h;
-		} else if (!compositeOperation) {
-			!webGL && ctx.clearRect(0, 0, w+1, h+1);
-		}
-
-		// TODO: filters and cache scale don't play well together at present.
-		if(!webGL) {
-			ctx.save();
-			ctx.globalCompositeOperation = compositeOperation;
-			ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
-			this.draw(ctx, true);
-			//this._applyFilters(cacheCanvas, webGL);
-			if (!this.filters || this.filters.length == 0 || !this.cacheCanvas) { return; }
-			var master = createjs.MasterFilter.get(canvas);
-			master.applyFilters(this, webGL);
-			ctx.restore();
-		} else {
-			//this._applyFilters(cacheCanvas, webGL);
-			if (!this.filters || this.filters.length == 0 || !this.cacheCanvas) { return; }
-			var master = createjs.MasterFilter.get(canvas);
-			master.applyFilters(this, webGL);
-		}
-
-		console.log(this._filterOffsetX, this._filterOffsetY);
-		this.cacheID = DisplayObject._nextCacheID++;
-		//*/
 	};
 
 	/**
@@ -1356,16 +1322,6 @@ this.createjs = this.createjs||{};
 		if (!this.filters || this.filters.length == 0 || !this.cacheCanvas) { return; }
 		var master = createjs.MasterFilter.get(canvas);
 		master.applyFilters(this, webGL);
-		return;
-
-		if (!this.filters || this.filters.length == 0 || !this.cacheCanvas) { return; }
-		var l = this.filters.length;
-		var ctx = this.cacheCanvas.getContext("2d");
-		var w = this.cacheCanvas.width;
-		var h = this.cacheCanvas.height;
-		for (var i=0; i<l; i++) {
-			this.filters[i].applyFilter(ctx, 0, 0, w, h);
-		}
 	};
 
 	/**
