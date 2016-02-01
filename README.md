@@ -1,8 +1,12 @@
 # EaselJS
 
-EaselJS is a library for building high-performance interactive 2D content in HTML5. It provides a feature-rich display list to allow you to manipulate and animate graphics. It also provides a robust interactive model for mouse and touch interactions.
+EaselJS is a library for building high-performance interactive 2D content in HTML5. It provides a feature-rich display 
+list to allow you to manipulate and animate graphics. It also provides a robust interactive model for mouse and touch 
+interactions.
 
-It is excellent for building games, generative art, ads, data visualization, and other highly graphical experiences. It works well alone, or with the rest of the [CreateJS](http://createjs.com/) suite: [SoundJS](http://createjs.com/SoundJS), [PreloadJS](http://createjs.com/PreloadJS), and [TweenJS](http://createjs.com/TweenJS).
+It is excellent for building games, generative art, ads, data visualization, and other highly graphical experiences. It 
+works well alone, or with the rest of the [CreateJS](http://createjs.com/) suite: [SoundJS](http://createjs.com/soundjs), 
+[PreloadJS](http://createjs.com/preloadjs), and [TweenJS](http://createjs.com/tweenjs).
 
 It has no external dependencies, and should be compatible with virtually any framework you enjoy using.
 
@@ -40,26 +44,31 @@ createjs.Ticker.on("tick", stage);
 
 ## Support and Resources
 * Find examples and more information at the [EaselJS web site](http://easeljs.com/).
-* Read the [documentation](http://createjs.com/Docs/EaselJS).
+* Read the [documentation](http://createjs.com/docs/easeljs).
 * Discuss, share projects, and interact with other users on [reddit](http://www.reddit.com/r/createjs/).
 * Ask technical questions on [Stack Overflow](http://stackoverflow.com/questions/tagged/easeljs).
 * File verified bugs or formal feature requests using Issues on [GitHub](https://github.com/createjs/EaselJS/issues).
 * There is a [Google Group](http://groups.google.com/group/createjs-discussion) for discussions and support.
-* Have a look at the included [examples](https://github.com/CreateJS/EaselJS/tree/master/examples) and [API documentation](http://createjs.com/Docs/EaselJS/) for more in-depth information.
+* Have a look at the included [examples](https://github.com/CreateJS/EaselJS/tree/master/examples) and 
+[API documentation](http://createjs.com/docs/easeljs/) for more in-depth information.
 
 It was built by [gskinner.com](http://www.gskinner.com), and is released for free under the MIT license, which means you
-can use it for almost any purpose (including commercial projects). We appreciate credit where possible, but it is not a requirement.
+can use it for almost any purpose (including commercial projects). We appreciate credit where possible, but it is not a 
+requirement.
 
 
 ## Classes
 
-The API is inspired in part by Flash's display list, and should be easy to pick up for both JS and AS3 developers. Check out the [docs](http://createjs.com/Docs/EaselJS/) for more information.
+The API is inspired in part by Flash's display list, and should be easy to pick up for both JS and AS3 developers. Check 
+out the [docs](http://createjs.com/docs/easeljs/) for more information.
 
 **DisplayObject**
-Abstract base class for all display elements in EaselJS. Exposes all of the display properties (ex. x, y, rotation, scaleX, scaleY, skewX, skewY, alpha, shadow, etc) that are common to all display objects.
+Abstract base class for all display elements in EaselJS. Exposes all of the display properties (ex. x, y, rotation, 
+scaleX, scaleY, skewX, skewY, alpha, shadow, etc) that are common to all display objects.
 
 **Stage**
-The root level display container for display elements. Each time tick() is called on Stage, it will update and render the display list to its associated canvas.
+The root level display container for display elements. Each time tick() is called on Stage, it will update and render 
+the display list to its associated canvas.
 
 **Container**
 A nestable display container, which lets you aggregate display objects and manipulate them as a group.
@@ -78,6 +87,9 @@ Provides an easy to use API for drawing vector data. Can be used with Shape, or 
 
 **Text**
 Renders a single line of text to the stage.
+
+**BitmapText**
+Renders text using a SpriteSheet of letter.
 
 **DOMElement**
 An experimental display object that allows you to manage an HTML element as a part of the display list.
@@ -115,3 +127,13 @@ Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
 
 **Point**
 Represents a point on a 2 dimensional x / y coordinate system.
+
+A WebGL implementation currently exists, but is limited.
+
+**SpriteContainer**
+A container that accepts a SpriteSheet, and uses a WebGL stage (SpriteStage) for WebGL-accelerated content.
+
+**SpriteStage**
+A Stage class that uses a WebGL context. Currently, can only have children that are SpriteContainers.
+
+A new WebGL implementation is in the works, which removes these limitations.
