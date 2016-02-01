@@ -57,12 +57,13 @@ this.createjs = this.createjs||{};
 	 * On devices or browsers that don't support WebGL, content will automatically be rendered via canvas 2D.
 	 *
 	 * Complications:
-	 *     - only Sprite, Container, BitmapText, Bitmap, and DOMElement are rendered when added to the display list.
-	  *    - to display something SpriteStage cannot normally render, cache the object. A cached object is the same to the renderer as a new image regardless of its contents.
-	 *     - images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
-	 *     - if new images are continually added and removed from the display list it will leak memory due to WebGL Texture wrappers being made.
+	 *     - Only Sprite, Container, BitmapText, Bitmap, and DOMElement are rendered when added to the display list.
+	  *    - To display something SpriteStage cannot normally render, cache the object. A cached object is the same to the renderer as a new image regardless of its contents.
+	 *     - Images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
+	 *     - If new images are continually added and removed from the display list it will leak memory due to WebGL Texture wrappers being made.
 																														//TODO: add in a hook so that people can easily clear old texture memory
-	 *     - you must call updateViewport if you resize your canvas after making a SpriteStage, this will properly size the 3D context stored in memory, this won't affect the DOM.
+	 *     - Clone an image node (DOM/Canvas Element) to re-use it between multiple SpriteStage instances, the GPU texture loading and tracking is not advanced enough yet.
+	 *     - You must call updateViewport if you resize your canvas after making a SpriteStage, this will properly size the 3D context stored in memory, this won't affect the DOM.
 	 *
 	 * <h4>How to use Example</h4>
 	 * This example creates a sprite stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
@@ -80,6 +81,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * <strong>Note:</strong> SpriteStage is not included in the minified version of EaselJS.
 	 * <strong>Note:</strong> SpriteContainer was required by previous versions but is deprecated.
+	 * <strong>Note:</strong> Previous versions had hard limitations about images per container etc, these have been removed.
 	 *
 	 * @class SpriteStage
 	 * @extends Stage
@@ -340,6 +342,8 @@ this.createjs = this.createjs||{};
 
 		this._isDrawing = 0;
 
+		this._lastTrackedCanvas = 0;
+
 		this.isCacheControlled = false;
 		this._cacheContainer = new createjs.Container();
 
@@ -493,6 +497,9 @@ this.createjs = this.createjs||{};
 		"varying lowp float alphaValue;" +
 
 		"void main(void) {" +
+			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix see js... bypass for now
+			//vertexPosition, round if flag
+			//"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
 			"gl_Position = vec4("+
 				"(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
 				"(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1]," +
@@ -520,14 +527,17 @@ this.createjs = this.createjs||{};
 		"varying lowp float indexPicker;" +
 		"varying lowp float alphaValue;" +
 
-		"uniform sampler2D uSampler;" +
+		"uniform sampler2D uSampler[{{count}}];" +
 		"uniform int testVar;" +
 
 		"void main(void) {" +
 			"int src = int(indexPicker);" +
 			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
 
-			"color = texture2D(uSampler, vTextureCoord);" +
+			"if(src == 0) {" +
+				"color = texture2D(uSampler[0], vTextureCoord);" +
+				"{{alternates}}" +
+			"}" +
 
 			//"gl_FragColor = color;" +
 			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
@@ -619,6 +629,7 @@ this.createjs = this.createjs||{};
 	///////////////////////////////////////////////////////
 	/** docced in super class **/
 	p.update = function(props) {
+		console.log("update");
 		//DHG TODO: test context swapping and re-acqusition
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
@@ -627,6 +638,7 @@ this.createjs = this.createjs||{};
 			// Use WebGL.
 			this._batchDraw(this, this._webGLContext);
 		} else {
+			return;
 			// Use 2D.
 			if (this.autoClear) { this.clear(); }
 			var ctx = this.canvas.getContext("2d");
@@ -647,7 +659,7 @@ this.createjs = this.createjs||{};
 		if (this.isWebGLActive(this._webGLContext)) {
 			var gl = this._webGLContext;
 			// Use WebGL.
-			//gl.clear(gl.COLOR_BUFFER_BIT);
+			gl.clear(gl.COLOR_BUFFER_BIT);
 		} else {
 			// Use 2D.
 			var ctx = this.canvas.getContext("2d");
@@ -676,7 +688,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.draw = function(gl, ignoreCache) {
 		if (this.isWebGLActive(gl)) {
-			this._batchDraw(this, gl);
+			this._batchDraw(this, gl, ignoreCache);
 			return true;
 		} else {
 			return this.Stage_draw(gl, ignoreCache);
@@ -695,12 +707,23 @@ this.createjs = this.createjs||{};
 	 * into itself).
 	 **/
 	p.cacheDraw = function(target) {
+		var gl = this._webGLContext;
+		this._shaderBackup = this._shaderProgram;
+		try{
+			this._shaderProgram =  this._fetchShaderProgram(gl, "test");
+		} catch (e) {
+			console.log("SHADER SWITCH FAILURE", e);
+			return;																										//TODO: DHG: something gracefull
+		}
+
 		var mtx = target.getMatrix();
 		mtx = mtx.clone().invert();
 		var container = this._cacheContainer;
 		container.children = [target];
 		container.transformMatrix = mtx;
-		this._batchDraw(container, this._webGLContext);
+		this._batchDraw(container, gl, true);
+
+		this._shaderProgram = this._shaderBackup;
 	};
 
 	/**
@@ -721,7 +744,7 @@ this.createjs = this.createjs||{};
 				this._shaderProgram = this._fetchShaderProgram(gl);
 				success = true;
 			} catch(e) {
-				if(count == 1){
+				if(this._batchTextureCount == 1){
 					throw("Cannot compile shader "+ e);
 				}
 
@@ -867,8 +890,8 @@ this.createjs = this.createjs||{};
 		var targetFrag, targetVtx;
 		switch(shader) {
 			case "test":
-				targetVtx = SpriteStage.VTX_SHADER_TEST;
-				targetFrag = SpriteStage.FRAG_SHADER_TEST;
+				targetVtx = SpriteStage.VTX_SHADER;
+				targetFrag = SpriteStage.FRAG_SHADER;
 				break;
 			default:
 				targetVtx = SpriteStage.VTX_SHADER;
@@ -895,7 +918,28 @@ this.createjs = this.createjs||{};
 		// then save it off on the shader because it's so tied to the shader itself
 		switch(shader) {
 			case "test":
-				//shaderProgram.testVarUniform = gl.getAttribLocation(shaderProgram, "testVar");
+				shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
+				gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+				shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
+				gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
+
+				shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
+				shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
+				gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
+
+				shaderProgram.alphaAttribute = gl.getAttribLocation(shaderProgram, "objectAlpha");
+				gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
+
+				var samplers = [];
+				for(var i = 0; i < this._batchTextureCount; i++) {
+					samplers[i] = i;
+				}
+
+				shaderProgram.samplerData = samplers;
+				shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+				gl.uniform1iv(shaderProgram.samplerUniform, samplers);
+				shaderProgram.testVarUniform = gl.getAttribLocation(shaderProgram, "testVar");
 			default:
 				shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 				gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
@@ -904,13 +948,6 @@ this.createjs = this.createjs||{};
 				gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
 
 				shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
-				break;
-		}
-
-		switch(shader) {
-			case "test":
-				break;
-			default:
 				shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
 				gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
 
@@ -1077,7 +1114,7 @@ this.createjs = this.createjs||{};
 		if(!src){
 			// one time canvas property setup
 			image._isCanvas = true;
-			src = image.src = "canvas_" + Math.random();																//TODO: make index based not random
+			src = image.src = "canvas_" + this._lastTrackedCanvas++;
 		}
 
 		var storeID = this._textureIDs[src];
@@ -1142,7 +1179,7 @@ this.createjs = this.createjs||{};
 	 * @param {Stage || Container} sceneGraph Container object with all that needs to rendered, prefferably a stage
 	 * @method _batchDraw
 	 */
-	p._batchDraw = function(sceneGraph, gl) {
+	p._batchDraw = function(sceneGraph, gl, ignoreCache) {
 		if(this._isDrawing > 0) {
 			this._drawToGPU(gl);
 		}
@@ -1153,7 +1190,7 @@ this.createjs = this.createjs||{};
 		this.depth = 0;
 
 		var mtx = new createjs.Matrix2D();
-		this._appendToBatchGroup(sceneGraph, gl, mtx, 1);																//TODO: DHG: isn't there a global alpha or something?
+		this._appendToBatchGroup(sceneGraph, gl, mtx, 1, ignoreCache);																//TODO: DHG: isn't there a global alpha or something?
 
 		this.batchReason = "drawFinish";
 		this._drawToGPU(gl);								// <--------------------------------------------------------
@@ -1167,7 +1204,7 @@ this.createjs = this.createjs||{};
 	 * @param {Matrix2D} concatMtx Cumulative offset so far
 	 * @method _appendToBatchGroup
 	 */
-	p._appendToBatchGroup = function(container, gl, concatMtx, concatAlpha) {
+	p._appendToBatchGroup = function(container, gl, concatMtx, concatAlpha, ignoreCache) {
 		// sort out shared properties
 		if(!container._glMtx) { container._glMtx = new createjs.Matrix2D(); }
 		var cMtx = container._glMtx;
@@ -1194,7 +1231,7 @@ this.createjs = this.createjs||{};
 			var item = container.children[i];
 
 			if(!(item.visible && concatAlpha)) { continue; }
-			if(!item.cacheCanvas) {
+			if(!item.cacheCanvas || ignoreCache) {
 				if(item.filters && item.filters.length){
 					console.log("I NEED A CACHE!");
 				} else {
@@ -1241,9 +1278,22 @@ this.createjs = this.createjs||{};
 			var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;
 			var loc = (offset/2)|0;
 
-			if(item._webGLRenderStyle === 2 || item.cacheCanvas) {			// BITMAP / Cached Canvas
-				var w,h;
-				var image = item.cacheCanvas || item.image;
+			if(item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
+				var image = (ignoreCache?false:item.cacheCanvas) || item.image;
+
+				///////////////////////////////////////////////
+				///////////////////////////////////////////////
+				///////////////////////////////////////////////
+				///////////////////////////////////////////////
+				if(ignoreCache && image === item.cacheCanvas) {
+					console.log("CACHE");
+				} else {
+					console.log("NO-CACHE");
+				}
+				///////////////////////////////////////////////
+				///////////////////////////////////////////////
+				///////////////////////////////////////////////
+				///////////////////////////////////////////////
 
 				// calculate texture
 				var texture;

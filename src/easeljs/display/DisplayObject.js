@@ -786,9 +786,12 @@ this.createjs = this.createjs||{};
 			if(this._webGLCache !== webGL) {
 				if(webGL === true) {
 					this.cacheCanvas = document.createElement("canvas");
+					//this.cacheCanvas = document.getElementById("cachedCnv");
+					//this.cacheCanvas = document.getElementById("canvas");
 					this._webGLCache = new createjs.SpriteStage(this.cacheCanvas);
 					this._webGLCache.isCacheControlled = true;
-					document.body.appendChild(this.cacheCanvas);
+					this._webGLCache.vocalDebug = true;
+					//this._webGLCache.tickEnabled = false;
 				} else {
 					this._webGLCache = webGL;
 					this.cacheCanvas = webGL.canvas;
@@ -857,6 +860,9 @@ this.createjs = this.createjs||{};
 				}
 			}
 			this._webGLCache.cacheDraw(this);
+			document.body.appendChild(this.cacheCanvas);
+			//this.uncache();
+			//return;
 		} else {
 			var ctx = cacheCanvas.getContext("2d");
 
@@ -876,8 +882,9 @@ this.createjs = this.createjs||{};
 			master.applyFilters(this);
 			ctx.restore();
 
-			this.cacheID = DisplayObject._nextCacheID++;
+			document.body.appendChild(this.cacheCanvas);
 		}
+		this.cacheID = DisplayObject._nextCacheID++;
 	};
 
 	/**

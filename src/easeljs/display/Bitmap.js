@@ -194,8 +194,9 @@ this.createjs = this.createjs||{};
 	 * @method clone
 	 * @return {Bitmap} a clone of the Bitmap instance.
 	 **/
-	p.clone = function() {
-		var o = new Bitmap(this.image);
+	p.clone = function(node) {
+		var image = node?this.image.cloneNode():this.image;
+		var o = new Bitmap(image);
 		if (this.sourceRect) { o.sourceRect = this.sourceRect.clone(); }
 		this._cloneProps(o);
 		return o;

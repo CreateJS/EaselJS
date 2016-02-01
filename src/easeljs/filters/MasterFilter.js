@@ -152,7 +152,7 @@ this.createjs = this.createjs||{};
 		var spriteStage = null;
 		if(webGL) {
 			// setup
-			spriteStage = webGL._webGLContext ? webGL : this._getWebGLContext(canvas);
+			spriteStage = webGL;
 
 			// apply
 			spriteStage.filterDraw(target);
