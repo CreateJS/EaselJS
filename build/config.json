@@ -16,6 +16,7 @@
 	"../src/easeljs/display/Shadow.js",
 	"../src/easeljs/display/SpriteSheet.js",
 	"../src/easeljs/display/Graphics.js",
+	"../src/easeljs/filters/MasterFilter.js",
 	"../src/easeljs/display/DisplayObject.js",
 	"../src/easeljs/display/Container.js",
 	"../src/easeljs/display/Stage.js",
@@ -36,6 +37,7 @@
 	"../src/easeljs/filters/ColorMatrix.js",
 	"../src/easeljs/filters/ColorMatrixFilter.js",
 	"../src/easeljs/ui/Touch.js",
+	"../src/easeljs/display/SpriteStage.js",
 	"../src/easeljs/version.js"
   ],
   "gl_source": [
