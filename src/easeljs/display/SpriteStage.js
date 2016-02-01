@@ -185,12 +185,12 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * The shader program used to draw the current batch.
-		 * @property _shaderProgram
+		 * @property _activeShader
 		 * @protected
 		 * @type {WebGLProgram}
 		 * @default null
 		 **/
-		this._shaderProgram = null;
+		this._activeShader = null;
 
 		/**
 		 * The vertex position data for the current draw call.
@@ -540,7 +540,7 @@ this.createjs = this.createjs||{};
 			"}" +
 
 			//"gl_FragColor = color;" +
-			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
+			"gl_FragColor = vec4(color.r / 2.0, color.g / 2.0, color.b / 2.0, color.a * alphaValue);" +
 		"}"
 	);
 
@@ -629,7 +629,6 @@ this.createjs = this.createjs||{};
 	///////////////////////////////////////////////////////
 	/** docced in super class **/
 	p.update = function(props) {
-		console.log("update");
 		//DHG TODO: test context swapping and re-acqusition
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
@@ -638,7 +637,6 @@ this.createjs = this.createjs||{};
 			// Use WebGL.
 			this._batchDraw(this, this._webGLContext);
 		} else {
-			return;
 			// Use 2D.
 			if (this.autoClear) { this.clear(); }
 			var ctx = this.canvas.getContext("2d");
@@ -708,12 +706,13 @@ this.createjs = this.createjs||{};
 	 **/
 	p.cacheDraw = function(target) {
 		var gl = this._webGLContext;
-		this._shaderBackup = this._shaderProgram;
+		this._shaderBackup = this._activeShader;
 		try{
-			this._shaderProgram =  this._fetchShaderProgram(gl, "test");
+			//this._activeShader = this._fetchShaderProgram(gl, "test");
 		} catch (e) {
 			console.log("SHADER SWITCH FAILURE", e);
-			return;																										//TODO: DHG: something gracefull
+			this._activeShader = this._shaderBackup;
+			//return;																										//TODO: DHG: something gracefull
 		}
 
 		var mtx = target.getMatrix();
@@ -723,7 +722,7 @@ this.createjs = this.createjs||{};
 		container.transformMatrix = mtx;
 		this._batchDraw(container, gl, true);
 
-		this._shaderProgram = this._shaderBackup;
+		this._activeShader = this._shaderBackup;
 	};
 
 	/**
@@ -741,7 +740,7 @@ this.createjs = this.createjs||{};
 
 		while(!success) {
 			try{
-				this._shaderProgram = this._fetchShaderProgram(gl);
+				this._activeShader = this._fetchShaderProgram(gl);
 				success = true;
 			} catch(e) {
 				if(this._batchTextureCount == 1){
@@ -890,8 +889,8 @@ this.createjs = this.createjs||{};
 		var targetFrag, targetVtx;
 		switch(shader) {
 			case "test":
-				targetVtx = SpriteStage.VTX_SHADER;
-				targetFrag = SpriteStage.FRAG_SHADER;
+				targetVtx = SpriteStage.VTX_SHADER_TEST;
+				targetFrag = SpriteStage.FRAG_SHADER_TEST;
 				break;
 			default:
 				targetVtx = SpriteStage.VTX_SHADER;
@@ -904,11 +903,13 @@ this.createjs = this.createjs||{};
 		var fragmentShader = this._createShader(gl, gl.FRAGMENT_SHADER, targetFrag);
 
 		var shaderProgram = gl.createProgram();
+
 		gl.attachShader(shaderProgram, vertexShader);
 		gl.attachShader(shaderProgram, fragmentShader);
 		gl.linkProgram(shaderProgram);
 
 		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+			gl.useProgram(this._activeShader);
 			throw(gl.getShaderInfoLog(shaderProgram));
 		}
 
@@ -965,6 +966,7 @@ this.createjs = this.createjs||{};
 				break;
 		}
 
+		gl.useProgram(this._activeShader);
 		return shaderProgram;
 	};
 
@@ -1281,20 +1283,6 @@ this.createjs = this.createjs||{};
 			if(item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
 				var image = (ignoreCache?false:item.cacheCanvas) || item.image;
 
-				///////////////////////////////////////////////
-				///////////////////////////////////////////////
-				///////////////////////////////////////////////
-				///////////////////////////////////////////////
-				if(ignoreCache && image === item.cacheCanvas) {
-					console.log("CACHE");
-				} else {
-					console.log("NO-CACHE");
-				}
-				///////////////////////////////////////////////
-				///////////////////////////////////////////////
-				///////////////////////////////////////////////
-				///////////////////////////////////////////////
-
 				// calculate texture
 				var texture;
 				if(image._storeID === undefined) {
@@ -1445,11 +1433,13 @@ this.createjs = this.createjs||{};
 		if(this.vocalDebug) {
 			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
 		}
-		var shaderProgram = this._shaderProgram;
+		var shaderProgram = this._activeShader;
 		var vertexPositionBuffer = this._vertexPositionBuffer;
 		var textureIndexBuffer = this._textureIndexBuffer;
 		var uvPositionBuffer = this._uvPositionBuffer;
 		var alphaBuffer = this._alphaBuffer;
+
+		gl.useProgram(shaderProgram);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);

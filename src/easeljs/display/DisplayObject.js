@@ -860,7 +860,6 @@ this.createjs = this.createjs||{};
 				}
 			}
 			this._webGLCache.cacheDraw(this);
-			document.body.appendChild(this.cacheCanvas);
 			//this.uncache();
 			//return;
 		} else {
@@ -877,12 +876,11 @@ this.createjs = this.createjs||{};
 			ctx.globalCompositeOperation = compositeOperation;
 			ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
 			this.draw(ctx, true);
-			if (!this.filters || this.filters.length == 0) { return; }
-			var master = createjs.MasterFilter.get(canvas);
-			master.applyFilters(this);
-			ctx.restore();
-
-			document.body.appendChild(this.cacheCanvas);
+			if (this.filters && this.filters.length) {
+				var master = createjs.MasterFilter.get(canvas);
+				master.applyFilters(this);
+				ctx.restore();
+			}
 		}
 		this.cacheID = DisplayObject._nextCacheID++;
 	};
