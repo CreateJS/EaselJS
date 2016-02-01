@@ -40,12 +40,12 @@ createjs.Ticker.on("tick", stage);
 
 ## Support and Resources
 * Find examples and more information at the [EaselJS web site](http://easeljs.com/).
-* Read the [documentation](http://createjs.com/Docs/EaselJS).
+* Read the [documentation](http://createjs.com/docs/easeljs/).
 * Discuss, share projects, and interact with other users on [reddit](http://www.reddit.com/r/createjs/).
 * Ask technical questions on [Stack Overflow](http://stackoverflow.com/questions/tagged/easeljs).
 * File verified bugs or formal feature requests using Issues on [GitHub](https://github.com/createjs/EaselJS/issues).
 * There is a [Google Group](http://groups.google.com/group/createjs-discussion) for discussions and support.
-* Have a look at the included [examples](https://github.com/CreateJS/EaselJS/tree/master/examples) and [API documentation](http://createjs.com/Docs/EaselJS/) for more in-depth information.
+* Have a look at the included [examples](https://github.com/CreateJS/EaselJS/tree/master/examples) and [API documentation](http://createjs.com/docs/easeljs/) for more in-depth information.
 
 It was built by [gskinner.com](http://www.gskinner.com), and is released for free under the MIT license, which means you
 can use it for almost any purpose (including commercial projects). We appreciate credit where possible, but it is not a requirement.
@@ -53,7 +53,7 @@ can use it for almost any purpose (including commercial projects). We appreciate
 
 ## Classes
 
-The API is inspired in part by Flash's display list, and should be easy to pick up for both JS and AS3 developers. Check out the [docs](http://createjs.com/Docs/EaselJS/) for more information.
+The API is inspired in part by Flash's display list, and should be easy to pick up for both JS and AS3 developers. Check out the [docs](http://createjs.com/docs/easeljs/) for more information.
 
 **DisplayObject**
 Abstract base class for all display elements in EaselJS. Exposes all of the display properties (ex. x, y, rotation, scaleX, scaleY, skewX, skewY, alpha, shadow, etc) that are common to all display objects.
