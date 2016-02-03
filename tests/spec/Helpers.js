@@ -4,7 +4,10 @@ beforeEach(function (done) {
 	this.sColor = "#000";
 	this.fColor = "#ff0000";
 
-	this.stage = new createjs.Stage(imagediff.createCanvas(200, 200));
+	this.stageWidth = 200;
+	this.stageHeight = 200;
+
+	this.stage = new createjs.Stage(imagediff.createCanvas(this.stageWidth, this.stageHeight));
 
 	jasmine.addMatchers(imagediff.jasmine);
 

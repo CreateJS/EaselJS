@@ -6,9 +6,11 @@ module.exports = function (grunt) {
 			jasmine: {
 				run: {
 					src: [
-						'../lib/easeljs-NEXT.combined.js'
+						'../lib/easeljs-NEXT.combined.js',
+						'../src/easeljs/display/DisplayObject.js',
+						'../src/easeljs/display/SpriteStage.js'
 					],
-					
+
 					options: {
 						specs: 'spec/*Spec.js',
 						helpers: [
