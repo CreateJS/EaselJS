@@ -23,8 +23,8 @@ beforeEach(function (done) {
 
 	/**
 	 * Compare each drawing to a pre-saved base line image.
-	 * Need to has a small tolerance (100),
-	 * to account for antialiasing differnces between the saved images also browser to browser to browser differnces.
+	 * Need to have a small tolerance (100) to account for antialiasing differences between the saved images
+	 * as well as browser to browser differences.
 	 *
 	 * @param path
 	 * @param done
