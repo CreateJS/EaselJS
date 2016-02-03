@@ -490,7 +490,7 @@ this.createjs = this.createjs||{};
 		"attribute float objectAlpha;" +
 
 		"uniform mat4 pMatrix;" +
-		"uniform int testVar;" +
+		"uniform lowp int testVar;" +
 
 		"varying highp vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
@@ -528,7 +528,7 @@ this.createjs = this.createjs||{};
 		"varying lowp float alphaValue;" +
 
 		"uniform sampler2D uSampler[{{count}}];" +
-		"uniform int testVar;" +
+		"uniform lowp int testVar;" +
 
 		"void main(void) {" +
 			"int src = int(indexPicker);" +
@@ -708,7 +708,7 @@ this.createjs = this.createjs||{};
 		var gl = this._webGLContext;
 		this._shaderBackup = this._activeShader;
 		try{
-			//this._activeShader = this._fetchShaderProgram(gl, "test");
+			this._activeShader = this._fetchShaderProgram(gl, "test");
 		} catch (e) {
 			console.log("SHADER SWITCH FAILURE", e);
 			this._activeShader = this._shaderBackup;
@@ -886,6 +886,8 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._fetchShaderProgram = function(gl, shader) {
+		gl.useProgram(null);		//saftey to avoid collisions
+
 		var targetFrag, targetVtx;
 		switch(shader) {
 			case "test":
@@ -910,7 +912,7 @@ this.createjs = this.createjs||{};
 
 		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
 			gl.useProgram(this._activeShader);
-			throw(gl.getShaderInfoLog(shaderProgram));
+			throw(gl.getProgramInfoLog(shaderProgram));
 		}
 
 		gl.useProgram(shaderProgram);
@@ -941,6 +943,7 @@ this.createjs = this.createjs||{};
 				shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
 				gl.uniform1iv(shaderProgram.samplerUniform, samplers);
 				shaderProgram.testVarUniform = gl.getAttribLocation(shaderProgram, "testVar");
+				break;
 			default:
 				shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 				gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
@@ -980,8 +983,6 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._createShader = function(gl, type, str) {
-		var shader = gl.createShader(type);
-
 		// inject the static number
 		str = str.replace("{{count}}", this._batchTextureCount);
 
@@ -992,6 +993,7 @@ this.createjs = this.createjs||{};
 		}
 		str = str.replace("{{alternates}}", insert);
 
+		var shader = gl.createShader(type);
 		gl.shaderSource(shader, str);
 		gl.compileShader(shader);
 
@@ -1135,10 +1137,10 @@ this.createjs = this.createjs||{};
 		this._insertTextureInBatch(gl, texture);
 
 		image._storeID = storeID;
-		if(image.complete || image.naturalWidth || image._isCanvas) {
+		if(image.complete || image.naturalWidth || image._isCanvas) {		// is it already loaded
 			this._updateTextureImageData(gl, image);
 		} else  {
-			image.onload = this._updateTextureImageData.bind(this, gl, image);
+			image.onload = this._updateTextureImageData.bind(this, gl, image);											//TODO: DHG: EventListener instead of callback
 		}
 
 		return texture;
@@ -1223,13 +1225,13 @@ this.createjs = this.createjs||{};
 				container.regX, container.regY
 			);
 		}
-		concatAlpha *= this.alpha;
+		//concatAlpha *= container.alpha;																				//TODO: DHG: Probably not needed.
 
 		//var tlX = 0, tlY = 0, trX = 0, trY = 0, blX = 0, blY = 0, brX = 0, brY = 0;
 		var subL, subT, subR, subB;
 
 		// actually apply its data to the buffers
-		for(var i = 0, l = container.children.length; i < l; i++) {
+		for(var i = 0, l = container.children.length; i < l; i++) {														//TODO: DHG: store off length
 			var item = container.children[i];
 
 			if(!(item.visible && concatAlpha)) { continue; }
@@ -1277,7 +1279,7 @@ this.createjs = this.createjs||{};
 			var vertices = this._vertices;
 			var texI = this._indecies;
 			var alphas = this._alphas;
-			var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;
+			var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;											//TODO: DHG: you can do better
 			var loc = (offset/2)|0;
 
 			if(item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas

@@ -776,10 +776,11 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
 	 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
 	 * 	cached elements with greater fidelity. Default is 1.
-	 * @param {Boolean || WebGLRenderingContext} webGL The webgl context to render to, or "true" to create a new one.
+	 * @param {Boolean || SpriteStage} webGL The webgl context to render to, or "true" to create a new one.
 	 * If rendering in WebGL already use the same webGL context for best performance.
 	 **/
 	p.cache = function(x, y, width, height, scale, webGL) {
+		//TODO: DHG: self SpriteStage checking maybe?
 		// draw to canvas.
 		scale = scale||1;
 		if(webGL && createjs.SpriteStage) {
@@ -791,7 +792,6 @@ this.createjs = this.createjs||{};
 					this._webGLCache = new createjs.SpriteStage(this.cacheCanvas);
 					this._webGLCache.isCacheControlled = true;
 					this._webGLCache.vocalDebug = true;
-					//this._webGLCache.tickEnabled = false;
 				} else {
 					this._webGLCache = webGL;
 					this.cacheCanvas = webGL.canvas;
@@ -876,10 +876,10 @@ this.createjs = this.createjs||{};
 			ctx.globalCompositeOperation = compositeOperation;
 			ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
 			this.draw(ctx, true);
+			ctx.restore();
 			if (this.filters && this.filters.length) {
 				var master = createjs.MasterFilter.get(canvas);
 				master.applyFilters(this);
-				ctx.restore();
 			}
 		}
 		this.cacheID = DisplayObject._nextCacheID++;
