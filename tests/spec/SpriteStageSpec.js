@@ -200,7 +200,6 @@ describe("SpriteStage", function () {
 		obj.addChild(child);
 
 		var objSS = obj.clone(true);
-		objSS.cache(0, 0, this.bmp.width, this.bmp.height);
 
 		this.stage.addChild(obj);
 		this.spriteStage.addChild(objSS);
@@ -242,7 +241,6 @@ describe("SpriteStage", function () {
 		obj.y = 30;
 
 		var objSS = obj.clone(true);
-		objSS.cache(0, 0, this.bmp.width, this.bmp.height);
 
 		this.stage.addChild(obj);
 		this.spriteStage.addChild(objSS);
