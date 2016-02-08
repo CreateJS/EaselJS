@@ -191,7 +191,7 @@ describe("SpriteStage", function () {
 		this.compareStages(expect, done);
 	});
 
-	it("Container", function (done) {
+	it("Container + image", function (done) {
 		var obj = new createjs.Container();
 		obj.x = 30;
 		obj.y = 30;
@@ -207,13 +207,30 @@ describe("SpriteStage", function () {
 		this.compareStages(expect, done);
 	});
 
-	it("Containers and translated images", function (done) {
+	it("Containers + translated image", function (done) {
+		var obj = new createjs.Container();
+
+		var child = this.bmp.clone(true);
+		child.regX = -25;
+		obj.addChild(child);
+
+		var objSS = obj.clone(true);
+
+		this.stage.addChild(obj);
+		this.spriteStage.addChild(objSS);
+
+		this.compareStages(expect, done);
+	});
+
+	it("Containers + multiple translated images", function (done) {
 		var obj = new createjs.Container();
 		obj.x = 30;
 		obj.y = 30;
 		obj.scaleX = 1.5;
 
 		var child = this.bmp.clone(true);
+		child.x = 50;
+		child.regX = 25;
 		obj.addChild(child);
 
 		var childContainer = new createjs.Container();
