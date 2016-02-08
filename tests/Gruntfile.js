@@ -12,6 +12,7 @@ module.exports = function (grunt) {
 					],
 
 					options: {
+						styles: 'styles/styles.css',
 						specs: 'spec/*Spec.js',
 						helpers: [
 							'spec/Helpers.js',
