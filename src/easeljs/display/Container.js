@@ -588,7 +588,8 @@ this.createjs = this.createjs||{};
 	 **/
 	p._getObjectsUnderPoint = function(x, y, arr, mouse, activeListener, currentDepth) {
 		currentDepth = currentDepth || 0;
-		if (!currentDepth && !this._testMask(this, x, y)) { return null; }
+		var hitMask = this._testMask(this, x, y);
+		if (!currentDepth && !hitMask) { return null; }
 		var mtx, ctx = createjs.DisplayObject._hitTestContext;
 		activeListener = activeListener || (mouse&&this._hasMouseEventListener());
 
@@ -626,6 +627,11 @@ this.createjs = this.createjs||{};
 				else { return (mouse && !this.mouseChildren) ? this : child; }
 			}
 		}
+
+		if (hitMask && this.mouseEnabled) {
+			if (arr) { arr.push(this); }
+			return this;
+		}
 		return null;
 	};
 	
@@ -638,7 +644,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._testMask = function(target, x, y) {
-		var mask = target.mask;
+		var mask = target.mask || target;
 		if (!mask || !mask.graphics || mask.graphics.isEmpty()) { return true; }
 		
 		var mtx = this._props.matrix, parent = target.parent;
