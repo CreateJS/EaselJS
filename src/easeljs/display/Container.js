@@ -647,8 +647,8 @@ this.createjs = this.createjs||{};
 		var mask = target.mask || target;
 		if (!mask || !mask.graphics || mask.graphics.isEmpty()) { return true; }
 		
-		var mtx = this._props.matrix, parent = target.parent;
-		mtx = parent ? parent.getConcatenatedMatrix(mtx) : mtx.identity();
+		var parent = target.parent;
+		var mtx = parent ? parent.getConcatenatedMatrix(this._props.matrix.clone()) : mtx.identity();
 		mtx = mask.getMatrix(mask._props.matrix).prependMatrix(mtx);
 		
 		var ctx = createjs.DisplayObject._hitTestContext;
