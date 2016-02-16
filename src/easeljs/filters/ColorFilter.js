@@ -71,8 +71,8 @@ this.createjs = this.createjs||{};
 	 * @extends Filter
 	 **/
 	function ColorFilter(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
-		
-	
+		this.Filter_constructor();
+
 	// public properties:
 		/**
 		 * Red channel multiplier.
@@ -129,6 +129,18 @@ this.createjs = this.createjs||{};
 		 * @type Number
 		 **/
 		this.alphaOffset = alphaOffset || 0;
+
+		this.FRAG_SHADER_BODY = (
+			"uniform vec4 uColorMultiplier;" +
+			"uniform vec4 uColorOffset;" +
+
+			"void main(void) {" +
+				"vec4 color = texture2D(uSampler, vTextureCoord);" +
+
+				"gl_FragColor = (color * uColorMultiplier) + uColorOffset;" +
+			"}"
+		);
+
 	}
 	var p = createjs.extend(ColorFilter, createjs.Filter);
 
@@ -137,6 +149,20 @@ this.createjs = this.createjs||{};
 
 
 // public methods:
+	p.shaderParamSetup = function(gl, stage, shaderProgram) {
+		shaderProgram.colorMultiplier = gl.getUniformLocation(shaderProgram, "uColorMultiplier");
+		gl.uniform4f(
+			shaderProgram.colorMultiplier,
+			this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier
+		);
+
+		shaderProgram.colorOffset = gl.getUniformLocation(shaderProgram, "uColorOffset");
+		gl.uniform4f(
+			shaderProgram.colorOffset,
+			this.redOffset/255, this.greenOffset/255, this.blueOffset/255, this.alphaOffset/255
+		);
+	};
+
 	/** docced in super class **/
 	p.toString = function() {
 		return "[ColorFilter]";
@@ -144,9 +170,11 @@ this.createjs = this.createjs||{};
 
 	/** docced in super class **/
 	p.clone = function() {
-		return new ColorFilter(this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier, this.redOffset, this.greenOffset, this.blueOffset, this.alphaOffset);
+		return new ColorFilter(
+			this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier,
+			this.redOffset, this.greenOffset, this.blueOffset, this.alphaOffset
+		);
 	};
-	
 
 // private methods:
 	/** docced in super class **/

@@ -64,8 +64,8 @@ this.createjs = this.createjs||{};
 	 * class.
 	 **/
 	function ColorMatrixFilter(matrix) {
-	
-		
+		this.Filter_constructor();
+
 	// public properties:
 		/**
 		 * A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
@@ -73,12 +73,44 @@ this.createjs = this.createjs||{};
 		 * @type Array | ColorMatrix
 		 **/
 		this.matrix = matrix;
+
+		this.FRAG_SHADER_BODY = (
+			"uniform mat4 uColorMatrix;" +
+			"uniform vec4 uColorMatrixOffset;" +
+
+			"void main(void) {" +
+				"vec4 color = texture2D(uSampler, vTextureCoord);" +
+
+				"mat4 m = uColorMatrix;" +
+				"vec4 newColor = vec4(0,0,0,0);" +
+				"newColor.r = color.r*m[0][0] + color.g*m[0][1] + color.b*m[0][2] + color.a*m[0][3];" +
+				"newColor.g = color.r*m[1][0] + color.g*m[1][1] + color.b*m[1][2] + color.a*m[1][3];" +
+				"newColor.b = color.r*m[2][0] + color.g*m[2][1] + color.b*m[2][2] + color.a*m[2][3];" +
+				"newColor.a = color.r*m[3][0] + color.g*m[3][1] + color.b*m[3][2] + color.a*m[3][3];" +
+
+				"gl_FragColor = newColor + uColorMatrixOffset;" +
+			"}"
+		);
 	}
 	var p = createjs.extend(ColorMatrixFilter, createjs.Filter);
 
 	// TODO: deprecated
 	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
-	
+
+	p.shaderParamSetup = function(gl, stage, shaderProgram) {
+		var mat = this.matrix;
+		var colorMatrix = new Float32Array([
+			mat[0],mat[1],mat[2],mat[3],
+			mat[5],mat[6],mat[7],mat[8],
+			mat[10],mat[11],mat[12],mat[13],
+			mat[15],mat[16],mat[17],mat[18]
+		]);
+
+		gl.colorMatrixUniform = gl.getUniformLocation(shaderProgram, "uColorMatrix");
+		gl.uniformMatrix4fv(gl.colorMatrixUniform, false, colorMatrix);
+		gl.colorMatrixOffsetUniform = gl.getUniformLocation(shaderProgram, "uColorMatrixOffset");
+		gl.uniform4f(gl.colorMatrixOffsetUniform, mat[4]/255, mat[9]/255, mat[14]/255, mat[19]/255);
+	};
 
 // public methods:
 	/** docced in super class **/
@@ -115,7 +147,6 @@ this.createjs = this.createjs||{};
 		}
 		return true;
 	};
-
 
 	createjs.ColorMatrixFilter = createjs.promote(ColorMatrixFilter, "Filter");
 }());

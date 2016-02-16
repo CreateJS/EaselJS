@@ -68,7 +68,7 @@ this.createjs = this.createjs || {};
 	 * result. This should be exactly the same dimensions as the target.
 	 **/
 	function AlphaMapFilter(alphaMap) {
-	
+		this.Filter_constructor();
 	
 	// public properties:
 		/**

@@ -787,15 +787,14 @@ this.createjs = this.createjs||{};
 			if(this._webGLCache !== webGL) {
 				if(webGL === true) {
 					this.cacheCanvas = document.createElement("canvas");
-					//this.cacheCanvas = document.getElementById("cachedCnv");
-					//this.cacheCanvas = document.getElementById("canvas");
 					this._webGLCache = new createjs.SpriteStage(this.cacheCanvas);
+					// flag so render textures aren't used
 					this._webGLCache.isCacheControlled = true;
-					this._webGLCache.vocalDebug = true;
 				} else {
+					this.cacheCanvas = webGL.getRenderBufferTexture(width, height);
 					this._webGLCache = webGL;
-					this.cacheCanvas = webGL.canvas;
 				}
+				this._webGLCache.vocalDebug = true;
 			}
 		} else {
 			if(!this.cacheCanvas || this._webGLCache) {
@@ -849,7 +848,7 @@ this.createjs = this.createjs||{};
 		w = Math.ceil(w*scale) + fBounds.width;
 		h = Math.ceil(h*scale) + fBounds.height;
 
-		cacheCanvas._invalid = true;																					//TODO: DHG: maybe there's a way for it to keep its spot yet get refreshed?
+		cacheCanvas._invalid = true;
 
 		if (webGL) {
 			if (webGL.isCacheControlled) {
@@ -859,9 +858,7 @@ this.createjs = this.createjs||{};
 					webGL.updateViewport(w, h);
 				}
 			}
-			this._webGLCache.cacheDraw(this);
-			//this.uncache();
-			//return;
+			this._webGLCache.cacheDraw(this, this.filters);
 		} else {
 			var ctx = cacheCanvas.getContext("2d");
 
@@ -879,7 +876,7 @@ this.createjs = this.createjs||{};
 			ctx.restore();
 			if (this.filters && this.filters.length) {
 				var master = createjs.MasterFilter.get(canvas);
-				master.applyFilters(this);
+				master.applyFilters(this);																//TODO: DHG: had grander plans for master, probably should remove the current master though
 			}
 		}
 		this.cacheID = DisplayObject._nextCacheID++;

@@ -67,7 +67,7 @@ this.createjs = this.createjs || {};
 	 * @param {HTMLImageElement|HTMLCanvasElement} mask
 	 **/
 	function AlphaMaskFilter(mask) {
-	
+		this.Filter_constructor();
 	
 	// public properties:
 		/**

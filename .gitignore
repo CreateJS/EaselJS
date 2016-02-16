@@ -15,3 +15,4 @@ config.local.json
 npm-debug.log
 build/.sass-cache
 main.css
+/src/easeljs/filters/webgl

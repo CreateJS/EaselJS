@@ -66,6 +66,8 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [quality=1] The number of blur iterations.
 	 **/
 	function BlurFilter( blurX, blurY, quality) {
+		this.Filter_constructor();
+
 		if ( isNaN(blurX) || blurX < 0 ) blurX = 0;
 		if ( isNaN(blurY) || blurY < 0 ) blurY = 0;
 		if ( isNaN(quality) || quality < 1  ) quality = 1;

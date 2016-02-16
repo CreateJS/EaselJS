@@ -171,7 +171,7 @@ this.createjs = this.createjs||{};
 		 * @type {Object}
 		 * @default black
 		 **/
-		this._clearColor = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };															//TODO: formalize this approach into regular canvases
+		this._clearColor = { r: 0.0, g: 0.0, b: 0.0, a: 0.0 };															//TODO: formalize this approach into regular canvases
 
 		/**
 		 * The maximum number of cards (aka a single sprite) that can be drawn in one draw call.
@@ -408,26 +408,44 @@ this.createjs = this.createjs||{};
 	 */
 	SpriteStage.UV_RECT = {t:0, l:0, b:1, r:1};
 
-	/**
-	 * Pre-processing shader code, will be parsed before being fed in.
-	 * @property VTX_SHADER
-	 * @static
-	 * @final
-	 * @type {String}
-	 * @readonly
-	 */
-	SpriteStage.VTX_SHADER = (
+	SpriteStage.COVER_UV = new Float32Array([
+		 0,		 0,		//TL
+		 1,		 0,		//TR
+		 0,		 1,		//BL
+		 1,		 0,		//TR
+		 1,		 1,		//BR
+		 0,		 1		//BL
+	]);
+	SpriteStage.COVER_VERT = new Float32Array([
+		-1,		 1,		//TL
+		 1,		 1,		//TR
+		-1,		-1,		//BL
+		 1,		 1,		//TR
+		 1,		-1,		//BR
+		-1,		-1		//BL
+	]);
+
+	SpriteStage.SHADER_VARYING_HEADER = (
+		"precision mediump float;" +
+
+		"varying vec2 vTextureCoord;" +
+		"varying lowp float indexPicker;" +
+		"varying lowp float alphaValue;"
+	);
+	SpriteStage.SHADER_VERTEX_HEADER = (
+		SpriteStage.SHADER_VARYING_HEADER +
 		"attribute vec2 vertexPosition;" +
 		"attribute vec2 uvPosition;" +
-		"attribute float textureIndex;" +
-		"attribute float objectAlpha;" +
+		"attribute lowp float textureIndex;" +
+		"attribute lowp float objectAlpha;" +
 
-		"uniform mat4 pMatrix;" +
-
-		"varying highp vec2 vTextureCoord;" +
-		"varying lowp float indexPicker;" +
-		"varying lowp float alphaValue;" +
-
+		"uniform mat4 pMatrix;"
+	);
+	SpriteStage.SHADER_FRAGMENT_HEADER = (
+		SpriteStage.SHADER_VARYING_HEADER +
+		"uniform sampler2D uSampler[{{count}}];"
+	);
+	SpriteStage.SHADER_VERTEX_BODY_REGULAR  = (
 		"void main(void) {" +
 			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix see js... bypass for now
 			//vertexPosition, round if flag
@@ -443,93 +461,7 @@ this.createjs = this.createjs||{};
 			"vTextureCoord = uvPosition;" +
 		"}"
 	);
-
-	/**
-	 * Pre-processing shader code, will be parsed before being fed in.
-	 * @property FRAG_SHADER
-	 * @static
-	 * @final
-	 * @type {String}
-	 * @readonly
-	 */
-	SpriteStage.FRAG_SHADER = (
-		"precision mediump float;" +
-
-		"varying highp vec2 vTextureCoord;" +
-		"varying lowp float indexPicker;" +
-		"varying lowp float alphaValue;" +
-
-		"uniform sampler2D uSampler[{{count}}];" +
-
-		"void main(void) {" +
-			"int src = int(indexPicker);" +
-			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
-
-			"if(src == 0) {" +
-				"color = texture2D(uSampler[0], vTextureCoord);" +
-			"{{alternates}}" +
-			"}" +
-
-			//"gl_FragColor = color;" +
-			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
-		"}"
-	);
-
-	/**
-	 * Pre-processing shader code, will be parsed before being fed in.
-	 * @property VTX_SHADER
-	 * @static
-	 * @final
-	 * @type {String}
-	 * @readonly
-	 */
-	SpriteStage.VTX_SHADER_TEST = (
-		"attribute vec2 vertexPosition;" +
-		"attribute vec2 uvPosition;" +
-		"attribute float textureIndex;" +
-		"attribute float objectAlpha;" +
-
-		"uniform mat4 pMatrix;" +
-		"uniform lowp int testVar;" +
-
-		"varying highp vec2 vTextureCoord;" +
-		"varying lowp float indexPicker;" +
-		"varying lowp float alphaValue;" +
-
-		"void main(void) {" +
-			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix see js... bypass for now
-			//vertexPosition, round if flag
-			//"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
-			"gl_Position = vec4("+
-				"(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
-				"(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1]," +
-				"pMatrix[3][2]," +
-				"1.0" +
-			");" +
-			"alphaValue = objectAlpha;" +
-			"indexPicker = textureIndex;" +
-			"vTextureCoord = uvPosition;" +
-		"}"
-	);
-
-	/**
-	 * Pre-processing shader code, will be parsed before being fed in.
-	 * @property FRAG_SHADER_TEST
-	 * @static
-	 * @final
-	 * @type {String}
-	 * @readonly
-	 */
-	SpriteStage.FRAG_SHADER_TEST = (
-		"precision mediump float;" +
-
-		"varying highp vec2 vTextureCoord;" +
-		"varying lowp float indexPicker;" +
-		"varying lowp float alphaValue;" +
-
-		"uniform sampler2D uSampler[{{count}}];" +
-		"uniform lowp int testVar;" +
-
+	SpriteStage.SHADER_FRAGMENT_BODY_REGULAR = (
 		"void main(void) {" +
 			"int src = int(indexPicker);" +
 			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
@@ -539,8 +471,41 @@ this.createjs = this.createjs||{};
 				"{{alternates}}" +
 			"}" +
 
-			//"gl_FragColor = color;" +
-			"gl_FragColor = vec4(color.r / 2.0, color.g / 2.0, color.b / 2.0, color.a * alphaValue);" +
+			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
+		"}"
+	);
+	SpriteStage.SHADER_VERTEX_BODY_PARTICLE = (
+		SpriteStage.SHADER_VERTEX_BODY_REGULAR																			//TODO: DHG: a real particle shader
+	);
+	SpriteStage.SHADER_FRAGMENT_BODY_PARTICLE = (
+		SpriteStage.SHADER_FRAGMENT_BODY_REGULAR																		//TODO: DHG: a real particle shader
+	);
+
+	SpriteStage.COVER_VARYING_HEADER = (
+		"precision mediump float;" +
+
+		"varying highp vec2 vTextureCoord;"
+	);
+	SpriteStage.COVER_VERTEX_HEADER = (
+		SpriteStage.COVER_VARYING_HEADER +
+		"attribute vec2 vertexPosition;" +
+		"attribute vec2 uvPosition;"
+	);
+	SpriteStage.COVER_FRAGMENT_HEADER = (
+		SpriteStage.COVER_VARYING_HEADER +
+		"uniform sampler2D uSampler;"
+	);
+	SpriteStage.COVER_VERTEX_BODY_REGULAR  = (
+		"void main(void) {" +
+			"gl_Position = vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
+			"vTextureCoord = uvPosition;" +
+		"}"
+	);
+	SpriteStage.COVER_FRAGMENT_BODY_REGULAR = (
+		"void main(void) {" +
+			"vec4 color = texture2D(uSampler, vTextureCoord);" +
+
+			"gl_FragColor = color;" +
 		"}"
 	);
 
@@ -704,25 +669,85 @@ this.createjs = this.createjs||{};
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 **/
-	p.cacheDraw = function(target) {
+	p.cacheDraw = function(target, filters) {
+		console.log(">>>>>>>>>");
 		var gl = this._webGLContext;
 		this._shaderBackup = this._activeShader;
-		try{
-			this._activeShader = this._fetchShaderProgram(gl, "test");
-		} catch (e) {
-			console.log("SHADER SWITCH FAILURE", e);
-			this._activeShader = this._shaderBackup;
-			//return;																										//TODO: DHG: something gracefull
-		}
 
+		// create offset container for drawing item
 		var mtx = target.getMatrix();
 		mtx = mtx.clone().invert();
 		var container = this._cacheContainer;
 		container.children = [target];
 		container.transformMatrix = mtx;
-		this._batchDraw(container, gl, true);
 
+		var filterCount = filters.length;
+		if(filterCount) {
+			gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));			// switch to the last texture slot for binding the RT
+			var renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+
+			gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+			// draw item to render texture		I -> T
+			console.log("I -> T");
+			this._batchDraw(container, gl, true);
+
+
+			// apply each filter in order, but remember to toggle used texture and used
+			for(var i=0; i<filterCount; i++) {
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, renderTexture);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+				gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));			// switch to the last texture slot for binding the RT
+				renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+				var filter = filters[i];
+
+				// swap to correct shader
+				this._activeShader = this.getFilterShader(gl, filter);
+				if(!this._activeShader) { continue; }
+
+				// draw result to render texture	R -> T
+				console.log("R -> T");
+				this._drawCover(gl);
+			}
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+			// is this for another stage or mine
+			if(this.isCacheControlled) {
+				gl.activeTexture(gl.TEXTURE0);			// switch to the last texture slot for binding the RT
+				gl.bindTexture(gl.TEXTURE_2D, renderTexture);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+				// draw result to canvas			R -> C
+				console.log("R -> C");
+				this._activeShader = this.getFilterShader(gl, null);
+				this._drawCover(gl);
+			} else {
+				// make sure the last texture is the active thing to draw
+			}
+		} else {
+			// is this for another stage or mine
+			if(this.isCacheControlled) {
+				// draw item to canvas				I -> C
+				console.log("I -> C");
+				this._batchDraw(container, gl, true);
+			} else {
+				gl.bindFramebuffer(gl.FRAMEBUFFER, null/*something*/);
+				// draw item to render texture		I -> T
+				console.log("I -> T");
+				// stuff
+				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+				// make sure the last texture is the active thing to draw
+			}
+		}
 		this._activeShader = this._shaderBackup;
+		console.log("<<<<<<<<<");
 	};
 
 	/**
@@ -783,6 +808,21 @@ this.createjs = this.createjs||{};
 		}
 	};
 
+	p.getFilterShader = function(gl, filter) {
+		filter = filter || {};
+		var targetShader = this._activeShader;
+		//try{
+			targetShader = this._fetchShaderProgram(
+				gl, "custom",
+				filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY,
+				filter.shaderParamSetup && filter.shaderParamSetup.bind(filter)
+			);
+		//} catch (e) {
+		//	console.log("SHADER SWITCH FAILURE", e);
+		//}
+		return targetShader;
+	};
+
 	/**
 	 * Clears an image's texture to free it up for garbage collection.
 	 * @method clearImageTexture
@@ -801,23 +841,66 @@ this.createjs = this.createjs||{};
 		return "[SpriteStage (name="+  this.name +")]";
 	};
 
-	p.getBaseTexture = function() {
+	/**
+	 * Returns a base texture for use without forgetting any initilization
+	 * @method getBaseTexture
+	 * @param  {HTMLImageElement} w The width of the texture, defaults to 1
+	 * @param  {HTMLImageElement} h The height of the texture, defaults to 1
+	 * @param  {HTMLImageElement} data in a Uint8Array width*height*4(rgba) long, defaults to a single pixel.
+	 * @return {Texture} the basic texture instance.
+	 **/
+	p.getBaseTexture = function(w, h, data) {
+		var width = w || 1;
+		var height = h || 1;
+		if(data === undefined){ data = new Uint8Array([0.1, 0.2, 0.3, 1.0]); }
+
 		var gl = this._webGLContext;
 		var texture = gl.createTexture();
-		gl.createTexture();
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texImage2D(
-			gl.TEXTURE_2D,		// target
-			0,					// level of detail
-			gl.RGBA,			// internalformat
-			1,	1,	0,			// width, height, border (only for array sourced textures)
-			gl.RGBA,			// format (match internal format)
-			gl.UNSIGNED_BYTE,	// type of texture(pixel color depth)
-			new Uint8Array([0.1, 0.2, 0.3, 1.0]	// image data
-		));
+			gl.TEXTURE_2D,			// target
+			0,						// level of detail
+			gl.RGBA,				// internalformat
+			width, height, 0,		// width, height, border (only for array/null sourced textures)
+			gl.RGBA,				// format (match internal format)
+			gl.UNSIGNED_BYTE,		// type of texture(pixel color depth)
+			data					// image data
+		);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		return texture;
+	};
+
+	/**
+	 * Returns a base texture (see getBaseTexture) with an attached render buffer in texture._frameBuffer
+	 * @method getBaseTexture
+	 * @param  {HTMLImageElement} w The width of the texture
+	 * @param  {HTMLImageElement} h The height of the texture
+	 * @return {Texture} the basic texture instance.
+	 **/
+	p.getRenderBufferTexture = function(w, h) {
+		var gl = this._webGLContext;
+
+		// get the texture
+		var renderTexture = this.getBaseTexture(w, h, null);
+
+		// get the frame buffer
+		var frameBuffer = gl.createFramebuffer();
+		gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+
+		// attach frame buffer to texture and provide cross links to look up each other
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, renderTexture, 0);
+		frameBuffer._renderTexture = renderTexture;
+		renderTexture._frameBuffer = frameBuffer;
+
+		// flag as an unstored texture, trying to store and maintain these would be complex due to
+		// issues like them being swapped aorund, plus tracking them in stored textures hold no benefits
+		renderTexture._storeID = -1;
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		return renderTexture;
 	};
 
 	/**
@@ -885,18 +968,28 @@ this.createjs = this.createjs||{};
 	 * @method _fetchShaderProgram
 	 * @protected
 	 */
-	p._fetchShaderProgram = function(gl, shader) {
+	p._fetchShaderProgram = function(gl, shader, customVTX, customFRAG, shaderParamSetup) {
 		gl.useProgram(null);		//saftey to avoid collisions
 
 		var targetFrag, targetVtx;
 		switch(shader) {
-			case "test":
-				targetVtx = SpriteStage.VTX_SHADER_TEST;
-				targetFrag = SpriteStage.FRAG_SHADER_TEST;
+			case "custom":
+				targetVtx = SpriteStage.COVER_VERTEX_HEADER;
+				targetFrag = SpriteStage.COVER_FRAGMENT_HEADER;
+				targetVtx += customVTX || SpriteStage.COVER_VERTEX_BODY_REGULAR;
+				targetFrag += customFRAG || SpriteStage.COVER_FRAGMENT_BODY_REGULAR;
+				break;
+			case "particle":
+				targetVtx = SpriteStage.SHADER_VERTEX_HEADER;
+				targetFrag = SpriteStage.SHADER_FRAGMENT_HEADER;
+				targetVtx += SpriteStage.SHADER_VERTEX_BODY_PARTICLE;
+				targetFrag += SpriteStage.SHADER_FRAGMENT_BODY_PARTICLE;
 				break;
 			default:
-				targetVtx = SpriteStage.VTX_SHADER;
-				targetFrag = SpriteStage.FRAG_SHADER;
+				targetVtx = SpriteStage.SHADER_VERTEX_HEADER;
+				targetFrag = SpriteStage.SHADER_FRAGMENT_HEADER;
+				targetVtx += SpriteStage.SHADER_VERTEX_BODY_REGULAR;
+				targetFrag += SpriteStage.SHADER_FRAGMENT_BODY_REGULAR;
 				break;
 		}
 
@@ -917,41 +1010,32 @@ this.createjs = this.createjs||{};
 
 		gl.useProgram(shaderProgram);
 
-		// get the places in memory the shader is stored so we can feed information into them
-		// then save it off on the shader because it's so tied to the shader itself
 		switch(shader) {
-			case "test":
+			case "custom":
 				shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 				gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
 				shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
 				gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
 
-				shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
-				shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
-				gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
-
-				shaderProgram.alphaAttribute = gl.getAttribLocation(shaderProgram, "objectAlpha");
-				gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
-
-				var samplers = [];
-				for(var i = 0; i < this._batchTextureCount; i++) {
-					samplers[i] = i;
-				}
-
-				shaderProgram.samplerData = samplers;
 				shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-				gl.uniform1iv(shaderProgram.samplerUniform, samplers);
-				shaderProgram.testVarUniform = gl.getAttribLocation(shaderProgram, "testVar");
+				gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+				// if there's some custom attributes be sure to hook them up
+				if(shaderParamSetup) {
+					shaderParamSetup(gl, this, shaderProgram);
+				}
 				break;
+			case "particle":
 			default:
+				// get the places in memory the shader is stored so we can feed information into them
+				// then save it off on the shader because it's so tied to the shader itself
 				shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 				gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
 				shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
 				gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
 
-				shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
 				shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
 				gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
 
@@ -962,6 +1046,8 @@ this.createjs = this.createjs||{};
 				for(var i = 0; i < this._batchTextureCount; i++) {
 					samplers[i] = i;
 				}
+
+				shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
 
 				shaderProgram.samplerData = samplers;
 				shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
@@ -1155,7 +1241,7 @@ this.createjs = this.createjs||{};
 	p._updateTextureImageData = function(gl, image) {
 		var texture = this._textureDictionary[image._storeID];
 
-		gl.activeTexture(gl.TEXTURE0 + texture._activeIndex); //TODO DHG: shouldn't this be in here?
+		gl.activeTexture(gl.TEXTURE0 + texture._activeIndex);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -1199,6 +1285,40 @@ this.createjs = this.createjs||{};
 		this.batchReason = "drawFinish";
 		this._drawToGPU(gl);								// <--------------------------------------------------------
 		this._isDrawing--;
+	};
+
+
+	/**
+	 * Draws all the currently defined boxes to the GPU.
+	 * @method _drawToGPU
+	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
+	 * @protected
+	 **/
+	p._drawCover = function(gl) {
+		if(this._isDrawing > 0) {
+			this._drawToGPU(gl);
+		}
+
+		if(this.vocalDebug) {
+			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ "Cover");
+		}
+		var shaderProgram = this._activeShader;
+		var vertexPositionBuffer = this._vertexPositionBuffer;
+		var uvPositionBuffer = this._uvPositionBuffer;
+
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.useProgram(shaderProgram);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, SpriteStage.COVER_VERT);
+		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, SpriteStage.COVER_UV);
+
+		gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+		gl.drawArrays(gl.TRIANGLES, 0, SpriteStage.INDICIES_PER_CARD);
 	};
 
 	/**
@@ -1292,8 +1412,14 @@ this.createjs = this.createjs||{};
 					texture = this._loadTextureImage(gl, image);
 					this._insertTextureInBatch(gl, texture);
 				} else {
-					// fetch the texture and put it in the batch if needed
-					texture = this._textureDictionary[image._storeID];
+					// fetch the texture
+					if(image._storeID < 0) {
+						// if it isn't a stored texture it's a render texture so the image object is the texture
+						texture = image;
+					} else {
+						texture = this._textureDictionary[image._storeID];
+					}
+					// put it in the batch if needed
 					if(texture._batchID !== this._batchID) {
 						this._insertTextureInBatch(gl, texture);
 					}
@@ -1311,37 +1437,20 @@ this.createjs = this.createjs||{};
 					uvRect.r = (src.y + src.height)/image.height;
 
 					// calculate vertices
-					//w = src.width;			h = src.height;
 					subL = -item.regX;									subT = -item.regY;
 					subR = src.width+subL;								subB = src.height+subT;
 				} else {
-					//TODO: make better cache canvas / filter co-ordinates system
+					// calculate uvs
+					// calculate vertices
 					if(item.cacheCanvas) {
 						uvRect = SpriteStage.UV_RECT;
-
 						subL = item._cacheOffsetX;							subT = item._cacheOffsetY;
 					} else {
 						uvRect = SpriteStage.UV_RECT;
-
 						subL = (-item.regX);								subT = (-item.regY);
 					}
 					subR = image.width+subL;							subB = image.height+subT;
 				}
-
-				// calculate vertices
-				/*
-				tlX = (-item.regX) *iMtx.a				+ (-item.regY) *iMtx.c				+iMtx.tx;
-				tlY = (-item.regX) *iMtx.b				+ (-item.regY) *iMtx.d				+iMtx.ty;
-				trX = (w-item.regX) *iMtx.a				+ (-item.regY) *iMtx.c				+iMtx.tx;
-				trY = (w-item.regX) *iMtx.b				+ (-item.regY) *iMtx.d				+iMtx.ty;
-				blX = (-item.regX) *iMtx.a				+ (h-item.regY) *iMtx.c				+iMtx.tx;
-				blY = (-item.regX) *iMtx.b				+ (h-item.regY) *iMtx.d				+iMtx.ty;
-				brX = (w-item.regX) *iMtx.a				+ (h-item.regY) *iMtx.c				+iMtx.tx;
-				brY = (w-item.regX) *iMtx.b				+ (h-item.regY) *iMtx.d				+iMtx.ty;
-				/*/
-				//subL = -item.regX;								subT = -item.regY;
-				//subR = w-item.regX;								subB = h-item.regY;
-				//*/
 			} else if(item._webGLRenderStyle === 1) {						// SPRITE
 				var frame = item.spriteSheet.getFrame(item.currentFrame);
 				var rect = frame.rect;
@@ -1360,8 +1469,14 @@ this.createjs = this.createjs||{};
 					texture = this._loadTextureImage(gl, image);
 					this._insertTextureInBatch(gl, texture);
 				} else {
-					// fetch the texture and put it in the batch if needed
-					texture = this._textureDictionary[image._storeID];
+					// fetch the texture
+					if(image._storeID < 0) {
+						// if it isn't a stored texture it's a render texture so the image object is the texture
+						texture = image;
+					} else {
+						texture = this._textureDictionary[image._storeID];
+					}
+					// put it in the batch if needed
 					if(texture._batchID !== this._batchID) {
 						this._insertTextureInBatch(gl, texture);
 					}
@@ -1369,42 +1484,21 @@ this.createjs = this.createjs||{};
 				texIndex = texture._activeIndex;
 
 				// calculate vertices
-				//DHG: See Matrix2D.transformPoint for why this math specifically
-				//TODO: DHG: optimize?
-				/*
-				tlX = (-frame.regX) *iMtx.a					+ (-frame.regY) *iMtx.c					+iMtx.tx;
-				tlY = (-frame.regX) *iMtx.b					+ (-frame.regY) *iMtx.d					+iMtx.ty;
-				trX = (rect.width-frame.regX) *iMtx.a		+ (-frame.regY) *iMtx.c					+iMtx.tx;
-				trY = (rect.width-frame.regX) *iMtx.b		+ (-frame.regY) *iMtx.d					+iMtx.ty;
-				blX = (-frame.regX) *iMtx.a					+ (rect.height-frame.regY) *iMtx.c		+iMtx.tx;
-				blY = (-frame.regX) *iMtx.b					+ (rect.height-frame.regY) *iMtx.d		+iMtx.ty;
-				brX = (rect.width-frame.regX) *iMtx.a		+ (rect.height-frame.regY) *iMtx.c		+iMtx.tx;
-				brY = (rect.width-frame.regX) *iMtx.b		+ (rect.height-frame.regY) *iMtx.d		+iMtx.ty;
-				/*/
 				subL = -frame.regX;								subT = -frame.regY;
 				subR = rect.width-frame.regX;					subB = rect.height-frame.regY;
-				//*/
 
 			} else {														// MISC (DOM objects render themselves later)
 				continue;
 			}
 
-			/*/
-			// apply vertices
-			vertices[offset] = tlX;				vertices[offset+1] = tlY;
-			vertices[offset+2] = blX;			vertices[offset+3] = blY;
-			vertices[offset+4] = trX;			vertices[offset+5] = trY;
-			vertices[offset+6] = blX;			vertices[offset+7] = blY;
-			vertices[offset+8] = trX;			vertices[offset+9] = trY;
-			vertices[offset+10] = brX;			vertices[offset+11] = brY;
-			/*/
+			//DHG: See Matrix2D.transformPoint for why this math specifically
+			// apply vertices																							//TODO: DHG: optimize?
 			vertices[offset] = subL *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+1] = subL *iMtx.b + subT *iMtx.d +iMtx.ty;
 			vertices[offset+2] = subL *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+3] = subL *iMtx.b + subB *iMtx.d +iMtx.ty;
 			vertices[offset+4] = subR *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+5] = subR *iMtx.b + subT *iMtx.d +iMtx.ty;
 			vertices[offset+6] = subL *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+7] = subL *iMtx.b + subB *iMtx.d +iMtx.ty;
 			vertices[offset+8] = subR *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+9] = subR *iMtx.b + subT *iMtx.d +iMtx.ty;
 			vertices[offset+10] = subR *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+11] = subR *iMtx.b + subB *iMtx.d +iMtx.ty;
-			//*/
 
 			// apply uvs
 			uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
@@ -1471,7 +1565,6 @@ this.createjs = this.createjs||{};
 
 		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*SpriteStage.INDICIES_PER_CARD);
 		this._batchID++;
-		//drawElements
 	};
 
 	/**
