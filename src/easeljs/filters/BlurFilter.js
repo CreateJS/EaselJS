@@ -98,6 +98,14 @@ this.createjs = this.createjs||{};
 		 * @type Number
 		 **/
 		this.quality = quality | 0;
+
+		this.FRAG_SHADER_BODY = (
+			"void main(void) {" +
+				"vec4 color = texture2D(uSampler, vTextureCoord);" +
+
+				"gl_FragColor = vec4(0.9 - (color.rgb * 0.8), color.a);" +
+			"}"
+		);
 	}
 	var p = createjs.extend(BlurFilter, createjs.Filter);
 

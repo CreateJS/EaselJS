@@ -416,6 +416,14 @@ this.createjs = this.createjs||{};
 		 1,		 1,		//BR
 		 0,		 1		//BL
 	]);
+	SpriteStage.COVER_UV_FLIP = new Float32Array([
+		 0,		 1,		//TL
+		 1,		 1,		//TR
+		 0,		 0,		//BL
+		 1,		 1,		//TR
+		 1,		 0,		//BR
+		 0,		 0		//BL
+	]);
 	SpriteStage.COVER_VERT = new Float32Array([
 		-1,		 1,		//TL
 		 1,		 1,		//TR
@@ -670,7 +678,6 @@ this.createjs = this.createjs||{};
 	 * into itself).
 	 **/
 	p.cacheDraw = function(target, filters) {
-		console.log(">>>>>>>>>");
 		var gl = this._webGLContext;
 		this._shaderBackup = this._activeShader;
 
@@ -683,17 +690,43 @@ this.createjs = this.createjs||{};
 
 		var filterCount = filters.length;
 		if(filterCount) {
-			gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));			// switch to the last texture slot for binding the RT
+			// we don't know which texture slot we're dealing with previously and we need one out of the way
+			// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
+			gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));
 			var renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
 
-			gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
 			// draw item to render texture		I -> T
-			console.log("I -> T");
+			gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
 			this._batchDraw(container, gl, true);
+			// TODO: because I'm using the last texture slot already a regular draw could cause issues depending upon content, find some way of blacklisting the last slot for insert into batch
 
+			// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, renderTexture);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+			var flipY = false;
 
 			// apply each filter in order, but remember to toggle used texture and used
 			for(var i=0; i<filterCount; i++) {
+				var filter = filters[i];
+
+				// now the old result is stored in slot 0, make a new render texture
+				gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));
+				renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+
+				// swap to correct shader
+				this._activeShader = this.getFilterShader(gl, filter);
+				if(!this._activeShader) { continue; }
+
+				// draw result to render texture	R -> T
+				this._drawCover(gl, flipY);
+
+				// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, renderTexture);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -701,53 +734,58 @@ this.createjs = this.createjs||{};
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-				gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));			// switch to the last texture slot for binding the RT
-				renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
-				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-				var filter = filters[i];
-
-				// swap to correct shader
-				this._activeShader = this.getFilterShader(gl, filter);
-				if(!this._activeShader) { continue; }
-
-				// draw result to render texture	R -> T
-				console.log("R -> T");
-				this._drawCover(gl);
+				// use flipping to keep things upright, things already cancel out on a single filter
+				if(filterCount > 1) {
+					flipY = !flipY;
+					//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
+				}
 			}
-			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
 			// is this for another stage or mine
 			if(this.isCacheControlled) {
-				gl.activeTexture(gl.TEXTURE0);			// switch to the last texture slot for binding the RT
-				gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
 				// draw result to canvas			R -> C
-				console.log("R -> C");
 				this._activeShader = this.getFilterShader(gl, null);
-				this._drawCover(gl);
+				this._drawCover(gl, flipY);
 			} else {
+				//TODO: DHG: this is less than ideal a flipped inital render for this circumstance might help, adjust the perspective matrix?
+				if(flipY) {
+					gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));
+					renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+					gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+
+					this._activeShader = this.getFilterShader(gl, null);
+					this._drawCover(gl, !flipY);
+
+				}
+				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
 				// make sure the last texture is the active thing to draw
+				target.cacheCanvas = renderTexture;
 			}
 		} else {
 			// is this for another stage or mine
 			if(this.isCacheControlled) {
 				// draw item to canvas				I -> C
-				console.log("I -> C");
 				this._batchDraw(container, gl, true);
 			} else {
-				gl.bindFramebuffer(gl.FRAMEBUFFER, null/*something*/);
+				// we don't know which texture slot we're dealing with previously and we need one out of the way
+				// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
+				gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));
+				var renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+
 				// draw item to render texture		I -> T
-				console.log("I -> T");
-				// stuff
+				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+				this._batchDraw(container, gl, true);
+				// TODO: because I'm using the last texture slot already a regular draw could cause issues depending upon content, find some way of blacklisting the last slot for insert into batch
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
 				// make sure the last texture is the active thing to draw
+				target.cacheCanvas = renderTexture;
 			}
 		}
 		this._activeShader = this._shaderBackup;
-		console.log("<<<<<<<<<");
 	};
 
 	/**
@@ -883,8 +921,10 @@ this.createjs = this.createjs||{};
 	p.getRenderBufferTexture = function(w, h) {
 		var gl = this._webGLContext;
 
-		// get the texture
+		// get the texture and set its width and height for spoofing as an image
 		var renderTexture = this.getBaseTexture(w, h, null);
+		renderTexture.width = w;
+		renderTexture.height = h;
 
 		// get the frame buffer
 		var frameBuffer = gl.createFramebuffer();
@@ -1292,9 +1332,10 @@ this.createjs = this.createjs||{};
 	 * Draws all the currently defined boxes to the GPU.
 	 * @method _drawToGPU
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
+	 * @param {Boolean} flipY Covers are used for things like RenderTextures and because of 3D vs Canvas space this can end up meaning y sometimes requires flipping in the render
 	 * @protected
 	 **/
-	p._drawCover = function(gl) {
+	p._drawCover = function(gl, flipY) {
 		if(this._isDrawing > 0) {
 			this._drawToGPU(gl);
 		}
@@ -1314,7 +1355,7 @@ this.createjs = this.createjs||{};
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, SpriteStage.COVER_VERT);
 		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, SpriteStage.COVER_UV);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, flipY?SpriteStage.COVER_UV_FLIP:SpriteStage.COVER_UV);
 
 		gl.uniform1i(shaderProgram.samplerUniform, 0);
 
@@ -1356,16 +1397,12 @@ this.createjs = this.createjs||{};
 
 			if(!(item.visible && concatAlpha)) { continue; }
 			if(!item.cacheCanvas || ignoreCache) {
-				if(item.filters && item.filters.length){
-					console.log("I NEED A CACHE!");
-				} else {
-					if(item._webGLRenderStyle === 3) {							// BITMAP TEXT SETUP
-						item._updateText();																				//TODO: DHG: Make this a more generic API like a "pre webgl render" function
-					}
-					if(item.children) {											// CONTAINER
-						this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
-						continue;
-					}
+				if(item._webGLRenderStyle === 3) {							// BITMAP TEXT SETUP
+					item._updateText();																				//TODO: DHG: Make this a more generic API like a "pre webgl render" function
+				}
+				if(item.children) {											// CONTAINER
+					this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
+					continue;
 				}
 			}
 

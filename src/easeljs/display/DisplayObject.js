@@ -791,7 +791,7 @@ this.createjs = this.createjs||{};
 					// flag so render textures aren't used
 					this._webGLCache.isCacheControlled = true;
 				} else {
-					this.cacheCanvas = webGL.getRenderBufferTexture(width, height);
+					this.cacheCanvas = webGL.getRenderBufferTexture(width, height);										//TODO: DHG: use this texture better
 					this._webGLCache = webGL;
 				}
 				this._webGLCache.vocalDebug = true;
