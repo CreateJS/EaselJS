@@ -131,7 +131,8 @@
 	};
 
 	/**
-	 * Mimics the return values at https://msdn.microsoft.com/en-us/library/dn302414(v=vs.85).aspx
+	 * Mimics the return values of WebGl's context.
+	 * @param {Number} type The parameter to look up.
 	 */
 	p.getParameter = function(type) {
 		return this._glCtx.getParameter(type);
