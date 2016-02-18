@@ -1289,6 +1289,8 @@ this.createjs = this.createjs||{};
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 
+		image._invalid = false;
+
 		texture._w = image.width;
 		texture._h = image.height;
 
@@ -1398,7 +1400,7 @@ this.createjs = this.createjs||{};
 			if(!(item.visible && concatAlpha)) { continue; }
 			if(!item.cacheCanvas || ignoreCache) {
 				if(item._webGLRenderStyle === 3) {							// BITMAP TEXT SETUP
-					item._updateText();																				//TODO: DHG: Make this a more generic API like a "pre webgl render" function
+					item._updateText();																					//TODO: DHG: Make this a more generic API like a "pre webgl render" function
 				}
 				if(item.children) {											// CONTAINER
 					this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
@@ -1436,8 +1438,6 @@ this.createjs = this.createjs||{};
 			var vertices = this._vertices;
 			var texI = this._indecies;
 			var alphas = this._alphas;
-			var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;											//TODO: DHG: you can do better
-			var loc = (offset/2)|0;
 
 			if(item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
 				var image = (ignoreCache?false:item.cacheCanvas) || item.image;
@@ -1528,22 +1528,26 @@ this.createjs = this.createjs||{};
 				continue;
 			}
 
+			// These must be calculated here else a forced draw might happen after they're set
+			var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;											//TODO: DHG: you can do better
+			var loc = (offset/2)|0;
+
 			//DHG: See Matrix2D.transformPoint for why this math specifically
 			// apply vertices																							//TODO: DHG: optimize?
-			vertices[offset] = subL *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+1] = subL *iMtx.b + subT *iMtx.d +iMtx.ty;
-			vertices[offset+2] = subL *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+3] = subL *iMtx.b + subB *iMtx.d +iMtx.ty;
-			vertices[offset+4] = subR *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+5] = subR *iMtx.b + subT *iMtx.d +iMtx.ty;
-			vertices[offset+6] = subL *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+7] = subL *iMtx.b + subB *iMtx.d +iMtx.ty;
-			vertices[offset+8] = subR *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+9] = subR *iMtx.b + subT *iMtx.d +iMtx.ty;
-			vertices[offset+10] = subR *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+11] = subR *iMtx.b + subB *iMtx.d +iMtx.ty;
+			vertices[offset] =		subL *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+1] =	subL *iMtx.b + subT *iMtx.d +iMtx.ty;
+			vertices[offset+2] =	subL *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+3] =	subL *iMtx.b + subB *iMtx.d +iMtx.ty;
+			vertices[offset+4] =	subR *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+5] =	subR *iMtx.b + subT *iMtx.d +iMtx.ty;
+			vertices[offset+6] =	vertices[offset+2];								vertices[offset+7] =	vertices[offset+3];
+			vertices[offset+8] =	vertices[offset+4];								vertices[offset+9] =	vertices[offset+5];
+			vertices[offset+10] =	subR *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+11] =	subR *iMtx.b + subB *iMtx.d +iMtx.ty;
 
 			// apply uvs
-			uvs[offset] = uvRect.l;				uvs[offset+1] = uvRect.t;
-			uvs[offset+2] = uvRect.l;			uvs[offset+3] = uvRect.b;
-			uvs[offset+4] = uvRect.r;			uvs[offset+5] = uvRect.t;
-			uvs[offset+6] = uvRect.l;			uvs[offset+7] = uvRect.b;
-			uvs[offset+8] = uvRect.r;			uvs[offset+9] = uvRect.t;
-			uvs[offset+10] = uvRect.r;			uvs[offset+11] = uvRect.b;
+			uvs[offset] =		uvRect.l;			uvs[offset+1] =		uvRect.t;
+			uvs[offset+2] =		uvRect.l;			uvs[offset+3] =		uvRect.b;
+			uvs[offset+4] =		uvRect.r;			uvs[offset+5] =		uvRect.t;
+			uvs[offset+6] =		uvRect.l;			uvs[offset+7] =		uvRect.b;
+			uvs[offset+8] =		uvRect.r;			uvs[offset+9] =		uvRect.t;
+			uvs[offset+10] =	uvRect.r;			uvs[offset+11] =	uvRect.b;
 
 			// apply texture
 			texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = texI[loc+4] = texI[loc+5] = texIndex;
