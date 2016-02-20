@@ -100,8 +100,9 @@ this.createjs = this.createjs||{};
 		this.quality = quality | 0;
 
 		this.FRAG_SHADER_BODY = (
+			//"uniform vec2 textureSize;" +
 			"void main(void) {" +
-				"vec4 color = texture2D(uSampler, vTextureCoord);" +
+				"vec4 color = texture2D(uSampler, vRenderCoord);" +
 
 				"gl_FragColor = vec4(0.9 - (color.rgb * 0.8), color.a);" +
 			"}"
@@ -112,6 +113,12 @@ this.createjs = this.createjs||{};
 	// TODO: deprecated
 	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
+	p.shaderParamSetup = function(gl, stage, shaderProgram) {
+		/*gl.uniform2fv(
+			gl.getUniformLocation(shaderProgram, "textureSize"),
+			1, 1
+		);*/
+	};
 
 // constants:
 	/**
@@ -156,7 +163,6 @@ this.createjs = this.createjs||{};
 
 	/** docced in super class **/
 	p._applyFilter = function (imageData) {
-
 		var radiusX = this.blurX >> 1;
 		if (isNaN(radiusX) || radiusX < 0) return false;
 		var radiusY = this.blurY >> 1;

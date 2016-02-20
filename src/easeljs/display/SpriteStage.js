@@ -492,12 +492,14 @@ this.createjs = this.createjs||{};
 	SpriteStage.COVER_VARYING_HEADER = (
 		"precision mediump float;" +
 
+		"varying highp vec2 vRenderCoord;" +
 		"varying highp vec2 vTextureCoord;"
 	);
 	SpriteStage.COVER_VERTEX_HEADER = (
 		SpriteStage.COVER_VARYING_HEADER +
 		"attribute vec2 vertexPosition;" +
-		"attribute vec2 uvPosition;"
+		"attribute vec2 uvPosition;" +
+		"uniform float uUpright;"
 	);
 	SpriteStage.COVER_FRAGMENT_HEADER = (
 		SpriteStage.COVER_VARYING_HEADER +
@@ -506,12 +508,14 @@ this.createjs = this.createjs||{};
 	SpriteStage.COVER_VERTEX_BODY_REGULAR  = (
 		"void main(void) {" +
 			"gl_Position = vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
-			"vTextureCoord = uvPosition;" +
+			"vRenderCoord = uvPosition;" +
+			"vTextureCoord = vec2(uvPosition.x, abs(uUpright - uvPosition.y));" +
+			//"vTextureCoord = uvPosition;" +
 		"}"
 	);
 	SpriteStage.COVER_FRAGMENT_BODY_REGULAR = (
 		"void main(void) {" +
-			"vec4 color = texture2D(uSampler, vTextureCoord);" +
+		"vec4 color = texture2D(uSampler, vRenderCoord);" +
 
 			"gl_FragColor = color;" +
 		"}"
@@ -703,10 +707,7 @@ this.createjs = this.createjs||{};
 			// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			this.setTextureParams(gl);
 
 			var flipY = false;
 
@@ -729,10 +730,7 @@ this.createjs = this.createjs||{};
 				// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+				this.setTextureParams(gl);
 
 				// use flipping to keep things upright, things already cancel out on a single filter
 				if(filterCount > 1) {
@@ -849,15 +847,15 @@ this.createjs = this.createjs||{};
 	p.getFilterShader = function(gl, filter) {
 		filter = filter || {};
 		var targetShader = this._activeShader;
-		//try{
+		try{
 			targetShader = this._fetchShaderProgram(
 				gl, "custom",
 				filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY,
 				filter.shaderParamSetup && filter.shaderParamSetup.bind(filter)
 			);
-		//} catch (e) {
-		//	console.log("SHADER SWITCH FAILURE", e);
-		//}
+		} catch (e) {
+			console.log("SHADER SWITCH FAILURE", e);
+		}
 		return targetShader;
 	};
 
@@ -904,10 +902,7 @@ this.createjs = this.createjs||{};
 			gl.UNSIGNED_BYTE,		// type of texture(pixel color depth)
 			data					// image data
 		);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		this.setTextureParams(gl);
 		return texture;
 	};
 
@@ -972,6 +967,13 @@ this.createjs = this.createjs||{};
 		}
 
 		return spritesheet._frames[(target != -1)?(target):(0)].uvRect || {t:0, l:0, b:1, r:1};
+	};
+
+	p.setTextureParams = function(gl, isPOT) {
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	};
 
 	// private methods:
@@ -1060,6 +1062,9 @@ this.createjs = this.createjs||{};
 
 				shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
 				gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+				shaderProgram.uprightUniform = gl.getUniformLocation(shaderProgram, "uUpright");
+				gl.uniform1f(shaderProgram.uprightUniform, 0);
 
 				// if there's some custom attributes be sure to hook them up
 				if(shaderParamSetup) {
@@ -1283,10 +1288,7 @@ this.createjs = this.createjs||{};
 
 		gl.activeTexture(gl.TEXTURE0 + texture._activeIndex);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		this.setTextureParams(gl);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 
 		image._invalid = false;
@@ -1360,6 +1362,7 @@ this.createjs = this.createjs||{};
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, flipY?SpriteStage.COVER_UV_FLIP:SpriteStage.COVER_UV);
 
 		gl.uniform1i(shaderProgram.samplerUniform, 0);
+		gl.uniform1f(shaderProgram.uprightUniform, flipY?0:1);
 
 		gl.drawArrays(gl.TRIANGLES, 0, SpriteStage.INDICIES_PER_CARD);
 	};
@@ -1415,7 +1418,7 @@ this.createjs = this.createjs||{};
 				this.batchCardCount = 0;
 			}
 
-			// actually apply its data to the buffers
+			// keep track of concatanted position
 			if(!item._glMtx) { item._glMtx = new createjs.Matrix2D(); }
 			var iMtx = item._glMtx;
 			iMtx.copy(cMtx);
@@ -1432,7 +1435,7 @@ this.createjs = this.createjs||{};
 				);
 			}
 
-			var uvRect, texIndex;
+			var uvRect, texIndex, image, frame, texture;
 
 			var uvs = this._uvs;
 			var vertices = this._vertices;
@@ -1440,29 +1443,36 @@ this.createjs = this.createjs||{};
 			var alphas = this._alphas;
 
 			if(item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
-				var image = (ignoreCache?false:item.cacheCanvas) || item.image;
+				image = (ignoreCache?false:item.cacheCanvas) || item.image;
+			} else if(item._webGLRenderStyle === 1) {											// SPRITE
+				frame = item.spriteSheet.getFrame(item.currentFrame);
+				image = frame.image;
+			} else {																			// MISC (DOM objects render themselves later)
+				continue;
+			}
 
-				// calculate texture
-				var texture;
-				if(image._storeID === undefined) {
-					// this texture is new to us so load it and add it to the batch
-					texture = this._loadTextureImage(gl, image);
-					this._insertTextureInBatch(gl, texture);
+			// calculate texture
+			if(!image){ continue; }
+			if(image._storeID === undefined) {
+				// this texture is new to us so load it and add it to the batch
+				texture = this._loadTextureImage(gl, image);
+				this._insertTextureInBatch(gl, texture);
+			} else {
+				// fetch the texture
+				if(image._storeID < 0) {
+					// if it isn't a stored texture it's a render texture so the image object is the texture
+					texture = image;
 				} else {
-					// fetch the texture
-					if(image._storeID < 0) {
-						// if it isn't a stored texture it's a render texture so the image object is the texture
-						texture = image;
-					} else {
-						texture = this._textureDictionary[image._storeID];
-					}
-					// put it in the batch if needed
-					if(texture._batchID !== this._batchID) {
-						this._insertTextureInBatch(gl, texture);
-					}
+					texture = this._textureDictionary[image._storeID];
 				}
-				texIndex = texture._activeIndex;
+				// put it in the batch if needed
+				if(texture._batchID !== this._batchID) {
+					this._insertTextureInBatch(gl, texture);
+				}
+			}
+			texIndex = texture._activeIndex;
 
+			if(item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
 				if(item.sourceRect) {
 					// calculate uvs
 					if(!item._uvRect) { item._uvRect = {}; }
@@ -1488,10 +1498,8 @@ this.createjs = this.createjs||{};
 					}
 					subR = image.width+subL;							subB = image.height+subT;
 				}
-			} else if(item._webGLRenderStyle === 1) {						// SPRITE
-				var frame = item.spriteSheet.getFrame(item.currentFrame);
+			} else if(item._webGLRenderStyle === 1) {											// SPRITE
 				var rect = frame.rect;
-				var image = frame.image;
 
 				// calculate uvs
 				uvRect = frame.uvRect;
@@ -1499,33 +1507,9 @@ this.createjs = this.createjs||{};
 					uvRect = this.buildUVRects(item.spriteSheet, item.currentFrame, false);
 				}
 
-				// calculate texture
-				var texture;
-				if(image._storeID === undefined) {
-					// this texture is new to us so load it and add it to the batch
-					texture = this._loadTextureImage(gl, image);
-					this._insertTextureInBatch(gl, texture);
-				} else {
-					// fetch the texture
-					if(image._storeID < 0) {
-						// if it isn't a stored texture it's a render texture so the image object is the texture
-						texture = image;
-					} else {
-						texture = this._textureDictionary[image._storeID];
-					}
-					// put it in the batch if needed
-					if(texture._batchID !== this._batchID) {
-						this._insertTextureInBatch(gl, texture);
-					}
-				}
-				texIndex = texture._activeIndex;
-
 				// calculate vertices
 				subL = -frame.regX;								subT = -frame.regY;
 				subR = rect.width-frame.regX;					subB = rect.height-frame.regY;
-
-			} else {														// MISC (DOM objects render themselves later)
-				continue;
 			}
 
 			// These must be calculated here else a forced draw might happen after they're set
@@ -1598,10 +1582,7 @@ this.createjs = this.createjs||{};
 			var texture = this._batchTextures[j];
 			gl.activeTexture(gl.TEXTURE0 + j);
 			gl.bindTexture(gl.TEXTURE_2D, texture);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+			this.setTextureParams(gl);
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*SpriteStage.INDICIES_PER_CARD);
@@ -1633,7 +1614,7 @@ this.createjs = this.createjs||{};
 			// we couldn't find anywhere for it go, meaning we're maxed out
 			if(found === -1) {
 				this.batchReason = "textureOverflow";
-				this._drawToGPU(gl);		// <--------------------------------------------------------
+				this._drawToGPU(gl);		// <------------------------------------------------------------------------
 				this.batchCardCount = 0;
 				found = start;
 			}
@@ -1643,10 +1624,7 @@ this.createjs = this.createjs||{};
 			texture._activeIndex = found;
 			gl.activeTexture(gl.TEXTURE0 + found);
 			gl.bindTexture(gl.TEXTURE_2D, texture);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+			this.setTextureParams(gl);																					//TODO: DHG: do we need this here?
 			this._lastTextureInsert = found;
 		} else {
 			var image = texture._imageData;

@@ -135,7 +135,7 @@ this.createjs = this.createjs||{};
 			"uniform vec4 uColorOffset;" +
 
 			"void main(void) {" +
-				"vec4 color = texture2D(uSampler, vTextureCoord);" +
+				"vec4 color = texture2D(uSampler, vRenderCoord);" +
 
 				"gl_FragColor = (color * uColorMultiplier) + uColorOffset;" +
 			"}"
@@ -150,15 +150,13 @@ this.createjs = this.createjs||{};
 
 // public methods:
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
-		shaderProgram.colorMultiplier = gl.getUniformLocation(shaderProgram, "uColorMultiplier");
 		gl.uniform4f(
-			shaderProgram.colorMultiplier,
+			gl.getUniformLocation(shaderProgram, "uColorMultiplier"),
 			this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier
 		);
 
-		shaderProgram.colorOffset = gl.getUniformLocation(shaderProgram, "uColorOffset");
 		gl.uniform4f(
-			shaderProgram.colorOffset,
+			gl.getUniformLocation(shaderProgram, "uColorOffset"),
 			this.redOffset/255, this.greenOffset/255, this.blueOffset/255, this.alphaOffset/255
 		);
 	};

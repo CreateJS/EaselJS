@@ -79,7 +79,7 @@ this.createjs = this.createjs||{};
 			"uniform vec4 uColorMatrixOffset;" +
 
 			"void main(void) {" +
-				"vec4 color = texture2D(uSampler, vTextureCoord);" +
+				"vec4 color = texture2D(uSampler, vRenderCoord);" +
 
 				"mat4 m = uColorMatrix;" +
 				"vec4 newColor = vec4(0,0,0,0);" +
@@ -106,10 +106,14 @@ this.createjs = this.createjs||{};
 			mat[15],mat[16],mat[17],mat[18]
 		]);
 
-		gl.colorMatrixUniform = gl.getUniformLocation(shaderProgram, "uColorMatrix");
-		gl.uniformMatrix4fv(gl.colorMatrixUniform, false, colorMatrix);
-		gl.colorMatrixOffsetUniform = gl.getUniformLocation(shaderProgram, "uColorMatrixOffset");
-		gl.uniform4f(gl.colorMatrixOffsetUniform, mat[4]/255, mat[9]/255, mat[14]/255, mat[19]/255);
+		gl.uniformMatrix4fv(
+			gl.getUniformLocation(shaderProgram, "uColorMatrix"),
+			false, colorMatrix
+		);
+		gl.uniform4f(
+			gl.getUniformLocation(shaderProgram, "uColorMatrixOffset"),
+			mat[4]/255, mat[9]/255, mat[14]/255, mat[19]/255
+		);
 	};
 
 // public methods:
