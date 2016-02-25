@@ -90,8 +90,9 @@ this.createjs = this.createjs||{};
 	 * of a canvas object in the current document.
 	 * @param {Boolean} preserveDrawingBuffer If true, the canvas is NOT auto-cleared by WebGL (spec discourages true). Useful if you want to use p.autoClear = false.
 	 * @param {Boolean} antialias Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
+	 * @param {Boolean} transparent If true, the canvas is transparent, this is VERY expensive.
 	 **/
-	function SpriteStage(canvas, preserveDrawingBuffer, antialias) {
+	function SpriteStage(canvas, preserveDrawingBuffer, antialias, transparent) {
 		this.Stage_constructor(canvas);
 
 		// public properties:
@@ -126,6 +127,15 @@ this.createjs = this.createjs||{};
 		 * @default false
 		 **/
 		this._antialias = antialias||false;																				//TODO: DHG: ensure this does something
+
+		/**
+		 * Specifies whether or not the browser's WebGL implementation should be transparent.
+		 * @property _antialias
+		 * @protected
+		 * @type {Boolean}
+		 * @default false
+		 **/
+		this._transparent = transparent||false;																				//TODO: DHG: ensure this does something
 
 		/**
 		 * The width of the drawing surface used in memory.
@@ -340,6 +350,8 @@ this.createjs = this.createjs||{};
 		 */
 		this._drawID = 0;
 
+		this._slotBlacklist = [];
+
 		this._isDrawing = 0;
 
 		this._lastTrackedCanvas = 0;
@@ -515,8 +527,7 @@ this.createjs = this.createjs||{};
 	);
 	SpriteStage.COVER_FRAGMENT_BODY_REGULAR = (
 		"void main(void) {" +
-		"vec4 color = texture2D(uSampler, vRenderCoord);" +
-
+			"vec4 color = texture2D(uSampler, vRenderCoord);" +
 			"gl_FragColor = color;" +
 		"}"
 	);
@@ -579,8 +590,8 @@ this.createjs = this.createjs||{};
 	p._createWebGL = function() {
 		// defaults and options
 		var options = {
-			//depth: false, // Disable the depth buffer as it isn't used.
-			alpha: false, // Make the canvas background transparent.
+			depth: false, // Disable the depth buffer as it isn't used.
+			alpha: this._transparent, // Make the canvas background transparent.
 			stencil: true,
 			antialias: this._antialias,
 			preserveDrawingBuffer: this._preserveDrawingBuffer,
@@ -593,8 +604,8 @@ this.createjs = this.createjs||{};
 		this._createBuffers(gl);
 		this._initTextures(gl);
 
-		//gl.clearColor(0.25, 0.25, 0.25, 1.0);
-		//gl.disable(gl.DEPTH_TEST);
+		gl.clearColor(0.25, 0.25, 0.25, 0.0);
+		gl.disable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
 		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
@@ -610,12 +621,13 @@ this.createjs = this.createjs||{};
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
 		this.dispatchEvent("drawstart"); // TODO: make cancellable?
+		if (this.autoClear) { this.clear(); }
+
 		if (this._webGLContext) {
 			// Use WebGL.
 			this._batchDraw(this, this._webGLContext);
 		} else {
 			// Use 2D.
-			if (this.autoClear) { this.clear(); }
 			var ctx = this.canvas.getContext("2d");
 			ctx.save();
 			this.updateContext(ctx);
@@ -670,6 +682,31 @@ this.createjs = this.createjs||{};
 		}
 	};
 
+	p.getTargetRenderTexture = function(gl, target) {
+		var result, toggle = false;
+		if(target.__lastRT !== undefined && target.__lastRT === target.__rtA){ toggle = true; }
+		if(!toggle){
+			if(target.__rtA === undefined) {
+				target.__rtA = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+				target.__rtA.__name = "rtA";
+			} else {
+				gl.bindTexture(gl.TEXTURE_2D, target.__rtA);
+				this.setTextureParams(gl);
+			}
+			result = target.__rtA;
+		} else {
+			if(target.__rtB === undefined) {
+				target.__rtB = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+				target.__rtA.__name = "rtB";
+			}
+			result = target.__rtB;
+			gl.bindTexture(gl.TEXTURE_2D, target.__rtA);
+			this.setTextureParams(gl);
+		}
+		target.__lastRT = result;
+		return result;
+	};
+
 	/**
 	 * Draws the stage into the specified context (using WebGL) ignoring its shadow.
 	 * If WebGL is not supported in the browser, it will default to a 2D context.
@@ -683,7 +720,12 @@ this.createjs = this.createjs||{};
 	 **/
 	p.cacheDraw = function(target, filters) {
 		var gl = this._webGLContext;
-		this._shaderBackup = this._activeShader;
+		var shaderBackup = this._activeShader;
+		var blackListBackup = this._slotBlacklist;
+		var lastTextureSlot = this._batchTextureCount-1;
+
+		// protect the last slot so that we have somewhere to bind the renderTextures so it doesn't get upset
+		this.protectTextureSlot(lastTextureSlot);
 
 		// create offset container for drawing item
 		var mtx = target.getMatrix();
@@ -692,17 +734,17 @@ this.createjs = this.createjs||{};
 		container.children = [target];
 		container.transformMatrix = mtx;
 
-		var filterCount = filters.length;
+		var filterCount = filters && filters.length;
 		if(filterCount) {
 			// we don't know which texture slot we're dealing with previously and we need one out of the way
 			// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
-			gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));
-			var renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+			gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
+			var renderTexture = this.getTargetRenderTexture(gl, target);
 
 			// draw item to render texture		I -> T
 			gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+			gl.clear(gl.COLOR_BUFFER_BIT);
 			this._batchDraw(container, gl, true);
-			// TODO: because I'm using the last texture slot already a regular draw could cause issues depending upon content, find some way of blacklisting the last slot for insert into batch
 
 			// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
 			gl.activeTexture(gl.TEXTURE0);
@@ -716,8 +758,8 @@ this.createjs = this.createjs||{};
 				var filter = filters[i];
 
 				// now the old result is stored in slot 0, make a new render texture
-				gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));
-				renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
+				renderTexture = this.getTargetRenderTexture(gl, target);
 				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
 
 				// swap to correct shader
@@ -735,7 +777,6 @@ this.createjs = this.createjs||{};
 				// use flipping to keep things upright, things already cancel out on a single filter
 				if(filterCount > 1) {
 					flipY = !flipY;
-					//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
 				}
 			}
 
@@ -744,16 +785,16 @@ this.createjs = this.createjs||{};
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
 				// draw result to canvas			R -> C
-				this._activeShader = this.getFilterShader(gl, null);
+				this._activeShader = this.getFilterShader(gl, this);
 				this._drawCover(gl, flipY);
 			} else {
 				//TODO: DHG: this is less than ideal a flipped inital render for this circumstance might help, adjust the perspective matrix?
 				if(flipY) {
-					gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));
-					renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+					gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
+					renderTexture = this.getTargetRenderTexture(gl, target);
 					gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
 
-					this._activeShader = this.getFilterShader(gl, null);
+					this._activeShader = this.getFilterShader(gl, this);
 					this._drawCover(gl, !flipY);
 
 				}
@@ -766,24 +807,73 @@ this.createjs = this.createjs||{};
 			// is this for another stage or mine
 			if(this.isCacheControlled) {
 				// draw item to canvas				I -> C
+				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
 			} else {
+				// make sure the last texture is the active thing to draw
+				target.cacheCanvas = this.getTargetRenderTexture(gl, target);
+
 				// we don't know which texture slot we're dealing with previously and we need one out of the way
 				// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
-				gl.activeTexture(gl.TEXTURE0+(this._batchTextureCount-1));
-				var renderTexture = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
+				var renderTexture = target.cacheCanvas;
 
 				// draw item to render texture		I -> T
 				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
-				// TODO: because I'm using the last texture slot already a regular draw could cause issues depending upon content, find some way of blacklisting the last slot for insert into batch
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-				// make sure the last texture is the active thing to draw
-				target.cacheCanvas = renderTexture;
+
 			}
 		}
-		this._activeShader = this._shaderBackup;
+		this.protectTextureSlot(lastTextureSlot, true);
+		this._activeShader = shaderBackup;
+		this._slotBlacklist = blackListBackup;
+	};
+
+	p.protectTextureSlot = function(id, free) {
+		this._slotBlacklist[id] = !!free;
+	};
+
+	p.unregisterTexture = function(item) {
+		// container
+		if(item.children) {
+			for(var i= 0, l=item.children.length; i<l; i++) {
+				this.unregisterTexture(item.children);
+			}
+		}
+
+		// render Texture
+		if(item._storeID < 0) {
+			//TODO: delete calls
+			return;
+		}
+
+		// sprites bitmaps and caches
+		var removeTarget;
+		if(item._storeID !== undefined) {
+			removeTarget = item;
+		} else if(item._webGLRenderStyle === 1) {
+			removeTarget = item.spriteSheet.getFrame(item.currentFrame).image;
+		} else if(item._webGLRenderStyle === 2) {
+			if(item.cacheCanvas) {
+				removeTarget = item.cacheCanvas;
+			} else {
+				removeTarget = item.image;
+			}
+		}
+
+		if(removeTarget === undefined) {
+			if(vocalDebug) {
+				console.log("No associated texture found on release");
+			}
+			return;
+		}
+
+		//TODO: delete calls
+		this._textureIDs[removeTarget.src] = undefined;
+		this._textureDictionary[removeTarget._storeID] = undefined;
 	};
 
 	/**
@@ -845,16 +935,24 @@ this.createjs = this.createjs||{};
 	};
 
 	p.getFilterShader = function(gl, filter) {
-		filter = filter || {};
+		if(!filter) { filter = this; }
 		var targetShader = this._activeShader;
-		try{
-			targetShader = this._fetchShaderProgram(
-				gl, "custom",
-				filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY,
-				filter.shaderParamSetup && filter.shaderParamSetup.bind(filter)
-			);
-		} catch (e) {
-			console.log("SHADER SWITCH FAILURE", e);
+		if(filter._builtShader) {
+			targetShader = filter._builtShader;
+			if(targetShader.shaderParamSetup) {
+				targetShader.shaderParamSetup(gl, this, targetShader);
+			}
+		} else {
+			try{
+				targetShader = this._fetchShaderProgram(
+					gl, "custom",
+					filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY,
+					filter.shaderParamSetup && filter.shaderParamSetup.bind(filter)
+				);
+				filter._builtShader = targetShader;
+			} catch (e) {
+				console.log("SHADER SWITCH FAILURE", e);
+			}
 		}
 		return targetShader;
 	};
@@ -1324,7 +1422,7 @@ this.createjs = this.createjs||{};
 		this.depth = 0;
 
 		var mtx = new createjs.Matrix2D();
-		this._appendToBatchGroup(sceneGraph, gl, mtx, 1, ignoreCache);																//TODO: DHG: isn't there a global alpha or something?
+		this._appendToBatchGroup(sceneGraph, gl, mtx, this.alpha, ignoreCache);											//TODO: DHG: isn't there a global alpha or something?
 
 		this.batchReason = "drawFinish";
 		this._drawToGPU(gl);								// <--------------------------------------------------------
@@ -1604,7 +1702,7 @@ this.createjs = this.createjs||{};
 			var start = (this._lastTextureInsert+1) % this._batchTextureCount;
 			var look = start;
 			do {
-				if(this._batchTextures[look]._batchID != this._batchID) {
+				if(this._batchTextures[look]._batchID != this._batchID && !this._slotBlacklist[look]) {
 					found = look;
 					break;
 				}
@@ -1628,7 +1726,7 @@ this.createjs = this.createjs||{};
 			this._lastTextureInsert = found;
 		} else {
 			var image = texture._imageData;
-			if(image._invalid) {
+			if(texture._storeID != -1 && image._invalid) {
 				this._updateTextureImageData(gl, image);
 			}
 		}
