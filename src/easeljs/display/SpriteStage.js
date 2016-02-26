@@ -697,11 +697,12 @@ this.createjs = this.createjs||{};
 		} else {
 			if(target.__rtB === undefined) {
 				target.__rtB = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
-				target.__rtA.__name = "rtB";
+				target.__rtB.__name = "rtB";
+			} else {
+				gl.bindTexture(gl.TEXTURE_2D, target.__rtB);
+				this.setTextureParams(gl);
 			}
 			result = target.__rtB;
-			gl.bindTexture(gl.TEXTURE_2D, target.__rtA);
-			this.setTextureParams(gl);
 		}
 		target.__lastRT = result;
 		return result;
@@ -733,6 +734,11 @@ this.createjs = this.createjs||{};
 		var container = this._cacheContainer;
 		container.children = [target];
 		container.transformMatrix = mtx;
+
+		for(var i=0; i<this._batchTextureCount;i++) {
+			gl.activeTexture(gl.TEXTURE0 + i);
+			this._batchTextures[i] = this.getBaseTexture();
+		}
 
 		var filterCount = filters && filters.length;
 		if(filterCount) {
@@ -810,23 +816,22 @@ this.createjs = this.createjs||{};
 				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
 			} else {
-				// make sure the last texture is the active thing to draw
-				target.cacheCanvas = this.getTargetRenderTexture(gl, target);
-
-				// we don't know which texture slot we're dealing with previously and we need one out of the way
-				// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
+				target.cacheCanvas = this.getTargetRenderTexture(gl, target);
 				var renderTexture = target.cacheCanvas;
 
 				// draw item to render texture		I -> T
 				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+
+				var backupMTX = this._projectionMatrix;
+				this._projectionMatrix = this._projectionMatrixFlip;
 				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-
+				this._projectionMatrix = backupMTX;
 			}
 		}
+
 		this.protectTextureSlot(lastTextureSlot, true);
 		this._activeShader = shaderBackup;
 		this._slotBlacklist = blackListBackup;
@@ -931,6 +936,9 @@ this.createjs = this.createjs||{};
 				0,				0,					1,				0,
 				-1,				1,					0.1,			0
 			]);
+			this._projectionMatrixFlip = this._projectionMatrix.slice();
+			this._projectionMatrixFlip[5] *= -1;
+			this._projectionMatrixFlip[13] *= -1;
 		}
 	};
 
@@ -1028,8 +1036,8 @@ this.createjs = this.createjs||{};
 		frameBuffer._renderTexture = renderTexture;
 		renderTexture._frameBuffer = frameBuffer;
 
-		// flag as an unstored texture, trying to store and maintain these would be complex due to
-		// issues like them being swapped aorund, plus tracking them in stored textures hold no benefits
+		// flag as an un-stored texture, trying to store and maintain these would be complex due to
+		// issues like them being swapped around, plus tracking them in stored textures hold no benefits
 		renderTexture._storeID = -1;
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -1720,9 +1728,14 @@ this.createjs = this.createjs||{};
 			// lets put it into that spot
 			this._batchTextures[found] = texture;
 			texture._activeIndex = found;
-			gl.activeTexture(gl.TEXTURE0 + found);
-			gl.bindTexture(gl.TEXTURE_2D, texture);
-			this.setTextureParams(gl);																					//TODO: DHG: do we need this here?
+			var image = texture._imageData;
+			if(image && image._invalid && texture._drawID !== undefined) {
+				this._updateTextureImageData(gl, image);
+			} else {
+				gl.activeTexture(gl.TEXTURE0 + found);
+				gl.bindTexture(gl.TEXTURE_2D, texture);
+				this.setTextureParams(gl);
+			}
 			this._lastTextureInsert = found;
 		} else {
 			var image = texture._imageData;
