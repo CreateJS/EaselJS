@@ -39,29 +39,17 @@ this.createjs = this.createjs||{};
 
 // constructor:
 	/**
-	 * @class MasterFilter
+	 * @class CacheManager
 	 * @constructor
 	 **/
-	function MasterFilter(context) {
-		/**
-		 * The context these filters are being used from. Necessary for re-using the same context in webGL scenarios,
-		 * also used as a key for the multi-singleton approach.
-		 * @property refCtx
-		 * @type {CanvasRenderingContext}
-		 * @default null
-		 */
-		this.refCtx = context || null;
-
-		/**
-		 * The context these filters are being used from. Necessary for re-using the same context in webGL scenarios,
-		 * also used as a key for the multi-singleton approach.
-		 * @property refCtx
-		 * @type {CanvasRenderingContext}
-		 * @default null
-		 */
-		this._spriteStage = null;
+	function CacheManager(context) {
+		this.width
+		this.height
+		this.x
+		this.y
+		this.scale
 	}
-	var p = MasterFilter.prototype;
+	var p = CacheManager.prototype;
 
 	/**
 	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
@@ -77,39 +65,13 @@ this.createjs = this.createjs||{};
 	// p.initialize = function() {}; // searchable for devs wondering where it is.
 
 	/**
-	 *
-	 */
-	MasterFilter._lastID = -1;
-
-	/**
-	 *
-	 */
-	MasterFilter._contextLookup = [];
-
-	/**
-	 *
-	 */
-	MasterFilter.get = function(context) {
-		if(!context._masterFilterID){
-			context._masterFilterID = ++MasterFilter._lastID;
-		}
-
-		var master = MasterFilter._contextLookup[context._masterFilterID];
-		if(!master){
-			master = MasterFilter._contextLookup[context._masterFilterID] = new MasterFilter(context);
-		}
-
-		return master;
-	};
-
-	/**
 	 * Returns the bounds that surround all applied filters.
 	 * @method getFilterBounds
 	 * @param {DisplayObject} target aaa.
 	 * @param {Rectangle} [output=null] Optional parameter, if provided then calculated bounds will be applied to that object.
 	 * @return {Rectangle} a string representation of the instance.
 	 **/
-	MasterFilter.getFilterBounds = function(target, output) {
+	CacheManager.getFilterBounds = function(target, output) {
 		if(!output){ output = new createjs.Rectangle(); }
 		var filters = target.filters;
 		var filterCount = filters && filters.length;
@@ -140,8 +102,90 @@ this.createjs = this.createjs||{};
 		return "[Filter]";
 	};
 
+	p.defineCache = function(target, x, y, width, height, scale, webGL) {
+		//TODO: DHG: self SpriteStage checking maybe?
+		// draw to canvas.
+		if(webGL) {
+			if(this._webGLCache !== webGL) {
+				if(webGL === true) {
+					this.cacheCanvas = document.createElement("canvas");
+					this._webGLCache = new createjs.SpriteStage(this.cacheCanvas);
+					// flag so render textures aren't used
+					this._webGLCache.isCacheControlled = true;
+				} else {
+					this.cacheCanvas = true;
+					this._webGLCache = webGL;
+				}
+			}
+		} else {
+			this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+			this._webGLCache = null;
+		}
+
+		scale = scale || 1;
+		target._cacheWidth = this.width = width;
+		target._cacheHeight = this.height = height;
+		target._cacheOffsetX = this.x = x;
+		target._cacheOffsetY = this.y = y;
+		target._cacheScale = this.scale = scale;
+
+		target.cacheCanvas = this.cacheCanvas;
+		this.target = target;
+		this.updateCache();
+	};
+
+	p.updateCache = function(compositeOperation) {
+		var target = this.target;
+		var cacheCanvas = this.cacheCanvas;
+		var webGL = this._webGLCache;
+		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
+		var scale = this.scale;
+		var offX = this.x*scale, offY = this.y*scale;
+
+		var fBounds = CacheManager.getFilterBounds(target);
+		offX += (target._filterOffsetX = fBounds.x);
+		offY += (target._filterOffsetY = fBounds.y);
+
+		var w = this.width, h = this.height;
+		w = Math.ceil(w*scale) + fBounds.width;
+		h = Math.ceil(h*scale) + fBounds.height;
+
+		if (webGL) {
+			if (webGL.isCacheControlled) {
+				if (w != cacheCanvas.width || h != cacheCanvas.height) {
+					cacheCanvas.width = w;
+					cacheCanvas.height = h;
+					webGL.updateViewport(w, h);
+				}
+			}
+			this._webGLCache.cacheDraw(target, target.filters);
+			this.cacheCanvas = target.cacheCanvas;
+		} else {
+			var ctx = cacheCanvas.getContext("2d");
+
+			if (w != cacheCanvas.width || h != cacheCanvas.height) {
+				cacheCanvas.width = w;
+				cacheCanvas.height = h;
+			} else if (!compositeOperation) {
+				ctx.clearRect(0, 0, w+1, h+1);
+			}
+
+			ctx.save();
+			ctx.globalCompositeOperation = compositeOperation;
+			ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
+			target.draw(ctx, true);
+			ctx.restore();
+			if (target.filters && target.filters.length) {
+				this.applyFilters(target);																				//TODO: DHG: had grander plans for master, probably should remove the current master though
+			}
+		}
+
+		// the actual cacheCanvas element could of changed during the cache process of a webGL texture
+		this.cacheCanvas._invalid = true;
+		this.cacheID = createjs.DisplayObject._nextCacheID++;
+	};
+
 	p.applyFilters = function(target, webGL) {
-		console.log("STARTING NOW MASTER!", webGL);
 		var canvas = target.cacheCanvas;
 		var filters = target.filters;
 
@@ -171,25 +215,9 @@ this.createjs = this.createjs||{};
 			//done
 			canvas.getContext("2d").putImageData(data, 0,0);
 		}
-		console.log("IT IS DONE MASTER!");
-	};
-
-	p._getFilterBounds = function(target, rect) {
-		var l, filters = target.filters, bounds = this._rectangle.setValues(0,0,0,0);
-		if (!filters || !(l=filters.length)) { return bounds; }
-
-		for (var i=0; i<l; i++) {
-			var f = this.filters[i];
-			f.getBounds&&f.getBounds(bounds);	//TODO: DHG: doesn't this not adapt to the biggest bounds, shouldn't it?
-		}
-		return bounds;
 	};
 
 // private methods:
-	p._getWebGLContext = function(canvas) {
-		var canvas = document.createElement("canvas");
-		return this._spriteStage ? this._spriteStage : (this._spriteStage = new createjs.SpriteStage(canvas));
-	};
 
-	createjs.MasterFilter = MasterFilter;
+	createjs.CacheManager = CacheManager;
 }());

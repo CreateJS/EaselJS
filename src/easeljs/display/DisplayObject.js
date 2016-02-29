@@ -780,6 +780,13 @@ this.createjs = this.createjs||{};
 	 * If rendering in WebGL already use the same webGL context for best performance.
 	 **/
 	p.cache = function(x, y, width, height, scale, webGL) {
+		if(!this.cacheController){
+			this.cacheController = new createjs.CacheManager();
+		}
+		this.cacheController.defineCache(this, x, y, width, height, scale, webGL);
+	};
+
+	p.cacheOLD = function(x, y, width, height, scale, webGL) {
 		//TODO: DHG: self SpriteStage checking maybe?
 		// draw to canvas.
 		scale = scale||1;
@@ -831,13 +838,20 @@ this.createjs = this.createjs||{};
 	 * whatwg spec on compositing</a>.
 	 **/
 	p.updateCache = function(compositeOperation) {
+		if(!this.cacheController) {
+			throw "cache() must be called before updateCache()";
+		}
+		this.cacheController.updateCache(compositeOperation);
+	};
+
+	p.updateCacheOLD = function(compositeOperation) {
 		var cacheCanvas = this.cacheCanvas;
 		var webGL = this._webGLCache;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
 		var scale = this._cacheScale;
 		var offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
 
-		var fBounds = createjs.MasterFilter.getFilterBounds(this);
+		var fBounds = createjs.CacheManager.getFilterBounds(this);
 		offX += (this._filterOffsetX = fBounds.x);
 		offY += (this._filterOffsetY = fBounds.y);
 
@@ -870,7 +884,7 @@ this.createjs = this.createjs||{};
 			this.draw(ctx, true);
 			ctx.restore();
 			if (this.filters && this.filters.length) {
-				var master = createjs.MasterFilter.get(canvas);
+				var master = createjs.CacheManager.get(canvas);
 				master.applyFilters(this);																				//TODO: DHG: had grander plans for master, probably should remove the current master though
 			}
 		}
@@ -1319,35 +1333,6 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * @method _applyFilters
-	 * @param {Boolean || WebGLRenderingContext} webGL The webgl context to render to, or "true" to create a new one.
-	 * If rendering in WebGL already use the same webGL context for best performance.
-	 * @protected
-	 **/
-	p._applyFilters = function(canvas, webGL) {
-		if (!this.filters || this.filters.length == 0 || !this.cacheCanvas) { return; }
-		var master = createjs.MasterFilter.get(canvas);
-		master.applyFilters(this, webGL);
-	};
-
-	/**
-	 * @method _getFilterBounds
-	 * @return {Rectangle}
-	 * @protected
-	 * @deprecated
-	 **/
-	p._getFilterBounds = function(rect) {
-		var l, filters = this.filters, bounds = this._rectangle.setValues(0,0,0,0);
-		if (!filters || !(l=filters.length)) { return bounds; }
-		
-		for (var i=0; i<l; i++) {
-			var f = this.filters[i];
-			f.getBounds&&f.getBounds(bounds);	//TODO: DHG: doesn't this not adapt to the biggest bounds, shouldn't it?
-		}
-		return bounds;
-	};
-
-	/**
 	 * @method _getBounds
 	 * @param {Matrix2D} matrix
 	 * @param {Boolean} ignoreTransform If true, does not apply this object's transform.
@@ -1383,11 +1368,11 @@ this.createjs = this.createjs||{};
 		if ((x = x_a + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
 		if ((x = x_a + y_c + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
 		if ((x = y_c + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
-		
+
 		if ((y = x_b + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 		if ((y = x_b + y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 		if ((y = y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
-		
+
 		return bounds.setValues(minX, minY, maxX-minX, maxY-minY);
 	};
 
