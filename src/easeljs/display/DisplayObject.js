@@ -434,20 +434,20 @@ this.createjs = this.createjs||{};
 		this._cacheScale = 1;
 
 		/**
+		* @deprecated
 		* @property _cacheDataURLID
 		* @protected
 		* @type {Number}
 		* @default 0
 		*/
-		this._cacheDataURLID = 0;
 
 		/**
+		 * @deprecated
 		* @property _cacheDataURL
 		* @protected
 		* @type {String}
 		* @default null
 		*/
-		this._cacheDataURL = null;
 
 		/**
 		 * @property _props
@@ -475,7 +475,17 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(DisplayObject, createjs.EventDispatcher);
 
-	// TODO: deprecated
+	/**
+	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	 * for details.
+	 *
+	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	 *
+	 * @method initialize
+	 * @protected
+	 * @deprecated
+	 */
 	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
 // static properties:
@@ -527,12 +537,12 @@ this.createjs = this.createjs||{};
 	}
 
 	/**
+	 * @deprecated
 	 * @property _nextCacheID
 	 * @type {Number}
 	 * @static
 	 * @protected
 	 **/
-	DisplayObject._nextCacheID = 1;
 
 
 // events:
@@ -747,13 +757,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Draws the display object into a new canvas, which is then used for subsequent draws. For complex content
+	 * Draws the display object into a new element, which is then used for subsequent draws. Intended for complex content
 	 * that does not change frequently (ex. a Container with many children that do not move, or a complex vector Shape),
 	 * this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
-	 * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must
-	 * manually update the cache by calling <code>updateCache()</code> or <code>cache()</code> again. You must specify
-	 * the cache area via the x, y, w, and h parameters. This defines the rectangle that will be rendered and cached
-	 * using this display object's coordinates.
+	 * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must manually
+	 * update the cache by calling <code>updateCache()</code> again. You must specify the cached area via the x, y, w,
+	 * and h parameters. This defines the rectangle that will be rendered and cached  using this display object's coordinates.
 	 *
 	 * <h4>Example</h4>
 	 * For example if you defined a Shape that drew a circle at 0, 0 with a radius of 25:
@@ -762,11 +771,15 @@ this.createjs = this.createjs||{};
 	 *      shape.graphics.beginFill("#ff0000").drawCircle(0, 0, 25);
 	 *      myShape.cache(-25, -25, 50, 50);
 	 *
-	 * Note that filters need to be defined <em>before</em> the cache is applied. Check out the {{#crossLink "Filter"}}{{/crossLink}}
-	 * class for more information. Some filters (ex. BlurFilter) will not work as expected in conjunction with the scale param.
+	 * Note that filters need to be defined <em>before</em> the cache is applied or you will have to call updateCache after
+	 * application. Check out the {{#crossLink "Filter"}}{{/crossLink}} class for more information. Some filters
+	 * (ex. BlurFilter) may not work as expected in conjunction with the scale param.
 	 * 
 	 * Usually, the resulting cacheCanvas will have the dimensions width*scale by height*scale, however some filters (ex. BlurFilter)
 	 * will add padding to the canvas dimensions.
+	 *
+	 * Actual implementation of the caching mechanism can change with a {{#crossLink "SpriteStage"}}{{/crossLink}} and so
+	 * all caching and filter behaviour has been moved to the {{#crossLink "CacheManager"}}{{/crossLink}}
 	 *
 	 * @method cache
 	 * @param {Number} x The x coordinate origin for the cache region.
@@ -776,44 +789,15 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
 	 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
 	 * 	cached elements with greater fidelity. Default is 1.
-	 * @param {Boolean || SpriteStage} webGL The webgl context to render to, or "true" to create a new one.
-	 * If rendering in WebGL already use the same webGL context for best performance.
+	 * @param {Object} options When using things like a {{#crossLink "SpriteStage"}}{{/crossLink}} there may be extra caching opportunities or needs.
 	 **/
-	p.cache = function(x, y, width, height, scale, webGL) {
+	p.cache = function(x, y, width, height, scale, options) {
 		if(!this.cacheController){
 			this.cacheController = new createjs.CacheManager();
-		}
-		this.cacheController.defineCache(this, x, y, width, height, scale, webGL);
-	};
-
-	p.cacheOLD = function(x, y, width, height, scale, webGL) {
-		//TODO: DHG: self SpriteStage checking maybe?
-		// draw to canvas.
-		scale = scale||1;
-		if(webGL && createjs.SpriteStage) {
-			if(this._webGLCache !== webGL) {
-				if(webGL === true) {
-					this.cacheCanvas = document.createElement("canvas");
-					this._webGLCache = new createjs.SpriteStage(this.cacheCanvas);
-					// flag so render textures aren't used
-					this._webGLCache.isCacheControlled = true;
-				} else {
-					this.cacheCanvas = true;
-					this._webGLCache = webGL;
-				}
-			}
 		} else {
-			if(!this.cacheCanvas || this._webGLCache) {
-				this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
-				this._webGLCache = null;
-			}
+			console.log("For best performance please uncache before making a new cache, or if it still the same cache call updateCache");
 		}
-		this._cacheWidth = width;
-		this._cacheHeight = height;
-		this._cacheOffsetX = x;
-		this._cacheOffsetY = y;
-		this._cacheScale = scale;
-		this.updateCache();
+		this.cacheController.defineCache(this, x, y, width, height, scale, options);
 	};
 
 	/**
@@ -830,11 +814,12 @@ this.createjs = this.createjs||{};
 	 *      shapeInstance.setStrokeStyle(3).beginStroke("#ff0000").moveTo(100, 100).lineTo(200,200);
 	 *      shapeInstance.updateCache();
 	 *
+	 * Actual implementation of the caching mechanism can change with a {{#crossLink "SpriteStage"}}{{/crossLink}} and so
+	 * all caching and filter behaviour has been moved to the {{#crossLink "CacheManager"}}{{/crossLink}}
+	 *
 	 * @method updateCache
 	 * @param {String} compositeOperation The compositeOperation to use, or null to clear the cache and redraw it.
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
-	 * @param {Boolean || WebGLRenderingContext} webGL The webgl context to render to, or "true" to create a new one.
-	 * If rendering in WebGL already use the same webGL context for best performance.
 	 * whatwg spec on compositing</a>.
 	 **/
 	p.updateCache = function(compositeOperation) {
@@ -844,70 +829,15 @@ this.createjs = this.createjs||{};
 		this.cacheController.updateCache(compositeOperation);
 	};
 
-	p.updateCacheOLD = function(compositeOperation) {
-		var cacheCanvas = this.cacheCanvas;
-		var webGL = this._webGLCache;
-		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
-		var scale = this._cacheScale;
-		var offX = this._cacheOffsetX*scale, offY = this._cacheOffsetY*scale;
-
-		var fBounds = createjs.CacheManager.getFilterBounds(this);
-		offX += (this._filterOffsetX = fBounds.x);
-		offY += (this._filterOffsetY = fBounds.y);
-
-		var w = this._cacheWidth, h = this._cacheHeight;
-		w = Math.ceil(w*scale) + fBounds.width;
-		h = Math.ceil(h*scale) + fBounds.height;
-
-		if (webGL) {
-			if (webGL.isCacheControlled) {
-				if (w != cacheCanvas.width || h != cacheCanvas.height) {
-					cacheCanvas.width = w;
-					cacheCanvas.height = h;
-					webGL.updateViewport(w, h);
-				}
-			}
-			this._webGLCache.cacheDraw(this, this.filters);
-		} else {
-			var ctx = cacheCanvas.getContext("2d");
-
-			if (w != cacheCanvas.width || h != cacheCanvas.height) {
-				cacheCanvas.width = w;
-				cacheCanvas.height = h;
-			} else if (!compositeOperation) {
-				ctx.clearRect(0, 0, w+1, h+1);
-			}
-
-			ctx.save();
-			ctx.globalCompositeOperation = compositeOperation;
-			ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
-			this.draw(ctx, true);
-			ctx.restore();
-			if (this.filters && this.filters.length) {
-				var master = createjs.CacheManager.get(canvas);
-				master.applyFilters(this);																				//TODO: DHG: had grander plans for master, probably should remove the current master though
-			}
-		}
-
-		// the actual cacheCanvas element could of changed during the cache process of a webGL texture
-		this.cacheCanvas._invalid = true;
-		this.cacheID = DisplayObject._nextCacheID++;
-	};
-
 	/**
 	 * Clears the current cache. See {{#crossLink "DisplayObject/cache"}}{{/crossLink}} for more information.
 	 * @method uncache
 	 **/
 	p.uncache = function() {
-		if(this._webGLCache) {
-			if(!this._webGLCache.isCacheControlled) {
-				this._webGLCache.unregisterTexture(this.cacheCanvas);
-			}
-			this._webGLCache = false;
+		if(this.cacheController) {
+			this.cacheController.uncache();
+			this.cacheController = undefined;
 		}
-		this._cacheDataURL = this.cacheCanvas = null;
-		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = this._filterOffsetX = this._filterOffsetY = 0;
-		this._cacheScale = 1;
 	};
 
 	/**
@@ -917,9 +847,7 @@ this.createjs = this.createjs||{};
 	 * @return {String} The image data url for the cache.
 	 **/
 	p.getCacheDataURL = function() {
-		if (!this.cacheCanvas) { return null; }
-		if (this.cacheID != this._cacheDataURLID) { this._cacheDataURL = this.cacheCanvas.toDataURL(); }
-		return this._cacheDataURL;
+		return this.cacheController?this.cacheController.getDataURL():null;
 	};
 
 	/**

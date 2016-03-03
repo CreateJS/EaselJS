@@ -16,7 +16,6 @@
 	"../src/easeljs/display/Shadow.js",
 	"../src/easeljs/display/SpriteSheet.js",
 	"../src/easeljs/display/Graphics.js",
-	"../src/easeljs/filters/CacheManager.js",
 	"../src/easeljs/display/DisplayObject.js",
 	"../src/easeljs/display/Container.js",
 	"../src/easeljs/display/Stage.js",
@@ -30,6 +29,7 @@
 	"../src/easeljs/utils/SpriteSheetBuilder.js",
 	"../src/easeljs/display/DOMElement.js",
 	"../src/easeljs/filters/Filter.js",
+	"../src/easeljs/filters/CacheManager.js",
 	"../src/easeljs/filters/BlurFilter.js",
 	"../src/easeljs/filters/AlphaMapFilter.js",
 	"../src/easeljs/filters/AlphaMaskFilter.js",
@@ -41,8 +41,8 @@
 	"../src/easeljs/version.js"
   ],
   "gl_source": [
-	"../src/easeljs/display/SpriteContainer.js",
-	"../src/easeljs/display/SpriteStage.js"
+	  "../src/easeljs/display/SpriteStage.js",
+	  "../src/easeljs/display/WebGLInspector.js"
   ],
   "docs_out_path": "../../createjs-com_version2/docs/easeljs/",
   "connect_root": "../",

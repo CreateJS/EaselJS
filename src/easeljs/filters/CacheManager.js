@@ -43,11 +43,67 @@ this.createjs = this.createjs||{};
 	 * @constructor
 	 **/
 	function CacheManager(context) {
-		this.width
-		this.height
-		this.x
-		this.y
-		this.scale
+
+		/**
+		 * @property _cacheDataURLID
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._cacheDataURLID = 0;
+
+		/**
+		 * @property _cacheDataURL
+		 * @protected
+		 * @type {String}
+		 * @default null
+		 */
+		this._cacheDataURL = null;
+
+		/**
+		 * Coordinates and dimensions relative to target
+		 * @property width
+		 * @protected
+		 * @type {Number}
+		 * @default undefined
+		 */
+		this.width = undefined;
+
+		/**
+		 * Coordinates and dimensions relative to target
+		 * @property height
+		 * @protected
+		 * @type {Number}
+		 * @default undefined
+		 */
+		this.height = undefined;
+
+		/**
+		 * Coordinates and dimensions relative to target
+		 * @property x
+		 * @protected
+		 * @type {Number}
+		 * @default undefined
+		 */
+		this.x = undefined;
+
+		/**
+		 * Coordinates and dimensions relative to target
+		 * @property y
+		 * @protected
+		 * @type {Number}
+		 * @default undefined
+		 */
+		this.y = undefined;
+
+		/**
+		 * Coordinates and dimensions relative to target
+		 * @property scale
+		 * @protected
+		 * @type {Number}
+		 * @default undefined
+		 */
+		this.scale = undefined;
 	}
 	var p = CacheManager.prototype;
 
@@ -63,6 +119,15 @@ this.createjs = this.createjs||{};
 	 * @deprecated
 	 */
 	// p.initialize = function() {}; // searchable for devs wondering where it is.
+
+	/**
+	 * @deprecated
+	 * @property _nextCacheID
+	 * @type {Number}
+	 * @static
+	 * @protected
+	 **/
+	CacheManager._nextCacheID = 1;
 
 	/**
 	 * Returns the bounds that surround all applied filters.
@@ -102,25 +167,23 @@ this.createjs = this.createjs||{};
 		return "[Filter]";
 	};
 
-	p.defineCache = function(target, x, y, width, height, scale, webGL) {
-		//TODO: DHG: self SpriteStage checking maybe?
-		// draw to canvas.
-		if(webGL) {
-			if(this._webGLCache !== webGL) {
-				if(webGL === true) {
-					this.cacheCanvas = document.createElement("canvas");
-					this._webGLCache = new createjs.SpriteStage(this.cacheCanvas);
-					// flag so render textures aren't used
-					this._webGLCache.isCacheControlled = true;
-				} else {
-					this.cacheCanvas = true;
-					this._webGLCache = webGL;
-				}
-			}
-		} else {
-			this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
-			this._webGLCache = null;
-		}
+	/**
+	 * Actual implementation of {{#crossLink "DisplayObject.cache"}}{{/crossLink}}. Creates and sets properties needed
+	 * for a cache to function and performs the initial update. See {{#crossLink "_createSurface"}}{{/crossLink}} for
+	 * specific implementation details of the caching object.
+	 * @method defineCache
+	 * @param {Number} x The x coordinate origin for the cache region.
+	 * @param {Number} y The y coordinate origin for the cache region.
+	 * @param {Number} width The width of the cache region.
+	 * @param {Number} height The height of the cache region.
+	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
+	 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
+	 * 	cached elements with greater fidelity. Default is 1.
+	 * @param {Object} options When using things like a {{#crossLink "SpriteStage"}}{{/crossLink}} there may be extra caching opportunities or needs.
+	 */
+	p.defineCache = function(target, x, y, width, height, scale, options) {
+		this.target = target;
+		this._createSurface(options);
 
 		scale = scale || 1;
 		target._cacheWidth = this.width = width;
@@ -130,94 +193,108 @@ this.createjs = this.createjs||{};
 		target._cacheScale = this.scale = scale;
 
 		target.cacheCanvas = this.cacheCanvas;
-		this.target = target;
 		this.updateCache();
 	};
 
 	p.updateCache = function(compositeOperation) {
 		var target = this.target;
 		var cacheCanvas = this.cacheCanvas;
-		var webGL = this._webGLCache;
 		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
 		var scale = this.scale;
-		var offX = this.x*scale, offY = this.y*scale;
 
+		this.offX = this.x*scale;
+		this.offY = this.y*scale;
 		var fBounds = CacheManager.getFilterBounds(target);
-		offX += (target._filterOffsetX = fBounds.x);
-		offY += (target._filterOffsetY = fBounds.y);
+		this.offX += (target._filterOffsetX = fBounds.x);
+		this.offY += (target._filterOffsetY = fBounds.y);
 
 		var w = this.width, h = this.height;
 		w = Math.ceil(w*scale) + fBounds.width;
 		h = Math.ceil(h*scale) + fBounds.height;
 
-		if (webGL) {
-			if (webGL.isCacheControlled) {
-				if (w != cacheCanvas.width || h != cacheCanvas.height) {
-					cacheCanvas.width = w;
-					cacheCanvas.height = h;
-					webGL.updateViewport(w, h);
-				}
-			}
-			this._webGLCache.cacheDraw(target, target.filters);
-			this.cacheCanvas = target.cacheCanvas;
-		} else {
-			var ctx = cacheCanvas.getContext("2d");
-
-			if (w != cacheCanvas.width || h != cacheCanvas.height) {
-				cacheCanvas.width = w;
-				cacheCanvas.height = h;
-			} else if (!compositeOperation) {
-				ctx.clearRect(0, 0, w+1, h+1);
-			}
-
-			ctx.save();
-			ctx.globalCompositeOperation = compositeOperation;
-			ctx.setTransform(scale, 0, 0, scale, -offX, -offY);
-			target.draw(ctx, true);
-			ctx.restore();
-			if (target.filters && target.filters.length) {
-				this.applyFilters(target);																				//TODO: DHG: had grander plans for master, probably should remove the current master though
-			}
-		}
+		this._drawToCache(compositeOperation, w, h);
 
 		// the actual cacheCanvas element could of changed during the cache process of a webGL texture
 		this.cacheCanvas._invalid = true;
-		this.cacheID = createjs.DisplayObject._nextCacheID++;
+		this.cacheID = createjs.CacheManager._nextCacheID++;
 	};
 
-	p.applyFilters = function(target, webGL) {
-		var canvas = target.cacheCanvas;
-		var filters = target.filters;
+	p.uncache = function() {
+		this.target = this.target.cacheCanvas = this._cacheDataURL = this.cacheCanvas = null;
+		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = this._filterOffsetX = this._filterOffsetY = 0;
+		this._cacheScale = 1;
+	};
 
-		//var ctx = this.ctx;
-		var w = canvas.width;
-		var h = canvas.height;
-
-		var spriteStage = null;
-		if(webGL) {
-			// setup
-			spriteStage = webGL;
-
-			// apply
-			spriteStage.filterDraw(target);
-
-			//done
-		} else {
-			// setup
-			var data = canvas.getContext("2d").getImageData(0,0, w,h);
-
-			// apply
-			var l = filters.length;
-			for (var i=0; i<l; i++) {
-				filters[i]._applyFilter(data);
-			}
-
-			//done
-			canvas.getContext("2d").putImageData(data, 0,0);
+	/**
+	 * Returns a data URL for the cache, or null if this display object is not cached.
+	 * Uses cacheID to ensure a new data URL is not generated if the cache has not changed.
+	 * @method getCacheDataURL
+	 * @return {String} The image data url for the cache.
+	 **/
+	p.getCacheDataURL = function() {
+		if (!this.cacheCanvas) { return null; }
+		if (this.cacheID != this._cacheDataURLID) {
+			this._cacheDataURLID = this.cacheID;
+			this._cacheDataURL = this.cacheCanvas.toDataURL();
 		}
+		return this._cacheDataURL;
 	};
 
 // private methods:
+	/**
+	 * Basic context2D caching works by creating a new canvas element
+	 * @protected
+	 * @method _createSurface
+	 * @param {Object} options un-used but added for expandability
+	 **/
+	p._createSurface = function(options) {
+		this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+		this._webGLCache = null;
+	};
+
+	p._drawToCache = function(compositeOperation, w, h) {
+		var cacheCanvas = this.cacheCanvas;
+		var target = this.target;
+		var ctx = cacheCanvas.getContext("2d");
+
+		if (w != cacheCanvas.width || h != cacheCanvas.height) {
+			cacheCanvas.width = w;
+			cacheCanvas.height = h;
+		} else if (!compositeOperation) {
+			ctx.clearRect(0, 0, w+1, h+1);
+		}
+
+		ctx.save();
+		ctx.globalCompositeOperation = compositeOperation;
+		ctx.setTransform(this.scale, 0, 0, this.scale, -this.offX, -this.offY);
+		target.draw(ctx, true);
+		ctx.restore();
+
+		if (target.filters && target.filters.length) {
+			this._applyFilters(target);
+		}
+	};
+
+	p._applyFilters = function() {
+		var target = this.target;
+		var canvas = this.cacheCanvas;
+		var filters = target.filters;
+
+		var w = canvas.width;
+		var h = canvas.height;
+
+		// setup
+		var data = canvas.getContext("2d").getImageData(0,0, w,h);
+
+		// apply
+		var l = filters.length;
+		for (var i=0; i<l; i++) {
+			filters[i]._applyFilter(data);
+		}
+
+		//done
+		canvas.getContext("2d").putImageData(data, 0,0);
+	};
 
 	createjs.CacheManager = CacheManager;
 }());

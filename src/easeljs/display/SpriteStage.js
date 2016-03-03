@@ -96,7 +96,6 @@ this.createjs = this.createjs||{};
 		this.Stage_constructor(canvas);
 
 		// public properties:
-		///////////////////////////////////////////////////////
 		/**
 		 * Console log potential issues and problems, this is designed to have -minimal- performance impact so
 		 * if you're looking for more extensive debugging information this may be inadequate.
@@ -107,7 +106,6 @@ this.createjs = this.createjs||{};
 		this.vocalDebug = false;
 
 		// private properties:
-		///////////////////////////////////////////////////////
 		/**
 		 * Used when the canvas context is created, requires context re-creation to update.
 		 * Specifies whether or not the canvas is auto-cleared by WebGL. Spec discourages true.
@@ -350,13 +348,44 @@ this.createjs = this.createjs||{};
 		 */
 		this._drawID = 0;
 
+		/**
+		 * Used to prevent textures in certain GPU slots from being replaced by an insert.
+		 * @protected
+		 * @type {Array}
+		 */
 		this._slotBlacklist = [];
 
+		/**
+		 * Used to prevent nested draw calls from accidently overwriting drawing information by tracking depth.
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
 		this._isDrawing = 0;
 
+		/**
+		 * Used to ensure every canvas used has a unique ID.
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
 		this._lastTrackedCanvas = 0;
 
+		/**
+		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} is the canvas or a render texture.
+		 * See the {{#crossLink "cache"}}{{/crossLink}} function modifications for full implications and discussion.
+		 * @protected
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this.isCacheControlled = false;
+
+		/**
+		 * Used to counter-position the object being cached so it aligns with the cache surface.
+		 * @protected
+		 * @type {Boolean}
+		 * @default false
+		 */
 		this._cacheContainer = new createjs.Container();
 
 		// and begin
@@ -364,9 +393,51 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(SpriteStage, createjs.Stage);
 
+	/**
+	 * Calculate the U/V co-ordinate based info for sprite frames. Instead of pixel count it uses a 0-1 space.
+	 * Also includes the ability to get info back for a specific frame or only calculate that one frame.
+	 * @param  {SpriteSheet} spritesheet The spritesheet to find _frames on
+	 * @param  {frame} [target=-1] The frame to return
+	 * @param  {Boolean} [onlyTarget=false] Whether "target" is the only frame that gets calculated
+	 * @method buildUVRects
+	 * @return {Object} the target frame if supplied and present or a generic frame {t, l, b, r}
+	 */
+	SpriteStage.buildUVRects = function(spritesheet, target, onlyTarget) {
+		// handle defaults and error cases
+		if(!spritesheet || !spritesheet._frames){ return null; }
+		if(target === undefined) { target = -1; }
+		if(onlyTarget === undefined) { onlyTarget = false; }
 
-	// constants:
-	///////////////////////////////////////////////////////
+		var start = (target != -1 && onlyTarget)?(target):(0);
+		var end = (target != -1 && onlyTarget)?(target+1):(spritesheet._frames.length);
+		for(var i=start; i<end; i++) {
+			var f = spritesheet._frames[i];
+			if(f.uvRect) { continue; }
+			if(f.image.width <= 0 || f.image.height <= 0) { continue; }
+
+			var r = f.rect;
+			f.uvRect = {
+				t: r.y / f.image.height,					l: r.x / f.image.width,
+				b: (r.y + r.height) / f.image.height,		r: (r.x + r.width) / f.image.width
+			};
+		}
+
+		return spritesheet._frames[(target != -1)?(target):(0)].uvRect || {t:0, l:0, b:1, r:1};
+	};
+
+	/**
+	 * Test a context to see if it has webgl enabled on it
+	 * @method isWebGLActive
+	 * @param {CanvasContext} ctx The context to test
+	 * @return {Boolean} Whether webgl is enabled
+	 */
+	SpriteStage.isWebGLActive = function(ctx) {
+		return ctx &&
+			ctx instanceof WebGLRenderingContext &&
+			typeof WebGLRenderingContext !== 'undefined';
+	};
+
+	// static properties:
 	/**
 	 * The number of properties defined per vertex.
 	 * x, y, textureU, textureV, textureIndex, alpha
@@ -420,6 +491,31 @@ this.createjs = this.createjs||{};
 	 */
 	SpriteStage.UV_RECT = {t:0, l:0, b:1, r:1};
 
+	/**
+	 * Vertex positions for a card that covers the entire render. Used with render targets primarily.
+	 * @property COVER_VERT
+	 * @static
+	 * @final
+	 * @type {Float32Array}
+	 * @readonly
+	 */
+	SpriteStage.COVER_VERT = new Float32Array([
+		-1,		 1,		//TL
+		1,		 1,		//TR
+		-1,		-1,		//BL
+		1,		 1,		//TR
+		1,		-1,		//BR
+		-1,		-1		//BL
+	]);
+
+	/**
+	 * U/V for {{#crossLink "COVER_VERT"}}{{/crossLink}}.
+	 * @property COVER_UV
+	 * @static
+	 * @final
+	 * @type {Float32Array}
+	 * @readonly
+	 */
 	SpriteStage.COVER_UV = new Float32Array([
 		 0,		 0,		//TL
 		 1,		 0,		//TR
@@ -428,6 +524,15 @@ this.createjs = this.createjs||{};
 		 1,		 1,		//BR
 		 0,		 1		//BL
 	]);
+
+	/**
+	 * Flipped U/V for {{#crossLink "COVER_VERT"}}{{/crossLink}}.
+	 * @property COVER_UV_FLIP
+	 * @static
+	 * @final
+	 * @type {Float32Array}
+	 * @readonly
+	 */
 	SpriteStage.COVER_UV_FLIP = new Float32Array([
 		 0,		 1,		//TL
 		 1,		 1,		//TR
@@ -436,24 +541,37 @@ this.createjs = this.createjs||{};
 		 1,		 0,		//BR
 		 0,		 0		//BL
 	]);
-	SpriteStage.COVER_VERT = new Float32Array([
-		-1,		 1,		//TL
-		 1,		 1,		//TR
-		-1,		-1,		//BL
-		 1,		 1,		//TR
-		 1,		-1,		//BR
-		-1,		-1		//BL
-	]);
 
-	SpriteStage.SHADER_VARYING_HEADER = (
+	/**
+	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders.
+	 * The regular shader is designed to render all expected objects.
+	 * Shader code may contain templates that are replaced pre compile.
+	 * @property REGULAR_VARYING_HEADER
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	SpriteStage.REGULAR_VARYING_HEADER = (
 		"precision mediump float;" +
 
 		"varying vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
 		"varying lowp float alphaValue;"
 	);
-	SpriteStage.SHADER_VERTEX_HEADER = (
-		SpriteStage.SHADER_VARYING_HEADER +
+
+	/**
+	 * Actual full header for the vertex shader. Includes the varying header.
+	 * The regular shader is designed to render all expected objects.
+	 * Shader code may contain templates that are replaced pre compile.
+	 * @property REGULAR_VERTEX_HEADER
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	SpriteStage.REGULAR_VERTEX_HEADER = (
+		SpriteStage.REGULAR_VARYING_HEADER +
 		"attribute vec2 vertexPosition;" +
 		"attribute vec2 uvPosition;" +
 		"attribute lowp float textureIndex;" +
@@ -461,11 +579,33 @@ this.createjs = this.createjs||{};
 
 		"uniform mat4 pMatrix;"
 	);
-	SpriteStage.SHADER_FRAGMENT_HEADER = (
-		SpriteStage.SHADER_VARYING_HEADER +
+
+	/**
+	 * Actual full header for the fragment shader. Includes the varying header.
+	 * The regular shader is designed to render all expected objects.
+	 * Shader code may contain templates that are replaced pre compile.
+	 * @property REGULAR_FRAGMENT_HEADER
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	SpriteStage.REGULAR_FRAGMENT_HEADER = (
+		SpriteStage.REGULAR_VARYING_HEADER +
 		"uniform sampler2D uSampler[{{count}}];"
 	);
-	SpriteStage.SHADER_VERTEX_BODY_REGULAR  = (
+
+	/**
+	 * Body of the vertex shader.
+	 * The regular shader is designed to render all expected objects.
+	 * Shader code may contain templates that are replaced pre compile.
+	 * @property REGULAR_VERTEX_BODY
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	SpriteStage.REGULAR_VERTEX_BODY  = (
 		"void main(void) {" +
 			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix see js... bypass for now
 			//vertexPosition, round if flag
@@ -481,7 +621,18 @@ this.createjs = this.createjs||{};
 			"vTextureCoord = uvPosition;" +
 		"}"
 	);
-	SpriteStage.SHADER_FRAGMENT_BODY_REGULAR = (
+
+	/**
+	 * Body of the fragment shader.
+	 * The regular shader is designed to render all expected objects.
+	 * Shader code may contain templates that are replaced pre compile.
+	 * @property REGULAR_FRAGMENT_BODY
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	SpriteStage.REGULAR_FRAGMENT_BODY = (
 		"void main(void) {" +
 			"int src = int(indexPicker);" +
 			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
@@ -494,30 +645,74 @@ this.createjs = this.createjs||{};
 			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
 		"}"
 	);
-	SpriteStage.SHADER_VERTEX_BODY_PARTICLE = (
-		SpriteStage.SHADER_VERTEX_BODY_REGULAR																			//TODO: DHG: a real particle shader
+
+	//TODO: DHG: a real particle shader
+	SpriteStage.PARTICLE_VERTEX_BODY = (
+		SpriteStage.REGULAR_VERTEX_BODY
 	);
-	SpriteStage.SHADER_FRAGMENT_BODY_PARTICLE = (
-		SpriteStage.SHADER_FRAGMENT_BODY_REGULAR																		//TODO: DHG: a real particle shader
+	SpriteStage.PARTICLE_FRAGMENT_BODY = (
+		SpriteStage.REGULAR_FRAGMENT_BODY
 	);
 
+	/**
+	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders.
+	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
+	 * Shader code may contain templates that are replaced pre compile.
+	 * @property COVER_VARYING_HEADER
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
 	SpriteStage.COVER_VARYING_HEADER = (
 		"precision mediump float;" +
 
 		"varying highp vec2 vRenderCoord;" +
 		"varying highp vec2 vTextureCoord;"
 	);
+	/**
+	 * Actual full header for the vertex shader. Includes the varying header.
+	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
+	 * Shader code may contain templates that are replaced pre compile.
+	 * @property COVER_VERTEX_HEADER
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
 	SpriteStage.COVER_VERTEX_HEADER = (
 		SpriteStage.COVER_VARYING_HEADER +
 		"attribute vec2 vertexPosition;" +
 		"attribute vec2 uvPosition;" +
 		"uniform float uUpright;"
 	);
+
+	/**
+	 * Actual full header for the fragment shader. Includes the varying header.
+	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
+	 * Shader code may contain templates that are replaced pre compile.
+	 * @property COVER_FRAGMENT_HEADER
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
 	SpriteStage.COVER_FRAGMENT_HEADER = (
 		SpriteStage.COVER_VARYING_HEADER +
 		"uniform sampler2D uSampler;"
 	);
-	SpriteStage.COVER_VERTEX_BODY_REGULAR  = (
+
+	/**
+	 * Body of the vertex shader.
+	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
+	 * Shader code may contain templates that are replaced pre compile.
+	 * @property COVER_VERTEX_BODY
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	SpriteStage.COVER_VERTEX_BODY  = (
 		"void main(void) {" +
 			"gl_Position = vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
 			"vRenderCoord = uvPosition;" +
@@ -525,15 +720,37 @@ this.createjs = this.createjs||{};
 			//"vTextureCoord = uvPosition;" +
 		"}"
 	);
-	SpriteStage.COVER_FRAGMENT_BODY_REGULAR = (
+
+	/**
+	 * Body of the fragment shader.
+	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
+	 * Shader code may contain templates that are replaced pre compile.
+	 * @property COVER_FRAGMENT_BODY
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	SpriteStage.COVER_FRAGMENT_BODY = (
 		"void main(void) {" +
 			"vec4 color = texture2D(uSampler, vRenderCoord);" +
 			"gl_FragColor = color;" +
 		"}"
 	);
 
-	// getter / setters:
-	///////////////////////////////////////////////////////
+// events:
+	/**
+	 * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
+	 * You can call preventDefault on the event object to cancel the draw.
+	 * @event drawstart
+	 */
+
+	/**
+	 * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
+	 * @event drawend
+	 */
+
+// getter / setters:
 	/**
 	 * Indicates whether WebGL is being used for rendering. For example, this would be false if WebGL is not
 	 * supported in the browser.
@@ -562,10 +779,10 @@ this.createjs = this.createjs||{};
 		});
 	} catch (e) {} // TODO: use Log
 
-	// ctor:
-	///////////////////////////////////////////////////////
+
+// constructor methods:
 	/**
-	 *
+	 * Create and properly intialize the webGL instance we will be using.
 	 * @method _initializeWebGL
 	 * @protected
 	 */
@@ -574,7 +791,30 @@ this.createjs = this.createjs||{};
 			if (!this._webGLContext || this._webGLContext.canvas !== this.canvas) {
 				// A context hasn't been defined yet,
 				// OR the defined context belongs to a different canvas, so reinitialize.
-				this._createWebGL();
+
+				// defaults and options
+				var options = {
+					depth: false, // Disable the depth buffer as it isn't used.
+					alpha: this._transparent, // Make the canvas background transparent.
+					stencil: true,
+					antialias: this._antialias,
+					preserveDrawingBuffer: this._preserveDrawingBuffer,
+					premultipliedAlpha: true // Assume the drawing buffer contains colors with premultiplied alpha.
+				};
+
+				var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
+
+				this.updateSimultaneousTextureCount(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
+				this._createBuffers(gl);
+				this._initTextures(gl);
+
+				gl.clearColor(0.25, 0.25, 0.25, 0.0);
+				gl.disable(gl.DEPTH_TEST);
+				gl.enable(gl.BLEND);
+				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+				gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+
+				this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
 			}
 		} else {
 			this._webGLContext = null;
@@ -582,45 +822,13 @@ this.createjs = this.createjs||{};
 		return this._webGLContext;
 	};
 
-	/**
-	 *
-	 * @method _createWebGL
-	 * @protected
-	 */
-	p._createWebGL = function() {
-		// defaults and options
-		var options = {
-			depth: false, // Disable the depth buffer as it isn't used.
-			alpha: this._transparent, // Make the canvas background transparent.
-			stencil: true,
-			antialias: this._antialias,
-			preserveDrawingBuffer: this._preserveDrawingBuffer,
-			premultipliedAlpha: true // Assume the drawing buffer contains colors with premultiplied alpha.
-		};
-
-		var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
-
-		this.updateSimultaneousTextureCount(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
-		this._createBuffers(gl);
-		this._initTextures(gl);
-
-		gl.clearColor(0.25, 0.25, 0.25, 0.0);
-		gl.disable(gl.DEPTH_TEST);
-		gl.enable(gl.BLEND);
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-
-		this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
-	};
-
-	// public methods:
-	///////////////////////////////////////////////////////
+// public methods:
 	/** docced in super class **/
 	p.update = function(props) {
 		//DHG TODO: test context swapping and re-acqusition
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
-		this.dispatchEvent("drawstart"); // TODO: make cancellable?
+		this.dispatchEvent("drawstart");
 		if (this.autoClear) { this.clear(); }
 
 		if (this._webGLContext) {
@@ -637,13 +845,11 @@ this.createjs = this.createjs||{};
 		this.dispatchEvent("drawend");
 	};
 
-	/**
-	 * Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
-	 * @method clear
-	 **/
+
+	/** docced in super class **/
 	p.clear = function() {
 		if (!this.canvas) { return; }
-		if (this.isWebGLActive(this._webGLContext)) {
+		if (SpriteStage.isWebGLActive(this._webGLContext)) {
 			var gl = this._webGLContext;
 			// Use WebGL.
 			gl.clear(gl.COLOR_BUFFER_BIT);
@@ -655,78 +861,45 @@ this.createjs = this.createjs||{};
 		}
 	};
 
-	p.isWebGLActive = function(ctx) {
-		return ctx &&
-			ctx instanceof WebGLRenderingContext &&
-			typeof WebGLRenderingContext !== 'undefined';
-	};
-
+	/** docced in super class **/
 	/**
-	 * Draws the stage into the specified context (using WebGL) ignoring its shadow.
-	 * If WebGL is not supported in the browser, it will default to a 2D context.
-	 * Returns true if the draw was handled (useful for overriding functionality).
-	 *
+	 * Draws the stage into the correct context be it canvas or Render Texture using WebGL.
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * @method draw
-	 * @param {CanvasRenderingContext2D} gl The canvas 2D context object to draw into.
-	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
-	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	 * into itself).
-	 **/
-	p.draw = function(gl, ignoreCache) {
-		if (this.isWebGLActive(gl)) {
-			this._batchDraw(this, gl, ignoreCache);
-			return true;
-		} else {
-			return this.Stage_draw(gl, ignoreCache);
-		}
-	};
-
-	p.getTargetRenderTexture = function(gl, target) {
-		var result, toggle = false;
-		if(target.__lastRT !== undefined && target.__lastRT === target.__rtA){ toggle = true; }
-		if(!toggle){
-			if(target.__rtA === undefined) {
-				target.__rtA = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
-				target.__rtA.__name = "rtA";
-			} else {
-				gl.bindTexture(gl.TEXTURE_2D, target.__rtA);
-				this.setTextureParams(gl);
-			}
-			result = target.__rtA;
-		} else {
-			if(target.__rtB === undefined) {
-				target.__rtB = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
-				target.__rtB.__name = "rtB";
-			} else {
-				gl.bindTexture(gl.TEXTURE_2D, target.__rtB);
-				this.setTextureParams(gl);
-			}
-			result = target.__rtB;
-		}
-		target.__lastRT = result;
-		return result;
-	};
-
-	/**
-	 * Draws the stage into the specified context (using WebGL) ignoring its shadow.
-	 * If WebGL is not supported in the browser, it will default to a 2D context.
-	 * Returns true if the draw was handled (useful for overriding functionality).
-	 *
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * @method filterDraw
+	 * @method cacheDraw
 	 * @param {DisplayObject} target The object we're drawing into cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
+	 * @param {Array} filters The filters we're drawing into cache.
+	 **/
+	p.draw = function(context, ignoreCache) {
+		aaaaaaaaaaaaaaaaaaaaaaaaaaaa
+		if (SpriteStage.isWebGLActive(this._webGLContext)) {
+			var gl = this._webGLContext;
+			this._batchDraw(this, gl, ignoreCache);
+			return true;
+		} else {
+			return this.Stage_draw(context, ignoreCache);
+		}
+	};
+
+	/**
+	 * Draws the target into the correct context be it canvas or Render Texture using WebGL.
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method cacheDraw
+	 * @param {DisplayObject} target The object we're drawing into cache.
+	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+	 * into itself).
+	 * @param {Array} filters The filters we're drawing into cache.
 	 **/
 	p.cacheDraw = function(target, filters) {
 		var gl = this._webGLContext;
+		var renderTexture;
 		var shaderBackup = this._activeShader;
 		var blackListBackup = this._slotBlacklist;
 		var lastTextureSlot = this._batchTextureCount-1;
 
 		// protect the last slot so that we have somewhere to bind the renderTextures so it doesn't get upset
-		this.protectTextureSlot(lastTextureSlot);
+		this.protectTextureSlot(lastTextureSlot, true);
 
 		// create offset container for drawing item
 		var mtx = target.getMatrix();
@@ -735,9 +908,9 @@ this.createjs = this.createjs||{};
 		container.children = [target];
 		container.transformMatrix = mtx;
 
-		for(var i=0; i<this._batchTextureCount;i++) {
-			gl.activeTexture(gl.TEXTURE0 + i);
-			this._batchTextures[i] = this.getBaseTexture();
+		for(var j=0; j<this._batchTextureCount;j++) {
+			gl.activeTexture(gl.TEXTURE0 + j);
+			this._batchTextures[j] = this.getBaseTexture();
 		}
 
 		var filterCount = filters && filters.length;
@@ -745,7 +918,7 @@ this.createjs = this.createjs||{};
 			// we don't know which texture slot we're dealing with previously and we need one out of the way
 			// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
 			gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-			var renderTexture = this.getTargetRenderTexture(gl, target);
+			renderTexture = this.getTargetRenderTexture(gl, target);
 
 			// draw item to render texture		I -> T
 			gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
@@ -818,7 +991,7 @@ this.createjs = this.createjs||{};
 			} else {
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
 				target.cacheCanvas = this.getTargetRenderTexture(gl, target);
-				var renderTexture = target.cacheCanvas;
+				renderTexture = target.cacheCanvas;
 
 				// draw item to render texture		I -> T
 				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
@@ -832,15 +1005,66 @@ this.createjs = this.createjs||{};
 			}
 		}
 
-		this.protectTextureSlot(lastTextureSlot, true);
+		this.protectTextureSlot(lastTextureSlot, false);
 		this._activeShader = shaderBackup;
 		this._slotBlacklist = blackListBackup;
 	};
 
-	p.protectTextureSlot = function(id, free) {
-		this._slotBlacklist[id] = !!free;
+	/**
+	 * Blocks, or frees a texture "slot" on the GPU. Can be usefull if you are overflowing textures.
+	 * When overflowing textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large textures.
+	 * By blocking the slot you reduce available slots potentially increasing draw calls but prevent a texture being re-uploaded if it moved slot due to overflow.
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method protectTextureSlot
+	 * @param  {Number} id The slot to be affected
+	 * @param  {Boolean} lock Whether this slot is the one being locked.
+	 */
+	p.protectTextureSlot = function(id, lock) {
+		if(id > this._batchTextureCount || id < 0){
+			throw("Slot outside of acceptable range");
+		}
+		this._slotBlacklist[id] = !!lock;
 	};
 
+	/**
+	 * Render textures can't draw into themselves so any item being used for renderTextures needs two.
+	 * This function creates, gets, and toggles the render surface.
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @param  {WebGLRenderingContext} gl
+	 * @param  {DisplayObject} target The object associated with the render textures, usually a cached object.
+	 * @method getTargetRenderTexture
+	 */
+	p.getTargetRenderTexture = function(gl, target) {
+		var result, toggle = false;
+		if(target.__lastRT !== undefined && target.__lastRT === target.__rtA){ toggle = true; }
+		if(!toggle){
+			if(target.__rtA === undefined) {
+				target.__rtA = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+			} else {
+				gl.bindTexture(gl.TEXTURE_2D, target.__rtA);
+				this.setTextureParams(gl);
+			}
+			result = target.__rtA;
+		} else {
+			if(target.__rtB === undefined) {
+				target.__rtB = this.getRenderBufferTexture(target._cacheWidth, target._cacheHeight);
+			} else {
+				gl.bindTexture(gl.TEXTURE_2D, target.__rtB);
+				this.setTextureParams(gl);
+			}
+			result = target.__rtB;
+		}
+		target.__lastRT = result;
+		return result;
+	};
+
+	/**
+	 * For every image encountered it is registered and tracked automatically.
+	 * When all items using an image are removed from the stage its recommended to remove it manually to prevent memory leaks.
+	 * If you remove a texture and add it again later the texture will get re added and ne re-removing.
+	 * @method unregisterTexture
+	 * @param  {DisplayObject} item a display object that used the texture you are no longer using.
+	 */
 	p.unregisterTexture = function(item) {
 		// container
 		if(item.children) {
@@ -882,8 +1106,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Try to set the max textures the system can handle, should default to the hardware max.
-	 * @method updateViewport
+	 * Try to set the max textures the system can handle, should default to the hardware max and lower values may limit performance.
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method updateSimultaneousTextureCount
 	 * @param {Number} count
 	 */
 	p.updateSimultaneousTextureCount = function(count) {
@@ -914,14 +1139,14 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Update the WebGL viewport. Note that this does NOT update the canvas element's width/height.
+	 * Update the WebGL viewport. Note that this does NOT update the canvas element's width/height but the render surface.
 	 * @method updateViewport
 	 * @param {Number} width Integer pixel size of render surface.
 	 * @param {Number} height Integer pixel size of render surface.
 	 **/
 	p.updateViewport = function (width, height) {
-		this._viewportWidth = width;
-		this._viewportHeight = height;
+		this._viewportWidth = width|0;
+		this._viewportHeight = height|0;
 		var gl = this._webGLContext;
 
 		if (gl) {
@@ -931,10 +1156,10 @@ this.createjs = this.createjs||{};
 			// we need to flip the y, scale and then translate the co-ordinates to match this
 			// additionally we offset into they Y so the polygons are inside the camera's "clipping" plane
 			this._projectionMatrix = new Float32Array([
-				2 / width,		0,					0,				0,
-				0,				-2 / height,		1,				0,
-				0,				0,					1,				0,
-				-1,				1,					0.1,			0
+				2 / this._viewportWidth,	0,								0,							0,
+				0,							-2 / this._viewportHeight,		1,							0,
+				0,							0,								1,							0,
+				-1,							1,								0.1,						0
 			]);
 			this._projectionMatrixFlip = this._projectionMatrix.slice();
 			this._projectionMatrixFlip[5] *= -1;
@@ -942,6 +1167,12 @@ this.createjs = this.createjs||{};
 		}
 	};
 
+	/**
+	 * Fetches the shader compiled and setup to work with the provided filter.
+	 * The shader is compiled on first use and returned on subsequent calls.
+	 * @method getFilterShader
+	 * @param  {WebGLRenderingContext} gl
+	 */
 	p.getFilterShader = function(gl, filter) {
 		if(!filter) { filter = this; }
 		var targetShader = this._activeShader;
@@ -966,25 +1197,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Clears an image's texture to free it up for garbage collection.
-	 * @method clearImageTexture
-	 * @param  {HTMLImageElement} image
+	 * See {{#crossLink "unregisterTexture"}}{{/crossLink}} for the new API
+	 * @deprecated clearImageTexture
 	 **/
-	p.clearImageTexture = function(image) {
-		image.__easeljs_texture = null;
-	};
 
 	/**
-	 * Returns a string representation of this object.
-	 * @method toString
-	 * @return {String} a string representation of the instance.
-	 **/
-	p.toString = function() {
-		return "[SpriteStage (name="+  this.name +")]";
-	};
-
-	/**
-	 * Returns a base texture for use without forgetting any initilization
+	 * Returns a base texture as either a
 	 * @method getBaseTexture
 	 * @param  {HTMLImageElement} w The width of the texture, defaults to 1
 	 * @param  {HTMLImageElement} h The height of the texture, defaults to 1
@@ -1045,47 +1263,32 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Calculate the U/V co-ordinate based info for sprite frames. Instead of pixels a 0-1 space.
-	 * Also includes the ability to get info back for a specific frame or only calculate that one frame.
-	 * @param  {SpriteSheet} spritesheet The spritesheet to process
-	 * @param  {frame} target The frame we're most worried about
-	 * @param  {Boolean} onlyTarget The DOM canvas element to attach to
-	 * @method buildUVRects
-	 * @return {UVRect} the target frame or a generic frame
+	 * Common utility function used to apply the correct texture processing parameters for the bound texture.
+	 * @param  {WebGLRenderingContext} gl
+	 * @param  {Boolean} [isPOT = false] Marks whether the texture is "Power of Two", this may allow better quality.
+	 * @method _fetchWebGLContext
+	 * @protected
 	 */
-	p.buildUVRects = function(spritesheet, target, onlyTarget) {
-		if(!spritesheet || !spritesheet._frames){ return result; }
-		if(target === undefined) { target = -1; }
-		if(onlyTarget === undefined) { onlyTarget = false; }
-
-		var start = (target != -1 && onlyTarget)?(target):(0);
-		var end = (target != -1 && onlyTarget)?(target+1):(spritesheet._frames.length);
-		for(var i=start; i<end; i++) {
-			var f = spritesheet._frames[i];
-			if(f.uvRect) { continue; }
-			if(f.image.width <= 0 || f.image.height <= 0) { continue; }
-
-			var r = f.rect;
-			f.uvRect = {
-				t: r.y / f.image.height,					l: r.x / f.image.width,
-				b: (r.y + r.height) / f.image.height,		r: (r.x + r.width) / f.image.width
-			};
-		}
-
-		return spritesheet._frames[(target != -1)?(target):(0)].uvRect || {t:0, l:0, b:1, r:1};
-	};
-
 	p.setTextureParams = function(gl, isPOT) {
+		//TODO: hook up isPOT to actual functionality
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	};
 
-	// private methods:
-	///////////////////////////////////////////////////////
 	/**
-	 * Sets up and returns the webgl context for the canvas
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
+	p.toString = function() {
+		return "[SpriteStage (name="+  this.name +")]";
+	};
+
+// private methods:
+	/**
+	 * Sets up and returns the webgl context for the canvas.
 	 * @param  {Canvas} canvas The DOM canvas element to attach to
 	 * @param  {Object} options The options to be handed into the WebGL object, see WebGL spec
 	 * @method _fetchWebGLContext
@@ -1111,55 +1314,65 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Create the completed Sahder Program from the vertex and fragment shaders
+	 * Create the completed Shader Program from the vertex and fragment shaders. Allows building of custom shaders for filters.
+	 * Once compiled shaders are saved so if the Shader code is dynamic re-run this function when it needs to change.
 	 * @param  {WebGLRenderingContext} gl
+	 * @param  {String} [shaderName="regular"] "custom", "regular". Which type of shader to build, only "custom" uses the other 3 fields.
+	 * @param  {String} [customVTX=undefined] Extra vertex shader information to replace a regular draw, see {{#crossLink "COVER_VERTEX_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
+	 * @param  {String} [customFRAG=undefined] Extra fragment shader information to replace a regular draw, see {{#crossLink "COVER_FRAGMENT_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
+	 * @param  {Function} [shaderParamSetup=undefined] Function to run so custom shader parameters can get applied for the render.
 	 * @method _fetchShaderProgram
 	 * @protected
 	 */
-	p._fetchShaderProgram = function(gl, shader, customVTX, customFRAG, shaderParamSetup) {
+	p._fetchShaderProgram = function(gl, shaderName, customVTX, customFRAG, shaderParamSetup) {
 		gl.useProgram(null);		//saftey to avoid collisions
 
+		// build the correct shader string out of the right headers and bodies
 		var targetFrag, targetVtx;
-		switch(shader) {
+		switch(shaderName) {
 			case "custom":
 				targetVtx = SpriteStage.COVER_VERTEX_HEADER;
 				targetFrag = SpriteStage.COVER_FRAGMENT_HEADER;
-				targetVtx += customVTX || SpriteStage.COVER_VERTEX_BODY_REGULAR;
-				targetFrag += customFRAG || SpriteStage.COVER_FRAGMENT_BODY_REGULAR;
+				targetVtx += customVTX || SpriteStage.COVER_VERTEX_BODY;
+				targetFrag += customFRAG || SpriteStage.COVER_FRAGMENT_BODY;
 				break;
 			case "particle":
-				targetVtx = SpriteStage.SHADER_VERTEX_HEADER;
-				targetFrag = SpriteStage.SHADER_FRAGMENT_HEADER;
-				targetVtx += SpriteStage.SHADER_VERTEX_BODY_PARTICLE;
-				targetFrag += SpriteStage.SHADER_FRAGMENT_BODY_PARTICLE;
+				targetVtx = SpriteStage.REGULAR_VERTEX_HEADER;
+				targetFrag = SpriteStage.REGULAR_FRAGMENT_HEADER;
+				targetVtx += SpriteStage.PARTICLE_VERTEX_BODY;
+				targetFrag += SpriteStage.PARTICLE_FRAGMENT_BODY;
 				break;
+			case "regular":
 			default:
-				targetVtx = SpriteStage.SHADER_VERTEX_HEADER;
-				targetFrag = SpriteStage.SHADER_FRAGMENT_HEADER;
-				targetVtx += SpriteStage.SHADER_VERTEX_BODY_REGULAR;
-				targetFrag += SpriteStage.SHADER_FRAGMENT_BODY_REGULAR;
+				targetVtx = SpriteStage.REGULAR_VERTEX_HEADER;
+				targetFrag = SpriteStage.REGULAR_FRAGMENT_HEADER;
+				targetVtx += SpriteStage.REGULAR_VERTEX_BODY;
+				targetFrag += SpriteStage.REGULAR_FRAGMENT_BODY;
 				break;
 		}
 
-		//DHG might need to pre-process shader code so get the result
+		// create the seperate pars
 		var vertexShader = this._createShader(gl, gl.VERTEX_SHADER, targetVtx);
 		var fragmentShader = this._createShader(gl, gl.FRAGMENT_SHADER, targetFrag);
 
+		// link them together
 		var shaderProgram = gl.createProgram();
-
 		gl.attachShader(shaderProgram, vertexShader);
 		gl.attachShader(shaderProgram, fragmentShader);
 		gl.linkProgram(shaderProgram);
 
+		// check compile status
 		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
 			gl.useProgram(this._activeShader);
 			throw(gl.getProgramInfoLog(shaderProgram));
 		}
 
+		// setup the parameters on the shader
 		gl.useProgram(shaderProgram);
-
-		switch(shader) {
+		switch(shaderName) {
 			case "custom":
+				// get the places in memory the shader is stored so we can feed information into them
+				// then save it off on the shader because it's so tied to the shader itself
 				shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 				gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
@@ -1178,6 +1391,7 @@ this.createjs = this.createjs||{};
 				}
 				break;
 			case "particle":
+			case "regular":
 			default:
 				// get the places in memory the shader is stored so we can feed information into them
 				// then save it off on the shader because it's so tied to the shader itself
@@ -1198,11 +1412,11 @@ this.createjs = this.createjs||{};
 					samplers[i] = i;
 				}
 
-				shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
-
 				shaderProgram.samplerData = samplers;
 				shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
 				gl.uniform1iv(shaderProgram.samplerUniform, samplers);
+
+				shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
 				break;
 		}
 
@@ -1211,7 +1425,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Creates a shader from the specified string.
+	 * Creates a shader from the specified string. Replaces several template items marked with {{name}}.
 	 * @method _createShader
 	 * @param  {WebGLRenderingContext} gl
 	 * @param  {Number} type The type of shader to create. gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
@@ -1223,17 +1437,19 @@ this.createjs = this.createjs||{};
 		// inject the static number
 		str = str.replace("{{count}}", this._batchTextureCount);
 
-		// add in arbitrary line count
+		// resolve issue with no dynamic samplers by creating correct samplers in if else chain
 		var insert = "";
 		for(var i=1; i<this._batchTextureCount; i++) {
 			insert += "} else if(src == "+ i +") { color = texture2D(uSampler["+ i +"], vTextureCoord);";
 		}
 		str = str.replace("{{alternates}}", insert);
 
+		// actually compile the shader
 		var shader = gl.createShader(type);
 		gl.shaderSource(shader, str);
 		gl.compileShader(shader);
 
+		// check compile status
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw(gl.getShaderInfoLog(shader));
 			return null;
@@ -1243,7 +1459,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Sets up the necessary vertices and indices buffers.
+	 * Sets up the necessary vertex property buffers including position and u/v.
 	 * @method _createBuffers
 	 * @param {WebGLRenderingContext} gl
 	 * @protected
@@ -1252,29 +1468,31 @@ this.createjs = this.createjs||{};
 		var groupCount = this._maxCardsPerBatch * SpriteStage.INDICIES_PER_CARD;
 		var groupSize, i;
 
-		// DHG, all buffers are created using this pattern
+		// INFO:
+		// all buffers are created using this pattern
 		// create a webGL buffer
-		// attach it to WebGL
+		// attach it to context
 		// figure out how many parts it has to an entry
 		// fill it with empty data to reserve the memory
 		// attach the empty data to the GPU
 		// track the sizes on the buffer object
 
-		/* DHG: a single buffer may be optimal in some situations and would be approached like this
-		DHG: currently not implemented due to lack of need
-		var vertexBuffer = this._vertexBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-		groupSize = 2 + 2 + 1 + 1; //x/y, u/v, index, alpha
-		var vertexData = this._vertexData = new Float32Array(groupCount * groupSize);
-		for(i=0; i<vertexData.length; i+=groupSize) {
-			vertexData[i+0] = vertexData[i+1] = 0;
-			vertexData[i+2] = vertexData[i+3] = 0.5;
-			vertexData[i+4] = 0;
-			vertexData[i+5] = 1;
-		}
-		vertexBuffer.itemSize = groupSize;
-		vertexBuffer.numItems = groupCount;
-		*/
+		// INFO:
+		// a single buffer may be optimal in some situations and would be approached like this
+		// currently not implemented due to lack of need and potential complications with drawCover
+
+		// var vertexBuffer = this._vertexBuffer = gl.createBuffer();
+		// gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+		// groupSize = 2 + 2 + 1 + 1; //x/y, u/v, index, alpha
+		// var vertexData = this._vertexData = new Float32Array(groupCount * groupSize);
+		// for(i=0; i<vertexData.length; i+=groupSize) {
+		// 	vertexData[i+0] = vertexData[i+1] = 0;
+		// 	vertexData[i+2] = vertexData[i+3] = 0.5;
+		// 	vertexData[i+4] = 0;
+		// 	vertexData[i+5] = 1;
+		// }
+		// vertexBuffer.itemSize = groupSize;
+		// vertexBuffer.numItems = groupCount;
 
 		// the actual position information
 		var vertexPositionBuffer = this._vertexPositionBuffer = gl.createBuffer();
@@ -1318,12 +1536,11 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Do all the setup work for loading textures.
+	 * Do all the setup work for textures in the system.
 	 * @method _initTextures
-	 * @param {WebGLRenderingContext} gl
 	 * @protected
 	 */
-	p._initTextures = function(gl) {
+	p._initTextures = function() {
 		//TODO: DHG: add a cleanup routine in here in case this happens mid stream
 
 		// reset counters
@@ -1349,7 +1566,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._loadTextureImage = function(gl, image) {
-		var index = ++this._lastTextureID;
+		++this._lastTextureID;
 		var src = image.src;
 
 		if(!src){
@@ -1358,6 +1575,7 @@ this.createjs = this.createjs||{};
 			src = image.src = "canvas_" + this._lastTrackedCanvas++;
 		}
 
+		// put the texture into our storage system
 		var storeID = this._textureIDs[src];
 		if(storeID === undefined) {
 			storeID = this._textureDictionary.length;
@@ -1367,12 +1585,14 @@ this.createjs = this.createjs||{};
 			this._textureDictionary[storeID] = this.getBaseTexture();
 		}
 
+		// get texture params all set up
 		var texture = this._textureDictionary[storeID];
 		texture._batchID = this._batchID;
 		texture._storeID = storeID;
 		texture._imageData = image;
 		this._insertTextureInBatch(gl, texture);
 
+		// get the data into the texture or wait for it to load
 		image._storeID = storeID;
 		if(image.complete || image.naturalWidth || image._isCanvas) {		// is it already loaded
 			this._updateTextureImageData(gl, image);
@@ -1384,7 +1604,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Neccesary to upload the actual image data to the gpu. Without this the texture will be blank.
+	 * Necessary to upload the actual image data to the gpu. Without this the texture will be blank.
 	 * @param {WebGLRenderingContext} gl
 	 * @param {Image | Canvas} image The image data to be uploaded
 	 * @method _updateTextureImageData
@@ -1414,14 +1634,67 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Begin the drawing process
+	 * Adds the texture to a spot in the current batch, forcing a draw if no spots are free.
+	 * @method _insertTextureInBatch
+	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
+	 * @param {WebGLTexture} gl The canvas WebGL context object to draw into.
+	 * @protected
+	 */
+	p._insertTextureInBatch = function(gl, texture) {
+		// if it wasn't used last batch
+		if(this._batchTextures[texture._activeIndex] !== texture) {
+			// we've got to find it a a spot.
+			var found = -1;
+			var start = (this._lastTextureInsert+1) % this._batchTextureCount;
+			var look = start;
+			do {
+				if(this._batchTextures[look]._batchID != this._batchID && !this._slotBlacklist[look]) {
+					found = look;
+					break;
+				}
+				look = (look+1) % this._batchTextureCount;
+			} while(look !== start);
+
+			// we couldn't find anywhere for it go, meaning we're maxed out
+			if(found === -1) {
+				this.batchReason = "textureOverflow";
+				this._drawBuffers(gl);		// <------------------------------------------------------------------------
+				this.batchCardCount = 0;
+				found = start;
+			}
+
+			// lets put it into that spot
+			this._batchTextures[found] = texture;
+			texture._activeIndex = found;
+			var image = texture._imageData;
+			if(image && image._invalid && texture._drawID !== undefined) {
+				this._updateTextureImageData(gl, image);
+			} else {
+				gl.activeTexture(gl.TEXTURE0 + found);
+				gl.bindTexture(gl.TEXTURE_2D, texture);
+				this.setTextureParams(gl);
+			}
+			this._lastTextureInsert = found;
+		} else {
+			var image = texture._imageData;
+			if(texture._storeID != -1 && image._invalid) {
+				this._updateTextureImageData(gl, image);
+			}
+		}
+
+		texture._drawID = this._drawID;
+		texture._batchID = this._batchID;
+	};
+
+	/**
+	 * Begin the drawing process for a regular render.
 	 * @param {WebGLRenderingContext} gl
-	 * @param {Stage || Container} sceneGraph Container object with all that needs to rendered, prefferably a stage
+	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"))((/crossLink}} object with all that needs to rendered, prefferably a stage
 	 * @method _batchDraw
 	 */
 	p._batchDraw = function(sceneGraph, gl, ignoreCache) {
 		if(this._isDrawing > 0) {
-			this._drawToGPU(gl);
+			this._drawBuffers(gl);
 		}
 		this._isDrawing++;
 		this._drawID++;
@@ -1433,51 +1706,18 @@ this.createjs = this.createjs||{};
 		this._appendToBatchGroup(sceneGraph, gl, mtx, this.alpha, ignoreCache);											//TODO: DHG: isn't there a global alpha or something?
 
 		this.batchReason = "drawFinish";
-		this._drawToGPU(gl);								// <--------------------------------------------------------
+		this._drawBuffers(gl);								// <--------------------------------------------------------
 		this._isDrawing--;
 	};
 
-
 	/**
-	 * Draws all the currently defined boxes to the GPU.
-	 * @method _drawToGPU
-	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-	 * @param {Boolean} flipY Covers are used for things like RenderTextures and because of 3D vs Canvas space this can end up meaning y sometimes requires flipping in the render
-	 * @protected
-	 **/
-	p._drawCover = function(gl, flipY) {
-		if(this._isDrawing > 0) {
-			this._drawToGPU(gl);
-		}
-
-		if(this.vocalDebug) {
-			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ "Cover");
-		}
-		var shaderProgram = this._activeShader;
-		var vertexPositionBuffer = this._vertexPositionBuffer;
-		var uvPositionBuffer = this._uvPositionBuffer;
-
-		gl.clear(gl.COLOR_BUFFER_BIT);
-		gl.useProgram(shaderProgram);
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, SpriteStage.COVER_VERT);
-		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
-		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, flipY?SpriteStage.COVER_UV_FLIP:SpriteStage.COVER_UV);
-
-		gl.uniform1i(shaderProgram.samplerUniform, 0);
-		gl.uniform1f(shaderProgram.uprightUniform, flipY?0:1);
-
-		gl.drawArrays(gl.TRIANGLES, 0, SpriteStage.INDICIES_PER_CARD);
-	};
-
-	/**
-	 * Add all the contents of a container to the display list, called recurssivley on each
-	 * @param {Container} container
+	 * Add all the contents of a container to the pending buffers, called recursivley on each container.
+	 * May trigger a draw if a buffer runs out of space.
+	 * @param {Container} container The {{#crossLink "Container"))((/crossLink}} that contains everything to be drawn.
 	 * @param {WebGLRenderingContext} gl
-	 * @param {Matrix2D} concatMtx Cumulative offset so far
+	 * @param {Matrix2D} concatMtx The effective (concatinated) position when begining this container
+	 * @param {Number} concatAlpha The effective (concatinated) alpha when begining this container
+	 * @param {Boolean} ignoreCache Don't use an element's cache during this draw
 	 * @method _appendToBatchGroup
 	 */
 	p._appendToBatchGroup = function(container, gl, concatMtx, concatAlpha, ignoreCache) {
@@ -1497,9 +1737,8 @@ this.createjs = this.createjs||{};
 				container.regX, container.regY
 			);
 		}
-		//concatAlpha *= container.alpha;																				//TODO: DHG: Probably not needed.
 
-		//var tlX = 0, tlY = 0, trX = 0, trY = 0, blX = 0, blY = 0, brX = 0, brY = 0;
+		// sub components of figuring out the position an object holds
 		var subL, subT, subR, subB;
 
 		// actually apply its data to the buffers
@@ -1520,7 +1759,7 @@ this.createjs = this.createjs||{};
 			// check for overflowing batch, if yes then force a render
 			if(this.batchCardCount+1 > this._maxCardsPerBatch) {														//TODO: DHG: consider making this polygon count dependant for things like vector draws
 				this.batchReason = "vertexOverflow";
-				this._drawToGPU(gl);					// <------------------------------------------------------------
+				this._drawBuffers(gl);					// <------------------------------------------------------------
 				this.batchCardCount = 0;
 			}
 
@@ -1610,7 +1849,7 @@ this.createjs = this.createjs||{};
 				// calculate uvs
 				uvRect = frame.uvRect;
 				if(!uvRect) {
-					uvRect = this.buildUVRects(item.spriteSheet, item.currentFrame, false);
+					uvRect = SpriteStage.buildUVRects(item.spriteSheet, item.currentFrame, false);
 				}
 
 				// calculate vertices
@@ -1650,12 +1889,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Draws all the currently defined boxes to the GPU.
-	 * @method _drawToGPU
+	 * Draws all the currently defined cards in the buffer to the render surface.
+	 * @method _drawBuffers
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @protected
 	 **/
-	p._drawToGPU = function(gl) {
+	p._drawBuffers = function(gl) {
 		//return;
 		if(this.vocalDebug) {
 			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
@@ -1671,18 +1910,20 @@ this.createjs = this.createjs||{};
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._vertices);
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
 		gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, textureIndexBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._indecies);
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._uvs);
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
 		gl.vertexAttribPointer(shaderProgram.alphaAttribute, alphaBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._alphas);
 
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
-		//gl.uniformMatrix1i(shaderProgram.flagUniform, gl.FALSE, this.flags);
 
 		for (var j = 0; j < this._batchTextureCount; j++) {
 			var texture = this._batchTextures[j];
@@ -1696,71 +1937,127 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Adds the texture to a spot in the current batch, forcing a draw if no spots are free.
-	 * @method _insertTextureInBatch
+	 * Draws a card that covers the entire render surface.
+	 * @method _drawBuffers
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-	 * @param {WebGLTexture} gl The canvas WebGL context object to draw into.
+	 * @param {Boolean} flipY Covers are used for things like RenderTextures and because of 3D vs Canvas space this can end up meaning y sometimes requires flipping in the render
 	 * @protected
-	 */
-	p._insertTextureInBatch = function(gl, texture) {
-		// if it wasn't used last batch
-		if(this._batchTextures[texture._activeIndex] !== texture) {
-			// we've got to find it a a spot.
-			var found = -1;
-			var start = (this._lastTextureInsert+1) % this._batchTextureCount;
-			var look = start;
-			do {
-				if(this._batchTextures[look]._batchID != this._batchID && !this._slotBlacklist[look]) {
-					found = look;
-					break;
-				}
-				look = (look+1) % this._batchTextureCount;
-			} while(look !== start);
-
-			// we couldn't find anywhere for it go, meaning we're maxed out
-			if(found === -1) {
-				this.batchReason = "textureOverflow";
-				this._drawToGPU(gl);		// <------------------------------------------------------------------------
-				this.batchCardCount = 0;
-				found = start;
-			}
-
-			// lets put it into that spot
-			this._batchTextures[found] = texture;
-			texture._activeIndex = found;
-			var image = texture._imageData;
-			if(image && image._invalid && texture._drawID !== undefined) {
-				this._updateTextureImageData(gl, image);
-			} else {
-				gl.activeTexture(gl.TEXTURE0 + found);
-				gl.bindTexture(gl.TEXTURE_2D, texture);
-				this.setTextureParams(gl);
-			}
-			this._lastTextureInsert = found;
-		} else {
-			var image = texture._imageData;
-			if(texture._storeID != -1 && image._invalid) {
-				this._updateTextureImageData(gl, image);
-			}
+	 **/
+	p._drawCover = function(gl, flipY) {
+		if(this._isDrawing > 0) {
+			this._drawBuffers(gl);
 		}
 
-		texture._drawID = this._drawID;
-		texture._batchID = this._batchID;
+		if(this.vocalDebug) {
+			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ "Cover");
+		}
+		var shaderProgram = this._activeShader;
+		var vertexPositionBuffer = this._vertexPositionBuffer;
+		var uvPositionBuffer = this._uvPositionBuffer;
+
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.useProgram(shaderProgram);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, SpriteStage.COVER_VERT);
+		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, flipY?SpriteStage.COVER_UV_FLIP:SpriteStage.COVER_UV);
+
+		gl.uniform1i(shaderProgram.samplerUniform, 0);
+		gl.uniform1f(shaderProgram.uprightUniform, flipY?0:1);
+
+		gl.drawArrays(gl.TRIANGLES, 0, SpriteStage.INDICIES_PER_CARD);
 	};
 
-	// Injections
-	///////////////////////////////////////////////////////
-	/**
+	// injected properties and methods:
+	/*
 	 * We need to modify other classes, do this during our class initialization
 	 */
-	(function _injectRenderStyles() {
+	(function _injectWebGLFunctionality() {
 		// Set which classes are compatible with SpriteStage. The order is important!!!
 		// Reflect any changes to the drawing loop
-		var candidates = [createjs.Sprite, createjs.Bitmap, createjs.BitmapText, createjs.DOMElement];
+		var candidates = [createjs.Sprite, createjs.Bitmap, createjs.BitmapText];
 		candidates.forEach(function(_class, index) {
 			_class.prototype._webGLRenderStyle = index + 1;
 		});
-		//createjs.Container.prototype._webGLRenderStyle = createjs.SpriteContainer.prototype._webGLRenderStyle;
+
+		var cm = createjs.CacheManager.prototype;
+		/**
+		 * Functionality injected to {{#crossLink "DisplayObject"}}{{/crossLink}}. Ensure SpriteStage is loaded before
+		 * making any DisplayObject instances but after all other standard easeljs classes for injection to take full effect.
+		 * Replaces the 2D only behaviour with potential WebGL behaviour. If options is set to true a SpriteStage
+		 * is created and contained on the object for use when rendering a cache.
+		 * If options is a SpriteStage instance it should be the same SpriteStage the target object is on.
+		 * When it is a webgl texture will be made this gives a substantial performance boost compared to a canvas.
+		 * <h4>Example</h4>
+		 * With a 2d context:
+		 *      var stage = new createjs.Stage();
+		 *      var bmp = new createjs.Bitmap(src);
+		 *      bmp.cache(0, 0, bmp.width, bmp.height, 1, true);
+		 * <h4>Example</h4>
+		 * With a webgl context:
+		 *      var stage = new createjs.SpriteStage();
+		 *      var bmp = new createjs.Bitmap(src);
+		 *      bmp.cache(0, 0, bmp.width, bmp.height, 1, stage);
+		 * You can make your own SpriteStage and have it render to a canvas if you set ".isCacheControlled" to true on your stage.
+		 * DO NOT set it to true if you wish to use the fast Render Textures available to SpriteStages
+		 * @pubic
+		 * @method cache
+		 **/
+		cm._createSurfaceBASE = cm._createSurface;
+		cm._createSurface = function(options) {
+			if(!options) {
+				this._createSurfaceBASE();
+				return;
+			}
+
+			if(this._webGLCache !== options) {
+				if(options === true) {
+					this.cacheCanvas = document.createElement("canvas");
+					this._webGLCache = new createjs.SpriteStage(this.cacheCanvas);
+					// flag so it can tell whether to do a final render texture output
+					this._webGLCache.isCacheControlled = true;
+				} else {
+					this.cacheCanvas = true;
+					this._webGLCache = options;
+				}
+			}
+		};
+
+		cm._drawToCacheBASE = cm._drawToCache;
+		cm._drawToCache = function(compositeOperation, w, h) {
+			var cacheCanvas = this.cacheCanvas;
+			var target = this.target;
+			var webGL = this._webGLCache;
+
+			if(!webGL){
+				this._drawToCacheBASE(compositeOperation, w, h);
+				return;
+			}
+
+			if(webGL.isCacheControlled) {
+				if (w != cacheCanvas.width || h != cacheCanvas.height) {
+					cacheCanvas.width = w;
+					cacheCanvas.height = h;
+					webGL.updateViewport(w, h);
+				}
+			}
+			this._webGLCache.cacheDraw(target, target.filters);
+			this.cacheCanvas = target.cacheCanvas;
+		};
+
+		cm.uncacheBASE = cm.uncache;
+		cm.uncache = function() {
+			if(this._webGLCache) {
+				if(!this._webGLCache.isCacheControlled) {
+					this._webGLCache.unregisterTexture(this.cacheCanvas);
+				}
+				this._webGLCache = false;
+			}
+			this.uncacheBASE();
+		};
 	})();
 
 	createjs.SpriteStage = createjs.promote(SpriteStage, "Stage");
