@@ -36,7 +36,6 @@
 	"../src/easeljs/filters/ColorFilter.js",
 	"../src/easeljs/filters/ColorMatrix.js",
 	"../src/easeljs/filters/ColorMatrixFilter.js",
-	"../src/easeljs/display/SpriteStage.js",
 	"../src/easeljs/ui/Touch.js",
 	"../src/easeljs/version.js"
   ],

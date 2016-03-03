@@ -1742,13 +1742,13 @@ this.createjs = this.createjs||{};
 		var subL, subT, subR, subB;
 
 		// actually apply its data to the buffers
-		for(var i = 0, l = container.children.length; i < l; i++) {														//TODO: DHG: store off length
+		for(var i = 0, l = container.children.length; i < l; i++) {
 			var item = container.children[i];
 
 			if(!(item.visible && concatAlpha)) { continue; }
 			if(!item.cacheCanvas || ignoreCache) {
-				if(item._webGLRenderStyle === 3) {							// BITMAP TEXT SETUP
-					item._updateText();																					//TODO: DHG: Make this a more generic API like a "pre webgl render" function
+				if(item.preGLRender) {							// BITMAP TEXT SETUP
+					item.preGLRender();
 				}
 				if(item.children) {											// CONTAINER
 					this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
@@ -1978,7 +1978,7 @@ this.createjs = this.createjs||{};
 	(function _injectWebGLFunctionality() {
 		// Set which classes are compatible with SpriteStage. The order is important!!!
 		// Reflect any changes to the drawing loop
-		var candidates = [createjs.Sprite, createjs.Bitmap, createjs.BitmapText];
+		var candidates = [createjs.Sprite, createjs.Bitmap];
 		candidates.forEach(function(_class, index) {
 			_class.prototype._webGLRenderStyle = index + 1;
 		});
@@ -2058,6 +2058,20 @@ this.createjs = this.createjs||{};
 			}
 			this.uncacheBASE();
 		};
+
+		/**
+		 * Functionality injected to {{#crossLink "BitmapText"}}{{/crossLink}}. Ensure SpriteStage is loaded after all
+		 * other standard easeljs classes for injection to take full effect.
+		 * Part of a draw call to BitmapText is to re-create the text, without this process there is nothing or stale info to render.
+		 * As SpriteStage does not call distinct draw calls per object we need to simulate that functionality with the preGLRender function.
+		 * If you encounter a similar situation with a custom class simply add a preGLRender function to it and it will be detected and called.
+		 * @pubic
+		 * @method preGLRender
+		 **/
+		var bt = createjs.BitmapText.prototype;
+		bt.preGLRender = function() {
+			this._updateText();
+		}
 	})();
 
 	createjs.SpriteStage = createjs.promote(SpriteStage, "Stage");
