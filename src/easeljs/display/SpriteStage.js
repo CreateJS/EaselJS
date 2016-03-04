@@ -41,7 +41,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
 	 * Vertex Property: a piece of information attached to the vertex like x,y,z
-	 * Index/Indecies: used in groups of 3 to define a triangle, points to vertecies by their index in an array (some render modes do not use these)
+	 * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render modes do not use these)
 	 * Card: a group of 2 triangles used to display a rectangular image
 	 * U/V: common names for the [0-1] texture co-ordinates on an image
 	 * Batch: a single call to the renderer, best done as little as possible so multiple cards are put into a single batch
@@ -52,7 +52,7 @@ this.createjs = this.createjs||{};
 	**/
 
 	/**
-	 * A Sprite Stage is the root level {{#crossLink "Container"}}{{/crossLink}} for an webGL optimized display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
+	 * A Sprite Stage is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL optimized display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
 	 * method is called, it will render its display list to its target canvas ignoring non webGL compatible Display Objects.
 	 * On devices or browsers that don't support WebGL, content will automatically be rendered via canvas 2D.
 	 *
@@ -209,7 +209,7 @@ this.createjs = this.createjs||{};
 		this._vertices = null;
 
 		/**
-		 * The WebGL buffer attached to _vertecies.
+		 * The WebGL buffer attached to _vertices.
 		 * @property _vertexPositionBuffer
 		 * @protected
 		 * @type {WebGLBuffer}
@@ -218,7 +218,7 @@ this.createjs = this.createjs||{};
 		this._vertexPositionBuffer = null;
 
 		/**
-		 * The vertices data for the current draw call.
+		 * The vertex U/V data for the current draw call.
 		 * @property _uvs
 		 * @protected
 		 * @type {Float32Array}
@@ -236,7 +236,7 @@ this.createjs = this.createjs||{};
 		this._uvPositionBuffer = null;
 
 		/**
-		 * The vertices data for the current draw call.
+		 * The vertex indices data for the current draw call.
 		 * @property _indecies
 		 * @protected
 		 * @type {Float32Array}
@@ -300,7 +300,7 @@ this.createjs = this.createjs||{};
 		this._batchTextures = [];
 
 		/**
-		 * How many concurrent textures the gpu can handle. Dynamically Get this value from WebGL during initilization.
+		 * How many concurrent textures the gpu can handle. Dynamically set from WebGL during initialization.
 		 * Spec states 8 is lowest guaranteed value but it could be higher.
 		 * Do not set higher than the value returned by the GPU, and setting it lower will potentially reduce performance.
 		 *      gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)
@@ -332,7 +332,7 @@ this.createjs = this.createjs||{};
 		this._lastTextureID = -1;
 
 		/**
-		 * Current batch being drawn, a batch consists of a call to "drawElements" on the GPU. mnay may occur per draw.
+		 * Current batch being drawn, a batch consists of a call to "drawElements" on the GPU. Many may occur per draw.
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -355,7 +355,7 @@ this.createjs = this.createjs||{};
 		this._slotBlacklist = [];
 
 		/**
-		 * Used to prevent nested draw calls from accidently overwriting drawing information by tracking depth.
+		 * Used to prevent nested draw calls from accidentally overwriting drawing information by tracking depth.
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -425,10 +425,10 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Test a context to see if it has webgl enabled on it
+	 * Test a context to see if it has WebGL enabled on it.
 	 * @method isWebGLActive
 	 * @param {CanvasContext} ctx The context to test
-	 * @return {Boolean} Whether webgl is enabled
+	 * @return {Boolean} Whether WebGL is enabled
 	 */
 	SpriteStage.isWebGLActive = function(ctx) {
 		return ctx &&
@@ -449,7 +449,7 @@ this.createjs = this.createjs||{};
 	SpriteStage.VERTEX_PROPERTY_COUNT = 6;
 
 	/**
-	 * The number of traingle indicies it takes to form a Card. 3 per triangles, 2 triangles.
+	 * The number of triangle indices it takes to form a Card. 3 per triangles, 2 triangles.
 	 * @property NUM_VERTEX_PROPERTIES
 	 * @static
 	 * @final
@@ -471,7 +471,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * The maximum size WebGL allows for element index numbers: 16 bit unsigned integer.
-	 * It takes 6 indcies to make a unique card
+	 * It takes 6 indices to make a unique card.
 	 * @property MAX_INDEX_SIZE
 	 * @static
 	 * @final
@@ -624,7 +624,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Body of the fragment shader.
 	 * The regular shader is designed to render all expected objects.
-	 * Shader code may contain templates that are replaced pre compile.
+	 * Shader code may contain templates that are replaced pre-compile.
 	 * @property REGULAR_FRAGMENT_BODY
 	 * @static
 	 * @final
@@ -656,7 +656,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders.
 	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
-	 * Shader code may contain templates that are replaced pre compile.
+	 * Shader code may contain templates that are replaced pre-compile.
 	 * @property COVER_VARYING_HEADER
 	 * @static
 	 * @final
@@ -773,7 +773,7 @@ this.createjs = this.createjs||{};
 	};
 
 	try {
-		Object.defineProperties(p, {
+		SpriteStage.defineProperties(p, {
 			isWebGL: { get: p._get_isWebGL }
 		});
 	} catch (e) {} // TODO: use Log
@@ -781,7 +781,7 @@ this.createjs = this.createjs||{};
 
 // constructor methods:
 	/**
-	 * Create and properly intialize the webGL instance we will be using.
+	 * Create and properly initialize the WebGL instance we will be using.
 	 * @method _initializeWebGL
 	 * @protected
 	 */
@@ -871,7 +871,6 @@ this.createjs = this.createjs||{};
 	 * @param {Array} filters The filters we're drawing into cache.
 	 **/
 	p.draw = function(context, ignoreCache) {
-		aaaaaaaaaaaaaaaaaaaaaaaaaaaa
 		if (SpriteStage.isWebGLActive(this._webGLContext)) {
 			var gl = this._webGLContext;
 			this._batchDraw(this, gl, ignoreCache);
@@ -982,7 +981,7 @@ this.createjs = this.createjs||{};
 				target.cacheCanvas = renderTexture;
 			}
 		} else {
-			// is this for another stage or mine
+			// is this for another stage or mine?
 			if(this.isCacheControlled) {
 				// draw item to canvas				I -> C
 				gl.clear(gl.COLOR_BUFFER_BIT);
@@ -1010,9 +1009,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Blocks, or frees a texture "slot" on the GPU. Can be usefull if you are overflowing textures.
+	 * Blocks, or frees a texture "slot" on the GPU. Can be useful if you are overflowing textures.
 	 * When overflowing textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large textures.
-	 * By blocking the slot you reduce available slots potentially increasing draw calls but prevent a texture being re-uploaded if it moved slot due to overflow.
+	 * By blocking the slot you reduce available slots potentially increasing draw calls, but mostly you prevent a texture being re-uploaded if it would of moved slot due to overflow.
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method protectTextureSlot
 	 * @param  {Number} id The slot to be affected
@@ -1059,8 +1058,8 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * For every image encountered it is registered and tracked automatically.
-	 * When all items using an image are removed from the stage its recommended to remove it manually to prevent memory leaks.
-	 * If you remove a texture and add it again later the texture will get re added and ne re-removing.
+	 * When all items using an image are removed from the stage it's recommended to remove it manually to prevent memory leaks.
+	 * If you remove a texture and add it again later the texture will get re-added and need re-removing later.
 	 * @method unregisterTexture
 	 * @param  {DisplayObject} item a display object that used the texture you are no longer using.
 	 */
@@ -1151,7 +1150,7 @@ this.createjs = this.createjs||{};
 		if (gl) {
 			gl.viewport(0, 0, this._viewportWidth, this._viewportHeight);
 
-			// openGL works with a -1,1 space on its screen. It also follows Y-Up
+			// WebGL works with a -1,1 space on its screen. It also follows Y-Up
 			// we need to flip the y, scale and then translate the co-ordinates to match this
 			// additionally we offset into they Y so the polygons are inside the camera's "clipping" plane
 			this._projectionMatrix = new Float32Array([
@@ -1201,7 +1200,7 @@ this.createjs = this.createjs||{};
 	 **/
 
 	/**
-	 * Returns a base texture as either a
+	 * Returns a base texture that has no image or data loaded. Not intende for loading images.
 	 * @method getBaseTexture
 	 * @param  {HTMLImageElement} w The width of the texture, defaults to 1
 	 * @param  {HTMLImageElement} h The height of the texture, defaults to 1
@@ -1219,7 +1218,7 @@ this.createjs = this.createjs||{};
 		gl.texImage2D(
 			gl.TEXTURE_2D,			// target
 			0,						// level of detail
-			gl.RGBA,				// internalformat
+			gl.RGBA,				// internal format
 			width, height, 0,		// width, height, border (only for array/null sourced textures)
 			gl.RGBA,				// format (match internal format)
 			gl.UNSIGNED_BYTE,		// type of texture(pixel color depth)
@@ -1287,7 +1286,7 @@ this.createjs = this.createjs||{};
 
 // private methods:
 	/**
-	 * Sets up and returns the webgl context for the canvas.
+	 * Sets up and returns the WebGL context for the canvas.
 	 * @param  {Canvas} canvas The DOM canvas element to attach to
 	 * @param  {Object} options The options to be handed into the WebGL object, see WebGL spec
 	 * @method _fetchWebGLContext
@@ -1324,7 +1323,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._fetchShaderProgram = function(gl, shaderName, customVTX, customFRAG, shaderParamSetup) {
-		gl.useProgram(null);		//saftey to avoid collisions
+		gl.useProgram(null);		// safety to avoid collisions
 
 		// build the correct shader string out of the right headers and bodies
 		var targetFrag, targetVtx;
@@ -1350,7 +1349,7 @@ this.createjs = this.createjs||{};
 				break;
 		}
 
-		// create the seperate pars
+		// create the separate vars
 		var vertexShader = this._createShader(gl, gl.VERTEX_SHADER, targetVtx);
 		var fragmentShader = this._createShader(gl, gl.FRAGMENT_SHADER, targetFrag);
 
@@ -1366,7 +1365,7 @@ this.createjs = this.createjs||{};
 			throw(gl.getProgramInfoLog(shaderProgram));
 		}
 
-		// setup the parameters on the shader
+		// set up the parameters on the shader
 		gl.useProgram(shaderProgram);
 		switch(shaderName) {
 			case "custom":
@@ -1469,7 +1468,7 @@ this.createjs = this.createjs||{};
 
 		// INFO:
 		// all buffers are created using this pattern
-		// create a webGL buffer
+		// create a WebGL buffer
 		// attach it to context
 		// figure out how many parts it has to an entry
 		// fill it with empty data to reserve the memory
@@ -1551,7 +1550,7 @@ this.createjs = this.createjs||{};
 		this._textureIDs = {};
 		this._batchTextures = [];
 
-		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for saftey code
+		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for safety code
 		for(var i=0; i<this._batchTextureCount;i++) {
 			this._batchTextures[i] = this.getBaseTexture();
 		}
@@ -1603,7 +1602,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Necessary to upload the actual image data to the gpu. Without this the texture will be blank.
+	 * Necessary to upload the actual image data to the GPU. Without this the texture will be blank.
 	 * @param {WebGLRenderingContext} gl
 	 * @param {Image | Canvas} image The image data to be uploaded
 	 * @method _updateTextureImageData
@@ -1688,7 +1687,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Begin the drawing process for a regular render.
 	 * @param {WebGLRenderingContext} gl
-	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"))((/crossLink}} object with all that needs to rendered, prefferably a stage
+	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"))((/crossLink}} object with all that needs to rendered, preferably a stage
 	 * @method _batchDraw
 	 */
 	p._batchDraw = function(sceneGraph, gl, ignoreCache) {
@@ -1710,12 +1709,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Add all the contents of a container to the pending buffers, called recursivley on each container.
+	 * Add all the contents of a container to the pending buffers, called recursively on each container.
 	 * May trigger a draw if a buffer runs out of space.
 	 * @param {Container} container The {{#crossLink "Container"))((/crossLink}} that contains everything to be drawn.
 	 * @param {WebGLRenderingContext} gl
-	 * @param {Matrix2D} concatMtx The effective (concatinated) position when begining this container
-	 * @param {Number} concatAlpha The effective (concatinated) alpha when begining this container
+	 * @param {Matrix2D} concatMtx The effective (concatenated) position when beginning this container
+	 * @param {Number} concatAlpha The effective (concatenated) alpha when beginning this container
 	 * @param {Boolean} ignoreCache Don't use an element's cache during this draw
 	 * @method _appendToBatchGroup
 	 */
@@ -1762,7 +1761,7 @@ this.createjs = this.createjs||{};
 				this.batchCardCount = 0;
 			}
 
-			// keep track of concatanted position
+			// keep track of concatenated position
 			if(!item._glMtx) { item._glMtx = new createjs.Matrix2D(); }
 			var iMtx = item._glMtx;
 			iMtx.copy(cMtx);
@@ -1985,18 +1984,18 @@ this.createjs = this.createjs||{};
 		var cm = createjs.CacheManager.prototype;
 		/**
 		 * Functionality injected to {{#crossLink "DisplayObject"}}{{/crossLink}}. Ensure SpriteStage is loaded before
-		 * making any DisplayObject instances but after all other standard easeljs classes for injection to take full effect.
-		 * Replaces the 2D only behaviour with potential WebGL behaviour. If options is set to true a SpriteStage
+		 * making any DisplayObject instances but after all other standard EaselJS classes for injection to take full effect.
+		 * Replaces the 2D only behavior with potential WebGL behavior. If options is set to true a SpriteStage
 		 * is created and contained on the object for use when rendering a cache.
 		 * If options is a SpriteStage instance it should be the same SpriteStage the target object is on.
-		 * When it is a webgl texture will be made this gives a substantial performance boost compared to a canvas.
+		 * When it is a WebGL texture will be made this gives a substantial performance boost compared to a canvas.
 		 * <h4>Example</h4>
 		 * With a 2d context:
 		 *      var stage = new createjs.Stage();
 		 *      var bmp = new createjs.Bitmap(src);
 		 *      bmp.cache(0, 0, bmp.width, bmp.height, 1, true);
 		 * <h4>Example</h4>
-		 * With a webgl context:
+		 * With a WebGL context:
 		 *      var stage = new createjs.SpriteStage();
 		 *      var bmp = new createjs.Bitmap(src);
 		 *      bmp.cache(0, 0, bmp.width, bmp.height, 1, stage);
@@ -2060,7 +2059,7 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * Functionality injected to {{#crossLink "BitmapText"}}{{/crossLink}}. Ensure SpriteStage is loaded after all
-		 * other standard easeljs classes for injection to take full effect.
+		 * other standard EaselJS classes for injection to take full effect.
 		 * Part of a draw call to BitmapText is to re-create the text, without this process there is nothing or stale info to render.
 		 * As SpriteStage does not call distinct draw calls per object we need to simulate that functionality with the preGLRender function.
 		 * If you encounter a similar situation with a custom class simply add a preGLRender function to it and it will be detected and called.
