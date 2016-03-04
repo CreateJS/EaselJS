@@ -30,7 +30,6 @@
  * @module EaselJS
  */
 
-// namespace:
 this.createjs = this.createjs||{};
 
 (function() {
@@ -62,7 +61,6 @@ this.createjs = this.createjs||{};
 	  *    - To display something SpriteStage cannot normally render, cache the object. A cached object is the same to the renderer as a new image regardless of its contents.
 	 *     - Images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
 	 *     - If new images are continually added and removed from the display list it will leak memory due to WebGL Texture wrappers being made.
-																														//TODO: add in a hook so that people can easily clear old texture memory
 	 *     - Clone an image node (DOM/Canvas Element) to re-use it between multiple SpriteStage instances, the GPU texture loading and tracking is not advanced enough yet.
 	 *     - You must call updateViewport if you resize your canvas after making a SpriteStage, this will properly size the 3D context stored in memory, this won't affect the DOM.
 	 *
@@ -116,7 +114,7 @@ this.createjs = this.createjs||{};
 		 * @type {Boolean}
 		 * @default false
 		 **/
-		this._preserveDrawingBuffer = preserveDrawingBuffer||false;														//TODO: DHG: look at turning this into autoClear directly
+		this._preserveDrawingBuffer = preserveDrawingBuffer||false;
 
 		/**
 		 * Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
@@ -125,16 +123,16 @@ this.createjs = this.createjs||{};
 		 * @type {Boolean}
 		 * @default false
 		 **/
-		this._antialias = antialias||false;																				//TODO: DHG: ensure this does something
+		this._antialias = antialias||false;
 
 		/**
 		 * Specifies whether or not the browser's WebGL implementation should be transparent.
-		 * @property _antialias
+		 * @property _transparent
 		 * @protected
 		 * @type {Boolean}
 		 * @default false
 		 **/
-		this._transparent = transparent||false;																				//TODO: DHG: ensure this does something
+		this._transparent = transparent||false;
 
 		/**
 		 * The width of the drawing surface used in memory.
@@ -244,7 +242,7 @@ this.createjs = this.createjs||{};
 		 * @type {Float32Array}
 		 * @default null
 		 **/
-		this._indecies = null; // TD: correct spelling is "_indices"
+		this._indecies = null;
 
 		/**
 		 * The WebGL buffer attached to _indecies.
@@ -302,7 +300,7 @@ this.createjs = this.createjs||{};
 		this._batchTextures = [];
 
 		/**
-		 * How many concurrent textures the gpu can handle. Dynamically Get this value from WebGL during initialization.
+		 * How many concurrent textures the gpu can handle. Dynamically set from WebGL during initialization.
 		 * Spec states 8 is lowest guaranteed value but it could be higher.
 		 * Do not set higher than the value returned by the GPU, and setting it lower will potentially reduce performance.
 		 *      gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)
@@ -775,7 +773,7 @@ this.createjs = this.createjs||{};
 	};
 
 	try {
-		Object.defineProperties(p, {
+		SpriteStage.defineProperties(p, {
 			isWebGL: { get: p._get_isWebGL }
 		});
 	} catch (e) {} // TODO: use Log
@@ -873,7 +871,6 @@ this.createjs = this.createjs||{};
 	 * @param {Array} filters The filters we're drawing into cache.
 	 **/
 	p.draw = function(context, ignoreCache) {
-		aaaaaaaaaaaaaaaaaaaaaaaaaaaa // TD: huh? Forcing an error to be thrown lol?
 		if (SpriteStage.isWebGLActive(this._webGLContext)) {
 			var gl = this._webGLContext;
 			this._batchDraw(this, gl, ignoreCache);
@@ -960,7 +957,7 @@ this.createjs = this.createjs||{};
 				}
 			}
 
-			// Is this for another stage or mine?
+			// is this for another stage or mine
 			if(this.isCacheControlled) {
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
@@ -984,7 +981,7 @@ this.createjs = this.createjs||{};
 				target.cacheCanvas = renderTexture;
 			}
 		} else {
-			// Is this for another stage or mine?
+			// is this for another stage or mine?
 			if(this.isCacheControlled) {
 				// draw item to canvas				I -> C
 				gl.clear(gl.COLOR_BUFFER_BIT);
@@ -1014,7 +1011,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Blocks, or frees a texture "slot" on the GPU. Can be useful if you are overflowing textures.
 	 * When overflowing textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large textures.
-	 * By blocking the slot you reduce available slots potentially increasing draw calls but prevent a texture being re-uploaded if it moved slots due to overflow.
+	 * By blocking the slot you reduce available slots potentially increasing draw calls, but mostly you prevent a texture being re-uploaded if it would of moved slot due to overflow.
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method protectTextureSlot
 	 * @param  {Number} id The slot to be affected
@@ -1062,8 +1059,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * For every image encountered it is registered and tracked automatically.
 	 * When all items using an image are removed from the stage it's recommended to remove it manually to prevent memory leaks.
-	 * If you remove a texture and add it again later the texture will get re-added and ne re-removing.
-	 *                                                                                  ^^ TD: what is that supposed to be? I can't tell.
+	 * If you remove a texture and add it again later the texture will get re-added and need re-removing later.
 	 * @method unregisterTexture
 	 * @param  {DisplayObject} item a display object that used the texture you are no longer using.
 	 */
@@ -1154,7 +1150,7 @@ this.createjs = this.createjs||{};
 		if (gl) {
 			gl.viewport(0, 0, this._viewportWidth, this._viewportHeight);
 
-			// OpenGL works with a -1,1 space on its screen. It also follows Y-Up
+			// WebGL works with a -1,1 space on its screen. It also follows Y-Up
 			// we need to flip the y, scale and then translate the co-ordinates to match this
 			// additionally we offset into they Y so the polygons are inside the camera's "clipping" plane
 			this._projectionMatrix = new Float32Array([
@@ -1204,8 +1200,7 @@ this.createjs = this.createjs||{};
 	 **/
 
 	/**
-	 * Returns a base texture as either a
-	 *                                    ^^^ TD: incomplete sentence.
+	 * Returns a base texture that has no image or data loaded. Not intende for loading images.
 	 * @method getBaseTexture
 	 * @param  {HTMLImageElement} w The width of the texture, defaults to 1
 	 * @param  {HTMLImageElement} h The height of the texture, defaults to 1
@@ -1290,7 +1285,6 @@ this.createjs = this.createjs||{};
 	};
 
 // private methods:
-
 	/**
 	 * Sets up and returns the WebGL context for the canvas.
 	 * @param  {Canvas} canvas The DOM canvas element to attach to
@@ -2079,5 +2073,4 @@ this.createjs = this.createjs||{};
 	})();
 
 	createjs.SpriteStage = createjs.promote(SpriteStage, "Stage");
-
 }());
