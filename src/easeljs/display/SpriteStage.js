@@ -61,7 +61,6 @@ this.createjs = this.createjs||{};
 	  *    - To display something SpriteStage cannot normally render, cache the object. A cached object is the same to the renderer as a new image regardless of its contents.
 	 *     - Images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
 	 *     - If new images are continually added and removed from the display list it will leak memory due to WebGL Texture wrappers being made.
-																														//TODO: add in a hook so that people can easily clear old texture memory
 	 *     - Clone an image node (DOM/Canvas Element) to re-use it between multiple SpriteStage instances, the GPU texture loading and tracking is not advanced enough yet.
 	 *     - You must call updateViewport if you resize your canvas after making a SpriteStage, this will properly size the 3D context stored in memory, this won't affect the DOM.
 	 *
@@ -115,7 +114,7 @@ this.createjs = this.createjs||{};
 		 * @type {Boolean}
 		 * @default false
 		 **/
-		this._preserveDrawingBuffer = preserveDrawingBuffer||false;														//TODO: DHG: look at turning this into autoClear directly
+		this._preserveDrawingBuffer = preserveDrawingBuffer||false;
 
 		/**
 		 * Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
@@ -124,16 +123,16 @@ this.createjs = this.createjs||{};
 		 * @type {Boolean}
 		 * @default false
 		 **/
-		this._antialias = antialias||false;																				//TODO: DHG: ensure this does something
+		this._antialias = antialias||false;
 
 		/**
 		 * Specifies whether or not the browser's WebGL implementation should be transparent.
-		 * @property _antialias
+		 * @property _transparent
 		 * @protected
 		 * @type {Boolean}
 		 * @default false
 		 **/
-		this._transparent = transparent||false;																				//TODO: DHG: ensure this does something
+		this._transparent = transparent||false;
 
 		/**
 		 * The width of the drawing surface used in memory.
