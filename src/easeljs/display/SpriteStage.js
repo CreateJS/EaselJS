@@ -237,15 +237,15 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * The vertex indices data for the current draw call.
-		 * @property _indecies
+		 * @property _indices
 		 * @protected
 		 * @type {Float32Array}
 		 * @default null
 		 **/
-		this._indecies = null;
+		this._indices = null;
 
 		/**
-		 * The WebGL buffer attached to _indecies.
+		 * The WebGL buffer attached to _indices.
 		 * @property _textureIndexBuffer
 		 * @protected
 		 * @type {WebGLBuffer}
@@ -1516,7 +1516,7 @@ this.createjs = this.createjs||{};
 		var textureIndexBuffer = this._textureIndexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
 		groupSize = 1;
-		var indecies = this._indecies = new Float32Array(groupCount * groupSize);
+		var indecies = this._indices = new Float32Array(groupCount * groupSize);
 		for(i=0; i<indecies.length; i++) { indecies[i] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, indecies, gl.DYNAMIC_DRAW);
 		textureIndexBuffer.itemSize = groupSize;
@@ -1782,7 +1782,7 @@ this.createjs = this.createjs||{};
 
 			var uvs = this._uvs;
 			var vertices = this._vertices;
-			var texI = this._indecies;
+			var texI = this._indices;
 			var alphas = this._alphas;
 
 			if(item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
@@ -1911,7 +1911,7 @@ this.createjs = this.createjs||{};
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
 		gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, textureIndexBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._indecies);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._indices);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
