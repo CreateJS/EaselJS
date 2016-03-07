@@ -850,7 +850,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Maps the familiar ActionScript <code>curveTo()</code> method to the functionally similar {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}}
 	 * method.
-	 * @method quadraticCurveTo
+	 * @method curveTo
 	 * @param {Number} cpx
 	 * @param {Number} cpy
 	 * @param {Number} x
