@@ -1613,7 +1613,17 @@ this.createjs = this.createjs||{};
 		gl.activeTexture(gl.TEXTURE0 + texture._activeIndex);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		this.setTextureParams(gl);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+		try{
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+		} catch(e) {
+			var errString = "\nAn error has occurred. This is most likely due to security restrictions on webgl images with local or cross-domain origins";
+			if(console.error) {
+				console.error(e, errString);
+			} else {
+				console.log(e, errString);
+			}
+		}
 
 		image._invalid = false;
 
