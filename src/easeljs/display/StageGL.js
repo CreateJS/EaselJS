@@ -1,5 +1,5 @@
 /*
-* SpriteStage
+* StageGL
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
@@ -58,17 +58,17 @@ this.createjs = this.createjs||{};
 	 *
 	 * Complications:
 	 *     - Only Sprite, Container, BitmapText, Bitmap, and DOMElement are rendered when added to the display list.
-	  *    - To display something SpriteStage cannot normally render, cache the object. A cached object is the same to the renderer as a new image regardless of its contents.
+	  *    - To display something StageGL cannot normally render, cache the object. A cached object is the same to the renderer as a new image regardless of its contents.
 	 *     - Images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
 	 *     - If new images are continually added and removed from the display list it will leak memory due to WebGL Texture wrappers being made.
-	 *     - Clone an image node (DOM/Canvas Element) to re-use it between multiple SpriteStage instances, the GPU texture loading and tracking is not advanced enough yet.
-	 *     - You must call updateViewport if you resize your canvas after making a SpriteStage, this will properly size the 3D context stored in memory, this won't affect the DOM.
+	 *     - Clone an image node (DOM/Canvas Element) to re-use it between multiple StageGL instances, the GPU texture loading and tracking is not advanced enough yet.
+	 *     - You must call updateViewport if you resize your canvas after making a StageGL, this will properly size the 3D context stored in memory, this won't affect the DOM.
 	 *
 	 * <h4>How to use Example</h4>
 	 * This example creates a sprite stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
-	 * and redraw the stage using {{#crossLink "SpriteStage/update"}}{{/crossLink}}.
+	 * and redraw the stage using {{#crossLink "StageGL/update"}}{{/crossLink}}.
 	 *
-	 *      var stage = new createjs.SpriteStage("canvasElementId", false, false);
+	 *      var stage = new createjs.StageGL("canvasElementId", false, false);
 	 *      stage.updateViewport(800, 600);
 	 *      var image = new createjs.Bitmap("imagePath.png");
 	 *      stage.addChild(image);
@@ -78,20 +78,20 @@ this.createjs = this.createjs||{};
 	 *          stage.update();
 	 *      }
 	 *
-	 * <strong>Note:</strong> SpriteStage is not included in the minified version of EaselJS.
+	 * <strong>Note:</strong> StageGL is not included in the minified version of EaselJS.
 	 * <strong>Note:</strong> SpriteContainer was required by previous versions but is deprecated.
 	 * <strong>Note:</strong> Previous versions had hard limitations about images per container etc, these have been removed.
 	 *
-	 * @class SpriteStage
+	 * @class StageGL
 	 * @extends Stage
 	 * @constructor
-	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the SpriteStage will render to, or the string id
+	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the StageGL will render to, or the string id
 	 * of a canvas object in the current document.
 	 * @param {Boolean} preserveDrawingBuffer If true, the canvas is NOT auto-cleared by WebGL (spec discourages true). Useful if you want to use p.autoClear = false.
 	 * @param {Boolean} antialias Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
 	 * @param {Boolean} transparent If true, the canvas is transparent, this is VERY expensive.
 	 **/
-	function SpriteStage(canvas, preserveDrawingBuffer, antialias, transparent) {
+	function StageGL(canvas, preserveDrawingBuffer, antialias, transparent) {
 		this.Stage_constructor(canvas);
 
 		// public properties:
@@ -186,9 +186,9 @@ this.createjs = this.createjs||{};
 		 * @property _maxCardsPerBatch
 		 * @protected
 		 * @type {Number}
-		 * @default SpriteStage.DEFAULT_MAX_BATCH_SIZE
+		 * @default StageGL.DEFAULT_MAX_BATCH_SIZE
 		 **/
-		this._maxCardsPerBatch = SpriteStage.DEFAULT_MAX_BATCH_SIZE;													//TODO: write getter/setters for this
+		this._maxCardsPerBatch = StageGL.DEFAULT_MAX_BATCH_SIZE;													//TODO: write getter/setters for this
 
 		/**
 		 * The shader program used to draw the current batch.
@@ -390,7 +390,7 @@ this.createjs = this.createjs||{};
 		// and begin
 		this._initializeWebGL();
 	}
-	var p = createjs.extend(SpriteStage, createjs.Stage);
+	var p = createjs.extend(StageGL, createjs.Stage);
 
 	/**
 	 * Calculate the U/V co-ordinate based info for sprite frames. Instead of pixel count it uses a 0-1 space.
@@ -401,7 +401,7 @@ this.createjs = this.createjs||{};
 	 * @method buildUVRects
 	 * @return {Object} the target frame if supplied and present or a generic frame {t, l, b, r}
 	 */
-	SpriteStage.buildUVRects = function(spritesheet, target, onlyTarget) {
+	StageGL.buildUVRects = function(spritesheet, target, onlyTarget) {
 		// handle defaults and error cases
 		if(!spritesheet || !spritesheet._frames){ return null; }
 		if(target === undefined) { target = -1; }
@@ -430,7 +430,7 @@ this.createjs = this.createjs||{};
 	 * @param {CanvasContext} ctx The context to test
 	 * @return {Boolean} Whether WebGL is enabled
 	 */
-	SpriteStage.isWebGLActive = function(ctx) {
+	StageGL.isWebGLActive = function(ctx) {
 		return ctx &&
 			ctx instanceof WebGLRenderingContext &&
 			typeof WebGLRenderingContext !== 'undefined';
@@ -446,7 +446,7 @@ this.createjs = this.createjs||{};
 	 * @type {Number}
 	 * @readonly
 	 **/
-	SpriteStage.VERTEX_PROPERTY_COUNT = 6;
+	StageGL.VERTEX_PROPERTY_COUNT = 6;
 
 	/**
 	 * The number of triangle indices it takes to form a Card. 3 per triangles, 2 triangles.
@@ -456,7 +456,7 @@ this.createjs = this.createjs||{};
 	 * @type {Number}
 	 * @readonly
 	 **/
-	SpriteStage.INDICIES_PER_CARD = 6;
+	StageGL.INDICIES_PER_CARD = 6;
 
 	/**
 	 * Default value for the maximum number of cards we want to process in a batch.
@@ -467,7 +467,7 @@ this.createjs = this.createjs||{};
 	 * @type {Number}
 	 * @readonly
 	 **/
-	SpriteStage.DEFAULT_MAX_BATCH_SIZE = 8000;
+	StageGL.DEFAULT_MAX_BATCH_SIZE = 8000;
 
 	/**
 	 * The maximum size WebGL allows for element index numbers: 16 bit unsigned integer.
@@ -478,7 +478,7 @@ this.createjs = this.createjs||{};
 	 * @type {Number}
 	 * @readonly
 	 **/
-	SpriteStage.WEBGL_MAX_INDEX_NUM = Math.pow(2, 16);
+	StageGL.WEBGL_MAX_INDEX_NUM = Math.pow(2, 16);
 
 	/**
 	 * Default U/V rect for dealing with full coverage from an image source.
@@ -488,7 +488,7 @@ this.createjs = this.createjs||{};
 	 * @type {Object}
 	 * @readonly
 	 */
-	SpriteStage.UV_RECT = {t:0, l:0, b:1, r:1};
+	StageGL.UV_RECT = {t:0, l:0, b:1, r:1};
 
 	/**
 	 * Vertex positions for a card that covers the entire render. Used with render targets primarily.
@@ -498,7 +498,7 @@ this.createjs = this.createjs||{};
 	 * @type {Float32Array}
 	 * @readonly
 	 */
-	SpriteStage.COVER_VERT = new Float32Array([
+	StageGL.COVER_VERT = new Float32Array([
 		-1,		 1,		//TL
 		1,		 1,		//TR
 		-1,		-1,		//BL
@@ -515,7 +515,7 @@ this.createjs = this.createjs||{};
 	 * @type {Float32Array}
 	 * @readonly
 	 */
-	SpriteStage.COVER_UV = new Float32Array([
+	StageGL.COVER_UV = new Float32Array([
 		 0,		 0,		//TL
 		 1,		 0,		//TR
 		 0,		 1,		//BL
@@ -532,7 +532,7 @@ this.createjs = this.createjs||{};
 	 * @type {Float32Array}
 	 * @readonly
 	 */
-	SpriteStage.COVER_UV_FLIP = new Float32Array([
+	StageGL.COVER_UV_FLIP = new Float32Array([
 		 0,		 1,		//TL
 		 1,		 1,		//TR
 		 0,		 0,		//BL
@@ -551,7 +551,7 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 */
-	SpriteStage.REGULAR_VARYING_HEADER = (
+	StageGL.REGULAR_VARYING_HEADER = (
 		"precision mediump float;" +
 
 		"varying vec2 vTextureCoord;" +
@@ -569,8 +569,8 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 */
-	SpriteStage.REGULAR_VERTEX_HEADER = (
-		SpriteStage.REGULAR_VARYING_HEADER +
+	StageGL.REGULAR_VERTEX_HEADER = (
+		StageGL.REGULAR_VARYING_HEADER +
 		"attribute vec2 vertexPosition;" +
 		"attribute vec2 uvPosition;" +
 		"attribute lowp float textureIndex;" +
@@ -589,8 +589,8 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 */
-	SpriteStage.REGULAR_FRAGMENT_HEADER = (
-		SpriteStage.REGULAR_VARYING_HEADER +
+	StageGL.REGULAR_FRAGMENT_HEADER = (
+		StageGL.REGULAR_VARYING_HEADER +
 		"uniform sampler2D uSampler[{{count}}];"
 	);
 
@@ -604,7 +604,7 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 */
-	SpriteStage.REGULAR_VERTEX_BODY  = (
+	StageGL.REGULAR_VERTEX_BODY  = (
 		"void main(void) {" +
 			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix see js... bypass for now
 			//vertexPosition, round if flag
@@ -631,7 +631,7 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 */
-	SpriteStage.REGULAR_FRAGMENT_BODY = (
+	StageGL.REGULAR_FRAGMENT_BODY = (
 		"void main(void) {" +
 			"int src = int(indexPicker);" +
 			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
@@ -646,11 +646,11 @@ this.createjs = this.createjs||{};
 	);
 
 	//TODO: DHG: a real particle shader
-	SpriteStage.PARTICLE_VERTEX_BODY = (
-		SpriteStage.REGULAR_VERTEX_BODY
+	StageGL.PARTICLE_VERTEX_BODY = (
+		StageGL.REGULAR_VERTEX_BODY
 	);
-	SpriteStage.PARTICLE_FRAGMENT_BODY = (
-		SpriteStage.REGULAR_FRAGMENT_BODY
+	StageGL.PARTICLE_FRAGMENT_BODY = (
+		StageGL.REGULAR_FRAGMENT_BODY
 	);
 
 	/**
@@ -663,7 +663,7 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 */
-	SpriteStage.COVER_VARYING_HEADER = (
+	StageGL.COVER_VARYING_HEADER = (
 		"precision mediump float;" +
 
 		"varying highp vec2 vRenderCoord;" +
@@ -679,8 +679,8 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 */
-	SpriteStage.COVER_VERTEX_HEADER = (
-		SpriteStage.COVER_VARYING_HEADER +
+	StageGL.COVER_VERTEX_HEADER = (
+		StageGL.COVER_VARYING_HEADER +
 		"attribute vec2 vertexPosition;" +
 		"attribute vec2 uvPosition;" +
 		"uniform float uUpright;"
@@ -696,8 +696,8 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 */
-	SpriteStage.COVER_FRAGMENT_HEADER = (
-		SpriteStage.COVER_VARYING_HEADER +
+	StageGL.COVER_FRAGMENT_HEADER = (
+		StageGL.COVER_VARYING_HEADER +
 		"uniform sampler2D uSampler;"
 	);
 
@@ -711,7 +711,7 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 */
-	SpriteStage.COVER_VERTEX_BODY  = (
+	StageGL.COVER_VERTEX_BODY  = (
 		"void main(void) {" +
 			"gl_Position = vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
 			"vRenderCoord = uvPosition;" +
@@ -730,7 +730,7 @@ this.createjs = this.createjs||{};
 	 * @type {String}
 	 * @readonly
 	 */
-	SpriteStage.COVER_FRAGMENT_BODY = (
+	StageGL.COVER_FRAGMENT_BODY = (
 		"void main(void) {" +
 			"vec4 color = texture2D(uSampler, vRenderCoord);" +
 			"gl_FragColor = color;" +
@@ -773,7 +773,7 @@ this.createjs = this.createjs||{};
 	};
 
 	try {
-		SpriteStage.defineProperties(p, {
+		StageGL.defineProperties(p, {
 			isWebGL: { get: p._get_isWebGL }
 		});
 	} catch (e) {} // TODO: use Log
@@ -848,7 +848,7 @@ this.createjs = this.createjs||{};
 	/** docced in super class **/
 	p.clear = function() {
 		if (!this.canvas) { return; }
-		if (SpriteStage.isWebGLActive(this._webGLContext)) {
+		if (StageGL.isWebGLActive(this._webGLContext)) {
 			var gl = this._webGLContext;
 			// Use WebGL.
 			gl.clear(gl.COLOR_BUFFER_BIT);
@@ -871,7 +871,7 @@ this.createjs = this.createjs||{};
 	 * @param {Array} filters The filters we're drawing into cache.
 	 **/
 	p.draw = function(context, ignoreCache) {
-		if (SpriteStage.isWebGLActive(this._webGLContext)) {
+		if (StageGL.isWebGLActive(this._webGLContext)) {
 			var gl = this._webGLContext;
 			this._batchDraw(this, gl, ignoreCache);
 			return true;
@@ -1281,7 +1281,7 @@ this.createjs = this.createjs||{};
 	 * @return {String} a string representation of the instance.
 	 **/
 	p.toString = function() {
-		return "[SpriteStage (name="+  this.name +")]";
+		return "[StageGL (name="+  this.name +")]";
 	};
 
 // private methods:
@@ -1329,23 +1329,23 @@ this.createjs = this.createjs||{};
 		var targetFrag, targetVtx;
 		switch(shaderName) {
 			case "custom":
-				targetVtx = SpriteStage.COVER_VERTEX_HEADER;
-				targetFrag = SpriteStage.COVER_FRAGMENT_HEADER;
-				targetVtx += customVTX || SpriteStage.COVER_VERTEX_BODY;
-				targetFrag += customFRAG || SpriteStage.COVER_FRAGMENT_BODY;
+				targetVtx = StageGL.COVER_VERTEX_HEADER;
+				targetFrag = StageGL.COVER_FRAGMENT_HEADER;
+				targetVtx += customVTX || StageGL.COVER_VERTEX_BODY;
+				targetFrag += customFRAG || StageGL.COVER_FRAGMENT_BODY;
 				break;
 			case "particle":
-				targetVtx = SpriteStage.REGULAR_VERTEX_HEADER;
-				targetFrag = SpriteStage.REGULAR_FRAGMENT_HEADER;
-				targetVtx += SpriteStage.PARTICLE_VERTEX_BODY;
-				targetFrag += SpriteStage.PARTICLE_FRAGMENT_BODY;
+				targetVtx = StageGL.REGULAR_VERTEX_HEADER;
+				targetFrag = StageGL.REGULAR_FRAGMENT_HEADER;
+				targetVtx += StageGL.PARTICLE_VERTEX_BODY;
+				targetFrag += StageGL.PARTICLE_FRAGMENT_BODY;
 				break;
 			case "regular":
 			default:
-				targetVtx = SpriteStage.REGULAR_VERTEX_HEADER;
-				targetFrag = SpriteStage.REGULAR_FRAGMENT_HEADER;
-				targetVtx += SpriteStage.REGULAR_VERTEX_BODY;
-				targetFrag += SpriteStage.REGULAR_FRAGMENT_BODY;
+				targetVtx = StageGL.REGULAR_VERTEX_HEADER;
+				targetFrag = StageGL.REGULAR_FRAGMENT_HEADER;
+				targetVtx += StageGL.REGULAR_VERTEX_BODY;
+				targetFrag += StageGL.REGULAR_FRAGMENT_BODY;
 				break;
 		}
 
@@ -1463,7 +1463,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._createBuffers = function(gl) {
-		var groupCount = this._maxCardsPerBatch * SpriteStage.INDICIES_PER_CARD;
+		var groupCount = this._maxCardsPerBatch * StageGL.INDICIES_PER_CARD;
 		var groupSize, i;
 
 		// INFO:
@@ -1843,10 +1843,10 @@ this.createjs = this.createjs||{};
 					// calculate uvs
 					// calculate vertices
 					if(item.cacheCanvas) {
-						uvRect = SpriteStage.UV_RECT;
+						uvRect = StageGL.UV_RECT;
 						subL = item._cacheOffsetX;							subT = item._cacheOffsetY;
 					} else {
-						uvRect = SpriteStage.UV_RECT;
+						uvRect = StageGL.UV_RECT;
 						subL = (-item.regX);								subT = (-item.regY);
 					}
 					subR = image.width+subL;							subB = image.height+subT;
@@ -1857,7 +1857,7 @@ this.createjs = this.createjs||{};
 				// calculate uvs
 				uvRect = frame.uvRect;
 				if(!uvRect) {
-					uvRect = SpriteStage.buildUVRects(item.spriteSheet, item.currentFrame, false);
+					uvRect = StageGL.buildUVRects(item.spriteSheet, item.currentFrame, false);
 				}
 
 				// calculate vertices
@@ -1866,7 +1866,7 @@ this.createjs = this.createjs||{};
 			}
 
 			// These must be calculated here else a forced draw might happen after they're set
-			var offset = this.batchCardCount*SpriteStage.INDICIES_PER_CARD*2;											//TODO: DHG: you can do better
+			var offset = this.batchCardCount*StageGL.INDICIES_PER_CARD*2;											//TODO: DHG: you can do better
 			var loc = (offset/2)|0;
 
 			//DHG: See Matrix2D.transformPoint for why this math specifically
@@ -1940,7 +1940,7 @@ this.createjs = this.createjs||{};
 			this.setTextureParams(gl);
 		}
 
-		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*SpriteStage.INDICIES_PER_CARD);
+		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*StageGL.INDICIES_PER_CARD);
 		this._batchID++;
 	};
 
@@ -1968,15 +1968,15 @@ this.createjs = this.createjs||{};
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, SpriteStage.COVER_VERT);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_VERT);
 		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, flipY?SpriteStage.COVER_UV_FLIP:SpriteStage.COVER_UV);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, flipY?StageGL.COVER_UV_FLIP:StageGL.COVER_UV);
 
 		gl.uniform1i(shaderProgram.samplerUniform, 0);
 		gl.uniform1f(shaderProgram.uprightUniform, flipY?0:1);
 
-		gl.drawArrays(gl.TRIANGLES, 0, SpriteStage.INDICIES_PER_CARD);
+		gl.drawArrays(gl.TRIANGLES, 0, StageGL.INDICIES_PER_CARD);
 	};
 
 	// injected properties and methods:
@@ -1984,7 +1984,7 @@ this.createjs = this.createjs||{};
 	 * We need to modify other classes, do this during our class initialization
 	 */
 	(function _injectWebGLFunctionality() {
-		// Set which classes are compatible with SpriteStage. The order is important!!!
+		// Set which classes are compatible with StageGL. The order is important!!!
 		// Reflect any changes to the drawing loop
 		var candidates = [createjs.Sprite, createjs.Bitmap];
 		candidates.forEach(function(_class, index) {
@@ -1993,11 +1993,11 @@ this.createjs = this.createjs||{};
 
 		var cm = createjs.CacheManager.prototype;
 		/**
-		 * Functionality injected to {{#crossLink "DisplayObject"}}{{/crossLink}}. Ensure SpriteStage is loaded before
+		 * Functionality injected to {{#crossLink "DisplayObject"}}{{/crossLink}}. Ensure StageGL is loaded before
 		 * making any DisplayObject instances but after all other standard EaselJS classes for injection to take full effect.
-		 * Replaces the 2D only behavior with potential WebGL behavior. If options is set to true a SpriteStage
+		 * Replaces the 2D only behavior with potential WebGL behavior. If options is set to true a StageGL
 		 * is created and contained on the object for use when rendering a cache.
-		 * If options is a SpriteStage instance it should be the same SpriteStage the target object is on.
+		 * If options is a StageGL instance it should be the same StageGL the target object is on.
 		 * When it is a WebGL texture will be made this gives a substantial performance boost compared to a canvas.
 		 * <h4>Example</h4>
 		 * With a 2d context:
@@ -2006,11 +2006,11 @@ this.createjs = this.createjs||{};
 		 *      bmp.cache(0, 0, bmp.width, bmp.height, 1, true);
 		 * <h4>Example</h4>
 		 * With a WebGL context:
-		 *      var stage = new createjs.SpriteStage();
+		 *      var stage = new createjs.StageGL();
 		 *      var bmp = new createjs.Bitmap(src);
 		 *      bmp.cache(0, 0, bmp.width, bmp.height, 1, stage);
-		 * You can make your own SpriteStage and have it render to a canvas if you set ".isCacheControlled" to true on your stage.
-		 * DO NOT set it to true if you wish to use the fast Render Textures available to SpriteStages
+		 * You can make your own StageGL and have it render to a canvas if you set ".isCacheControlled" to true on your stage.
+		 * DO NOT set it to true if you wish to use the fast Render Textures available to StageGLs
 		 * @pubic
 		 * @method cache
 		 **/
@@ -2024,7 +2024,7 @@ this.createjs = this.createjs||{};
 			if(this._webGLCache !== options) {
 				if(options === true) {
 					this.cacheCanvas = document.createElement("canvas");
-					this._webGLCache = new createjs.SpriteStage(this.cacheCanvas);
+					this._webGLCache = new createjs.StageGL(this.cacheCanvas);
 					// flag so it can tell whether to do a final render texture output
 					this._webGLCache.isCacheControlled = true;
 				} else {
@@ -2068,10 +2068,10 @@ this.createjs = this.createjs||{};
 		};
 
 		/**
-		 * Functionality injected to {{#crossLink "BitmapText"}}{{/crossLink}}. Ensure SpriteStage is loaded after all
+		 * Functionality injected to {{#crossLink "BitmapText"}}{{/crossLink}}. Ensure StageGL is loaded after all
 		 * other standard EaselJS classes for injection to take full effect.
 		 * Part of a draw call to BitmapText is to re-create the text, without this process there is nothing or stale info to render.
-		 * As SpriteStage does not call distinct draw calls per object we need to simulate that functionality with the preGLRender function.
+		 * As StageGL does not call distinct draw calls per object we need to simulate that functionality with the preGLRender function.
 		 * If you encounter a similar situation with a custom class simply add a preGLRender function to it and it will be detected and called.
 		 * @pubic
 		 * @method preGLRender
@@ -2082,5 +2082,5 @@ this.createjs = this.createjs||{};
 		}
 	})();
 
-	createjs.SpriteStage = createjs.promote(SpriteStage, "Stage");
+	createjs.StageGL = createjs.promote(StageGL, "Stage");
 }());

@@ -1,4 +1,4 @@
-describe("SpriteStage", function () {
+describe("StageGL", function () {
 
 	beforeEach(function (done) {
 		this.sprite = new createjs.Shape();
@@ -38,24 +38,24 @@ describe("SpriteStage", function () {
 		canvas.height = this.stageHeight;
 
 		//*
-		this.spriteStage = new createjs.SpriteStage(canvas, false, true);
-		this.spriteStage.updateViewport(canvas.width, canvas.height);
+		this.stageGL = new createjs.StageGL(canvas, false, true);
+		this.stageGL.updateViewport(canvas.width, canvas.height);
 		/*/
-		this.spriteStage = new createjs.Stage(canvas);
+		this.stageGL = new createjs.Stage(canvas);
 		//*/
-		this.spriteStage.addChild(bgColorSS); // Don't really need this, but adding for mirroring consistency.
+		this.stageGL.addChild(bgColorSS); // Don't really need this, but adding for mirroring consistency.
 
-		this.spriteStage2DCanvas = document.createElement("canvas");
-		this.spriteStage2DCanvas.width = this.stageWidth;
-		this.spriteStage2DCanvas.height = this.stageHeight;
+		this.stageGL2DCanvas = document.createElement("canvas");
+		this.stageGL2DCanvas.width = this.stageWidth;
+		this.stageGL2DCanvas.height = this.stageHeight;
 
-		this.spriteStage2DContext = this.spriteStage2DCanvas.getContext("2d");
+		this.stageGL2DContext = this.stageGL2DCanvas.getContext("2d");
 
 		this.compareStages = function (expect, done, debug) {
 			this.stage.update();
-			this.spriteStage.update();
+			this.stageGL.update();
 
-			this.spriteStage2DContext.drawImage(this.spriteStage.canvas, 0, 0);
+			this.stageGL2DContext.drawImage(this.stageGL.canvas, 0, 0);
 
 			if (debug) {
 				var debugTest = document.createElement("div");
@@ -65,7 +65,7 @@ describe("SpriteStage", function () {
 				var debugStageLabel = document.createElement("div");
 				debugStageLabel.innerHTML = "Actual:";
 				debugStage.appendChild(debugStageLabel);
-				debugStage.appendChild(this.spriteStage2DCanvas);
+				debugStage.appendChild(this.stageGL2DCanvas);
 				debugTest.appendChild(debugStage);
 
 				var debugStage = document.createElement("div");
@@ -83,7 +83,7 @@ describe("SpriteStage", function () {
 			var tolerance = pixels * 0.005; // Small tolerance to account for antialias inconsistencies.
 			// tolerance = 0;
 
-			expect(this.spriteStage2DCanvas).toImageDiffEqual(this.stage.canvas, tolerance);
+			expect(this.stageGL2DCanvas).toImageDiffEqual(this.stage.canvas, tolerance);
 
 			done();
 		};
@@ -96,7 +96,7 @@ describe("SpriteStage", function () {
 		objSS.cache(0, 0, this.sprite.width, this.sprite.height);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -110,7 +110,7 @@ describe("SpriteStage", function () {
 		objSS.cache(0, 0, this.sprite.width, this.sprite.height);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -124,7 +124,7 @@ describe("SpriteStage", function () {
 		objSS.cache(0, 0, this.sprite.width, this.sprite.height);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -137,7 +137,7 @@ describe("SpriteStage", function () {
 		objSS.cache(0, 0, this.sprite.width, this.sprite.height);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -151,7 +151,7 @@ describe("SpriteStage", function () {
 		objSS.cache(0, 0, this.sprite.width, this.sprite.height);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -165,7 +165,7 @@ describe("SpriteStage", function () {
 		objSS.cache(0, 0, this.sprite.width, this.sprite.height);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -186,7 +186,7 @@ describe("SpriteStage", function () {
 		objSS.cache(0, 0, this.sprite.width, this.sprite.height);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -202,7 +202,7 @@ describe("SpriteStage", function () {
 		var objSS = obj.clone(true);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -217,7 +217,7 @@ describe("SpriteStage", function () {
 		var objSS = obj.clone(true);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -247,7 +247,7 @@ describe("SpriteStage", function () {
 		var objSS = obj.clone(true);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -260,7 +260,7 @@ describe("SpriteStage", function () {
 		var objSS = obj.clone(true);
 
 		this.stage.addChild(obj);
-		this.spriteStage.addChild(objSS);
+		this.stageGL.addChild(objSS);
 
 		this.compareStages(expect, done);
 	});
@@ -344,7 +344,7 @@ describe("SpriteStage", function () {
 			var textSS = text.clone();
 
 			this.stage.addChild(text);
-			this.spriteStage.addChild(textSS);
+			this.stageGL.addChild(textSS);
 
 			// Need to delay this for Safari.
 			setTimeout(function () {
@@ -376,7 +376,7 @@ describe("SpriteStage", function () {
 		this.stage.addChild(bmp);
 
 		var bmpSS = bmp.clone(true);
-		this.spriteStage.addChild(bmpSS);
+		this.stageGL.addChild(bmpSS);
 
 		// note that the shape can be used in the display list as well if you'd like, or
 		// we can reuse the Graphics instance in another shape if we'd like to transform it differently.
@@ -402,11 +402,11 @@ describe("SpriteStage", function () {
 		var dotSS = dot.clone(true);
 		dotSS.cache(0, 0, 50, 50);
 
-		this.spriteStage.addChild(dotSS);
-		this.spriteStage.update();
+		this.stageGL.addChild(dotSS);
+		this.stageGL.update();
 
 		expect(this.stage.hitTest(1, 1)).toBe(true);
-		expect(this.spriteStage.hitTest(1, 1)).toBe(true);
+		expect(this.stageGL.hitTest(1, 1)).toBe(true);
 
 		// Compare stages, just to make sure the hit test isn't a fluke:
 		this.compareStages(expect, done);
@@ -453,22 +453,22 @@ describe("SpriteStage", function () {
 			var circle2 = new createjs.Sprite(spriteSheet, "circle");
 			var circle2SS = circle2.clone();
 			this.stage.addChild(circle2).set({x: 40, y: 120});
-			this.spriteStage.addChild(circle2SS).set({x: 40, y: 120});
+			this.stageGL.addChild(circle2SS).set({x: 40, y: 120});
 
 			var circle3 = new createjs.Sprite(spriteSheet, "circle");
 			var circle3SS = circle3.clone();
 			this.stage.addChild(circle3).set({x: 120, y: 120});
-			this.spriteStage.addChild(circle3SS).set({x: 120, y: 120});
+			this.stageGL.addChild(circle3SS).set({x: 120, y: 120});
 
 			var square2 = new createjs.Sprite(spriteSheet, "square");
 			var square2SS = square2.clone();
 			this.stage.addChild(square2);
-			this.spriteStage.addChild(square2SS);
+			this.stageGL.addChild(square2SS);
 
 			var square3 = new createjs.Sprite(spriteSheet, "square2");
 			var square3SS = square3.clone();
 			this.stage.addChild(square3).set({x: 80});
-			this.spriteStage.addChild(square3SS).set({x: 80});
+			this.stageGL.addChild(square3SS).set({x: 80});
 
 			this.compareStages(expect, done);
 		});
@@ -480,22 +480,22 @@ describe("SpriteStage", function () {
 				var circle2 = new createjs.Sprite(spriteSheet, "circle");
 				var circle2SS = circle2.clone();
 				this.stage.addChild(circle2).set({x: 40, y: 120});
-				this.spriteStage.addChild(circle2SS).set({x: 40, y: 120});
+				this.stageGL.addChild(circle2SS).set({x: 40, y: 120});
 
 				var circle3 = new createjs.Sprite(spriteSheet, "circle");
 				var circle3SS = circle3.clone();
 				this.stage.addChild(circle3).set({x: 120, y: 120});
-				this.spriteStage.addChild(circle3SS).set({x: 120, y: 120});
+				this.stageGL.addChild(circle3SS).set({x: 120, y: 120});
 
 				var square2 = new createjs.Sprite(spriteSheet, "square");
 				var square2SS = square2.clone();
 				this.stage.addChild(square2);
-				this.spriteStage.addChild(square2SS);
+				this.stageGL.addChild(square2SS);
 
 				var square3 = new createjs.Sprite(spriteSheet, "square2");
 				var square3SS = square3.clone();
 				this.stage.addChild(square3).set({x: 80});
-				this.spriteStage.addChild(square3SS).set({x: 80});
+				this.stageGL.addChild(square3SS).set({x: 80});
 
 				// this.compareBaseLine("assets/SpriteSheetBuilder.png", done, expect, 0.0075);
 				this.compareStages(expect, done);

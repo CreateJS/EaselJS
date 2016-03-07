@@ -17,7 +17,7 @@
 
 	<p>This sample demonstrates WebGL rendering where available, and reducing
 		effect complexity (in this case particle count)
-		when WebGL is not supported. Uses <code>SpriteStage</code> and <code>SpriteContainer</code>.
+		when WebGL is not supported. Uses <code>StageGL</code> and <code>SpriteContainer</code>.
 		Append "<code>?c2d</code>" to the url to disable WebGL & notice how the
 		particle count is reduced.</p>
 </header>
@@ -30,7 +30,7 @@
 
 <!-- WebGL specific classes -->
 <script src="../src/easeljs/display/SpriteContainer.js"></script>
-<script src="../src/easeljs/display/SpriteStage.js"></script>
+<script src="../src/easeljs/display/StageGL.js"></script>
 
 <script src="../_assets/libs/preloadjs-NEXT.min.js"></script>
 
@@ -45,7 +45,7 @@
 			// force it to use Context2D if c2d appears in the query string: ex. Runners.html?c2d
 			stage = new createjs.Stage("testCanvas");
 		} else {
-			stage = new createjs.SpriteStage("testCanvas");
+			stage = new createjs.StageGL("testCanvas");
 		}
 
 		// reduce visual complexity if WebGL is not supported:
@@ -157,7 +157,7 @@
 	}
 
 	function setupUI(queue) {
-		// background hill - just to demonstrate that bitmaps can be added to a SpriteStage:
+		// background hill - just to demonstrate that bitmaps can be added to a StageGL:
 		var hill1 = new createjs.Bitmap(queue.getResult("hill"));
 		hill1.setTransform(345, 110, 3, 3);
 		var hill2 = hill1.clone();

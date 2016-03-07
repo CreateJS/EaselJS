@@ -8,7 +8,7 @@ module.exports = function (grunt) {
 					src: [
 						'../lib/easeljs-NEXT.combined.js',
 						'../src/easeljs/display/DisplayObject.js',
-						'../src/easeljs/display/SpriteStage.js'
+						'../src/easeljs/display/StageGL.js'
 					],
 
 					options: {

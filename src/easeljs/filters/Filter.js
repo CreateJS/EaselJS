@@ -70,7 +70,7 @@ this.createjs = this.createjs||{};
 	function Filter() {
 		/**
 		 * Pre-processing shader code, will be parsed before being fed in.
-		 * This should be based upon SpriteStage.SHADER_VERTEX_BODY_REGULAR
+		 * This should be based upon StageGL.SHADER_VERTEX_BODY_REGULAR
 		 * @property VTX_SHADER
 		 * @virtual
 		 * @type {String}
@@ -80,7 +80,7 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * Pre-processing shader code, will be parsed before being fed in.
-		 * This should be based upon SpriteStage.SHADER_FRAGMENT_BODY_REGULAR
+		 * This should be based upon StageGL.SHADER_FRAGMENT_BODY_REGULAR
 		 * @property FRAG_SHADER
 		 * @virtual
 		 * @type {String}
@@ -120,7 +120,7 @@ this.createjs = this.createjs||{};
 	 * @method shaderParamSetup
 	 * @virtual
 	 * @param {WebGLContext} gl The context associated with the stage performing the render.
-	 * @param {SpriteStage} stage  The stage instance that will be rendering.
+	 * @param {StageGL} stage  The stage instance that will be rendering.
 	 * @param {ShaderProgram} shaderProgram The compiled shader that is going to be sued to perform the render.
 	 */
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {};

@@ -40,7 +40,7 @@
 	"../src/easeljs/version.js"
   ],
   "gl_source": [
-	  "../src/easeljs/display/SpriteStage.js",
+	  "../src/easeljs/display/StageGL.js",
 	  "../src/easeljs/display/WebGLInspector.js"
   ],
   "docs_out_path": "../../createjs-com_version2/docs/easeljs/",

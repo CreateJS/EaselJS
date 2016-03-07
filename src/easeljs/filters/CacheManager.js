@@ -179,7 +179,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
 	 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
 	 * 	cached elements with greater fidelity. Default is 1.
-	 * @param {Object} options When using things like a {{#crossLink "SpriteStage"}}{{/crossLink}} there may be extra caching opportunities or needs.
+	 * @param {Object} options When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be extra caching opportunities or needs.
 	 */
 	p.defineCache = function(target, x, y, width, height, scale, options) {
 		this.target = target;

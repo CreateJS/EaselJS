@@ -778,7 +778,7 @@ this.createjs = this.createjs||{};
 	 * Usually, the resulting cacheCanvas will have the dimensions width*scale by height*scale, however some filters (ex. BlurFilter)
 	 * will add padding to the canvas dimensions.
 	 *
-	 * Actual implementation of the caching mechanism can change with a {{#crossLink "SpriteStage"}}{{/crossLink}} and so
+	 * Actual implementation of the caching mechanism can change with a {{#crossLink "StageGL"}}{{/crossLink}} and so
 	 * all caching and filter behaviour has been moved to the {{#crossLink "CacheManager"}}{{/crossLink}}
 	 *
 	 * @method cache
@@ -789,7 +789,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
 	 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
 	 * 	cached elements with greater fidelity. Default is 1.
-	 * @param {Object} options When using things like a {{#crossLink "SpriteStage"}}{{/crossLink}} there may be extra caching opportunities or needs.
+	 * @param {Object} options When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be extra caching opportunities or needs.
 	 **/
 	p.cache = function(x, y, width, height, scale, options) {
 		if(!this.cacheController){
@@ -814,7 +814,7 @@ this.createjs = this.createjs||{};
 	 *      shapeInstance.setStrokeStyle(3).beginStroke("#ff0000").moveTo(100, 100).lineTo(200,200);
 	 *      shapeInstance.updateCache();
 	 *
-	 * Actual implementation of the caching mechanism can change with a {{#crossLink "SpriteStage"}}{{/crossLink}} and so
+	 * Actual implementation of the caching mechanism can change with a {{#crossLink "StageGL"}}{{/crossLink}} and so
 	 * all caching and filter behaviour has been moved to the {{#crossLink "CacheManager"}}{{/crossLink}}
 	 *
 	 * @method updateCache
