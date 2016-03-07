@@ -597,7 +597,7 @@ this.createjs = this.createjs||{};
 	};
 
 
-// public methods that roughly map to Flash graphics APIs:
+// public methods that roughly map to Adobe Flash/Animate graphics APIs:
 	/**
 	 * Clears all drawing instructions, effectively resetting this Graphics instance. Any line and fill styles will need
 	 * to be redefined to draw shapes following a clear call. A tiny API method "c" also exists.

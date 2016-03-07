@@ -173,7 +173,7 @@ this.createjs = this.createjs||{};
 	 * @method initialize
 	 * @deprecated in favour of `createjs.promote()`
 	 **/
-	p.initialize = Sprite; // TODO: Deprecated. This is for backwards support of FlashCC spritesheet export.
+	p.initialize = Sprite; // TODO: Deprecated. This is for backwards support of Flash/Animate spritesheet export.
 
 
 // events:
