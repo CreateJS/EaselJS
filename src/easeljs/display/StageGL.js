@@ -1090,7 +1090,7 @@ this.createjs = this.createjs||{};
 		}
 
 		var foundImage = undefined;
-		if(item.storeID){
+		if(item._storeID !== undefined){
 			// this is a texture itself
 			if(item._storeID < 0) {
 				this._killTextureObject(item);
@@ -1119,7 +1119,7 @@ this.createjs = this.createjs||{};
 		}
 
 		// remove it
-		p._killTextureObject(this._textureDictionary[foundImage._storeID]);
+		this._killTextureObject(this._textureDictionary[foundImage._storeID]);
 	};
 
 	/**
@@ -2160,6 +2160,9 @@ this.createjs = this.createjs||{};
 				}
 				// set the context to none and let the garbage collector get the rest
 				this._webGLCache = false;
+			} else {
+				var stage = this.target.getStage();
+				if(stage instanceof StageGL){ stage.releaseTexture(this.cacheCanvas); }
 			}
 			this.uncacheBASE();
 		};
