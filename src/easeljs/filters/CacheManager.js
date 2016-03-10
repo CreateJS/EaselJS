@@ -172,6 +172,7 @@ this.createjs = this.createjs||{};
 	 * for a cache to function and performs the initial update. See {{#crossLink "_createSurface"}}{{/crossLink}} for
 	 * specific implementation details of the caching object.
 	 * @method defineCache
+	 * @param {DisplayObject} target The DisplayObject this cache is linked to.
 	 * @param {Number} x The x coordinate origin for the cache region.
 	 * @param {Number} y The y coordinate origin for the cache region.
 	 * @param {Number} width The width of the cache region.
@@ -179,7 +180,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
 	 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
 	 * 	cached elements with greater fidelity. Default is 1.
-	 * @param {Object} options When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be extra caching opportunities or needs.
+	 * @param {Object} [options=undefined] When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be extra caching opportunities or needs.
 	 */
 	p.defineCache = function(target, x, y, width, height, scale, options) {
 		this.target = target;
@@ -196,6 +197,9 @@ this.createjs = this.createjs||{};
 		this.updateCache();
 	};
 
+	/**
+	 * Actual implementation of {{#crossLink "DisplayObject.updateCache"}}{{/crossLink}}. Creates and sets properties needed
+	 */
 	p.updateCache = function(compositeOperation) {
 		var target = this.target;
 		var cacheCanvas = this.cacheCanvas;
@@ -214,11 +218,14 @@ this.createjs = this.createjs||{};
 
 		this._drawToCache(compositeOperation, w, h);
 
-		// the actual cacheCanvas element could of changed during the cache process of a webGL texture
+		// the actual cacheCanvas element could of changed during the cache process so use this.cacheCanvas to make sure
 		this.cacheCanvas._invalid = true;
 		this.cacheID = createjs.CacheManager._nextCacheID++;
 	};
 
+	/**
+	 * Release all the cache associated with this manager.
+	 */
 	p.uncache = function() {
 		this.target = this.target.cacheCanvas = this._cacheDataURL = this.cacheCanvas = null;
 		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = this._filterOffsetX = this._filterOffsetY = 0;
@@ -252,6 +259,9 @@ this.createjs = this.createjs||{};
 		this._webGLCache = null;
 	};
 
+	/**
+	 * Now all the setup properties have been performed, do the actual cache draw out for context 2D.
+	 */
 	p._drawToCache = function(compositeOperation, w, h) {
 		var cacheCanvas = this.cacheCanvas;
 		var target = this.target;
@@ -275,6 +285,9 @@ this.createjs = this.createjs||{};
 		}
 	};
 
+	/**
+	 * Work through every filter and apply its individual transformation to it.
+	 */
 	p._applyFilters = function() {
 		var target = this.target;
 		var canvas = this.cacheCanvas;
