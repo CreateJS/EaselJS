@@ -340,12 +340,12 @@ this.createjs = this.createjs||{};
 	 **/
 	p.toString = function() {
     		var str = '';
-    		for (var p in this) {
-        		if (this.hasOwnProperty(p)) {
-          			if (p < 24) {
-            				str += this[p] + ', ';
+    		for (var value in this) {
+        		if (this.hasOwnProperty(value)) {
+          			if (value < 24) {
+            				str += this[value] + ', ';
           			} else {
-            				str += this[p]
+            				str += this[value]
           			}
 			}
     		}
