@@ -334,7 +334,7 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * Returns a string representation of this object.
-	 * Please note the matrix this generates is filled top to bottom then left to right.
+	 * Please note the string representation of this matrix is top to bottom then left to right.
 	 * @method toString
 	 * @return {String} a string representation of the instance.
 	 **/
