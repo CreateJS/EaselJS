@@ -35,7 +35,7 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-	function WebGLInspector() {
+	function WebGLInspector(stage) {
 		this.EventDispatcher_constructor();
 
 		// public properties:
@@ -43,7 +43,7 @@ this.createjs = this.createjs||{};
 
 		// private properties:
 		///////////////////////////////////////////////////////
-
+		this._stage = stage;
 
 		// and begin
 		this._initializeWebGLInspector();
@@ -69,7 +69,7 @@ this.createjs = this.createjs||{};
 	// public methods:
 	///////////////////////////////////////////////////////
 	p.log = function(stage) {
-		if(!stage){ console.log("Nothing to log!"); return; }
+		if(!stage){ stage = this._stage; }
 
 		console.log("Batches Per Draw", (stage._batchID/stage._drawID).toFixed(4));
 		this.logDepth(stage.children, "");
@@ -77,16 +77,20 @@ this.createjs = this.createjs||{};
 	};
 
 	p.toggleGPUDraw = function(stage, enabled) {
+		if(!stage){ stage = this._stage; }
+
 		if(enabled === undefined) {
-			//toggle
-			enabled = !stage._injectedPsuedoDraw;
+			enabled = !!stage._drawBuffers_;
 		}
 
-		if(enabled && stage._drawToGPU_) {
-			stage._drawToGPU = stage._drawToGPU_;
+		if(enabled) {
+			if(stage._drawBuffers_) {
+				stage._drawBuffers = stage._drawBuffers_;
+				stage._drawBuffers_ = undefined;
+			}
 		} else {
-			stage._drawToGPU_ = stage._drawToGPU;
-			stage._drawToGPU = function(gl) {
+			stage._drawBuffers_ = stage._drawBuffers;
+			stage._drawBuffers = function(gl) {
 				if(this.vocalDebug) {
 					console.log("BlankDraw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
 				}
@@ -94,22 +98,29 @@ this.createjs = this.createjs||{};
 		}
 	};
 
-	// protected methods:
-	///////////////////////////////////////////////////////
-	p.logDepth = function(children, prepend) {
+	p.logDepth = function(children, prepend, customLog) {
+		if(!children){ children = this._stage.children; }
+		if(!prepend){ prepend = ""; }
+
 		var l = children.length;
 		for(var i=0; i<l; i++) {
 			var child = children[i];
-			if(child.children) {
-				console.log(prepend+"|", child);
-				p.logDepth(child.children, "-"+prepend);
+			if(customLog !== undefined){
+				customLog(prepend+"-", child);
 			} else {
-				console.log(prepend, child);
+				console.log(prepend+"-", child);
+			}
+			if(child.children && child.children.length) {
+				p.logDepth(child.children, "|"+prepend, customLog);
 			}
 		}
 	};
 
+	// protected methods:
+	///////////////////////////////////////////////////////
 	p.logTextureFill = function(stage) {
+		if(!stage){ stage = this._stage; }
+
 		var dict = stage._textureDictionary;
 		var count = stage._batchTextureCount;
 		console.log("textureMax:", count);
@@ -134,6 +145,17 @@ this.createjs = this.createjs||{};
 			var active = out.element._drawID == stage._drawID;
 			console.log("["+out.src+"]", active?"ACTIVE":"stale", out.shifted?"steady":"DRIFT", out.element);
 		}
+	};
+
+	p.dispProps = function(prepend, item){
+		if(!prepend){ prepend = ""; }
+
+		console.log(
+			prepend,
+			item.toString()+"\t",
+			"\tP:"+ item.x.toFixed(2)+"x"+item.y.toFixed(2) +"\t",
+			"\tR:"+ item.regX.toFixed(2)+"x"+item.regY.toFixed(2) +"\t"
+		);
 	};
 
 	// Injections
