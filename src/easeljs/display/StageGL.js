@@ -807,7 +807,7 @@ this.createjs = this.createjs||{};
 				this._createBuffers(gl);
 				this._initTextures(gl);
 
-				gl.clearColor(0.25, 0.25, 0.25, 0.0);
+				gl.clearColor(0.00, 0.00, 0.00, 0.00);
 				gl.disable(gl.DEPTH_TEST);
 				gl.enable(gl.BLEND);
 				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -1929,7 +1929,7 @@ this.createjs = this.createjs||{};
 					uvRect.r = (src.y + src.height)/image.height;
 
 					// calculate vertices
-					subL = -item.regX;									subT = -item.regY;
+					subL = 0;									subT = 0;
 					subR = src.width+subL;								subB = src.height+subT;
 				} else {
 					// calculate uvs
@@ -1939,7 +1939,7 @@ this.createjs = this.createjs||{};
 						subL = item._cacheOffsetX;							subT = item._cacheOffsetY;
 					} else {
 						uvRect = StageGL.UV_RECT;
-						subL = (-item.regX);								subT = (-item.regY);
+						subL = 0;								subT = 0;
 					}
 					subR = image.width+subL;							subB = image.height+subT;
 				}
@@ -2085,8 +2085,8 @@ this.createjs = this.createjs||{};
 
 		var cm = createjs.CacheManager.prototype;
 		/**
-		 * Functionality injected to {{#crossLink "DisplayObject"}}{{/crossLink}}. Ensure StageGL is loaded before
-		 * making any DisplayObject instances but after all other standard EaselJS classes for injection to take full effect.
+		 * Functionality injected to {{#crossLink "DisplayObject"}}{{/crossLink}}. Ensure StageGL is loaded before making any
+		 * DisplayObject instances but after all other standard EaselJS classes are loaded for injection to take full effect.
 		 * Replaces the 2D only behavior with potential WebGL behavior. If options is set to true a StageGL
 		 * is created and contained on the object for use when rendering a cache.
 		 * If options is a StageGL instance it should be the same StageGL the target object is on.
