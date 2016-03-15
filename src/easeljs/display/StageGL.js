@@ -888,7 +888,7 @@ this.createjs = this.createjs||{};
 	 * into itself).
 	 * @param {Array} filters The filters we're drawing into cache.
 	 **/
-	p.cacheDraw = function(target, filters) {
+	p.cacheDraw = function(target, filters, manager) {
 		var gl = this._webGLContext;
 		var renderTexture;
 		var shaderBackup = this._activeShader;
@@ -901,6 +901,7 @@ this.createjs = this.createjs||{};
 		// create offset container for drawing item
 		var mtx = target.getMatrix();
 		mtx = mtx.clone().invert();
+		mtx.translate(-manager.offX, -manager.offY);
 		var container = this._cacheContainer;
 		container.children = [target];
 		container.transformMatrix = mtx;
@@ -2144,7 +2145,7 @@ this.createjs = this.createjs||{};
 					webGL.updateViewport(w, h);
 				}
 			}
-			this._webGLCache.cacheDraw(target, target.filters);
+			this._webGLCache.cacheDraw(target, target.filters, this);
 			this.cacheCanvas = target.cacheCanvas;
 		};
 
