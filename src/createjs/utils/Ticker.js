@@ -593,6 +593,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @protected
 	 **/
+	var tickEvent = null;
 	Ticker._tick = function() {
 		var paused = Ticker.paused;
 		var time = Ticker._getTime();
@@ -606,12 +607,19 @@ this.createjs = this.createjs||{};
 		}
 		
 		if (Ticker.hasEventListener("tick")) {
-			var event = new createjs.Event("tick");
+			var event = tickEvent ? tickEvent : new createjs.Event("tick");
 			var maxDelta = Ticker.maxDelta;
 			event.delta = (maxDelta && elapsedTime > maxDelta) ? maxDelta : elapsedTime;
 			event.paused = paused;
 			event.time = time;
 			event.runTime = time-Ticker._pausedTime;
+
+			event.timeStamp = Date.now();
+			event.target = null;
+			event.currentTarget = null;
+
+			tickEvent = event;
+
 			Ticker.dispatchEvent(event);
 		}
 		
