@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>easeljs bunnymark</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="bunny mark for pixi.js the html5 webGL canvas 2d renderer">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+
+	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+
+	<style type="text/css">
+		#canvasWrap {
+			margin-left: auto;
+			margin-right: auto;
+		}
+	</style>
+</head>
+<body>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r14/Stats.min.js"></script>
+
+<script src="../../build/output/easeljs-NEXT.combined.js"></script>
+<script src="../../src/easeljs/display/StageGL.js"></script>
+<script>
+	$(document).ready(onReady);
+
+	$(window).resize(resize);
+	window.onorientationchange = resize;
+
+	var width = 480;
+	var height = 320;
+
+	var bunnySpriteSheet;
+	var bunnys = [];
+
+	var gravity = 0.5;
+
+	var maxX = width;
+	var minX = 0;
+	var maxY = height;
+	var minY = 0;
+
+	var startBunnyCount = 0;
+	var isAdding = false;
+	var count = 0;
+	var amount = 100;
+
+	var container;
+	var clickImage;
+	var bmp;
+
+	function onReady() {
+		canvas = document.getElementById("testCanvas");
+		stage = new createjs.StageGL(canvas, false);
+
+		stats = new Stats();
+		document.getElementById("canvasWrap").appendChild(stats.domElement);
+		stats.domElement.style.position = "relative";
+		stats.domElement.style.top = "-600px";
+
+		counter = document.createElement("div");
+		counter.className = "counter";
+		document.body.appendChild(counter);
+
+		count = startBunnyCount;
+		counter.innerHTML = count + " BUNNIES";
+
+		bunnySpriteSheet = new createjs.SpriteSheet({
+			"framerate": 8,
+			"images": ["images/bunnys.png"],
+			"frames": [
+				[2, 47,		26, 37,		0,		13, 37],
+				[2, 86,		26, 37,		0,		13, 37],
+				[2, 125,	26, 37,		0,		13, 37],
+				[2, 164,	26, 37,		0,		13, 37],
+				[2, 2,		26, 37,		0,		13, 37]
+			],
+			"animations": {
+				"bunny1": {
+					"frames": [0]
+				},
+				"bunny2": {
+					"frames": [1]
+				},
+				"bunny3": {
+					"frames": [2]
+				},
+				"bunny4": {
+					"frames": [3]
+				},
+				"bunny5": {
+					"frames": [4]
+				}
+			}
+		});
+		bunnyAnimations = ["bunny1", "bunny2", "bunny3", "bunny4", "bunny5"];
+
+		container = new createjs.Container();
+		stage.addChild(container);
+
+		bunnyType = 2;
+
+		for (var i = 0; i < startBunnyCount; i++) {
+			makeBunny();
+		}
+
+		$(canvas).mousedown(onTouchStart);
+		$(canvas).mouseup(onTouchEnd);
+
+		document.addEventListener("touchstart", onTouchStart, true);
+		document.addEventListener("touchend", onTouchEnd, true);
+
+		resize();
+		requestAnimationFrame(update);
+	}
+
+	function onTouchStart(event) {
+		isAdding = true;
+	}
+
+	function onTouchEnd(event) {
+		bunnyType = (bunnyType+1)%5;
+		isAdding = false;
+	}
+
+	function resize() {
+		var width = $(window).width();
+		var height = $(window).height();
+
+		if(width > 800)width  = 800;
+		if(height > 600)height = 600;
+
+		maxX = width;
+		minX = 0;
+		maxY = height;
+		minY = 0;
+
+		var w = $(window).width() / 2 - width/2;
+		var h = $(window).height() / 2 - height/2;
+
+		//canvas.style.left = $(window).width() / 2 - width/2 + "px";
+		//canvas.style.top = $(window).height() / 2 - height/2 + "px";
+
+		//stats.domElement.style.left = w + "px";
+		//stats.domElement.style.top = h + "px";
+
+		//counter.style.left = w + "px";
+		//counter.style.top = h + 49 + "px";
+
+		canvas.style.width = (canvas.width = width) + "px";
+		canvas.style.height = (canvas.height = height) + "px";
+		stage.updateViewport && stage.updateViewport(width, height);
+	}
+
+	function makeBunny(scale, rot) {
+		var bunny = new createjs.Sprite(bunnySpriteSheet, bunnyAnimations[bunnyType]);
+		bunny.speedX = Math.random() * 10;
+		bunny.speedY = (Math.random() * 10) - 5;
+		bunny.x = bunny.y = 0;
+
+		if(scale) {
+			bunny.scaleX = bunny.scaleY = 0.5 + Math.random()*0.5;
+		}
+		if(rot) {
+			bunny.rotation = (Math.random()-0.5) * 57.2958;
+		}
+
+		bunnys.push(bunny);
+		container.addChild(bunny);
+
+		count++;
+	}
+
+	function update() {
+		stats.begin();
+		var i, l;
+
+		if(isAdding) {
+			if(count < 500000) {
+				for (i = 0, l = amount; i < l; i++) {
+					makeBunny(true, true);
+					count++;
+				}
+			}
+
+			counter.innerHTML = count + (stage._webGLContext?" GL_EASEL":" C2D_EASEL");
+		}
+
+		for (i = 0, l = bunnys.length; i < l; i++) {
+			var bunny = bunnys[i];
+
+			bunny.x += bunny.speedX;
+			bunny.y += bunny.speedY;
+			bunny.speedY += gravity;
+
+			if (bunny.x > maxX) {
+				bunny.speedX *= -1;
+				bunny.x = maxX;
+			} else if (bunny.x < minX) {
+				bunny.speedX *= -1;
+				bunny.x = minX;
+			}
+
+			if (bunny.y > maxY) {
+				bunny.speedY *= -0.85;
+				bunny.y = maxY;
+				bunny.spin = (Math.random()-0.5) * 0.2;
+
+				if (Math.random() > 0.5) {
+					bunny.speedY -= Math.random() * 6;
+				}
+			} else if (bunny.y < minY) {
+				bunny.speedY = 0;
+				bunny.y = minY;
+			}
+		}
+
+		stage.update();
+		requestAnimationFrame(update);
+		stats.end();
+	}
+</script>
+
+<header class="EaselJS">
+	<h1>BunnyMark</h1>
+
+	<p>A clone of <a href="http://www.goodboydigital.com/pixijs/bunnymark_v3/">bunnymark</a> which shows an easel versus pixi implementation.
+		Note: as createjs do not currently have a particle render the particle render has been disabled for pixi as well for fair comparison.
+		All visual content is copied from goodboydigital for fair comparison.<br/>
+	</p>
+</header>
+
+<div id="canvasWrap">
+	<canvas id="testCanvas" width="800" height="600"></canvas>
+</div>
+
+</body>
+</html>

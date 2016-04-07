@@ -68,25 +68,23 @@ this.createjs = this.createjs||{};
 	function BlurFilter( blurX, blurY, quality) {
 		this.Filter_constructor();
 
-		if(isNaN(quality) || quality < 1){ quality = 1; }
-
 		// public properties:
 		/**
 		 * Horizontal blur radius in pixels
-		 * @property _blurX
+		 * @property blurX
 		 * @default 0
 		 * @type Number
 		 **/
-		this._blurX;
+		this._blurX = blurX;
 		this._blurXTable = [];
 
 		/**
 		 * Vertical blur radius in pixels
-		 * @property _blurY
+		 * @property blurY
 		 * @default 0
 		 * @type Number
 		 **/
-		this._blurY;
+		this._blurY = blurY;
 		this._blurYTable = [];
 
 		/**
@@ -96,10 +94,11 @@ this.createjs = this.createjs||{};
 		 * @default 1
 		 * @type Number
 		 **/
-		this.quality = quality | 0;
+		this._quality;
 
-
-
+		/**
+		 * This is a template to generate the shader for {{#crossLink FRAG_SHADER_BODY}}{{/crossLink}}
+		 */
 		this.FRAG_SHADER_TEMPLATE = (
 			"uniform float xWeight[{{blurX}}];" +
 			"uniform float yWeight[{{blurY}}];" +
@@ -119,14 +118,12 @@ this.createjs = this.createjs||{};
 				"}" +
 
 				"gl_FragColor = color.rgba;" +
-				//"gl_FragColor = vec4(sampleOffset.x, sampleOffset.y, 0.0, 1.0);" +
-				//"gl_FragColor = vec4(vRenderCoord.x, vRenderCoord.y, 0.0, 1.0);" +
 			"}"
 		);
 
-		// update the blurX using
-		this.setBlurX(blurX);
-		this.setBlurY(blurY);
+		// update the filter using the setters
+		if(isNaN(quality) || quality < 1){ quality = 1; }
+		this.setQuality(quality|0);
 	}
 	var p = createjs.extend(BlurFilter, createjs.Filter);
 
@@ -137,27 +134,29 @@ this.createjs = this.createjs||{};
 	p.getBlurY = function() { return this._blurY; };
 	p.setBlurX = function(value) {
 		if(isNaN(value) || value < 0){ value = 0; }
-		this._blurX = value;
-		this._blurXTable = this._getTable(value);
+		this._blurY = value;
+		this._blurYTable = this._getTable(value * this._quality);
 		this.updateShader();
 	};
 	p.setBlurY = function(value) {
 		if(isNaN(value) || value < 0){ value = 0; }
 		this._blurY = value;
-		this._blurYTable = this._getTable(value);
+		this._blurYTable = this._getTable(value * this._quality);
+		this.updateShader();
+	};
+	p.getQuality = function() { return this._quality; };
+	p.setQuality = function(value) {
+		this._quality = value;
+		this._blurXTable = this._getTable(this._blurX * this._quality);
+		this._blurYTable = this._getTable(this._blurY * this._quality);
 		this.updateShader();
 	};
 
-	/**
-	 *
-	 * @property blurX
-	 * @static
-	 * @type {Number}
-	 **/
 	try {
 		Object.defineProperties(p, {
 			blurX: { get: p.getBlurX, set: p.setBlurX },
-			blurY: { get: p.getBlurY, set: p.setBlurY }
+			blurY: { get: p.getBlurY, set: p.setBlurY },
+			quality: { get: p.getQuality, set: p.setQuality }
 		});
 	} catch (e) { console.log(e); }
 
@@ -185,7 +184,9 @@ this.createjs = this.createjs||{};
 		this.FRAG_SHADER_BODY = result;
 	};
 
+	/** docced in super class **/
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
+		// load the normalized gaussian weight tables
 		gl.uniform1fv(
 			gl.getUniformLocation(shaderProgram, "xWeight"),
 			this._blurXTable
@@ -195,9 +196,10 @@ this.createjs = this.createjs||{};
 			this._blurYTable
 		);
 
+		// what is the size of a single pixel in -1, 1 (webGL) space
 		gl.uniform2f(
 			gl.getUniformLocation(shaderProgram, "textureOffset"),
-			1/gl.drawingBufferWidth, 1/gl.drawingBufferHeight
+			2/(stage._viewportWidth*this._quality), 2/(stage._viewportHeight*this._quality)
 		);
 	};
 

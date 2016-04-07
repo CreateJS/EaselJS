@@ -57,7 +57,7 @@ this.createjs = this.createjs||{};
 	 * On devices or browsers that don't support WebGL, content will automatically be rendered via canvas 2D.
 	 *
 	 * Complications:
-	 *     - Only Sprite, Container, BitmapText, Bitmap, and DOMElement are rendered when added to the display list.
+	 *     - Shape, Shadow, and Text are not automatically rendered when added to the display list.
 	  *    - To display something StageGL cannot normally render, cache the object. A cached object is the same to the renderer as a new image regardless of its contents.
 	 *     - Images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
 	 *     - If new images are continually added and removed from the display list it will leak memory due to WebGL Texture wrappers being made.
@@ -178,7 +178,7 @@ this.createjs = this.createjs||{};
 		 * @type {Object}
 		 * @default black
 		 **/
-		this._clearColor = { r: 0.0, g: 0.0, b: 0.0, a: 0.0 };															//TODO: formalize this approach into regular canvases
+		this._clearColor = {r: 0.00, g: 0.00, b: 0.00, a: 0.00};														//TODO: formalize this approach into regular canvases
 
 		/**
 		 * The maximum number of cards (aka a single sprite) that can be drawn in one draw call.
@@ -188,7 +188,7 @@ this.createjs = this.createjs||{};
 		 * @type {Number}
 		 * @default StageGL.DEFAULT_MAX_BATCH_SIZE
 		 **/
-		this._maxCardsPerBatch = StageGL.DEFAULT_MAX_BATCH_SIZE;													//TODO: write getter/setters for this
+		this._maxCardsPerBatch = StageGL.DEFAULT_MAX_BATCH_SIZE;														//TODO: write getter/setters for this
 
 		/**
 		 * The shader program used to draw the current batch.
@@ -467,7 +467,7 @@ this.createjs = this.createjs||{};
 	 * @type {Number}
 	 * @readonly
 	 **/
-	StageGL.DEFAULT_MAX_BATCH_SIZE = 8000;
+	StageGL.DEFAULT_MAX_BATCH_SIZE = 10000;
 
 	/**
 	 * The maximum size WebGL allows for element index numbers: 16 bit unsigned integer.
@@ -716,7 +716,6 @@ this.createjs = this.createjs||{};
 			"gl_Position = vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
 			"vRenderCoord = uvPosition;" +
 			"vTextureCoord = vec2(uvPosition.x, abs(uUpright - uvPosition.y));" +
-			//"vTextureCoord = uvPosition;" +
 		"}"
 	);
 
@@ -798,7 +797,7 @@ this.createjs = this.createjs||{};
 					stencil: true,
 					antialias: this._antialias,
 					preserveDrawingBuffer: this._preserveDrawingBuffer,
-					premultipliedAlpha: true // Assume the drawing buffer contains colors with premultiplied alpha.
+					premultipliedAlpha: false // Assume the drawing buffer contains colors with premultiplied alpha.
 				};
 
 				var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
@@ -807,12 +806,13 @@ this.createjs = this.createjs||{};
 				this._createBuffers(gl);
 				this._initTextures(gl);
 
-				gl.clearColor(0.00, 0.00, 0.00, 0.00);
 				gl.disable(gl.DEPTH_TEST);
 				gl.enable(gl.BLEND);
-				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 				gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+				gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
 
+				this.setClearColor();
 				this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
 			}
 		} else {
@@ -887,6 +887,7 @@ this.createjs = this.createjs||{};
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 * @param {Array} filters The filters we're drawing into cache.
+	 * @param {CacheManager} manager .
 	 **/
 	p.cacheDraw = function(target, filters, manager) {
 		var gl = this._webGLContext;
@@ -894,6 +895,7 @@ this.createjs = this.createjs||{};
 		var shaderBackup = this._activeShader;
 		var blackListBackup = this._slotBlacklist;
 		var lastTextureSlot = this._batchTextureCount-1;
+		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
 
 		// protect the last slot so that we have somewhere to bind the renderTextures so it doesn't get upset
 		this.protectTextureSlot(lastTextureSlot, true);
@@ -906,11 +908,14 @@ this.createjs = this.createjs||{};
 		container.children = [target];
 		container.transformMatrix = mtx;
 
+		if(!this._backupTextures){ this._backupTextures = []; }
+
 		for(var j=0; j<this._batchTextureCount;j++) {
 			gl.activeTexture(gl.TEXTURE0 + j);
+			this._backupTextures[j] = this._batchTextures[j];
 			this._batchTextures[j] = this._baseTextures[j];
 			gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[j]);
-			this.setTextureParams(gl);
+			this.setTextureParams(gl, false);
 		}
 
 		var filterCount = filters && filters.length;
@@ -922,6 +927,7 @@ this.createjs = this.createjs||{};
 
 			// draw item to render texture		I -> T
 			gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+			this.updateViewport(manager.width, manager.height);
 			gl.clear(gl.COLOR_BUFFER_BIT);
 			this._batchDraw(container, gl, true);
 
@@ -932,20 +938,22 @@ this.createjs = this.createjs||{};
 
 			var flipY = false;
 
-			// apply each filter in order, but remember to toggle used texture and used
+			// apply each filter in order, but remember to toggle used texture and render buffer
 			for(var i=0; i<filterCount; i++) {
 				var filter = filters[i];
+
+				// swap to correct shader
+				this._activeShader = this.getFilterShader(gl, filter);
+				if(!this._activeShader) { continue; }
 
 				// now the old result is stored in slot 0, make a new render texture
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
 				renderTexture = this.getTargetRenderTexture(gl, target);
 				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
 
-				// swap to correct shader
-				this._activeShader = this.getFilterShader(gl, filter);
-				if(!this._activeShader) { continue; }
-
 				// draw result to render texture	R -> T
+				gl.viewport(0,0, manager.width, manager.height);
+				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._drawCover(gl, flipY);
 
 				// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
@@ -962,9 +970,11 @@ this.createjs = this.createjs||{};
 			// is this for another stage or mine
 			if(this.isCacheControlled) {
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+				this.updateViewport(wBackup, hBackup);
 
 				// draw result to canvas			R -> C
 				this._activeShader = this.getFilterShader(gl, this);
+				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._drawCover(gl, flipY);
 			} else {
 				//TODO: DHG: this is less than ideal a flipped inital render for this circumstance might help, adjust the perspective matrix?
@@ -974,10 +984,12 @@ this.createjs = this.createjs||{};
 					gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
 
 					this._activeShader = this.getFilterShader(gl, this);
+					gl.viewport(0,0, manager.width, manager.height);
+					gl.clear(gl.COLOR_BUFFER_BIT);
 					this._drawCover(gl, !flipY);
-
 				}
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+				this.updateViewport(wBackup, hBackup);
 
 				// make sure the last texture is the active thing to draw
 				target.cacheCanvas = renderTexture;
@@ -995,15 +1007,23 @@ this.createjs = this.createjs||{};
 
 				// draw item to render texture		I -> T
 				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-
-				var backupMTX = this._projectionMatrix;
+				this.updateViewport(manager.width, manager.height);
 				this._projectionMatrix = this._projectionMatrixFlip;
 				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
+
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-				this._projectionMatrix = backupMTX;
+				this.updateViewport(wBackup, hBackup);
 			}
 		}
+
+		for(var j=0; j<this._batchTextureCount;j++) {
+			gl.activeTexture(gl.TEXTURE0 + j);
+			this._batchTextures[j] = this._backupTextures[j];
+			gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[j]);
+			this.setTextureParams(gl, this._batchTextures[j].isPOT);
+		}
+
 
 		this.protectTextureSlot(lastTextureSlot, false);
 		this._activeShader = shaderBackup;
@@ -1134,8 +1154,8 @@ this.createjs = this.createjs||{};
 	p.purgeTextures = function(count) {
 		if(count == undefined){ count = 100; }
 
-		for(var i= 0, l=this.textureDictionary.length; i<l; i++) {
-			var item = this.textureDictionary[i];
+		for(var i= 0, l=this._textureDictionary.length; i<l; i++) {
+			var item = this._textureDictionary[i];
 			if(!item){ continue; }
 			if(item._drawID + count < this._drawID) {	// use draw not batch as draw is more indicative of time
 				this._killTextureObject(item);
@@ -1200,7 +1220,10 @@ this.createjs = this.createjs||{};
 				0,							0,								1,							0,
 				-1,							1,								0.1,						0
 			]);
-			this._projectionMatrixFlip = this._projectionMatrix.slice();
+			// create the flipped version for use with render texture flipping
+			// DHG: this would be a slice but some platforms don't offer slice's for Float32Array
+			this._projectionMatrixFlip = new Float32Array([0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0]);
+			this._projectionMatrixFlip.set(this._projectionMatrix);
 			this._projectionMatrixFlip[5] *= -1;
 			this._projectionMatrixFlip[13] *= -1;
 		}
@@ -1229,7 +1252,7 @@ this.createjs = this.createjs||{};
 				);
 				filter._builtShader = targetShader;
 			} catch (e) {
-				console.log("SHADER SWITCH FAILURE", e);
+				console && console.log("SHADER SWITCH FAILURE", e);
 			}
 		}
 		return targetShader;
@@ -1266,7 +1289,7 @@ this.createjs = this.createjs||{};
 			gl.UNSIGNED_BYTE,		// type of texture(pixel color depth)
 			data					// image data
 		);
-		this.setTextureParams(gl);
+		this.setTextureParams(gl, false);
 		return texture;
 	};
 
@@ -1314,11 +1337,66 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p.setTextureParams = function(gl, isPOT) {
-		//TODO: hook up isPOT to actual functionality
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		if(isPOT && this._antialias) {
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		} else {
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		}
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	};
+
+	/**
+	 * Changes the webGL clear aka "background" color to the provided value.
+	 * A transparent clear is recommended, non transparent colours may create undesired boxes.
+	 * The clear color will also be used for filters and other "render textures".
+	 * The stage background will ignore the transparency value and display solid color.
+	 * For the stage to recognize transparency it must be created with the transparent flag set to true.
+	 * Using "transparent white" to demonstrate, the valid data formats are as follows:
+	 * <ul>
+	 *     <li>"#FFF"</li>
+	 *     <li>"#FFFFFF"</li>
+	 *     <li>"#FFFFFF00"</li>
+	 *     <li>"rgba(255,255,255,0.0)"</li>
+	 *     <li>0xFFFFFF00</li>
+	 * @method setClearColor
+	 * @param {String|uint} [color = 0x00000000] The new colour to use as the background
+	 */
+	p.setClearColor = function(color) {
+		var r, g, b, a, output;
+
+		if(typeof color == "string") {
+			if(color.indexOf("#") == 0) {
+				if(color.length == 4){
+					color = "#" + color.charAt(1)+color.charAt(1) + color.charAt(2)+color.charAt(2) + color.charAt(3)+color.charAt(3)
+				}
+				r = Number("0x"+color.slice(1, 3))/255;
+				g = Number("0x"+color.slice(3, 5))/255;
+				b = Number("0x"+color.slice(5, 7))/255;
+				a = Number("0x"+color.slice(7, 9))/255;
+			} else if(color.indexOf("rgba(") == 0) {
+				output = color.slice(5, -1).explode(",");
+				r = Number(output[0])/255;
+				g = Number(output[1])/255;
+				b = Number(output[2])/255;
+				a = Number(output[3]);
+			}
+		} else {	// >>> is an unsigned shift which is what we want as 0x80000000 and up are negative values
+			r = ((color & 0xFF000000) >>> 24)/255;
+			g = ((color & 0x00FF0000) >>> 16)/255;
+			b = ((color & 0x0000FF00) >>> 8)/255;
+			a = (color & 0x000000FF)/255;
+		}
+
+		this._clearColor.r = r || 0;
+		this._clearColor.g = g || 0;
+		this._clearColor.b = b || 0;
+		this._clearColor.a = a || 0;
+
+		if(!this._webGLContext) { return; }
+		this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 	};
 
 	/**
@@ -1386,6 +1464,12 @@ this.createjs = this.createjs||{};
 				targetVtx += StageGL.PARTICLE_VERTEX_BODY;
 				targetFrag += StageGL.PARTICLE_FRAGMENT_BODY;
 				break;
+			case "override":
+				targetVtx = StageGL.REGULAR_VERTEX_HEADER;
+				targetFrag = StageGL.REGULAR_FRAGMENT_HEADER;
+				targetVtx += customVTX || StageGL.REGULAR_VERTEX_BODY;
+				targetFrag += customFRAG || StageGL.REGULAR_FRAGMENT_BODY;
+				break;
 			case "regular":
 			default:
 				targetVtx = StageGL.REGULAR_VERTEX_HEADER;
@@ -1404,6 +1488,7 @@ this.createjs = this.createjs||{};
 		gl.attachShader(shaderProgram, vertexShader);
 		gl.attachShader(shaderProgram, fragmentShader);
 		gl.linkProgram(shaderProgram);
+		shaderProgram._type = shaderName;
 
 		// check compile status
 		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
@@ -1434,6 +1519,7 @@ this.createjs = this.createjs||{};
 					shaderParamSetup(gl, this, shaderProgram);
 				}
 				break;
+			case "override":
 			case "particle":
 			case "regular":
 			default:
@@ -1670,12 +1756,15 @@ this.createjs = this.createjs||{};
 	 * @method _updateTextureImageData
 	 */
 	p._updateTextureImageData = function(gl, image) {
-		var texture = this._textureDictionary[image._storeID];
+		// the bitwise & is intentional, cheap exponent 2 check
 		var isNPOT = (image.width & image.width-1) || (image.height & image.height-1);
+		var texture = this._textureDictionary[image._storeID];
 
 		gl.activeTexture(gl.TEXTURE0 + texture._activeIndex);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
-		this.setTextureParams(gl, !isNPOT);
+
+		texture.isPOT = !isNPOT;
+		this.setTextureParams(gl, texture.isPOT);
 
 		try{
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
@@ -1684,7 +1773,7 @@ this.createjs = this.createjs||{};
 			if(console.error) {
 				console.error(e, errString);
 			} else {
-				console.log(e, errString);
+				console && console.log(e, errString);
 			}
 		}
 
@@ -1694,12 +1783,11 @@ this.createjs = this.createjs||{};
 		texture._h = image.height;
 
 		if(this.vocalDebug) {
-			// the bitwise & is intentional, cheap exponent 2 check
 			if(isNPOT) {
 				console.warn("NPOT(Non Power of Two) Texture: "+ image.src);
 			}
 			if(image.width > gl.MAX_TEXTURE_SIZE || image.height > gl.MAX_TEXTURE_SIZE){
-				console.error("Oversized Texture: "+ image.width+"x"+image.height +" vs "+ gl.MAX_TEXTURE_SIZE +"max");
+				console && console.error("Oversized Texture: "+ image.width+"x"+image.height +" vs "+ gl.MAX_TEXTURE_SIZE +"max");
 			}
 		}
 	};
@@ -1849,7 +1937,7 @@ this.createjs = this.createjs||{};
 			if(!(item.visible && concatAlpha)) { continue; }
 			if(!item.cacheCanvas || ignoreCache) {
 				if(item.preGLRender) {
-					item.preGLRender();
+					item.preGLRender(this);
 				}
 				if(item.children) {
 					this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
@@ -1931,18 +2019,18 @@ this.createjs = this.createjs||{};
 
 					// calculate vertices
 					subL = 0;									subT = 0;
-					subR = src.width+subL;								subB = src.height+subT;
+					subR = src.width+subL;						subB = src.height+subT;
 				} else {
 					// calculate uvs
 					// calculate vertices
 					if(item.cacheCanvas) {
 						uvRect = StageGL.UV_RECT;
-						subL = item._cacheOffsetX;							subT = item._cacheOffsetY;
+						subL = item._cacheOffsetX;				subT = item._cacheOffsetY;
 					} else {
 						uvRect = StageGL.UV_RECT;
 						subL = 0;								subT = 0;
 					}
-					subR = image.width+subL;							subB = image.height+subT;
+					subR = image.width+subL;					subB = image.height+subT;
 				}
 			} else if(item._webGLRenderStyle === 1) {											// SPRITE
 				var rect = frame.rect;
@@ -1959,31 +2047,31 @@ this.createjs = this.createjs||{};
 			}
 
 			// These must be calculated here else a forced draw might happen after they're set
-			var offset = this.batchCardCount*StageGL.INDICIES_PER_CARD*2;											//TODO: DHG: you can do better
-			var loc = (offset/2)|0;
+			var offV1 = this.batchCardCount*StageGL.INDICIES_PER_CARD;		// offset for 1 component vectors
+			var offV2 = offV1*2;											// offset for 2 component vectors
 
 			//DHG: See Matrix2D.transformPoint for why this math specifically
-			// apply vertices																							//TODO: DHG: optimize?
-			vertices[offset] =		subL *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+1] =	subL *iMtx.b + subT *iMtx.d +iMtx.ty;
-			vertices[offset+2] =	subL *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+3] =	subL *iMtx.b + subB *iMtx.d +iMtx.ty;
-			vertices[offset+4] =	subR *iMtx.a + subT *iMtx.c +iMtx.tx;			vertices[offset+5] =	subR *iMtx.b + subT *iMtx.d +iMtx.ty;
-			vertices[offset+6] =	vertices[offset+2];								vertices[offset+7] =	vertices[offset+3];
-			vertices[offset+8] =	vertices[offset+4];								vertices[offset+9] =	vertices[offset+5];
-			vertices[offset+10] =	subR *iMtx.a + subB *iMtx.c +iMtx.tx;			vertices[offset+11] =	subR *iMtx.b + subB *iMtx.d +iMtx.ty;
+			// apply vertices
+			vertices[offV2] =		subL *iMtx.a + subT *iMtx.c +iMtx.tx;		vertices[offV2+1] =		subL *iMtx.b + subT *iMtx.d +iMtx.ty;
+			vertices[offV2+2] =		subL *iMtx.a + subB *iMtx.c +iMtx.tx;		vertices[offV2+3] =		subL *iMtx.b + subB *iMtx.d +iMtx.ty;
+			vertices[offV2+4] =		subR *iMtx.a + subT *iMtx.c +iMtx.tx;		vertices[offV2+5] =		subR *iMtx.b + subT *iMtx.d +iMtx.ty;
+			vertices[offV2+6] =		vertices[offV2+2];							vertices[offV2+7] =		vertices[offV2+3];
+			vertices[offV2+8] =		vertices[offV2+4];							vertices[offV2+9] =		vertices[offV2+5];
+			vertices[offV2+10] =	subR *iMtx.a + subB *iMtx.c +iMtx.tx;		vertices[offV2+11] =	subR *iMtx.b + subB *iMtx.d +iMtx.ty;
 
 			// apply uvs
-			uvs[offset] =		uvRect.l;			uvs[offset+1] =		uvRect.t;
-			uvs[offset+2] =		uvRect.l;			uvs[offset+3] =		uvRect.b;
-			uvs[offset+4] =		uvRect.r;			uvs[offset+5] =		uvRect.t;
-			uvs[offset+6] =		uvRect.l;			uvs[offset+7] =		uvRect.b;
-			uvs[offset+8] =		uvRect.r;			uvs[offset+9] =		uvRect.t;
-			uvs[offset+10] =	uvRect.r;			uvs[offset+11] =	uvRect.b;
+			uvs[offV2] =	uvRect.l;			uvs[offV2+1] =	uvRect.t;
+			uvs[offV2+2] =	uvRect.l;			uvs[offV2+3] =	uvRect.b;
+			uvs[offV2+4] =	uvRect.r;			uvs[offV2+5] =	uvRect.t;
+			uvs[offV2+6] =	uvRect.l;			uvs[offV2+7] =	uvRect.b;
+			uvs[offV2+8] =	uvRect.r;			uvs[offV2+9] =	uvRect.t;
+			uvs[offV2+10] =	uvRect.r;			uvs[offV2+11] =	uvRect.b;
 
 			// apply texture
-			texI[loc] = texI[loc+1] = texI[loc+2] = texI[loc+3] = texI[loc+4] = texI[loc+5] = texIndex;
+			texI[offV1] = texI[offV1+1] = texI[offV1+2] = texI[offV1+3] = texI[offV1+4] = texI[offV1+5] = texIndex;
 
 			// apply alpha
-			alphas[loc] = alphas[loc+1] = alphas[loc+2] = alphas[loc+3] = alphas[loc+4] = alphas[loc+5] = item.alpha * concatAlpha;
+			alphas[offV1] = alphas[offV1+1] = alphas[offV1+2] = alphas[offV1+3] = alphas[offV1+4] = alphas[offV1+5] = item.alpha * concatAlpha;
 
 			this.batchCardCount++;
 		}
@@ -1996,7 +2084,8 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._drawBuffers = function(gl) {
-		//return;
+		if(this.batchCardCount <= 0) { return; }	// prevents error spam on stages filled with unrenederable content.
+
 		if(this.vocalDebug) {
 			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
 		}
@@ -2030,7 +2119,7 @@ this.createjs = this.createjs||{};
 			var texture = this._batchTextures[j];
 			gl.activeTexture(gl.TEXTURE0 + j);
 			gl.bindTexture(gl.TEXTURE_2D, texture);
-			this.setTextureParams(gl);
+			this.setTextureParams(gl, texture.isPOT);
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*StageGL.INDICIES_PER_CARD);
@@ -2086,26 +2175,45 @@ this.createjs = this.createjs||{};
 
 		var cm = createjs.CacheManager.prototype;
 		/**
-		 * Functionality injected to {{#crossLink "DisplayObject"}}{{/crossLink}}. Ensure StageGL is loaded before making any
-		 * DisplayObject instances but after all other standard EaselJS classes are loaded for injection to take full effect.
-		 * Replaces the 2D only behavior with potential WebGL behavior. If options is set to true a StageGL
-		 * is created and contained on the object for use when rendering a cache.
-		 * If options is a StageGL instance it should be the same StageGL the target object is on.
-		 * When it is a WebGL texture will be made this gives a substantial performance boost compared to a canvas.
+		 * Functionality injected to {{#crossLink "CacheManager"}}{{/crossLink}}. Ensure StageGL is loaded after all other
+		 * standard EaselJS classes are loaded but before making any DisplayObject instances for injection to take full effect.
+		 * Replaces the context2D cache draw with the option for WebGL or context2D drawing.
+		 * If options is set to "true" a StageGL is created and contained on the object for use when rendering a cache.
+		 * If options is a StageGL instance it will not create an instance but use the one provided.
+		 * If possible it is best to provide the StageGL instance that is a parent to this DisplayObject for performance reasons.
+		 * A StageGL cache does not infer the ability to draw objects a StageGL cannot currently draw,
+		 * i.e. do not use a WebGL context cacge when caching a Shape, Text, etc.
 		 * <h4>Example</h4>
-		 * With a 2d context:
+		 * Using WebGL cache with a 2d context:
 		 *      var stage = new createjs.Stage();
 		 *      var bmp = new createjs.Bitmap(src);
-		 *      bmp.cache(0, 0, bmp.width, bmp.height, 1, true);
+		 *      bmp.cache(0, 0, bmp.width, bmp.height, 1, true);        // no StageGL to use, so make one
+		 *      var shp = new createjs.Shape();
+		 *      shp.graphics.clear().fill("red").drawRect(0,0,20,20);
+		 *      shp.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
 		 * <h4>Example</h4>
-		 * With a WebGL context:
+		 * Using WebGL cache with a WebGL context:
 		 *      var stage = new createjs.StageGL();
 		 *      var bmp = new createjs.Bitmap(src);
-		 *      bmp.cache(0, 0, bmp.width, bmp.height, 1, stage);
+		 *      bmp.cache(0, 0, bmp.width, bmp.height, 1, stage);       // use our StageGL to cache
+		 *      var shp = new createjs.Shape();
+		 *      shp.graphics.clear().fill("red").drawRect(0,0,20,20);
+		 *      shp.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
 		 * You can make your own StageGL and have it render to a canvas if you set ".isCacheControlled" to true on your stage.
-		 * DO NOT set it to true if you wish to use the fast Render Textures available to StageGLs
+		 * You may wish to create your own StageGL instance to control factors like background color/transparency, AA, and etc.
+		 * You must set "options" to its own stage if you wish to use the fast Render Textures available only to StageGLs.
+		 * If you use WebGL cache on a container with Shapes you will have to cache each shape individually before the container,
+		 * otherwise the WebGL cache will not render the shapes.
 		 * @pubic
-		 * @method cache
+		 * @method DisplayObject.cache
+		 * @param {Number} x The x coordinate origin for the cache region.
+		 * @param {Number} y The y coordinate origin for the cache region.
+		 * @param {Number} width The width of the cache region.
+		 * @param {Number} height The height of the cache region.
+		 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
+		 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
+		 * 	cached elements with greater fidelity. Default is 1.
+		 * @param {Boolean|StageGL} options Select whether to use context 2D, or WebGL rendering, and whether to make a new stage instance or use an existing one.
 		 **/
 		cm._createSurfaceBASE = cm._createSurface;
 		cm._createSurface = function(options) {
@@ -2117,7 +2225,7 @@ this.createjs = this.createjs||{};
 			if(this._webGLCache !== options) {
 				if(options === true) {
 					this.cacheCanvas = document.createElement("canvas");
-					this._webGLCache = new createjs.StageGL(this.cacheCanvas);
+					this._webGLCache = new createjs.StageGL(this.cacheCanvas, undefined, undefined, true);
 					// flag so it can tell whether to do a final render texture output
 					this._webGLCache.isCacheControlled = true;
 				} else {
@@ -2169,16 +2277,31 @@ this.createjs = this.createjs||{};
 		};
 
 		/**
-		 * Functionality injected to {{#crossLink "BitmapText"}}{{/crossLink}}. Ensure StageGL is loaded after all
-		 * other standard EaselJS classes for injection to take full effect.
+		 * Functionality injected to {{#crossLink "BitmapText"}}{{/crossLink}}. Ensure StageGL is loaded after all other
+		 * standard EaselJS classes are loaded but before making any BitmapText instances for injection to take full effect.
 		 * Part of a draw call to BitmapText is to re-create the text, without this process there is nothing or stale info to render.
 		 * As StageGL does not call distinct draw calls per object we need to simulate that functionality with the preGLRender function.
 		 * If you encounter a similar situation with a custom class simply add a preGLRender function to it and it will be detected and called.
+		 * It is recommended to not add one if you have no content to do for optimizations sake.
+		 *      (function() {
+		 *          "use strict";
+		 *          function NewClass() {
+		 *              this.DisplayObject_constructor(canvas);
+		 *          }
+		 *          var p = createjs.extend(NewClass, createjs.DisplayObject);
+		 *
+		 *          p.preGLRender = function(stage) {
+		 *              console.log("draw");
+		 *          }
+		 *
+		 *          scope.NewClass = createjs.promote(NewClass, "DisplayObject");
+		 *      }());
 		 * @pubic
-		 * @method preGLRender
+		 * @param {StageGL} stage An instance of the stage that is drawing this object, may be useful.
+		 * @method DisplayObject.preGLRender
 		 **/
 		var bt = createjs.BitmapText.prototype;
-		bt.preGLRender = function() {
+		bt.preGLRender = function(stage) {
 			this._updateText();
 		}
 	})();

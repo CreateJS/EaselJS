@@ -1,10 +1,14 @@
 # WebGL Examples
 
-These examples are specific to the new WebGL public preview for EaselJS. These demos must all be run from a server, and are dependent on the ../../libs and ../assets directory.
+These examples are specific to the new WebGL classes for EaselJS. These demos MUST all be run from a server, and are dependent on the ../../libs and ../assets directory.
+
+## Sparkles
+
+Benchmarking and an example of a minimal StageGL implementation
 
 ## Runners
 
-Example showing StageGL, SpriteContainer, Sprite, BitmapText, and Bitmap in use in WebGL. Also shows the use of vector hit areas, and using the StageGL.isWebGL property to scale content when WebGL is not supported.
+Example showing StageGL, Sprite, BitmapText, and Bitmap in use in WebGL. Also shows the use of vector hit areas, and using the StageGL.isWebGL property to scale content when WebGL is not supported.
 
 ## TwoStages
 
