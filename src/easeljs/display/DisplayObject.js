@@ -314,6 +314,13 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 **/
 		this.y = 0;
+
+		/** The zIndex position of the display object for sorting
+		 * @property zIndex
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.zIndex = 0;
 		
 		/**
 		 * If set, defines the transformation for this display object, overriding all other transformation properties
