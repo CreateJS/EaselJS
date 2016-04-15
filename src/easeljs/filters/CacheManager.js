@@ -44,22 +44,7 @@ this.createjs = this.createjs||{};
 	 **/
 	function CacheManager(context) {
 
-		/**
-		 * @property _cacheDataURLID
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 */
-		this._cacheDataURLID = 0;
-
-		/**
-		 * @property _cacheDataURL
-		 * @protected
-		 * @type {String}
-		 * @default null
-		 */
-		this._cacheDataURL = null;
-
+		// public:
 		/**
 		 * Coordinates and dimensions relative to target
 		 * @property width
@@ -104,6 +89,38 @@ this.createjs = this.createjs||{};
 		 * @default undefined
 		 */
 		this.scale = undefined;
+
+		// protected:
+		/**
+		 * @property _cacheDataURLID
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._cacheDataURLID = 0;
+
+		/**
+		 * @property _cacheDataURL
+		 * @protected
+		 * @type {String}
+		 * @default null
+		 */
+		this._cacheDataURL = null;
+
+		/**
+		 * @property _drawWidth
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._drawWidth = 0;
+		/**
+		 * @property _drawHeight
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._drawHeight = 0;
 	}
 	var p = CacheManager.prototype;
 
@@ -164,12 +181,12 @@ this.createjs = this.createjs||{};
 	 * @return {String} a string representation of the instance.
 	 **/
 	p.toString = function() {
-		return "[Filter]";
+		return "[CacheManager]";
 	};
 
 	/**
 	 * Actual implementation of {{#crossLink "DisplayObject.cache"}}{{/crossLink}}. Creates and sets properties needed
-	 * for a cache to function and performs the initial update. See {{#crossLink "_createSurface"}}{{/crossLink}} for
+	 * for a cache to function and performs the initial update. See {{#crossLink "_updateSurface"}}{{/crossLink}} for
 	 * specific implementation details of the caching object.
 	 * @method defineCache
 	 * @param {DisplayObject} target The DisplayObject this cache is linked to.
@@ -182,19 +199,18 @@ this.createjs = this.createjs||{};
 	 * 	cached elements with greater fidelity. Default is 1.
 	 * @param {Object} [options=undefined] When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be extra caching opportunities or needs.
 	 */
-	p.defineCache = function(target, x, y, width, height, scale, options) {
-		this.target = target;
-		this._createSurface(options);
+	 p.defineCache = function(target, x, y, width, height, scale, options) {
+		 if(!target){ throw "No symbol to cache"; }
+		 this._options = options;
+		 this.target = target;
 
-		scale = scale || 1;
-		target._cacheWidth = this.width = width;
-		target._cacheHeight = this.height = height;
-		target._cacheOffsetX = this.x = x;
-		target._cacheOffsetY = this.y = y;
-		target._cacheScale = this.scale = scale;
+		 target._cacheWidth =	this.width =	width >= 1 ? width : 1;
+		 target._cacheHeight =	this.height =	height >= 1 ? height : 1;
+		 target._cacheOffsetX =	this.x =		x || 0;
+		 target._cacheOffsetY =	this.y =		y || 0;
+		 target._cacheScale =	this.scale =	scale || 1;
 
-		target.cacheCanvas = this.cacheCanvas;
-		this.updateCache();
+		 this.updateCache();
 	};
 
 	/**
@@ -202,21 +218,24 @@ this.createjs = this.createjs||{};
 	 */
 	p.updateCache = function(compositeOperation) {
 		var target = this.target;
-		var cacheCanvas = this.cacheCanvas;
-		if (!cacheCanvas) { throw "cache() must be called before updateCache()"; }
-		var scale = this.scale;
+		if(!target) { throw "cache() must be called before updateCache()"; }
 
-		this.offX = this.x*scale;
-		this.offY = this.y*scale;
-		var fBounds = CacheManager.getFilterBounds(target);
-		this.offX += (target._filterOffsetX = fBounds.x);
-		this.offY += (target._filterOffsetY = fBounds.y);
+		var newBounds = CacheManager.getFilterBounds(target);
+		if(!this.lastBounds || newBounds.width != this.lastBounds.width || newBounds.height != this.lastBounds.height) {
+			this.lastBounds = newBounds;
 
-		var w = this.width, h = this.height;
-		w = Math.ceil(w*scale) + fBounds.width;
-		h = Math.ceil(h*scale) + fBounds.height;
+			this._drawWidth = Math.ceil(this.width*this.scale) + newBounds.width;
+			this._drawHeight = Math.ceil(this.height*this.scale) + newBounds.height;
 
-		this._drawToCache(compositeOperation, w, h);
+			this._updateSurface();
+		} else {
+			this.lastBounds = newBounds;
+		}
+
+		this.offX = this.x*this.scale + (target._filterOffsetX = newBounds.x);
+		this.offY = this.y*this.scale + (target._filterOffsetY = newBounds.y);
+
+		this._drawToCache(compositeOperation);
 
 		// the actual cacheCanvas element could of changed during the cache process so use this.cacheCanvas to make sure
 		this.cacheCanvas._invalid = true;
@@ -249,29 +268,31 @@ this.createjs = this.createjs||{};
 
 // private methods:
 	/**
-	 * Basic context2D caching works by creating a new canvas element
+	 * Basic context2D caching works by creating a new canvas element at setting its physical size
 	 * @protected
-	 * @method _createSurface
-	 * @param {Object} options un-used but added for expandability
+	 * @method _updateSurface
 	 **/
-	p._createSurface = function(options) {
-		this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
-		this._webGLCache = null;
+	p._updateSurface = function() {
+		// create it if it's missing
+		if(!this.cacheCanvas) {
+			this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+		}
+
+		// now size it
+		this.cacheCanvas.width = this._drawWidth;
+		this.cacheCanvas.height = this._drawHeight;
 	};
 
 	/**
 	 * Now all the setup properties have been performed, do the actual cache draw out for context 2D.
 	 */
-	p._drawToCache = function(compositeOperation, w, h) {
+	p._drawToCache = function(compositeOperation) {
 		var cacheCanvas = this.cacheCanvas;
 		var target = this.target;
 		var ctx = cacheCanvas.getContext("2d");
 
-		if (w != cacheCanvas.width || h != cacheCanvas.height) {
-			cacheCanvas.width = w;
-			cacheCanvas.height = h;
-		} else if (!compositeOperation) {
-			ctx.clearRect(0, 0, w+1, h+1);
+		if (!compositeOperation) {
+			ctx.clearRect(0, 0, this._drawWidth+1, this._drawHeight+1);
 		}
 
 		ctx.save();
