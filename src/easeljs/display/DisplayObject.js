@@ -721,12 +721,6 @@ this.createjs = this.createjs||{};
 		if (ignoreCache || !cacheCanvas) { return false; }
 		var scale = this._cacheScale;
 		ctx.drawImage(cacheCanvas, this._cacheOffsetX+this._filterOffsetX, this._cacheOffsetY+this._filterOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
-
-		var src = {x:this._cacheOffsetX+this._filterOffsetX, y:this._cacheOffsetY+this._filterOffsetY};
-		var p = this.localToGlobal(src.x, src.y);
-		var p2 = this.localToGlobal(src.x+(cacheCanvas.width/scale), src.y+(cacheCanvas.height/scale));
-		console.log([p.x, p.y, p2.x, p2.y ]);
-
 		return true;
 	};
 	
@@ -800,8 +794,6 @@ this.createjs = this.createjs||{};
 	p.cache = function(x, y, width, height, scale, options) {
 		if(!this.cacheController){
 			this.cacheController = new createjs.CacheManager();
-		} else {
-			console.log("For best performance please uncache before making a new cache, or if it still the same cache call updateCache");
 		}
 		this.cacheController.defineCache(this, x, y, width, height, scale, options);
 	};
