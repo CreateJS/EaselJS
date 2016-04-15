@@ -181,8 +181,28 @@ this.createjs = this.createjs||{};
 	 * @method clone
 	 * @return {MouseEvent} a clone of the MouseEvent instance.
 	 **/
+	var mouseEvent = null;
 	p.clone = function() {
-		return new MouseEvent(this.type, this.bubbles, this.cancelable, this.stageX, this.stageY, this.nativeEvent, this.pointerID, this.primary, this.rawX, this.rawY);
+		var event = mouseEvent || new MouseEvent();
+
+		for ( var prop in event )
+			if ( typeof event[prop] !== 'function' )
+				event[prop] = null;
+
+		event.type = this.type;
+		event.bubbles = this.bubbles;
+		event.cancelable = this.cancelable;
+		event.stageX = this.stageX;
+		event.stageY = this.stageY;
+		event.nativeEvent = this.navtiveEvent;
+		event.pointerID = this.pointerID;
+		event.primary = this.primary;
+		event.rawX = this.rawX;
+		event.rawY = this.rawY;
+
+		mouseEvent = event;
+
+		return event;
 	};
 
 	/**
