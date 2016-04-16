@@ -1,11 +1,11 @@
 /*
 * Stage
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -59,7 +59,7 @@ this.createjs = this.createjs||{};
 	 * @extends Container
 	 * @constructor
 	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
-	 * of a canvas object in the current document.
+	 * of a canvas object in the current window.document.
 	 **/
 	function Stage(canvas) {
 		this.Container_constructor();
@@ -96,7 +96,7 @@ this.createjs = this.createjs||{};
 		 * @property canvas
 		 * @type HTMLCanvasElement | Object
 		 **/
-		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
+		this.canvas = (typeof canvas == "string") ? window.document.getElementById(canvas) : canvas;
 	
 		/**
 		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
@@ -524,7 +524,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Enables or disables the event listeners that stage adds to DOM elements (window, document and canvas). It is good
+	 * Enables or disables the event listeners that stage adds to DOM elements (window, window.document and canvas). It is good
 	 * practice to disable events when disposing of a Stage instance, otherwise the stage will continue to receive
 	 * events from the page.
 	 *
@@ -548,7 +548,7 @@ this.createjs = this.createjs||{};
 			}
 			this._eventListeners = null;
 		} else if (enable && !ls && this.canvas) {
-			var t = window.addEventListener ? window : document;
+			var t = window.addEventListener ? window : window.document;
 			var _this = this;
 			ls = this._eventListeners = {};
 			ls["mouseup"] = {t:t, f:function(e) { _this._handleMouseUp(e)} };
@@ -592,8 +592,8 @@ this.createjs = this.createjs||{};
 		try { bounds = e.getBoundingClientRect(); } // this can fail on disconnected DOM elements in IE9
 		catch (err) { bounds = {top: e.offsetTop, left: e.offsetLeft, width:e.offsetWidth, height:e.offsetHeight}; }
 
-		var offX = (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || document.body.clientLeft || 0);
-		var offY = (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || document.body.clientTop  || 0);
+		var offX = (window.pageXOffset || window.document.scrollLeft || 0) - (window.document.clientLeft || window.document.body.clientLeft || 0);
+		var offY = (window.pageYOffset || window.document.scrollTop || 0) - (window.document.clientTop  || window.document.body.clientTop  || 0);
 
 		var styles = window.getComputedStyle ? getComputedStyle(e,null) : e.currentStyle; // IE <9 compatibility.
 		var padL = parseInt(styles.paddingLeft)+parseInt(styles.borderLeftWidth);

@@ -1,11 +1,11 @@
 /*
 * SpriteSheetBuilder
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -41,7 +41,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * The SpriteSheetBuilder allows you to generate {{#crossLink "SpriteSheet"}}{{/crossLink}} instances at run time
 	 * from any display object. This can allow you to maintain your assets as vector graphics (for low file size), and
-	 * render them at run time as SpriteSheets for better performance.
+	 * render them at run time as SpriteSheets for better window.performance.
 	 *
 	 * SpriteSheets can be built either synchronously, or asynchronously, so that large SpriteSheets can be generated
 	 * without locking the UI.
@@ -415,7 +415,7 @@ this.createjs = this.createjs||{};
 			if (o.w > x) { x = o.w; }
 			y += o.h;
 			if (!o.h || !frames.length) {
-				var canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+				var canvas = createjs.createCanvas?createjs.createCanvas():window.document.createElement("canvas");
 				canvas.width = this._getSize(x,this.maxWidth);
 				canvas.height = this._getSize(y,this.maxHeight);
 				this._data.images[img] = canvas;

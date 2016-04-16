@@ -1,11 +1,11 @@
 /*
 * SpriteSheetUtils
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -64,7 +64,7 @@ this.createjs = this.createjs||{};
 	 * @type CanvasRenderingContext2D
 	 * @protected
 	*/
-	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	var canvas = (createjs.createCanvas?createjs.createCanvas():window.document.createElement("canvas"));
 	if (canvas.getContext) {
 		SpriteSheetUtils._workingCanvas = canvas;
 		SpriteSheetUtils._workingContext = canvas.getContext("2d");
@@ -84,7 +84,7 @@ this.createjs = this.createjs||{};
 	 * The above would add frames that are flipped horizontally AND frames that are flipped vertically.
 	 * <br/><br/>
 	 * Note that you can also flip any display object by setting its scaleX or scaleY to a negative value. On some
-	 * browsers (especially those without hardware accelerated canvas) this can result in slightly degraded performance,
+	 * browsers (especially those without hardware accelerated canvas) this can result in slightly degraded window.performance,
 	 * which is why addFlippedFrames is available.
 	 * @method addFlippedFrames
 	 * @static
@@ -131,7 +131,7 @@ this.createjs = this.createjs||{};
 		canvas.width = r.width;
 		canvas.height = r.height;
 		SpriteSheetUtils._workingContext.drawImage(data.image, r.x, r.y, r.width, r.height, 0, 0, r.width, r.height);
-		var img = document.createElement("img");
+		var img = window.document.createElement("img");
 		img.src = canvas.toDataURL("image/png");
 		return img;
 	};
@@ -150,7 +150,7 @@ this.createjs = this.createjs||{};
 	 * @deprecated Tools such as ImageAlpha generally provide better results. This will be moved to sandbox in the future.
 	*/
 	SpriteSheetUtils.mergeAlpha = function(rgbImage, alphaImage, canvas) {
-		if (!canvas) { canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
+		if (!canvas) { canvas = createjs.createCanvas?createjs.createCanvas():window.document.createElement("canvas"); }
 		canvas.width = Math.max(alphaImage.width, rgbImage.width);
 		canvas.height = Math.max(alphaImage.height, rgbImage.height);
 		var ctx = canvas.getContext("2d");
@@ -178,7 +178,7 @@ this.createjs = this.createjs||{};
 			canvas.height = src.height;
 			ctx.setTransform(h?-1:1, 0, 0, v?-1:1, h?src.width:0, v?src.height:0);
 			ctx.drawImage(src,0,0);
-			var img = document.createElement("img");
+			var img = window.document.createElement("img");
 			img.src = canvas.toDataURL("image/png");
 			// work around a strange bug in Safari:
 			img.width = src.width;

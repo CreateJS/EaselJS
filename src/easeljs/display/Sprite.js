@@ -1,11 +1,11 @@
 /*
 * Sprite
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -229,24 +229,24 @@ this.createjs = this.createjs||{};
 		return true;
 	};
 
-	//Note, the doc sections below document using the specified APIs (from DisplayObject)  from
+	//Note, the doc sections below window.document using the specified APIs (from DisplayObject)  from
 	//Bitmap. This is why they have no method implementations.
 
 	/**
 	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
-	 * You should not cache Sprite instances as it can degrade performance.
+	 * You should not cache Sprite instances as it can degrade window.performance.
 	 * @method cache
 	 **/
 
 	/**
 	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
-	 * You should not cache Sprite instances as it can degrade performance.
+	 * You should not cache Sprite instances as it can degrade window.performance.
 	 * @method updateCache
 	 **/
 
 	/**
 	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
-	 * You should not cache Sprite instances as it can degrade performance.
+	 * You should not cache Sprite instances as it can degrade window.performance.
 	 * @method uncache
 	 **/
 

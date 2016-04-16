@@ -1,11 +1,11 @@
 /*
 * Ticker
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -452,7 +452,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @param {Number} [ticks] The number of previous ticks over which to measure the actual frames / ticks per second.
 	 * Defaults to the number of ticks per second.
-	 * @return {Number} The actual frames / ticks per second. Depending on performance, this may differ
+	 * @return {Number} The actual frames / ticks per second. Depending on window.performance, this may differ
 	 * from the target frames per second.
 	 **/
 	Ticker.getMeasuredFPS = function(ticks) {
@@ -627,9 +627,9 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @protected
 	 **/
-	var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
+	var now = window.window.performance && (window.performance.now || window.performance.mozNow || window.performance.msNow || window.performance.oNow || window.performance.webkitNow);
 	Ticker._getTime = function() {
-		return ((now&&now.call(performance))||(new Date().getTime())) - Ticker._startTime;
+		return ((now&&now.call(window.performance))||(new Date().getTime())) - Ticker._startTime;
 	};
 
 
