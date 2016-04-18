@@ -595,7 +595,7 @@ this.createjs = this.createjs||{};
 		var offX = (window.pageXOffset || window.document.scrollLeft || 0) - (window.document.clientLeft || window.document.body.clientLeft || 0);
 		var offY = (window.pageYOffset || window.document.scrollTop || 0) - (window.document.clientTop  || window.document.body.clientTop  || 0);
 
-		var styles = window.getComputedStyle ? getComputedStyle(e,null) : e.currentStyle; // IE <9 compatibility.
+		var styles = window.getComputedStyle ? window.getComputedStyle(e,null) : e.currentStyle; // IE <9 compatibility.
 		var padL = parseInt(styles.paddingLeft)+parseInt(styles.borderLeftWidth);
 		var padT = parseInt(styles.paddingTop)+parseInt(styles.borderTopWidth);
 		var padR = parseInt(styles.paddingRight)+parseInt(styles.borderRightWidth);
