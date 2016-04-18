@@ -72,6 +72,7 @@ this.createjs = this.createjs||{};
 		if(!stage){ stage = this._stage; }
 
 		console.log("Batches Per Draw", (stage._batchID/stage._drawID).toFixed(4));
+		this.logContextInfo(stage._webGLContext);
 		this.logDepth(stage.children, "");
 		this.logTextureFill(stage);
 	};
@@ -114,6 +115,18 @@ this.createjs = this.createjs||{};
 				p.logDepth(child.children, "|"+prepend, customLog);
 			}
 		}
+	};
+
+	p.logContextInfo = function(gl) {
+		if(!gl) { gl = this._stage._webGLContext; }
+		var data = "== LOG:\n";
+		data += "Max textures: " + gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) +"\n";
+		data += "Max combined: " + gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS) +"\n";
+		data += "Max vertex: " + gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) +"\n";
+		data += "\n";
+		data += "Max tex size: " + gl.getParameter(gl.MAX_TEXTURE_SIZE) +"\n";
+		data += "Vtx atr max: " + gl.getParameter(gl.MAX_VERTEX_ATTRIBS) +"\n";
+		console.log(data+"======");
 	};
 
 	// protected methods:
