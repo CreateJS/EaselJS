@@ -1057,8 +1057,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Try to set the max textures the system can handle, should default to the hardware max and lower values may limit performance.
+	 * Try to set the max textures the system can handle, should default to the hardware maximum, lower values may limit performance.
 	 * Some devices have been known to mis-report their max textures, or you may need a standard baseline cross devices for testing.
+	 * Barring the previous suggestions there is little need to call this function as the library will automatically try to find the best value.
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method updateSimultaneousTextureCount
 	 * @param {Number} [count=1] The number of textures intended for simultaneous loading.
@@ -2344,6 +2345,7 @@ this.createjs = this.createjs||{};
 
 			cacheCanvas.width = this.width;
 			cacheCanvas.height = this.height;
+			cacheCanvas._invalid = true;
 		};
 
 		cm.uncacheBASE = cm.uncache;

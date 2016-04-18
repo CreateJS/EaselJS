@@ -237,8 +237,6 @@ this.createjs = this.createjs||{};
 
 		this._drawToCache(compositeOperation);
 
-		// the actual cacheCanvas element could of changed during the cache process so use this.cacheCanvas to make sure
-		this.cacheCanvas._invalid = true;
 		this.cacheID = createjs.CacheManager._nextCacheID++;
 	};
 
@@ -275,7 +273,7 @@ this.createjs = this.createjs||{};
 	p._updateSurface = function() {
 		// create it if it's missing
 		if(!this.cacheCanvas) {
-			this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+			this.target.cacheCanvas = this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 		}
 
 		// now size it
