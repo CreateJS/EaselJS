@@ -38,11 +38,9 @@ this.createjs = this.createjs||{};
 	function WebGLInspector(stage) {
 		this.EventDispatcher_constructor();
 
-		// public properties:
-		///////////////////////////////////////////////////////
+	// public properties:
 
-		// private properties:
-		///////////////////////////////////////////////////////
+	// private properties:
 		this._stage = stage;
 
 		// and begin
@@ -50,14 +48,11 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(WebGLInspector, createjs.EventDispatcher);
 
-	// constants:
-	///////////////////////////////////////////////////////
+// constants:
 
-	// getter / setters:
-	///////////////////////////////////////////////////////
+// getter / setters:
 
-	// ctor:
-	///////////////////////////////////////////////////////
+// ctor:
 	/**
 	 *
 	 * @method _initializeWebGL
@@ -66,8 +61,7 @@ this.createjs = this.createjs||{};
 	p._initializeWebGLInspector = function() {
 	};
 
-	// public methods:
-	///////////////////////////////////////////////////////
+// public methods:
 	p.log = function(stage) {
 		if(!stage){ stage = this._stage; }
 
@@ -129,8 +123,7 @@ this.createjs = this.createjs||{};
 		console.log(data+"======");
 	};
 
-	// protected methods:
-	///////////////////////////////////////////////////////
+// protected methods:
 	p.logTextureFill = function(stage) {
 		if(!stage){ stage = this._stage; }
 
@@ -170,9 +163,6 @@ this.createjs = this.createjs||{};
 			"\tR:"+ item.regX.toFixed(2)+"x"+item.regY.toFixed(2) +"\t"
 		);
 	};
-
-	// Injections
-	///////////////////////////////////////////////////////
 
 	createjs.WebGLInspector = createjs.promote(WebGLInspector, "EventDispatcher");
 }());

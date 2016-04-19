@@ -215,6 +215,8 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Actual implementation of {{#crossLink "DisplayObject.updateCache"}}{{/crossLink}}. Creates and sets properties needed
+	 * @method updateCache
+	 * @param {String} compositeOperation The DisplayObject this cache is linked to.
 	 */
 	p.updateCache = function(compositeOperation) {
 		var target = this.target;
@@ -283,6 +285,8 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Now all the setup properties have been performed, do the actual cache draw out for context 2D.
+	 * @protected
+	 * @method _drawToCache
 	 */
 	p._drawToCache = function(compositeOperation) {
 		var cacheCanvas = this.cacheCanvas;
@@ -306,6 +310,8 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Work through every filter and apply its individual transformation to it.
+	 * @protected
+	 * @method _applyFilters
 	 */
 	p._applyFilters = function() {
 		var target = this.target;

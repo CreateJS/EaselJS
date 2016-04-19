@@ -824,6 +824,7 @@ this.createjs = this.createjs||{};
 				var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
 
 				this.updateSimultaneousTextureCount(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
+				this._maxTextureSlots = gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
 				this._createBuffers(gl);
 				this._initTextures(gl);
 
@@ -931,7 +932,7 @@ this.createjs = this.createjs||{};
 	 * @param  {Boolean} lock Whether this slot is the one being locked.
 	 */
 	p.protectTextureSlot = function(id, lock) {
-		if(id > this._batchTextureCount || id < 0){
+		if(id > this._maxTextureSlots || id < 0){
 			throw "Slot outside of acceptable range";
 		}
 		this._slotBlacklist[id] = !!lock;
@@ -1195,6 +1196,7 @@ this.createjs = this.createjs||{};
 			gl.RGBA,					// format (match internal format)
 			gl.UNSIGNED_BYTE,			// type of texture(pixel color depth)
 			null						// image data, we can do null because we're doing array data
+			//new Uint8Array(width*height*4)
 		);
 	};
 
@@ -1828,7 +1830,7 @@ this.createjs = this.createjs||{};
 		var renderTexture;
 		var shaderBackup = this._activeShader;
 		var blackListBackup = this._slotBlacklist;
-		var lastTextureSlot = this._batchTextureCount-1;
+		var lastTextureSlot = this._maxTextureSlots-1;//this._batchTextureCount-1;
 		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
 
 		// protect the last slot so that we have somewhere to bind the renderTextures so it doesn't get upset
@@ -1856,80 +1858,7 @@ this.createjs = this.createjs||{};
 
 		var filterCount = filters && filters.length;
 		if(filterCount) {
-			// we don't know which texture slot we're dealing with previously and we need one out of the way
-			// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
-			gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-			renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
-
-			// draw item to render texture		I -> T
-			gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-			this.updateViewport(manager._drawWidth, manager._drawHeight);
-			gl.clear(gl.COLOR_BUFFER_BIT);
-			this._batchDraw(container, gl, true);
-
-			// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-			this.setTextureParams(gl);
-
-			var flipY = false;
-
-			// apply each filter in order, but remember to toggle used texture and render buffer
-			for(var i=0; i<filterCount; i++) {
-				var filter = filters[i];
-
-				// swap to correct shader
-				this._activeShader = this.getFilterShader(gl, filter);
-				if(!this._activeShader) { continue; }
-
-				// now the old result is stored in slot 0, make a new render texture
-				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-				renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
-				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-
-				// draw result to render texture	R -> T
-				gl.viewport(0,0, manager._drawWidth, manager._drawHeight);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._drawCover(gl, flipY);
-
-				// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
-				gl.activeTexture(gl.TEXTURE0);
-				gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-				this.setTextureParams(gl);
-
-				// use flipping to keep things upright, things already cancel out on a single filter
-				if(filterCount > 1) {
-					flipY = !flipY;
-				}
-			}
-
-			// is this for another stage or mine
-			if(this.isCacheControlled) {
-				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-				this.updateViewport(wBackup, hBackup);
-
-				// draw result to canvas			R -> C
-				this._activeShader = this.getFilterShader(gl, this);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._drawCover(gl, flipY);
-			} else {
-				//TODO: DHG: this is less than ideal a flipped inital render for this circumstance might help, adjust the perspective matrix?
-				if(flipY) {
-					gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-					renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
-					gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-
-					this._activeShader = this.getFilterShader(gl, this);
-					gl.viewport(0,0, manager._drawWidth, manager._drawHeight);
-					gl.clear(gl.COLOR_BUFFER_BIT);
-					this._drawCover(gl, !flipY);
-				}
-				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-				this.updateViewport(wBackup, hBackup);
-
-				// make sure the last texture is the active thing to draw
-				target.cacheCanvas = renderTexture;
-			}
+			this._drawFilters(gl, target, filters, manager);var gl = this._webGLContext;
 		} else {
 			// is this for another stage or mine?
 			if(this.isCacheControlled) {
@@ -1964,6 +1893,93 @@ this.createjs = this.createjs||{};
 		this.protectTextureSlot(lastTextureSlot, false);
 		this._activeShader = shaderBackup;
 		this._slotBlacklist = blackListBackup;
+	};
+
+	p._drawFilters = function(gl, target, filters, manager) {
+		var gl = this._webGLContext;
+		var renderTexture;
+		var shaderBackup = this._activeShader;
+		var blackListBackup = this._slotBlacklist;
+		var lastTextureSlot = this._maxTextureSlots-1;//this._batchTextureCount-1;
+		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
+
+		var container = this._cacheContainer;
+		var filterCount = filters && filters.length;
+
+		// we don't know which texture slot we're dealing with previously and we need one out of the way
+		// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
+		gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
+		renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
+
+		// draw item to render texture		I -> T
+		gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+		this.updateViewport(manager._drawWidth, manager._drawHeight);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		this._batchDraw(container, gl, true);
+
+		// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, renderTexture);
+		this.setTextureParams(gl);
+
+		var flipY = false;
+
+		// apply each filter in order, but remember to toggle used texture and render buffer
+		for(var i=0; i<filterCount; i++) {
+			var filter = filters[i];
+
+			// swap to correct shader
+			this._activeShader = this.getFilterShader(gl, filter);
+			if(!this._activeShader) { continue; }
+
+			// now the old result is stored in slot 0, make a new render texture
+			gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
+			renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+
+			// draw result to render texture	R -> T
+			gl.viewport(0,0, manager._drawWidth, manager._drawHeight);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+			this._drawCover(gl, flipY);
+
+			// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, renderTexture);
+			this.setTextureParams(gl);
+
+			// use flipping to keep things upright, things already cancel out on a single filter
+			if(filterCount > 1) {
+				flipY = !flipY;
+			}
+		}
+
+		// is this for another stage or mine
+		if(this.isCacheControlled) {
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+			this.updateViewport(wBackup, hBackup);
+
+			// draw result to canvas			R -> C
+			this._activeShader = this.getFilterShader(gl, this);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+			this._drawCover(gl, flipY);
+		} else {
+			//TODO: DHG: this is less than ideal a flipped inital render for this circumstance might help, adjust the perspective matrix?
+			if(flipY) {
+				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
+				renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
+				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+
+				this._activeShader = this.getFilterShader(gl, this);
+				gl.viewport(0,0, manager._drawWidth, manager._drawHeight);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+				this._drawCover(gl, !flipY);
+			}
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+			this.updateViewport(wBackup, hBackup);
+
+			// make sure the last texture is the active thing to draw
+			target.cacheCanvas = renderTexture;
+		}
 	};
 
 	/**
@@ -2295,13 +2311,13 @@ this.createjs = this.createjs||{};
 			if(!this._webGLCache) {
 				if(this._options === true) {
 					// a StageGL dedicated to this cache
-					this.cacheCanvas = document.createElement("canvas");
+					this.target.cacheCanvas = this.cacheCanvas = document.createElement("canvas");
 					this._webGLCache = new createjs.StageGL(this.cacheCanvas, undefined, undefined, true);
 					this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
 				} else {
 					// a StageGL re-used by this cache
 					try{
-						this.cacheCanvas = true;
+						this.cacheCanvas = true;	// we'll replace this with a render texture during the draw as it changes per draw
 						this._webGLCache = this._options;
 					} catch(e) {
 						throw "Invalid StageGL object used for cache param";
@@ -2309,8 +2325,14 @@ this.createjs = this.createjs||{};
 				}
 			}
 
-			// now size it
+			// now size render surfaces
 			var stageGL = this._webGLCache;
+			// if we have a dedicated stage we've gotta size it
+			if(stageGL.isCacheControlled) {
+				this.cacheCanvas.width = this._drawWidth;
+				this.cacheCanvas.height = this._drawHeight;
+				stageGL.updateViewport(this._drawWidth, this._drawHeight);
+			}
 			if(this.target.filters) {
 				// with filters we can't tell how many we'll need but the most we'll ever need is two, so make them now
 				stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
@@ -2319,8 +2341,6 @@ this.createjs = this.createjs||{};
 				// without filters then we only need one RenderTexture, and that's only if its not a dedicated stage
 				if(!stageGL.isCacheControlled) {
 					stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
-				} else {
-					stageGL.updateViewport(this._drawWidth, this._drawHeight);
 				}
 			}
 		};
