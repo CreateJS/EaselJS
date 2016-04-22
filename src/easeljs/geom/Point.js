@@ -118,26 +118,28 @@ this.createjs = this.createjs||{};
 	 * @method offset
 	 * @param {Number} The length coordinate of the polar pair.
 	 * @param {Number} The angle, in radians, of the polar pair.
-	 * @return {Point} This instance. Useful for chaining method calls.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
+	 * @return {Point} The new, interpolated point.
 	 * @chainable
 	*/
-	p.polar = function(len, angle) {
-		this.x = len * (Math.cos(angle));
-		this.y = len * (Math.sin(angle));
-		return this;
+	Point.polar = function(len, angle, pt) {
+		pt = pt||{};
+		pt.x = len * (Math.cos(angle));
+		pt.y = len * (Math.sin(angle));
+		return pt;
 	};
 
 	/** 
 	 * Determines a point between two specified points. The parameter `f` determines where the new interpolated point is located relative to the two end points specified by parameters `pt1` and `pt2`. The closer the value of the parameter `f` is to 1.0, the closer the interpolated point is to the first point (parameter `pt1`). The closer the value of the parameter `f` is to 0, the closer the interpolated point is to the second point (parameter `pt2`).
 	 * @method offset
-	 * @param {Point} The first point.
-	 * @param {Point} The second point.
+	 * @param {Point | Object} The first point as a Point or generic object.
+	 * @param {Point | Object} The second point as a Point or generic object.
 	 * @param {Number} The level of interpolation between the two points. Indicates where the new point will be, along the line between `pt1` and `pt2`. If `f=1`, `pt1` is returned; if `f=0`, `pt2` is returned.
 	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
 	 * @return {Point} The new, interpolated point.
 	 * @chainable
 	*/
-	p.interpolate = function(pt1, pt2, f, pt) {
+	Point.interpolate = function(pt1, pt2, f, pt) {
 		pt = pt||{};
 		pt.x = pt2.x + (f * (pt1.x - pt2.x));
 		pt.y = pt2.y + (f * (pt1.y - pt2.y));
