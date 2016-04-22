@@ -360,7 +360,7 @@ this.createjs = this.createjs||{};
 	 * documentation for details.
 	 **/
 	p.sortChildren = function(sortFunction) {
-		this.children.sort(sortFunction);
+		this.children.sort(sortFunction || this._sortDefault);
 	};
 
 	/**
