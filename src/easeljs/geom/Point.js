@@ -133,13 +133,15 @@ this.createjs = this.createjs||{};
 	 * @param {Point} The first point.
 	 * @param {Point} The second point.
 	 * @param {Number} The level of interpolation between the two points. Indicates where the new point will be, along the line between `pt1` and `pt2`. If `f=1`, `pt1` is returned; if `f=0`, `pt2` is returned.
-	 * @return {Point} This instance. Useful for chaining method calls.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
+	 * @return {Point} The new, interpolated point.
 	 * @chainable
 	*/
-	p.interpolate = function(pt1, pt2, f) {
-		this.x = pt2.x + (f * (pt1.x - pt2.x));
-		this.y = pt2.y + (f * (pt1.y - pt2.y));
-		return this;
+	p.interpolate = function(pt1, pt2, f, pt) {
+		pt = pt||{};
+		pt.x = pt2.x + (f * (pt1.x - pt2.x));
+		pt.y = pt2.y + (f * (pt1.y - pt2.y));
+		return pt;
 	};
 	
 	/**
