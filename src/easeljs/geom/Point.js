@@ -102,8 +102,8 @@ this.createjs = this.createjs||{};
 	/** 
 	 * Offsets the Point object by the specified amount. The value of dx is added to the original value of x to create the new x value. The value of dy is added to the original value of y to create the new y value.
 	 * @method offset
-	 * @param {Number} The amount by which to offset the horizontal coordinate, x.
-	 * @param {Number} The amount by which to offset the vertical coordinate, y.
+	 * @param {Number} dx The amount by which to offset the horizontal coordinate, x.
+	 * @param {Number} dy The amount by which to offset the vertical coordinate, y.
 	 * @return {Point} This instance. Useful for chaining method calls.
 	 * @chainable
 	*/
@@ -115,9 +115,9 @@ this.createjs = this.createjs||{};
 
 	/** 
 	 * Converts a pair of polar coordinates to a Cartesian point coordinate.
-	 * @method offset
-	 * @param {Number} The length coordinate of the polar pair.
-	 * @param {Number} The angle, in radians, of the polar pair.
+	 * @method polar
+	 * @param {Number} len The length coordinate of the polar pair.
+	 * @param {Number} angle The angle, in radians, of the polar pair.
 	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
 	 * @return {Point} The new, interpolated point.
 	 * @chainable
@@ -131,10 +131,10 @@ this.createjs = this.createjs||{};
 
 	/** 
 	 * Determines a point between two specified points. The parameter `f` determines where the new interpolated point is located relative to the two end points specified by parameters `pt1` and `pt2`. The closer the value of the parameter `f` is to 1.0, the closer the interpolated point is to the first point (parameter `pt1`). The closer the value of the parameter `f` is to 0, the closer the interpolated point is to the second point (parameter `pt2`).
-	 * @method offset
-	 * @param {Point | Object} The first point as a Point or generic object.
-	 * @param {Point | Object} The second point as a Point or generic object.
-	 * @param {Number} The level of interpolation between the two points. Indicates where the new point will be, along the line between `pt1` and `pt2`. If `f=1`, `pt1` is returned; if `f=0`, `pt2` is returned.
+	 * @method interpolate
+	 * @param {Point | Object} pt1 The first point as a Point or generic object.
+	 * @param {Point | Object} pt2 The second point as a Point or generic object.
+	 * @param {Number} f The level of interpolation between the two points. Indicates where the new point will be, along the line between `pt1` and `pt2`. If `f=1`, `pt1` is returned; if `f=0`, `pt2` is returned.
 	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
 	 * @return {Point} The new, interpolated point.
 	 * @chainable
