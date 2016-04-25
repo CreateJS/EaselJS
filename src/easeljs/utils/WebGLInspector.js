@@ -35,12 +35,23 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
+	/**
+	* @class WebGLInspector
+	* @constructor
+	* @param {StageGL} stage The default stage to use when none is supplied.
+	**/
 	function WebGLInspector(stage) {
 		this.EventDispatcher_constructor();
 
 	// public properties:
 
 	// private properties:
+		/**
+		 * The internal reference to the default stage this Inspector is for.
+		 * @property _stage
+		 * @protected
+		 * @type {StageGL}
+		 */
 		this._stage = stage;
 
 		// and begin
@@ -48,13 +59,22 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(WebGLInspector, createjs.EventDispatcher);
 
-// constants:
+// static:
+	/**
+	 * Alternate output for debugging situations where "console" is not available, i.e. Mobile or remote debugging.
+	 * Expects object with a "log" function that takes any number of params.
+	 * @property alternateOutput
+	 * @protected
+	 * @type {Console}
+	 * @default null
+	 * @static
+	 */
+	p.alternateOutput = undefined;
 
 // getter / setters:
 
 // ctor:
 	/**
-	 *
 	 * @method _initializeWebGL
 	 * @protected
 	 */
@@ -62,6 +82,11 @@ this.createjs = this.createjs||{};
 	};
 
 // public methods:
+	/**
+	 * Perform all of the logging reports at once.
+	 * @method log
+	 * @param {StageGL} [stage=this._stage] The stage to log about.
+	 */
 	p.log = function(stage) {
 		if(!stage){ stage = this._stage; }
 
@@ -71,6 +96,12 @@ this.createjs = this.createjs||{};
 		this.logTextureFill(stage);
 	};
 
+	/**
+	 * Replace the stage's Draw command with an empty draw command, useful for testing performance ignoring rendering.
+	 * @method log
+	 * @param {StageGL} [stage=this._stage] The stage to log about.
+	 * @param {Boolean} enabled Force enabled. If left undefined, it will toggle.
+	 */
 	p.toggleGPUDraw = function(stage, enabled) {
 		if(!stage){ stage = this._stage; }
 
@@ -87,12 +118,21 @@ this.createjs = this.createjs||{};
 			stage._drawBuffers_ = stage._drawBuffers;
 			stage._drawBuffers = function(gl) {
 				if(this.vocalDebug) {
-					console.log("BlankDraw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
+					var output = "BlankDraw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason;
+					this.alternateOutput?this.alternateOutput.log(output):console.log(output);
 				}
 			};
 		}
 	};
 
+	/**
+	 * Recursively walk the entire display tree and log the attached items and display it in a tree view.
+	 * @method logDepth
+	 * @param {Array} [children=this._stage.children] The children array to walk through.
+	 * @param {String} prepend What to prepend to this output from this point onwards.
+	 * @param {Function} customLog Which logging function to use, mainly for filtering or formatting output.
+	 * Fallback hierarchy is customLog -> alternateOutput -> console.log.
+	 */
 	p.logDepth = function(children, prepend, customLog) {
 		if(!children){ children = this._stage.children; }
 		if(!prepend){ prepend = ""; }
@@ -103,7 +143,7 @@ this.createjs = this.createjs||{};
 			if(customLog !== undefined){
 				customLog(prepend+"-", child);
 			} else {
-				console.log(prepend+"-", child);
+				this.alternateOutput?this.alternateOutput.log(prepend+"-", child):console.log(prepend+"-", child);
 			}
 			if(child.children && child.children.length) {
 				p.logDepth(child.children, "|"+prepend, customLog);
@@ -111,19 +151,30 @@ this.createjs = this.createjs||{};
 		}
 	};
 
+	/**
+	 * Examine the context and provide information about its capabilities.
+	 * @param {WebGLRenderingContext} gl The WebGL context to inspect.
+	 */
 	p.logContextInfo = function(gl) {
 		if(!gl) { gl = this._stage._webGLContext; }
 		var data = "== LOG:\n";
-		data += "Max textures: " + gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) +"\n";
-		data += "Max combined: " + gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS) +"\n";
-		data += "Max vertex: " + gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) +"\n";
+		data += "Max textures per draw: " + gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) +"\n";
+		data += "Max textures active: " + gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS) +"\n";
 		data += "\n";
-		data += "Max tex size: " + gl.getParameter(gl.MAX_TEXTURE_SIZE) +"\n";
-		data += "Vtx atr max: " + gl.getParameter(gl.MAX_VERTEX_ATTRIBS) +"\n";
-		console.log(data+"======");
+		data += "Max texture size: " + (gl.getParameter(gl.MAX_TEXTURE_SIZE)/2) +"^2 \n";
+		data += "Max cache size: " + (gl.getParameter(gl.MAX_RENDERBUFFER_SIZE)/2) +"^2 \n";
+		data += "\n";
+		data += "Max attributes per vertex: " + gl.getParameter(gl.MAX_VERTEX_ATTRIBS) +"\n";
+		data += "WebGL Version string: " + gl.getParameter(gl.VERSION) +"\n";
+		data += "======";
+		this.alternateOutput?this.alternateOutput.log(data):console.log(data);
 	};
 
-// protected methods:
+	/**
+	 * Simulate renders and watch what happens for textures moving around between draw calls.
+	 * A texture moving between slots means it was removed and then re-added to draw calls, performance may be better if it was allowed to stay in place.
+	 * @param {StageGL} [stage=this._stage] The stage to log about.
+	 */
 	p.logTextureFill = function(stage) {
 		if(!stage){ stage = this._stage; }
 
@@ -149,19 +200,33 @@ this.createjs = this.createjs||{};
 		for(var i = 0; i<l; i++) {
 			var out = output[i];
 			var active = out.element._drawID == stage._drawID;
-			console.log("["+out.src+"]", active?"ACTIVE":"stale", out.shifted?"steady":"DRIFT", out.element);
+			var output = "["+out.src+"] "+ (active?"ACTIVE":"stale") +" "+ (out.shifted?"steady":"DRIFT");
+			this.alternateOutput?this.alternateOutput.log(output, out.element):console.log(output, out.element);
 		}
 	};
 
-	p.dispProps = function(prepend, item){
+
+// protected methods:
+
+
+// static methods:
+	/**
+	 * Utility function for use with {{#crossLink "logDepth"))((/crossLink}}, logs an item's position and registration.
+	 * Useful to see if something is being forced off screen or has an integer position.
+	 * @param {String} prepend The string to show before the item, usually formatting for a tree view.
+	 * @param {DisplayObject} item The item we're currently logging about.
+	 */
+	WebGLInspector.dispProps = function(prepend, item){
 		if(!prepend){ prepend = ""; }
 
-		console.log(
-			prepend,
-			item.toString()+"\t",
-			"\tP:"+ item.x.toFixed(2)+"x"+item.y.toFixed(2) +"\t",
-			"\tR:"+ item.regX.toFixed(2)+"x"+item.regY.toFixed(2) +"\t"
-		);
+		var p = "\tP:"+ item.x.toFixed(2)+"x"+item.y.toFixed(2) +"\t";
+		var r = "\tR:"+ item.regX.toFixed(2)+"x"+item.regY.toFixed(2) +"\t";
+
+		if(!this.alternateOutput) {
+			console.log(prepend, item.toString()+"\t", p,r);
+		} else {
+			this.alternateOutput.log(prepend, item.toString()+"\t", p,r);
+		}
 	};
 
 	createjs.WebGLInspector = createjs.promote(WebGLInspector, "EventDispatcher");

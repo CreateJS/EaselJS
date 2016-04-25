@@ -40,7 +40,7 @@ this.createjs = this.createjs||{};
 	 * Terminology for developers:
 	 *
 	 * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
-	 * Vertex Property: a piece of information attached to the vertex like x,y,z
+	 * Vertex Property: a piece of information attached to the vertex like a vector3 containing x,y,z
 	 * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render modes do not use these)
 	 * Card: a group of 2 triangles used to display a rectangular image
 	 * U/V: common names for the [0-1] texture co-ordinates on an image
@@ -48,7 +48,7 @@ this.createjs = this.createjs||{};
 	 * Buffer: WebGL array data
 	 * Program/Shader: For every vertex we run the Vertex shader, this information is then passed to a paired Fragment shader. When combined and paired these are a shader "program"
 	 * Texture: WebGL representation of image data and associated extra information
-	 *
+	 * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
 	**/
 
 	/**
@@ -770,30 +770,19 @@ this.createjs = this.createjs||{};
 	 */
 
 // getter / setters:
-	/**
-	 * Indicates whether WebGL is being used for rendering. For example, this would be false if WebGL is not
-	 * supported in the browser.
-	 * @readonly
-	 * @property isWebGL
-	 * @type {Boolean}
-	 **/
 	p._get_isWebGL = function() {
 		return !!this._webGLContext;
 	};
 
-	/**
-	 * Indicates whether WebGL is being used for rendering. For example, this would be false if WebGL is not
-	 * supported in the browser.
-	 * @readonly
-	 * @property contextWebGL
-	 * @type {WebGLRenderingContext}
-	 **/
-	p._get_contextWebGL = function() {
-		return this._webGLContext;
-	};
-
 	try {
-		StageGL.defineProperties(p, {
+		Object.defineProperties(p, {
+			/**
+			 * Indicates whether WebGL is being used for rendering. For example, this would be false if WebGL is not
+			 * supported in the browser.
+			 * @readonly
+			 * @property isWebGL
+			 * @type {Boolean}
+			 **/
 			isWebGL: { get: p._get_isWebGL }
 		});
 	} catch (e) {} // TODO: use Log
@@ -822,6 +811,7 @@ this.createjs = this.createjs||{};
 				};
 
 				var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
+				if(!gl) { return null; }
 
 				this.updateSimultaneousTextureCount(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
 				this._maxTextureSlots = gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
@@ -846,7 +836,6 @@ this.createjs = this.createjs||{};
 // public methods:
 	/** docced in super class **/
 	p.update = function(props) {
-		//DHG TODO: test context swapping and re-acqusition
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
 		this.dispatchEvent("drawstart");
@@ -955,7 +944,9 @@ this.createjs = this.createjs||{};
 			if(target.__rtA === undefined) {
 				target.__rtA = this.getRenderBufferTexture(w, h);
 			} else {
-				this.resizeTexture(target.__rtA, w, h);
+				if(w != target.__rtA._width || h != target.__rtA._height) {
+					this.resizeTexture(target.__rtA, w, h);
+				}
 				this.setTextureParams(gl);
 			}
 			result = target.__rtA;
@@ -963,7 +954,9 @@ this.createjs = this.createjs||{};
 			if(target.__rtB === undefined) {
 				target.__rtB = this.getRenderBufferTexture(w, h);
 			} else {
-				this.resizeTexture(target.__rtB, w, h);
+				if(w != target.__rtB._width || h != target.__rtB._height) {
+					this.resizeTexture(target.__rtB, w, h);
+				}
 				this.setTextureParams(gl);
 			}
 			result = target.__rtB;
@@ -1146,6 +1139,7 @@ this.createjs = this.createjs||{};
 					filter.shaderParamSetup && filter.shaderParamSetup.bind(filter)
 				);
 				filter._builtShader = targetShader;
+				targetShader._name = filter.toString();
 			} catch (e) {
 				console && console.log("SHADER SWITCH FAILURE", e);
 			}
@@ -1196,8 +1190,9 @@ this.createjs = this.createjs||{};
 			gl.RGBA,					// format (match internal format)
 			gl.UNSIGNED_BYTE,			// type of texture(pixel color depth)
 			null						// image data, we can do null because we're doing array data
-			//new Uint8Array(width*height*4)
 		);
+		texture.width = width;
+		texture.height = height;
 	};
 
 	/**
@@ -1329,11 +1324,12 @@ this.createjs = this.createjs||{};
 		try {
 			gl = canvas.getContext("webgl", options) || canvas.getContext("experimental-webgl", options);
 		} catch (e) {
-			// don't do anything in catch null will handle it and we may get false positives given the || operation
+			// don't do anything in catch, null check will handle it
 		}
 
 		if (!gl) {
-			alert("Could not initialize WebGL");
+			var msg = "Could not initialize WebGL";
+			console.error?console.error(msg):console.log(msg);
 		} else {
 			gl.viewportWidth = canvas.width;
 			gl.viewportHeight = canvas.height;
@@ -1641,7 +1637,8 @@ this.createjs = this.createjs||{};
 			if(image.complete || image.naturalWidth || image._isCanvas) {		// is it already loaded
 				this._updateTextureImageData(gl, image);
 			} else  {
-				image.onload = this._updateTextureImageData.bind(this, gl, image);										//TODO: DHG: EventListener instead of callback
+				//image.onload = this._updateTextureImageData.bind(this, gl, image);										//TODO: DHG: EventListener instead of callback
+				image.addEventListener("load", this._updateTextureImageData.bind(this, gl, image));
 			}
 		} else {
 			// we really really should have a texture, try to recover the error by using a saved empty texture so we don't crash
@@ -1787,9 +1784,37 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
+	 * Store or restore current batch textures into a backup array
+	 * @param {Boolean} restore Perform a restore instead of a store.
+	 * @param {Array} [target=this._backupTextures] Where to perform the back, defaults to internal backup.
+	 * @method _backupBatchTextures
+	 */
+	p._backupBatchTextures = function(restore, target) {
+		var gl = this._webGLContext;
+
+		if(!this._backupTextures){ this._backupTextures = []; }
+		if(target === undefined) { target = this._backupTextures; }
+
+		for(var j=0; j<this._batchTextureCount;j++) {
+			gl.activeTexture(gl.TEXTURE0 + j);
+			if(restore) {
+				this._batchTextures[j] = target[j];
+			} else {
+				target[j] = this._batchTextures[j];
+				this._batchTextures[j] = this._baseTextures[j];
+			}
+			gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[j]);
+			this.setTextureParams(gl, this._batchTextures[j].isPOT);
+		}
+
+		if(restore && target === this._backupTextures){ this._backupTextures = []; }
+	};
+
+	/**
 	 * Begin the drawing process for a regular render.
 	 * @param {WebGLRenderingContext} gl
 	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"))((/crossLink}} object with all that needs to rendered, preferably a stage
+	 * @param {WebGLRenderingContext} ignoreCache
 	 * @method _batchDraw
 	 */
 	p._batchDraw = function(sceneGraph, gl, ignoreCache) {
@@ -1830,7 +1855,7 @@ this.createjs = this.createjs||{};
 		var renderTexture;
 		var shaderBackup = this._activeShader;
 		var blackListBackup = this._slotBlacklist;
-		var lastTextureSlot = this._maxTextureSlots-1;//this._batchTextureCount-1;
+		var lastTextureSlot = this._maxTextureSlots-1;
 		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
 
 		// protect the last slot so that we have somewhere to bind the renderTextures so it doesn't get upset
@@ -1846,19 +1871,13 @@ this.createjs = this.createjs||{};
 		container.children = [target];
 		container.transformMatrix = mtx;
 
-		if(!this._backupTextures){ this._backupTextures = []; }
-
-		for(var j=0; j<this._batchTextureCount;j++) {
-			gl.activeTexture(gl.TEXTURE0 + j);
-			this._backupTextures[j] = this._batchTextures[j];
-			this._batchTextures[j] = this._baseTextures[j];
-			gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[j]);
-			this.setTextureParams(gl, false);
-		}
+		this._backupBatchTextures(false);
 
 		var filterCount = filters && filters.length;
 		if(filterCount) {
-			this._drawFilters(gl, target, filters, manager);var gl = this._webGLContext;
+			//this._backupBatchTextures(false);
+			this._drawFilters(target, filters, manager);
+			//this._backupBatchTextures(true);
 		} else {
 			// is this for another stage or mine?
 			if(this.isCacheControlled) {
@@ -1866,6 +1885,7 @@ this.createjs = this.createjs||{};
 				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
 			} else {
+				//this._backupBatchTextures(false);
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
 				target.cacheCanvas = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
 				renderTexture = target.cacheCanvas;
@@ -1879,27 +1899,20 @@ this.createjs = this.createjs||{};
 
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 				this.updateViewport(wBackup, hBackup);
+				//this._backupBatchTextures(true);
 			}
 		}
 
-		for(var j=0; j<this._batchTextureCount;j++) {
-			gl.activeTexture(gl.TEXTURE0 + j);
-			this._batchTextures[j] = this._backupTextures[j];
-			gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[j]);
-			this.setTextureParams(gl, this._batchTextures[j].isPOT);
-		}
-
+		this._backupBatchTextures(true);
 
 		this.protectTextureSlot(lastTextureSlot, false);
 		this._activeShader = shaderBackup;
 		this._slotBlacklist = blackListBackup;
 	};
 
-	p._drawFilters = function(gl, target, filters, manager) {
+	p._drawFilters = function(target, filters, manager) {
 		var gl = this._webGLContext;
 		var renderTexture;
-		var shaderBackup = this._activeShader;
-		var blackListBackup = this._slotBlacklist;
 		var lastTextureSlot = this._maxTextureSlots-1;//this._batchTextureCount-1;
 		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
 
@@ -2057,7 +2070,7 @@ this.createjs = this.createjs||{};
 			if(item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
 				image = (ignoreCache?false:item.cacheCanvas) || item.image;
 			} else if(item._webGLRenderStyle === 1) {											// SPRITE
-				frame = item.spriteSheet.getFrame(item.currentFrame);
+				frame = item.spriteSheet.getFrame(item.currentFrame);	//TODO: Faster way?
 				image = frame.image;
 			} else {																			// MISC (DOM objects render themselves later)
 				continue;
@@ -2353,6 +2366,7 @@ this.createjs = this.createjs||{};
 
 			if(!webGL){
 				this._drawToCacheBASE(compositeOperation);
+				cacheCanvas._invalid = true;
 				return;
 			}
 
