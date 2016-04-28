@@ -133,7 +133,7 @@ this.createjs = this.createjs||{};
 		var img = this.image, rect = this.sourceRect;
 		if (rect) {
 			// some browsers choke on out of bound values, so we'll fix them:
-			var x1 = rect.x, y1 = rect.y, x2 = x1 + rect.width, y2 = y1 + rect.height, x = 0, y = 0, w = img.width, h = img.height;
+			var x1 = rect.x, y1 = rect.y, x2 = x1 + rect.width, y2 = y1 + rect.height, x = 0, y = 0, w = img.naturalWidth, h = img.naturalHeight;
 			if (x1 < 0) { x -= x1; x1 = 0; }
 			if (x2 > w) { x2 = w; }
 			if (y1 < 0) { y -= y1; y1 = 0; }
