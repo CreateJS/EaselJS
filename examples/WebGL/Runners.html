@@ -2,13 +2,220 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<base href="../"/>
 	<title>EaselJS Example: WebGL Basics</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../../_assets/js/examples.js"></script>
 
+	<script src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
+	<script src="../../lib/easeljs-NEXT.combined.js"></script>
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+
+	<!-- WebGL specific classes -->
+	<script src="../../src/easeljs/display/StageGL.js"></script>
+
+	<script id="editable">
+		var stage;
+		var runnerSS, textSS, sparkleSS;
+		var runnerContainer, sparkleContainer;
+		var sparklePool, maxRunners = 300, maxSparkles = 1000;
+
+		function init() {
+			if (location.search.match(/c2d/i)) {
+				// force it to use Context2D if c2d appears in the query string: ex. Runners.html?c2d
+				stage = new createjs.Stage("testCanvas");
+			} else {
+				stage = new createjs.StageGL("testCanvas");
+				stage.setClearColor("#66AA99");
+			}
+
+			// reduce visual complexity if WebGL is not supported:
+			if (!stage.isWebGL) {
+				maxRunners = maxRunners / 5 | 0;
+				maxSparkles = maxSparkles / 5 | 0;
+			}
+			sparklePool = []; // simple object pool
+
+			var queue = new createjs.LoadQueue();
+			queue.on("complete", handleLoad, this);
+			queue.loadManifest([
+				{id: "runner",	src: "../../_assets/art/spritesheet_grant.png"},
+				{id: "sparkle",	src: "../../_assets/art/spritesheet_sparkle.png"},
+				{id: "font",	src: "../../_assets/art/spritesheet_font.png"},
+				{id: "hill",	src: "../../_assets/art/hill1.png"}
+			], true);
+		}
+
+		function handleLoad(evt) {
+			setupSpriteSheets(evt.target);
+			setupUI(evt.target);
+			createjs.Ticker.timingMode = createjs.Ticker.RAF;
+			createjs.Ticker.on("tick", tick, this);
+		}
+
+		function tick(evt) {
+			// runners:
+			var l = runnerContainer.getNumChildren();
+			if (l < maxRunners && Math.random() < 0.3) {
+				addRunner();
+				l++;
+			}
+
+			for (var i = 0; i < l; i++) {
+				var runner = runnerContainer.getChildAt(i);
+				runner.x += runner.velX;
+				if (runner.x > 1000) {
+					resetRunner(runner);
+				}
+			}
+
+			l = sparkleContainer.getNumChildren();
+			for (var i = 0; i < l; i++) {
+				var sparkle = sparkleContainer.getChildAt(i);
+				sparkle.x += sparkle.velX;
+				sparkle.y += sparkle.velY;
+				sparkle.velX *= 0.99;
+				sparkle.velY = (sparkle.velY + 0.5) * 0.99;
+				if (sparkle.y > 400 || sparkle.x < 0 || sparkle.x > 960) {
+					sparkleContainer.removeChildAt(i);
+					sparklePool.push(sparkle);
+					i--;
+					l--;
+				}
+			}
+
+			stage.update(evt);
+		}
+
+		function addRunner() {
+			var runner = new createjs.Sprite(runnerSS, "run");
+			runner.on("mousedown", explodeRunner, this);
+			resetRunner(runner);
+		}
+
+		function explodeRunner(evt) {
+			var runner = evt.target;
+			addSparkles(runner.x, runner.y - 140 * runner.scaleY, runner.velX, -8);
+			resetRunner(runner);
+		}
+
+		function resetRunner(runner) {
+			runner.x = -100;
+			runner.y = Math.random() * 90 + 300 | 0;
+
+			runnerContainer.removeChild(runner);
+			var l = runnerContainer.getNumChildren();
+
+			// very simple depth sorting. Not exact, but good enough for this example.
+			for (var i = 0; i < l; i++) {
+				if (runner.y <= runnerContainer.getChildAt(i).y) {
+					runnerContainer.addChildAt(runner, i);
+					break;
+				}
+			}
+			if (i == l) {
+				runnerContainer.addChild(runner);
+			}
+
+			var size = Math.random() * Math.random() * Math.random();
+			runner.velX = 6 - size * 4;
+			runner.framerate = runner.velX * 8;
+			runner.scaleX = runner.scaleY = size + 0.45;
+		}
+
+		function addSparkles(x, y, velX, velY) {
+			for (var i = 0; i < maxSparkles; i++) {
+				var sparkle = sparklePool.length ? sparklePool.pop() : new createjs.Sprite(sparkleSS);
+				sparkle.gotoAndPlay(Math.random() * sparkleSS.getNumFrames());
+				var sc = Math.random() + 1;
+				sparkle.setTransform(x, y, sc, sc, Math.random() * 360);
+				var r = Math.random() * Math.PI * 2;
+				var v = Math.random() * 15;
+				sparkle.velX = velX + Math.cos(r) * v;
+				sparkle.velY = velY + Math.sin(r) * v;
+				sparkleContainer.addChild(sparkle);
+			}
+		}
+
+		function setupUI(queue) {
+			// background hill - just to demonstrate that bitmaps can be added to a StageGL:
+			var hill1 = new createjs.Bitmap(queue.getResult("hill"));
+			hill1.setTransform(345, 110, 3, 3);
+			var hill2 = hill1.clone();
+			hill2.x -= 600;
+
+			// SpriteContainers for runners and sparkles.
+			// Each SpriteContainer specifies a SpriteSheet that all its descendants must share:
+			runnerContainer = new createjs.Container(runnerSS);
+			sparkleContainer = new createjs.Container(sparkleSS);
+
+			// Bitmap Text header.
+			// Again, the children must all share the SpriteSheet specified by the container.
+			var topText = new createjs.BitmapText("CLICK TO DETONATE!", textSS);
+			topText.setTransform(10, 10);
+
+			stage.addChild(hill1, hill2, runnerContainer, topText, sparkleContainer);
+		}
+
+		function setupSpriteSheets(queue) {
+			runnerSS = new createjs.SpriteSheet({
+				framerate: 30,
+				"images": [queue.getResult("runner")],
+				"frames": {"regX": 82, "height": 292, "count": 64, "regY": 292, "width": 165},
+				"animations": {
+					"run": [0, 25, "run"],
+					"jump": [26, 63, "run"]
+				}
+			});
+
+			sparkleSS = new createjs.SpriteSheet({
+				framerate: 60,
+				images: [queue.getResult("sparkle")],
+				frames: {width: 21, height: 23, regX: 10, regY: 11}
+			});
+
+			textSS = new createjs.SpriteSheet({
+				images: [queue.getResult("font")],
+				frames: [
+					[155, 2, 25, 41, 0, -10, -3],
+					[72, 2, 28, 43, 0, -8, -1],
+					[599, 2, 28, 38, 0, -8, -4],
+					[41, 2, 27, 44, 0, -8, -1],
+					[728, 2, 32, 38, 0, -6, -4],
+					[184, 2, 35, 41, 0, -4, -2],
+					[409, 2, 30, 39, 0, -7, -3],
+					[443, 2, 29, 39, 0, -7, -3],
+					[901, 2, 13, 35, 0, -8, -5],
+					[698, 2, 26, 38, 0, -9, -4],
+					[666, 2, 28, 38, 0, -8, -4],
+					[764, 2, 23, 38, 0, -10, -4],
+					[828, 2, 37, 36, 0, -3, -5],
+					[567, 2, 28, 38, 0, -8, -4],
+					[519, 2, 44, 38, 0, 1, -4],
+					[869, 2, 28, 36, 0, -8, -5],
+					[476, 2, 39, 38, 0, -2, -4],
+					[371, 2, 34, 39, 0, -5, -3],
+					[631, 2, 31, 38, 0, -6, -4],
+					[289, 2, 39, 40, 0, -2, -3],
+					[918, 2, 31, 32, 0, -6, -7],
+					[791, 2, 33, 37, 0, -5, -4],
+					[2, 2, 35, 46, 0, -4, 1],
+					[253, 2, 32, 40, 0, -6, -3],
+					[104, 2, 32, 43, 0, -6, -1],
+					[332, 2, 35, 39, 0, -5, -4],
+					[953, 2, 9, 16, 0, -17, -29],
+					[140, 2, 11, 41, 0, -16, -1],
+					[223, 2, 26, 41, 0, -7, -1],
+					[966, 2, 9, 10, 0, -17, -31]
+				],
+				animations: {
+					"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6, "H": 7, "I": 8, "J": 9, "K": 10, "L": 11, "M": 12, "N": 13, "O": 14, "P": 15, "Q": 16, "R": 17, "S": 18, "T": 19, "U": 20, "V": 21, "W": 22, "X": 23, "Y": 24, "Z": 25, ",": 26, "!": 27, "?": 28, ".": 29
+				}
+			});
+		}
+	</script>
 </head>
 
 <body onload="init();">
@@ -17,224 +224,14 @@
 
 	<p>This sample demonstrates WebGL rendering where available, and reducing
 		effect complexity (in this case particle count)
-		when WebGL is not supported. Uses <code>StageGL</code> and <code>SpriteContainer</code>.
+		when WebGL is not supported. Uses <code>StageGL</code>.
 		Append "<code>?c2d</code>" to the url to disable WebGL & notice how the
 		particle count is reduced.</p>
 </header>
-<canvas id="testCanvas" width="960" height="400"
-		style="background: #66AA99"></canvas>
 
-<script src="../lib/easeljs-NEXT.combined.js"></script>
-<!-- We also provide hosted minified versions of all CreateJS libraries.
-  http://code.createjs.com -->
-
-<!-- WebGL specific classes -->
-<script src="../src/easeljs/display/SpriteContainer.js"></script>
-<script src="../src/easeljs/display/StageGL.js"></script>
-
-<script src="../_assets/libs/preloadjs-NEXT.min.js"></script>
-
-<script id="editable">
-	var stage;
-	var runnerSS, textSS, sparkleSS;
-	var runnerContainer, sparkleContainer;
-	var sparklePool, maxRunners = 300, maxSparkles = 1000;
-
-	function init() {
-		if (location.search.match(/c2d/i)) {
-			// force it to use Context2D if c2d appears in the query string: ex. Runners.html?c2d
-			stage = new createjs.Stage("testCanvas");
-		} else {
-			stage = new createjs.StageGL("testCanvas");
-		}
-
-		// reduce visual complexity if WebGL is not supported:
-		if (!stage.isWebGL) {
-			maxRunners = maxRunners / 5 | 0;
-			maxSparkles = maxSparkles / 5 | 0;
-		}
-		sparklePool = []; // simple object pool
-
-		var queue = new createjs.LoadQueue();
-		queue.on("complete", handleLoad, this);
-		queue.loadManifest([
-							   {id: "runner", src: "../_assets/art/spritesheet_grant.png"},
-							   {id: "sparkle", src: "../_assets/art/spritesheet_sparkle.png"},
-							   {id: "font", src: "../_assets/art/spritesheet_font.png"},
-							   {id: "hill", src: "../_assets/art/hill1.png"}
-						   ], true);
-	}
-
-	function handleLoad(evt) {
-		setupSpriteSheets(evt.target);
-		setupUI(evt.target);
-		createjs.Ticker.timingMode = createjs.Ticker.RAF;
-		createjs.Ticker.on("tick", tick, this);
-	}
-
-	function tick(evt) {
-		// runners:
-		var l = runnerContainer.getNumChildren();
-		if (l < maxRunners && Math.random() < 0.3) {
-			addRunner();
-			l++;
-		}
-
-		for (var i = 0; i < l; i++) {
-			var runner = runnerContainer.getChildAt(i);
-			runner.x += runner.velX;
-			if (runner.x > 1000) {
-				resetRunner(runner);
-			}
-		}
-
-		l = sparkleContainer.getNumChildren();
-		for (var i = 0; i < l; i++) {
-			var sparkle = sparkleContainer.getChildAt(i);
-			sparkle.x += sparkle.velX;
-			sparkle.y += sparkle.velY;
-			sparkle.velX *= 0.99;
-			sparkle.velY = (sparkle.velY + 0.5) * 0.99;
-			if (sparkle.y > 400 || sparkle.x < 0 || sparkle.x > 960) {
-				sparkleContainer.removeChildAt(i);
-				sparklePool.push(sparkle);
-				i--;
-				l--;
-			}
-		}
-
-		stage.update(evt);
-	}
-
-	function addRunner() {
-		var runner = new createjs.Sprite(runnerSS, "run");
-		runner.on("mousedown", explodeRunner, this);
-		resetRunner(runner);
-	}
-
-	function explodeRunner(evt) {
-		var runner = evt.target;
-		addSparkles(runner.x, runner.y - 140 * runner.scaleY, runner.velX, -8);
-		resetRunner(runner);
-	}
-
-	function resetRunner(runner) {
-		runner.x = -100;
-		runner.y = Math.random() * 90 + 300 | 0;
-
-		runnerContainer.removeChild(runner);
-		var l = runnerContainer.getNumChildren();
-
-		// very simple depth sorting. Not exact, but good enough for this example.
-		for (var i = 0; i < l; i++) {
-			if (runner.y <= runnerContainer.getChildAt(i).y) {
-				runnerContainer.addChildAt(runner, i);
-				break;
-			}
-		}
-		if (i == l) {
-			runnerContainer.addChild(runner);
-		}
-
-		var size = Math.random() * Math.random() * Math.random();
-		runner.velX = 6 - size * 4;
-		runner.framerate = runner.velX * 8;
-		runner.scaleX = runner.scaleY = size + 0.5;
-	}
-
-	function addSparkles(x, y, velX, velY) {
-		for (var i = 0; i < maxSparkles; i++) {
-			var sparkle = sparklePool.length ? sparklePool.pop() : new createjs.Sprite(sparkleSS);
-			sparkle.gotoAndPlay(Math.random() * sparkleSS.getNumFrames());
-			var sc = Math.random() + 1;
-			sparkle.setTransform(x, y, sc, sc, Math.random() * 360);
-			var r = Math.random() * Math.PI * 2;
-			var v = Math.random() * 15;
-			sparkle.velX = velX + Math.cos(r) * v;
-			sparkle.velY = velY + Math.sin(r) * v;
-			sparkleContainer.addChild(sparkle);
-		}
-	}
-
-	function setupUI(queue) {
-		// background hill - just to demonstrate that bitmaps can be added to a StageGL:
-		var hill1 = new createjs.Bitmap(queue.getResult("hill"));
-		hill1.setTransform(345, 110, 3, 3);
-		var hill2 = hill1.clone();
-		hill2.x -= 600;
-
-		// SpriteContainers for runners and sparkles.
-		// Each SpriteContainer specifies a SpriteSheet that all its descendants must share:
-		runnerContainer = new createjs.SpriteContainer(runnerSS);
-		sparkleContainer = new createjs.SpriteContainer(sparkleSS);
-
-		// Bitmap Text header.
-		// Again, the children must all share the SpriteSheet specified by the container.
-		var topText = new createjs.BitmapText("CLICK THE RUNNERS!", textSS);
-		topText.setTransform(10, 10);
-		var bottomText = new createjs.BitmapText("THEY WILL EXPLODE!!", textSS);
-		bottomText.setTransform(400, 350);
-
-		stage.addChild(hill1, hill2, runnerContainer, bottomText, topText, sparkleContainer);
-	}
-
-	function setupSpriteSheets(queue) {
-		runnerSS = new createjs.SpriteSheet({
-												framerate: 30,
-												"images": [queue.getResult("runner")],
-												"frames": {"regX": 82, "height": 292, "count": 64, "regY": 292, "width": 165},
-												"animations": {
-													"run": [0, 25, "run"],
-													"jump": [26, 63, "run"]
-												}
-											});
-
-		sparkleSS = new createjs.SpriteSheet({
-												 framerate: 60,
-												 images: [queue.getResult("sparkle")],
-												 frames: {width: 21, height: 23, regX: 10, regY: 11}
-											 });
-
-		textSS = new createjs.SpriteSheet({
-											  images: [queue.getResult("font")],
-											  frames: [
-												  [155, 2, 25, 41, 0, -10, -3],
-												  [72, 2, 28, 43, 0, -8, -1],
-												  [599, 2, 28, 38, 0, -8, -4],
-												  [41, 2, 27, 44, 0, -8, -1],
-												  [728, 2, 32, 38, 0, -6, -4],
-												  [184, 2, 35, 41, 0, -4, -2],
-												  [409, 2, 30, 39, 0, -7, -3],
-												  [443, 2, 29, 39, 0, -7, -3],
-												  [901, 2, 13, 35, 0, -8, -5],
-												  [698, 2, 26, 38, 0, -9, -4],
-												  [666, 2, 28, 38, 0, -8, -4],
-												  [764, 2, 23, 38, 0, -10, -4],
-												  [828, 2, 37, 36, 0, -3, -5],
-												  [567, 2, 28, 38, 0, -8, -4],
-												  [519, 2, 44, 38, 0, 1, -4],
-												  [869, 2, 28, 36, 0, -8, -5],
-												  [476, 2, 39, 38, 0, -2, -4],
-												  [371, 2, 34, 39, 0, -5, -3],
-												  [631, 2, 31, 38, 0, -6, -4],
-												  [289, 2, 39, 40, 0, -2, -3],
-												  [918, 2, 31, 32, 0, -6, -7],
-												  [791, 2, 33, 37, 0, -5, -4],
-												  [2, 2, 35, 46, 0, -4, 1],
-												  [253, 2, 32, 40, 0, -6, -3],
-												  [104, 2, 32, 43, 0, -6, -1],
-												  [332, 2, 35, 39, 0, -5, -4],
-												  [953, 2, 9, 16, 0, -17, -29],
-												  [140, 2, 11, 41, 0, -16, -1],
-												  [223, 2, 26, 41, 0, -7, -1],
-												  [966, 2, 9, 10, 0, -17, -31]
-											  ],
-											  animations: {
-												  "A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6, "H": 7, "I": 8, "J": 9, "K": 10, "L": 11, "M": 12, "N": 13, "O": 14, "P": 15, "Q": 16, "R": 17, "S": 18, "T": 19, "U": 20, "V": 21, "W": 22, "X": 23, "Y": 24, "Z": 25, ",": 26, "!": 27, "?": 28, ".": 29
-											  }
-										  });
-	}
-</script>
+<div>
+	<canvas id="testCanvas" width="960" height="400" style="background: #66AA99"></canvas>
+</div>
 
 </body>
 </html>

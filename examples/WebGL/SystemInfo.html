@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
+	<meta charset="utf-8">
 	<title>EaselJS: WebGL Context Info</title>
 
 	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="../../_assets/js/examples.js"></script>
 
 	<script src="../../lib/easeljs-NEXT.combined.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
@@ -57,14 +57,6 @@
 	</script>
 
 	<style>
-		code {
-			background: none;
-		}
-
-		canvas {
-			border: 1px solid #DDD;
-		}
-
 		#output {
 			padding-left: 60px;
 			position: absolute;
@@ -83,11 +75,11 @@
 <header class="EaselJS">
 	<h1>WebGL Context Info</h1>
 
-	<p>Output of common WebGL context variables using the WebGLInspector, useful for investigation or debugging. For in-depth and related statistics visit <a href="http://www.webglstats.com">WebGL Stats</a></p>
+	<p>Output of common <code>WebGL</code> context variables using the <code>WebGLInspector</code>, useful for investigation or debugging. For in-depth and related statistics visit <a href="http://www.webglstats.com">WebGL Stats</a></p>
 </header>
 
 <div class="content" id="wrap">
-	<canvas id="testCanvas" width="958" height="1" style="display: none;"></canvas>
+	<canvas id="testCanvas" width="960" height="1" style="display: none;"></canvas>
 	<div id="output">
 		<!-- this will get filled dynamically -->
 	</div>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EaselJS Example: Benchmark</title>
+
+	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script type="text/javascript" src="../../_assets/js/examples.js"></script>
+
+	<!-- support libs -->
+	<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
+	<script type="text/javascript" src="../../_assets/libs/datgui.min.js"></script>
+	<script type="text/javascript" src="../../_assets/libs/stats.min.js"></script>
+	<script type="text/javascript" src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
+
+	<!-- easeljs libs -->
+	<script type="text/javascript" src="../../lib/easeljs-NEXT.combined.js"></script>
+	<script type="text/javascript" src="../../src/easeljs/display/StageGL.js"></script>
+
+	<!-- pixi v4 libs -->
+	<script type="text/javascript" src="../../_assets/libs/pixi.js"></script>
+
+	<style>
+		#output {
+			position: relative;
+		}
+		#output canvas, #loading {
+			background-color: #000000;
+			color: #ffffff;
+			position: absolute;
+			width: 800px;
+			height: 400px;
+			top: 0;
+			left: 0;
+			text-align: center;
+		}
+		#controls {
+			background-color: #222222;
+			color: #ffffff;
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 160px;
+			height: 400px;
+		}
+
+		#controls div {
+			box-sizing: border-box;
+			background-color: #282828;
+			width: 160px;
+			height: 2rem;
+			padding-left: 1rem;
+			padding-top: 0.4rem;
+			border-top: 1px #303030 solid;
+			border-bottom: 1px #1F1F1F solid;
+		}
+
+		#controls div.disabled{
+			color: #606060;
+			border-top: 1px #1F1F1F solid;
+			border-bottom: 1px #303030 solid;
+		}
+
+		#controls div[data-type='info'] {
+			border-left: 5px #374252 solid;
+		}
+		#controls div[data-type='toggle'] {
+			border-left: 5px #f8f2a8 solid;
+		}
+		#controls div[data-type='action'] {
+			border-left: 5px #f4f7fa solid;
+		}
+	</style>
+
+<script id="editable">
+	var canvas, stage, stats, renderer, container;
+	var isReady = false;
+	var manifest = [];
+	var queue = null;
+	var lastType = 0;
+
+	var MIN_STEP = 5;
+	var CANVAS_WIDTH = 800;
+	var CANVAS_HEIGHT = 400;
+	var MaxPerTick = 100;
+
+	var isCJS = true;
+	var isParticle = false;
+	var isMultiTexture = true;
+
+	var cjsSprites = null;
+	var pixiSprites = null;
+	var pixiTextures = null;
+	var objectCount = MaxPerTick;
+	var objects = [];
+	var adding = 0;
+	var bounds = {};
+
+	var counter = null;
+	var rate = null;
+	var isCount = true;
+	var isFPS = true;
+
+	function ready(){
+		canvas = document.getElementById("loading");
+
+		stats = new Stats();
+		document.getElementById("output").appendChild(stats.domElement);
+		stats.domElement.style.position = "absolute";
+		stats.domElement.style.top = "0px";
+
+		manifest = [
+			{id: "robot0",	src: "../../_assets/art/robojs/robojs.png"},
+			{id: "robot1",	src: "../../_assets/art/robojs/robojs1.png"},
+			{id: "robot2",	src: "../../_assets/art/robojs/robojs2.png"},
+			{id: "robot3",	src: "../../_assets/art/robojs/robojs3.png"},
+			{id: "robot4",	src: "../../_assets/art/robojs/robojs4.png"},
+			{id: "robot5",	src: "../../_assets/art/robojs/robojs5.png"},
+			{id: "robot6",	src: "../../_assets/art/robojs/robojs6.png"},
+			{id: "robot7",	src: "../../_assets/art/robojs/robojs7.png"},
+			{id: "robot8",	src: "../../_assets/art/robojs/robojs8.png"},
+			{id: "robot9",	src: "../../_assets/art/robojs/robojs9.png"},
+			{id: "robot10",	src: "../../_assets/art/robojs/robojs10.png"}
+		];
+
+		queue = new createjs.LoadQueue();
+		queue.on("complete", handleLoad, this);
+		queue.loadManifest(manifest, true);
+	}
+
+	function handleLoad() {
+		var bmp, i,l, id,src;
+		isReady = true;
+
+		pixiSprites = {};
+		pixiTextures = {};
+		cjsSprites = new createjs.SpriteSheetBuilder();
+		for(i=0, l=manifest.length; i<l; i++) {
+			id = manifest[i].id;
+			src = manifest[i].src;
+			bmp = new createjs.Bitmap(queue._loadedResults[id]);
+			cjsSprites.addFrame(bmp);
+			cjsSprites.addAnimation(id, i);
+			pixiTextures[id] = new PIXI.Texture.fromImage(src);
+		}
+		bounds = bmp.getBounds();
+
+		cjsSprites.build();
+		var sheet = cjsSprites.spriteSheet;
+		pixiSprites.root = new PIXI.Texture.fromCanvas(sheet._images[0], PIXI.SCALE_MODES.NEAREST);
+		for(i=0, l=manifest.length; i<l; i++) {
+			id = manifest[i].id;
+			var rect = sheet.getFrame(i).rect;
+			pixiSprites[id] = new PIXI.Texture(
+				pixiSprites.root,
+				new PIXI.Rectangle(rect.x,rect.y, rect.width, rect.height)
+			);
+		}
+
+		init();
+
+		window.addEventListener("blur", handleRelease);
+		document.addEventListener("mouseup", handleRelease);
+		document.addEventListener("touchend", handleRelease);
+		requestAnimationFrame(tick);
+	}
+
+	function init() {
+		if(!isReady){ return; }
+
+		// cleanup
+		if(canvas) {
+			canvas.parentNode.removeChild(canvas);
+		}
+		if(stage && stage.releaseTexture) {
+			stage.releaseTexture(cjsSprites.spriteSheet._images[0]); // CJS cleanup for multi stage-use
+		}
+
+		// make new stages and canvases
+		if(isCJS) {
+			canvas = document.createElement("canvas");
+			canvas.width = CANVAS_WIDTH; canvas.height = CANVAS_HEIGHT;
+			stage = new createjs.StageGL(canvas, {transparent: false});
+			container = new createjs.Container();
+			stage.addChild(container);
+		} else {
+			renderer = PIXI.autoDetectRenderer(CANVAS_WIDTH, CANVAS_HEIGHT, {transparent:false});
+			canvas = renderer.view;
+			stage = new PIXI.Stage(0x000000);
+			if(isParticle) {
+				container = new PIXI.particles.ParticleContainer(200000, [false, true, false, false, false]);
+			} else {
+				container = new PIXI.Container();
+			}
+			stage.addChild(container);
+		}
+
+		// insert to DOM
+		counter = document.getElementById("counter");
+		var out = document.getElementById("output");
+		out.insertBefore(canvas, document.getElementById("controls"));
+	}
+
+	function addObject() {
+		var item;
+		var id = manifest[lastType].id;
+		if(isCJS){
+			if(isMultiTexture){
+				item = new createjs.Bitmap(manifest[lastType].src);
+			} else {
+				item = new createjs.Sprite(cjsSprites.spriteSheet, id);
+				item.stop();
+			}
+			item.x = CANVAS_WIDTH/2;
+			item.regX = bounds.width/2;
+			item.regY = bounds.height;
+			item.scaleX = item.scaleY = 0.5 + Math.random()*0.5;
+			item.rotation = (Math.random()-0.5) * 57.2958;
+		} else {
+			if(isMultiTexture){
+				item = new PIXI.Sprite(pixiTextures[id]);
+			} else {
+				item = new PIXI.Sprite(pixiSprites[id]);
+			}
+			item.position.x = CANVAS_WIDTH/2;
+			item.anchor.x = 0.5;
+			item.anchor.y = 1;
+			item.scale.set(0.5 + Math.random()*0.5);
+			item.rotation = Math.random()-0.5;
+		}
+		item.vX = (Math.random() * 20) - 10;
+		item.vY = (Math.random() * 10) - 5;
+
+		container.addChild(item);
+		objects.push(item);
+	}
+
+	function removeObject() {
+		container.removeChild(objects.shift());
+	}
+
+	function togglePlatform() {
+		objects = [];
+		isCJS = !isCJS;
+		document.getElementById("platform").textContent = isCJS?"Easel JS":"Pixi";
+		document.getElementById("particle").className = isCJS?"disabled":"";
+		init();
+	}
+
+	function toggleTexture() {
+		objects = [];
+		isMultiTexture = !isMultiTexture;
+		document.getElementById("texture").textContent = isMultiTexture?"Multiple Textures":"Texture Sheet";
+		init();
+	}
+
+	function toggleParticle() {
+		if(isCJS){ return; }
+
+		objects = [];
+		isParticle = !isParticle;
+		document.getElementById("particle").textContent = isParticle?"Particle Render":"Scene Graph";
+		init();
+	}
+
+	function reset() {
+		isCJS = true;
+		isParticle = false;
+		objects = [];
+		objectCount = MaxPerTick;
+		init();
+	}
+
+	function toggleCountDisplay(){
+		isCount = !isCount;
+	}
+
+	function startAdd(e) {
+		document.addEventListener("mouseup", handleRelease);
+		lastType = (lastType+1)%manifest.length;
+		adding = MIN_STEP;
+	}
+
+	function startRemove(e) {
+		document.addEventListener("mouseup", handleRelease);
+		adding = -MIN_STEP;
+	}
+
+	function handleRelease() {
+		adding = 0;
+	}
+
+	function tick() {
+		if(!stage){
+			requestAnimationFrame(tick);
+			return;
+		}
+
+		if(adding){
+			adding *= 1.1;
+			if(adding > MaxPerTick){ adding = MaxPerTick; }
+			if(adding < -MaxPerTick){ adding = -MaxPerTick; }
+			objectCount = (objectCount + adding)|0;
+			if(objectCount < 0){ objectCount = 0; }
+		}
+
+		var added = 0;
+		while(objects.length < objectCount && added < (5*MaxPerTick)){
+			added++;
+			addObject();
+		}
+
+		while(objects.length > objectCount){
+			removeObject();
+		}
+
+		var gravity = 0.5, size = bounds.width/2;
+		var maxX = CANVAS_WIDTH-(size), maxY = CANVAS_HEIGHT;
+		var minX = size, minY = 0;
+
+		stats.begin();
+
+		for(var i=0,l=objects.length; i<l; i++) {
+			var item = objects[i];
+			var xPos, yPos;
+			if(isCJS){
+				xPos = item.x += item.vX;
+				yPos = item.y += item.vY;
+			} else {
+				xPos = item.position.x += item.vX;
+				yPos = item.position.y += item.vY;
+			}
+
+			if(xPos > maxX || xPos < minX) {			// flip with tiny accel to stop border looping
+				item.vX *= -1.0001;
+			}
+			if(yPos > maxY) {							// bounce but sometimes reinvigorate
+				item.vY *= -0.85;
+				if(isCJS){
+					item.y = maxY;
+				} else {
+					item.position.y = maxY;
+				}
+				if(Math.random() < 0.45) {
+					item.vY -= (Math.random()*3)+3;
+				}
+			} else if(yPos < minY && item.vY < 0) {		// dampen out of bounds
+				item.vY *= 0.50;
+			}
+
+			item.vY += gravity;
+		}
+
+		if(isCJS){
+			stage.update();
+		} else {
+			renderer.render(stage);
+		}
+
+		stats.end();
+		counter.textContent = isCount?(objectCount+" Robots"):(objectCount*2+" Triangles");
+
+		requestAnimationFrame(tick);
+	}
+</script>
+</head>
+
+<body onload="ready();">
+
+<header class="EaselJS">
+	<h1>Hello World!</h1>
+
+	<p>
+		Bechmarking page for <code>StageGL</code>, also allows for comparison to <a href="http://www.pixijs.com/">pixijs v4</a>.
+		Give the Garbage Collector time to stabilize after switching properties.
+	</p>
+</header>
+
+<div id="output">
+	<div id="loading">
+		Loading...
+	</div>
+	<div id="controls">
+		<div data-type="info" id="counter" onclick="toggleCountDisplay();"></div>
+
+		<div data-type="action" style="margin-top: 1rem"
+			 onmousedown="startAdd();" ontouchstart="startAdd();">
+			More +
+		</div>
+		<div data-type="action"
+			 onmousedown="startRemove();" ontouchstart="startRemove();">
+			Less -
+		</div>
+
+		<div data-type="toggle" style="margin-top: 1rem"
+			id="platform" onclick="togglePlatform();">
+			EaselJS
+		</div>
+		<div data-type="toggle" class="disabled"
+			 id="particle" onclick="toggleParticle();">
+			Scene Graph
+		</div>
+		<div data-type="toggle"
+			 id="texture" onclick="toggleTexture();">
+			Multiple Textures
+		</div>
+
+		<div data-type="action" style="position: absolute; bottom: 0px"
+			 onclick="reset();">
+			Reset
+		</div>
+	</div>
+</div>
+</body>
+</html>
