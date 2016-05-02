@@ -1002,6 +1002,7 @@ this.createjs = this.createjs||{};
 			// this is a texture itself
 			if(item._storeID < 0) {
 				this._killTextureObject(item);
+				item._storeID = undefined;
 				return;
 			}
 
@@ -1020,7 +1021,7 @@ this.createjs = this.createjs||{};
 
 		// did we find anything
 		if(foundImage === undefined) {
-			if(vocalDebug) {
+			if(this.vocalDebug) {
 				console.log("No associated texture found on release");
 			}
 			return;
@@ -1028,6 +1029,7 @@ this.createjs = this.createjs||{};
 
 		// remove it
 		this._killTextureObject(this._textureDictionary[foundImage._storeID]);
+		foundImage._storeID = undefined;
 	};
 
 	/**
@@ -1044,7 +1046,7 @@ this.createjs = this.createjs||{};
 		for(var i= 0, l=this._textureDictionary.length; i<l; i++) {
 			var item = this._textureDictionary[i];
 			if(!item){ continue; }
-			if(item._drawID + count < this._drawID) {	// use draw not batch as draw is more indicative of time
+			if(item._drawID + count <= this._drawID) {	// use draw not batch as draw is more indicative of time
 				this._killTextureObject(item);
 			}
 		}
@@ -1764,6 +1766,10 @@ this.createjs = this.createjs||{};
 		// remove linkage
 		if(tex._storeID !== undefined && tex._storeID >= 0) {
 			this._textureDictionary[tex._storeID] = undefined;
+			for(var n in this._textureIDs) {
+				if(this._textureIDs[n] == tex._storeID) { delete this._textureIDs[n]; }
+			}
+			tex._storeID = undefined;
 		}
 
 		// make sure to drop it out of an active slot
@@ -2322,7 +2328,7 @@ this.createjs = this.createjs||{};
 
 			// create it if it's missing
 			if(!this._webGLCache) {
-				if(this._options === true) {
+				if(this._options === true || this.target.getStage() !== this._options) {
 					// a StageGL dedicated to this cache
 					this.target.cacheCanvas = this.cacheCanvas = document.createElement("canvas");
 					this._webGLCache = new createjs.StageGL(this.cacheCanvas, undefined, undefined, true);
