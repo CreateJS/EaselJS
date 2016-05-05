@@ -10,7 +10,7 @@
 
 	<!-- support libs -->
 	<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
-	<script type="text/javascript" src="../../_assets/libs/datgui.min.js"></script>
+	<script type="text/javascript" src="../../_assets/libs/dat.gui.min.js"></script>
 	<script type="text/javascript" src="../../_assets/libs/stats.min.js"></script>
 	<script type="text/javascript" src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
 
@@ -26,50 +26,26 @@
 			position: relative;
 		}
 		#output canvas, #loading {
+			position: absolute;
 			background-color: #000000;
 			color: #ffffff;
-			position: absolute;
-			width: 800px;
+			width: 960px;
 			height: 400px;
-			top: 0;
-			left: 0;
 			text-align: center;
 		}
-		#controls {
-			background-color: #222222;
-			color: #ffffff;
-			position: absolute;
-			top: 0;
-			right: 0;
-			width: 160px;
-			height: 400px;
-		}
 
-		#controls div {
-			box-sizing: border-box;
-			background-color: #282828;
-			width: 160px;
-			height: 2rem;
-			padding-left: 1rem;
-			padding-top: 0.4rem;
-			border-top: 1px #303030 solid;
-			border-bottom: 1px #1F1F1F solid;
+		.dg.main {
+			position: relative;
+			padding-bottom: 20px;
 		}
-
-		#controls div.disabled{
-			color: #606060;
-			border-top: 1px #1F1F1F solid;
-			border-bottom: 1px #303030 solid;
+		.cr.number.has-slider .property-name{
+			width: 25%;
 		}
-
-		#controls div[data-type='info'] {
-			border-left: 5px #374252 solid;
+		.cr.number.has-slider .c{
+			width: 75%;
 		}
-		#controls div[data-type='toggle'] {
-			border-left: 5px #f8f2a8 solid;
-		}
-		#controls div[data-type='action'] {
-			border-left: 5px #f4f7fa solid;
+		.number input, .string input{
+			text-align: right;
 		}
 	</style>
 
@@ -78,38 +54,75 @@
 	var isReady = false;
 	var manifest = [];
 	var queue = null;
-	var lastType = 0;
 
 	var MIN_STEP = 5;
-	var CANVAS_WIDTH = 800;
+	var CANVAS_WIDTH = 960;
 	var CANVAS_HEIGHT = 400;
 	var MaxPerTick = 100;
+	var MaxEver = 100000;
 
-	var isCJS = true;
-	var isParticle = false;
-	var isMultiTexture = true;
+	var guiProps = null;
+	var guiPropsRef = function(){
+		this.objects = MaxPerTick;
+		this.triangles = "";
+
+		this.library = "createJS";
+		this.texture = "individual";
+		this.particleRender = false;
+
+		this.more = handleRelease;	// add event listener for down
+		this.less = handleRelease;	// add event listener for down
+		this.reset = reset;
+	};
+	var adjustFolder, propsFolder;
+	var propParticle;
 
 	var cjsSprites = null;
 	var pixiSprites = null;
 	var pixiTextures = null;
-	var objectCount = MaxPerTick;
-	var objects = [];
+
+	var outDOM = undefined;
 	var adding = 0;
+	var objects = [];
 	var bounds = {};
 
-	var counter = null;
-	var rate = null;
-	var isCount = true;
-	var isFPS = true;
-
 	function ready(){
+		outDOM = document.getElementById("output");
 		canvas = document.getElementById("loading");
 
+		// stats reporter
 		stats = new Stats();
-		document.getElementById("output").appendChild(stats.domElement);
+		outDOM.appendChild(stats.domElement);
 		stats.domElement.style.position = "absolute";
 		stats.domElement.style.top = "0px";
 
+		// controls setup
+		guiProps = new guiPropsRef();
+		var gui = new dat.GUI({ autoPlace: true });
+		outDOM.appendChild(gui.domElement);
+
+		var temp;
+		gui.add(guiProps, "objects", 0, MaxEver).step(5).listen();
+		temp = gui.add(guiProps, "triangles").listen().domElement.children[0];
+		temp.disabled = true;
+
+		adjustFolder = gui.addFolder('Robots (Click and hold)');
+		adjustFolder.open();
+		temp = adjustFolder.add(guiProps, "more").domElement.parentNode.parentNode;
+		temp.addEventListener("mousedown", startAdd);
+		temp.addEventListener("touchstart", startAdd);
+		temp = adjustFolder.add(guiProps, "less").domElement.parentNode.parentNode;
+		temp.addEventListener("mousedown", startRemove);
+		temp.addEventListener("touchstart", startRemove);
+
+		propsFolder = gui.addFolder('Properties');
+		propsFolder.add(guiProps, "library", ["createJS", "pixi V4"]).onChange(togglePlatform);
+		propsFolder.add(guiProps, "texture", ["individual", "sprite-sheet"]).onChange(toggleEffect);
+		//propParticle = propsFolder.add(guiProps, "particleRender").onChange(toggleEffect);
+
+		gui.add(guiProps, "reset");
+
+		// image assets, load separately and build into a single sheet for toggling
 		manifest = [
 			{id: "robot0",	src: "../../_assets/art/robojs/robojs.png"},
 			{id: "robot1",	src: "../../_assets/art/robojs/robojs1.png"},
@@ -124,6 +137,7 @@
 			{id: "robot10",	src: "../../_assets/art/robojs/robojs10.png"}
 		];
 
+		// begin actual load
 		queue = new createjs.LoadQueue();
 		queue.on("complete", handleLoad, this);
 		queue.loadManifest(manifest, true);
@@ -133,6 +147,7 @@
 		var bmp, i,l, id,src;
 		isReady = true;
 
+		// create individua entries
 		pixiSprites = {};
 		pixiTextures = {};
 		cjsSprites = new createjs.SpriteSheetBuilder();
@@ -146,6 +161,7 @@
 		}
 		bounds = bmp.getBounds();
 
+		// build into shared sheet
 		cjsSprites.build();
 		var sheet = cjsSprites.spriteSheet;
 		pixiSprites.root = new PIXI.Texture.fromCanvas(sheet._images[0], PIXI.SCALE_MODES.NEAREST);
@@ -158,8 +174,10 @@
 			);
 		}
 
+		// start up display (designed to be able to restart easily)
 		init();
 
+		// begin ticks and UI response fall-backs
 		window.addEventListener("blur", handleRelease);
 		document.addEventListener("mouseup", handleRelease);
 		document.addEventListener("touchend", handleRelease);
@@ -178,7 +196,7 @@
 		}
 
 		// make new stages and canvases
-		if(isCJS) {
+		if(guiProps.library == "createJS") {
 			canvas = document.createElement("canvas");
 			canvas.width = CANVAS_WIDTH; canvas.height = CANVAS_HEIGHT;
 			stage = new createjs.StageGL(canvas, {transparent: false});
@@ -188,8 +206,8 @@
 			renderer = PIXI.autoDetectRenderer(CANVAS_WIDTH, CANVAS_HEIGHT, {transparent:false});
 			canvas = renderer.view;
 			stage = new PIXI.Stage(0x000000);
-			if(isParticle) {
-				container = new PIXI.particles.ParticleContainer(200000, [false, true, false, false, false]);
+			if(guiProps.particleRender) {
+				container = new PIXI.particles.ParticleContainer(MaxEver, [false, true, false, false, false]);
 			} else {
 				container = new PIXI.Container();
 			}
@@ -197,17 +215,18 @@
 		}
 
 		// insert to DOM
-		counter = document.getElementById("counter");
-		var out = document.getElementById("output");
-		out.insertBefore(canvas, document.getElementById("controls"));
+		outDOM.insertBefore(canvas, document.getElementById("stats"));
 	}
 
 	function addObject() {
 		var item;
-		var id = manifest[lastType].id;
-		if(isCJS){
-			if(isMultiTexture){
-				item = new createjs.Bitmap(manifest[lastType].src);
+		var target = ((objects.length/100) % manifest.length)|0;
+		var id = manifest[target].id;
+
+		// due to minor API differences switch and create the right entities that are roughly equivelant
+		if(guiProps.library == "createJS"){
+			if(guiProps.texture == "individual"){
+				item = new createjs.Bitmap(manifest[target].src);
 			} else {
 				item = new createjs.Sprite(cjsSprites.spriteSheet, id);
 				item.stop();
@@ -216,9 +235,9 @@
 			item.regX = bounds.width/2;
 			item.regY = bounds.height;
 			item.scaleX = item.scaleY = 0.5 + Math.random()*0.5;
-			item.rotation = (Math.random()-0.5) * 57.2958;
+			item.rotation = (Math.random()-0.5) * 57.2958;	// radians to degrees
 		} else {
-			if(isMultiTexture){
+			if(guiProps.texture == "individual"){
 				item = new PIXI.Sprite(pixiTextures[id]);
 			} else {
 				item = new PIXI.Sprite(pixiSprites[id]);
@@ -229,65 +248,51 @@
 			item.scale.set(0.5 + Math.random()*0.5);
 			item.rotation = Math.random()-0.5;
 		}
+
+		// shared behaviour
+		container.addChild(item);
+
+		// custom code for demo
 		item.vX = (Math.random() * 20) - 10;
 		item.vY = (Math.random() * 10) - 5;
-
-		container.addChild(item);
 		objects.push(item);
 	}
 
 	function removeObject() {
+		// shared behaviour
 		container.removeChild(objects.shift());
 	}
 
+	function toggleEffect() {
+		// by reseting the object array to [] we let the GC clean up the old entries and the system then "add" content till we meet the old count
+		objects = [];
+		init();
+	}
+
 	function togglePlatform() {
-		objects = [];
-		isCJS = !isCJS;
-		document.getElementById("platform").textContent = isCJS?"Easel JS":"Pixi";
-		document.getElementById("particle").className = isCJS?"disabled":"";
-		init();
-	}
-
-	function toggleTexture() {
-		objects = [];
-		isMultiTexture = !isMultiTexture;
-		document.getElementById("texture").textContent = isMultiTexture?"Multiple Textures":"Texture Sheet";
-		init();
-	}
-
-	function toggleParticle() {
-		if(isCJS){ return; }
-
-		objects = [];
-		isParticle = !isParticle;
-		document.getElementById("particle").textContent = isParticle?"Particle Render":"Scene Graph";
-		init();
+		if(guiProps.library == "createJS") {
+			propParticle && propsFolder.remove(propParticle);
+			propParticle = undefined;
+		} else {
+			propParticle = propsFolder.add(guiProps, "particleRender").onChange(toggleEffect);
+		}
+		toggleEffect();
 	}
 
 	function reset() {
-		isCJS = true;
-		isParticle = false;
-		objects = [];
-		objectCount = MaxPerTick;
-		init();
-	}
-
-	function toggleCountDisplay(){
-		isCount = !isCount;
-	}
-
-	function startAdd(e) {
-		document.addEventListener("mouseup", handleRelease);
-		lastType = (lastType+1)%manifest.length;
-		adding = MIN_STEP;
+		guiProps.library = "createJS";
+		guiProps.particleRender = false;
+		guiProps.objects = MaxPerTick;
+		toggleEffect();
 	}
 
 	function startRemove(e) {
-		document.addEventListener("mouseup", handleRelease);
 		adding = -MIN_STEP;
 	}
-
-	function handleRelease() {
+	function startAdd(e) {
+		adding = MIN_STEP;
+	}
+	function handleRelease(e) {
 		adding = 0;
 	}
 
@@ -301,17 +306,19 @@
 			adding *= 1.1;
 			if(adding > MaxPerTick){ adding = MaxPerTick; }
 			if(adding < -MaxPerTick){ adding = -MaxPerTick; }
-			objectCount = (objectCount + adding)|0;
-			if(objectCount < 0){ objectCount = 0; }
+			guiProps.objects = (guiProps.objects + adding)|0;
+			if(guiProps.objects < 0){ guiProps.objects = 0; }
+			if(guiProps.objects > MaxEver) { guiProps.objects = MaxEver; }
 		}
 
-		var added = 0;
-		while(objects.length < objectCount && added < (5*MaxPerTick)){
-			added++;
+		var modify = 0;
+		while(objects.length < guiProps.objects && modify < (2.5*MaxPerTick)){
+			modify++;
 			addObject();
 		}
 
-		while(objects.length > objectCount){
+		while(objects.length > guiProps.objects && modify < (7.5*MaxPerTick)){
+			modify++;
 			removeObject();
 		}
 
@@ -324,7 +331,7 @@
 		for(var i=0,l=objects.length; i<l; i++) {
 			var item = objects[i];
 			var xPos, yPos;
-			if(isCJS){
+			if(guiProps.library == "createJS"){
 				xPos = item.x += item.vX;
 				yPos = item.y += item.vY;
 			} else {
@@ -337,7 +344,7 @@
 			}
 			if(yPos > maxY) {							// bounce but sometimes reinvigorate
 				item.vY *= -0.85;
-				if(isCJS){
+				if(guiProps.library == "createJS"){
 					item.y = maxY;
 				} else {
 					item.position.y = maxY;
@@ -352,14 +359,20 @@
 			item.vY += gravity;
 		}
 
-		if(isCJS){
+		if(guiProps.library == "createJS"){
 			stage.update();
 		} else {
 			renderer.render(stage);
 		}
 
 		stats.end();
-		counter.textContent = isCount?(objectCount+" Robots"):(objectCount*2+" Triangles");
+
+		guiProps.triangles = objects.length*2;
+		if(modify) {
+			stats.domElement.style.visibility = "hidden";
+		} else {
+			stats.domElement.style.visibility = "visible";
+		}
 
 		requestAnimationFrame(tick);
 	}
@@ -380,36 +393,6 @@
 <div id="output">
 	<div id="loading">
 		Loading...
-	</div>
-	<div id="controls">
-		<div data-type="info" id="counter" onclick="toggleCountDisplay();"></div>
-
-		<div data-type="action" style="margin-top: 1rem"
-			 onmousedown="startAdd();" ontouchstart="startAdd();">
-			More +
-		</div>
-		<div data-type="action"
-			 onmousedown="startRemove();" ontouchstart="startRemove();">
-			Less -
-		</div>
-
-		<div data-type="toggle" style="margin-top: 1rem"
-			id="platform" onclick="togglePlatform();">
-			EaselJS
-		</div>
-		<div data-type="toggle" class="disabled"
-			 id="particle" onclick="toggleParticle();">
-			Scene Graph
-		</div>
-		<div data-type="toggle"
-			 id="texture" onclick="toggleTexture();">
-			Multiple Textures
-		</div>
-
-		<div data-type="action" style="position: absolute; bottom: 0px"
-			 onclick="reset();">
-			Reset
-		</div>
 	</div>
 </div>
 </body>
