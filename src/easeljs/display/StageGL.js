@@ -2038,9 +2038,6 @@ this.createjs = this.createjs||{};
 
 			if(!(item.visible && concatAlpha)) { continue; }
 			if(!item.cacheCanvas || ignoreCache) {
-				if(item.preGLRender) {
-					item.preGLRender(this);
-				}
 				if(item.children) {
 					this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
 					continue;
@@ -2406,35 +2403,6 @@ this.createjs = this.createjs||{};
 			}
 			this.uncacheBASE();
 		};
-
-		/**
-		 * Functionality injected to {{#crossLink "BitmapText"}}{{/crossLink}}. Ensure StageGL is loaded after all other
-		 * standard EaselJS classes are loaded but before making any BitmapText instances for injection to take full effect.
-		 * Part of a draw call to BitmapText is to re-create the text, without this process there is nothing or stale info to render.
-		 * As StageGL does not call distinct draw calls per object we need to simulate that functionality with the preGLRender function.
-		 * If you encounter a similar situation with a custom class simply add a preGLRender function to it and it will be detected and called.
-		 * It is recommended to not add one if you you would have an empty function simply for optimizations sake.
-		 *      (function() {
-		 *          "use strict";
-		 *          function NewClass() {
-		 *              this.DisplayObject_constructor(canvas);
-		 *          }
-		 *          var p = createjs.extend(NewClass, createjs.DisplayObject);
-		 *
-		 *          p.preGLRender = function(stage) {
-		 *              console.log("draw");
-		 *          }
-		 *
-		 *          scope.NewClass = createjs.promote(NewClass, "DisplayObject");
-		 *      }());
-		 * @pubic
-		 * @param {StageGL} stage The current stage instance that is drawing this object, may be useful.
-		 * @method DisplayObject.preGLRender
-		 **/
-		var bt = createjs.BitmapText.prototype;
-		bt.preGLRender = function(stage) {
-			this._updateText();
-		}
 	})();
 
 	createjs.StageGL = createjs.promote(StageGL, "Stage");

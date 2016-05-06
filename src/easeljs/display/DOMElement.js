@@ -231,7 +231,7 @@ this.createjs = this.createjs||{};
 	 */
 	p._tick = function(evtObj) {
 		var stage = this.getStage();
-		stage&&stage.on("drawend", this._handleDrawEnd, this, true);
+		stage && stage.on("drawend", this._handleDrawEnd, this, true);
 		this.DisplayObject__tick(evtObj);
 	};
 	

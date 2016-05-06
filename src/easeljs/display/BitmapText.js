@@ -164,7 +164,7 @@ this.createjs = this.createjs || {};
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return; }
-		this._updateText();
+		//this._updateText();
 		this.Container_draw(ctx, ignoreCache);
 	};
 	
@@ -257,7 +257,7 @@ this.createjs = this.createjs || {};
 		var index = this._getFrameIndex(character, spriteSheet);
 		return index == null ? index : spriteSheet.getFrame(index);
 	};
-	
+
 	/**
 	 * @method _getLineHeight
 	 * @param {SpriteSheet} ss
@@ -268,6 +268,7 @@ this.createjs = this.createjs || {};
 		var frame = this._getFrame("1",ss) || this._getFrame("T",ss) || this._getFrame("L",ss) || ss.getFrame(0);
 		return frame ? frame.rect.height : 1;
 	};
+
 	/**
 	 * @method _getSpaceWidth
 	 * @param {SpriteSheet} ss
@@ -278,7 +279,13 @@ this.createjs = this.createjs || {};
 		var frame = this._getFrame("1",ss) || this._getFrame("l",ss) || this._getFrame("e",ss) || this._getFrame("a",ss) || ss.getFrame(0);
 		return frame ? frame.rect.width : 1;
 	};
-	
+
+	p._tick = function(evtObj) {
+		var stage = this.getStage();
+		stage && stage.on("drawstart", this._updateText, this, true);
+		this.DisplayObject__tick(evtObj);
+	};
+
 	/**
 	 * @method _drawText
 	 * @protected
