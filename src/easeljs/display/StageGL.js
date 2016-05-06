@@ -898,7 +898,7 @@ this.createjs = this.createjs||{};
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 * @param {Array} filters The filters we're drawing into cache.
-	 * @param {CacheManager} manager The CacheManager instance looking after the cache
+	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
 	 * @return {Boolean} Was the draw handled by this function
 	 **/
 	p.cacheDraw = function(target, filters, manager) {
@@ -1853,7 +1853,7 @@ this.createjs = this.createjs||{};
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	 * into itself).
 	 * @param {Array} filters The filters we're drawing into cache.
-	 * @param {CacheManager} manager The CacheManager instance looking after the cache
+	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
 	 * @return {Boolean} Was the draw handled by this function
 	 **/
 	p._cacheDraw = function(gl, target, filters, manager) {
@@ -2273,9 +2273,9 @@ this.createjs = this.createjs||{};
 			_class.prototype._webGLRenderStyle = index + 1;
 		});
 
-		var cm = createjs.CacheManager.prototype;
+		var bc = createjs.BitmapCache.prototype;
 		/**
-		 * Functionality injected to {{#crossLink "CacheManager"}}{{/crossLink}}. Ensure StageGL is loaded after all other
+		 * Functionality injected to {{#crossLink "BitmapCache"}}{{/crossLink}}. Ensure StageGL is loaded after all other
 		 * standard EaselJS classes are loaded but before making any DisplayObject instances for injection to take full effect.
 		 * Replaces the context2D cache draw with the option for WebGL or context2D drawing.
 		 * If options is set to "true" a StageGL is created and contained on the object for use when rendering a cache.
@@ -2315,9 +2315,9 @@ this.createjs = this.createjs||{};
 		 * 	cached elements with greater fidelity. Default is 1.
 		 * @param {Boolean|StageGL} options Select whether to use context 2D, or WebGL rendering, and whether to make a new stage instance or use an existing one.
 		 **/
-		/** @this CacheManager */
-		cm._updateSurfaceBASE = cm._updateSurface;
-		cm._updateSurface = function() {
+		/** @this BitmapCache */
+		bc._updateSurfaceBASE = bc._updateSurface;
+		bc._updateSurface = function() {
 			if(!this._options) {
 				this._updateSurfaceBASE();
 				return;
@@ -2361,8 +2361,8 @@ this.createjs = this.createjs||{};
 			}
 		};
 
-		cm._drawToCacheBASE = cm._drawToCache;
-		cm._drawToCache = function(compositeOperation) {
+		bc._drawToCacheBASE = bc._drawToCache;
+		bc._drawToCache = function(compositeOperation) {
 			var cacheCanvas = this.cacheCanvas;
 			var target = this.target;
 			var webGL = this._webGLCache;
@@ -2385,8 +2385,8 @@ this.createjs = this.createjs||{};
 			cacheCanvas._invalid = true;
 		};
 
-		cm.uncacheBASE = cm.uncache;
-		cm.uncache = function() {
+		bc.uncacheBASE = bc.uncache;
+		bc.uncache = function() {
 			if(this._webGLCache) {
 				// if it isn't cache controlled clean up after yourself
 				if(!this._webGLCache.isCacheControlled) {

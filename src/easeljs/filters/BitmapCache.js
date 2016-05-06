@@ -39,10 +39,10 @@ this.createjs = this.createjs||{};
 
 // constructor:
 	/**
-	 * @class CacheManager
+	 * @class BitmapCache
 	 * @constructor
 	 **/
-	function CacheManager(context) {
+	function BitmapCache(context) {
 
 		// public:
 		/**
@@ -122,7 +122,7 @@ this.createjs = this.createjs||{};
 		 */
 		this._drawHeight = 0;
 	}
-	var p = CacheManager.prototype;
+	var p = BitmapCache.prototype;
 
 	/**
 	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
@@ -144,7 +144,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @protected
 	 **/
-	CacheManager._nextCacheID = 1;
+	BitmapCache._nextCacheID = 1;
 
 	/**
 	 * Returns the bounds that surround all applied filters.
@@ -153,7 +153,7 @@ this.createjs = this.createjs||{};
 	 * @param {Rectangle} [output=null] Optional parameter, if provided then calculated bounds will be applied to that object.
 	 * @return {Rectangle} a string representation of the instance.
 	 **/
-	CacheManager.getFilterBounds = function(target, output) {
+	BitmapCache.getFilterBounds = function(target, output) {
 		if(!output){ output = new createjs.Rectangle(); }
 		var filters = target.filters;
 		var filterCount = filters && filters.length;
@@ -181,14 +181,14 @@ this.createjs = this.createjs||{};
 	 * @return {String} a string representation of the instance.
 	 **/
 	p.toString = function() {
-		return "[CacheManager]";
+		return "[BitmapCache]";
 	};
 
 	/**
 	 * Actual implementation of {{#crossLink "DisplayObject.cache"}}{{/crossLink}}. Creates and sets properties needed
 	 * for a cache to function and performs the initial update. See {{#crossLink "_updateSurface"}}{{/crossLink}} for
 	 * specific implementation details of the caching object.
-	 * @method defineCache
+	 * @method define
 	 * @param {DisplayObject} target The DisplayObject this cache is linked to.
 	 * @param {Number} x The x coordinate origin for the cache region.
 	 * @param {Number} y The y coordinate origin for the cache region.
@@ -199,7 +199,7 @@ this.createjs = this.createjs||{};
 	 * 	cached elements with greater fidelity. Default is 1.
 	 * @param {Object} [options=undefined] When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be extra caching opportunities or needs.
 	 */
-	 p.defineCache = function(target, x, y, width, height, scale, options) {
+	 p.define = function(target, x, y, width, height, scale, options) {
 		 if(!target){ throw "No symbol to cache"; }
 		 this._options = options;
 		 this.target = target;
@@ -210,19 +210,19 @@ this.createjs = this.createjs||{};
 		 target._cacheOffsetY =	this.y =		y || 0;
 		 target._cacheScale =	this.scale =	scale || 1;
 
-		 this.updateCache();
+		 this.update();
 	};
 
 	/**
 	 * Actual implementation of {{#crossLink "DisplayObject.updateCache"}}{{/crossLink}}. Creates and sets properties needed
-	 * @method updateCache
-	 * @param {String} compositeOperation The DisplayObject this cache is linked to.
+	 * @method update
+	 * @param {String} [compositeOperation=null] The DisplayObject this cache is linked to.
 	 */
-	p.updateCache = function(compositeOperation) {
+	p.update = function(compositeOperation) {
 		var target = this.target;
-		if(!target) { throw "cache() must be called before updateCache()"; }
+		if(!target) { throw "define() must be called before update()"; }
 
-		var newBounds = CacheManager.getFilterBounds(target);
+		var newBounds = BitmapCache.getFilterBounds(target);
 		if(!this.lastBounds || newBounds.width != this.lastBounds.width || newBounds.height != this.lastBounds.height) {
 			this.lastBounds = newBounds;
 
@@ -234,21 +234,26 @@ this.createjs = this.createjs||{};
 			this.lastBounds = newBounds;
 		}
 
-		this.offX = this.x*this.scale + (target._filterOffsetX = newBounds.x);
-		this.offY = this.y*this.scale + (target._filterOffsetY = newBounds.y);
+		this.filterOffX = newBounds.x;
+		this.filterOffY = newBounds.y;
+		this.offX = this.x*this.scale + this.filterOffX;
+		this.offY = this.y*this.scale + this.filterOffY;
 
 		this._drawToCache(compositeOperation);
 
-		this.cacheID = createjs.CacheManager._nextCacheID++;
+		this.cacheID = createjs.BitmapCache._nextCacheID++;
 	};
 
 	/**
-	 * Release all the cache associated with this manager.
+	 * Reset and release all the properties and memory associated with this cache.
+	 * @method release
 	 */
-	p.uncache = function() {
-		this.target = this.target.cacheCanvas = this._cacheDataURL = this.cacheCanvas = null;
-		this.cacheID = this._cacheOffsetX = this._cacheOffsetY = this._filterOffsetX = this._filterOffsetY = 0;
-		this._cacheScale = 1;
+	p.release = function() {
+		this.target = this.target.cacheCanvas = this.cacheCanvas = null;
+		this.cacheID = this._cacheDataURLID = this._cacheDataURL = null;
+		this.width = this.height = 0;
+		this.x = this.y = this.offX = this.offY = 0;
+		this.scale = 1;
 	};
 
 	/**
@@ -264,6 +269,22 @@ this.createjs = this.createjs||{};
 			this._cacheDataURL = this.cacheCanvas.toDataURL();
 		}
 		return this._cacheDataURL;
+	};
+
+	/**
+	 * Use context2D drawing commands to display the cache canvas being used
+	 * @method draw
+	 * @param Context2D ctx The context to draw into
+	 * @return Boolean Whether the draw was handled successfully
+	 */
+	p.draw = function(ctx) {
+		ctx.drawImage(cacheCanvas,
+			this.x + this.filterOffX,
+			this.y + this.filterOffY,
+			this.cacheCanvas.width / this.scale,
+			this.cacheCanvas.height / this.scale
+		);
+		return true;
 	};
 
 // private methods:
@@ -334,5 +355,5 @@ this.createjs = this.createjs||{};
 		canvas.getContext("2d").putImageData(data, 0,0);
 	};
 
-	createjs.CacheManager = CacheManager;
+	createjs.BitmapCache = BitmapCache;
 }());

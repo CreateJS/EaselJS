@@ -160,6 +160,16 @@ this.createjs = this.createjs||{};
 		this.cacheCanvas = null;
 
 		/**
+		 * If a cache is active, this returns the canvas that holds the cached version of this display object. See {{#crossLink "cache"}}{{/crossLink}}
+		 * for more information.
+		 * @property cacheCanvas
+		 * @type {HTMLCanvasElement | Object}
+		 * @default null
+		 * @readonly
+		 **/
+		this.bitmapCache = null;
+
+		/**
 		 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
 		 * determine if the cache has changed since a previous check.
 		 * @property cacheID
@@ -717,11 +727,11 @@ this.createjs = this.createjs||{};
 	 * @return {Boolean}
 	 **/
 	p.draw = function(ctx, ignoreCache) {
-		var cacheCanvas = this.cacheCanvas;
-		if (ignoreCache || !cacheCanvas) { return false; }
-		var scale = this._cacheScale;
-		ctx.drawImage(cacheCanvas, this._cacheOffsetX+this._filterOffsetX, this._cacheOffsetY+this._filterOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
-		return true;
+		var cache = this.bitmapCache;
+		if(cache && !ignoreCache) {
+			return cache.draw(ctx);
+		}
+		return false;
 	};
 	
 	/**
@@ -779,7 +789,7 @@ this.createjs = this.createjs||{};
 	 * will add padding to the canvas dimensions.
 	 *
 	 * Actual implementation of the caching mechanism can change with a {{#crossLink "StageGL"}}{{/crossLink}} and so
-	 * all caching and filter behaviour has been moved to the {{#crossLink "CacheManager"}}{{/crossLink}}
+	 * all caching and filter behaviour has been moved to the {{#crossLink "BitmapCache"}}{{/crossLink}}
 	 *
 	 * @method cache
 	 * @param {Number} x The x coordinate origin for the cache region.
@@ -792,10 +802,10 @@ this.createjs = this.createjs||{};
 	 * @param {Object} options When using alternate displays there may be extra caching opportunities or needs.
 	 **/
 	p.cache = function(x, y, width, height, scale, options) {
-		if(!this.cacheController){
-			this.cacheController = new createjs.CacheManager();
+		if(!this.bitmapCache){
+			this.bitmapCache = new createjs.BitmapCache();
 		}
-		this.cacheController.defineCache(this, x, y, width, height, scale, options);
+		this.bitmapCache.define(this, x, y, width, height, scale, options);
 	};
 
 	/**
@@ -813,7 +823,7 @@ this.createjs = this.createjs||{};
 	 *      shapeInstance.updateCache();
 	 *
 	 * Actual implementation of the caching mechanism can change with a {{#crossLink "StageGL"}}{{/crossLink}} and so
-	 * all caching and filter behaviour has been moved to the {{#crossLink "CacheManager"}}{{/crossLink}}
+	 * all caching and filter behaviour has been moved to the {{#crossLink "BitmapCache"}}{{/crossLink}}
 	 *
 	 * @method updateCache
 	 * @param {String} compositeOperation The compositeOperation to use, or null to clear the cache and redraw it.
@@ -821,10 +831,10 @@ this.createjs = this.createjs||{};
 	 * whatwg spec on compositing</a>.
 	 **/
 	p.updateCache = function(compositeOperation) {
-		if(!this.cacheController) {
+		if(!this.bitmapCache) {
 			throw "cache() must be called before updateCache()";
 		}
-		this.cacheController.updateCache(compositeOperation);
+		this.bitmapCache.update(compositeOperation);
 	};
 
 	/**
@@ -832,20 +842,20 @@ this.createjs = this.createjs||{};
 	 * @method uncache
 	 **/
 	p.uncache = function() {
-		if(this.cacheController) {
-			this.cacheController.uncache();
-			this.cacheController = undefined;
+		if(this.bitmapCache) {
+			this.bitmapCache.release();
+			this.bitmapCache = undefined;
 		}
 	};
 
 	/**
 	 * Returns a data URL for the cache, or null if this display object is not cached.
-	 * Uses cacheID to ensure a new data URL is not generated if the cache has not changed.
+	 * Only generated if the cache has changed, otherwise returns last result.
 	 * @method getCacheDataURL
 	 * @return {String} The image data url for the cache.
 	 **/
 	p.getCacheDataURL = function() {
-		return this.cacheController?this.cacheController.getDataURL():null;
+		return this.bitmapCache?this.bitmapCache.getDataURL():null;
 	};
 
 	/**
