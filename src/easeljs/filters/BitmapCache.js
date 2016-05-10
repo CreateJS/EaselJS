@@ -86,12 +86,58 @@ this.createjs = this.createjs||{};
 		 * @property scale
 		 * @protected
 		 * @type {Number}
-		 * @default undefined
+		 * @default 1
 		 */
-		this.scale = undefined;
+		this.scale = 1;
+
+		/**
+		 * Relative offset of the x position, used for drawing into the cache with the correct offsets. every evert update call
+		 * @property offX
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this.offX = 0;
+
+		/**
+		 * Relative offset of the y position, used for drawing into the cache with the correct offsets. Reset every update call
+		 * @property offY
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this.offY = 0;
 
 		// protected:
 		/**
+		 * Relative offset of the x position, used for drawing the cache into other scenes. Reset every update call
+		 * @property _filterOffY
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._filterOffX = 0;
+
+		/**
+		 * Relative offset of the y position, used for drawing into the cache into other scenes. Reset every update call
+		 * @property _filterOffY
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._filterOffY = 0;
+
+		/**
+		 * Track how many times the cache has been updated, mostly used for preventing duplicate cacheURLs
+		 * @property _cacheID
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._cacheID = 0;
+
+		/**
+		 * What the _cacheID was when a DataURL was requested
 		 * @property _cacheDataURLID
 		 * @protected
 		 * @type {Number}
@@ -100,6 +146,7 @@ this.createjs = this.createjs||{};
 		this._cacheDataURLID = 0;
 
 		/**
+		 * The cache's DataURL generated on demand using the getter
 		 * @property _cacheDataURL
 		 * @protected
 		 * @type {String}
@@ -108,6 +155,7 @@ this.createjs = this.createjs||{};
 		this._cacheDataURL = null;
 
 		/**
+		 * Internal tracking of final bounding width, approximately width*scale; however, filters can complicate the actual value.
 		 * @property _drawWidth
 		 * @protected
 		 * @type {Number}
@@ -115,6 +163,7 @@ this.createjs = this.createjs||{};
 		 */
 		this._drawWidth = 0;
 		/**
+		 * Internal tracking of final bounding height, approximately height*scale; however, filters can complicate the actual value.
 		 * @property _drawHeight
 		 * @protected
 		 * @type {Number}
@@ -136,15 +185,6 @@ this.createjs = this.createjs||{};
 	 * @deprecated
 	 */
 	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
-	/**
-	 * @deprecated
-	 * @property _nextCacheID
-	 * @type {Number}
-	 * @static
-	 * @protected
-	 **/
-	BitmapCache._nextCacheID = 1;
 
 	/**
 	 * Returns the bounds that surround all applied filters.
@@ -200,15 +240,15 @@ this.createjs = this.createjs||{};
 	 * @param {Object} [options=undefined] When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be extra caching opportunities or needs.
 	 */
 	 p.define = function(target, x, y, width, height, scale, options) {
-		 if(!target){ throw "No symbol to cache"; }
-		 this._options = options;
-		 this.target = target;
+		if(!target){ throw "No symbol to cache"; }
+		this._options = options;
+		this.target = target;
 
-		 target._cacheWidth =	this.width =	width >= 1 ? width : 1;
-		 target._cacheHeight =	this.height =	height >= 1 ? height : 1;
-		 target._cacheOffsetX =	this.x =		x || 0;
-		 target._cacheOffsetY =	this.y =		y || 0;
-		 target._cacheScale =	this.scale =	scale || 1;
+		this.width =		width >= 1 ? width : 1;
+		this.height =		height >= 1 ? height : 1;
+		this.x =			x || 0;
+		this.y =			y || 0;
+		this.scale =		scale || 1;
 
 		 this.update();
 	};
@@ -219,29 +259,26 @@ this.createjs = this.createjs||{};
 	 * @param {String} [compositeOperation=null] The DisplayObject this cache is linked to.
 	 */
 	p.update = function(compositeOperation) {
-		var target = this.target;
-		if(!target) { throw "define() must be called before update()"; }
+		if(!this.target) { throw "define() must be called before update()"; }
 
-		var newBounds = BitmapCache.getFilterBounds(target);
-		if(!this.lastBounds || newBounds.width != this.lastBounds.width || newBounds.height != this.lastBounds.height) {
-			this.lastBounds = newBounds;
+		var filterBounds = BitmapCache.getFilterBounds(this.target);
+		var surface = this.target.cacheCanvas;
 
-			this._drawWidth = Math.ceil(this.width*this.scale) + newBounds.width;
-			this._drawHeight = Math.ceil(this.height*this.scale) + newBounds.height;
+		this._drawWidth = Math.ceil(this.width*this.scale) + filterBounds.width;
+		this._drawHeight = Math.ceil(this.height*this.scale) + filterBounds.height;
 
+		if(!surface || this._drawWidth != surface.width || this._drawHeight != surface.height) {
 			this._updateSurface();
-		} else {
-			this.lastBounds = newBounds;
 		}
 
-		this.filterOffX = newBounds.x;
-		this.filterOffY = newBounds.y;
-		this.offX = this.x*this.scale + this.filterOffX;
-		this.offY = this.y*this.scale + this.filterOffY;
+		this._filterOffX = filterBounds.x;
+		this._filterOffY = filterBounds.y;
+		this.offX = this.x*this.scale + this._filterOffX;
+		this.offY = this.y*this.scale + this._filterOffY;
 
 		this._drawToCache(compositeOperation);
 
-		this.cacheID = createjs.BitmapCache._nextCacheID++;
+		this._cacheID = this._cacheID?this._cacheID+1:1;
 	};
 
 	/**
@@ -249,24 +286,24 @@ this.createjs = this.createjs||{};
 	 * @method release
 	 */
 	p.release = function() {
-		this.target = this.target.cacheCanvas = this.cacheCanvas = null;
-		this.cacheID = this._cacheDataURLID = this._cacheDataURL = null;
-		this.width = this.height = 0;
-		this.x = this.y = this.offX = this.offY = 0;
+		this.target = this.target.cacheCanvas = null;
+		this._cacheID = this._cacheDataURLID = this._cacheDataURL = undefined;
+		this.width = this.height = this.x = this.y = this.offX = this.offY = 0;
 		this.scale = 1;
 	};
 
 	/**
 	 * Returns a data URL for the cache, or null if this display object is not cached.
-	 * Uses cacheID to ensure a new data URL is not generated if the cache has not changed.
+	 * Uses _cacheID to ensure a new data URL is not generated if the cache has not changed.
 	 * @method getCacheDataURL
 	 * @return {String} The image data url for the cache.
 	 **/
 	p.getCacheDataURL = function() {
-		if (!this.cacheCanvas) { return null; }
-		if (this.cacheID != this._cacheDataURLID) {
-			this._cacheDataURLID = this.cacheID;
-			this._cacheDataURL = this.cacheCanvas.toDataURL();
+		var cacheCanvas = this.target && this.target.cacheCanvas;
+		if (!cacheCanvas) { return null; }
+		if (this._cacheID != this._cacheDataURLID) {
+			this._cacheDataURLID = this._cacheID;
+			this._cacheDataURL = cacheCanvas.toDataURL && cacheCanvas.toDataURL();	// null protection if cacheCanvas isn't a canvas
 		}
 		return this._cacheDataURL;
 	};
@@ -274,15 +311,14 @@ this.createjs = this.createjs||{};
 	/**
 	 * Use context2D drawing commands to display the cache canvas being used
 	 * @method draw
-	 * @param Context2D ctx The context to draw into
+	 * @param CanvasRenderingContext2D ctx The context to draw into
 	 * @return Boolean Whether the draw was handled successfully
 	 */
 	p.draw = function(ctx) {
-		ctx.drawImage(cacheCanvas,
-			this.x + this.filterOffX,
-			this.y + this.filterOffY,
-			this.cacheCanvas.width / this.scale,
-			this.cacheCanvas.height / this.scale
+		if(!this.target) { return false; }
+		ctx.drawImage(this.target.cacheCanvas,
+			this.x + this._filterOffX,		this.y + this._filterOffY,
+			this.width,						this.height
 		);
 		return true;
 	};
@@ -294,14 +330,15 @@ this.createjs = this.createjs||{};
 	 * @method _updateSurface
 	 **/
 	p._updateSurface = function() {
+		var surface = this.target.cacheCanvas;
 		// create it if it's missing
-		if(!this.cacheCanvas) {
-			this.target.cacheCanvas = this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+		if(!surface) {
+			surface = this.target.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 		}
 
 		// now size it
-		this.cacheCanvas.width = this._drawWidth;
-		this.cacheCanvas.height = this._drawHeight;
+		surface.width = this._drawWidth;
+		surface.height = this._drawHeight;
 	};
 
 	/**
@@ -310,9 +347,9 @@ this.createjs = this.createjs||{};
 	 * @method _drawToCache
 	 */
 	p._drawToCache = function(compositeOperation) {
-		var cacheCanvas = this.cacheCanvas;
 		var target = this.target;
-		var ctx = cacheCanvas.getContext("2d");
+		var surface = target.cacheCanvas;
+		var ctx = surface.getContext("2d");
 
 		if (!compositeOperation) {
 			ctx.clearRect(0, 0, this._drawWidth+1, this._drawHeight+1);
@@ -335,15 +372,14 @@ this.createjs = this.createjs||{};
 	 * @method _applyFilters
 	 */
 	p._applyFilters = function() {
-		var target = this.target;
-		var canvas = this.cacheCanvas;
-		var filters = target.filters;
+		var surface = this.target.cacheCanvas;
+		var filters = this.target.filters;
 
-		var w = canvas.width;
-		var h = canvas.height;
+		var w = surface.width;
+		var h = surface.height;
 
 		// setup
-		var data = canvas.getContext("2d").getImageData(0,0, w,h);
+		var data = surface.getContext("2d").getImageData(0,0, w,h);
 
 		// apply
 		var l = filters.length;
@@ -352,7 +388,7 @@ this.createjs = this.createjs||{};
 		}
 
 		//done
-		canvas.getContext("2d").putImageData(data, 0,0);
+		surface.getContext("2d").putImageData(data, 0,0);
 	};
 
 	createjs.BitmapCache = BitmapCache;

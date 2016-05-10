@@ -2068,7 +2068,7 @@ this.createjs = this.createjs||{};
 				);
 			}
 
-			var uvRect, texIndex, image, frame, texture;
+			var uvRect, texIndex, image, frame, texture, src;
 
 			if(item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
 				image = (ignoreCache?false:item.cacheCanvas) || item.image;
@@ -2109,7 +2109,7 @@ this.createjs = this.createjs||{};
 				if(item.sourceRect) {
 					// calculate uvs
 					if(!item._uvRect) { item._uvRect = {}; }
-					var src = item.sourceRect;
+					src = item.sourceRect;
 					uvRect = item._uvRect;
 					uvRect.t = (src.x)/image.width;
 					uvRect.l = (src.y)/image.height;
@@ -2117,19 +2117,21 @@ this.createjs = this.createjs||{};
 					uvRect.r = (src.y + src.height)/image.height;
 
 					// calculate vertices
-					subL = 0;									subT = 0;
-					subR = src.width+subL;						subB = src.height+subT;
+					subL = 0;							subT = 0;
+					subR = src.width+subL;				subB = src.height+subT;
 				} else {
 					// calculate uvs
 					// calculate vertices
 					if(item.cacheCanvas) {
+						src = item.bitmapCache;
 						uvRect = StageGL.UV_RECT;
-						subL = item._cacheOffsetX;				subT = item._cacheOffsetY;
+						subL = src.x;					subT = src.y;
+						subR = src.width+subL;			subB = src.height+subT;
 					} else {
 						uvRect = StageGL.UV_RECT;
-						subL = 0;								subT = 0;
+						subL = 0;						subT = 0;
+						subR = image.width+subL;		subB = image.height+subT;
 					}
-					subR = image.width+subL;					subB = image.height+subT;
 				}
 			} else if(item._webGLRenderStyle === 1) {											// SPRITE
 				var rect = frame.rect;
@@ -2325,15 +2327,15 @@ this.createjs = this.createjs||{};
 
 			// create it if it's missing
 			if(!this._webGLCache) {
-				if(this._options === true || this.target.getStage() !== this._options) {
+				if(this._options === true || this.target.stage !== this._options) {
 					// a StageGL dedicated to this cache
-					this.target.cacheCanvas = this.cacheCanvas = document.createElement("canvas");
-					this._webGLCache = new createjs.StageGL(this.cacheCanvas, undefined, undefined, true);
+					this.target.cacheCanvas = document.createElement("canvas");
+					this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, undefined, undefined, true);
 					this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
 				} else {
 					// a StageGL re-used by this cache
 					try{
-						this.cacheCanvas = true;	// we'll replace this with a render texture during the draw as it changes per draw
+						this.target.cacheCanvas = true;	// we'll replace this with a render texture during the draw as it changes per draw
 						this._webGLCache = this._options;
 					} catch(e) {
 						throw "Invalid StageGL object used for cache param";
@@ -2343,10 +2345,12 @@ this.createjs = this.createjs||{};
 
 			// now size render surfaces
 			var stageGL = this._webGLCache;
+			var surface = this.target.cacheCanvas;
+
 			// if we have a dedicated stage we've gotta size it
 			if(stageGL.isCacheControlled) {
-				this.cacheCanvas.width = this._drawWidth;
-				this.cacheCanvas.height = this._drawHeight;
+				surface.width = this._drawWidth;
+				surface.height = this._drawHeight;
 				stageGL.updateViewport(this._drawWidth, this._drawHeight);
 			}
 			if(this.target.filters) {
@@ -2363,26 +2367,25 @@ this.createjs = this.createjs||{};
 
 		bc._drawToCacheBASE = bc._drawToCache;
 		bc._drawToCache = function(compositeOperation) {
-			var cacheCanvas = this.cacheCanvas;
+			var surface = this.target.cacheCanvas;
 			var target = this.target;
 			var webGL = this._webGLCache;
 
 			if(!webGL){
 				this._drawToCacheBASE(compositeOperation);
-				cacheCanvas._invalid = true;
+				surface._invalid = true;
 				return;
 			}
 
 			//TODO: auto split blur into an x/y pass
 			this._webGLCache.cacheDraw(target, target.filters, this);
 
-			// we may of swapped around which element the
-			cacheCanvas = target.cacheCanvas;
-			this.cacheCanvas = cacheCanvas;
+			// NOTE: we may of swapped around which element the surface is, so we re-fetch it
+			surface = this.target.cacheCanvas;
 
-			cacheCanvas.width = this.width;
-			cacheCanvas.height = this.height;
-			cacheCanvas._invalid = true;
+			surface.width = this._drawWidth;
+			surface.height = this._drawHeight;
+			surface._invalid = true;
 		};
 
 		bc.uncacheBASE = bc.uncache;
@@ -2393,13 +2396,13 @@ this.createjs = this.createjs||{};
 					if(this.__lastRT){ this.__lastRT = undefined; }
 					if(this.__rtA){ this._webGLCache._killTextureObject(this.__rtA); }
 					if(this.__rtB){ this._webGLCache._killTextureObject(this.__rtB); }
-					if(this.cacheCanvas){ this._webGLCache._killTextureObject(this.cacheCanvas); }
+					if(this.target && this.target.cacheCanvas){ this._webGLCache._killTextureObject(this.target.cacheCanvas); }
 				}
 				// set the context to none and let the garbage collector get the rest
 				this._webGLCache = false;
 			} else {
-				var stage = this.target.getStage();
-				if(stage instanceof StageGL){ stage.releaseTexture(this.cacheCanvas); }
+				var stage = this.target.stage;
+				if(stage instanceof StageGL){ stage.releaseTexture(this.target.cacheCanvas); }
 			}
 			this.uncacheBASE();
 		};

@@ -281,7 +281,7 @@ this.createjs = this.createjs || {};
 	};
 
 	p._tick = function(evtObj) {
-		var stage = this.getStage();
+		var stage = this.stage;
 		stage && stage.on("drawstart", this._updateText, this, true);
 		this.DisplayObject__tick(evtObj);
 	};

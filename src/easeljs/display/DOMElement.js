@@ -230,7 +230,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._tick = function(evtObj) {
-		var stage = this.getStage();
+		var stage = this.stage;
 		stage && stage.on("drawend", this._handleDrawEnd, this, true);
 		this.DisplayObject__tick(evtObj);
 	};

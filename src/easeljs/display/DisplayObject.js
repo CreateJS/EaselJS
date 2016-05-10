@@ -408,56 +408,56 @@ this.createjs = this.createjs||{};
 		 * @protected
 		 * @type {Number}
 		 * @default 0
+		 * @deprecated
 		 **/
-		this._cacheOffsetX = 0;
 
 		/**
 		 * @property _cacheOffsetY
 		 * @protected
 		 * @type {Number}
 		 * @default 0
+		 * @deprecated
 		 **/
-		this._cacheOffsetY = 0;
 
 		/**
 		 * @property _filterOffsetX
 		 * @protected
 		 * @type {Number}
 		 * @default 0
+		 * @deprecated
 		 **/
-		this._filterOffsetX = 0;
 
 		/**
 		 * @property _filterOffsetY
 		 * @protected
 		 * @type {Number}
 		 * @default 0
+		 * @deprecated
 		 **/
-		this._filterOffsetY = 0;
 
 		/**
 		 * @property _cacheScale
 		 * @protected
 		 * @type {Number}
 		 * @default 1
-		 **/
-		this._cacheScale = 1;
-
-		/**
-		* @deprecated
-		* @property _cacheDataURLID
-		* @protected
-		* @type {Number}
-		* @default 0
-		*/
-
-		/**
 		 * @deprecated
-		* @property _cacheDataURL
-		* @protected
-		* @type {String}
-		* @default null
-		*/
+		 **/
+
+		/**
+		 * @property _cacheDataURLID
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 * @deprecated
+		 */
+
+		/**
+		 * @property _cacheDataURL
+		 * @protected
+		 * @type {String}
+		 * @default null
+		 * @deprecated
+		 */
 
 		/**
 		 * @property _props
@@ -545,15 +545,6 @@ this.createjs = this.createjs||{};
 		DisplayObject._hitTestContext = canvas.getContext("2d");
 		canvas.width = canvas.height = 1;
 	}
-
-	/**
-	 * @deprecated
-	 * @property _nextCacheID
-	 * @type {Number}
-	 * @static
-	 * @protected
-	 **/
-
 
 // events:
 	/**
@@ -697,7 +688,27 @@ this.createjs = this.createjs||{};
 	 **/
 	try {
 		Object.defineProperties(p, {
-			stage: { get: p.getStage }
+			stage: { get: p.getStage },
+			_cacheOffsetX: {
+				get: function(){ return this.bitmapCache && this.bitmapCache.x },
+				set: function(a){ this.bitmapCache && (this.bitmapCache.x = a) }
+			},
+			_cacheOffsetY: {
+				get: function(){ return this.bitmapCache && this.bitmapCache.y },
+				set: function(a){ this.bitmapCache && (this.bitmapCache.y = a) }
+			},
+			_filterOffsetX: {
+				get: function(){ return this.bitmapCache && this.bitmapCache.offX },
+				set: function(a){ this.bitmapCache && (this.bitmapCache.offX = a) }
+			},
+			_filterOffsetY: {
+				get: function(){ return this.bitmapCache && this.bitmapCache.offY },
+				set: function(a){ this.bitmapCache && (this.bitmapCache.offY = a) }
+			},
+			_cacheScale: {
+				get: function(){ return this.bitmapCache && this.bitmapCache.scale },
+				set: function(a){ this.bitmapCache && (this.bitmapCache.scale = a) }
+			}
 		});
 	} catch (e) {}
 
