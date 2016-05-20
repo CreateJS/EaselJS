@@ -36,10 +36,12 @@ this.createjs = this.createjs||{};
 	"use strict";
 
 	/**
-	* @class WebGLInspector
-	* @constructor
-	* @param {StageGL} stage The default stage to use when none is supplied.
-	**/
+	 * Utility and helper class designed to work with StageGL to help investigate, and test performance or display problems.
+	 * It contains logging functions to analyze behaviour and performance testing utilities.
+	 * @class WebGLInspector
+	 * @constructor
+	 * @param {StageGL} stage The default stage to use when none is supplied.
+	 */
 	function WebGLInspector(stage) {
 		this.EventDispatcher_constructor();
 
@@ -98,7 +100,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Replace the stage's Draw command with an empty draw command, useful for testing performance ignoring rendering.
-	 * @method log
+	 * @method toggleGPUDraw
 	 * @param {StageGL} [stage=this._stage] The stage to log about.
 	 * @param {Boolean} enabled Force enabled. If left undefined, it will toggle.
 	 */
@@ -153,6 +155,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Examine the context and provide information about its capabilities.
+	 * @method logContextInfo
 	 * @param {WebGLRenderingContext} gl The WebGL context to inspect.
 	 */
 	p.logContextInfo = function(gl) {
@@ -173,6 +176,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Simulate renders and watch what happens for textures moving around between draw calls.
 	 * A texture moving between slots means it was removed and then re-added to draw calls, performance may be better if it was allowed to stay in place.
+	 * @method logTextureFill
 	 * @param {StageGL} [stage=this._stage] The stage to log about.
 	 */
 	p.logTextureFill = function(stage) {
@@ -213,6 +217,8 @@ this.createjs = this.createjs||{};
 	/**
 	 * Utility function for use with {{#crossLink "logDepth"))((/crossLink}}, logs an item's position and registration.
 	 * Useful to see if something is being forced off screen or has an integer position.
+	 * @method dispProps
+	 * @static
 	 * @param {String} prepend The string to show before the item, usually formatting for a tree view.
 	 * @param {DisplayObject} item The item we're currently logging about.
 	 */

@@ -69,6 +69,7 @@
 		this.library = "createJS";
 		this.texture = "individual";
 		this.particleRender = false;
+		this.allowWebGL = true;
 
 		this.more = handleRelease;	// add event listener for down
 		this.less = handleRelease;	// add event listener for down
@@ -118,6 +119,7 @@
 		propsFolder = gui.addFolder('Properties');
 		propsFolder.add(guiProps, "library", ["createJS", "pixi V4"]).onChange(togglePlatform);
 		propsFolder.add(guiProps, "texture", ["individual", "sprite-sheet"]).onChange(toggleEffect);
+		propsFolder.add(guiProps, "allowWebGL").onChange(toggleEffect);
 		//propParticle = propsFolder.add(guiProps, "particleRender").onChange(toggleEffect);
 
 		gui.add(guiProps, "reset");
@@ -199,11 +201,19 @@
 		if(guiProps.library == "createJS") {
 			canvas = document.createElement("canvas");
 			canvas.width = CANVAS_WIDTH; canvas.height = CANVAS_HEIGHT;
-			stage = new createjs.StageGL(canvas, {transparent: false});
+			if(guiProps.allowWebGL) {
+				stage = new createjs.StageGL(canvas, {transparent: false, autoPurge: -1});
+			} else {
+				stage = new createjs.Stage(canvas);
+			}
 			container = new createjs.Container();
 			stage.addChild(container);
 		} else {
-			renderer = PIXI.autoDetectRenderer(CANVAS_WIDTH, CANVAS_HEIGHT, {transparent:false});
+			if(guiProps.allowWebGL) {
+				renderer = PIXI.autoDetectRenderer(CANVAS_WIDTH, CANVAS_HEIGHT, {transparent:false});
+			} else {
+				renderer = new PIXI.CanvasRenderer(CANVAS_WIDTH, CANVAS_HEIGHT);
+			}
 			canvas = renderer.view;
 			stage = new PIXI.Stage(0x000000);
 			if(guiProps.particleRender) {

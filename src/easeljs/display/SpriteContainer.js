@@ -34,9 +34,9 @@ this.createjs = this.createjs||{};
 
 
 	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `Container`.
-	 * See {{#crossLink "Container"}}{{/crossLink}}
-	 * for details.
+	 * <strong>REMOVED</strong>. Removed in favor of using `Container` and {{#crossLink "StageGL"}}{{/crossLink}}.
+	 * See {{#crossLink "Container"}}{{/crossLink}} for details.
+	 * Do not include or download and use in your projects.
 	 *
 	 * @class SpriteContainer
 	 * @extends Container
@@ -45,7 +45,7 @@ this.createjs = this.createjs||{};
 	function SpriteContainer() {
 		this.Container_constructor();
 		if(console) {
-			var msg = "Deprecated, use a regular createjs.Container";
+			var msg = "Deprecated, use a regular createjs.Container and StageGL";
 			if(console.warn) {
 				console.warn(msg);
 			} else {

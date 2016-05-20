@@ -39,119 +39,140 @@ this.createjs = this.createjs||{};
 
 // constructor:
 	/**
+	 * The BitmapCache is an internal representation of all the cache properties and logic required in order to "cache" an object.
+	 * This information and functionality used to be located on a DisplayObject.{{#crossLink "DisplayObject/cache:method"}}{{/crossLink}} but was moved here.
+	 * Caching in this context is purely visual and will render the DisplayObject out into an image to be used instead of the object.
+	 * The actual cache itself is still stored on the target with the {{#crossLink "DisplayObject/cacheCavnas:property"}}{{/crossLink}}
+	 *
+	 * Working with a singular image like a {{#crossLink "Bitmap"}}{{/crossLink}} there is little benefit to performing a cache as it is already a single image.
+	 * Caching is best done on containers containing multiple complex parts that do not move often so that rendering the image will improve overall rendering speed.
+	 * A cached object will not visually update until explicitly told to do so with a call to update, much like a Stage.
+	 * If a cache is being updated every frame it is likely not improving rendering performance, cache are best used when updates will be sparse.
+	 *
+	 * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need.
+	 * The BitmapCache is also responsible for applying filters to objects and reads each {{#crossLink "Filter"}}{{/crossLink}}.
+	 * Real-time Filters are not recommended performance wise when dealing with a Context2D canvas.
+	 * For best performance and to still allow for some visual effects use a compositeOperation.
 	 * @class BitmapCache
 	 * @constructor
 	 **/
-	function BitmapCache(context) {
+	function BitmapCache() {
 
 		// public:
 		/**
-		 * Coordinates and dimensions relative to target
+		 * Width of the cache relative to target object.
 		 * @property width
 		 * @protected
 		 * @type {Number}
 		 * @default undefined
-		 */
+		 **/
 		this.width = undefined;
 
 		/**
-		 * Coordinates and dimensions relative to target
+		 * Height of the cache relative to target object.
 		 * @property height
 		 * @protected
 		 * @type {Number}
 		 * @default undefined
-		 */
+		 **/
 		this.height = undefined;
 
 		/**
-		 * Coordinates and dimensions relative to target
+		 * X position of the cache relative to target's origin.
 		 * @property x
 		 * @protected
 		 * @type {Number}
 		 * @default undefined
-		 */
+		 **/
 		this.x = undefined;
 
 		/**
-		 * Coordinates and dimensions relative to target
+		 * Y position of the cache relative to target's origin.
 		 * @property y
 		 * @protected
 		 * @type {Number}
 		 * @default undefined
-		 */
+		 **/
 		this.y = undefined;
 
 		/**
-		 * Coordinates and dimensions relative to target
+		 * The internal scale of the cache image, does not affects display size.
+		 * Useful to both increase and decrease render quality.
+		 * Objects with increased scales are more likely to look good when scaled up.
+		 * Objects with decreased scales can save on rendering performance.
 		 * @property scale
 		 * @protected
 		 * @type {Number}
 		 * @default 1
-		 */
+		 **/
 		this.scale = 1;
 
 		/**
-		 * Relative offset of the x position, used for drawing into the cache with the correct offsets. every evert update call
+		 * Relative offset of the x position, used for drawing into the cache with the correct offsets.
+		 * Re-calculated every update call before drawing.
 		 * @property offX
 		 * @protected
 		 * @type {Number}
 		 * @default 0
-		 */
+		 **/
 		this.offX = 0;
 
 		/**
-		 * Relative offset of the y position, used for drawing into the cache with the correct offsets. Reset every update call
+		 * Relative offset of the y position, used for drawing into the cache with the correct offsets.
+		 * Re-calculated every update call before drawing.
 		 * @property offY
 		 * @protected
 		 * @type {Number}
 		 * @default 0
-		 */
+		 **/
 		this.offY = 0;
+
+		/**
+		 * Track how many times the cache has been updated, mostly used for preventing duplicate cacheURLs.
+		 * Can be usefull to see if a cache has been updated.
+		 * @property cacheID
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.cacheID = 0;
 
 		// protected:
 		/**
-		 * Relative offset of the x position, used for drawing the cache into other scenes. Reset every update call
+		 * Relative offset of the x position, used for drawing the cache into other scenes.
+		 * Re-calculated every update call before drawing.
 		 * @property _filterOffY
 		 * @protected
 		 * @type {Number}
 		 * @default 0
-		 */
+		 **/
 		this._filterOffX = 0;
 
 		/**
-		 * Relative offset of the y position, used for drawing into the cache into other scenes. Reset every update call
+		 * Relative offset of the y position, used for drawing into the cache into other scenes.
+		 * Re-calculated every update call before drawing.
 		 * @property _filterOffY
 		 * @protected
 		 * @type {Number}
 		 * @default 0
-		 */
+		 **/
 		this._filterOffY = 0;
 
 		/**
-		 * Track how many times the cache has been updated, mostly used for preventing duplicate cacheURLs
-		 * @property _cacheID
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 */
-		this._cacheID = 0;
-
-		/**
-		 * What the _cacheID was when a DataURL was requested
+		 * What the cacheID was when a DataURL was requested.
 		 * @property _cacheDataURLID
 		 * @protected
 		 * @type {Number}
 		 * @default 0
-		 */
+		 **/
 		this._cacheDataURLID = 0;
 
 		/**
-		 * The cache's DataURL generated on demand using the getter
+		 * The cache's DataURL generated on demand using the getter.
 		 * @property _cacheDataURL
 		 * @protected
 		 * @type {String}
 		 * @default null
-		 */
+		 **/
 		this._cacheDataURL = null;
 
 		/**
@@ -160,7 +181,7 @@ this.createjs = this.createjs||{};
 		 * @protected
 		 * @type {Number}
 		 * @default 0
-		 */
+		 **/
 		this._drawWidth = 0;
 		/**
 		 * Internal tracking of final bounding height, approximately height*scale; however, filters can complicate the actual value.
@@ -168,7 +189,7 @@ this.createjs = this.createjs||{};
 		 * @protected
 		 * @type {Number}
 		 * @default 0
-		 */
+		 **/
 		this._drawHeight = 0;
 	}
 	var p = BitmapCache.prototype;
@@ -183,13 +204,13 @@ this.createjs = this.createjs||{};
 	 * @method initialize
 	 * @protected
 	 * @deprecated
-	 */
+	 **/
 	// p.initialize = function() {}; // searchable for devs wondering where it is.
 
 	/**
-	 * Returns the bounds that surround all applied filters.
+	 * Returns the bounds that surround all applied filters, relies on each filter to describe how it changes bounds.
 	 * @method getFilterBounds
-	 * @param {DisplayObject} target aaa.
+	 * @param {DisplayObject} target The object to check the filter bounds for.
 	 * @param {Rectangle} [output=null] Optional parameter, if provided then calculated bounds will be applied to that object.
 	 * @return {Rectangle} a string representation of the instance.
 	 **/
@@ -225,9 +246,8 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Actual implementation of {{#crossLink "DisplayObject.cache"}}{{/crossLink}}. Creates and sets properties needed
-	 * for a cache to function and performs the initial update. See {{#crossLink "_updateSurface"}}{{/crossLink}} for
-	 * specific implementation details of the caching object.
+	 * Directly called via {{#crossLink "DisplayObject/cache:method"}}{{/crossLink}}. Creates and sets properties needed
+	 * for a cache to function and performs the initial update.
 	 * @method define
 	 * @param {DisplayObject} target The DisplayObject this cache is linked to.
 	 * @param {Number} x The x coordinate origin for the cache region.
@@ -238,7 +258,7 @@ this.createjs = this.createjs||{};
 	 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
 	 * 	cached elements with greater fidelity. Default is 1.
 	 * @param {Object} [options=undefined] When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be extra caching opportunities or needs.
-	 */
+	 **/
 	 p.define = function(target, x, y, width, height, scale, options) {
 		if(!target){ throw "No symbol to cache"; }
 		this._options = options;
@@ -250,14 +270,17 @@ this.createjs = this.createjs||{};
 		this.y =			y || 0;
 		this.scale =		scale || 1;
 
-		 this.update();
+		this.update();
 	};
 
 	/**
-	 * Actual implementation of {{#crossLink "DisplayObject.updateCache"}}{{/crossLink}}. Creates and sets properties needed
+	 * Directly called via {{#crossLink "DisplayObject/updateCache:method"}}{{/crossLink}} but also internally.
+	 * This has the dual responsibility of making sure the surface is ready to be drawn to and performing the draw.
+	 * For full details of each behaviour check the protected functions {{#crossLink "BitmapCache/_updateSurface:method"}}{{/crossLink}}
+	 * and {{#crossLink "BitmapCache/_drawToCache:method"}}{{/crossLink}} respectivley.
 	 * @method update
 	 * @param {String} [compositeOperation=null] The DisplayObject this cache is linked to.
-	 */
+	 **/
 	p.update = function(compositeOperation) {
 		if(!this.target) { throw "define() must be called before update()"; }
 
@@ -278,32 +301,32 @@ this.createjs = this.createjs||{};
 
 		this._drawToCache(compositeOperation);
 
-		this._cacheID = this._cacheID?this._cacheID+1:1;
+		this.cacheID = this.cacheID?this.cacheID+1:1;
 	};
 
 	/**
 	 * Reset and release all the properties and memory associated with this cache.
 	 * @method release
-	 */
+	 **/
 	p.release = function() {
 		this.target = this.target.cacheCanvas = null;
-		this._cacheID = this._cacheDataURLID = this._cacheDataURL = undefined;
+		this.cacheID = this._cacheDataURLID = this._cacheDataURL = undefined;
 		this.width = this.height = this.x = this.y = this.offX = this.offY = 0;
 		this.scale = 1;
 	};
 
 	/**
 	 * Returns a data URL for the cache, or null if this display object is not cached.
-	 * Uses _cacheID to ensure a new data URL is not generated if the cache has not changed.
+	 * Uses {{#crossLink "BitmapCache/cacheID:property"}}{{/crossLink}} to ensure a new data URL is not generated if the cache has not changed.
 	 * @method getCacheDataURL
 	 * @return {String} The image data url for the cache.
 	 **/
 	p.getCacheDataURL = function() {
 		var cacheCanvas = this.target && this.target.cacheCanvas;
 		if (!cacheCanvas) { return null; }
-		if (this._cacheID != this._cacheDataURLID) {
-			this._cacheDataURLID = this._cacheID;
-			this._cacheDataURL = cacheCanvas.toDataURL && cacheCanvas.toDataURL();	// null protection if cacheCanvas isn't a canvas
+		if (this.cacheID != this._cacheDataURLID) {
+			this._cacheDataURLID = this.cacheID;
+			this._cacheDataURL = cacheCanvas.toDataURL?cacheCanvas.toDataURL():null;	// incase function is
 		}
 		return this._cacheDataURL;
 	};
@@ -312,8 +335,8 @@ this.createjs = this.createjs||{};
 	 * Use context2D drawing commands to display the cache canvas being used
 	 * @method draw
 	 * @param CanvasRenderingContext2D ctx The context to draw into
-	 * @return Boolean Whether the draw was handled successfully
-	 */
+	 * @return {Boolean} Whether the draw was handled successfully
+	 **/
 	p.draw = function(ctx) {
 		if(!this.target) { return false; }
 		ctx.drawImage(this.target.cacheCanvas,
@@ -325,7 +348,8 @@ this.createjs = this.createjs||{};
 
 // private methods:
 	/**
-	 * Basic context2D caching works by creating a new canvas element at setting its physical size
+	 * Basic context2D caching works by creating a new canvas element at setting its physical size.
+	 * This function will create and or size the canvas as needed.
 	 * @protected
 	 * @method _updateSurface
 	 **/
@@ -345,7 +369,7 @@ this.createjs = this.createjs||{};
 	 * Now all the setup properties have been performed, do the actual cache draw out for context 2D.
 	 * @protected
 	 * @method _drawToCache
-	 */
+	 **/
 	p._drawToCache = function(compositeOperation) {
 		var target = this.target;
 		var surface = target.cacheCanvas;
@@ -370,7 +394,7 @@ this.createjs = this.createjs||{};
 	 * Work through every filter and apply its individual transformation to it.
 	 * @protected
 	 * @method _applyFilters
-	 */
+	 **/
 	p._applyFilters = function() {
 		var surface = this.target.cacheCanvas;
 		var filters = this.target.filters;
