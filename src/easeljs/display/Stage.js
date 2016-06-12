@@ -438,7 +438,7 @@ this.createjs = this.createjs||{};
 	 * event is received. This allows you to register a Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}}
 	 * directly, using:
 	 *
-	 *      Ticker.addEventListener("tick", myStage");
+	 *      Ticker.addEventListener("tick", myStage);
 	 *
 	 * Note that if you subscribe to ticks using this pattern, then the tick event object will be passed through to
 	 * display object tick handlers, instead of <code>delta</code> and <code>paused</code> parameters.
