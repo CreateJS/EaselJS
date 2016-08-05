@@ -221,7 +221,11 @@ this.createjs = this.createjs||{};
 	 * @return {Event} a clone of the Event instance.
 	 **/
 	p.clone = function() {
-		return new Event(this.type, this.bubbles, this.cancelable);
+		var e = new Event(this.type, this.bubbles, this.cancelable);
+		for (var n in this){
+			if(this.hasOwnProperty(n)){ e[n] = this[n] }
+		}
+		return e;
 	};
 	
 	/**
