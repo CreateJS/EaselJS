@@ -1774,6 +1774,7 @@ this.createjs = this.createjs||{};
 	 * @method _updateTextureImageData
 	 * @param {WebGLRenderingContext} gl
 	 * @param {Image | Canvas} image The image data to be uploaded
+	 * @protected
 	 */
 	p._updateTextureImageData = function(gl, image) {
 		// the bitwise & is intentional, cheap exponent 2 check
@@ -1870,6 +1871,7 @@ this.createjs = this.createjs||{};
 	 * removed and cleaned the texture. Mostly for internal use, recommended to call {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead.
 	 * @method _killTextureObject
 	 * @param {Texture} tex The texture to be cleaned out
+	 * @protected
 	 */
 	p._killTextureObject = function(tex) {
 		if(!tex){ return; }
@@ -1919,6 +1921,7 @@ this.createjs = this.createjs||{};
 	 * @method _backupBatchTextures
 	 * @param {Boolean} restore Perform a restore instead of a store.
 	 * @param {Array} [target=this._backupTextures] Where to perform the backup, defaults to internal backup.
+	 * @protected
 	 */
 	p._backupBatchTextures = function(restore, target) {
 		var gl = this._webGLContext;
@@ -1943,10 +1946,11 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Begin the drawing process for a regular render.
+	 * @method _batchDraw
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"}}{{/crossLink}} object with all that needs to rendered, preferably a stage
 	 * @param {WebGLRenderingContext} ignoreCache
-	 * @method _batchDraw
+	 * @protected
 	 * @todo Review the ignoreCache parameter. Is it a context or a boolean?
 	 */
 	p._batchDraw = function(sceneGraph, gl, ignoreCache) {
@@ -1975,6 +1979,7 @@ this.createjs = this.createjs||{};
 	 * @param {Array} filters The filters we're drawing into cache.
 	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
 	 * @return {Boolean} If the draw was handled by this function
+	 * @protected
 	 **/
 	p._cacheDraw = function(gl, target, filters, manager) {
 		/*
@@ -2140,12 +2145,13 @@ this.createjs = this.createjs||{};
 	/**
 	 * Add all the contents of a container to the pending buffers, called recursively on each container. This may
 	 * trigger a draw if a buffer runs out of space.
+	 * @method _appendToBatchGroup
 	 * @param {Container} container The {{#crossLink "Container"}}{{/crossLink}} that contains everything to be drawn.
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param {Matrix2D} concatMtx The effective (concatenated) transformation matrix when beginning this container
 	 * @param {Number} concatAlpha The effective (concatenated) alpha when beginning this container
 	 * @param {Boolean} ignoreCache Don't use an element's cache during this draw
-	 * @method _appendToBatchGroup
+	 * @protected
 	 */
 	p._appendToBatchGroup = function(container, gl, concatMtx, concatAlpha, ignoreCache) {
 		// sort out shared properties
@@ -2442,7 +2448,7 @@ this.createjs = this.createjs||{};
 		 * You must set "options" to its own stage if you wish to use the fast Render Textures available only to StageGLs.
 		 * If you use WebGL cache on a container with Shapes you will have to cache each shape individually before the container,
 		 * otherwise the WebGL cache will not render the shapes.
-		 * @pubic
+		 * @public
 		 * @method BitmapCache.cache
 		 * @param {Number} x The x coordinate origin for the cache region.
 		 * @param {Number} y The y coordinate origin for the cache region.
@@ -2452,8 +2458,9 @@ this.createjs = this.createjs||{};
 		 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
 		 * 	cached elements with greater fidelity. Default is 1.
 		 * @param {Boolean|StageGL} [options=undefined] Select whether to use context 2D, or WebGL rendering, and whether to make a new stage instance or use an existing one.
+		 * @for BitmapCache
+		 * @todo Doc the rest of BitmapCache
 		 **/
-		/** @this BitmapCache */
 		bc._updateSurfaceBASE = bc._updateSurface;
 		bc._updateSurface = function() {
 			if(!this._options) {
