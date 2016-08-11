@@ -36,8 +36,9 @@ this.createjs = this.createjs||{};
 	"use strict";
 
 	/**
-	 * Utility and helper class designed to work with StageGL to help investigate, and test performance or display problems.
-	 * It contains logging functions to analyze behaviour and performance testing utilities.
+	 * A utility and helper class designed to work with {{#crossLink "StageGL"}}{{/crossLink}} to help investigate and
+	 * test performance or display problems. It contains logging functions to analyze behaviour and performance testing
+	 * utilities.
 	 * @class WebGLInspector
 	 * @constructor
 	 * @param {StageGL} stage The default stage to use when none is supplied.
@@ -66,10 +67,10 @@ this.createjs = this.createjs||{};
 	 * Alternate output for debugging situations where "console" is not available, i.e. Mobile or remote debugging.
 	 * Expects object with a "log" function that takes any number of params.
 	 * @property alternateOutput
-	 * @protected
 	 * @type {Console}
 	 * @default null
 	 * @static
+	 * @protected
 	 */
 	p.alternateOutput = undefined;
 
@@ -80,14 +81,13 @@ this.createjs = this.createjs||{};
 	 * @method _initializeWebGL
 	 * @protected
 	 */
-	p._initializeWebGLInspector = function() {
-	};
+	p._initializeWebGLInspector = function() {};
 
 // public methods:
 	/**
 	 * Perform all of the logging reports at once.
 	 * @method log
-	 * @param {StageGL} [stage=this._stage] The stage to log about.
+	 * @param {StageGL} [stage=this._stage] The stage to log information for.
 	 */
 	p.log = function(stage) {
 		if(!stage){ stage = this._stage; }
@@ -99,9 +99,10 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Replace the stage's Draw command with an empty draw command, useful for testing performance ignoring rendering.
+	 * Replace the stage's Draw command with an empty draw command. This is useful for testing performance, and ignoring
+	 * rendering.
 	 * @method toggleGPUDraw
-	 * @param {StageGL} [stage=this._stage] The stage to log about.
+	 * @param {StageGL} [stage=this._stage] The stage to log information for.
 	 * @param {Boolean} enabled Force enabled. If left undefined, it will toggle.
 	 */
 	p.toggleGPUDraw = function(stage, enabled) {
@@ -128,7 +129,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Recursively walk the entire display tree and log the attached items and display it in a tree view.
+	 * Recursively walk the entire display tree, log the attached items, and display it in a tree view.
 	 * @method logDepth
 	 * @param {Array} [children=this._stage.children] The children array to walk through.
 	 * @param {String} prepend What to prepend to this output from this point onwards.
@@ -174,10 +175,11 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Simulate renders and watch what happens for textures moving around between draw calls.
-	 * A texture moving between slots means it was removed and then re-added to draw calls, performance may be better if it was allowed to stay in place.
+	 * Simulate renders and watch what happens for textures moving around between draw calls. A texture moving between
+	 * slots means it was removed and then re-added to draw calls. Performance may be better if it was allowed to stay
+	 * in place.
 	 * @method logTextureFill
-	 * @param {StageGL} [stage=this._stage] The stage to log about.
+	 * @param {StageGL} [stage=this._stage] The stage to log information for.
 	 */
 	p.logTextureFill = function(stage) {
 		if(!stage){ stage = this._stage; }
@@ -212,15 +214,14 @@ this.createjs = this.createjs||{};
 
 // protected methods:
 
-
 // static methods:
 	/**
-	 * Utility function for use with {{#crossLink "logDepth"))((/crossLink}}, logs an item's position and registration.
+	 * Utility function for use with {{#crossLink "logDepth"))((/crossLink}}. Logs an item's position and registration.
 	 * Useful to see if something is being forced off screen or has an integer position.
 	 * @method dispProps
-	 * @static
 	 * @param {String} prepend The string to show before the item, usually formatting for a tree view.
 	 * @param {DisplayObject} item The item we're currently logging about.
+	 * @static
 	 */
 	WebGLInspector.dispProps = function(prepend, item){
 		if(!prepend){ prepend = ""; }

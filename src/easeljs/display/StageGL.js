@@ -35,7 +35,7 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-	/**
+	/*
 	 * README IF EDITING:
 	 * Terminology for developers:
 	 *
@@ -49,33 +49,43 @@ this.createjs = this.createjs||{};
 	 * Program/Shader: For every vertex we run the Vertex shader. The results are used per pixel by the Fragment shader. When combined and paired these are a shader "program"
 	 * Texture: WebGL representation of image data and associated extra information
 	 * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
-	**/
+	 */
 
 	/**
-	 * A StageGL is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL optimized display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
-	 * method is called, it will render its display list to its target canvas ignoring non webGL compatible Display Objects.
-	 * On devices or browsers that don't support WebGL, content will automatically be rendered via canvas 2D.
-	 * This calss should behave identically to a {{#crossLink "Stage"}}{{/crossLink}} except for WebGL specific functionality.
+	 * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL-optimized display list,
+	 * which is used in place of the usual {{#crossLink "Stage"}}{{/crossLink}}. This class should behave identically to
+	 * a {{#crossLink "Stage"}}{{/crossLink}} except for WebGL-specific functionality.
 	 *
-	 * <h4>Complications</h4>
-	 * - {{#crossLink "Shape"}}{{/crossLink}}, {{#crossLink "Shadow"}}{{/crossLink}}, and {{#crossLink "Text"}}{{/crossLink}} are not automatically rendered when added to the display list.
-	 * - To display something StageGL cannot normally render, {{#crossLink "displayObject/cache"}}{{/crossLink}} the object, caches can be rendered regardless of source.
-	 * - Images are wrapped as a webGL texture, graphics cards have a limit to concurrent textures, too many textures will slow performance. Ironically meaning caching may slow WebGL.
-	 * - {{#crossLink "Bitmap/clone"}}{{/crossLink}} any image node (DOM Image/Canvas Element) to re-use it between multiple StageGL instances, otherwise the GPU texture loading and tracking will get confused currently.
-	 * - You must call {{#crossLink "StageGL/updateViewport"}}{{/crossLink}} if you resize your canvas after making a StageGL, this will properly size the 3D context stored in memory, this won't affect the DOM.
-	 * - Best performance will come from manual management of texture memory, but it is handled automatically by default. See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}}
+	 * Each time the {{#crossLink "Stage/tick"}}{{/crossLink}} method is called, the display list is rendered to the
+	 * target &lt;canvas/&gt; instance, ignoring non-WebGL-compatible display objects. On devices and browsers that don't
+	 * support WebGL, content will automatically be rendered to canvas 2D context instead.
 	 *
-	 * <h4>How to use Example</h4>
-	 * This example creates a StageGL, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
-	 * and redraw the stage using {{#crossLink "StageGL/update"}}{{/crossLink}}.
+	 * <h4>Limitations</h4>
+	 * - {{#crossLink "Shape"}}{{/crossLink}}, {{#crossLink "Shadow"}}{{/crossLink}}, and {{#crossLink "Text"}}{{/crossLink}}
+	 * 	are not rendered when added to the display list.
+	 * - Images are wrapped as a webGL texture. Graphics cards have a limit to concurrent textures, and too many
+	 *	textures can slow performance. Caching may slow WebGL.
+	 * - To display something StageGL cannot render, {{#crossLink "displayObject/cache"}}{{/crossLink}} the object.
+	 *	Caches can be rendered regardless of source. Be wary of creating a lot of small caches, and instead use
+	 *	techniques such as SpriteSheets to generate images that contain multiple objects.
+	 * - Clone image nodes (DOM Image/Canvas Element) to re-use them between multiple StageGL instances, otherwise the
+	 *	GPU texture loading and tracking will get confused.
+	 * - You must call {{#crossLink "StageGL/updateViewport"}}{{/crossLink}} if you resize your canvas after
+	 *	initializing StageGL to properly size the 3D context stored in memory.
+	 * - Best performance will come from manual management of texture memory, but it is handled automatically by default.
+	 * 	See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for more information.
+	 *
+	 * <h4>Example</h4>
+	 * This example creates a StageGL instance, adds a child to it, then uses the EaselJS {{#crossLink "Ticker"}}{{/crossLink}}
+	 * to update the child and redraw the stage.
 	 *
 	 *      var stage = new createjs.StageGL("canvasElementId", false, false);
-	 *      stage.updateViewport(800, 600);
+	 *      stage.updateViewport(800, 600); //LM: Is this necessary in this example? Could you use canvas.width instead?
 	 *
 	 *      var image = new createjs.Bitmap("imagePath.png");
 	 *      stage.addChild(image);
 	 *
-	 *      createjs.Ticker.addEventListener("tick", handleTick);
+	 *      createjs.Ticker.on("tick", handleTick);
 	 *
 	 *      function handleTick(event) {
 	 *          image.x += 10;
@@ -83,24 +93,29 @@ this.createjs = this.createjs||{};
 	 *      }
 	 *
 	 * <h4>Notes</h4>
-	 * - StageGL is not included in the minified version of EaselJS.
-	 * - {{#crossLink "SpriteContainer"}}{{/crossLink}} was required by previous versions but is deprecated.
-	 * - Previous versions had hard limitations about images per container etc, these have been removed.
+	 * - StageGL is not currently included in the minified version of EaselJS.
+	 * - {{#crossLink "SpriteContainer"}}{{/crossLink}} (the previous approach to WebGL with EaselJS) has been deprecated.
+	 * - Earlier versions of WebGL support in EaselJS (SpriteStage and SpriteContainer) had hard limitations on images
+	 * 	per container, which have been solved.
 	 *
 	 * @class StageGL
 	 * @extends Stage
 	 * @constructor
-	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the StageGL will render to, or the string id
-	 *  of a canvas object in the current document.
-	 * @param {Object} options All the option parameters in a refernce object.
-	 * @param {Boolean} [options.preserveBuffer=0] If true, the canvas is NOT auto-cleared by WebGL (spec discourages true).
-	 *  Useful if you want to persistent draw effects.
-	 * @param {Boolean} [options.antialias=false] Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
-	 *  Will also enable Linear pixel sampling on power of two textures (smoother images)
-	 * @param {Boolean} [options.transparent=false] If true, the canvas is transparent, this is VERY expensive.
-	 * @param {Boolean} [options.premultiply=false] Alters colour handling, if true assumes the shader must account for premultiplied alpha.
-	 *  This can help avoid visual halo effects with some assets, but may also cause problems with other assets.
-	 * @param {Integer} [options.autoPurge=1200] How often the system should automatically dump unused textures with `purgeTextures(autoPurge)` every `autoPurge/2` draws.
+	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that StageGL will render to, or the string id
+	 *  of a canvas object in the current DOM.
+	 * @param {Object} options All the option parameters in a reference object.
+	 * @param {Boolean} [options.preserveBuffer=0] If `true`, the canvas is NOT auto-cleared by WebGL (the spec
+	 *  discourages setting this to `true`). This is useful if you want persistent draw effects.
+	 * @param {Boolean} [options.antialias=false] Specifies whether or not the browser's WebGL implementation should try
+	 *  to perform anti-aliasing. This will also enable linear pixel sampling on power-of-two textures (smoother images).
+	 * @param {Boolean} [options.transparent=false] If `true`, the canvas is transparent. This is <strong>very</strong>
+	 * expensive, and should be used with caution.
+	 * @param {Boolean} [options.premultiply=false] Alters color handling. If `true`, this assumes the shader must
+	 * account for pre-multiplied alpha. This can help avoid visual halo effects with some assets, but may also cause
+	 * problems with other assets.
+	 * @param {Integer} [options.autoPurge=1200] How often the system should automatically dump unused textures with
+	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "purgeTextures"}}{{/crossLink}} for more
+	 * information.
 	 **/
 	function StageGL(canvas, options) {
 		this.Stage_constructor(canvas);
@@ -115,8 +130,8 @@ this.createjs = this.createjs||{};
 
 		// public properties:
 		/**
-		 * Console log potential issues and problems, this is designed to have -minimal- performance impact so
-		 * if extensive debugging information is required this may be inadequate. See {{#crossLink "WebGLInspector"}}{{/crossLink}}
+		 * Console log potential issues and problems. This is designed to have <em>minimal</em> performance impact, so
+		 * if extensive debugging information is required, this may be inadequate. See {{#crossLink "WebGLInspector"}}{{/crossLink}}
 		 * @property vocalDebug
 		 * @type {Boolean}
 		 * @default false
@@ -125,9 +140,9 @@ this.createjs = this.createjs||{};
 
 		// private properties:
 		/**
-		 * Used when the canvas context is created, requires context re-creation to update.
-		 * Specifies whether or not the canvas is auto-cleared by WebGL. Spec discourages true.
-		 * If true, the canvas is NOT auto-cleared by WebGL. WebGL replacement for `autoClear = false`.
+		 * Specifies whether or not the canvas is auto-cleared by WebGL. The WebGL spec discourages `true`.
+		 * If true, the canvas is NOT auto-cleared by WebGL. Used when the canvas context is created and requires
+		 * context re-creation to update.
 		 * @property _preserveBuffer
 		 * @protected
 		 * @type {Boolean}
@@ -136,7 +151,7 @@ this.createjs = this.createjs||{};
 		this._preserveBuffer = preserveBuffer||false;
 
 		/**
-		 * Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
+		 * Specifies whether or not the browser's WebGL implementation should try to perform anti-aliasing.
 		 * @property _antialias
 		 * @protected
 		 * @type {Boolean}
@@ -167,6 +182,7 @@ this.createjs = this.createjs||{};
 		 * @property _autoPurge
 		 * @protected
 		 * @type {Integer}
+		 * @default null
 		 */
 		this._autoPurge = undefined;
 		this.autoPurge = autoPurge;	//getter/setter handles setting the real value and validating
@@ -190,8 +206,8 @@ this.createjs = this.createjs||{};
 		this._viewportHeight = 0;
 
 		/**
-		 * A 2D projection matrix used to convert WebGL's viewspace into canvas co-ordinates.
-		 * Regular canvas display uses a Top-Left = 0,0 where WebGL uses a Center 0,0 Top-Right 1,1 system.
+		 * A 2D projection matrix used to convert WebGL's viewspace into canvas co-ordinates. Regular canvas display
+		 * uses Top-Left values of [0,0] where WebGL uses a Center [0,0] Top-Right [1,1] system.
 		 * @property _projectionMatrix
 		 * @protected
 		 * @type {Float32Array}
@@ -213,17 +229,17 @@ this.createjs = this.createjs||{};
 		 * @property _clearColor
 		 * @protected
 		 * @type {Object}
-		 * @default black
+		 * @default {r: 0.00, g: 0.00, b: 0.00, a: 0.00} (black)
 		 **/
 		this._clearColor = {r: 0.00, g: 0.00, b: 0.00, a: 0.00};														//TODO: formalize this approach into regular canvases
 
 		/**
-		 * The maximum number of cards (aka a single sprite) that can be drawn in one draw call.
-		 * Use getter/setters to modify otherwise internal buffers may be incorrect sizes.
+		 * The maximum number of cards (aka a single sprite) that can be drawn in one draw call. Use getter/setters to
+		 * modify otherwise internal buffers may be incorrect sizes.
 		 * @property _maxCardsPerBatch
 		 * @protected
 		 * @type {Number}
-		 * @default StageGL.DEFAULT_MAX_BATCH_SIZE
+		 * @default StageGL.DEFAULT_MAX_BATCH_SIZE (10000)
 		 **/
 		this._maxCardsPerBatch = StageGL.DEFAULT_MAX_BATCH_SIZE;														//TODO: write getter/setters for this
 
@@ -246,7 +262,7 @@ this.createjs = this.createjs||{};
 		this._vertices = null;
 
 		/**
-		 * The WebGL buffer attached to _vertices.
+		 * The WebGL buffer attached to {{#crossLink "StageGL/_vertices:property"}}{{/crossLink}}.
 		 * @property _vertexPositionBuffer
 		 * @protected
 		 * @type {WebGLBuffer}
@@ -264,7 +280,7 @@ this.createjs = this.createjs||{};
 		this._uvs = null;
 
 		/**
-		 * The WebGL buffer attached to _uvs.
+		 * The WebGL buffer attached to {{#crossLink "StageGL/_uvs:property"}}{{/crossLink}}.
 		 * @property _uvPositionBuffer
 		 * @protected
 		 * @type {WebGLBuffer}
@@ -282,7 +298,7 @@ this.createjs = this.createjs||{};
 		this._indices = null;
 
 		/**
-		 * The WebGL buffer attached to _indices.
+		 * The WebGL buffer attached to {{#crossLink "StageGL/_indices:property"}}{{/crossLink}}.
 		 * @property _textureIndexBuffer
 		 * @protected
 		 * @type {WebGLBuffer}
@@ -300,7 +316,7 @@ this.createjs = this.createjs||{};
 		this._alphas = null;
 
 		/**
-		 * The WebGL buffer attached to _alphas.
+		 * The WebGL buffer attached to {{#crossLink "StageGL/_alphas:property"}}{{/crossLink}}.
 		 * @property _alphaBuffer
 		 * @protected
 		 * @type {WebGLBuffer}
@@ -313,26 +329,23 @@ this.createjs = this.createjs||{};
 		 * @property _drawTexture
 		 * @protected
 		 * @type {Array}
-		 * @default null
 		 **/
 		this._textureDictionary = [];
 
 		/**
-		 * A string based lookup hash of what index a texture is stored at in the dictionary.
-		 * The lookup string is often the src url.
+		 * A string based lookup hash of which index a texture is stored at in the dictionary. The lookup string is
+		 * often the src url.
 		 * @property _textureIDs
 		 * @protected
 		 * @type {Object}
-		 * @default null
 		 **/
 		this._textureIDs = {};
 
 		/**
-		 * An array of all the textures currently loaded into the GPU, index in array matches GPU index.
+		 * An array of all the textures currently loaded into the GPU. The index in the array matches the GPU index.
 		 * @property _batchTextures
 		 * @protected
 		 * @type {Array}
-		 * @default null
 		 */
 		this._batchTextures = [];
 
@@ -341,16 +354,17 @@ this.createjs = this.createjs||{};
 		 * @property _baseTextures
 		 * @protected
 		 * @type {Array}
-		 * @default null
 		 */
 		this._baseTextures = [];
 
 		/**
-		 * How many concurrent textures the gpu can handle. Dynamically set from WebGL during initialization.
-		 * Spec states 8 is lowest guaranteed value but it could be higher.
-		 * Do not set higher than the value returned by the GPU, and setting it lower will potentially reduce performance.
+		 * The number of concurrent textures the GPU can handle. This value is dynamically set from WebGL during
+		 * initialization. The WebGL spec states that the lowest guaranteed value is 8, but it could be higher. Do not
+		 * set this value higher than the value returned by the GPU. Setting it lower will potentially reduce
+		 * performance.
+		 *
+		 * 		// Can also act as a length for _batchTextures
 		 *      gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)
-		 * Can also act as a length for _batchTextures
 		 * @property _batchTextureCount
 		 * @protected
 		 * @type {Number}
@@ -359,9 +373,11 @@ this.createjs = this.createjs||{};
 		this._batchTextureCount = 8;
 
 		/**
-		 * Location at which the last texture was inserted into a GPU slot in _batchTextures.
-		 * Manual control of this variable could yield improvements in performance by intelligently replacing textures inside a batch.
-		 * Impossible to write automated general use code for as it requires display list inspection/foreknowledge to attempt due to content knowledge.
+		 * The location at which the last texture was inserted into a GPU slot in {{#crossLink "StageGL/_batchTextures:property"}}{{/crossLink}}.
+		 * Manual control of this variable can yield improvements in performance by intelligently replacing textures
+		 * inside a batch. It is impossible to write automated general use code, as it requires display list inspection
+		 * and/or foreknowledge.
+		 * @property _lastTextureInsert
 		 * @protected
 		 * @type {Number}
 		 * @default -1
@@ -369,7 +385,9 @@ this.createjs = this.createjs||{};
 		this._lastTextureInsert = -1;
 
 		/**
-		 * Current batch being drawn, a batch consists of a call to "drawElements" on the GPU. Many may occur per draw.
+		 * The current batch being drawn, A batch consists of a call to `drawElements` on the GPU. Many of these calls
+		 * can occur per draw.
+		 * @property _batchId
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -377,7 +395,9 @@ this.createjs = this.createjs||{};
 		this._batchID = 0;
 
 		/**
-		 * Current draw being performed, may contain multiple batches. Comparing to _batchID can reveal batching efficiency.
+		 * The current draw being performed, and may contain multiple batches. Comparing to {{#crossLink "StageGL/_batchID:property"}}{{/crossLink}}
+		 * can reveal batching efficiency.
+		 * @property _drawID
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -386,6 +406,7 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * Used to prevent textures in certain GPU slots from being replaced by an insert.
+		 * @property _slotBlackList
 		 * @protected
 		 * @type {Array}
 		 */
@@ -393,6 +414,7 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * Used to prevent nested draw calls from accidentally overwriting drawing information by tracking depth.
+		 * @property _isDrawing
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -401,6 +423,7 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * Used to ensure every canvas used has a unique ID.
+		 * @property _lastTrackedCanvas
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -410,17 +433,20 @@ this.createjs = this.createjs||{};
 		/**
 		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} is the canvas or a render texture.
 		 * See the {{#crossLink "cache"}}{{/crossLink}} function modifications for full implications and discussion.
+		 * @property isCacheControlled
 		 * @protected
 		 * @type {Boolean}
 		 * @default false
+		 * @todo LM: is this supposed to be _isCacheControlled since its private?
 		 */
 		this.isCacheControlled = false;
 
 		/**
 		 * Used to counter-position the object being cached so it aligns with the cache surface.
+		 * @property _cacheContainer
 		 * @protected
 		 * @type {Container}
-		 * @default false
+		 * @default An instance of an EaselJS Container.
 		 */
 		this._cacheContainer = new createjs.Container();
 
@@ -430,12 +456,12 @@ this.createjs = this.createjs||{};
 	var p = createjs.extend(StageGL, createjs.Stage);
 
 	/**
-	 * Calculate the U/V co-ordinate based info for sprite frames. Instead of pixel count it uses a 0-1 space.
-	 * Also includes the ability to get info back for a specific frame or only calculate that one frame.
-	 * @param  {SpriteSheet} spritesheet The spritesheet to find _frames on
+	 * Calculate the U/V co-ordinate-based info for sprite frames. Instead of pixel count it uses a 0-1 space. It also
+	 * includes the ability to get info back for a specific frame, or only calculate that one frame.
+	 * @method buildUVRects
+	 * @param  {SpriteSheet} spritesheet The sprite sheet to find {{#crossLink "StageGL/_frames:property"}}{{/crossLink}} on.
 	 * @param  {frame} [target=-1] The frame to return
 	 * @param  {Boolean} [onlyTarget=false] Whether "target" is the only frame that gets calculated
-	 * @method buildUVRects
 	 * @static
 	 * @return {Object} the target frame if supplied and present or a generic frame {t, l, b, r}
 	 */
@@ -466,6 +492,7 @@ this.createjs = this.createjs||{};
 	 * Test a context to see if it has WebGL enabled on it.
 	 * @method isWebGLActive
 	 * @param {CanvasContext} ctx The context to test
+	 * @static
 	 * @return {Boolean} Whether WebGL is enabled
 	 */
 	StageGL.isWebGLActive = function(ctx) {
@@ -474,46 +501,49 @@ this.createjs = this.createjs||{};
 			typeof WebGLRenderingContext !== 'undefined';
 	};
 
-	// static properties:
+// static properties:
 	/**
-	 * The number of properties defined per vertex.
-	 * x, y, textureU, textureV, textureIndex, alpha
-	 * @property NUM_VERTEX_PROPERTIES
+	 * The number of properties defined per vertex (x, y, textureU, textureV, textureIndex, alpha)
+	 * @property VERTEX_PROPERTY_COUNT
 	 * @static
 	 * @final
 	 * @type {Number}
+	 * @default 6
 	 * @readonly
 	 **/
 	StageGL.VERTEX_PROPERTY_COUNT = 6;
 
 	/**
-	 * The number of triangle indices it takes to form a Card. 3 per triangles, 2 triangles.
-	 * @property NUM_VERTEX_PROPERTIES
+	 * The number of triangle indices it takes to form a Card. 3 per triangle, 2 triangles.
+	 * @property INDICIES_PER_CARD
 	 * @static
 	 * @final
 	 * @type {Number}
+	 * @default 6
 	 * @readonly
 	 **/
 	StageGL.INDICIES_PER_CARD = 6;
 
 	/**
-	 * Default value for the maximum number of cards we want to process in a batch.
-	 * See WEBGL_MAX_INDEX_NUM for a hard limit.
+	 * The default value for the maximum number of cards we want to process in a batch. See {{#crossLink "StageGL/WEBGL_MAX_INDEX_NUM:property"}}{{/crossLink}}
+	 * for a hard limit.
 	 * @property DEFAULT_MAX_BATCH_SIZE
 	 * @static
 	 * @final
 	 * @type {Number}
+	 * @default 10000
 	 * @readonly
 	 **/
 	StageGL.DEFAULT_MAX_BATCH_SIZE = 10000;
 
 	/**
-	 * The maximum size WebGL allows for element index numbers: 16 bit unsigned integer.
-	 * It takes 6 indices to make a unique card.
-	 * @property MAX_INDEX_SIZE
+	 * The maximum size WebGL allows for element index numbers. Uses a 16 bit unsigned integer. It takes 6 indices to
+	 * make a unique card.
+	 * @property WEBGL_MAX_INDEX_NUM
 	 * @static
 	 * @final
 	 * @type {Number}
+	 * @default 65536
 	 * @readonly
 	 **/
 	StageGL.WEBGL_MAX_INDEX_NUM = Math.pow(2, 16);
@@ -524,6 +554,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @final
 	 * @type {Object}
+	 * @default {t:0, l:0, b:1, r:1}
 	 * @readonly
 	 */
 	StageGL.UV_RECT = {t:0, l:0, b:1, r:1};
@@ -546,7 +577,7 @@ this.createjs = this.createjs||{};
 	]);
 
 	/**
-	 * U/V for {{#crossLink "COVER_VERT"}}{{/crossLink}}.
+	 * U/V for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
 	 * @property COVER_UV
 	 * @static
 	 * @final
@@ -563,7 +594,7 @@ this.createjs = this.createjs||{};
 	]);
 
 	/**
-	 * Flipped U/V for {{#crossLink "COVER_VERT"}}{{/crossLink}}.
+	 * Flipped U/V for {{#crossLink "StageGL:COVER_VERT:property"}}{{/crossLink}}.
 	 * @property COVER_UV_FLIP
 	 * @static
 	 * @final
@@ -580,9 +611,9 @@ this.createjs = this.createjs||{};
 	]);
 
 	/**
-	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders.
-	 * The regular shader is designed to render all expected objects.
-	 * Shader code may contain templates that are replaced pre compile.
+	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
+	 * regular shader is designed to render all expected objects. Shader code may contain templates that are replaced
+	 * pre-compile.
 	 * @property REGULAR_VARYING_HEADER
 	 * @static
 	 * @final
@@ -591,16 +622,14 @@ this.createjs = this.createjs||{};
 	 */
 	StageGL.REGULAR_VARYING_HEADER = (
 		"precision mediump float;" +
-
 		"varying vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
 		"varying lowp float alphaValue;"
 	);
 
 	/**
-	 * Actual full header for the vertex shader. Includes the varying header.
-	 * The regular shader is designed to render all expected objects.
-	 * Shader code may contain templates that are replaced pre compile.
+	 * Actual full header for the vertex shader. Includes the varying header. The regular shader is designed to render
+	 * all expected objects. Shader code may contain templates that are replaced pre-compile.
 	 * @property REGULAR_VERTEX_HEADER
 	 * @static
 	 * @final
@@ -613,14 +642,12 @@ this.createjs = this.createjs||{};
 		"attribute vec2 uvPosition;" +
 		"attribute lowp float textureIndex;" +
 		"attribute lowp float objectAlpha;" +
-
 		"uniform mat4 pMatrix;"
 	);
 
 	/**
-	 * Actual full header for the fragment shader. Includes the varying header.
-	 * The regular shader is designed to render all expected objects.
-	 * Shader code may contain templates that are replaced pre compile.
+	 * Actual full header for the fragment shader. Includes the varying header. The regular shader is designed to render
+	 * all expected objects. Shader code may contain templates that are replaced pre-compile.
 	 * @property REGULAR_FRAGMENT_HEADER
 	 * @static
 	 * @final
@@ -633,9 +660,8 @@ this.createjs = this.createjs||{};
 	);
 
 	/**
-	 * Body of the vertex shader.
-	 * The regular shader is designed to render all expected objects.
-	 * Shader code may contain templates that are replaced pre compile.
+	 * Body of the vertex shader. The regular shader is designed to render all expected objects. Shader code may contain
+	 * templates that are replaced pre-compile.
 	 * @property REGULAR_VERTEX_BODY
 	 * @static
 	 * @final
@@ -644,7 +670,7 @@ this.createjs = this.createjs||{};
 	 */
 	StageGL.REGULAR_VERTEX_BODY  = (
 		"void main(void) {" +
-			//DHG TODO: why won't this work? Must be something wrong with the hand built matrix see js... bypass for now
+			//DHG TODO: This doesn't work. Must be something wrong with the hand built matrix see js... bypass for now
 			//vertexPosition, round if flag
 			//"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
 			"gl_Position = vec4("+
@@ -660,9 +686,8 @@ this.createjs = this.createjs||{};
 	);
 
 	/**
-	 * Body of the fragment shader.
-	 * The regular shader is designed to render all expected objects.
-	 * Shader code may contain templates that are replaced pre-compile.
+	 * Body of the fragment shader. The regular shader is designed to render all expected objects. Shader code may
+	 * contain templates that are replaced pre-compile.
 	 * @property REGULAR_FRAGMENT_BODY
 	 * @static
 	 * @final
@@ -684,18 +709,33 @@ this.createjs = this.createjs||{};
 	);
 
 	//TODO: DHG: a real particle shader
+	/**
+	 * @property PARTICLE_VERTEX_BODY
+	 * @todo
+	 * @final
+	 * @static
+	 * @type {String}
+	 * @readonly
+	 */
 	StageGL.PARTICLE_VERTEX_BODY = (
 		StageGL.REGULAR_VERTEX_BODY
 	);
-
+	/**
+	 * @property PARTICLE_FRAGMENT_BODY
+	 * @todo
+	 * @final
+	 * @static
+	 * @type {String}
+	 * @readonly
+	 */
 	StageGL.PARTICLE_FRAGMENT_BODY = (
 		StageGL.REGULAR_FRAGMENT_BODY
 	);
 
 	/**
-	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders.
-	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
-	 * Shader code may contain templates that are replaced pre-compile.
+	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
+	 * cover shader is designed to be a simple vertex/uv only texture render that covers the render surface. Shader
+	 * code may contain templates that are replaced pre-compile.
 	 * @property COVER_VARYING_HEADER
 	 * @static
 	 * @final
@@ -710,9 +750,9 @@ this.createjs = this.createjs||{};
 	);
 
 	/**
-	 * Actual full header for the vertex shader. Includes the varying header.
-	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
-	 * Shader code may contain templates that are replaced pre compile.
+	 * Actual full header for the vertex shader. Includes the varying header. The cover shader is designed to be a
+	 * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
+	 * replaced pre-compile.
 	 * @property COVER_VERTEX_HEADER
 	 * @static
 	 * @final
@@ -727,9 +767,9 @@ this.createjs = this.createjs||{};
 	);
 
 	/**
-	 * Actual full header for the fragment shader. Includes the varying header.
-	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
-	 * Shader code may contain templates that are replaced pre compile.
+	 * Actual full header for the fragment shader. Includes the varying header. The cover shader is designed to be a
+	 * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
+	 * replaced pre-compile.
 	 * @property COVER_FRAGMENT_HEADER
 	 * @static
 	 * @final
@@ -742,9 +782,8 @@ this.createjs = this.createjs||{};
 	);
 
 	/**
-	 * Body of the vertex shader.
-	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
-	 * Shader code may contain templates that are replaced pre compile.
+	 * Body of the vertex shader. The cover shader is designed to be a simple vertex/uv only texture render that covers
+	 * the render surface. Shader code may contain templates that are replaced pre-compile.
 	 * @property COVER_VERTEX_BODY
 	 * @static
 	 * @final
@@ -760,9 +799,8 @@ this.createjs = this.createjs||{};
 	);
 
 	/**
-	 * Body of the fragment shader.
-	 * The cover shader is designed to be a simple vertex/uv only texture render that covers the render surface.
-	 * Shader code may contain templates that are replaced pre compile.
+	 * Body of the fragment shader. The cover shader is designed to be a simple vertex/uv only texture render that
+	 * covers the render surface. Shader code may contain templates that are replaced pre-compile.
 	 * @property COVER_FRAGMENT_BODY
 	 * @static
 	 * @final
@@ -779,12 +817,13 @@ this.createjs = this.createjs||{};
 // events:
 	/**
 	 * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
-	 * You can call preventDefault on the event object to cancel the draw.
+	 * You can call {{#crossLink "Event/preventDefault"}}{{/crossLink}} on the event to cancel the draw.
 	 * @event drawstart
 	 */
 
 	/**
-	 * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
+	 * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is
+	 * restored.
 	 * @event drawend
 	 */
 
@@ -807,18 +846,17 @@ this.createjs = this.createjs||{};
 	try {
 		Object.defineProperties(p, {
 			/**
-			 * Indicates whether WebGL is being used for rendering. For example, this would be false if WebGL is not
+			 * Indicates whether WebGL is being used for rendering. For example, this would be `false` if WebGL is not
 			 * supported in the browser.
-			 * @readonly
 			 * @property isWebGL
 			 * @type {Boolean}
+			 * @readonly
 			 **/
 			isWebGL: { get: p._get_isWebGL },
 
 			/**
-			 * Internal value of autoPurge
-			 * Specifies whether or not StageGL is automatically purging unused textures, higher numbers purge less often.
-			 * Values below 10 are upgraded to 10, -1 disables this feature.
+			 * Specifies whether or not StageGL is automatically purging unused textures. Higher numbers purge less
+			 * often. Values below 10 are upgraded to 10, and -1 disables this feature.
 			 * @property autoPurge
 			 * @protected
 			 * @type {Integer}
@@ -831,9 +869,10 @@ this.createjs = this.createjs||{};
 
 // constructor methods:
 	/**
-	 * Create and properly initialize the WebGL instance we will be using.
+	 * Create and properly initialize the WebGL instance.
 	 * @method _initializeWebGL
 	 * @protected
+	 * @return {WebGLRenderingContext}
 	 */
 	p._initializeWebGL = function() {
 		if (this.canvas) {
@@ -916,15 +955,15 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Draws the stage into the supplied context if possible. Many WebGL properties only exist on their context.
-	 * As such you cannot share contexts among many StageGLs and each context requires a unique StageGL.
+	 * As such you cannot share contexts among many StageGLs and each context requires a unique StageGL instance.
 	 * Contexts that don't match the context managed by this StageGL will be treated as a 2D context.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
 	 * @param {CanvasRenderingContext2D | WebGLRenderingContext} context The context object to draw into.
-	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache. For example,
-	 * used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
-	 * @return {Boolean} Was the draw handled by this function
+	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache. For
+	 *  example, used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
+	 * @return {Boolean} If the draw was handled by this function
 	 **/
 	p.draw = function(context, ignoreCache) {
 		if (context === this._webGLContext && StageGL.isWebGLActive(this._webGLContext)) {
@@ -937,16 +976,15 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Draws the target into the correct context be it canvas or Render Texture using WebGL.
+	 * Draws the target into the correct context, be it a canvas or Render Texture using WebGL.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method cacheDraw
 	 * @param {DisplayObject} target The object we're drawing into cache.
-	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	 * into itself).
+	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
 	 * @param {Array} filters The filters we're drawing into cache.
 	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
-	 * @return {Boolean} Was the draw handled by this function
+	 * @return {Boolean} If the draw was handled by this function
 	 **/
 	p.cacheDraw = function(target, filters, manager) {
 		if (StageGL.isWebGLActive(this._webGLContext)) {
@@ -959,12 +997,13 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Blocks, or frees a texture "slot" on the GPU. Can be useful if you are overflowing textures.
-	 * When overflowing textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large textures.
-	 * By blocking the slot you reduce available slots potentially increasing draw calls, but mostly you prevent a texture being re-uploaded if it would of moved slot due to overflow.
+	 * Blocks, or frees a texture "slot" on the GPU. Can be useful if you are overflowing textures. When overflowing
+	 * textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large
+	 * textures. By blocking the slot you reduce available slots, potentially increasing draw calls, but mostly you
+	 * prevent a texture being re-uploaded if it would have moved slots due to overflow.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * E.G. Block the slot a background image is stored in so there is less re-loading of that image.
+	 * For example, block the slot a background image is stored in so there is less re-loading of that image.
 	 * @method protectTextureSlot
 	 * @param  {Number} id The slot to be affected
 	 * @param  {Boolean} lock Whether this slot is the one being locked.
@@ -977,14 +1016,16 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Render textures can't draw into themselves so any item being used for renderTextures needs two.
-	 * This function creates, gets, and toggles the render surface.
+	 * Render textures can't draw into themselves so any item being used for renderTextures needs two. This function
+	 * creates, gets, and toggles the render surface.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method getTargetRenderTexture
 	 * @param  {DisplayObject} target The object associated with the render textures, usually a cached object.
 	 * @param  {Number} w The width to create the texture at.
 	 * @param  {Number} h The height to create the texture at.
-	 * @method getTargetRenderTexture
+	 * @return {Objet}
+	 * @todo fill in return type
 	 */
 	p.getTargetRenderTexture = function(target, w,h) {
 		var result, toggle = false;
@@ -1019,12 +1060,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * For every image encountered it is registered and tracked automatically.
-	 * When all items using an image are removed from the stage it's recommended to remove it manually to prevent memory leaks.
-	 * This function will remove all textures found on the object and its children, cache, etc.
-	 * Specifically it will also uncache, cached objects it finds.
-	 * This happens instantly so aggressive use could result in performance problems.
-	 * If you remove a texture and add it again later(by rendering an object using it for example) the texture will get re-added and need re-removing later.
+	 * For every image encountered it is registered and tracked automatically. When all items using an image are removed
+	 * from the stage it's recommended to remove it manually to prevent memory leaks. This function will remove all
+	 * textures found on the object and its children, cache, etc. Specifically it will also un-cache, cached objects
+	 * that it finds. This happens instantly, so aggressive use could result in performance problems. If you remove a
+	 * texture and add it again later(by rendering an object using it for example) the texture will get re-added and
+	 * need re-removing later.
 	 * @method releaseTexture
 	 * @param  {DisplayObject | Texture | Image | Canvas} item An object that used the texture you are no longer using.
 	 */
@@ -1083,11 +1124,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Akin to {{#crossLink "releaseTexture"}}{{/crossLink}} this function differs by searching for textures to release.
-	 * It works by assuming that it can purge any texture which was last used more than "count" draw calls ago.
-	 * Because this process is unaware of the objects and whether they may be used on your stage false positives can occur.
-	 * It is recommended to manually manage your memory with {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}}; however, there are many use cases where this is simpler and error free.
-	 * This process is also run by default under the hood to prevent leaks, to disable it see the {{#crossLink "StageGL/autoPurge"}}{{/crossLink}} property.
+	 * Similar to {{#crossLink "releaseTexture"}}{{/crossLink}}, but this function differs by searching for textures to
+	 * release. It works by assuming that it can purge any texture which was last used more than "count" draw calls ago.
+	 * Because this process is unaware of the objects and whether they may be used on your stage, false positives can
+	 * occur. It is recommended to manually manage your memory with {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}},
+	 * however, there are many use cases where this is simpler and error-free. This process is also run by default under
+	 * the hood to prevent leaks. To disable it see the {{#crossLink "StageGL/autoPurge:property"}}{{/crossLink}} property.
 	 * @method purgeTextures
 	 * @param {Number} count How many renders ago the texture was last used
 	 */
@@ -1104,9 +1146,10 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Try to set the max textures the system can handle, should default to the hardware maximum, lower values may limit performance.
-	 * Some devices have been known to mis-report their max textures, or you may need a standard baseline cross devices for testing.
-	 * Barring the previous suggestions there is little need to call this function as the library will automatically try to find the best value.
+	 * Try to set the max textures the system can handle. It should default to the hardware maximum, and lower values
+	 * may limit performance. Some devices have been known to mis-report their max textures, or you may need a standard
+	 * baseline cross devices for testing. Barring the previous suggestions, there is little need to call this function
+	 * as the library will automatically try to find the best value.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method updateSimultaneousTextureCount
@@ -1140,11 +1183,11 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Update the WebGL viewport. Note that this does NOT update the canvas element's width/height but the render surface.
-	 * Necessary after resizing the canvas object.
+	 * Update the WebGL viewport. Note that this does <strong>not</strong> update the canvas element's width/height, but
+	 * the render surface's instead. This is necessary after resizing the canvas object.
 	 * @method updateViewport
-	 * @param {Integer} width Pixel size of render surface.
-	 * @param {Integer} height Pixel size of render surface.
+	 * @param {Integer} width The width of the render surface in pixels.
+	 * @param {Integer} height The height of the render surface in pixels.
 	 **/
 	p.updateViewport = function (width, height) {
 		this._viewportWidth = width|0;
@@ -1173,10 +1216,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Fetches the shader compiled and setup to work with the provided filter/object.
-	 * The shader is compiled on first use and returned on subsequent calls.
+	 * Fetches the shader compiled and set up to work with the provided filter/object. The shader is compiled on first
+	 * use and returned on subsequent calls.
 	 * @method getFilterShader
 	 * @param  {Filter|Object} filter The object which will provide the information needed to construct the filter shader.
+	 * @return {FilterShader}
+	 * @todo Review return type
 	 */
 	p.getFilterShader = function(filter) {
 		if(!filter) { filter = this; }
@@ -1206,16 +1251,17 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * See {{#crossLink "releaseTexture"}}{{/crossLink}} for the new API
-	 * @deprecated clearImageTexture
+	 * @property clearImageTexture
+	 * @deprecated See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for the new API
 	 **/
 
 	/**
-	 * Returns a base texture that has no image or data loaded. Not intended for loading images.
-	 * May return null in some error cases, trying to use a "null" texture can cause renders to fail.
+	 * Returns a base texture that has no image or data loaded. Not intended for loading images. It may return `null`
+	 * in some error cases, and trying to use a "null" texture can cause renders to fail.
 	 * @method getBaseTexture
-	 * @param  {uint} w The width of the texture, defaults to 1
-	 * @param  {uint} h The height of the texture, defaults to 1
+	 * @param  {uint} w The width of the texture in pixels, defaults to 1
+	 * @param  {uint} h The height of the texture in pixels, defaults to 1
+	 * @todo Remove the console.log in this function. Please check for other instances.
 	 **/
 	p.getBaseTexture = function(w, h) {
 		var width = Math.ceil(w>0?w:1) || 1;
@@ -1233,13 +1279,14 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Resizes a supplied texture element
-	 * May return null in some error cases, texture too large, out of texture memory, etc trying to use a "null" texture can cause renders to fail.
-	 * NOTE: must have been made with "texImage2D", all default APIs in StageGL use this so this only matters for changes.
+	 * Resizes a supplied texture element. It may return `null` in some error cases, such as when the texture is too
+	 * large, an out of texture memory error occurs, etc. Trying to use a "null" texture can cause renders to fail.
+	 * NOTE: The texture must have been made with "texImage2D", all default APIs in StageGL use this so this only
+	 * matters for changes.
 	 * @method getBaseTexture
 	 * @param  {WebGLTexture} texture The GL Texture to be modified.
-	 * @param  {uint} width The width of the texture, defaults to 1
-	 * @param  {uint} height The height of the texture, defaults to 1
+	 * @param  {uint} width The width of the texture in pixels, defaults to 1
+	 * @param  {uint} height The height of the texture in pixels, defaults to 1
 	 **/
 	p.resizeTexture = function(texture, width,height) {
 		var gl = this._webGLContext;
@@ -1258,10 +1305,11 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Returns a base texture (see getBaseTexture) with an attached render buffer in texture._frameBuffer
+	 * Returns a base texture (see {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}) with an attached render buffer
+	 * in `texture._frameBuffer`.
 	 * @method getRenderBufferTexture
-	 * @param  {Number} w The width of the texture
-	 * @param  {Number} h The height of the texture
+	 * @param  {Number} w The width of the texture in pixels.
+	 * @param  {Number} h The height of the texture in pixels.
 	 * @return {Texture} the basic texture instance with a render buffer property.
 	 **/
 	p.getRenderBufferTexture = function(w, h) {
@@ -1295,9 +1343,9 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Common utility function used to apply the correct texture processing parameters for the bound texture.
-	 * @param  {WebGLRenderingContext} gl
-	 * @param  {Boolean} [isPOT = false] Marks whether the texture is "Power of Two", this may allow better quality.
 	 * @method _fetchWebGLContext
+	 * @param  {WebGLRenderingContext} gl  The canvas WebGL context object to draw into.
+	 * @param  {Boolean} [isPOT = false] Marks whether the texture is "Power of Two", this may allow better quality.
 	 * @protected
 	 */
 	p.setTextureParams = function(gl, isPOT) {
@@ -1313,13 +1361,13 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Changes the webGL clear aka "background" color to the provided value.
-	 * A transparent clear is recommended, non transparent colours may create undesired boxes around some visuals.
+	 * Changes the webGL clear, aka "background" color to the provided value. A transparent clear is recommended, as
+	 * non-transparent colours may create undesired boxes around some visuals.
 	 *
-	 * The clear color will also be used for filters and other "render textures".
-	 * The stage background will ignore the transparency value and display solid color normally.
-	 * For the stage to recognize and use transparency it must be created with the transparent flag set to true.
-	 * Using "transparent white" to demonstrate, the valid data formats are as follows:
+	 * The clear color will also be used for filters and other "render textures". The stage background will ignore the
+	 * transparency value and display a solid color normally. For the stage to recognize and use transparency it must be
+	 * created with the transparent flag set to `true`. Using "transparent white" to demonstrate, the valid data formats
+	 * are as follows:
 	 * <ul>
 	 *     <li>"#FFF"</li>
 	 *     <li>"#FFFFFF"</li>
@@ -1365,11 +1413,7 @@ this.createjs = this.createjs||{};
 		this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 	};
 
-	/**
-	 * Returns a string representation of this object.
-	 * @method toString
-	 * @return {String} a string representation of the instance.
-	 **/
+	// docced in subclass
 	p.toString = function() {
 		return "[StageGL (name="+  this.name +")]";
 	};
@@ -1381,6 +1425,8 @@ this.createjs = this.createjs||{};
 	 * @param  {Object} options The options to be handed into the WebGL object, see WebGL spec
 	 * @method _fetchWebGLContext
 	 * @protected
+	 * @return {WebGLRenderingContext}
+	 * @todo Review return type and add description.
 	 */
 	p._fetchWebGLContext = function(canvas, options) {
 		var gl;
@@ -1403,16 +1449,19 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Create the completed Shader Program from the vertex and fragment shaders. Allows building of custom shaders for filters.
-	 * Once compiled shaders are saved so if the Shader code is dynamic re-run this function when it needs to change.
-	 * @param  {WebGLRenderingContext} gl
+	 * Create the completed Shader Program from the vertex and fragment shaders. Allows building of custom shaders for
+	 * filters. Once compiled, shaders are saved so that if the Shader code is dynamically reruns this function when it
+	 * needs to change.
+	 * @method _fetchShaderProgram
+	 * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param  {String} [shaderName="regular"] Working values: "regular", "override", and "filter". Which type of shader to build.
 	 * Filter and override both accept the custom params. Regular and override have all features. Filter is a special case reduced feature shader meant to be over-ridden.
 	 * @param  {String} [customVTX=undefined] Extra vertex shader information to replace a regular draw, see {{#crossLink "COVER_VERTEX_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
 	 * @param  {String} [customFRAG=undefined] Extra fragment shader information to replace a regular draw, see {{#crossLink "COVER_FRAGMENT_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
 	 * @param  {Function} [shaderParamSetup=undefined] Function to run so custom shader parameters can get applied for the render.
-	 * @method _fetchShaderProgram
 	 * @protected
+	 * @return {ShaderProgram}
+	 * @todo Review the return type
 	 */
 	p._fetchShaderProgram = function(gl, shaderName, customVTX, customFRAG, shaderParamSetup) {
 		gl.useProgram(null);		// safety to avoid collisions
@@ -1525,7 +1574,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Creates a shader from the specified string. Replaces several template items marked with {{name}}.
 	 * @method _createShader
-	 * @param  {WebGLRenderingContext} gl
+	 * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param  {Number} type The type of shader to create. gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
 	 * @param  {String} str The definition for the shader.
 	 * @return {WebGLShader}
@@ -1558,7 +1607,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Sets up the necessary vertex property buffers including position and u/v.
+	 * Sets up the necessary vertex property buffers, including position and U/V.
 	 * @method _createBuffers
 	 * @param {WebGLRenderingContext} gl
 	 * @protected
@@ -1636,7 +1685,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Do all the setup work for textures in the system.
+	 * Do all the setup steps for textures in the system.
 	 * @method _initTextures
 	 * @protected
 	 */
@@ -1663,7 +1712,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Load a specific texture, accounting for potential delay as it might not be preloaded
+	 * Load a specific texture, accounting for potential delay, as it might not be preloaded
 	 * @method _loadTextureImage
 	 * @param {WebGLRenderingContext} gl
 	 * @param {Image} image Actual image to be loaded
@@ -1722,9 +1771,9 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Necessary to upload the actual image data to the GPU. Without this the texture will be blank.
+	 * @method _updateTextureImageData
 	 * @param {WebGLRenderingContext} gl
 	 * @param {Image | Canvas} image The image data to be uploaded
-	 * @method _updateTextureImageData
 	 */
 	p._updateTextureImageData = function(gl, image) {
 		// the bitwise & is intentional, cheap exponent 2 check
@@ -1742,6 +1791,7 @@ this.createjs = this.createjs||{};
 		} catch(e) {
 			var errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
 			if(console.error) {
+				//TODO: LM: I recommend putting this into a log function internally, since you do it so often, and each is implemented differently.
 				console.error(e, errString);
 			} else {
 				console && console.log(e, errString);
@@ -1817,8 +1867,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Actually make sure the texture handed into the function is removed and cleaned.
-	 * Mostly for internal use, recommended to call {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead.
+	 * removed and cleaned the texture. Mostly for internal use, recommended to call {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead.
 	 * @method _killTextureObject
 	 * @param {Texture} tex The texture to be cleaned out
 	 */
@@ -1859,13 +1908,17 @@ this.createjs = this.createjs||{};
 		}
 	};
 
+	/**
+	 * @todo What is this? most properties are on the instance, not prototype. Is this for testing? Please remove or document.
+	 * @type {number}
+	 */
 	p.COUNTMEUP = 0;		//__trackName
 
 	/**
 	 * Store or restore current batch textures into a backup array
+	 * @method _backupBatchTextures
 	 * @param {Boolean} restore Perform a restore instead of a store.
 	 * @param {Array} [target=this._backupTextures] Where to perform the backup, defaults to internal backup.
-	 * @method _backupBatchTextures
 	 */
 	p._backupBatchTextures = function(restore, target) {
 		var gl = this._webGLContext;
@@ -1890,10 +1943,11 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Begin the drawing process for a regular render.
-	 * @param {WebGLRenderingContext} gl
+	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"}}{{/crossLink}} object with all that needs to rendered, preferably a stage
 	 * @param {WebGLRenderingContext} ignoreCache
 	 * @method _batchDraw
+	 * @todo Review the ignoreCache parameter. Is it a context or a boolean?
 	 */
 	p._batchDraw = function(sceneGraph, gl, ignoreCache) {
 		if(this._isDrawing > 0) {
@@ -1916,12 +1970,11 @@ this.createjs = this.createjs||{};
 	/**
 	 * Perform the drawing process to create cache textures, including applying filters
 	 * @method _cacheDraw
-	 * @param {DisplayObject} target The object we're drawing into cache.
-	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	 * into itself).
+	 * @param {DisplayObject} target The object we're drawing into the cache. For example, used for drawing the cache
+	 * (to prevent it from simply drawing an existing cache back into itself).
 	 * @param {Array} filters The filters we're drawing into cache.
 	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
-	 * @return {Boolean} Was the draw handled by this function
+	 * @return {Boolean} If the draw was handled by this function
 	 **/
 	p._cacheDraw = function(gl, target, filters, manager) {
 		/*
@@ -1991,6 +2044,14 @@ this.createjs = this.createjs||{};
 		this._slotBlacklist = blackListBackup;
 	};
 
+	/**
+	 * @method _drawFilters
+	 * @param target
+	 * @param filters
+	 * @param manager
+	 * @protected
+	 * @todo Please doc this method
+	 */
 	p._drawFilters = function(target, filters, manager) {
 		var gl = this._webGLContext;
 		var renderTexture;
@@ -2077,10 +2138,10 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Add all the contents of a container to the pending buffers, called recursively on each container.
-	 * May trigger a draw if a buffer runs out of space.
+	 * Add all the contents of a container to the pending buffers, called recursively on each container. This may
+	 * trigger a draw if a buffer runs out of space.
 	 * @param {Container} container The {{#crossLink "Container"}}{{/crossLink}} that contains everything to be drawn.
-	 * @param {WebGLRenderingContext} gl The context to draw into
+	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param {Matrix2D} concatMtx The effective (concatenated) transformation matrix when beginning this container
 	 * @param {Number} concatAlpha The effective (concatenated) alpha when beginning this container
 	 * @param {Boolean} ignoreCache Don't use an element's cache during this draw
@@ -2301,7 +2362,8 @@ this.createjs = this.createjs||{};
 	 * Draws a card that covers the entire render surface.
 	 * @method _drawBuffers
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-	 * @param {Boolean} flipY Covers are used for things like RenderTextures and because of 3D vs Canvas space this can end up meaning y sometimes requires flipping in the render
+	 * @param {Boolean} flipY Covers are used for things like RenderTextures and because of 3D vs Canvas space this can
+	 * end up meaning `y` sometimes, and requires flipping in the render
 	 * @protected
 	 **/
 	p._drawCover = function(gl, flipY) {
