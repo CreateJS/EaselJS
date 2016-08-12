@@ -1064,6 +1064,19 @@ this.createjs = this.createjs||{};
 		ctx.clearRect(0, 0, 2, 2);
 		return hit;
 	};
+
+	/**
+	 * Removes the Display Object from the parent container, if part of a container
+	 *
+	 * @method remove
+	 * @return {DisplayObject} Returns the instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	*/
+	p.remove = function() {
+		if ( this.parent )
+			this.parent.removeChild(this);
+		return this;
+	};
 	
 	/**
 	 * Provides a chainable shortcut method for setting a number of properties on the instance.
