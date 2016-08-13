@@ -1073,7 +1073,7 @@ this.createjs = this.createjs||{};
 	 * @chainable
 	*/
 	p.remove = function() {
-		if ( this.parent )
+		if ( this.parent instanceof createjs.Container )
 			this.parent.removeChild(this);
 		return this;
 	};
