@@ -48,8 +48,8 @@ this.createjs = this.createjs||{};
 	 *
 	 * <h4>Example</h4>
 	 *
-	 *      var instance = new createjs.Sprite(spriteSheet);
-	 *      instance.gotoAndStop("frameName");
+	 *			var instance = new createjs.Sprite(spriteSheet);
+	 *			instance.gotoAndStop("frameName");
 	 *
 	 * Until {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} or {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}} is called,
 	 * only the first defined frame defined in the sprite sheet will be displayed.
@@ -229,7 +229,7 @@ this.createjs = this.createjs||{};
 		return true;
 	};
 
-	//Note, the doc sections below document using the specified APIs (from DisplayObject)  from
+	//Note, the doc sections below document using the specified APIs (from DisplayObject)	from
 	//Bitmap. This is why they have no method implementations.
 
 	/**
@@ -336,7 +336,7 @@ this.createjs = this.createjs||{};
 	 * @return {String} a string representation of the instance.
 	 **/
 	p.toString = function() {
-		return "[Sprite (name="+  this.name +")]";
+		return "[Sprite (name="+	this.name +")]";
 	};
 
 // private methods:
@@ -464,7 +464,10 @@ this.createjs = this.createjs||{};
 				this._animation = data;
 				this.currentAnimation = frameOrAnimation;
 				this._normalizeFrame(frame);
+			} else {
+				console.error('no frame or animation named:', frameOrAnimation)
 			}
+			
 		} else {
 			this.currentAnimation = this._animation = null;
 			this._currentFrame = frameOrAnimation;
