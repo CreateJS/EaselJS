@@ -3,8 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<base href="../"/>
-	<title>EaselJS Example: Passing interactions between a Context2D and WebGL
-		stage.</title>
+	<title>EaselJS Example: Passing interactions between a Context2D and WebGL stage.</title>
 
 	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
@@ -90,10 +89,10 @@
 
 		// spritesheet "bitmap" button:
 		var spriteSheet = new createjs.SpriteSheet({
-													   images: [evt.target],
-													   frames: {width: 300, height: 100},
-													   animations: { out: 0, over: 1, down: 2 }
-												   });
+			images: [evt.target],
+			frames: {width: 300, height: 100},
+			animations: { out: 0, over: 1, down: 2 }
+		});
 		var bitmapButton = new createjs.Sprite(spriteSheet, "up");
 		webGLStage.addChild(bitmapButton).set({x: 250, y: 150});
 		new createjs.ButtonHelper(bitmapButton);
