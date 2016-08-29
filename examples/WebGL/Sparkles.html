@@ -14,11 +14,9 @@
 	  http://code.createjs.com -->
 
 <script id="editable">
-	var canvas;
-	var stage;
-
-	var imgSeq = new Image();        // The image for the sparkle animation
-	var sprite;                        // The animated sparkle template to clone
+	var canvas, stage;
+	var imgSeq = new Image();  // The image for the sparkle animation
+	var sprite; // The animated sparkle template to clone
 	var fpsLabel;
 
 	function init() {
@@ -35,7 +33,12 @@
 		// it will auto-calculate the number of frames from the image dimensions and loop them
 		var data = {
 			images: ["../../_assets/art/spritesheet_sparkle.png"],
-			frames: {width: 21, height: 23, regX: 10, regY: 11}
+			frames: {
+				regX: 10,
+				regY: 11,
+				height: 23,
+				width: 21
+			}
 		};
 
 		// set up an animation instance, which we will clone
@@ -46,7 +49,7 @@
 		stage.addChild(fpsLabel);
 		fpsLabel.x = 10;
 		fpsLabel.y = 20;
-		fpsLabel.cache(0,0, 96, 16);
+		fpsLabel.cache(0, 0, 96, 16);
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
 		createjs.Ticker.timingMode = createjs.Ticker.RAF;
@@ -57,7 +60,7 @@
 		// loop through all of the active sparkles on stage:
 		var l = stage.getNumChildren();
 		var m = event.delta / 16;
-		for (var i = l - 1; i > 0; i--) {
+		for(var i = l - 1; i > 0; i--) {
 			var sparkle = stage.getChildAt(i);
 
 			// apply gravity and friction
@@ -79,28 +82,26 @@
 			}
 		}
 
-		var str = "";
-		str += (l - 1) + " @ ";
-		str += Math.round(createjs.Ticker.getMeasuredFPS()) + " fps";
-		fpsLabel.text = str;
+		// compose the fps string
+		fpsLabel.text = (l - 1) + " @ " + Math.round(createjs.Ticker.getMeasuredFPS()) + " fps";
 		fpsLabel.updateCache();
 
 		// draw the updates to stage
 		stage.update(event);
 	}
 
-	//sparkle explosion
+	// sparkle explosion
 	function clickCanvas(evt) {
 		addSparkles(Math.random() * 200 + 100 | 0, stage.mouseX, stage.mouseY, 1);
 	}
 
-	//sparkle trail
+	// sparkle trail
 	function moveCanvas(evt) {
 		addSparkles(Math.random() * 6 + 3 | 0, stage.mouseX, stage.mouseY, 0.5);
 	}
 
 	function addSparkles(count, x, y, speed) {
-		//create the specified number of sparkles
+		// create the specified number of sparkles
 		for (var i = 0; i < count; i++) {
 			// clone the original sparkle, so we don't need to set shared properties:
 			var sparkle = sprite.clone();
@@ -108,7 +109,7 @@
 			// set display properties:
 			sparkle.x = x;
 			sparkle.y = y;
-			//sparkle.rotation = Math.random()*360;
+			// sparkle.rotation = Math.random()*360;
 			sparkle.alpha = Math.random() * 0.5 + 0.5;
 			sparkle.scaleX = sparkle.scaleY = Math.random() + 0.3;
 
@@ -145,8 +146,7 @@
 </header>
 
 <div>
-	<canvas id="testCanvas" width="960" height="400"
-			style="background:black"></canvas>
+	<canvas id="testCanvas" width="960" height="400" style="background:black"></canvas>
 </div>
 </body>
 </html>
