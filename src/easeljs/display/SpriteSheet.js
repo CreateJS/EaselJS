@@ -178,7 +178,7 @@ this.createjs = this.createjs||{};
 	 *     <li>Exporting SpriteSheets or HTML5 content from Adobe Flash/Animate supports the EaselJS SpriteSheet format.</li>
 	 *     <li>The popular <a href="https://www.codeandweb.com/texturepacker/easeljs" target="_blank">Texture Packer</a> has
 	 *     EaselJS support.
-	 *     <li>SWF animations in Adobe Flash/Animate can be exported to SpriteSheets using <a href="http://createjs.com/zoe" target="_blank"></a></li>
+	 *     <li>SWF animations in Adobe Flash/Animate can be exported to SpriteSheets using <a href="http://createjs.com/zoe" target="_blank">Zo&euml;</a></li>
 	 * </ul>
 	 *
 	 * <h3>Cross Origin Issues</h3>
