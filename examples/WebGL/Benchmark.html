@@ -22,10 +22,10 @@
 	<script type="text/javascript" src="../../_assets/libs/pixi.js"></script>
 
 	<style>
-		#output {
+		#content {
 			position: relative;
 		}
-		#output canvas, #loading {
+		#content canvas {
 			position: absolute;
 			background-color: #000000;
 			color: #ffffff;
@@ -82,12 +82,12 @@
 	var pixiSprites = null;
 	var pixiTextures = null;
 
-	var outDOM = undefined;
 	var adding = 0;
 	var objects = [];
 	var bounds = {};
 
 	function ready() {
+		examples.showDistractor("content");
 		outDOM = document.getElementById("output");
 		canvas = document.getElementById("loading");
 
@@ -107,8 +107,7 @@
 		temp = gui.add(guiProps, "triangles").listen().domElement.children[0];
 		temp.disabled = true;
 
-		adjustFolder = gui.addFolder('Robots (Click and hold)');
-		adjustFolder.open();
+		adjustFolder = gui.addFolder('Sprites (Click and hold)');
 		temp = adjustFolder.add(guiProps, "more").domElement.parentNode.parentNode;
 		temp.addEventListener("mousedown", startAdd);
 		temp.addEventListener("touchstart", startAdd);
@@ -117,8 +116,9 @@
 		temp.addEventListener("touchstart", startRemove);
 
 		propsFolder = gui.addFolder('Properties');
+		propsFolder.open();
 		propsFolder.add(guiProps, "library", ["CreateJS", "PixiJS v4"]).onChange(togglePlatform);
-		propsFolder.add(guiProps, "texture", ["Individual", "Spritesheet"]).onChange(toggleEffect);
+		propsFolder.add(guiProps, "texture", ["Individual", "Sprite Sheet"]).onChange(toggleEffect);
 		propsFolder.add(guiProps, "allowWebGL").onChange(toggleEffect);
 		//propParticle = propsFolder.add(guiProps, "particleRender").onChange(toggleEffect);
 
@@ -184,6 +184,8 @@
 		document.addEventListener("mouseup", handleRelease);
 		document.addEventListener("touchend", handleRelease);
 		requestAnimationFrame(tick);
+
+		examples.hideDistractor();
 	}
 
 	function init() {
@@ -402,17 +404,14 @@
 
 <header class="EaselJS">
 	<h1>Hello World!</h1>
-
 	<p>
-		Bechmarking page for <code>StageGL</code>, also allows for comparison to <a href="http://www.pixijs.com/">PixiJS v4</a>.
+		Benchmarking page for <code>StageGL</code>. Also allows for comparison to <a href="http://www.pixijs.com/">PixiJS v4</a>.
 		Give the Garbage Collector time to stabilize after switching properties.
 	</p>
 </header>
 
-<div id="output">
-	<div id="loading">
-		Loading...
-	</div>
+<div id="content" class="content">
 </div>
+
 </body>
 </html>
