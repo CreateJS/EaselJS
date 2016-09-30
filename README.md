@@ -130,10 +130,9 @@ Represents a point on a 2 dimensional x / y coordinate system.
 
 A WebGL implementation currently exists, but is limited.
 
-**SpriteContainer**
-A container that accepts a SpriteSheet, and uses a WebGL stage (SpriteStage) for WebGL-accelerated content.
+**StageGL**
+A drop-in replacement for the EaselJS Stage class that fully supports a WebGL pipeline. StageGL will draw most Bitmap-
+based content, including any cached DisplayObjects.
 
-**SpriteStage**
-A Stage class that uses a WebGL context. Currently, can only have children that are SpriteContainers.
-
-A new WebGL implementation is in the works, which removes these limitations.
+**WebGLInspector**
+A utility and helper class designed to work with StageGL to help investigate and test performance or display problems. 
