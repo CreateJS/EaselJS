@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ES5 Transpiled Simple Performance Tests</title>
+    <script src="../../node_modules/createjs/node_modules/benchmark/node_modules/lodash/lodash.min.js"></script>
+    <script src="../../node_modules/createjs/node_modules/benchmark/benchmark.js"></script>
+    <script src="./assets/simple-transpiled.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+      // PROMOTE / EXTEND utils from createjs
+      function promote (subclass, prefix) {
+      	var subP = subclass.prototype, supP = (Object.getPrototypeOf&&Object.getPrototypeOf(subP))||subP.__proto__;
+      	if (supP) {
+      		subP[(prefix+="_") + "constructor"] = supP.constructor; // constructor is not always innumerable
+      		for (var n in supP) {
+      			if (subP.hasOwnProperty(n) && (typeof supP[n] == "function")) { subP[prefix + n] = supP[n]; }
+      		}
+      	}
+      	return subclass;
+      }
+      function extend (subclass, superclass) {
+      	function o() { this.constructor = subclass; }
+      	o.prototype = superclass.prototype;
+      	return (subclass.prototype = new o());
+      }
+
+      // SIMPLE class
+      var p;
+      function BaseSimple () {
+
+      }
+      p = BaseSimple.prototype;
+      p.superTest = function () {
+
+      };
+      p.inheritTest = function () {
+
+      };
+      // Extended class, extends SIMPLE.
+      function BaseExtended () {
+        this.BaseSimple_constructor();
+      }
+      p = extend(BaseExtended, BaseSimple);
+      p.superTest = function () {
+        this.BaseSimple_superTest();
+      };
+      p.extendTest = function () {
+
+      };
+      var BaseExtended = promote(BaseExtended, "BaseSimple");
+
+      // create the suites
+      var classSuite = new Benchmark.Suite;
+      var methodSuite = new Benchmark.Suite;
+
+      function cycle (evt) {
+        console.log(evt.target.toString());
+      }
+
+      function complete () {
+        for (var i = 0, l = this.length; i < l; i+=2) {
+          var testA = this[i];
+          var testB = this[i+1];
+          var countA = testA.count;
+          var countB = testB.count;
+          var max = Math.max(countA, countB);
+          var min = Math.min(countA, countB);
+          var fastest = "Indeterminate";
+          if (testA.compare(testB) == 1) { fastest = "Base"; }
+          else { fastest = "Transpiled"; }
+          console.log("-- " + testA.name + " --");
+          console.log("fastest: " + fastest + " by " + (((max - min) / ((max + min) / 2)) * 100).toFixed(2) + "%");
+        }
+        this.reset();
+      }
+
+      // create the class instantiation tests
+      classSuite.add("instantiating simple", function (C) { new C(); }.bind(classSuite, BaseSimple))
+                .add("instantiating simple", function (C) { new C(); }.bind(classSuite, TranspiledSimple));
+      classSuite.add("instantiating extended", function (C) { new C(); }.bind(classSuite, BaseExtended))
+                .add("instantiating extended", function (C) { new C(); }.bind(classSuite, TranspiledExtended));
+      classSuite.on("cycle", cycle).on("complete", complete);
+
+      // create the method call tests
+      let baseSimple = new BaseSimple();
+      let transpiledSimple = new TranspiledSimple();
+      let baseExtended = new BaseExtended();
+      let transpiledExtended = new TranspiledExtended();
+      methodSuite.add("proto", function () { baseSimple.inheritTest(); })
+                 .add("proto", function () { transpiledSimple.inheritTest(); })
+                 .add("inherit", function () { baseExtended.inheritTest(); })
+                 .add("inherit", function () { transpiledExtended.inheritTest(); })
+                 .add("extended", function () { baseExtended.extendTest(); })
+                 .add("extended", function () { transpiledExtended.extendTest(); })
+                 .add("super", function () { baseExtended.superTest(); })
+                 .add("super", function () { transpiledExtended.superTest(); })
+                 .on("cycle", cycle).on("complete", complete);
+
+      // type `classSuite.run()` or `methodSuite.run()` in console to initiate testing.
+    </script>
+  </body>
+</html>
