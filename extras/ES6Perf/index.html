@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ES5/ES6 Compile Performance Tests</title>
+    <script src="../node_modules/benchmark/node_modules/lodash/lodash.min.js"></script>
+    <script src="../node_modules/benchmark/benchmark.js"></script>
+    <script src="../lib/easeljs-0.8.2.combined.js"></script>
+    <script src="../lib/main.es5.js"></script>
+    <script src="../lib/main.es6.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+      // create the suites
+      var classSuite = new Benchmark.Suite;
+      var methodSuite = new Benchmark.Suite;
+
+      // exclude these classes from instantiation due to being static or having reqiured params.
+      var exclude = [
+        "EaselJS",
+        "indexOf",
+        "promote",
+        "extend",
+        "UID",
+        "Ticker",
+        "Touch",
+        "SpriteSheetUtils",
+        "MasterFilter",
+        "DOMElement",
+        "MovieClip",
+        "ButtonHelper",
+        "SpriteStage"
+      ];
+
+      // define event handlers
+      function cycle (evt) {
+        console.log(evt.target.toString());
+      }
+
+      function complete () {
+        for (var i = 0, l = this.length; i < l; i+=3) {
+          var testA = this[i];
+          var testB = this[i+1];
+          var testC = this[i+2];
+          var countA = testA.count;
+          var countB = testB.count;
+          var countC = testC.count;
+          var max = Math.max(countA, countB, countC);
+          var median = Math.max(Math.min(countA, countB), Math.min(Math.max(countA, countB), countC));
+          var compareAB = testA.compare(testB);
+          var compareAC = testA.compare(testC);
+          var compareBC = testB.compare(testC);
+          var fastest = "Indeterminate";
+          if (compareAB == 1 && compareAC == 1) { fastest = "ES5"; }
+          else if (compareAB == -1 && compareBC == 1) { fastest = "Transpiled"; }
+          else if (compareAC == -1 && compareBC == -1) { fastest = "ES6"; }
+          console.log("-- " + testA.name + " --");
+          console.log("fastest: " + fastest + " by " + ((max - median) / median * 100).toFixed(2) + "%");
+        }
+        this.reset();
+      }
+
+      // create the class instantiation tests
+      for (var _Class in createjs) {
+          if (exclude.indexOf(_Class) >= 0 || typeof createjs[_Class] !== "function") { continue; }
+          var name = _Class.toLowerCase();
+          classSuite.add("ES5: instantiating " + name, function (C) { new createjs[C](); }.bind(classSuite, _Class))
+                    .add("TRA: instantiating " + name, function (C) { new cjstranspiled[C](); }.bind(classSuite, _Class))
+                    .add("ES6: instantiating " + name, function (C) { new cjses6[C](); }.bind(classSuite, _Class));
+      }
+      classSuite.on("cycle", cycle).on("complete", complete);
+
+      // create the method call tests
+      var containerA = new createjs.Container();
+      containerA.setBounds(0, 0, 100, 100);
+      containerA.setTransform(0, 0, 0.6, 0.6, 50, 4, 8, 0, 0);
+      var containerB = new cjstranspiled.Container();
+      containerB.setBounds(0, 0, 100, 100);
+      containerB.setTransform(0, 0, 0.6, 0.6, 50, 4, 8, 0, 0);
+      var containerC = new cjses6.Container();
+      containerC.setBounds(0, 0, 100, 100);
+      containerC.setTransform(0, 0, 0.6, 0.6, 50, 4, 8, 0, 0);
+
+      methodSuite.add("ES5: no super (isVisible)", function () { containerA.isVisible(); })
+                 .add("TRA: no super (isVisible)", function () { containerB.isVisible(); })
+                 .add("ES6: no super (isVisible)", function () { containerC.isVisible(); })
+                 .add("ES5: super (getTransformedBounds)", function () { containerA.getTransformedBounds(); })
+                 .add("TRA: super (getTransformedBounds)", function () { containerB.getTransformedBounds(); })
+                 .add("ES6: super (getTransformedBounds)", function () { containerC.getTransformedBounds(); })
+                 .on("cycle", cycle).on("complete", complete);
+
+      // type `classSuite.run()` or `methodSuite.run()` in console to initiate testing.
+
+    </script>
+  </body>
+</html>

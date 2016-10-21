@@ -89,14 +89,14 @@ describe("DisplayList", function () {
 		expect(this.stage.getConcatenatedMatrix()).not.toBe(null);
 	});
 
-	it("stage.getNumChildren() should be 2", function () {
+	it("stage.numChildren should be 2", function () {
 		this.stage.addChild(new createjs.Sprite());
 		this.stage.addChild(new createjs.Sprite());
-		expect(this.stage.getNumChildren()).toBe(2);
+		expect(this.stage.numChildren).toBe(2);
 	});
 
-	it("stage.getStage() should eq stage.", function () {
-		expect(this.stage.getStage()).toBe(this.stage);
+	it("stage.stage should eq stage.", function () {
+		expect(this.stage.stage).toBe(this.stage);
 	});
 
 	describe("*.clone() should work", function () {
@@ -425,7 +425,7 @@ describe("DisplayList", function () {
 		expect(c.localToGlobal(0, 0).x).toBe(50);
 		expect(c2.localToGlobal(0, 0).x).toBe(75);
 		expect(c3.localToGlobal(0, 0).x).toBe(70);
-		
+
 		expect(c.localToGlobal(0, 0).y).toBe(50);
 		expect(c2.localToGlobal(0, 0).y).toBe(75);
 		expect(c3.localToGlobal(0, 0).y).toBe(70);

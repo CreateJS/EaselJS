@@ -1,0 +1,16 @@
+{
+  "name": "EaselJS",
+  "version": "1.0.0",
+  "description": "Description :).",
+  "url": "http://createjs.com/easeljs",
+  "logo": "assets/docs-icon-EaselJS.png",
+  "options": {
+    "outdir": "docs",
+    "helpers": ["node_modules/createjs/buildAssets/path.js"],
+    "themedir": "node_modules/createjs/docsTheme",
+    "linkNatives": true,
+    "attributesEmit": true,
+    "selleck": true,
+    "quiet": true
+  }
+}

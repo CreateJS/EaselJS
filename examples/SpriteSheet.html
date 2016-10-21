@@ -11,16 +11,21 @@
 	<script src="../_assets/libs/preloadjs-NEXT.min.js"></script>
 
 	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/main.es5.js"></script>
+	<script src="../lib/main.es6.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
 <script id="editable">
 	var stage, w, h, loader;
 	var sky, grant, ground, hill, hill2;
+	var lib = createjs;
+	var ticker = lib.Ticker;
 
 	function init() {
 		examples.showDistractor();
-		stage = new createjs.Stage("testCanvas");
+		stage = new lib.Stage("testCanvas");
+		// ticker = new lib.Ticker();
 
 		// grab canvas width and height for later calculations:
 		w = stage.canvas.width;
@@ -42,23 +47,23 @@
 	function handleComplete() {
 		examples.hideDistractor();
 
-		sky = new createjs.Shape();
+		sky = new lib.Shape();
 		sky.graphics.beginBitmapFill(loader.getResult("sky")).drawRect(0, 0, w, h);
 
 		var groundImg = loader.getResult("ground");
-		ground = new createjs.Shape();
+		ground = new lib.Shape();
 		ground.graphics.beginBitmapFill(groundImg).drawRect(0, 0, w + groundImg.width, groundImg.height);
 		ground.tileW = groundImg.width;
 		ground.y = h - groundImg.height;
 
-		hill = new createjs.Bitmap(loader.getResult("hill"));
+		hill = new lib.Bitmap(loader.getResult("hill"));
 		hill.setTransform(Math.random() * w, h - hill.image.height * 4 - groundImg.height, 4, 4);
 		hill.alpha = 0.5;
 
-		hill2 = new createjs.Bitmap(loader.getResult("hill2"));
+		hill2 = new lib.Bitmap(loader.getResult("hill2"));
 		hill2.setTransform(Math.random() * w, h - hill2.image.height * 3 - groundImg.height, 3, 3);
 
-		var spriteSheet = new createjs.SpriteSheet({
+		var spriteSheet = new lib.SpriteSheet({
 				framerate: 30,
 				"images": [loader.getResult("grant")],
 				"frames": {"regX": 82, "height": 292, "count": 64, "regY": 0, "width": 165},
@@ -68,14 +73,14 @@
 					"jump": [26, 63, "run"]
 				}
 			});
-		grant = new createjs.Sprite(spriteSheet, "run");
+		grant = new lib.Sprite(spriteSheet, "run");
 		grant.y = 35;
 
 		stage.addChild(sky, hill, hill2, ground, grant);
 		stage.addEventListener("stagemousedown", handleJumpStart);
 
-		createjs.Ticker.timingMode = createjs.Ticker.RAF;
-		createjs.Ticker.addEventListener("tick", tick);
+		ticker.timingMode = lib.Ticker.RAF;
+		ticker.addEventListener("tick", tick);
 	}
 
 	function handleJumpStart() {

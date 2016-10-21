@@ -1,0 +1,10 @@
+_assets/
+build/
+docs/
+examples/
+extras/
+tests/
+tutorials/
+bower.json
+VERSIONS.txt
+README_SECURITY_ERROR.txt
