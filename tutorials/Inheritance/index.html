@@ -49,8 +49,8 @@ function Button(label) {
 }
 var p = createjs.extend(Button, createjs.Container);
 
-p.draw = function() {
-	this.Container_draw();
+p.draw = function(ctx, ignoreCache) {
+	this.Container_draw(ctx, ignoreCache);
 	// add custom logic here.
 }
 
