@@ -5,6 +5,9 @@ examples/
 extras/
 tests/
 tutorials/
+
 bower.json
+yuidoc.json
+icon.png
 VERSIONS.txt
 README_SECURITY_ERROR.txt
