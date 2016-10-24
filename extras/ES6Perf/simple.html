@@ -9,7 +9,6 @@
   </head>
   <body>
     <script type="text/javascript">
-
       // PROMOTE / EXTEND utils from createjs
       function promote (subclass, prefix) {
       	var subP = subclass.prototype, supP = (Object.getPrototypeOf&&Object.getPrototypeOf(subP))||subP.__proto__;
@@ -26,30 +25,17 @@
       	o.prototype = superclass.prototype;
       	return (subclass.prototype = new o());
       }
-
       // SIMPLE class
       var p;
-      function BaseSimple () {
-
-      }
+      function BaseSimple () { }
       p = BaseSimple.prototype;
-      p.superTest = function () {
-
-      };
-      p.inheritTest = function () {
-
-      };
+      p.superTest = function () { };
+      p.inheritTest = function () { };
       // Extended class, extends SIMPLE.
-      function BaseExtended () {
-        this.BaseSimple_constructor();
-      }
+      function BaseExtended () { this.BaseSimple_constructor(); }
       p = extend(BaseExtended, BaseSimple);
-      p.superTest = function () {
-        this.BaseSimple_superTest();
-      };
-      p.extendTest = function () {
-
-      };
+      p.superTest = function () { this.BaseSimple_superTest(); };
+      p.extendTest = function () { };
       var BaseExtended = promote(BaseExtended, "BaseSimple");
 
       // create the suites
@@ -71,33 +57,35 @@
           var fastest = "Indeterminate";
           if (testA.compare(testB) == 1) { fastest = "Base"; }
           else { fastest = "Transpiled"; }
-          console.log("-- " + testA.name + " --");
+          console.log("-- " + testA.name.split(':')[1].trim() + " --");
           console.log("fastest: " + fastest + " by " + (((max - min) / ((max + min) / 2)) * 100).toFixed(2) + "%");
         }
         this.reset();
       }
 
       // create the class instantiation tests
-      classSuite.add("instantiating simple", function (C) { new C(); }.bind(classSuite, BaseSimple))
-                .add("instantiating simple", function (C) { new C(); }.bind(classSuite, TranspiledSimple));
-      classSuite.add("instantiating extended", function (C) { new C(); }.bind(classSuite, BaseExtended))
-                .add("instantiating extended", function (C) { new C(); }.bind(classSuite, TranspiledExtended));
-      classSuite.on("cycle", cycle).on("complete", complete);
+      classSuite.add("base: instantiating simple", function (C) { new C(); }.bind(classSuite, BaseSimple))
+                .add("transpiled: instantiating simple", function (C) { new C(); }.bind(classSuite, TranspiledSimple))
+                .add("base: instantiating extended", function (C) { new C(); }.bind(classSuite, BaseExtended))
+                .add("transpiled: instantiating extended", function (C) { new C(); }.bind(classSuite, TranspiledExtended))
+                .on("cycle", cycle)
+                .on("complete", complete);
 
       // create the method call tests
       let baseSimple = new BaseSimple();
       let transpiledSimple = new TranspiledSimple();
       let baseExtended = new BaseExtended();
       let transpiledExtended = new TranspiledExtended();
-      methodSuite.add("proto", function () { baseSimple.inheritTest(); })
-                 .add("proto", function () { transpiledSimple.inheritTest(); })
-                 .add("inherit", function () { baseExtended.inheritTest(); })
-                 .add("inherit", function () { transpiledExtended.inheritTest(); })
-                 .add("extended", function () { baseExtended.extendTest(); })
-                 .add("extended", function () { transpiledExtended.extendTest(); })
-                 .add("super", function () { baseExtended.superTest(); })
-                 .add("super", function () { transpiledExtended.superTest(); })
-                 .on("cycle", cycle).on("complete", complete);
+      methodSuite.add("base: proto", function () { baseSimple.inheritTest(); })
+                 .add("transpiled: proto", function () { transpiledSimple.inheritTest(); })
+                 .add("base: inherit", function () { baseExtended.inheritTest(); })
+                 .add("transpiled: inherit", function () { transpiledExtended.inheritTest(); })
+                 .add("base: extended", function () { baseExtended.extendTest(); })
+                 .add("transpiled: extended", function () { transpiledExtended.extendTest(); })
+                 .add("base: super", function () { baseExtended.superTest(); })
+                 .add("transpiled: super", function () { transpiledExtended.superTest(); })
+                 .on("cycle", cycle)
+                 .on("complete", complete);
 
       // type `classSuite.run()` or `methodSuite.run()` in console to initiate testing.
     </script>
