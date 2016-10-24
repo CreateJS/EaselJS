@@ -1,5 +1,5 @@
 /*
- * @license EaselJS
+ * @license easeljs
  * Visit http://createjs.com for documentation, updates and examples.
  *
  * Copyright (c) 2010 gskinner.com, inc.
@@ -2377,10 +2377,10 @@
         if (!bounds) {
           return bounds
         }
-        var x = bounds.x;
-        var y = bounds.y;
-        var width = bounds.width;
-        var height = bounds.height;
+        var x = bounds.x,
+          y = bounds.y,
+          width = bounds.width,
+          height = bounds.height;
         var mtx = this._props.matrix;
         mtx = ignoreTransform ? mtx.identity() : this.getMatrix(mtx);
         if (x || y) {
@@ -8147,16 +8147,16 @@
      * information.
      */
     function StageGL(canvas, _ref) {
-      var _ref$preserveBuffer = _ref.preserveBuffer;
-      var preserveBuffer = _ref$preserveBuffer === undefined ? false : _ref$preserveBuffer;
-      var _ref$antialias = _ref.antialias;
-      var antialias = _ref$antialias === undefined ? false : _ref$antialias;
-      var _ref$transparent = _ref.transparent;
-      var transparent = _ref$transparent === undefined ? false : _ref$transparent;
-      var _ref$premultiply = _ref.premultiply;
-      var premultiply = _ref$premultiply === undefined ? false : _ref$premultiply;
-      var _ref$autoPurge = _ref.autoPurge;
-      var autoPurge = _ref$autoPurge === undefined ? 1200 : _ref$autoPurge;
+      var _ref$preserveBuffer = _ref.preserveBuffer,
+        preserveBuffer = _ref$preserveBuffer === undefined ? false : _ref$preserveBuffer,
+        _ref$antialias = _ref.antialias,
+        antialias = _ref$antialias === undefined ? false : _ref$antialias,
+        _ref$transparent = _ref.transparent,
+        transparent = _ref$transparent === undefined ? false : _ref$transparent,
+        _ref$premultiply = _ref.premultiply,
+        premultiply = _ref$premultiply === undefined ? false : _ref$premultiply,
+        _ref$autoPurge = _ref.autoPurge,
+        autoPurge = _ref$autoPurge === undefined ? 1200 : _ref$autoPurge;
       classCallCheck(this, StageGL);
       // public properties:
       /**
