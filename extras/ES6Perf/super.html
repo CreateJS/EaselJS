@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Super-call Performance Tests</title>
+    <script src="./assets/simple-transpiled.js"></script>
+    <script src="./assets/simple-es6.js"></script>
+    <script src="./assets/simple-es5.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      var iterations = 100000;
+
+      // create the method call tests
+      var es5 = new ES5Extended();
+      var transpiled = new TranspiledExtended();
+      var es6 = new ES6Extended();
+
+      function test (name, _class) {
+        var start = performance.now();
+        for (var i = 0; i < 100000; i++) {
+          _class.superTest();
+        }
+        var end = performance.now();
+        console.log(name + ":", (end - start).toFixed(4) + "ms");
+      }
+
+      function run () {
+        console.log("running tests " + iterations + " times");
+        test("ES5", es5);
+        test("Transpiled", transpiled);
+        test("ES6", es6);
+      }
+
+      // type `run()` in console to initiate testing.
+      console.log("type `run()` in console to initiate testing.");
+    </script>
+  </body>
+</html>
