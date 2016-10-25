@@ -1,51 +1,5 @@
 "use strict";
 
-var _get = function get(proto, property) {
-    var parent = proto;
-    while (parent = parent.__proto__) {
-        var prop = parent.constructor.name+"_"+property;
-        if (proto.hasOwnProperty(prop)) {
-          return proto[prop];
-        }
-    }
-};
-
-var _promote = function(subClass, superClass, p) {
-  if (superClass && superClass.name !== "Object") {
-    var prefix = superClass.name;
-    var subP = subClass.prototype,
-        supP = subP.__proto__;
-    if (supP) {
-      subP[(prefix+="_") + "constructor"] = supP.constructor; // constructor is not always innumerable
-      Object.getOwnPropertyNames(supP).forEach(function (n) {
-        if (subP.hasOwnProperty(n) && (typeof supP[n] == "function")) { subP[prefix + n] = supP[n]; }
-      });
-    }
-  }
-  debugger;
-  return subClass;
-};
-
-var _createClass = function() {
-    function defineProperties(target, props) {
-        for (var i = 0; i < props.length; i++) {
-            var descriptor = props[i];
-            descriptor.enumerable = descriptor.enumerable || false;
-            descriptor.configurable = true;
-            if ("value" in descriptor)
-                descriptor.writable = true;
-            Object.defineProperty(target, descriptor.key, descriptor);
-        }
-    }
-    return function(Constructor, protoProps, staticProps) {
-        if (protoProps)
-            defineProperties(Constructor.prototype, protoProps);
-        if (staticProps)
-            defineProperties(Constructor, staticProps);
-        return _promote(Constructor, Constructor.prototype.__proto__.constructor);
-    };
-}();
-
 function _possibleConstructorReturn(self, call) {
     if (!self) {
         throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -56,10 +10,22 @@ function _possibleConstructorReturn(self, call) {
 }
 
 function _inherits(subClass, superClass) {
-    function o() { this.constructor = subClass; }
-    o.prototype = superClass.prototype;
-    return (subClass.prototype = new o());
-}
+    if (typeof superClass !== "function" && superClass !== null) {
+        throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+        constructor: {
+            value: subClass,
+            enumerable: false,
+            writable: true,
+            configurable: true
+        }
+    });
+    if (superClass)
+        Object.setPrototypeOf
+            ? Object.setPrototypeOf(subClass, superClass)
+            : subClass.__proto__ = superClass;
+    }
 
 function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -72,15 +38,9 @@ var TranspiledSimple = function() {
         _classCallCheck(this, TranspiledSimple);
     }
 
-    _createClass(TranspiledSimple, [
-        {
-            key: "superTest",
-            value: function superTest() {}
-        }, {
-            key: "superTest2",
-            value: function superTest2() {}
-        }
-    ]);
+    TranspiledSimple.prototype.superTest = function superTest() { console.log('simple test'); };
+
+    TranspiledSimple.prototype.superTest2 = function superTest2() {};
 
     return TranspiledSimple;
 }();
@@ -91,17 +51,13 @@ var TranspiledMid = function(_TranspiledSimple) {
     function TranspiledMid() {
         _classCallCheck(this, TranspiledMid);
 
-        return _possibleConstructorReturn(this, (TranspiledMid.__proto__ || Object.getPrototypeOf(TranspiledMid)).call(this));
+        return _possibleConstructorReturn(this, _TranspiledSimple.call(this));
     }
 
-    _createClass(TranspiledMid, [
-        {
-            key: "superTest",
-            value: function superTest() {
-                _get(TranspiledMid.prototype, "superTest", this).call(this);
-            }
-        }
-    ]);
+    TranspiledMid.prototype.superTest2 = function superTest() {
+       console.log('mid test');
+        _TranspiledSimple.prototype.superTest.call(this);
+    };
 
     return TranspiledMid;
 }(TranspiledSimple);
@@ -112,22 +68,17 @@ var TranspiledExtended = function(_TranspiledMid) {
     function TranspiledExtended() {
         _classCallCheck(this, TranspiledExtended);
 
-        return _possibleConstructorReturn(this, (TranspiledExtended.__proto__ || Object.getPrototypeOf(TranspiledExtended)).call(this));
+        return _possibleConstructorReturn(this, _TranspiledMid.call(this));
     }
 
-    _createClass(TranspiledExtended, [
-        {
-            key: "superTest",
-            value: function superTest() {
-                _get(TranspiledExtended.prototype, "superTest", this).call(this);
-            }
-        }, {
-            key: "superTest2",
-            value: function superTest2() {
-                _get(TranspiledExtended.prototype, "superTest2", this).call(this);
-            }
-        }
-    ]);
+    TranspiledExtended.prototype.superTest = function superTest() {
+       console.log('ext test');
+        _TranspiledMid.prototype.superTest.call(this);
+    };
+
+    TranspiledExtended.prototype.superTest2 = function superTest2() {
+        _TranspiledMid.prototype.superTest2.call(this);
+    };
 
     return TranspiledExtended;
 }(TranspiledMid);

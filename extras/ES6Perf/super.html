@@ -9,7 +9,7 @@
   </head>
   <body>
     <script type="text/javascript">
-      var iterations = 100000;
+      var iterations = 1;
 
       // create the method call tests
       var es5 = new ES5Extended();
@@ -18,7 +18,7 @@
 
       function test (name, _class) {
         var start = performance.now();
-        for (var i = 0; i < 100000; i++) {
+        for (var i = 0; i < iterations; i++) {
           _class.superTest();
         }
         var end = performance.now();
