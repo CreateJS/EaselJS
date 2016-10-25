@@ -14,8 +14,8 @@
 		"type": "git",
 		"url": "git://github.com:CreateJS/EaselJS.git",
 	},
-	"main": "TODO",
-	"moduleType": "es6? TODO",
+	"main": "dist/easeljs.cjs.js",
+	"moduleType": "node",
 	"keywords": [
 		"easeljs",
 		"html5",
@@ -25,22 +25,16 @@
 	],
 	"license": "MIT",
 	"ignore": [
-		"**/.*",
 		"_assets",
 		"node_modules",
-		"bower_components",
-		".bower.json",
-		"build",
 		"docs",
 		"examples",
 		"extras",
 		"icon.png",
-		"LICENSE.txt",
-		"README.md",
 		"README_SECURITY_ERROR.txt",
-		"src",
+		"yuidoc.json",
 		"tests",
 		"tutorials",
-		"VERSIONS.txt"
+		"CHANGELOG"
 	]
 }

@@ -9,6 +9,7 @@ OTHER:
 - Build process and shared files (Event, EventDispatcher, Ticker) moved to external repository which is a devDependency of this one.
 - REVIEW: WebGL plugin is no longer a plugin, it has been fully integrated. WebGL will be leveraged if support is found.
 
+
 Version 0.8.2 [November 26, 2015]
 ****************************************************************************************************
 CRITICAL (may break existing content):
