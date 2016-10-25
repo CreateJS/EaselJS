@@ -1,3 +1,7 @@
+// createjs deps
+export { default as EventDispatcher } from "createjs/src/events/EventDispatcher";
+export { default as Event } from "createjs/src/events/Event";
+export { default as Ticker } from "createjs/src/utils/Ticker";
 // display
 export { default as DisplayObject } from "./display/DisplayObject";
 export { default as Container } from "./display/Container";
