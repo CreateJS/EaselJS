@@ -5,12 +5,28 @@
     <title>ES5 Transpiled Simple Performance Tests</title>
     <script src="../../node_modules/createjs/node_modules/benchmark/node_modules/lodash/lodash.min.js"></script>
     <script src="../../node_modules/createjs/node_modules/benchmark/benchmark.js"></script>
-    <script src="./assets/simple-transpiled.js"></script>
-    <script src="./assets/simple-es6.js"></script>
-    <script src="./assets/simple-es5.js"></script>
+    <script src="./assets/transpiled-strict.js"></script>
+    <script src="./assets/transpiled-loose.js"></script>
+    <script src="./assets/es6.js"></script>
+    <script src="./assets/es5.js"></script>
   </head>
   <body>
     <script type="text/javascript">
+      // utils
+      function percent (max, min) {
+        return (((max - min) / min) * 100).toFixed(2) + "%";
+      }
+
+      function times (max, min) {
+        return (max / min).toFixed(2) + "x";
+      }
+
+      function ms (start, end, dec) {
+        return (end - start).toFixed(dec) + "ms";
+      }
+
+      // BENCHMARK
+
       // create the suites
       var classSuite = new Benchmark.Suite;
       var methodSuite = new Benchmark.Suite;
@@ -20,61 +36,109 @@
       }
 
       function complete () {
-        for (var i = 0, l = this.length; i < l; i+=3) {
-          var testA = this[i];
-          var testB = this[i+1];
-          var testC = this[i+2];
-          var countA = testA.count;
-          var countB = testB.count;
-          var countC = testC.count;
-          var max = Math.max(countA, countB, countC);
-          var median = Math.max(Math.min(countA, countB), Math.min(Math.max(countA, countB), countC));
-          var compareAB = testA.compare(testB);
-          var compareAC = testA.compare(testC);
-          var compareBC = testB.compare(testC);
-          var fastest = "Indeterminate";
-          if (compareAB == 1 && compareAC == 1) { fastest = "ES5"; }
-          else if (compareAB == -1 && compareBC == 1) { fastest = "Transpiled"; }
-          else if (compareAC == -1 && compareBC == -1) { fastest = "ES6"; }
-          console.log("-- " + testA.name + " --");
-          var perc = (((max - min) / min) * 100).toFixed(2) + "%";
-          var times = (max / min).toFixed(2) + "x";
-          console.log("fastest: " + fastest + " by " + perc + " (" + times + ")");
+        var tests = this;
+        while (tests.length) {
+          var [ es5, loose, strict, es6 ] = tests.splice(0, 4);
+
         }
-        this.reset();
+        tests.reset();
       }
 
       // create the class instantiation tests
-      classSuite.add("es5: instantiating simple", function (C) { new C(); }.bind(classSuite, BaseSimple))
-                .add("transpiled: instantiating simple", function (C) { new C(); }.bind(classSuite, TranspiledSimple))
-                .add("es5: instantiating extended", function (C) { new C(); }.bind(classSuite, BaseExtended))
-                .add("transpiled: instantiating extended", function (C) { new C(); }.bind(classSuite, TranspiledExtended))
+      classSuite.add("es5: instantiating simple", function (C) { new C(); }.bind(classSuite, ES5Simple))
+                .add("transpiled (loose): instantiating simple", function (C) { new C(); }.bind(classSuite, TranspiledLooseSimple))
+                .add("transpiled (strict): instantiating simple", function (C) { new C(); }.bind(classSuite, TranspiledStrictSimple))
+                .add("es6: instantiating simple", function (C) { new C(); }.bind(classSuite, ES6Simple))
+                .add("es5: instantiating extended", function (C) { new C(); }.bind(classSuite, ES5Extended))
+                .add("transpiled (loose): instantiating extended", function (C) { new C(); }.bind(classSuite, TranspiledLooseExtended))
+                .add("transpiled (strict): instantiating extended", function (C) { new C(); }.bind(classSuite, TranspiledStrictExtended))
+                .add("es6: instantiating extended", function (C) { new C(); }.bind(classSuite, ES6Extended))
                 .on("cycle", cycle)
                 .on("complete", complete);
 
       // create the method call tests
       let es5Simple = new ES5Simple();
-      let transpiledSimple = new TranspiledSimple();
+      let transpiledLooseSimple = new TranspiledLooseSimple();
       let es6Simple = new ES6Simple();
       let es5Extended = new ES5Extended();
-      let transpiledExtended = new TranspiledExtended();
+      let transpiledLooseExtended = new TranspiledLooseExtended();
       let es6Extended = new ES6Extended();
-      methodSuite.add("es5: proto", function () { es5Simple.inheritTest(); })
-                 .add("transpiled: proto", function () { transpiledSimple.inheritTest(); })
-                 .add("es6: proto", function () { es6Simple.inheritTest(); })
-                 .add("es5: inherit", function () { es5Extended.inheritTest(); })
-                 .add("transpiled: inherit", function () { transpiledExtended.inheritTest(); })
-                 .add("es6: inherit", function () { es6Extended.inheritTest(); })
-                 .add("es5: extended", function () { es5Extended.extendTest(); })
-                 .add("transpiled: extended", function () { transpiledExtended.extendTest(); })
-                 .add("es6: extended", function () { es6Extended.extendTest(); })
-                 .add("es5: super", function () { es5Extended.superTest(); })
-                 .add("transpiled: super", function () { transpiledExtended.superTest(); })
-                 .add("es6: super", function () { es6Extended.superTest(); })
+      methodSuite.add("es5: proto", function () { es5Simple.inherit(); })
+                 .add("transpiled: proto", function () { transpiledLooseSimple.inherit(); })
+                 .add("es6: proto", function () { es6Simple.inherit(); })
+                 .add("es5: inherit", function () { es5Extended.inherit(); })
+                 .add("transpiled: inherit", function () { transpiledLooseExtended.inherit(); })
+                 .add("es6: inherit", function () { es6Extended.inherit(); })
+                 .add("es5: extended", function () { es5Extended.extend(); })
+                 .add("transpiled: extended", function () { transpiledLooseExtended.extend(); })
+                 .add("es6: extended", function () { es6Extended.extend(); })
+                 .add("es5: super-chained", function () { es5Extended.superChained(); })
+                 .add("transpiled: super-chained", function () { transpiledLooseExtended.superChained(); })
+                 .add("es6: super-chained", function () { es6Extended.superChained(); })
+                 .add("es5: super-grandparent", function () { es5Extended.superGrandParent(); })
+                 .add("transpiled: super-grandparent", function () { transpiledLooseExtended.superGrandParent(); })
+                 .add("es6: super-grandparent", function () { es6Extended.superGrandParent(); })
                  .on("cycle", cycle)
                  .on("complete", complete);
 
-      // type `classSuite.run()` or `methodSuite.run()` in console to initiate testing.
+      // FIXED
+
+      var iterations = 100000;
+
+      function testInstantiation (name, _Class) {
+        var start = performance.now();
+        for (var i = 0; i < iterations; i++) {
+          new _Class();
+        }
+        var end = performance.now();
+        console.log(name + ":", ms(start, end, 4));
+      }
+
+      var classFixed = {
+        run: function run () {
+          console.log("running instantiation tests " + iterations + " times");
+          testInstantiation("ES5", ES5Extended);
+          testInstantiation("Transpiled (Loose)", TranspiledLooseExtended);
+          testInstantiation("Transpiled (Strict)", TranspiledStrictExtended);
+          testInstantiation("ES6", ES6Extended);
+        }
+      };
+
+      var fixedES5 = new ES5Extended();
+      var fixedTranspiledLoose = new TranspiledLooseExtended();
+      var fixedTranspiledStrict = new TranspiledStrictExtended();
+      var fixedES6 = new ES6Extended();
+
+      function testSuper (name, instance) {
+        var start = performance.now();
+        for (var i = 0; i < iterations; i++) {
+          instance.superChained();
+        }
+        var end = performance.now();
+        console.log(name + ":", ms(start, end, 4));
+      }
+
+      var superFixed = {
+        run: function run () {
+          console.log("running super tests " + iterations + " times");
+          testSuper("ES5", fixedES5);
+          testSuper("Transpiled (Loose)", fixedTranspiledLoose);
+          testSuper("Transpiled (Strict)", fixedTranspiledStrict);
+          testSuper("ES6", fixedES6);
+        }
+      };
+
+      // -------------------
+      console.log('Instructions');
+      console.log('------------');
+      console.log('type `classSuite.run()` to test class instantiation with Benchmark.');
+      console.log('type `methodSuite.run()` to test method calls with Benchmark.');
+      console.log('------------');
+      console.log('type `classFixed.run()` to test class instantiation at a fixed iteration count.');
+      console.log('type `superFixed.run()` to test super calls at a fixed iteration count.');
+      console.log('set the global `iterations` variable to change iteration count');
+      console.log('------------');
+
     </script>
   </body>
 </html>
