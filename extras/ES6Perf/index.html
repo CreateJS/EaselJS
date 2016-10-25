@@ -36,6 +36,8 @@
       }
 
       function complete () {
+        return;
+        // TODO: Flesh this out if we want nicer summaries.
         var tests = this;
         while (tests.length) {
           var [ es5, loose, strict, es6 ] = tests.splice(0, 4);
