@@ -8,6 +8,7 @@
     <script src="./assets/transpiled-strict.js"></script>
     <script src="./assets/transpiled-loose.js"></script>
     <script src="./assets/es6.js"></script>
+    <!--<script src="./assets/es6.js"></script>-->
     <script src="./assets/es5.js"></script>
   </head>
   <body>
@@ -40,7 +41,7 @@
         // TODO: Flesh this out if we want nicer summaries.
         var tests = this;
         while (tests.length) {
-          var [ es5, loose, strict, es6 ] = tests.splice(0, 4);
+          var [ es5, loose, strict, es6 ] = tests.splice(0, 3);
 
         }
         tests.reset();
@@ -50,36 +51,43 @@
       classSuite.add("es5: instantiating simple", function (C) { new C(); }.bind(classSuite, ES5Simple))
                 .add("transpiled (loose): instantiating simple", function (C) { new C(); }.bind(classSuite, TranspiledLooseSimple))
                 .add("transpiled (strict): instantiating simple", function (C) { new C(); }.bind(classSuite, TranspiledStrictSimple))
-                .add("es6: instantiating simple", function (C) { new C(); }.bind(classSuite, ES6Simple))
+                //.add("es6: instantiating simple", function (C) { new C(); }.bind(classSuite, ES6Simple))
                 .add("es5: instantiating extended", function (C) { new C(); }.bind(classSuite, ES5Extended))
                 .add("transpiled (loose): instantiating extended", function (C) { new C(); }.bind(classSuite, TranspiledLooseExtended))
                 .add("transpiled (strict): instantiating extended", function (C) { new C(); }.bind(classSuite, TranspiledStrictExtended))
-                .add("es6: instantiating extended", function (C) { new C(); }.bind(classSuite, ES6Extended))
+                //.add("es6: instantiating extended", function (C) { new C(); }.bind(classSuite, ES6Extended))
                 .on("cycle", cycle)
                 .on("complete", complete);
 
       // create the method call tests
       let es5Simple = new ES5Simple();
       let transpiledLooseSimple = new TranspiledLooseSimple();
-      let es6Simple = new ES6Simple();
+      let transpiledStrictSimple = new TranspiledStrictSimple();
+      //let es6Simple = new ES6Simple();
       let es5Extended = new ES5Extended();
       let transpiledLooseExtended = new TranspiledLooseExtended();
-      let es6Extended = new ES6Extended();
+      let transpiledStrictExtended = new TranspiledStrictExtended();
+      //let es6Extended = new ES6Extended();
       methodSuite.add("es5: proto", function () { es5Simple.inherit(); })
-                 .add("transpiled: proto", function () { transpiledLooseSimple.inherit(); })
-                 .add("es6: proto", function () { es6Simple.inherit(); })
+                 .add("transpiled (loose): proto", function () { transpiledLooseSimple.inherit(); })
+                 .add("transpiled (strict): proto", function () { transpiledStrictSimple.inherit(); })
+                 //.add("es6: proto", function () { es6Simple.inherit(); })
                  .add("es5: inherit", function () { es5Extended.inherit(); })
-                 .add("transpiled: inherit", function () { transpiledLooseExtended.inherit(); })
-                 .add("es6: inherit", function () { es6Extended.inherit(); })
+                 .add("transpiled (loose): inherit", function () { transpiledLooseExtended.inherit(); })
+                 .add("transpiled (strict): inherit", function () { transpiledStrictExtended.inherit(); })
+                 //.add("es6: inherit", function () { es6Extended.inherit(); })
                  .add("es5: extended", function () { es5Extended.extend(); })
-                 .add("transpiled: extended", function () { transpiledLooseExtended.extend(); })
-                 .add("es6: extended", function () { es6Extended.extend(); })
+                 .add("transpiled (loose): extended", function () { transpiledLooseExtended.extend(); })
+                 .add("transpiled (strict): extended", function () { transpiledStrictExtended.extend(); })
+                 //.add("es6: extended", function () { es6Extended.extend(); })
                  .add("es5: super-chained", function () { es5Extended.superChained(); })
-                 .add("transpiled: super-chained", function () { transpiledLooseExtended.superChained(); })
-                 .add("es6: super-chained", function () { es6Extended.superChained(); })
+                 .add("transpiled (loose): super-chained", function () { transpiledLooseExtended.superChained(); })
+                 .add("transpiled (strict): super-chained", function () { transpiledStrictExtended.superChained(); })
+                 //.add("es6: super-chained", function () { es6Extended.superChained(); })
                  .add("es5: super-grandparent", function () { es5Extended.superGrandParent(); })
-                 .add("transpiled: super-grandparent", function () { transpiledLooseExtended.superGrandParent(); })
-                 .add("es6: super-grandparent", function () { es6Extended.superGrandParent(); })
+                 .add("transpiled (loose): super-grandparent", function () { transpiledLooseExtended.superGrandParent(); })
+                 .add("transpiled (strict): super-grandparent", function () { transpiledStrictExtended.superGrandParent(); })
+                 //.add("es6: super-grandparent", function () { es6Extended.superGrandParent(); })
                  .on("cycle", cycle)
                  .on("complete", complete);
 
@@ -102,14 +110,14 @@
           testInstantiation("ES5", ES5Extended);
           testInstantiation("Transpiled (Loose)", TranspiledLooseExtended);
           testInstantiation("Transpiled (Strict)", TranspiledStrictExtended);
-          testInstantiation("ES6", ES6Extended);
+          //testInstantiation("ES6", ES6Extended);
         }
       };
 
       var fixedES5 = new ES5Extended();
       var fixedTranspiledLoose = new TranspiledLooseExtended();
       var fixedTranspiledStrict = new TranspiledStrictExtended();
-      var fixedES6 = new ES6Extended();
+      // var fixedES6 = new ES6Extended();
 
       function testSuper (name, instance) {
         var start = performance.now();
@@ -126,7 +134,7 @@
           testSuper("ES5", fixedES5);
           testSuper("Transpiled (Loose)", fixedTranspiledLoose);
           testSuper("Transpiled (Strict)", fixedTranspiledStrict);
-          testSuper("ES6", fixedES6);
+          //testSuper("ES6", fixedES6);
         }
       };
 
