@@ -412,6 +412,37 @@ describe("StageGL", function () {
 		this.compareStages(expect, done);
 	});
 
+	it('translates children', function () {
+		var x = 10;
+		var size = 6;
+		var scale = 2;
+		var pt = new createjs.Point();
+
+		var shape = new createjs.Shape();
+		var stage = this.stage;
+		shape.setBounds(0, 0, size, size);
+		stage.addChild(shape);
+		// translate
+		shape.x = x;
+		stage.x = x;
+		stage.update();
+		shape.localToGlobal(0, 0, pt);
+		expect(pt.x).toEqual(x*2);
+		// scale
+		stage.scaleX = stage.scaleY = scale;
+		stage.update();
+		shape.localToGlobal(0, 0, pt);
+		expect(pt.x).toEqual(x * 3);
+		// rotate
+		stage.scaleX = stage.scaleY = 1;
+		stage.x = 0;
+		stage.rotation = 90;
+		stage.update();
+		shape.localToGlobal(0, 0, pt);
+		expect(pt.x|0).toEqual(0);
+		expect(pt.y).toEqual(x);
+	});
+
 	// NOTE: copied from UtilityMethodsSpec.js
 	describe("SpriteSheetBuilder", function () {
 		beforeEach(function () {
