@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
- * @module EaselJS
- */
-
 const _H_OFFSETS = {start: 0, left: 0, center: -0.5, end: -1, right: -1};
 const _V_OFFSETS = {top: 0, hanging: -0.01, middle: -0.4, alphabetic: -0.8, ideographic: -0.85, bottom: -1};
 
@@ -57,6 +53,7 @@ import DisplayObject from "./DisplayObject";
  * browsers will render Text exactly the same.
  * @class Text
  * @extends DisplayObject
+ * @module EaselJS
  */
 export default class Text extends DisplayObject {
 
@@ -71,7 +68,7 @@ export default class Text extends DisplayObject {
 	 */
 	constructor (text, font, color) {
 		super();
-		
+
 // public properties:
 		/**
 		 * The text to display.

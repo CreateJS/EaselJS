@@ -26,10 +26,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/**
- * @module EaselJS
- */
-
 let _alternateOutput = null;
 
 import EventDispatcher from "createjs/src/events/EventDispatcher";
@@ -40,6 +36,7 @@ import EventDispatcher from "createjs/src/events/EventDispatcher";
   * utilities.
   * @class WebGLInspector
   * @extends EventDispatcher
+  * @module EaselJS
   */
 export default class WebGLInspector extends EventDispatcher {
 

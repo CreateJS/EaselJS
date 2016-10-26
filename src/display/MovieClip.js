@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
- * @module EaselJS
- */
-
 import Container from "./Container";
 // TODO: Get Tween and Timeline imports.
 
@@ -73,8 +69,8 @@ import Container from "./Container";
  * <code>tween.set()</code> method to affect properties will likely not provide the desired result.
  *
  * @class MovieClip
- * @main MovieClip
  * @extends Container
+ * @module EaselJS
  */
 export default class MovieClip extends Container {
 

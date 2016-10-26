@@ -27,10 +27,6 @@
 */
 
 /**
- * @module EaselJS
- */
-
-/**
  * Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
  *
  * <h4>Example</h4>
@@ -38,6 +34,7 @@
  *      var rect = new createjs.Rectangle(0, 0, 100, 100);
  *
  * @class Rectangle
+ * @module EaselJS
  */
 export default class Rectangle {
 

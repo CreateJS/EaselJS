@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
- * @module EaselJS
- */
-
 import Container from "./Container";
 import DisplayObject from "./DisplayObject";
 import Event from "createjs/src/events/Event";
@@ -54,6 +50,7 @@ import MouseEvent from "../events/MouseEvent";
  *
  * @class Stage
  * @extends Container
+ * @module EaselJS
  */
 export default class Stage extends Container {
 

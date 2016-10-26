@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
- * @module EaselJS
- */
-
 let _nextID = 0;
 
 /**
@@ -37,6 +33,7 @@ let _nextID = 0;
  * and should not be instantiated.
  * @class UID
  * @static
+ * @module EaselJS
  */
 export default class UID {
 

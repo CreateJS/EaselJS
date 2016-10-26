@@ -27,10 +27,6 @@
 */
 
 /**
- * @module EaselJS
- */
-
-/**
  * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API (iOS and
  * modern Android browser) and the Pointer API (IE), including ms-prefixed events in IE10, and unprefixed in IE11.
  *
@@ -48,6 +44,7 @@
  *
  * @class Touch
  * @static
+ * @module EaselJS
  */
 export default class Touch {
 

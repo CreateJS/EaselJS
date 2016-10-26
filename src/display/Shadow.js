@@ -27,10 +27,6 @@
 */
 
 /**
- * @module EaselJS
- */
-
-/**
  * This class encapsulates the properties required to define a shadow to apply to a {{#crossLink "DisplayObject"}}{{/crossLink}}
  * via its <code>shadow</code> property.
  *
@@ -39,6 +35,7 @@
  *      myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
  *
  * @class Shadow
+ * @module EaselJS
  */
 export default class Shadow {
 

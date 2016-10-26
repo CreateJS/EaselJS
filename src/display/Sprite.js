@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
- * @module EaselJS
- */
-
 import DisplayObject from "./DisplayObject";
 import Event from "createjs/src/events/Event";
 
@@ -51,6 +47,7 @@ import Event from "createjs/src/events/Event";
  *
  * @class Sprite
  * @extends DisplayObject
+ * @module EaselJS
  */
 export default class Sprite extends DisplayObject {
 

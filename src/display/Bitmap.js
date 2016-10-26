@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
-* @module EaselJS
-*/
-
 import DisplayObject from "./DisplayObject";
 
 /**
@@ -55,6 +51,7 @@ import DisplayObject from "./DisplayObject";
  *
  * @class Bitmap
  * @extends DisplayObject
+ * @module EaselJS
  */
 export default class Bitmap extends DisplayObject {
 

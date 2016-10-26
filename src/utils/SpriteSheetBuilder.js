@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
- * @module EaselJS
- */
-
 const _ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
 const _ERR_RUNNING = "a build is already running";
 
@@ -53,6 +49,7 @@ import Event from "createjs/src/events/Event";
  * @param {Number} [framerate=0] The {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} of
  * {{#crossLink "SpriteSheet"}}{{/crossLink}} instances that are created.
  * @extends EventDispatcher
+ * @module EaselJS
  */
 export default class SpriteSheetBuilder extends EventDispatcher {
 

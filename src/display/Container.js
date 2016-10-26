@@ -47,6 +47,7 @@ import DisplayObject from './DisplayObject';
  *
  * @class Container
  * @extends DisplayObject
+ * @module EaselJS
  */
 export default class Container extends DisplayObject {
 

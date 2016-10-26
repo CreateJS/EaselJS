@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
- * @module EaselJS
- */
-
 import DisplayObject from "./DisplayObject";
 import Graphics from "./Graphics";
 
@@ -53,6 +49,7 @@ import Graphics from "./Graphics";
  *
  * @class Shape
  * @extends DisplayObject
+ * @module EaselJS
  */
 export default class Shape extends DisplayObject {
 

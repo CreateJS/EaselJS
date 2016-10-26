@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
- * @module EaselJS
- */
-
 import Filter from "./Filter";
 import Rectangle from "../geom/Rectangle";
 import StageGL from "../display/StageGL";
@@ -54,7 +50,9 @@ import StageGL from "../display/StageGL";
  * Real-time Filters are not recommended when dealing with a Context2D canvas if performance is a concern. For best
  * performance and to still allow for some visual effects, use a {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}}
  * when possible.
+ * 
  * @class BitmapCache
+ * @module EaselJS
  */
 export default class BitmapCache extends Filter {
 

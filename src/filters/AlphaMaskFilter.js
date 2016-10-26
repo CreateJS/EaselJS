@@ -26,10 +26,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/**
- * @module EaselJS
- */
-
 import Filter from "./Filter";
 
 /**
@@ -57,6 +53,7 @@ import Filter from "./Filter";
  * See {{#crossLink "Filter"}}{{/crossLink}} for more information on applying filters.
  * @class AlphaMaskFilter
  * @extends Filter
+ * @module EaselJS
  */
 export default class AlphaMaskFilter extends Filter {
 

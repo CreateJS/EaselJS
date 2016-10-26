@@ -26,10 +26,6 @@
  * OTHER DEAliNGS IN THE SOFTWARE.
  */
 
-/**
- * @module EaselJS
- */
-
 import EventDispatcher from "createjs/src/events/EventDispatcher";
 import Event from "createjs/src/events/Event";
 import Rectangle from "../geom/Rectangle";
@@ -199,6 +195,7 @@ import Rectangle from "../geom/Rectangle";
  *
  * @class SpriteSheet
  * @extends EventDispatcher
+ * @module EaselJS
  */
 export default class SpriteSheet extends EventDispatcher {
 

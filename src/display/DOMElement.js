@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
- * @module EaselJS
- */
-
 import DisplayObject from "./DisplayObject";
 import DisplayProps from "../geom/DisplayProps";
 
@@ -62,6 +58,7 @@ import DisplayProps from "../geom/DisplayProps";
  *
  * @class DOMElement
  * @extends DisplayObject
+ * @module EaselJS
  */
 export default class DOMElement extends DisplayObject {
 

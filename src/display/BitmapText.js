@@ -43,6 +43,7 @@ let _spritePool = [];
  * As such, methods like addChild and removeChild are disabled.
  * @class BitmapText
  * @extends Container
+ * @module EaselJS
  */
 export default class BitmapText extends Container {
 

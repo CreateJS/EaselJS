@@ -27,10 +27,6 @@
 */
 
 /**
- * @module EaselJS
- */
-
-/**
  * The ButtonHelper is a helper class to create interactive buttons from {{#crossLink "MovieClip"}}{{/crossLink}} or
  * {{#crossLink "Sprite"}}{{/crossLink}} instances. This class will intercept mouse events from an object, and
  * automatically call {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} or {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}},
@@ -50,6 +46,7 @@
  *      }
  *
  * @class ButtonHelper
+ * @module EaselJS
  */
 export default class ButtonHelper {
 

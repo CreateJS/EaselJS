@@ -26,10 +26,6 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/**
- * @module EaselJS
- */
-
 import Event from "createjs/src/events/Event";
 
 /**
@@ -37,6 +33,7 @@ import Event from "createjs/src/events/Event";
  * see the {{#crossLink "DisplayObject"}}{{/crossLink}} and {{#crossLink "Stage"}}{{/crossLink}} event listings.
  * @class MouseEvent
  * @extends Event
+ * @module EaselJS
  */
 export default class MouseEvent extends Event {
 

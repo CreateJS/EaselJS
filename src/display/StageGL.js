@@ -44,9 +44,6 @@
 
 import Stage from "./Stage";
 import Container from "./Container";
-import Sprite from "./Sprite";
-import Bitmap from "./Bitmap";
-import BitmapCache from "../filters/BitmapCache";
 import Matrix2D from "../geom/Matrix2D";
 
 /**
@@ -98,6 +95,7 @@ import Matrix2D from "../geom/Matrix2D";
  *
  * @class StageGL
  * @extends Stage
+ * @module EaselJS
  */
 export default class StageGL extends Stage {
 
