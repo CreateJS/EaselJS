@@ -161,6 +161,15 @@ export default class Sprite extends DisplayObject {
 		 */
 		this._skipAdvance = false;
 
+		/**
+		 * Set as compatible with WebGL.
+		 * @property _webGLRenderStyle
+		 * @protected
+		 * @type {Number}
+		 * @default 1
+		 */
+		this._webGLRenderStyle = 1;
+
 		if (frameOrAnimation != null) { this.gotoAndPlay(frameOrAnimation); }
 	}
 

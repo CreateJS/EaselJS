@@ -300,11 +300,32 @@ export default class BitmapCache extends Filter {
 	 * Reset and release all the properties and memory associated with this cache.
 	 * @method release
 	 */
-	release () {
+	releaseOld () {
 		this.target = this.target.cacheCanvas = null;
 		this.cacheID = this._cacheDataURLID = this._cacheDataURL = undefined;
 		this.width = this.height = this.x = this.y = this.offX = this.offY = 0;
 		this.scale = 1;
+	}
+
+	release () {
+		if(this._webGLCache) {
+			// if it isn't cache controlled clean up after yourself
+			if(!this._webGLCache.isCacheControlled) {
+				if(this.__lastRT){ this.__lastRT = undefined; }
+				if(this.__rtA){ this._webGLCache._killTextureObject(this.__rtA); }
+				if(this.__rtB){ this._webGLCache._killTextureObject(this.__rtB); }
+				if(this.target && this.target.cacheCanvas){ this._webGLCache._killTextureObject(this.target.cacheCanvas); }
+			}
+			// set the context to none and let the garbage collector get the rest when the canvas itself gets removed
+			this._webGLCache = false;
+		} else {
+			var stage = this.target.stage;
+			if(stage instanceof StageGL){
+				stage.releaseTexture(this.target.cacheCanvas);
+				this.target.cacheCanvas.remove();
+			}
+		}
+		this.releaseOld();
 	}
 
 	/**
@@ -346,7 +367,7 @@ export default class BitmapCache extends Filter {
 	 * @method _updateSurface
 	 * @protected
 	 */
-	_updateSurface () {
+	_updateSurfaceOld () {
 		let surface = this.target.cacheCanvas;
 		// create it if it's missing
 		if (!surface) {
@@ -358,12 +379,58 @@ export default class BitmapCache extends Filter {
 		surface.height = this._drawHeight;
 	}
 
+	_updateSurface () {
+		if(!this._options) {
+			this._updateSurfaceOld();
+			return;
+		}
+
+		// create it if it's missing
+		if(!this._webGLCache) {
+			if(this._options === true || this.target.stage !== this._options) {
+				// a StageGL dedicated to this cache
+				this.target.cacheCanvas = document.createElement("canvas");
+				this._webGLCache = new StageGL(this.target.cacheCanvas, {});
+				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
+			} else {
+				// a StageGL re-used by this cache
+				try{
+					this.target.cacheCanvas = true;	// we'll replace this with a render texture during the draw as it changes per draw
+					this._webGLCache = this._options;
+				} catch(e) {
+					throw "Invalid StageGL object used for cache param";
+				}
+			}
+		}
+
+		// now size render surfaces
+		var stageGL = this._webGLCache;
+		var surface = this.target.cacheCanvas;
+
+		// if we have a dedicated stage we've gotta size it
+		if(stageGL.isCacheControlled) {
+			surface.width = this._drawWidth;
+			surface.height = this._drawHeight;
+			stageGL.updateViewport(this._drawWidth, this._drawHeight);
+		}
+		if(this.target.filters) {
+			// with filters we can't tell how many we'll need but the most we'll ever need is two, so make them now
+			stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
+			stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
+		} else {
+			// without filters then we only need one RenderTexture, and that's only if its not a dedicated stage
+			if(!stageGL.isCacheControlled) {
+				stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
+			}
+		}
+	}
+
 	/**
 	 * Perform the cache draw out for context 2D now that the setup properties have been performed.
 	 * @method _drawToCache
 	 * @protected
 	 */
-	_drawToCache (compositeOperation) {
+	_drawToCacheOld (compositeOperation) {
 		let target = this.target;
 		let surface = target.cacheCanvas;
 		let ctx = surface.getContext("2d");
@@ -381,6 +448,28 @@ export default class BitmapCache extends Filter {
 		if (target.filters && target.filters.length) {
 			this._applyFilters(target);
 		}
+	}
+
+	_drawToCache (compositeOperation) {
+		var surface = this.target.cacheCanvas;
+		var target = this.target;
+		var webGL = this._webGLCache;
+
+		if(!webGL){
+			this._drawToCacheOld(compositeOperation);
+			surface._invalid = true;
+			return;
+		}
+
+		//TODO: auto split blur into an x/y pass
+		this._webGLCache.cacheDraw(target, target.filters, this);
+
+		// NOTE: we may of swapped around which element the surface is, so we re-fetch it
+		surface = this.target.cacheCanvas;
+
+		surface.width = this._drawWidth;
+		surface.height = this._drawHeight;
+		surface._invalid = true;
 	}
 
 	/**
@@ -409,3 +498,48 @@ export default class BitmapCache extends Filter {
 	}
 
 }
+
+/**
+ * Functionality injected to {{#crossLink "BitmapCache"}}{{/crossLink}}. Ensure StageGL is loaded after all other
+ * standard EaselJS classes are loaded but before making any DisplayObject instances for injection to take full effect.
+ * Replaces the context2D cache draw with the option for WebGL or context2D drawing.
+ * If options is set to "true" a StageGL is created and contained on the object for use when rendering a cache.
+ * If options is a StageGL instance it will not create an instance but use the one provided.
+ * If possible it is best to provide the StageGL instance that is a parent to this DisplayObject for performance reasons.
+ * A StageGL cache does not infer the ability to draw objects a StageGL cannot currently draw,
+ * i.e. do not use a WebGL context cache when caching a Shape, Text, etc.
+ * <h4>Example</h4>
+ * Using WebGL cache with a 2d context
+ *
+ *     var stage = new createjs.Stage();
+ *     var bmp = new createjs.Bitmap(src);
+ *     bmp.cache(0, 0, bmp.width, bmp.height, 1, true);          // no StageGL to use, so make one
+ *     var shape = new createjs.Shape();
+ *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
+ *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
+ *
+ * <h4>Example</h4>
+ * Using WebGL cache with a WebGL context:
+ *
+ *     var stageGL = new createjs.StageGL();
+ *     var bmp = new createjs.Bitmap(src);
+ *     bmp.cache(0, 0, bmp.width, bmp.height, 1, stageGL);       // use our StageGL to cache
+ *     var shape = new createjs.Shape();
+ *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
+ *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
+ *
+ * You can make your own StageGL and have it render to a canvas if you set ".isCacheControlled" to true on your stage.
+ * You may wish to create your own StageGL instance to control factors like background color/transparency, AA, and etc.
+ * You must set "options" to its own stage if you wish to use the fast Render Textures available only to StageGLs.
+ * If you use WebGL cache on a container with Shapes you will have to cache each shape individually before the container,
+ * otherwise the WebGL cache will not render the shapes.
+ * @method cache
+ * @param {Number} x The x coordinate origin for the cache region.
+ * @param {Number} y The y coordinate origin for the cache region.
+ * @param {Number} width The width of the cache region.
+ * @param {Number} height The height of the cache region.
+ * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
+ * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
+ * 	cached elements with greater fidelity. Default is 1.
+ * @param {Boolean|StageGL} [options] Select whether to use context 2D, or WebGL rendering, and whether to make a new stage instance or use an existing one.
+ */

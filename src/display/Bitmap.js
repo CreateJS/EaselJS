@@ -89,6 +89,15 @@ export default class Bitmap extends DisplayObject {
 		 * @default null
 		 */
 		this.sourceRect = null;
+
+		/**
+		 * Set as compatible with WebGL.
+		 * @property _webGLRenderStyle
+		 * @protected
+		 * @type {Number}
+		 * @default 2
+		 */
+		this._webGLRenderStyle = 2;
 	}
 
 // public methods:
