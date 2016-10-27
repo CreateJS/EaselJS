@@ -151,4 +151,6 @@ export { default as SpriteSheetBuilder } from "./utils/SpriteSheetBuilder";
 export { default as SpriteSheetUtils } from "./utils/SpriteSheetUtils";
 export { default as UID } from "./utils/UID";
 export { default as WebGLInspector } from "./utils/WebGLInspector";
-// TODO: Export version?
+// TODO: Review this version export.
+// version (templated in gulpfile, pulled from package).
+export const version = "<%= version %>";
