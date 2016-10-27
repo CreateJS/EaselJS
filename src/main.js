@@ -100,7 +100,7 @@
 // re-export shared classes
 export { default as EventDispatcher } from "createjs/src/events/EventDispatcher";
 export { default as Event } from "createjs/src/events/Event";
-export { default as Ticker } from "createjs/src/utils/Ticker";
+export { default as Ticker, TickerAPI } from "createjs/src/utils/Ticker";
 // display
 export { default as StageGL } from "./display/StageGL";
 export { default as Stage } from "./display/Stage";

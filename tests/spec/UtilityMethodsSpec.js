@@ -1,107 +1,113 @@
 describe("Utlity Methods", function () {
 
-	var ticker;
-
 	beforeEach(function () {
-		ticker = new createjs.Ticker();
-		ticker.init();
+		createjs.Ticker.reset();
+		createjs.Ticker.init();
+	});
+
+	it("indexOf()", function () {
+		var arr = [1, 2, 3, 4, 5];
+		expect(createjs.indexOf(arr, 3)).toBe(2);
 	});
 
 	describe("Ticker", function () {
-		it("ticker.addEventListener(tick) evt.time", function (done) {
+		it("createjs.Ticker.addEventListener(tick) evt.time", function (done) {
 			setTimeout(function () {
 				var tick = function (evt) {
-					expect(evt.time).toBeInRange(ticker.getTime(), 2);
+					expect(evt.time).toBeInRange(createjs.Ticker.getTime(), 2);
 					done();
 
-					ticker.removeEventListener("tick", tick);
+					createjs.Ticker.removeEventListener("tick", tick);
 				}
-				ticker.addEventListener("tick", tick);
+				createjs.Ticker.addEventListener("tick", tick);
 			}, 1000);
 		});
 
-		it("ticker.addEventListener(tick) evt.delta", function (done) {
+		it("createjs.Ticker.addEventListener(tick) evt.delta", function (done) {
 			setTimeout(function () {
 				var tick = function (evt) {
-					expect(evt.delta).toBeInRange(ticker.interval, 5);
+					expect(evt.delta).toBeInRange(createjs.Ticker.getInterval(), 5);
 					done();
 
-					ticker.removeEventListener("tick", tick);
+					createjs.Ticker.removeEventListener("tick", tick);
 				}
-				ticker.addEventListener("tick", tick);
+				createjs.Ticker.addEventListener("tick", tick);
 			}, 1000);
 		});
 
-		it("ticker.addEventListener(tick) evt.runTime", function (done) {
+		it("createjs.Ticker.addEventListener(tick) evt.runTime", function (done) {
 			setTimeout(function () {
 				var tick = function (evt) {
-					expect(evt.runTime).toBeInRange(ticker.getTime() | 0, 1);
+					expect(evt.runTime).toBeInRange(createjs.Ticker.getTime() | 0, 1);
 					done();
 
-					ticker.removeEventListener("tick", tick);
+					createjs.Ticker.removeEventListener("tick", tick);
 				}
-				ticker.addEventListener("tick", tick);
+				createjs.Ticker.addEventListener("tick", tick);
 			}, 1000);
 		});
 
-		it("paused", function (done) {
-			ticker.paused = true;
+		it("setPaused", function (done) {
+			createjs.Ticker.setPaused(true);
+
+			// Should be paused
+			expect(createjs.Ticker.getPaused()).toBe(true);
 
 			// tick event should also also be paused.
 			var func = function (evt) {
 				expect(evt.paused).toBe(true);
-				ticker.removeEventListener("tick", func);
+				createjs.Ticker.removeEventListener("tick", func);
 				done();
 			};
-			ticker.addEventListener("tick", func);
+			createjs.Ticker.addEventListener("tick", func);
 		});
 
-		it("get framerate", function () {
-			ticker.interval = 40;
+		it("getFPS", function () {
+			createjs.Ticker.setInterval(40);
 
-			expect(ticker.framerate).toBe(25);
-			expect(ticker.interval).toBe(40);
+			expect(createjs.Ticker.getFPS()).toBe(25);
+			expect(createjs.Ticker.getInterval()).toBe(40);
 		});
 
-		it("set framerate", function (done) {
-			ticker.framerate = 40;
+		it("setFPS", function (done) {
+			createjs.Ticker.setFPS(40);
 			setTimeout(function () {
-				expect(ticker.getTime() | 0).toBeInRange(40 * 2, 3);
+				expect(createjs.Ticker.getTime() | 0).toBeInRange(40 * 2, 3);
 				done();
 			}, 40 * 2);
 		});
 
 		it("getMeasuredFPS", function (done) {
 			setTimeout(function () {
-				expect(ticker.getMeasuredFPS()).toBeInRange(ticker.framerate, 5);
+				expect(createjs.Ticker.getMeasuredFPS()).toBeInRange(createjs.Ticker.getFPS(), 5);
 				done();
 			}, 1000);
 		});
 
 		it("getMeasuredTickTime", function () {
-			expect(ticker.getMeasuredTickTime() | 0).not.toBe(null);
+			expect(createjs.Ticker.getMeasuredTickTime() | 0).not.toBe(null);
 		});
 
 		it("getTicks", function (done) {
 			setTimeout(function () {
-				expect(ticker.getTicks()).toBeInRange(ticker.framerate, 5);
+				expect(createjs.Ticker.getTicks()).toBeInRange(createjs.Ticker.getFPS(), 5);
 				done();
 			}, 1000);
 		});
 
 		it("should advance by 1 seconds - getTime()", function (done) {
 			setTimeout(function () {
-				expect(ticker.getTime()).toBeInRange(1000, 5);
+				expect(createjs.Ticker.getTime()).toBeInRange(1000, 5);
 				done();
 			}, 1000);
 		});
 
 		it("getEventTime", function (done) {
 			setTimeout(function () {
-				var expected = (ticker.interval * ticker.framerate) - ticker.interval;
+				var expected = (createjs.Ticker.getInterval() * createjs.Ticker.getFPS()) - createjs.Ticker.getInterval();
 
 				// Firefox needs the higest range (on average)
-				expect(ticker.getEventTime() | 0).toBeInRange(expected, 40);
+				expect(createjs.Ticker.getEventTime() | 0).toBeInRange(expected, 40);
 				done();
 			}, 1000);
 		});
