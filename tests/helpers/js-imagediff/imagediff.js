@@ -296,7 +296,7 @@
 	  toImageDiffEqual: function (util, customEqualityTesters) {
 		  return {
 			  compare: function (actual, expected, tolerance) {
-			    var result = {};
+			  var message = {};
 				  if (typeof (document) !== UNDEFINED) {
 					  var
 						  div = get('div'),
@@ -326,13 +326,16 @@
 					  div.appendChild(b);
 					  div.appendChild(c);
 
-            // Setting message to string rather than div to resolve issues with karma-jasmine.
-					  result.message = "Expected images to be the same.";
+					  div.toString = function() {
+					  	return "Expected images to be the same.";
+					  }
+
+					  message.message = div;
 				  }
 
-				  result.pass = imagediff.equal(actual, expected, tolerance);
+				  message.pass = imagediff.equal(actual, expected, tolerance);
 
-				  return result;
+				  return message;
 			  }
 		  }
 	  }
