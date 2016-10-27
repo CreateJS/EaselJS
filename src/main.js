@@ -94,8 +94,8 @@ export { default as EventDispatcher } from "createjs/src/events/EventDispatcher"
 export { default as Event } from "createjs/src/events/Event";
 export { default as Ticker } from "createjs/src/utils/Ticker";
 // display
-export { default as DisplayObject } from "./display/DisplayObject";
 export { default as Container } from "./display/Container";
+export { default as DisplayObject } from "./display/DisplayObject";
 export { default as Bitmap } from "./display/Bitmap";
 export { default as BitmapText } from "./display/BitmapText";
 export { default as DOMElement } from "./display/DOMElement";
