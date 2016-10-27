@@ -1,5 +1,5 @@
 /*
-* DisplayObject
+* @license DisplayObject
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
@@ -222,7 +222,8 @@ export default class DisplayObject extends EventDispatcher {
 		 */
 		this.x = 0;
 
-		/** The y (vertical) position of the display object, relative to its parent.
+		/**
+		 * The y (vertical) position of the display object, relative to its parent.
 		 * @property y
 		 * @type {Number}
 		 * @default 0

@@ -1,5 +1,5 @@
 /*
-* Shadow
+* @license Shadow
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
@@ -57,21 +57,24 @@ export default class Shadow {
 		 */
 		this.color = color;
 
-		/** The x offset of the shadow.
+		/**
+		 * The x offset of the shadow.
 		 * @property offsetX
 		 * @type Number
 		 * @default 0
 		 */
 		this.offsetX = offsetX;
 
-		/** The y offset of the shadow.
+		/**
+		 * The y offset of the shadow.
 		 * @property offsetY
 		 * @type Number
 		 * @default 0
 		 */
 		this.offsetY = offsetY;
 
-		/** The blur of the shadow.
+		/**
+		 * The blur of the shadow.
 		 * @property blur
 		 * @type Number
 		 * @default 0

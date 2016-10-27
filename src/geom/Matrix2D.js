@@ -1,5 +1,5 @@
 /*
-* Matrix2D
+* @license Matrix2D
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
