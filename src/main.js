@@ -89,6 +89,14 @@
  * @main EaselJS
  */
 
+/**
+ * README: Export Order
+ *
+ * Due to some classes having circular import bindings (whether at the top of the import chain or deeper in),
+ * some exports here are in reverse order (such as Container being exported before DisplayObject).
+ * This is explained here: https://github.com/rollup/rollup/issues/845#issuecomment-240277194
+ */
+
 // re-export shared classes
 export { default as EventDispatcher } from "createjs/src/events/EventDispatcher";
 export { default as Event } from "createjs/src/events/Event";
