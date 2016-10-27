@@ -44,7 +44,8 @@
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.8.0",
     "babel-preset-es2015": "^6.14.0",
-    "createjs": "0.0.1"
+    "createjs": "0.0.1",
+    "js-imagediff": "tehvgg/js-imagediff"
   },
   "engine": "node >= 4.2.2"
 }

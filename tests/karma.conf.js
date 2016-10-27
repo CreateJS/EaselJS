@@ -18,7 +18,7 @@ module.exports = function (config) {
       { pattern: "dist/easeljs-NEXT.map", included: false },
       // helpers
       "tests/helpers/helpers.js",
-      "tests/helpers/js-imagediff/imagediff.js",
+      "node_modules/imagediff/js/imagediff.js",
       // specs
       "tests/spec/*.js"
     ],
