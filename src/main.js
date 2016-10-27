@@ -102,6 +102,8 @@ export { default as EventDispatcher } from "createjs/src/events/EventDispatcher"
 export { default as Event } from "createjs/src/events/Event";
 export { default as Ticker } from "createjs/src/utils/Ticker";
 // display
+export { default as StageGL } from "./display/StageGL";
+export { default as Stage } from "./display/Stage";
 export { default as Container } from "./display/Container";
 export { default as DisplayObject } from "./display/DisplayObject";
 export { default as Bitmap } from "./display/Bitmap";
@@ -132,8 +134,6 @@ export { default as Shadow } from "./display/Shadow";
 export { default as Shape } from "./display/Shape";
 export { default as Sprite } from "./display/Sprite";
 export { default as SpriteSheet } from "./display/SpriteSheet";
-export { default as Stage } from "./display/Stage";
-export { default as StageGL } from "./display/StageGL";
 export { default as Text } from "./display/Text";
 // events
 export { default as MouseEvent } from "./events/MouseEvent";

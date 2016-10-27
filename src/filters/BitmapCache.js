@@ -50,7 +50,7 @@ import StageGL from "../display/StageGL";
  * Real-time Filters are not recommended when dealing with a Context2D canvas if performance is a concern. For best
  * performance and to still allow for some visual effects, use a {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}}
  * when possible.
- * 
+ *
  * @class BitmapCache
  * @module EaselJS
  */
@@ -301,6 +301,7 @@ export default class BitmapCache extends Filter {
 	 * @method release
 	 */
 	release () {
+		let stage = this.target.stage;
 		if (this._useWebGL && this._webGLCache) {
 			// if it isn't cache controlled clean up after yourself
 			if (!this._webGLCache.isCacheControlled) {
@@ -312,7 +313,6 @@ export default class BitmapCache extends Filter {
 			// set the context to none and let the garbage collector get the rest when the canvas itself gets removed
 			this._webGLCache = false;
 		} else if (stage instanceof StageGL) {
-			let stage = this.target.stage;
 			stage.releaseTexture(this.target.cacheCanvas);
 			this.target.cacheCanvas.remove();
 		}

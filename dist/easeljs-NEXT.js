@@ -205,11 +205,19 @@
     return value
   };
   /**
+   * A collection of classes that are shared across the CreateJS libraries.
+   * Classes required by a library are compiled with that library.
+   *
+   * @module CreateJS
+   * @main CreateJS
+   */
+  /**
    * Contains properties and methods shared by all events for use with {{#crossLink "EventDispatcher"}}{{/crossLink}}.
    * Note that Event objects are often reused, so you should never
    * rely on an event object's state outside of the call stack it was received in.
    *
    * @class Event
+   * @module CreateJS
    */
   var Event = function() {
     // constructor:
@@ -399,54 +407,6 @@
     };
     return Event
   }();
-  /**
-   * EventDispatcher provides methods for managing queues of event listeners and dispatching events.
-   *
-   * You can either extend EventDispatcher or mix its methods into an existing prototype or instance by using the
-   * EventDispatcher {{#crossLink "EventDispatcher/initialize"}}{{/crossLink}} method.
-   *
-   * Together with the CreateJS Event class, EventDispatcher provides an extended event model that is based on the
-   * DOM Level 2 event model, including addEventListener, removeEventListener, and dispatchEvent. It supports
-   * bubbling / capture, preventDefault, stopPropagation, stopImmediatePropagation, and handleEvent.
-   *
-   * EventDispatcher also exposes a {{#crossLink "EventDispatcher/on"}}{{/crossLink}} method, which makes it easier
-   * to create scoped listeners, listeners that only run once, and listeners with associated arbitrary data. The
-   * {{#crossLink "EventDispatcher/off"}}{{/crossLink}} method is merely an alias to
-   * {{#crossLink "EventDispatcher/removeEventListener"}}{{/crossLink}}.
-   *
-   * Another addition to the DOM Level 2 model is the {{#crossLink "EventDispatcher/removeAllEventListeners"}}{{/crossLink}}
-   * method, which can be used to listeners for all events, or listeners for a specific event. The Event object also
-   * includes a {{#crossLink "Event/remove"}}{{/crossLink}} method which removes the active listener.
-   *
-   * <h4>Example</h4>
-   * Add EventDispatcher capabilities to the "MyClass" class.
-   *
-   *      EventDispatcher.initialize(MyClass.prototype);
-   *
-   * Add an event (see {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}}).
-   *
-   *      instance.addEventListener("eventName", handlerMethod);
-   *      function handlerMethod(event) {
-   *          console.log(event.target + " Was Clicked");
-   *      }
-   *
-   * <b>Maintaining proper scope</b><br />
-   * Scope (ie. "this") can be be a challenge with events. Using the {{#crossLink "EventDispatcher/on"}}{{/crossLink}}
-   * method to subscribe to events simplifies this.
-   *
-   *      instance.addEventListener("click", function(event) {
-   *          console.log(instance == this); // false, scope is ambiguous.
-   *      });
-   *
-   *      instance.on("click", function(event) {
-   *          console.log(instance == this); // true, "on" uses dispatcher scope by default.
-   *      });
-   *
-   * If you want to use addEventListener instead, you may want to use function.bind() or a similar proxy to manage scope.
-   *
-   *
-   * @class EventDispatcher
-   */
   var EventDispatcher = function() {
     // static methods:
     /**
@@ -793,27 +753,6 @@
     };
     return EventDispatcher
   }();
-  /**
-   * The Ticker provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe to the tick
-   * event to be notified when a set time interval has elapsed.
-   *
-   * Note that the interval that the tick event is called is a target interval, and may be broadcast at a slower interval
-   * when under high CPU load. The Ticker class uses a static interface (ex. `Ticker.framerate = 30;`) and
-   * can not be instantiated.
-   *
-   * <h4>Example</h4>
-   *
-   *      createjs.Ticker.addEventListener("tick", handleTick);
-   *      function handleTick(event) {
-   *          // Actions carried out each tick (aka frame)
-   *          if (!event.paused) {
-   *              // Actions carried out when the Ticker is not paused.
-   *          }
-   *      }
-   *
-   * @class Ticker
-   * @extends EventDispatcher
-   */
   var Ticker = function(_EventDispatcher) {
     inherits(Ticker, _EventDispatcher);
     // constructor:
@@ -944,26 +883,14 @@
       _this._raf = true;
       return _this
     }
-    // constants:
+    // accessor properties:
     /**
-     * In this mode, Ticker uses the requestAnimationFrame API, but attempts to synch the ticks to target framerate. It
-     * uses a simple heuristic that compares the time of the RAF return to the target time for the current frame and
-     * dispatches the tick when the time is within a certain threshold.
-     *
-     * This mode has a higher variance for time between frames than {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}},
-     * but does not require that content be time based as with {{#crossLink "Ticker/RAF:property"}}{{/crossLink}} while
-     * gaining the benefits of that API (screen synch, background throttling).
-     *
-     * Variance is usually lowest for framerates that are a divisor of the RAF frequency. This is usually 60, so
-     * framerates of 10, 12, 15, 20, and 30 work well.
-     *
-     * Falls back to {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}} if the requestAnimationFrame API is not
-     * supported.
-     * @property RAF_SYNCHED
+     * Indicates the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
+     * Note that actual time between ticks may be more than specified depending on CPU load.
+     * This property is ignored if the ticker is using the `RAF` timing mode.
+     * @property interval
      * @static
-     * @type {String}
-     * @default "synched"
-     * @readonly
+     * @type {Number}
      */
     // public methods:
     /**
@@ -1180,15 +1107,6 @@
     };
     createClass(Ticker, [{
       key: "interval",
-      // accessor properties:
-      /**
-       * Indicates the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
-       * Note that actual time between ticks may be more than specified depending on CPU load.
-       * This property is ignored if the ticker is using the `RAF` timing mode.
-       * @property interval
-       * @static
-       * @type {Number}
-       */
       get: function get() {
         return this._interval
       },
@@ -1207,30 +1125,85 @@
       set: function set(fps) {
         this.interval = 1e3 / fps
       }
-    }], [{
-      key: "RAF_SYNCHED",
-      get: function get() {
-        return "synched"
-      }
-    }, {
-      key: "RAF",
-      get: function get() {
-        return "raf"
-      }
-    }, {
-      key: "TIMEOUT",
-      get: function get() {
-        return "timeout"
-      }
     }]);
     return Ticker
   }(EventDispatcher);
+  // constants:
+  /**
+   * In this mode, Ticker uses the requestAnimationFrame API, but attempts to synch the ticks to target framerate. It
+   * uses a simple heuristic that compares the time of the RAF return to the target time for the current frame and
+   * dispatches the tick when the time is within a certain threshold.
+   *
+   * This mode has a higher variance for time between frames than {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}},
+   * but does not require that content be time based as with {{#crossLink "Ticker/RAF:property"}}{{/crossLink}} while
+   * gaining the benefits of that API (screen synch, background throttling).
+   *
+   * Variance is usually lowest for framerates that are a divisor of the RAF frequency. This is usually 60, so
+   * framerates of 10, 12, 15, 20, and 30 work well.
+   *
+   * Falls back to {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}} if the requestAnimationFrame API is not
+   * supported.
+   * @property RAF_SYNCHED
+   * @static
+   * @type {String}
+   * @default "synched"
+   * @readonly
+   */
+  Ticker.RAF_SYNCHED = "synched";
+  /**
+   * In this mode, Ticker passes through the requestAnimationFrame heartbeat, ignoring the target framerate completely.
+   * Because requestAnimationFrame frequency is not deterministic, any content using this mode should be time based.
+   * You can leverage {{#crossLink "Ticker/getTime"}}{{/crossLink}} and the {{#crossLink "Ticker/tick:event"}}{{/crossLink}}
+   * event object's "delta" properties to make this easier.
+   *
+   * Falls back on {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}} if the requestAnimationFrame API is not
+   * supported.
+   * @property RAF
+   * @static
+   * @type {String}
+   * @default "raf"
+   * @readonly
+   */
+  Ticker.RAF = "raf";
+  /**
+   * In this mode, Ticker uses the setTimeout API. This provides predictable, adaptive frame timing, but does not
+   * provide the benefits of requestAnimationFrame (screen synch, background throttling).
+   * @property TIMEOUT
+   * @static
+   * @type {String}
+   * @default "timeout"
+   * @readonly
+   */
+  Ticker.TIMEOUT = "timeout";
+  // events:
+  /**
+   * Dispatched each tick. The event will be dispatched to each listener even when the Ticker has been paused using
+   * {{#crossLink "Ticker/setPaused"}}{{/crossLink}}.
+   *
+   * <h4>Example</h4>
+   *
+   *      createjs.Ticker.addEventListener("tick", handleTick);
+   *      function handleTick(event) {
+   *          console.log("Paused:", event.paused, event.delta);
+   *      }
+   *
+   * @event tick
+   * @param {Object} target The object that dispatched the event.
+   * @param {String} type The event type.
+   * @param {Boolean} paused Indicates whether the ticker is currently paused.
+   * @param {Number} delta The time elapsed in ms since the last tick.
+   * @param {Number} time The total time in ms since Ticker was initialized.
+   * @param {Number} runTime The total time in ms that Ticker was not paused since it was initialized. For example,
+   * 	you could determine the amount of time that the Ticker has been paused since initialization with `time-runTime`.
+   * @since 0.6.0
+   */
   var _nextID = 0;
   /**
    * Global utility for generating sequential unique ID numbers. The UID class uses a static interface (ex. <code>UID.get()</code>)
    * and should not be instantiated.
    * @class UID
    * @static
+   * @module EaselJS
    */
   var UID = function() {
     // constructor:
@@ -1268,6 +1241,9 @@
     }]);
     return UID
   }();
+  /**
+   * @module EaselJS
+   */
   /**
    * Represents a point on a 2 dimensional x / y coordinate system.
    *
@@ -1338,17 +1314,7 @@
     return Point
   }();
   /**
-   * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrices.
-   *
-   * This matrix can be visualized as:
-   *
-   * 	[ a  c  tx
-   * 	  b  d  ty
-   * 	  0  0  1  ]
-   *
-   * Note the locations of b and c.
-   *
-   * @class Matrix2D
+   * @module EaselJS
    */
   var Matrix2D = function() {
     // constructor:
@@ -1755,13 +1721,30 @@
       return "[Matrix2D (a=" + this.a + " b=" + this.b + " c=" + this.c + " d=" + this.d + " tx=" + this.tx + " ty=" + this.ty + ")]"
     };
     return Matrix2D
-  }(); {
+  }();
+  // constants:
+  /**
+   * Multiplier for converting degrees to radians. Used internally by Matrix2D.
+   * @property DEG_TO_RAD
+   * @static
+   * @final
+   * @type Number
+   * @readonly
+   */
+  // static public properties:
+  /**
+   * An identity matrix, representing a null transformation.
+   * @property identity
+   * @static
+   * @type Matrix2D
+   * @readonly
+   */
+  {
     Matrix2D.DEG_TO_RAD = Math.PI / 180;
     Matrix2D.identity = new Matrix2D
   }
   /**
-   * Used for calculating and encapsulating display related properties.
-   * @class DisplayProps
+   * @module EaselJS
    */
   var DisplayProps = function() {
     // constructor:
@@ -1885,6 +1868,7 @@
    *      var rect = new createjs.Rectangle(0, 0, 100, 100);
    *
    * @class Rectangle
+   * @module EaselJS
    */
   var Rectangle = function() {
     // constructor:
@@ -2067,6 +2051,9 @@
     return Rectangle
   }();
   /**
+   * @module EaselJS
+   */
+  /**
    * Base class that all filters should inherit from. Filters need to be applied to objects that have been cached using
    * the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method. If an object changes, please cache it again, or use
    * {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}. Note that the filters must be applied before caching.
@@ -2217,7 +2204,9 @@
    * Real-time Filters are not recommended when dealing with a Context2D canvas if performance is a concern. For best
    * performance and to still allow for some visual effects, use a {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}}
    * when possible.
+   *
    * @class BitmapCache
+   * @module EaselJS
    */
   var BitmapCache = function(_Filter) {
     inherits(BitmapCache, _Filter);
@@ -2403,7 +2392,7 @@
      * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape
      * using `myShape.cache(0,0,100,100,2)`, then the resulting cacheCanvas will be 200x200 pixels. This lets you scale
      * and rotate cached elements with greater fidelity.
-     * @param {Object} [options=undefined] When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be
+     * @param {Object} [options] When using things like {{#crossLink "StageGL"}}{{/crossLink}} there may be
      * extra caching opportunities or requirements.
      */
     BitmapCache.prototype.define = function define(target) {
@@ -2417,6 +2406,7 @@
         throw "No symbol to cache"
       }
       this._options = options;
+      this._useWebGL = options !== undefined;
       this.target = target;
       this.width = width >= 1 ? width : 1;
       this.height = height >= 1 ? height : 1;
@@ -2456,6 +2446,29 @@
      * @method release
      */
     BitmapCache.prototype.release = function release() {
+      var stage = this.target.stage;
+      if (this._useWebGL && this._webGLCache) {
+        // if it isn't cache controlled clean up after yourself
+        if (!this._webGLCache.isCacheControlled) {
+          if (this.__lastRT) {
+            this.__lastRT = undefined
+          }
+          if (this.__rtA) {
+            this._webGLCache._killTextureObject(this.__rtA)
+          }
+          if (this.__rtB) {
+            this._webGLCache._killTextureObject(this.__rtB)
+          }
+          if (this.target && this.target.cacheCanvas) {
+            this._webGLCache._killTextureObject(this.target.cacheCanvas)
+          }
+        }
+        // set the context to none and let the garbage collector get the rest when the canvas itself gets removed
+        this._webGLCache = false
+      } else if (stage instanceof StageGL) {
+        stage.releaseTexture(this.target.cacheCanvas);
+        this.target.cacheCanvas.remove()
+      }
       this.target = this.target.cacheCanvas = null;
       this.cacheID = this._cacheDataURLID = this._cacheDataURL = undefined;
       this.width = this.height = this.x = this.y = this.offX = this.offY = 0;
@@ -2500,14 +2513,52 @@
      * @protected
      */
     BitmapCache.prototype._updateSurface = function _updateSurface() {
-      var surface = this.target.cacheCanvas;
-      // create it if it's missing
-      if (!surface) {
-        surface = this.target.cacheCanvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas")
+      if (!this._useWebGL) {
+        var _surface = this.target.cacheCanvas;
+        // create it if it's missing
+        if (!_surface) {
+          _surface = this.target.cacheCanvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas")
+        }
+        // now size it
+        _surface.width = this._drawWidth;
+        _surface.height = this._drawHeight;
+        // skip the webgl-only updates
+        return
       }
-      // now size it
-      surface.width = this._drawWidth;
-      surface.height = this._drawHeight
+      // create it if it's missing
+      if (!this._webGLCache) {
+        if (this._options === true || this.target.stage !== this._options) {
+          // a StageGL dedicated to this cache
+          this.target.cacheCanvas = document.createElement("canvas");
+          this._webGLCache = new StageGL(this.target.cacheCanvas, {});
+          this._webGLCache.isCacheControlled = true
+        } else {
+          // a StageGL re-used by this cache
+          try {
+            this.target.cacheCanvas = true; // we'll replace this with a render texture during the draw as it changes per draw
+            this._webGLCache = this._options
+          } catch (e) {
+            throw "Invalid StageGL object used for cache parameter."
+          }
+        }
+      }
+      // now size render surfaces
+      var stageGL = this._webGLCache;
+      var surface = this.target.cacheCanvas;
+      // if we have a dedicated stage we've gotta size it
+      if (stageGL.isCacheControlled) {
+        surface.width = this._drawWidth;
+        surface.height = this._drawHeight;
+        stageGL.updateViewport(this._drawWidth, this._drawHeight)
+      }
+      if (this.target.filters) {
+        // with filters we can't tell how many we'll need but the most we'll ever need is two, so make them now
+        stageGL.getTargetRenderTexture(this.target, this._drawWidth, this._drawHeight);
+        stageGL.getTargetRenderTexture(this.target, this._drawWidth, this._drawHeight)
+      } else if (!stageGL.isCacheControlled) {
+        // without filters then we only need one RenderTexture, and that's only if its not a dedicated stage
+        stageGL.getTargetRenderTexture(this.target, this._drawWidth, this._drawHeight)
+      }
     };
     /**
      * Perform the cache draw out for context 2D now that the setup properties have been performed.
@@ -2517,18 +2568,30 @@
     BitmapCache.prototype._drawToCache = function _drawToCache(compositeOperation) {
       var target = this.target;
       var surface = target.cacheCanvas;
-      var ctx = surface.getContext("2d");
-      if (!compositeOperation) {
-        ctx.clearRect(0, 0, this._drawWidth + 1, this._drawHeight + 1)
+      var webGL = this._webGLCache;
+      if (!this._useWebGL || !webGL) {
+        var ctx = surface.getContext("2d");
+        if (!compositeOperation) {
+          ctx.clearRect(0, 0, this._drawWidth + 1, this._drawHeight + 1)
+        }
+        ctx.save();
+        ctx.globalCompositeOperation = compositeOperation;
+        ctx.setTransform(this.scale, 0, 0, this.scale, -this.offX, -this.offY);
+        target.draw(ctx, true);
+        ctx.restore();
+        if (target.filters && target.filters.length) {
+          this._applyFilters(target)
+        }
+        surface._invalid = true;
+        return
       }
-      ctx.save();
-      ctx.globalCompositeOperation = compositeOperation;
-      ctx.setTransform(this.scale, 0, 0, this.scale, -this.offX, -this.offY);
-      target.draw(ctx, true);
-      ctx.restore();
-      if (target.filters && target.filters.length) {
-        this._applyFilters(target)
-      }
+      // TODO: auto split blur into an x/y pass
+      this._webGLCache.cacheDraw(target, target.filters, this);
+      // NOTE: we may of swapped around which element the surface is, so we re-fetch it
+      surface = this.target.cacheCanvas;
+      surface.width = this._drawWidth;
+      surface.height = this._drawHeight;
+      surface._invalid = true
     };
     /**
      * Work through every filter and apply its individual transformation to it.
@@ -2552,15 +2615,6 @@
     };
     return BitmapCache
   }(Filter);
-  /**
-   * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
-   * {{#crossLink "Container"}}{{/crossLink}}, {{#crossLink "Bitmap"}}{{/crossLink}}, and {{#crossLink "Shape"}}{{/crossLink}}.
-   * DisplayObject is the base class for all display classes in the EaselJS library. It defines the core properties and
-   * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
-   * caching, and mouse handlers.
-   * @class DisplayObject
-   * @extends EventDispatcher
-   */
   var DisplayObject = function(_EventDispatcher) {
     inherits(DisplayObject, _EventDispatcher);
     // constructor:
@@ -3005,11 +3059,11 @@
      * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
      * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
      * 	cached elements with greater fidelity. Default is 1.
-     * @param {Object} [options=Object] When using alternate displays there may be extra caching opportunities or needs.
+     * @param {Object} [options] When using alternate displays there may be extra caching opportunities or needs.
      */
     DisplayObject.prototype.cache = function cache(x, y, width, height) {
       var scale = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
-      var options = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
+      var options = arguments[5];
       if (!this.bitmapCache) {
         this.bitmapCache = new BitmapCache
       }
@@ -3580,7 +3634,44 @@
       }
     }]);
     return DisplayObject
-  }(EventDispatcher); {
+  }(EventDispatcher);
+  // static properties:
+  /**
+   * Listing of mouse event names. Used in _hasMouseEventListener.
+   * @property _MOUSE_EVENTS
+   * @protected
+   * @static
+   * @type {Array}
+   * @readonly
+   */
+  /**
+   * Suppresses errors generated when using features like hitTest, mouse events, and {{#crossLink "getObjectsUnderPoint"}}{{/crossLink}}
+   * with cross domain content.
+   * @property suppressCrossDomainErrors
+   * @static
+   * @type {Boolean}
+   * @default false
+   */
+  /**
+   * @property _snapToPixelEnabled
+   * @protected
+   * @static
+   * @type {Boolean}
+   * @default false
+   */
+  /**
+   * @property _hitTestCanvas
+   * @type {HTMLCanvasElement | Object}
+   * @static
+   * @protected
+   */
+  /**
+   * @property _hitTestContext
+   * @type {CanvasRenderingContext2D}
+   * @static
+   * @protected
+   */
+  {
     var canvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas"); // prevent errors on load in browsers without canvas.
     if (canvas.getContext) {
       DisplayObject._hitTestCanvas = canvas;
@@ -3697,26 +3788,6 @@
    * @param {Array} params An array containing any arguments that were passed to the Stage.update() method. For
    *      example if you called stage.update("hello"), then the params would be ["hello"].
    * @since 0.6.0
-   */
-  /**
-   * A Container is a nestable display list that allows you to work with compound display elements. For  example you could
-   * group arm, leg, torso and head {{#crossLink "Bitmap"}}{{/crossLink}} instances together into a Person Container, and
-   * transform them as a group, while still being able to move the individual parts relative to each other. Children of
-   * containers have their <code>transform</code> and <code>alpha</code> properties concatenated with their parent
-   * Container.
-   *
-   * For example, a {{#crossLink "Shape"}}{{/crossLink}} with x=100 and alpha=0.5, placed in a Container with <code>x=50</code>
-   * and <code>alpha=0.7</code> will be rendered to the canvas at <code>x=150</code> and <code>alpha=0.35</code>.
-   * Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
-   *
-   * <h4>Example</h4>
-   *
-   *      var container = new createjs.Container();
-   *      container.addChild(bitmapInstance, shapeInstance);
-   *      container.x = 100;
-   *
-   * @class Container
-   * @extends DisplayObject
    */
   var Container = function(_DisplayObject) {
     inherits(Container, _DisplayObject);
@@ -4451,4933 +4522,6 @@
     }]);
     return Container
   }(DisplayObject);
-  /**
-   * A Bitmap represents an Image, Canvas, or Video in the display list. A Bitmap can be instantiated using an existing
-   * HTML element, or a string.
-   *
-   * <h4>Example</h4>
-   *
-   *      var bitmap = new createjs.Bitmap("imagePath.jpg");
-   *
-   * <strong>Notes:</strong>
-   * <ol>
-   *     <li>When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
-   *      will be displayed.</li>
-   *     <li>Bitmaps with an SVG source currently will not respect an alpha value other than 0 or 1. To get around this,
-   *     the Bitmap can be cached.</li>
-   *     <li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
-   *     happens in all browsers except recent Firefox builds.</li>
-   *     <li>Images loaded cross-origin will throw cross-origin security errors when interacted with using a mouse, using
-   *     methods such as `getObjectUnderPoint`, or using filters, or caching. You can get around this by setting
-   *     `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`</li>
-   * </ol>
-   *
-   * @class Bitmap
-   * @extends DisplayObject
-   */
-  var Bitmap = function(_DisplayObject) {
-    inherits(Bitmap, _DisplayObject);
-    // constructor:
-    /**
-     * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to
-     * display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use.
-     * If it is a URI, a new Image object will be constructed and assigned to the .image property.
-     * @constructor
-     */
-    function Bitmap(imageOrUri) {
-      classCallCheck(this, Bitmap);
-      // public properties:
-      /**
-       * The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially
-       * mobile browsers) support drawing video to a canvas.
-       * @property image
-       * @type HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
-       */
-      var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
-      if (typeof imageOrUri == "string") {
-        _this.image = document.createElement("img");
-        _this.image.src = imageOrUri
-      } else {
-        _this.image = imageOrUri
-      }
-      /**
-       * Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
-       * Note that video sources must have a width / height set to work correctly with `sourceRect`.
-       * @property sourceRect
-       * @type Rectangle
-       * @default null
-       */
-      _this.sourceRect = null;
-      return _this
-    }
-    // public methods:
-    /**
-     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-     * This does not account for whether it would be visible within the boundaries of the stage.
-     *
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method isVisible
-     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-     */
-    Bitmap.prototype.isVisible = function isVisible() {
-      var image = this.image;
-      var hasContent = this.cacheCanvas || image && (image.naturalWidth || image.getContext || image.readyState >= 2);
-      return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent)
-    };
-    /**
-     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-     * Returns true if the draw was handled (useful for overriding functionality).
-     *
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method draw
-     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-     * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
-     * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-     * into itself).
-     * @return {Boolean}
-     */
-    Bitmap.prototype.draw = function draw(ctx) {
-      var ignoreCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache) || !this.image) {
-        return true
-      }
-      var img = this.image,
-        rect = this.sourceRect;
-      if (rect) {
-        // some browsers choke on out of bound values, so we'll fix them:
-        var x1 = rect.x,
-          y1 = rect.y,
-          x2 = x1 + rect.width,
-          y2 = y1 + rect.height,
-          x = 0,
-          y = 0,
-          w = img.width,
-          h = img.height;
-        if (x1 < 0) {
-          x -= x1;
-          x1 = 0
-        }
-        if (x2 > w) {
-          x2 = w
-        }
-        if (y1 < 0) {
-          y -= y1;
-          y1 = 0
-        }
-        if (y2 > h) {
-          y2 = h
-        }
-        ctx.drawImage(img, x1, y1, x2 - x1, y2 - y1, x, y, x2 - x1, y2 - y1)
-      } else {
-        ctx.drawImage(img, 0, 0)
-      }
-      return true
-    };
-    // Note, the doc sections below document using the specified APIs (from DisplayObject) from
-    // Bitmap. This is why they have no method implementations.
-    /**
-     * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-     * You should <b>not</b> cache Bitmap instances as it can degrade performance.
-     *
-     * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work.</strong>
-     * To see the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
-     * method.
-     * @method cache
-     */
-    /**
-     * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-     * You should <b>not</b> cache Bitmap instances as it can degrade performance.
-     *
-     * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work.</strong>
-     * To see the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
-     * method.
-     * @method updateCache
-     */
-    /**
-     * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-     * You should <b>not</b> cache Bitmap instances as it can degrade performance.
-     *
-     * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work.</strong>
-     * To see the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
-     * method.
-     * @method uncache
-     */
-    /**
-     * Docced in superclass.
-     */
-    Bitmap.prototype.getBounds = function getBounds() {
-      var rect = _DisplayObject.prototype.getBounds.call(this);
-      if (rect) {
-        return rect
-      }
-      var image = this.image,
-        o = this.sourceRect || image;
-      var hasContent = image && (image.naturalWidth || image.getContext || image.readyState >= 2);
-      return hasContent ? this._rectangle.setValues(0, 0, o.width, o.height) : null
-    };
-    /**
-     * Returns a clone of the Bitmap instance.
-     * @method clone
-     * @return {Bitmap} a clone of the Bitmap instance.
-     */
-    Bitmap.prototype.clone = function clone() {
-      var o = new Bitmap(this.image);
-      if (this.sourceRect) {
-        o.sourceRect = this.sourceRect.clone()
-      }
-      this._cloneProps(o);
-      return o
-    };
-    return Bitmap
-  }(DisplayObject);
-  /**
-   * Displays a frame or sequence of frames (ie. an animation) from a SpriteSheet instance. A sprite sheet is a series of
-   * images (usually animation frames) combined into a single image. For example, an animation consisting of 8 100x100
-   * images could be combined into a 400x200 sprite sheet (4 frames across by 2 high). You can display individual frames,
-   * play frames as an animation, and even sequence animations together.
-   *
-   * See the {{#crossLink "SpriteSheet"}}{{/crossLink}} class for more information on setting up frames and animations.
-   *
-   * <h4>Example</h4>
-   *
-   *      var instance = new createjs.Sprite(spriteSheet);
-   *      instance.gotoAndStop("frameName");
-   *
-   * Until {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} or {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}} is called,
-   * only the first defined frame defined in the sprite sheet will be displayed.
-   *
-   * @class Sprite
-   * @extends DisplayObject
-   */
-  var Sprite = function(_DisplayObject) {
-    inherits(Sprite, _DisplayObject);
-    // constructor:
-    /**
-     * @constructor
-     * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
-     * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
-     * @param {String|Number} [frameOrAnimation] The frame number or animation to play initially.
-     */
-    function Sprite(spriteSheet, frameOrAnimation) {
-      classCallCheck(this, Sprite);
-      // public properties:
-      /**
-       * The frame index that will be drawn when draw is called. Note that with some {{#crossLink "SpriteSheet"}}{{/crossLink}}
-       * definitions, this will advance non-sequentially. This will always be an integer value.
-       * @property currentFrame
-       * @type {Number}
-       * @default 0
-       * @readonly
-       */
-      var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
-      _this.currentFrame = 0;
-      /**
-       * Returns the name of the currently playing animation.
-       * @property currentAnimation
-       * @type {String}
-       * @final
-       * @readonly
-       */
-      _this.currentAnimation = null;
-      /**
-       * Prevents the animation from advancing each tick automatically. For example, you could create a sprite
-       * sheet of icons, set paused to true, and display the appropriate icon by setting <code>currentFrame</code>.
-       * @property paused
-       * @type {Boolean}
-       * @default false
-       */
-      _this.paused = true;
-      /**
-       * The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame
-       * data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
-       * @property spriteSheet
-       * @type {SpriteSheet}
-       * @readonly
-       */
-      _this.spriteSheet = spriteSheet;
-      /**
-       * Specifies the current frame index within the currently playing animation. When playing normally, this will increase
-       * from 0 to n-1, where n is the number of frames in the current animation.
-       *
-       * This could be a non-integer value if
-       * using time-based playback (see {{#crossLink "Sprite/framerate"}}{{/crossLink}}, or if the animation's speed is
-       * not an integer.
-       * @property currentAnimationFrame
-       * @type {Number}
-       * @default 0
-       */
-      _this.currentAnimationFrame = 0;
-      /**
-       * By default Sprite instances advance one frame per tick. Specifying a framerate for the Sprite (or its related
-       * SpriteSheet) will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
-       * framerate.
-       *
-       * For example, if a Sprite with a framerate of 10 is placed on a Stage being updated at 40fps, then the Sprite will
-       * advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will
-       * vary slightly between frames.
-       *
-       * This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being
-       * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
-       * @property framerate
-       * @type {Number}
-       * @default 0
-       */
-      _this.framerate = 0;
-      // private properties:
-      /**
-       * Current animation object.
-       * @property _animation
-       * @protected
-       * @type {Object}
-       * @default null
-       */
-      _this._animation = null;
-      /**
-       * Current frame index.
-       * @property _currentFrame
-       * @protected
-       * @type {Number}
-       * @default null
-       */
-      _this._currentFrame = null;
-      /**
-       * Skips the next auto advance. Used by gotoAndPlay to avoid immediately jumping to the next frame
-       * @property _skipAdvance
-       * @protected
-       * @type {Boolean}
-       * @default false
-       */
-      _this._skipAdvance = false;
-      if (frameOrAnimation != null) {
-        _this.gotoAndPlay(frameOrAnimation)
-      }
-      return _this
-    }
-    // public methods:
-    /**
-     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-     * This does not account for whether it would be visible within the boundaries of the stage.
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method isVisible
-     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-     */
-    Sprite.prototype.isVisible = function isVisible() {
-      var hasContent = this.cacheCanvas || this.spriteSheet.complete;
-      return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent)
-    };
-    /**
-     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-     * Returns true if the draw was handled (useful for overriding functionality).
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method draw
-     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-     * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
-     * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-     * into itself).
-     */
-    Sprite.prototype.draw = function draw(ctx, ignoreCache) {
-      if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache)) {
-        return true
-      }
-      this._normalizeFrame();
-      var o = this.spriteSheet.getFrame(this._currentFrame | 0);
-      if (!o) {
-        return false
-      }
-      var rect = o.rect;
-      if (rect.width && rect.height) {
-        ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, -o.regX, -o.regY, rect.width, rect.height)
-      }
-      return true
-    };
-    // Note, the doc sections below document using the specified APIs (from DisplayObject) from
-    // Bitmap. This is why they have no method implementations.
-    /**
-     * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
-     * You should not cache Sprite instances as it can degrade performance.
-     * @method cache
-     */
-    /**
-     * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
-     * You should not cache Sprite instances as it can degrade performance.
-     * @method updateCache
-     */
-    /**
-     * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
-     * You should not cache Sprite instances as it can degrade performance.
-     * @method uncache
-     */
-    /**
-     * Play (unpause) the current animation. The Sprite will be paused if either {{#crossLink "Sprite/stop"}}{{/crossLink}}
-     * or {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} is called. Single frame animations will remain
-     * unchanged.
-     * @method play
-     */
-    Sprite.prototype.play = function play() {
-      this.paused = false
-    };
-    /**
-     * Stop playing a running animation. The Sprite will be playing if {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}}
-     * is called. Note that calling {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}} or {{#crossLink "Sprite/play"}}{{/crossLink}}
-     * will resume playback.
-     * @method stop
-     */
-    Sprite.prototype.stop = function stop() {
-      this.paused = true
-    };
-    /**
-     * Sets paused to false and plays the specified animation name, named frame, or frame number.
-     * @method gotoAndPlay
-     * @param {String|Number} frameOrAnimation The frame number or animation name that the playhead should move to
-     * and begin playing.
-     */
-    Sprite.prototype.gotoAndPlay = function gotoAndPlay(frameOrAnimation) {
-      this.paused = false;
-      this._skipAdvance = true;
-      this._goto(frameOrAnimation)
-    };
-    /**
-     * Sets paused to true and seeks to the specified animation name, named frame, or frame number.
-     * @method gotoAndStop
-     * @param {String|Number} frameOrAnimation The frame number or animation name that the playhead should move to
-     * and stop.
-     */
-    Sprite.prototype.gotoAndStop = function gotoAndStop(frameOrAnimation) {
-      this.paused = true;
-      this._goto(frameOrAnimation)
-    };
-    /**
-     * Advances the playhead. This occurs automatically each tick by default.
-     * @param [time] {Number} The amount of time in ms to advance by. Only applicable if framerate is set on the Sprite
-     * or its SpriteSheet.
-     * @method advance
-     */
-    Sprite.prototype.advance = function advance(time) {
-      var fps = this.framerate || this.spriteSheet.framerate;
-      var t = fps && time != null ? time / (1e3 / fps) : 1;
-      this._normalizeFrame(t)
-    };
-    /**
-     * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the current frame relative to
-     * the origin. For example, a 90 x 70 frame with <code>regX=50</code> and <code>regY=40</code> would return a
-     * rectangle with [x=-50, y=-40, width=90, height=70]. This ignores transformations on the display object.
-     *
-     * Also see the SpriteSheet {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}} method.
-     * @method getBounds
-     * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully
-     * loaded.
-     */
-    Sprite.prototype.getBounds = function getBounds() {
-      // TODO: should this normalizeFrame?
-      return _DisplayObject.prototype.getBounds.call(this) || this.spriteSheet.getFrameBounds(this.currentFrame, this._rectangle)
-    };
-    /**
-     * Returns a clone of the Sprite instance. Note that the same SpriteSheet is shared between cloned
-     * instances.
-     * @method clone
-     * @return {Sprite} a clone of the Sprite instance.
-     */
-    Sprite.prototype.clone = function clone() {
-      return this._cloneProps(new Sprite(this.spriteSheet))
-    };
-    // private methods:
-    /**
-     * @method _cloneProps
-     * @param {Sprite} o
-     * @return {Sprite} o
-     * @protected
-     */
-    Sprite.prototype._cloneProps = function _cloneProps(o) {
-      _DisplayObject.prototype._cloneProps.call(this, o);
-      o.currentFrame = this.currentFrame;
-      o.currentAnimation = this.currentAnimation;
-      o.paused = this.paused;
-      o.currentAnimationFrame = this.currentAnimationFrame;
-      o.framerate = this.framerate;
-      o._animation = this._animation;
-      o._currentFrame = this._currentFrame;
-      o._skipAdvance = this._skipAdvance;
-      return o
-    };
-    /**
-     * Advances the <code>currentFrame</code> if paused is not true. This is called automatically when the {{#crossLink "Stage"}}{{/crossLink}}
-     * ticks.
-     * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
-     * @protected
-     * @method _tick
-     */
-    Sprite.prototype._tick = function _tick(evtObj) {
-      if (!this.paused) {
-        if (!this._skipAdvance) {
-          this.advance(evtObj && evtObj.delta)
-        }
-        this._skipAdvance = false
-      }
-      _DisplayObject.prototype._tick.call(this, evtObj)
-    };
-    /**
-     * Normalizes the current frame, advancing animations and dispatching callbacks as appropriate.
-     * @protected
-     * @method _normalizeFrame
-     * @param {Number} [frameDelta=0]
-     */
-    Sprite.prototype._normalizeFrame = function _normalizeFrame() {
-      var frameDelta = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-      var animation = this._animation;
-      var paused = this.paused;
-      var frame = this._currentFrame;
-      if (animation) {
-        var speed = animation.speed || 1;
-        var animFrame = this.currentAnimationFrame;
-        var l = animation.frames.length;
-        if (animFrame + frameDelta * speed >= l) {
-          var next = animation.next;
-          if (this._dispatchAnimationEnd(animation, frame, paused, next, l - 1)) {
-            // something changed in the event stack, so we shouldn't make any more changes here.
-            return
-          } else if (next) {
-            // sequence. Automatically calls _normalizeFrame again with the remaining frames.
-            return this._goto(next, frameDelta - (l - animFrame) / speed)
-          } else {
-            // end.
-            this.paused = true;
-            animFrame = animation.frames.length - 1
-          }
-        } else {
-          animFrame += frameDelta * speed
-        }
-        this.currentAnimationFrame = animFrame;
-        this._currentFrame = animation.frames[animFrame | 0]
-      } else {
-        frame = this._currentFrame += frameDelta;
-        var _l = this.spriteSheet.getNumFrames();
-        if (frame >= _l && _l > 0) {
-          if (!this._dispatchAnimationEnd(animation, frame, paused, _l - 1)) {
-            // looped.
-            if ((this._currentFrame -= _l) >= _l) {
-              return this._normalizeFrame()
-            }
-          }
-        }
-      }
-      frame = this._currentFrame | 0;
-      if (this.currentFrame != frame) {
-        this.currentFrame = frame;
-        this.dispatchEvent("change")
-      }
-    };
-    /**
-     * Dispatches the "animationend" event. Returns true if a handler changed the animation (ex. calling {{#crossLink "Sprite/stop"}}{{/crossLink}},
-     * {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}}, etc.)
-     * @method _dispatchAnimationEnd
-     * @param animation
-     * @param frame
-     * @param paused
-     * @param next
-     * @param end
-     * @private
-     */
-    Sprite.prototype._dispatchAnimationEnd = function _dispatchAnimationEnd(animation, frame, paused, next, end) {
-      var name = animation ? animation.name : null;
-      if (this.hasEventListener("animationend")) {
-        var evt = new Event("animationend");
-        evt.name = name;
-        evt.next = next;
-        this.dispatchEvent(evt)
-      }
-      // did the animation get changed in the event stack?:
-      var changed = this._animation != animation || this._currentFrame != frame;
-      // if the animation hasn't changed, but the sprite was paused, then we want to stick to the last frame:
-      if (!changed && !paused && this.paused) {
-        this.currentAnimationFrame = end;
-        changed = true
-      }
-      return changed
-    };
-    /**
-     * Moves the playhead to the specified frame number or animation.
-     * @method _goto
-     * @param {String|Number} frameOrAnimation The frame number or animation that the playhead should move to.
-     * @param {Boolean} [frame] The frame of the animation to go to. Defaults to 0.
-     * @protected
-     */
-    Sprite.prototype._goto = function _goto(frameOrAnimation, frame) {
-      this.currentAnimationFrame = 0;
-      if (isNaN(frameOrAnimation)) {
-        var data = this.spriteSheet.getAnimation(frameOrAnimation);
-        if (data) {
-          this._animation = data;
-          this.currentAnimation = frameOrAnimation;
-          this._normalizeFrame(frame)
-        }
-      } else {
-        this.currentAnimation = this._animation = null;
-        this._currentFrame = frameOrAnimation;
-        this._normalizeFrame()
-      }
-    };
-    return Sprite
-  }(DisplayObject);
-  // ES6 does not support static properties, this is a work around.
-  var _maxPoolSize = 100;
-  var _spritePool = [];
-  /**
-   * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
-   * using new line characters, but automatic wrapping is not supported. See the
-   * {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
-   * property for more information on defining glyphs.
-   *
-   * <strong>Important:</strong> BitmapText extends Container, but is not designed to be used as one.
-   * As such, methods like addChild and removeChild are disabled.
-   * @class BitmapText
-   * @extends Container
-   */
-  var BitmapText = function(_Container) {
-    inherits(BitmapText, _Container);
-    // constructor:
-    /**
-     * @param {String} [text=""] The text to display.
-     * @param {SpriteSheet} [spriteSheet=null] The spritesheet that defines the character glyphs.
-     * @constructor
-     */
-    function BitmapText() {
-      var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-      var spriteSheet = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-      classCallCheck(this, BitmapText);
-      // public properties:
-      /**
-       * The text to display.
-       * @property text
-       * @type String
-       * @default ""
-       */
-      var _this = possibleConstructorReturn(this, _Container.call(this));
-      _this.text = text;
-      /**
-       * A SpriteSheet instance that defines the glyphs for this bitmap text. Each glyph/character
-       * should have a single frame animation defined in the sprite sheet named the same as
-       * corresponding character. For example, the following animation definition:
-       *
-       * 		"A": {frames: [0]}
-       *
-       * would indicate that the frame at index 0 of the spritesheet should be drawn for the "A" character. The short form
-       * is also acceptable:
-       *
-       * 		"A": 0
-       *
-       * Note that if a character in the text is not found in the sprite sheet, it will also
-       * try to use the alternate case (upper or lower).
-       *
-       * See SpriteSheet for more information on defining sprite sheet data.
-       * @property spriteSheet
-       * @type SpriteSheet
-       * @default null
-       */
-      _this.spriteSheet = spriteSheet;
-      /**
-       * The height of each line of text. If 0, then it will use a line height calculated
-       * by checking for the height of the "1", "T", or "L" character (in that order). If
-       * those characters are not defined, it will use the height of the first frame of the
-       * sprite sheet.
-       * @property lineHeight
-       * @type Number
-       * @default 0
-       */
-      _this.lineHeight = 0;
-      /**
-       * This spacing (in pixels) will be added after each character in the output.
-       * @property letterSpacing
-       * @type Number
-       * @default 0
-       */
-      _this.letterSpacing = 0;
-      /**
-       * If a space character is not defined in the sprite sheet, then empty pixels equal to
-       * spaceWidth will be inserted instead. If 0, then it will use a value calculated
-       * by checking for the width of the "1", "l", "E", or "A" character (in that order). If
-       * those characters are not defined, it will use the width of the first frame of the
-       * sprite sheet.
-       * @property spaceWidth
-       * @type Number
-       * @default 0
-       */
-      _this.spaceWidth = 0;
-      // private properties:
-      /**
-       * @property _oldProps
-       * @type Object
-       * @protected
-       */
-      _this._oldProps = {
-        text: 0,
-        spriteSheet: 0,
-        lineHeight: 0,
-        letterSpacing: 0,
-        spaceWidth: 0
-      };
-      return _this
-    }
-    // static properties:
-    /**
-     * BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains
-     * an internal object pool of sprite instances to reuse. Increasing this value can cause more sprites to be
-     * retained, slightly increasing memory use, but reducing instantiation.
-     * @property maxPoolSize
-     * @type Number
-     * @static
-     * @default 100
-     */
-    // public methods:
-    /**
-     * Docced in superclass.
-     */
-    BitmapText.prototype.draw = function draw(ctx, ignoreCache) {
-      _Container.prototype.draw.call(this, ctx, ignoreCache)
-    };
-    /**
-     * Docced in superclass.
-     */
-    BitmapText.prototype.getBounds = function getBounds() {
-      this._updateText();
-      return _Container.prototype.getBounds.call(this)
-    };
-    /**
-     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-     * This does not account for whether it would be visible within the boundaries of the stage.
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method isVisible
-     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-     */
-    BitmapText.prototype.isVisible = function isVisible() {
-      var hasContent = this.cacheCanvas || this.spriteSheet && this.spriteSheet.complete && this.text;
-      return !!(this.visible && this.alpha > 0 && this.scaleX !== 0 && this.scaleY !== 0 && hasContent)
-    };
-    BitmapText.prototype.clone = function clone() {
-      return this._cloneProps(new BitmapText(this.text, this.spriteSheet))
-    };
-    /**
-     * <strong>Disabled in BitmapText.</strong>
-     * @method addChild
-     */
-    BitmapText.prototype.addChild = function addChild() {};
-    /**
-     * <strong>Disabled in BitmapText.</strong>
-     * @method addChildAt
-     */
-    BitmapText.prototype.addChildAt = function addChildAt() {};
-    /**
-     * <strong>Disabled in BitmapText.</strong>
-     * @method removeChild
-     */
-    BitmapText.prototype.removeChild = function removeChild() {};
-    /**
-     * <strong>Disabled in BitmapText.</strong>
-     * @method removeChildAt
-     */
-    BitmapText.prototype.removeChildAt = function removeChildAt() {};
-    /**
-     * <strong>Disabled in BitmapText.</strong>
-     * @method removeAllChildren
-     */
-    BitmapText.prototype.removeAllChildren = function removeAllChildren() {};
-    // private methods:
-    /**
-     * @method _cloneProps
-     * @param {BitmapText} o
-     * @return {BitmapText} o
-     * @protected
-     */
-    BitmapText.prototype._cloneProps = function _cloneProps(o) {
-      _Container.prototype._cloneProps.call(this, o);
-      o.lineHeight = this.lineHeight;
-      o.letterSpacing = this.letterSpacing;
-      o.spaceWidth = this.spaceWidth;
-      return o
-    };
-    /**
-     * @method _getFrameIndex
-     * @param {String} character
-     * @param {SpriteSheet} spriteSheet
-     * @return {Number}
-     * @protected
-     */
-    BitmapText.prototype._getFrameIndex = function _getFrameIndex(character, spriteSheet) {
-      var c = void 0,
-        o = spriteSheet.getAnimation(character);
-      if (!o) {
-        character != (c = character.toUpperCase()) || character != (c = character.toLowerCase()) || (c = null);
-        if (c) {
-          o = spriteSheet.getAnimation(c)
-        }
-      }
-      return o && o.frames[0]
-    };
-    /**
-     * @method _getFrame
-     * @param {String} character
-     * @param {SpriteSheet} spriteSheet
-     * @return {Object}
-     * @protected
-     */
-    BitmapText.prototype._getFrame = function _getFrame(character, spriteSheet) {
-      var index = this._getFrameIndex(character, spriteSheet);
-      return index == null ? index : spriteSheet.getFrame(index)
-    };
-    /**
-     * @method _getLineHeight
-     * @param {SpriteSheet} ss
-     * @return {Number}
-     * @protected
-     */
-    BitmapText.prototype._getLineHeight = function _getLineHeight(ss) {
-      var frame = this._getFrame("1", ss) || this._getFrame("T", ss) || this._getFrame("L", ss) || ss.getFrame(0);
-      return frame ? frame.rect.height : 1
-    };
-    /**
-     * @method _getSpaceWidth
-     * @param {SpriteSheet} ss
-     * @return {Number}
-     * @protected
-     */
-    BitmapText.prototype._getSpaceWidth = function _getSpaceWidth(ss) {
-      var frame = this._getFrame("1", ss) || this._getFrame("l", ss) || this._getFrame("e", ss) || this._getFrame("a", ss) || ss.getFrame(0);
-      return frame ? frame.rect.width : 1
-    };
-    BitmapText.prototype._tick = function _tick(evtObj) {
-      var stage = this.stage;
-      stage && stage.on("drawstart", this._updateText, this, true);
-      _Container.prototype._tick.call(this, evtObj)
-    };
-    /**
-     * @method _updateText
-     * @protected
-     */
-    BitmapText.prototype._updateText = function _updateText() {
-      var x = 0,
-        y = 0,
-        o = this._oldProps,
-        change = false,
-        spaceW = this.spaceWidth,
-        lineH = this.lineHeight,
-        ss = this.spriteSheet;
-      var pool = BitmapText._spritePool,
-        kids = this.children,
-        childIndex = 0,
-        numKids = kids.length,
-        sprite = void 0;
-      for (var n in o) {
-        if (o[n] != this[n]) {
-          o[n] = this[n];
-          change = true
-        }
-      }
-      if (!change) {
-        return
-      }
-      var hasSpace = !!this._getFrame(" ", ss);
-      if (!hasSpace && !spaceW) {
-        spaceW = this._getSpaceWidth(ss)
-      }
-      if (!lineH) {
-        lineH = this._getLineHeight(ss)
-      }
-      for (var i = 0, l = this.text.length; i < l; i++) {
-        var character = this.text.charAt(i);
-        if (character == " " && !hasSpace) {
-          x += spaceW;
-          continue
-        } else if (character == "\n" || character == "\r") {
-          if (character == "\r" && this.text.charAt(i + 1) == "\n") {
-            i++
-          } // crlf
-          x = 0;
-          y += lineH;
-          continue
-        }
-        var index = this._getFrameIndex(character, ss);
-        if (index == null) {
-          continue
-        }
-        if (childIndex < numKids) {
-          sprite = kids[childIndex]
-        } else {
-          kids.push(sprite = pool.length ? pool.pop() : new Sprite);
-          sprite.parent = this;
-          numKids++
-        }
-        sprite.spriteSheet = ss;
-        sprite.gotoAndStop(index);
-        sprite.x = x;
-        sprite.y = y;
-        childIndex++;
-        x += sprite.getBounds().width + this.letterSpacing
-      }
-      while (numKids > childIndex) {
-        // faster than removeChild.
-        pool.push(sprite = kids.pop());
-        sprite.parent = null;
-        numKids--
-      }
-      if (pool.length > BitmapText.maxPoolSize) {
-        pool.length = BitmapText.maxPoolSize
-      }
-    };
-    createClass(BitmapText, null, [{
-      key: "maxPoolSize",
-      get: function get() {
-        return _maxPoolSize
-      },
-      set: function set(maxPoolSize) {
-        _maxPoolSize = maxPoolSize
-      }
-    }, {
-      key: "_spritePool",
-      get: function get() {
-        return _spritePool
-      }
-    }]);
-    return BitmapText
-  }(Container);
-  /**
-   * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>
-   *
-   * A DOMElement allows you to associate a HTMLElement with the display list. It will be transformed
-   * within the DOM as though it is child of the {{#crossLink "Container"}}{{/crossLink}} it is added to. However, it is
-   * not rendered to canvas, and as such will retain whatever z-index it has relative to the canvas (ie. it will be
-   * drawn in front of or behind the canvas).
-   *
-   * The position of a DOMElement is relative to their parent node in the DOM. It is recommended that
-   * the DOM Object be added to a div that also contains the canvas so that they share the same position
-   * on the page.
-   *
-   * DOMElement is useful for positioning HTML elements over top of canvas content, and for elements
-   * that you want to display outside the bounds of the canvas. For example, a tooltip with rich HTML
-   * content.
-   *
-   * <h4>Mouse Interaction</h4>
-   *
-   * DOMElement instances are not full EaselJS display objects, and do not participate in EaselJS mouse
-   * events or support methods like hitTest. To get mouse events from a DOMElement, you must instead add handlers to
-   * the htmlElement (note, this does not support EventDispatcher)
-   *
-   *      var domElement = new createjs.DOMElement(htmlElement);
-   *      domElement.htmlElement.onclick = function() {
-   *          console.log("clicked");
-   *      }
-   *
-   * @class DOMElement
-   * @extends DisplayObject
-   */
-  var DOMElement = function(_DisplayObject) {
-    inherits(DOMElement, _DisplayObject);
-    // constructor:
-    /**
-     * @constructor
-     * @param {HTMLElement|String} htmlElement A reference or id for the DOM element to manage.
-     */
-    function DOMElement(htmlElement) {
-      classCallCheck(this, DOMElement);
-      var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
-      if (typeof htmlElement == "string") {
-        htmlElement = document.getElementById(htmlElement)
-      }
-      _this.mouseEnabled = false;
-      var style = htmlElement.style;
-      style.position = "absolute";
-      style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
-      // public properties:
-      /**
-       * The DOM object to manage.
-       * @property htmlElement
-       * @type HTMLElement
-       */
-      _this.htmlElement = htmlElement;
-      // private properties:
-      /**
-       * @property _oldMtx
-       * @type Matrix2D
-       * @protected
-       */
-      _this._oldProps = null;
-      return _this
-    }
-    // public methods:
-    /**
-     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-     * This does not account for whether it would be visible within the boundaries of the stage.
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method isVisible
-     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-     */
-    DOMElement.prototype.isVisible = function isVisible() {
-      return this.htmlElement != null
-    };
-    /**
-     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-     * Returns true if the draw was handled (useful for overriding functionality).
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method draw
-     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-     * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
-     * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-     * into itself).
-     * @return {Boolean}
-     */
-    DOMElement.prototype.draw = function draw(ctx, ignoreCache) {
-      // this relies on the _tick method because draw isn't called if the parent is not visible.
-      // the actual update happens in _handleDrawEnd
-      return true
-    };
-    /**
-     * Not applicable to DOMElement.
-     * @method cache
-     */
-    DOMElement.prototype.cache = function cache() {};
-    /**
-     * Not applicable to DOMElement.
-     * @method uncache
-     */
-    DOMElement.prototype.uncache = function uncache() {};
-    /**
-     * Not applicable to DOMElement.
-     * @method updateCache
-     */
-    DOMElement.prototype.updateCache = function updateCache() {};
-    /**
-     * Not applicable to DOMElement.
-     * @method hitTest
-     */
-    DOMElement.prototype.hitTest = function hitTest() {};
-    /**
-     * Not applicable to DOMElement.
-     * @method localToGlobal
-     */
-    DOMElement.prototype.localToGlobal = function localToGlobal() {};
-    /**
-     * Not applicable to DOMElement.
-     * @method globalToLocal
-     */
-    DOMElement.prototype.globalToLocal = function globalToLocal() {};
-    /**
-     * Not applicable to DOMElement.
-     * @method localToLocal
-     */
-    DOMElement.prototype.localToLocal = function localToLocal() {};
-    /**
-     * DOMElement cannot be cloned. Throws an error.
-     * @method clone
-     */
-    DOMElement.prototype.clone = function clone() {
-      throw "DOMElement cannot be cloned."
-    };
-    // private methods:
-    /**
-     * @method _tick
-     * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
-     * function.
-     * @protected
-     */
-    DOMElement.prototype._tick = function _tick(evtObj) {
-      var stage = this.stage;
-      stage && stage.on("drawend", this._handleDrawEnd, this, true);
-      _DisplayObject.prototype._tick.call(this, evtObj)
-    };
-    /**
-     * @method _handleDrawEnd
-     * @param {Event} evt
-     * @protected
-     */
-    DOMElement.prototype._handleDrawEnd = function _handleDrawEnd(evt) {
-      var o = this.htmlElement;
-      if (!o) {
-        return
-      }
-      var style = o.style;
-      var props = this.getConcatenatedDisplayProps(this._props),
-        mtx = props.matrix;
-      var visibility = props.visible ? "visible" : "hidden";
-      if (visibility != style.visibility) {
-        style.visibility = visibility
-      }
-      if (!props.visible) {
-        return
-      }
-      var oldProps = this._oldProps,
-        oldMtx = oldProps && oldProps.matrix;
-      var n = 1e4; // precision
-      if (!oldMtx || !oldMtx.equals(mtx)) {
-        var str = "matrix(" + (mtx.a * n | 0) / n + "," + (mtx.b * n | 0) / n + "," + (mtx.c * n | 0) / n + "," + (mtx.d * n | 0) / n + "," + (mtx.tx + .5 | 0);
-        style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str + "," + (mtx.ty + .5 | 0) + ")";
-        style.MozTransform = str + "px," + (mtx.ty + .5 | 0) + "px)";
-        if (!oldProps) {
-          oldProps = this._oldProps = new DisplayProps(true, NaN)
-        }
-        oldProps.matrix.copy(mtx)
-      }
-      if (oldProps.alpha != props.alpha) {
-        style.opacity = "" + (props.alpha * n | 0) / n;
-        oldProps.alpha = props.alpha
-      }
-    };
-    return DOMElement
-  }(DisplayObject);
-  /**
-   * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a
-   * specified context. Note that you can use Graphics without any dependency on the EaselJS framework by calling {{#crossLink "Graphics/draw"}}{{/crossLink}}
-   * directly, or it can be used with the {{#crossLink "Shape"}}{{/crossLink}} object to draw vector graphics within the
-   * context of an EaselJS display list.
-   *
-   * There are two approaches to working with Graphics object: calling methods on a Graphics instance (the "Graphics API"), or
-   * instantiating Graphics command objects and adding them to the graphics queue via {{#crossLink "Graphics/append"}}{{/crossLink}}.
-   * The former abstracts the latter, simplifying beginning and ending paths, fills, and strokes.
-   *
-   *      var g = new createjs.Graphics();
-   *      g.setStrokeStyle(1);
-   *      g.beginStroke("#000000");
-   *      g.beginFill("red");
-   *      g.drawCircle(0,0,30);
-   *
-   * All drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
-   * the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill:
-   *
-   *      myGraphics.beginStroke("red").beginFill("blue").drawRect(20, 20, 100, 50);
-   *
-   * Each graphics API call generates a command object (see below). The last command to be created can be accessed via
-   * {{#crossLink "Graphics/command:property"}}{{/crossLink}}:
-   *
-   *      var fillCommand = myGraphics.beginFill("red").command;
-   *      // ... later, update the fill style/color:
-   *      fillCommand.style = "blue";
-   *      // or change it to a bitmap fill:
-   *      fillCommand.bitmap(myImage);
-   *
-   * For more direct control of rendering, you can instantiate and append command objects to the graphics queue directly. In this case, you
-   * need to manage path creation manually, and ensure that fill/stroke is applied to a defined path:
-   *
-   *      // start a new path. Graphics.beginCmd is a reusable BeginPath instance:
-   *      myGraphics.append(createjs.Graphics.beginCmd);
-   *      // we need to define the path before applying the fill:
-   *      var circle = new createjs.Graphics.Circle(0,0,30);
-   *      myGraphics.append(circle);
-   *      // fill the path we just defined:
-   *      var fill = new createjs.Graphics.Fill("red");
-   *      myGraphics.append(fill);
-   *
-   * These approaches can be used together, for example to insert a custom command:
-   *
-   *      myGraphics.beginFill("red");
-   *      var customCommand = new CustomSpiralCommand(etc);
-   *      myGraphics.append(customCommand);
-   *      myGraphics.beginFill("blue");
-   *      myGraphics.drawCircle(0, 0, 30);
-   *
-   * See {{#crossLink "Graphics/append"}}{{/crossLink}} for more info on creating custom commands.
-   *
-   * <h4>Tiny API</h4>
-   * The Graphics class also includes a "tiny API", which is one or two-letter methods that are shortcuts for all of the
-   * Graphics methods. These methods are great for creating compact instructions, and is used by the Toolkit for CreateJS
-   * to generate readable code. All tiny methods are marked as protected, so you can view them by enabling protected
-   * descriptions in the docs.
-   *
-   * <table>
-   *     <tr><td><b>Tiny</b></td><td><b>Method</b></td><td><b>Tiny</b></td><td><b>Method</b></td></tr>
-   *     <tr><td>mt</td><td>{{#crossLink "Graphics/moveTo"}}{{/crossLink}} </td>
-   *     <td>lt</td> <td>{{#crossLink "Graphics/lineTo"}}{{/crossLink}}</td></tr>
-   *     <tr><td>a/at</td><td>{{#crossLink "Graphics/arc"}}{{/crossLink}} / {{#crossLink "Graphics/arcTo"}}{{/crossLink}} </td>
-   *     <td>bt</td><td>{{#crossLink "Graphics/bezierCurveTo"}}{{/crossLink}} </td></tr>
-   *     <tr><td>qt</td><td>{{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} (also curveTo)</td>
-   *     <td>r</td><td>{{#crossLink "Graphics/rect"}}{{/crossLink}} </td></tr>
-   *     <tr><td>cp</td><td>{{#crossLink "Graphics/closePath"}}{{/crossLink}} </td>
-   *     <td>c</td><td>{{#crossLink "Graphics/clear"}}{{/crossLink}} </td></tr>
-   *     <tr><td>f</td><td>{{#crossLink "Graphics/beginFill"}}{{/crossLink}} </td>
-   *     <td>lf</td><td>{{#crossLink "Graphics/beginLinearGradientFill"}}{{/crossLink}} </td></tr>
-   *     <tr><td>rf</td><td>{{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} </td>
-   *     <td>bf</td><td>{{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} </td></tr>
-   *     <tr><td>ef</td><td>{{#crossLink "Graphics/endFill"}}{{/crossLink}} </td>
-   *     <td>ss / sd</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} / {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} </td></tr>
-   *     <tr><td>s</td><td>{{#crossLink "Graphics/beginStroke"}}{{/crossLink}} </td>
-   *     <td>ls</td><td>{{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} </td></tr>
-   *     <tr><td>rs</td><td>{{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} </td>
-   *     <td>bs</td><td>{{#crossLink "Graphics/beginBitmapStroke"}}{{/crossLink}} </td></tr>
-   *     <tr><td>es</td><td>{{#crossLink "Graphics/endStroke"}}{{/crossLink}} </td>
-   *     <td>dr</td><td>{{#crossLink "Graphics/drawRect"}}{{/crossLink}} </td></tr>
-   *     <tr><td>rr</td><td>{{#crossLink "Graphics/drawRoundRect"}}{{/crossLink}} </td>
-   *     <td>rc</td><td>{{#crossLink "Graphics/drawRoundRectComplex"}}{{/crossLink}} </td></tr>
-   *     <tr><td>dc</td><td>{{#crossLink "Graphics/drawCircle"}}{{/crossLink}} </td>
-   *     <td>de</td><td>{{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} </td></tr>
-   *     <tr><td>dp</td><td>{{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} </td>
-   *     <td>p</td><td>{{#crossLink "Graphics/decodePath"}}{{/crossLink}} </td></tr>
-   * </table>
-   *
-   * Here is the above example, using the tiny API instead.
-   *
-   *      myGraphics.s("red").f("blue").r(20, 20, 100, 50);
-   *
-   * @class Graphics
-   */
-  var Graphics = function() {
-    // constructor:
-    /**
-     * @constructor
-     */
-    function Graphics() {
-      classCallCheck(this, Graphics);
-      // public properties
-      /**
-       * Holds a reference to the last command that was created or appended. For example, you could retain a reference
-       * to a Fill command in order to dynamically update the color later by using:
-       *
-       * 		var myFill = myGraphics.beginFill("red").command;
-       * 		// update color later:
-       * 		myFill.style = "yellow";
-       *
-       * @property command
-       * @type Object
-       */
-      this.command = null;
-      // private properties
-      /**
-       * @property _stroke
-       * @protected
-       * @type {Stroke}
-       */
-      this._stroke = null;
-      /**
-       * @property _strokeStyle
-       * @protected
-       * @type {StrokeStyle}
-       */
-      this._strokeStyle = null;
-      /**
-       * @property _oldStrokeStyle
-       * @protected
-       * @type {StrokeStyle}
-       */
-      this._oldStrokeStyle = null;
-      /**
-       * @property _strokeDash
-       * @protected
-       * @type {StrokeDash}
-       */
-      this._strokeDash = null;
-      /**
-       * @property _oldStrokeDash
-       * @protected
-       * @type {StrokeDash}
-       */
-      this._oldStrokeDash = null;
-      /**
-       * @property _strokeIgnoreScale
-       * @protected
-       * @type Boolean
-       */
-      this._strokeIgnoreScale = false;
-      /**
-       * @property _fill
-       * @protected
-       * @type {Fill}
-       */
-      this._fill = null;
-      /**
-       * @property _instructions
-       * @protected
-       * @type {Array}
-       */
-      this._instructions = [];
-      /**
-       * Indicates the last instruction index that was committed.
-       * @property _commitIndex
-       * @protected
-       * @type {Number}
-       */
-      this._commitIndex = 0;
-      /**
-       * Uncommitted instructions.
-       * @property _activeInstructions
-       * @protected
-       * @type {Array}
-       */
-      this._activeInstructions = [];
-      /**
-       * This indicates that there have been changes to the activeInstruction list since the last updateInstructions call.
-       * @property _dirty
-       * @protected
-       * @type {Boolean}
-       * @default false
-       */
-      this._dirty = false;
-      /**
-       * Index to draw from if a store operation has happened.
-       * @property _storeIndex
-       * @protected
-       * @type {Number}
-       * @default 0
-       */
-      this._storeIndex = 0;
-      // ActionScript mappings:
-      /**
-       * Maps the familiar ActionScript <code>curveTo()</code> method to the functionally similar {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}}
-       * method.
-       * @method curveTo
-       * @param {Number} cpx
-       * @param {Number} cpy
-       * @param {Number} x
-       * @param {Number} y
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       */
-      this.curveTo = this.quadraticCurveTo;
-      /**
-       * Maps the familiar ActionScript <code>drawRect()</code> method to the functionally similar {{#crossLink "Graphics/rect"}}{{/crossLink}}
-       * method.
-       * @method drawRect
-       * @param {Number} x
-       * @param {Number} y
-       * @param {Number} w Width of the rectangle
-       * @param {Number} h Height of the rectangle
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       */
-      this.drawRect = this.rect;
-      // tiny API:
-      /**
-       * Shortcut to moveTo.
-       * @method mt
-       * @param {Number} x The x coordinate the drawing point should move to.
-       * @param {Number} y The y coordinate the drawing point should move to.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls).
-       * @chainable
-       * @protected
-       */
-      this.mt = this.moveTo;
-      /**
-       * Shortcut to lineTo.
-       * @method lt
-       * @param {Number} x The x coordinate the drawing point should draw to.
-       * @param {Number} y The y coordinate the drawing point should draw to.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.lt = this.lineTo;
-      /**
-       * Shortcut to arcTo.
-       * @method at
-       * @param {Number} x1
-       * @param {Number} y1
-       * @param {Number} x2
-       * @param {Number} y2
-       * @param {Number} radius
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.at = this.arcTo;
-      /**
-       * Shortcut to bezierCurveTo.
-       * @method bt
-       * @param {Number} cp1x
-       * @param {Number} cp1y
-       * @param {Number} cp2x
-       * @param {Number} cp2y
-       * @param {Number} x
-       * @param {Number} y
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.bt = this.bezierCurveTo;
-      /**
-       * Shortcut to quadraticCurveTo / curveTo.
-       * @method qt
-       * @param {Number} cpx
-       * @param {Number} cpy
-       * @param {Number} x
-       * @param {Number} y
-       * @protected
-       * @chainable
-       */
-      this.qt = this.quadraticCurveTo;
-      /**
-       * Shortcut to arc.
-       * @method a
-       * @param {Number} x
-       * @param {Number} y
-       * @param {Number} radius
-       * @param {Number} startAngle Measured in radians.
-       * @param {Number} endAngle Measured in radians.
-       * @param {Boolean} anticlockwise
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @protected
-       * @chainable
-       */
-      this.a = this.arc;
-      /**
-       * Shortcut to rect.
-       * @method r
-       * @param {Number} x
-       * @param {Number} y
-       * @param {Number} w Width of the rectangle
-       * @param {Number} h Height of the rectangle
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.r = this.rect;
-      /**
-       * Shortcut to closePath.
-       * @method cp
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.cp = this.closePath;
-      /**
-       * Shortcut to clear.
-       * @method c
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.c = this.clear;
-      /**
-       * Shortcut to beginFill.
-       * @method f
-       * @param {String} color A CSS compatible color value (ex. "red", "#FF0000", or "rgba(255,0,0,0.5)"). Setting to
-       * null will result in no fill.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.f = this.beginFill;
-      /**
-       * Shortcut to beginLinearGradientFill.
-       * @method lf
-       * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient
-       * drawing from red to blue.
-       * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw
-       * the first color to 10% then interpolating to the second color at 90%.
-       * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
-       * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
-       * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
-       * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.lf = this.beginLinearGradientFill;
-      /**
-       * Shortcut to beginRadialGradientFill.
-       * @method rf
-       * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
-       * a gradient drawing from red to blue.
-       * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
-       * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
-       * @param {Number} x0 Center position of the inner circle that defines the gradient.
-       * @param {Number} y0 Center position of the inner circle that defines the gradient.
-       * @param {Number} r0 Radius of the inner circle that defines the gradient.
-       * @param {Number} x1 Center position of the outer circle that defines the gradient.
-       * @param {Number} y1 Center position of the outer circle that defines the gradient.
-       * @param {Number} r1 Radius of the outer circle that defines the gradient.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.rf = this.beginRadialGradientFill;
-      /**
-       * Shortcut to beginBitmapFill.
-       * @method bf
-       * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
-       * as the pattern.
-       * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
-       * "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat". Note that Firefox does not support "repeat-x" or
-       * "repeat-y" (latest tests were in FF 20.0), and will default to "repeat".
-       * @param {Matrix2D} matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation
-       * will be applied relative to the parent transform.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.bf = this.beginBitmapFill;
-      /**
-       * Shortcut to endFill.
-       * @method ef
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.ef = this.endFill;
-      /**
-       * Shortcut to setStrokeStyle.
-       * @method ss
-       * @param {Number} thickness The width of the stroke.
-       * @param {String | Number} [caps=0] Indicates the type of caps to use at the end of lines. One of butt,
-       * round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with
-       * the tiny API.
-       * @param {String | Number} [joints=0] Specifies the type of joints that should be used where two lines meet.
-       * One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel)
-       * for use with the tiny API.
-       * @param {Number} [miterLimit=10] If joints is set to "miter", then you can specify a miter limit ratio which
-       * controls at what point a mitered joint will be clipped.
-       * @param {Boolean} [ignoreScale=false] If true, the stroke will be drawn at the specified thickness regardless
-       * of active transformations.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.ss = this.setStrokeStyle;
-      /**
-       * Shortcut to setStrokeDash.
-       * @method sd
-       * @param {Array} [segments] An array specifying the dash pattern, alternating between line and gap.
-       * For example, [20,10] would create a pattern of 20 pixel lines with 10 pixel gaps between them.
-       * Passing null or an empty array will clear any existing dash.
-       * @param {Number} [offset=0] The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.sd = this.setStrokeDash;
-      /**
-       * Shortcut to beginStroke.
-       * @method s
-       * @param {String} color A CSS compatible color value (ex. "#FF0000", "red", or "rgba(255,0,0,0.5)"). Setting to
-       * null will result in no stroke.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.s = this.beginStroke;
-      /**
-       * Shortcut to beginLinearGradientStroke.
-       * @method ls
-       * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
-       * a gradient drawing from red to blue.
-       * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
-       * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
-       * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
-       * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
-       * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
-       * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.ls = this.beginLinearGradientStroke;
-      /**
-       * Shortcut to beginRadialGradientStroke.
-       * @method rs
-       * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
-       * a gradient drawing from red to blue.
-       * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
-       * 0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color
-       * to 100%.
-       * @param {Number} x0 Center position of the inner circle that defines the gradient.
-       * @param {Number} y0 Center position of the inner circle that defines the gradient.
-       * @param {Number} r0 Radius of the inner circle that defines the gradient.
-       * @param {Number} x1 Center position of the outer circle that defines the gradient.
-       * @param {Number} y1 Center position of the outer circle that defines the gradient.
-       * @param {Number} r1 Radius of the outer circle that defines the gradient.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.rs = this.beginRadialGradientStroke;
-      /**
-       * Shortcut to beginBitmapStroke.
-       * @method bs
-       * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
-       * as the pattern.
-       * @param {String} [repetition=repeat] Optional. Indicates whether to repeat the image in the fill area. One of
-       * "repeat", "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.bs = this.beginBitmapStroke;
-      /**
-       * Shortcut to endStroke.
-       * @method es
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.es = this.endStroke;
-      /**
-       * Shortcut to drawRect.
-       * @method dr
-       * @param {Number} x
-       * @param {Number} y
-       * @param {Number} w Width of the rectangle
-       * @param {Number} h Height of the rectangle
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.dr = this.drawRect;
-      /**
-       * Shortcut to drawRoundRect.
-       * @method rr
-       * @param {Number} x
-       * @param {Number} y
-       * @param {Number} w
-       * @param {Number} h
-       * @param {Number} radius Corner radius.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.rr = this.drawRoundRect;
-      /**
-       * Shortcut to drawRoundRectComplex.
-       * @method rc
-       * @param {Number} x The horizontal coordinate to draw the round rect.
-       * @param {Number} y The vertical coordinate to draw the round rect.
-       * @param {Number} w The width of the round rect.
-       * @param {Number} h The height of the round rect.
-       * @param {Number} radiusTL Top left corner radius.
-       * @param {Number} radiusTR Top right corner radius.
-       * @param {Number} radiusBR Bottom right corner radius.
-       * @param {Number} radiusBL Bottom left corner radius.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.rc = this.drawRoundRectComplex;
-      /**
-       * Shortcut to drawCircle.
-       * @method dc
-       * @param {Number} x x coordinate center point of circle.
-       * @param {Number} y y coordinate center point of circle.
-       * @param {Number} radius Radius of circle.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.dc = this.drawCircle;
-      /**
-       * Shortcut to drawEllipse.
-       * @method de
-       * @param {Number} x The left coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
-       * which draws from center.
-       * @param {Number} y The top coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
-       * which draws from the center.
-       * @param {Number} w The height (horizontal diameter) of the ellipse. The horizontal radius will be half of this
-       * number.
-       * @param {Number} h The width (vertical diameter) of the ellipse. The vertical radius will be half of this number.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.de = this.drawEllipse;
-      /**
-       * Shortcut to drawPolyStar.
-       * @method dp
-       * @param {Number} x Position of the center of the shape.
-       * @param {Number} y Position of the center of the shape.
-       * @param {Number} radius The outer radius of the shape.
-       * @param {Number} sides The number of points on the star or sides on the polygon.
-       * @param {Number} pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular
-       * polygon (no points), a pointSize of 1 will draw nothing because the points are infinitely pointy.
-       * @param {Number} angle The angle of the first point / corner. For example a value of 0 will draw the first point
-       * directly to the right of the center.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.dp = this.drawPolyStar;
-      /**
-       * Shortcut to decodePath.
-       * @method p
-       * @param {String} str The path string to decode.
-       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-       * @chainable
-       * @protected
-       */
-      this.p = this.decodePath;
-      this.clear()
-    }
-    // static public methods:
-    /**
-     * Returns a CSS compatible color string based on the specified RGB numeric color values in the format
-     * "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)". For example,
-     *
-     *      createjs.Graphics.getRGB(50, 100, 150, 0.5);
-     *      // Returns "rgba(50,100,150,0.5)"
-     *
-     * It also supports passing a single hex color value as the first param, and an optional alpha value as the second
-     * param. For example,
-     *
-     *      createjs.Graphics.getRGB(0xFF00FF, 0.2);
-     *      // Returns "rgba(255,0,255,0.2)"
-     *
-     * @method getRGB
-     * @static
-     * @param {Number} r The red component for the color, between 0 and 0xFF (255).
-     * @param {Number} g The green component for the color, between 0 and 0xFF (255).
-     * @param {Number} b The blue component for the color, between 0 and 0xFF (255).
-     * @param {Number} [alpha] The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
-     * @return {String} A CSS compatible color string based on the specified RGB numeric color values in the format
-     * "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)".
-     */
-    Graphics.getRGB = function getRGB(r, g, b, alpha) {
-      if (r != null && b == null) {
-        alpha = g;
-        b = r & 255;
-        g = r >> 8 & 255;
-        r = r >> 16 & 255
-      }
-      if (alpha == null) {
-        return "rgb(" + r + "," + g + "," + b + ")"
-      } else {
-        return "rgba(" + r + "," + g + "," + b + "," + alpha + ")"
-      }
-    };
-    /**
-     * Returns a CSS compatible color string based on the specified HSL numeric color values in the format "hsla(360,100,100,1.0)",
-     * or if alpha is null then in the format "hsl(360,100,100)".
-     *
-     *      createjs.Graphics.getHSL(150, 100, 70);
-     *      // Returns "hsl(150,100,70)"
-     *
-     * @method getHSL
-     * @static
-     * @param {Number} hue The hue component for the color, between 0 and 360.
-     * @param {Number} saturation The saturation component for the color, between 0 and 100.
-     * @param {Number} lightness The lightness component for the color, between 0 and 100.
-     * @param {Number} [alpha] The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
-     * @return {String} A CSS compatible color string based on the specified HSL numeric color values in the format
-     * "hsla(360,100,100,1.0)", or if alpha is null then in the format "hsl(360,100,100)".
-     */
-    Graphics.getHSL = function getHSL(hue, saturation, lightness, alpha) {
-      if (alpha == null) {
-        return "hsl(" + hue % 360 + "," + saturation + "%," + lightness + "%)"
-      } else {
-        return "hsl(" + hue % 360 + "," + saturation + "%," + lightness + "%," + alpha + ")"
-      }
-    };
-    // accessor properties:
-    /**
-     * Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect)
-     * Modifying the returned array directly is not recommended, and is likely to result in unexpected behaviour.
-     *
-     * This property is mainly intended for introspection of the instructions (ex. for graphics export).
-     * @property instructions
-     * @type {Array}
-     * @readonly
-     */
-    // public methods:
-    /**
-     * Returns true if this Graphics instance has no drawing commands.
-     * @method isEmpty
-     * @return {Boolean} Returns true if this Graphics instance has no drawing commands.
-     */
-    Graphics.prototype.isEmpty = function isEmpty() {
-      return !(this._instructions.length || this._activeInstructions.length)
-    };
-    /**
-     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-     * Returns true if the draw was handled (useful for overriding functionality).
-     *
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method draw
-     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-     * @param {Object} data Optional data that is passed to graphics command exec methods. When called from a Shape instance, the shape passes itself as the data parameter. This can be used by custom graphic commands to insert contextual data.
-     */
-    Graphics.prototype.draw = function draw(ctx, data) {
-      this._updateInstructions();
-      var instr = this._instructions;
-      var l = instr.length;
-      for (var i = this._storeIndex; i < l; i++) {
-        instr[i].exec(ctx, data)
-      }
-    };
-    /**
-     * Draws only the path described for this Graphics instance, skipping any non-path instructions, including fill and
-     * stroke descriptions. Used for <code>DisplayObject.mask</code> to draw the clipping path, for example.
-     *
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method drawAsPath
-     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-     */
-    Graphics.prototype.drawAsPath = function drawAsPath(ctx) {
-      this._updateInstructions();
-      var instr = void 0,
-        instrs = this._instructions;
-      var l = instrs.length;
-      for (var i = this._storeIndex; i < l; i++) {
-        // the first command is always a beginPath command.
-        if ((instr = instrs[i]).path !== false) {
-          instr.exec(ctx)
-        }
-      }
-    };
-    // public methods that map directly to context 2D calls:
-    /**
-     * Moves the drawing point to the specified position. A tiny API method "mt" also exists.
-     * @method moveTo
-     * @param {Number} x The x coordinate the drawing point should move to.
-     * @param {Number} y The y coordinate the drawing point should move to.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls).
-     * @chainable
-     */
-    Graphics.prototype.moveTo = function moveTo(x, y) {
-      return this.append(new MoveTo(x, y), true)
-    };
-    /**
-     * Draws a line from the current drawing point to the specified position, which become the new current drawing
-     * point. Note that you *must* call {{#crossLink "Graphics/moveTo"}}{{/crossLink}} before the first `lineTo()`.
-     * A tiny API method "lt" also exists.
-     *
-     * For detailed information, read the
-     * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
-     * whatwg spec</a>.
-     * @method lineTo
-     * @param {Number} x The x coordinate the drawing point should draw to.
-     * @param {Number} y The y coordinate the drawing point should draw to.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.lineTo = function lineTo(x, y) {
-      return this.append(new LineTo(x, y))
-    };
-    /**
-     * Draws an arc with the specified control points and radius.  For detailed information, read the
-     * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arcto">
-     * whatwg spec</a>. A tiny API method "at" also exists.
-     * @method arcTo
-     * @param {Number} x1
-     * @param {Number} y1
-     * @param {Number} x2
-     * @param {Number} y2
-     * @param {Number} radius
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.arcTo = function arcTo(x1, y1, x2, y2, radius) {
-      return this.append(new ArcTo(x1, y1, x2, y2, radius))
-    };
-    /**
-     * Draws an arc defined by the radius, startAngle and endAngle arguments, centered at the position (x, y). For
-     * example, to draw a full circle with a radius of 20 centered at (100, 100):
-     *
-     *      arc(100, 100, 20, 0, Math.PI*2);
-     *
-     * For detailed information, read the
-     * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arc">whatwg spec</a>.
-     * A tiny API method "a" also exists.
-     * @method arc
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} radius
-     * @param {Number} startAngle Measured in radians.
-     * @param {Number} endAngle Measured in radians.
-     * @param {Boolean} anticlockwise
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.arc = function arc(x, y, radius, startAngle, endAngle, anticlockwise) {
-      return this.append(new Arc(x, y, radius, startAngle, endAngle, anticlockwise))
-    };
-    /**
-     * Draws a quadratic curve from the current drawing point to (x, y) using the control point (cpx, cpy). For detailed
-     * information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-quadraticcurveto">
-     * whatwg spec</a>. A tiny API method "qt" also exists.
-     * @method quadraticCurveTo
-     * @param {Number} cpx
-     * @param {Number} cpy
-     * @param {Number} x
-     * @param {Number} y
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.quadraticCurveTo = function quadraticCurveTo(cpx, cpy, x, y) {
-      return this.append(new QuadraticCurveTo(cpx, cpy, x, y))
-    };
-    /**
-     * Draws a bezier curve from the current drawing point to (x, y) using the control points (cp1x, cp1y) and (cp2x,
-     * cp2y). For detailed information, read the
-     * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-beziercurveto">
-     * whatwg spec</a>. A tiny API method "bt" also exists.
-     * @method bezierCurveTo
-     * @param {Number} cp1x
-     * @param {Number} cp1y
-     * @param {Number} cp2x
-     * @param {Number} cp2y
-     * @param {Number} x
-     * @param {Number} y
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.bezierCurveTo = function bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) {
-      return this.append(new BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y))
-    };
-    /**
-     * Draws a rectangle at (x, y) with the specified width and height using the current fill and/or stroke.
-     * For detailed information, read the
-     * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-rect">
-     * whatwg spec</a>. A tiny API method "r" also exists.
-     * @method rect
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} w Width of the rectangle
-     * @param {Number} h Height of the rectangle
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.rect = function rect(x, y, w, h) {
-      return this.append(new Rect(x, y, w, h))
-    };
-    /**
-     * Closes the current path, effectively drawing a line from the current drawing point to the first drawing point specified
-     * since the fill or stroke was last set. A tiny API method "cp" also exists.
-     * @method closePath
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.closePath = function closePath() {
-      return this._activeInstructions.length ? this.append(new ClosePath) : this
-    };
-    // public methods that roughly map to Adobe Flash/Animate graphics APIs:
-    /**
-     * Clears all drawing instructions, effectively resetting this Graphics instance. Any line and fill styles will need
-     * to be redefined to draw shapes following a clear call. A tiny API method "c" also exists.
-     * @method clear
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.clear = function clear() {
-      this._instructions.length = this._activeInstructions.length = this._commitIndex = 0;
-      this._strokeStyle = this._oldStrokeStyle = this._stroke = this._fill = this._strokeDash = this._oldStrokeDash = null;
-      this._dirty = this._strokeIgnoreScale = false;
-      return this
-    };
-    /**
-     * Begins a fill with the specified color. This ends the current sub-path. A tiny API method "f" also exists.
-     * @method beginFill
-     * @param {String} color A CSS compatible color value (ex. "red", "#FF0000", or "rgba(255,0,0,0.5)"). Setting to
-     * null will result in no fill.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.beginFill = function beginFill(color) {
-      return this._setFill(color ? new Fill(color) : null)
-    };
-    /**
-     * Begins a linear gradient fill defined by the line (x0, y0) to (x1, y1). This ends the current sub-path. For
-     * example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a
-     * square to display it:
-     *
-     *      myGraphics.beginLinearGradientFill(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
-     *
-     * A tiny API method "lf" also exists.
-     * @method beginLinearGradientFill
-     * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient
-     * drawing from red to blue.
-     * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw
-     * the first color to 10% then interpolating to the second color at 90%.
-     * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
-     * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
-     * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
-     * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.beginLinearGradientFill = function beginLinearGradientFill(colors, ratios, x0, y0, x1, y1) {
-      return this._setFill((new Fill).linearGradient(colors, ratios, x0, y0, x1, y1))
-    };
-    /**
-     * Begins a radial gradient fill. This ends the current sub-path. For example, the following code defines a red to
-     * blue radial gradient centered at (100, 100), with a radius of 50, and draws a circle to display it:
-     *
-     *      myGraphics.beginRadialGradientFill(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50).drawCircle(100, 100, 50);
-     *
-     * A tiny API method "rf" also exists.
-     * @method beginRadialGradientFill
-     * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
-     * a gradient drawing from red to blue.
-     * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
-     * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
-     * @param {Number} x0 Center position of the inner circle that defines the gradient.
-     * @param {Number} y0 Center position of the inner circle that defines the gradient.
-     * @param {Number} r0 Radius of the inner circle that defines the gradient.
-     * @param {Number} x1 Center position of the outer circle that defines the gradient.
-     * @param {Number} y1 Center position of the outer circle that defines the gradient.
-     * @param {Number} r1 Radius of the outer circle that defines the gradient.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.beginRadialGradientFill = function beginRadialGradientFill(colors, ratios, x0, y0, r0, x1, y1, r1) {
-      return this._setFill((new Fill).radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1))
-    };
-    /**
-     * Begins a pattern fill using the specified image. This ends the current sub-path. A tiny API method "bf" also
-     * exists.
-     * @method beginBitmapFill
-     * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
-     * as the pattern. Must be loaded prior to creating a bitmap fill, or the fill will be empty.
-     * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
-     * "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat". Note that Firefox does not support "repeat-x" or
-     * "repeat-y" (latest tests were in FF 20.0), and will default to "repeat".
-     * @param {Matrix2D} matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation
-     * will be applied relative to the parent transform.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.beginBitmapFill = function beginBitmapFill(image, repetition, matrix) {
-      return this._setFill(new Fill(null, matrix).bitmap(image, repetition))
-    };
-    /**
-     * Ends the current sub-path, and begins a new one with no fill. Functionally identical to <code>beginFill(null)</code>.
-     * A tiny API method "ef" also exists.
-     * @method endFill
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.endFill = function endFill() {
-      return this.beginFill()
-    };
-    /**
-     * Sets the stroke style. Like all drawing methods, this can be chained, so you can define
-     * the stroke style and color in a single line of code like so:
-     *
-     * 	myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
-     *
-     * A tiny API method "ss" also exists.
-     * @method setStrokeStyle
-     * @param {Number} thickness The width of the stroke.
-     * @param {String | Number} [caps=0] Indicates the type of caps to use at the end of lines. One of butt,
-     * round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with
-     * the tiny API.
-     * @param {String | Number} [joints=0] Specifies the type of joints that should be used where two lines meet.
-     * One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel)
-     * for use with the tiny API.
-     * @param {Number} [miterLimit=10] If joints is set to "miter", then you can specify a miter limit ratio which
-     * controls at what point a mitered joint will be clipped.
-     * @param {Boolean} [ignoreScale=false] If true, the stroke will be drawn at the specified thickness regardless
-     * of active transformations.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.setStrokeStyle = function setStrokeStyle(thickness) {
-      var caps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      var joints = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      var miterLimit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10;
-      var ignoreScale = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-      this._updateInstructions(true);
-      this._strokeStyle = this.command = new StrokeStyle(thickness, caps, joints, miterLimit, ignoreScale);
-      // ignoreScale lives on Stroke, not StrokeStyle, so we do a little trickery:
-      if (this._stroke) {
-        this._stroke.ignoreScale = ignoreScale
-      }
-      this._strokeIgnoreScale = ignoreScale;
-      return this
-    };
-    /**
-     * Sets or clears the stroke dash pattern.
-     *
-     * 	myGraphics.setStrokeDash([20, 10], 0);
-     *
-     * A tiny API method `sd` also exists.
-     * @method setStrokeDash
-     * @param {Array} [segments] An array specifying the dash pattern, alternating between line and gap.
-     * For example, `[20,10]` would create a pattern of 20 pixel lines with 10 pixel gaps between them.
-     * Passing null or an empty array will clear the existing stroke dash.
-     * @param {Number} [offset=0] The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.setStrokeDash = function setStrokeDash(segments) {
-      var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      this._updateInstructions(true);
-      this._strokeDash = this.command = new StrokeDash(segments, offset);
-      return this
-    };
-    /**
-     * Begins a stroke with the specified color. This ends the current sub-path. A tiny API method "s" also exists.
-     * @method beginStroke
-     * @param {String} color A CSS compatible color value (ex. "#FF0000", "red", or "rgba(255,0,0,0.5)"). Setting to
-     * null will result in no stroke.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.beginStroke = function beginStroke(color) {
-      return this._setStroke(color ? new Stroke(color) : null)
-    };
-    /**
-     * Begins a linear gradient stroke defined by the line (x0, y0) to (x1, y1). This ends the current sub-path. For
-     * example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a
-     * square to display it:
-     *
-     *      myGraphics.setStrokeStyle(10).
-     *          beginLinearGradientStroke(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
-     *
-     * A tiny API method "ls" also exists.
-     * @method beginLinearGradientStroke
-     * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
-     * a gradient drawing from red to blue.
-     * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
-     * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
-     * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
-     * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
-     * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
-     * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.beginLinearGradientStroke = function beginLinearGradientStroke(colors, ratios, x0, y0, x1, y1) {
-      return this._setStroke((new Stroke).linearGradient(colors, ratios, x0, y0, x1, y1))
-    };
-    /**
-     * Begins a radial gradient stroke. This ends the current sub-path. For example, the following code defines a red to
-     * blue radial gradient centered at (100, 100), with a radius of 50, and draws a rectangle to display it:
-     *
-     *      myGraphics.setStrokeStyle(10)
-     *          .beginRadialGradientStroke(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50)
-     *          .drawRect(50, 90, 150, 110);
-     *
-     * A tiny API method "rs" also exists.
-     * @method beginRadialGradientStroke
-     * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
-     * a gradient drawing from red to blue.
-     * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
-     * 0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color
-     * to 100%.
-     * @param {Number} x0 Center position of the inner circle that defines the gradient.
-     * @param {Number} y0 Center position of the inner circle that defines the gradient.
-     * @param {Number} r0 Radius of the inner circle that defines the gradient.
-     * @param {Number} x1 Center position of the outer circle that defines the gradient.
-     * @param {Number} y1 Center position of the outer circle that defines the gradient.
-     * @param {Number} r1 Radius of the outer circle that defines the gradient.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.beginRadialGradientStroke = function beginRadialGradientStroke(colors, ratios, x0, y0, r0, x1, y1, r1) {
-      return this._setStroke((new Stroke).radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1))
-    };
-    /**
-     * Begins a pattern fill using the specified image. This ends the current sub-path. Note that unlike bitmap fills,
-     * strokes do not currently support a matrix parameter due to limitations in the canvas API. A tiny API method "bs"
-     * also exists.
-     * @method beginBitmapStroke
-     * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
-     * as the pattern. Must be loaded prior to creating a bitmap fill, or the fill will be empty.
-     * @param {String} [repetition=repeat] Optional. Indicates whether to repeat the image in the fill area. One of
-     * "repeat", "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.beginBitmapStroke = function beginBitmapStroke(image) {
-      var repetition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "repeat";
-      // NOTE: matrix is not supported for stroke because transforms on strokes also affect the drawn stroke width.
-      return this._setStroke((new Stroke).bitmap(image, repetition))
-    };
-    /**
-     * Ends the current sub-path, and begins a new one with no stroke. Functionally identical to <code>beginStroke(null)</code>.
-     * A tiny API method "es" also exists.
-     * @method endStroke
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.endStroke = function endStroke() {
-      return this.beginStroke()
-    };
-    /**
-     * Draws a rounded rectangle with all corners with the specified radius.
-     * @method drawRoundRect
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} w
-     * @param {Number} h
-     * @param {Number} radius Corner radius.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.drawRoundRect = function drawRoundRect(x, y, w, h, radius) {
-      return this.drawRoundRectComplex(x, y, w, h, radius, radius, radius, radius)
-    };
-    /**
-     * Draws a rounded rectangle with different corner radii. Supports positive and negative corner radii. A tiny API
-     * method "rc" also exists.
-     * @method drawRoundRectComplex
-     * @param {Number} x The horizontal coordinate to draw the round rect.
-     * @param {Number} y The vertical coordinate to draw the round rect.
-     * @param {Number} w The width of the round rect.
-     * @param {Number} h The height of the round rect.
-     * @param {Number} radiusTL Top left corner radius.
-     * @param {Number} radiusTR Top right corner radius.
-     * @param {Number} radiusBR Bottom right corner radius.
-     * @param {Number} radiusBL Bottom left corner radius.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.drawRoundRectComplex = function drawRoundRectComplex(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
-      return this.append(new RoundRect(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL))
-    };
-    /**
-     * Draws a circle with the specified radius at (x, y).
-     *
-     *      var g = new createjs.Graphics();
-     *	    g.setStrokeStyle(1);
-     *	    g.beginStroke(createjs.Graphics.getRGB(0,0,0));
-     *	    g.beginFill(createjs.Graphics.getRGB(255,0,0));
-     *	    g.drawCircle(0,0,3);
-     *
-     *	    var s = new createjs.Shape(g);
-     *		  s.x = 100;
-     *		  s.y = 100;
-     *
-     *	    stage.addChild(s);
-     *	    stage.update();
-     *
-     * A tiny API method "dc" also exists.
-     * @method drawCircle
-     * @param {Number} x x coordinate center point of circle.
-     * @param {Number} y y coordinate center point of circle.
-     * @param {Number} radius Radius of circle.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.drawCircle = function drawCircle(x, y, radius) {
-      return this.append(new Circle(x, y, radius))
-    };
-    /**
-     * Draws an ellipse (oval) with a specified width (w) and height (h). Similar to {{#crossLink "Graphics/drawCircle"}}{{/crossLink}},
-     * except the width and height can be different. A tiny API method "de" also exists.
-     * @method drawEllipse
-     * @param {Number} x The left coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
-     * which draws from center.
-     * @param {Number} y The top coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
-     * which draws from the center.
-     * @param {Number} w The height (horizontal diameter) of the ellipse. The horizontal radius will be half of this
-     * number.
-     * @param {Number} h The width (vertical diameter) of the ellipse. The vertical radius will be half of this number.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.drawEllipse = function drawEllipse(x, y, w, h) {
-      return this.append(new Ellipse(x, y, w, h))
-    };
-    /**
-     * Draws a star if pointSize is greater than 0, or a regular polygon if pointSize is 0 with the specified number of
-     * points. For example, the following code will draw a familiar 5 pointed star shape centered at 100, 100 and with a
-     * radius of 50:
-     *
-     *      myGraphics.beginFill("#FF0").drawPolyStar(100, 100, 50, 5, 0.6, -90);
-     *      // Note: -90 makes the first point vertical
-     *
-     * A tiny API method "dp" also exists.
-     *
-     * @method drawPolyStar
-     * @param {Number} x Position of the center of the shape.
-     * @param {Number} y Position of the center of the shape.
-     * @param {Number} radius The outer radius of the shape.
-     * @param {Number} sides The number of points on the star or sides on the polygon.
-     * @param {Number} pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular
-     * polygon (no points), a pointSize of 1 will draw nothing because the points are infinitely pointy.
-     * @param {Number} angle The angle of the first point / corner. For example a value of 0 will draw the first point
-     * directly to the right of the center.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.drawPolyStar = function drawPolyStar(x, y, radius, sides, pointSize, angle) {
-      return this.append(new PolyStar(x, y, radius, sides, pointSize, angle))
-    };
-    /**
-     * Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
-     * that accepts two parameters: the Context2D to operate on, and an arbitrary data object passed into
-     * {{#crossLink "Graphics/draw"}}{{/crossLink}}. The latter will usually be the Shape instance that called draw.
-     *
-     * This method is used internally by Graphics methods, such as drawCircle, but can also be used directly to insert
-     * built-in or custom graphics commands. For example:
-     *
-     * 		// attach data to our shape, so we can access it during the draw:
-     * 		myShape.color = "red";
-     *
-     * 		// append a Circle command object:
-     * 		myShape.graphics.append(new createjs.Graphics.Circle(50, 50, 30));
-     *
-     * 		// append a custom command object with an exec method that sets the fill style
-     * 		// based on the shape's data, and then fills the circle.
-     * 		myShape.graphics.append({exec:function(ctx, shape) {
-     * 			ctx.fillStyle = shape.color;
-     * 			ctx.fill();
-     * 		}});
-     *
-     * @method append
-     * @param {Object} command A graphics command object exposing an "exec" method.
-     * @param {boolean} clean The clean param is primarily for internal use. A value of true indicates that a command does not generate a path that should be stroked or filled.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.append = function append(command, clean) {
-      this._activeInstructions.push(command);
-      this.command = command;
-      if (!clean) {
-        this._dirty = true
-      }
-      return this
-    };
-    /**
-     * Decodes a compact encoded path string into a series of draw instructions.
-     * This format is not intended to be human readable, and is meant for use by authoring tools.
-     * The format uses a base64 character set, with each character representing 6 bits, to define a series of draw
-     * commands.
-     *
-     * Each command is comprised of a single "header" character followed by a variable number of alternating x and y
-     * position values. Reading the header bits from left to right (most to least significant): bits 1 to 3 specify the
-     * type of operation (0-moveTo, 1-lineTo, 2-quadraticCurveTo, 3-bezierCurveTo, 4-closePath, 5-7 unused). Bit 4
-     * indicates whether position values use 12 bits (2 characters) or 18 bits (3 characters), with a one indicating the
-     * latter. Bits 5 and 6 are currently unused.
-     *
-     * Following the header is a series of 0 (closePath), 2 (moveTo, lineTo), 4 (quadraticCurveTo), or 6 (bezierCurveTo)
-     * parameters. These parameters are alternating x/y positions represented by 2 or 3 characters (as indicated by the
-     * 4th bit in the command char). These characters consist of a 1 bit sign (1 is negative, 0 is positive), followed
-     * by an 11 (2 char) or 17 (3 char) bit integer value. All position values are in tenths of a pixel. Except in the
-     * case of move operations which are absolute, this value is a delta from the previous x or y position (as
-     * appropriate).
-     *
-     * For example, the string "A3cAAMAu4AAA" represents a line starting at -150,0 and ending at 150,0.
-     * <br />A - bits 000000. First 3 bits (000) indicate a moveTo operation. 4th bit (0) indicates 2 chars per
-     * parameter.
-     * <br />n0 - 110111011100. Absolute x position of -150.0px. First bit indicates a negative value, remaining bits
-     * indicate 1500 tenths of a pixel.
-     * <br />AA - 000000000000. Absolute y position of 0.
-     * <br />I - 001100. First 3 bits (001) indicate a lineTo operation. 4th bit (1) indicates 3 chars per parameter.
-     * <br />Au4 - 000000101110111000. An x delta of 300.0px, which is added to the previous x value of -150.0px to
-     * provide an absolute position of +150.0px.
-     * <br />AAA - 000000000000000000. A y delta value of 0.
-     *
-     * A tiny API method "p" also exists.
-     * @method decodePath
-     * @param {String} str The path string to decode.
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.decodePath = function decodePath(str) {
-      var instructions = [this.moveTo, this.lineTo, this.quadraticCurveTo, this.bezierCurveTo, this.closePath];
-      var paramCount = [2, 2, 4, 6, 0];
-      var i = 0;
-      var l = str.length;
-      var params = [];
-      var x = 0,
-        y = 0;
-      var base64 = Graphics.BASE_64;
-      while (i < l) {
-        var c = str.charAt(i);
-        var n = base64[c];
-        var fi = n >> 3; // highest order bits 1-3 code for operation.
-        var f = instructions[fi];
-        // check that we have a valid instruction & that the unused bits are empty:
-        if (!f || n & 3) {
-          throw "bad path data (@" + i + "):c"
-        }
-        var pl = paramCount[fi];
-        if (!fi) {
-          x = y = 0
-        } // move operations reset the position.
-        params.length = 0;
-        i++;
-        var charCount = (n >> 2 & 1) + 2; // 4th header bit indicates number size for this operation.
-        for (var p = 0; p < pl; p++) {
-          var num = base64[str.charAt(i)];
-          var sign = num >> 5 ? -1 : 1;
-          num = (num & 31) << 6 | base64[str.charAt(i + 1)];
-          if (charCount == 3) {
-            num = num << 6 | base64[str.charAt(i + 2)]
-          }
-          num = sign * num / 10;
-          if (p % 2) {
-            x = num += x
-          } else {
-            y = num += y
-          }
-          params[p] = num;
-          i += charCount
-        }
-        f.apply(this, params)
-      }
-      return this
-    };
-    /**
-     * Stores all graphics commands so they won't be executed in future draws. Calling store() a second time adds to
-     * the existing store. This also affects `drawAsPath()`.
-     *
-     * This is useful in cases where you are creating vector graphics in an iterative manner (ex. generative art), so
-     * that only new graphics need to be drawn (which can provide huge performance benefits), but you wish to retain all
-     * of the vector instructions for later use (ex. scaling, modifying, or exporting).
-     *
-     * Note that calling store() will force the active path (if any) to be ended in a manner similar to changing
-     * the fill or stroke.
-     *
-     * For example, consider a application where the user draws lines with the mouse. As each line segment (or collection of
-     * segments) are added to a Shape, it can be rasterized using {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}},
-     * and then stored, so that it can be redrawn at a different scale when the application is resized, or exported to SVGraphics.
-     *
-     * 	// set up cache:
-     * 	myShape.cache(0,0,500,500,scale);
-     *
-     * 	// when the user drags, draw a new line:
-     * 	myShape.graphics.moveTo(oldX,oldY).lineTo(newX,newY);
-     * 	// then draw it into the existing cache:
-     * 	myShape.updateCache("source-over");
-     * 	// store the new line, so it isn't redrawn next time:
-     * 	myShape.store();
-     *
-     * 	// then, when the window resizes, we can re-render at a different scale:
-     * 	// first, unstore all our lines:
-     * 	myShape.unstore();
-     * 	// then cache using the new scale:
-     * 	myShape.cache(0,0,500,500,newScale);
-     * 	// finally, store the existing commands again:
-     * 	myShape.store();
-     *
-     * @method store
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.store = function store() {
-      this._updateInstructions(true);
-      this._storeIndex = this._instructions.length;
-      return this
-    };
-    /**
-     * Unstores any graphics commands that were previously stored using {{#crossLink "Graphics/store"}}{{/crossLink}}
-     * so that they will be executed in subsequent draw calls.
-     *
-     * @method unstore
-     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
-     * @chainable
-     */
-    Graphics.prototype.unstore = function unstore() {
-      this._storeIndex = 0;
-      return this
-    };
-    /**
-     * Returns a clone of this Graphics instance. Note that the individual command objects are not cloned.
-     * @method clone
-     * @return {Graphics} A clone of the current Graphics instance.
-     */
-    Graphics.prototype.clone = function clone() {
-      var o = new Graphics;
-      o.command = this.command;
-      o._stroke = this._stroke;
-      o._strokeStyle = this._strokeStyle;
-      o._strokeDash = this._strokeDash;
-      o._strokeIgnoreScale = this._strokeIgnoreScale;
-      o._fill = this._fill;
-      o._instructions = this._instructions.slice();
-      o._commitIndex = this._commitIndex;
-      o._activeInstructions = this._activeInstructions.slice();
-      o._dirty = this._dirty;
-      o._storeIndex = this._storeIndex;
-      return o
-    };
-    /**
-     * Returns a string representation of this object.
-     * @method toString
-     * @return {String} a string representation of the instance.
-     */
-    Graphics.prototype.toString = function toString() {
-      return "[Graphics]"
-    };
-    // private methods:
-    /**
-     * @method _updateInstructions
-     * @param commit
-     * @protected
-     */
-    Graphics.prototype._updateInstructions = function _updateInstructions(commit) {
-      var instr = this._instructions,
-        active = this._activeInstructions,
-        commitIndex = this._commitIndex;
-      if (this._dirty && active.length) {
-        instr.length = commitIndex; // remove old, uncommitted commands
-        instr.push(Graphics.beginCmd);
-        var l = active.length,
-          ll = instr.length;
-        instr.length = ll + l;
-        for (var i = 0; i < l; i++) {
-          instr[i + ll] = active[i]
-        }
-        if (this._fill) {
-          instr.push(this._fill)
-        }
-        if (this._stroke) {
-          // doesn't need to be re-applied if it hasn't changed.
-          if (this._strokeDash !== this._oldStrokeDash) {
-            this._oldStrokeDash = this._strokeDash;
-            instr.push(this._strokeDash)
-          }
-          if (this._strokeStyle !== this._oldStrokeStyle) {
-            this._oldStrokeStyle = this._strokeStyle;
-            instr.push(this._strokeStyle)
-          }
-          instr.push(this._stroke)
-        }
-        this._dirty = false
-      }
-      if (commit) {
-        active.length = 0;
-        this._commitIndex = instr.length
-      }
-    };
-    /**
-     * @method _setFill
-     * @param fill
-     * @protected
-     */
-    Graphics.prototype._setFill = function _setFill(fill) {
-      this._updateInstructions(true);
-      this.command = this._fill = fill;
-      return this
-    };
-    /**
-     * @method _setStroke
-     * @param stroke
-     * @protected
-     */
-    Graphics.prototype._setStroke = function _setStroke(stroke) {
-      this._updateInstructions(true);
-      if (this.command = this._stroke = stroke) {
-        stroke.ignoreScale = this._strokeIgnoreScale
-      }
-      return this
-    };
-    createClass(Graphics, [{
-      key: "instructions",
-      get: function get() {
-        this._updateInstructions();
-        return this._instructions
-      }
-    }]);
-    return Graphics
-  }();
-  var LineTo = function() {
-    /**
-     * @constructor
-     * @param {Number} x
-     * @param {Number} y
-     */
-    function LineTo(x, y) {
-      classCallCheck(this, LineTo);
-      /**
-       * @property x
-       * @type Number
-       */
-      this.x = x;
-      /**
-       * @property y
-       * @type Number
-       */
-      this.y = y
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    LineTo.prototype.exec = function exec(ctx) {
-      ctx.lineTo(this.x, this.y)
-    };
-    return LineTo
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/moveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class MoveTo
-   */
-  var MoveTo = function() {
-    /**
-     * @constructor
-     * @param {Number} x
-     * @param {Number} y
-     */
-    function MoveTo(x, y) {
-      classCallCheck(this, MoveTo);
-      /**
-       * @property x
-       * @type Number
-       */
-      this.x = x;
-      /**
-       * @property y
-       * @type Number
-       */
-      this.y = y
-    }
-    /**
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx
-     */
-    MoveTo.prototype.exec = function exec(ctx) {
-      ctx.moveTo(this.x, this.y)
-    };
-    return MoveTo
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/arcTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class ArcTo
-   */
-  var ArcTo = function() {
-    /**
-     * @constructor
-     * @param {Number} x1
-     * @param {Number} y1
-     * @param {Number} x2
-     * @param {Number} y2
-     * @param {Number} radius
-     */
-    function ArcTo(x1, y1, x2, y2, radius) {
-      classCallCheck(this, ArcTo);
-      /**
-       * @property x1
-       * @type Number
-       */
-      this.x1 = x1;
-      /**
-       * @property y1
-       * @type Number
-       */
-      this.y1 = y1;
-      /**
-       * @property x2
-       * @type Number
-       */
-      this.x2 = x2;
-      /**
-       * @property y2
-       * @type Number
-       */
-      this.y2 = y2;
-      /**
-       * @property radius
-       * @type Number
-       */
-      this.radius = radius
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    ArcTo.prototype.exec = function exec(ctx) {
-      ctx.arcTo(this.x1, this.y1, this.x2, this.y2, this.radius)
-    };
-    return ArcTo
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/arc"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class Arc
-   */
-  var Arc = function() {
-    /**
-     * @constructor
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} radius
-     * @param {Number} startAngle
-     * @param {Number} endAngle
-     * @param {Number} anticlockwise
-     */
-    function Arc(x, y, radius, startAngle, endAngle, anticlockwise) {
-      classCallCheck(this, Arc);
-      /**
-       * @property x
-       * @type Number
-       */
-      this.x = x;
-      /**
-       * @property y
-       * @type Number
-       */
-      this.y = y;
-      /**
-       * @property radius
-       * @type Number
-       */
-      this.radius = radius;
-      /**
-       * @property startAngle
-       * @type Number
-       */
-      this.startAngle = startAngle;
-      /**
-       * @property endAngle
-       * @type Number
-       */
-      this.endAngle = endAngle;
-      /**
-       * @property anticlockwise
-       * @type Number
-       */
-      this.anticlockwise = !!anticlockwise
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    Arc.prototype.exec = function exec(ctx) {
-      ctx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle, this.anticlockwise)
-    };
-    return Arc
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class QuadraticCurveTo
-   */
-  var QuadraticCurveTo = function() {
-    /**
-     * @constructor
-     * @param {Number} cpx
-     * @param {Number} cpy
-     * @param {Number} x
-     * @param {Number} y
-     */
-    function QuadraticCurveTo(cpx, cpy, x, y) {
-      classCallCheck(this, QuadraticCurveTo);
-      /**
-       * @property cpx
-       * @type Number
-       */
-      this.cpx = cpx;
-      /**
-       * @property cpy
-       * @type Number
-       */
-      this.cpy = cpy;
-      /**
-       * @property x
-       * @type Number
-       */
-      this.x = x;
-      /**
-       * @property y
-       * @type Number
-       */
-      this.y = y
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    QuadraticCurveTo.prototype.exec = function exec(ctx) {
-      ctx.quadraticCurveTo(this.cpx, this.cpy, this.x, this.y)
-    };
-    return QuadraticCurveTo
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/bezierCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class BezierCurveTo
-   */
-  var BezierCurveTo = function() {
-    /**
-     * @constructor
-     * @param {Number} cp1x
-     * @param {Number} cp1y
-     * @param {Number} cp2x
-     * @param {Number} cp2y
-     * @param {Number} x
-     * @param {Number} y
-     */
-    function BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) {
-      classCallCheck(this, BezierCurveTo);
-      /**
-       * @property cp1x
-       * @type Number
-       */
-      this.cp1x = cp1x;
-      /**
-       * @property cp1y
-       * @type Number
-       */
-      this.cp1y = cp1y;
-      /**
-       * @property cp2x
-       * @type Number
-       */
-      this.cp2x = cp2x;
-      /**
-       * @property cp2y
-       * @type Number
-       */
-      this.cp2y = cp2y;
-      /**
-       * @property x
-       * @type Number
-       */
-      this.x = x;
-      /**
-       * @property y
-       * @type Number
-       */
-      this.y = y
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    BezierCurveTo.prototype.exec = function exec(ctx) {
-      ctx.bezierCurveTo(this.cp1x, this.cp1y, this.cp2x, this.cp2y, this.x, this.y)
-    };
-    return BezierCurveTo
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/rect"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class Rect
-   */
-  var Rect = function() {
-    /**
-     * @constructor
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} w
-     * @param {Number} h
-     */
-    function Rect(x, y, w, h) {
-      classCallCheck(this, Rect);
-      /**
-       * @property x
-       * @type Number
-       */
-      this.x = x;
-      /**
-       * @property y
-       * @type Number
-       */
-      this.y = y;
-      /**
-       * @property w
-       * @type Number
-       */
-      this.w = w;
-      /**
-       * @property h
-       * @type Number
-       */
-      this.h = h
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    Rect.prototype.exec = function exec(ctx) {
-      ctx.rect(this.x, this.y, this.w, this.h)
-    };
-    return Rect
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/closePath"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class ClosePath
-   */
-  var ClosePath = function() {
-    /**
-     * @constructor
-     */
-    function ClosePath() {
-      classCallCheck(this, ClosePath)
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    ClosePath.prototype.exec = function exec(ctx) {
-      ctx.closePath()
-    };
-    return ClosePath
-  }();
-  /**
-   * Graphics command object to begin a new path. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class BeginPath
-   */
-  var BeginPath = function() {
-    /**
-     * @constructor
-     */
-    function BeginPath() {
-      classCallCheck(this, BeginPath)
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    BeginPath.prototype.exec = function exec(ctx) {
-      ctx.beginPath()
-    };
-    return BeginPath
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/beginFill"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class Fill
-   */
-  var Fill = function() {
-    /**
-     * @constructor
-     * @param {Object} style A valid Context2D fillStyle.
-     * @param {Matrix2D} matrix
-     */
-    function Fill(style, matrix) {
-      classCallCheck(this, Fill);
-      /**
-       * A valid Context2D fillStyle.
-       * @property style
-       * @type Object
-       */
-      this.style = style;
-      /**
-       * @property matrix
-       * @type Matrix2D
-       */
-      this.matrix = matrix;
-      /**
-       * @property path
-       * @type {Boolean}
-       */
-      this.path = false
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    Fill.prototype.exec = function exec(ctx) {
-      if (!this.style) {
-        return
-      }
-      ctx.fillStyle = this.style;
-      var mtx = this.matrix;
-      if (mtx) {
-        ctx.save();
-        ctx.transform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty)
-      }
-      ctx.fill();
-      if (mtx) {
-        ctx.restore()
-      }
-    };
-    /**
-     * Creates a linear gradient style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
-     * See {{#crossLink "Graphics/beginLinearGradientFill"}}{{/crossLink}} for more information.
-     * @method linearGradient
-     * @param {Array} colors
-     *
-     * @param {Array} ratios
-     * @param {Number} x0
-     * @param {Number} y0
-     * @param {Number} x1
-     * @param {Number} y1
-     * @return {Fill} Returns this Fill object for chaining or assignment.
-     */
-    Fill.prototype.linearGradient = function linearGradient(colors, ratios, x0, y0, x1, y1) {
-      var o = this.style = Graphics._ctx.createLinearGradient(x0, y0, x1, y1);
-      var l = colors.length;
-      for (var i = 0; i < l; i++) {
-        o.addColorStop(ratios[i], colors[i])
-      }
-      o.props = {
-        colors: colors,
-        ratios: ratios,
-        x0: x0,
-        y0: y0,
-        x1: x1,
-        y1: y1,
-        type: "linear"
-      };
-      return this
-    };
-    /**
-     * Creates a radial gradient style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
-     * See {{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} for more information.
-     * @method radialGradient
-     * @param {Array} colors
-     * @param {Array} ratios
-     * @param {Number} x0
-     * @param {Number} y0
-     * @param {Number} r0
-     * @param {Number} x1
-     * @param {Number} y1
-     * @param {Number} r1
-     * @return {Fill} Returns this Fill object for chaining or assignment.
-     */
-    Fill.prototype.radialGradient = function radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1) {
-      var o = this.style = Graphics._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
-      var l = colors.length;
-      for (var i = 0; i < l; i++) {
-        o.addColorStop(ratios[i], colors[i])
-      }
-      o.props = {
-        colors: colors,
-        ratios: ratios,
-        x0: x0,
-        y0: y0,
-        r0: r0,
-        x1: x1,
-        y1: y1,
-        r1: r1,
-        type: "radial"
-      };
-      return this
-    };
-    /**
-     * Creates a bitmap fill style and assigns it to the {{#crossLink "Fill/style:property"}}{{/crossLink}}.
-     * See {{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} for more information.
-     * @method bitmap
-     * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image  Must be loaded prior to creating a bitmap fill, or the fill will be empty.
-     * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
-     * @return {Fill} Returns this Fill object for chaining or assignment.
-     */
-    Fill.prototype.bitmap = function bitmap(image) {
-      var repetition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
-      if (image.naturalWidth || image.getContext || image.readyState >= 2) {
-        var o = this.style = Graphics._ctx.createPattern(image, repetition);
-        o.props = {
-          image: image,
-          repetition: repetition,
-          type: "bitmap"
-        }
-      }
-      return this
-    };
-    return Fill
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/beginStroke"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class Stroke
-   */
-  var Stroke = function() {
-    /**
-     * @constructor
-     * @param {Object} style A valid Context2D fillStyle.
-     * @param {Boolean} ignoreScale
-     */
-    function Stroke(style, ignoreScale) {
-      classCallCheck(this, Stroke);
-      /**
-       * A valid Context2D strokeStyle.
-       * @property style
-       * @type Object
-       */
-      this.style = style;
-      /**
-       * @property ignoreScale
-       * @type Boolean
-       */
-      this.ignoreScale = ignoreScale;
-      /**
-       * @property path
-       * @type {Boolean}
-       */
-      this.path = false
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    Stroke.prototype.exec = function exec(ctx) {
-      if (!this.style) {
-        return
-      }
-      ctx.strokeStyle = this.style;
-      if (this.ignoreScale) {
-        ctx.save();
-        ctx.setTransform(1, 0, 0, 1, 0, 0)
-      }
-      ctx.stroke();
-      if (this.ignoreScale) {
-        ctx.restore()
-      }
-    };
-    /**
-     * Creates a linear gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
-     * See {{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} for more information.
-     * @method linearGradient
-     * @param {Array} colors
-     * @param {Array} ratios
-     * @param {Number} x0
-     * @param {Number} y0
-     * @param {Number} x1
-     * @param {Number} y1
-     * @return {Fill} Returns this Stroke object for chaining or assignment.
-     */
-    Stroke.prototype.linearGradient = function linearGradient() {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key]
-      }
-      // TODO-ES6: Anything but this...
-      Fill.prototype.linearGradient.apply(this, args)
-    };
-    /**
-     * Creates a radial gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
-     * See {{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} for more information.
-     * @method radialGradient
-     * @param {Array} colors
-     * @param {Array} ratios
-     * @param {Number} x0
-     * @param {Number} y0
-     * @param {Number} r0
-     * @param {Number} x1
-     * @param {Number} y1
-     * @param {Number} r1
-     * @return {Fill} Returns this Stroke object for chaining or assignment.
-     */
-    Stroke.prototype.radialGradient = function radialGradient() {
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2]
-      }
-      Fill.prototype.radialGradient.apply(this, args)
-    };
-    /**
-     * Creates a bitmap fill style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
-     * See {{#crossLink "Graphics/beginBitmapStroke"}}{{/crossLink}} for more information.
-     * @method bitmap
-     * @param {HTMLImageElement} image
-     * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
-     * @return {Fill} Returns this Stroke object for chaining or assignment.
-     */
-    Stroke.prototype.bitmap = function bitmap() {
-      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        args[_key3] = arguments[_key3]
-      }
-      Fill.prototype.bitmap.apply(this, args)
-    };
-    return Stroke
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class StrokeStyle
-   */
-  var StrokeStyle = function() {
-    /**
-     * @constructor
-     * @param {Number} [width=1]
-     * @param {String} [caps=butt]
-     * @param {String} [joints=miter]
-     * @param {Number} [miterLimit=10]
-     * @param {Boolean} [ignoreScale=false]
-     * @type {String}
-     */
-    function StrokeStyle(width) {
-      var caps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "butt";
-      var joints = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "miter";
-      var miterLimit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10;
-      var ignoreScale = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-      classCallCheck(this, StrokeStyle);
-      /**
-       * @property width
-       * @type Number
-       */
-      this.width = width;
-      /**
-       * One of: butt, round, square
-       * @property caps
-       * @type String
-       */
-      this.caps = caps;
-      /**
-       * One of: round, bevel, miter
-       * @property joints
-       * @type String
-       */
-      this.joints = joints;
-      /**
-       * @property miterLimit
-       * @type Number
-       */
-      this.miterLimit = miterLimit;
-      /**
-       * @property ignoreScale
-       * @type Boolean
-       */
-      this.ignoreScale = ignoreScale;
-      /**
-       * @property path
-       * @type {Boolean}
-       */
-      this.path = false
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    StrokeStyle.prototype.exec = function exec(ctx) {
-      ctx.lineWidth = this.width;
-      ctx.lineCap = isNaN(this.caps) ? this.caps : Graphics.STROKE_CAPS_MAP[this.caps];
-      ctx.lineJoin = isNaN(this.joints) ? this.joints : Graphics.STROKE_JOINTS_MAP[this.joints];
-      ctx.miterLimit = this.miterLimit;
-      ctx.ignoreScale = this.ignoreScale
-    };
-    return StrokeStyle
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class StrokeDash
-   */
-  var StrokeDash = function() {
-    /**
-     * @constructor
-     * @param {Array} [segments=[]]
-     * @param {Number} [offset=0]
-     */
-    function StrokeDash() {
-      var segments = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : StrokeDash.EMPTY_SEGMENTS;
-      var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      classCallCheck(this, StrokeDash);
-      /**
-       * @property segments
-       * @type Array
-       */
-      this.segments = segments;
-      /**
-       * @property offset
-       * @type Number
-       */
-      this.offset = offset
-    }
-    /**
-     * The default value for segments (ie. no dash).
-     * Used instead of [] to reduce churn.
-     * @property EMPTY_SEGMENTS
-     * @static
-     * @final
-     * @readonly
-     * @protected
-     * @type {Array}
-     */
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    StrokeDash.prototype.exec = function exec(ctx) {
-      if (ctx.setLineDash) {
-        // feature detection.
-        ctx.setLineDash(this.segments);
-        ctx.lineDashOffset = this.offset
-      }
-    };
-    createClass(StrokeDash, null, [{
-      key: "EMPTY_SEGMENTS",
-      get: function get() {
-        return _EMPTY_SEGMENTS
-      }
-    }]);
-    return StrokeDash
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/drawRoundRectComplex"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class RoundRect
-   */
-  var RoundRect = function() {
-    /**
-     * @constructor
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} w
-     * @param {Number} h
-     * @param {Number} radiusTL
-     * @param {Number} radiusTR
-     * @param {Number} radiusBR
-     * @param {Number} radiusBL
-     */
-    function RoundRect(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
-      classCallCheck(this, RoundRect);
-      /**
-       * @property x
-       * @type Number
-       */
-      this.x = x;
-      /**
-       * @property y
-       * @type Number
-       */
-      this.y = y;
-      /**
-       * @property w
-       * @type Number
-       */
-      this.w = w;
-      /**
-       * @property h
-       * @type Number
-       */
-      this.h = h;
-      /**
-       * @property radiusTL
-       * @type Number
-       */
-      this.radiusTL = radiusTL;
-      /**
-       * @property radiusTR
-       * @type Number
-       */
-      this.radiusTR = radiusTR;
-      /**
-       * @property radiusBR
-       * @type Number
-       */
-      this.radiusBR = radiusBR;
-      /**
-       * @property radiusBL
-       * @type Number
-       */
-      this.radiusBL = radiusBL
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    RoundRect.prototype.exec = function exec(ctx) {
-      var max = (w < h ? w : h) / 2;
-      var mTL = 0,
-        mTR = 0,
-        mBR = 0,
-        mBL = 0;
-      var x = this.x,
-        y = this.y,
-        w = this.w,
-        h = this.h;
-      var rTL = this.radiusTL,
-        rTR = this.radiusTR,
-        rBR = this.radiusBR,
-        rBL = this.radiusBL;
-      if (rTL < 0) {
-        rTL *= mTL = -1
-      }
-      if (rTL > max) {
-        rTL = max
-      }
-      if (rTR < 0) {
-        rTR *= mTR = -1
-      }
-      if (rTR > max) {
-        rTR = max
-      }
-      if (rBR < 0) {
-        rBR *= mBR = -1
-      }
-      if (rBR > max) {
-        rBR = max
-      }
-      if (rBL < 0) {
-        rBL *= mBL = -1
-      }
-      if (rBL > max) {
-        rBL = max
-      }
-      ctx.moveTo(x + w - rTR, y);
-      ctx.arcTo(x + w + rTR * mTR, y - rTR * mTR, x + w, y + rTR, rTR);
-      ctx.lineTo(x + w, y + h - rBR);
-      ctx.arcTo(x + w + rBR * mBR, y + h + rBR * mBR, x + w - rBR, y + h, rBR);
-      ctx.lineTo(x + rBL, y + h);
-      ctx.arcTo(x - rBL * mBL, y + h + rBL * mBL, x, y + h - rBL, rBL);
-      ctx.lineTo(x, y + rTL);
-      ctx.arcTo(x - rTL * mTL, y - rTL * mTL, x + rTL, y, rTL);
-      ctx.closePath()
-    };
-    return RoundRect
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/drawCircle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class Circle
-   */
-  var Circle = function() {
-    /**
-     * @constructor
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} radius
-     */
-    function Circle(x, y, radius) {
-      classCallCheck(this, Circle);
-      /**
-       * @property x
-       * @type Number
-       */
-      this.x = x;
-      /**
-       * @property y
-       * @type Number
-       */
-      this.y = y;
-      /**
-       * @property radius
-       * @type Number
-       */
-      this.radius = radius
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    Circle.prototype.exec = function exec(ctx) {
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
-    };
-    return Circle
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class Ellipse
-   */
-  var Ellipse = function() {
-    /**
-     * @constructor
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} w
-     * @param {Number} h
-     */
-    function Ellipse(x, y, w, h) {
-      classCallCheck(this, Ellipse);
-      /**
-       * @property x
-       * @type Number
-       */
-      this.x = x;
-      /**
-       * @property y
-       * @type Number
-       */
-      this.y = y;
-      /**
-       * @property w
-       * @type Number
-       */
-      this.w = w;
-      /**
-       * @property h
-       * @type Number
-       */
-      this.h = h
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    Ellipse.prototype.exec = function exec(ctx) {
-      var x = this.x,
-        y = this.y;
-      var w = this.w,
-        h = this.h;
-      var k = .5522848;
-      var ox = w / 2 * k;
-      var oy = h / 2 * k;
-      var xe = x + w;
-      var ye = y + h;
-      var xm = x + w / 2;
-      var ym = y + h / 2;
-      ctx.moveTo(x, ym);
-      ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-      ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-      ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-      ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym)
-    };
-    return Ellipse
-  }();
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class PolyStar
-   */
-  var PolyStar = function() {
-    /**
-     * @constructor
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} radius
-     * @param {Number} sides
-     * @param {Number} [pointSize=0]
-     * @param {Number} [angle=0]
-     */
-    function PolyStar(x, y, radius, sides) {
-      var pointSize = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
-      var angle = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
-      classCallCheck(this, PolyStar);
-      /**
-       * @property x
-       * @type Number
-       */
-      this.x = x;
-      /**
-       * @property y
-       * @type Number
-       */
-      this.y = y;
-      /**
-       * @property radius
-       * @type Number
-       */
-      this.radius = radius;
-      /**
-       * @property sides
-       * @type Number
-       */
-      this.sides = sides;
-      /**
-       * @property pointSize
-       * @type Number
-       */
-      this.pointSize = pointSize;
-      /**
-       * @property angle
-       * @type Number
-       */
-      this.angle = angle
-    }
-    /**
-     * Execute the Graphics command in the provided Canvas context.
-     * @method exec
-     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
-     */
-    PolyStar.prototype.exec = function exec(ctx) {
-      var x = this.x,
-        y = this.y;
-      var radius = this.radius;
-      var angle = this.angle / 180 * Math.PI;
-      var sides = this.sides;
-      var ps = 1 - this.pointSize;
-      var a = Math.PI / sides;
-      ctx.moveTo(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius);
-      for (var i = 0; i < sides; i++) {
-        angle += a;
-        if (ps != 1) {
-          ctx.lineTo(x + Math.cos(angle) * radius * ps, y + Math.sin(angle) * radius * ps)
-        }
-        angle += a;
-        ctx.lineTo(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius)
-      }
-      ctx.closePath()
-    };
-    return PolyStar
-  }();
-  // static properties:
-  /**
-   * A reusable instance of {{#crossLink "Graphics/BeginPath"}}{{/crossLink}} to avoid
-   * unnecessary instantiation.
-   * @property beginCmd
-   * @type {Graphics.BeginPath}
-   * @static
-   * @readonly
-   */
-  /**
-   * Map of Base64 characters to values. Used by {{#crossLink "Graphics/decodePath"}}{{/crossLink}}.
-   * @property BASE_64
-   * @static
-   * @final
-   * @readonly
-   * @type {Object}
-   */
-  /**
-   * Maps numeric values for the caps parameter of {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} to
-   * corresponding string values. This is primarily for use with the tiny API. The mappings are as follows: 0 to
-   * "butt", 1 to "round", and 2 to "square".
-   * For example, to set the line caps to "square":
-   *
-   *      myGraphics.ss(16, 2);
-   *
-   * @property STROKE_CAPS_MAP
-   * @static
-   * @final
-   * @readonly
-   * @type {Array}
-   */
-  /**
-   * Maps numeric values for the joints parameter of {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} to
-   * corresponding string values. This is primarily for use with the tiny API. The mappings are as follows: 0 to
-   * "miter", 1 to "round", and 2 to "bevel".
-   * For example, to set the line joints to "bevel":
-   *
-   *      myGraphics.ss(16, 0, 2);
-   *
-   * @property STROKE_JOINTS_MAP
-   * @static
-   * @final
-   * @readonly
-   * @type {Array}
-   */
-  /**
-   * @property _ctx
-   * @static
-   * @protected
-   * @type {CanvasRenderingContext2D}
-   */
-  {
-    var canvas$1 = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-    if (canvas$1.getContext) {
-      Graphics._ctx = canvas$1.getContext("2d");
-      canvas$1.width = canvas$1.height = 1
-    }
-    Graphics.beginCmd = new BeginPath;
-    Graphics.BASE_64 = {
-      A: 0,
-      B: 1,
-      C: 2,
-      D: 3,
-      E: 4,
-      F: 5,
-      G: 6,
-      H: 7,
-      I: 8,
-      J: 9,
-      K: 10,
-      L: 11,
-      M: 12,
-      N: 13,
-      O: 14,
-      P: 15,
-      Q: 16,
-      R: 17,
-      S: 18,
-      T: 19,
-      U: 20,
-      V: 21,
-      W: 22,
-      X: 23,
-      Y: 24,
-      Z: 25,
-      a: 26,
-      b: 27,
-      c: 28,
-      d: 29,
-      e: 30,
-      f: 31,
-      g: 32,
-      h: 33,
-      i: 34,
-      j: 35,
-      k: 36,
-      l: 37,
-      m: 38,
-      n: 39,
-      o: 40,
-      p: 41,
-      q: 42,
-      r: 43,
-      s: 44,
-      t: 45,
-      u: 46,
-      v: 47,
-      w: 48,
-      x: 49,
-      y: 50,
-      z: 51,
-      0: 52,
-      1: 53,
-      2: 54,
-      3: 55,
-      4: 56,
-      5: 57,
-      6: 58,
-      7: 59,
-      8: 60,
-      9: 61,
-      "+": 62,
-      "/": 63
-    };
-    Graphics.STROKE_CAPS_MAP = ["butt", "round", "square"];
-    Graphics.STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
-    Graphics.EMPTY_SEGMENTS = []
-  }
-  // TODO: Get Tween and Timeline imports.
-  /**
-   * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
-   * you to create objects which encapsulate timeline animations, state changes, and synched actions. Due to the
-   * complexities inherent in correctly setting up a MovieClip, it is largely intended for tool output and is not included
-   * in the main EaselJS library.
-   *
-   * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
-   * been made to support time-based timelines in the future.
-   *
-   * <h4>Example</h4>
-   * This example animates two shapes back and forth. The grey shape starts on the left, but we jump to a mid-point in
-   * the animation using {{#crossLink "MovieClip/gotoAndPlay"}}{{/crossLink}}.
-   *
-   *      var stage = new createjs.Stage("canvas");
-   *      createjs.Ticker.addEventListener("tick", stage);
-   *
-   *      var mc = new createjs.MovieClip(null, 0, true, {start:20});
-   *      stage.addChild(mc);
-   *
-   *      var child1 = new createjs.Shape(
-   *          new createjs.Graphics().beginFill("#999999")
-   *              .drawCircle(30,30,30));
-   *      var child2 = new createjs.Shape(
-   *          new createjs.Graphics().beginFill("#5a9cfb")
-   *              .drawCircle(30,30,30));
-   *
-   *      mc.timeline.addTween(
-   *          createjs.Tween.get(child1)
-   *              .to({x:0}).to({x:60}, 50).to({x:0}, 50));
-   *      mc.timeline.addTween(
-   *          createjs.Tween.get(child2)
-   *              .to({x:60}).to({x:0}, 50).to({x:60}, 50));
-   *
-   *      mc.gotoAndPlay("start");
-   *
-   * It is recommended to use <code>tween.to()</code> to animate and set properties (use no duration to have it set
-   * immediately), and the <code>tween.wait()</code> method to create delays between animations. Note that using the
-   * <code>tween.set()</code> method to affect properties will likely not provide the desired result.
-   *
-   * @class MovieClip
-   * @main MovieClip
-   * @extends Container
-   */
-  var MovieClip = function(_Container) {
-    inherits(MovieClip, _Container);
-    // constructor:
-    /**
-     * @constructor
-     * @param {String} [mode=independent] Initial value for the mode property. One of {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}},
-     * {{#crossLink "MovieClip/SINGLE_FRAME:property"}}{{/crossLink}}, or {{#crossLink "MovieClip/SYNCHED:property"}}{{/crossLink}}.
-     * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
-     * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
-     * property.
-     * @param {Boolean} [loop=true] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
-     * property. The default is `true`.
-     * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
-     * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
-     */
-    function MovieClip() {
-      var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : MovieClip.INDEPENDENT;
-      var startPosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      var loop = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-      var labels = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-      classCallCheck(this, MovieClip);
-      var _this = possibleConstructorReturn(this, _Container.call(this));
-      !MovieClip.inited && MovieClip.init(); // static init
-      // public properties:
-      /**
-       * Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED).
-       * See each constant for a description of the behaviour.
-       * @property mode
-       * @type String
-       * @default null
-       */
-      _this.mode = mode;
-      /**
-       * Specifies what the first frame to play in this movieclip, or the only frame to display if mode is SINGLE_FRAME.
-       * @property startPosition
-       * @type Number
-       * @default 0
-       */
-      _this.startPosition = startPosition;
-      /**
-       * Indicates whether this MovieClip should loop when it reaches the end of its timeline.
-       * @property loop
-       * @type Boolean
-       * @default true
-       */
-      _this.loop = loop;
-      /**
-       * The current frame of the movieclip.
-       * @property currentFrame
-       * @type Number
-       * @default 0
-       * @readonly
-       */
-      _this.currentFrame = 0;
-      /**
-       * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
-       * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
-       * instances to the timeline.
-       *
-       * <h4>Example</h4>
-       *
-       *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
-       *      var mc = new createjs.MovieClip();
-       *      mc.timeline.addTween(tween);
-       *
-       * Elements can be added and removed from the timeline by toggling an "_off" property
-       * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
-       * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
-       * frame 1. You can use the "visible" property to achieve the same effect.
-       *
-       *      var tween = createjs.Tween.get(target).to({_off:false})
-       *          .wait(1).to({_off:true})
-       *          .wait(1).to({_off:false});
-       *
-       * @property timeline
-       * @type Timeline
-       * @default null
-       */
-      _this.timeline = new Timeline(null, labels, {
-        paused: true,
-        position: startPosition,
-        useTicks: true
-      });
-      /**
-       * If true, the MovieClip's position will not advance when ticked.
-       * @property paused
-       * @type Boolean
-       * @default false
-       */
-      _this.paused = false;
-      /**
-       * If true, actions in this MovieClip's tweens will be run when the playhead advances.
-       * @property actionsEnabled
-       * @type Boolean
-       * @default true
-       */
-      _this.actionsEnabled = true;
-      /**
-       * If true, the MovieClip will automatically be reset to its first frame whenever the timeline adds
-       * it back onto the display list. This only applies to MovieClip instances with mode=INDEPENDENT.
-       * <br><br>
-       * For example, if you had a character animation with a "body" child MovieClip instance
-       * with different costumes on each frame, you could set body.autoReset = false, so that
-       * you can manually change the frame it is on, without worrying that it will be reset
-       * automatically.
-       * @property autoReset
-       * @type Boolean
-       * @default true
-       */
-      _this.autoReset = true;
-      /**
-       * An array of bounds for each frame in the MovieClip. This is mainly intended for tool output.
-       * @property frameBounds
-       * @type Array
-       * @default null
-       */
-      _this.frameBounds = _this.frameBounds || null; // TODO: Deprecated. This is for backwards support of Flash/Animate
-      /**
-       * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
-       * will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
-       * framerate.
-       *
-       * For example, if a MovieClip with a framerate of 10 is placed on a Stage being updated at 40fps, then the MovieClip will
-       * advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will
-       * vary slightly between frames.
-       *
-       * This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being
-       * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
-       * @property framerate
-       * @type {Number}
-       * @default null
-       */
-      _this.framerate = null;
-      // private properties:
-      /**
-       * @property _synchOffset
-       * @type Number
-       * @default 0
-       * @private
-       */
-      _this._synchOffset = 0;
-      /**
-       * @property _prevPos
-       * @type Number
-       * @default -1
-       * @private
-       */
-      _this._prevPos = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
-      /**
-       * @property _prevPosition
-       * @type Number
-       * @default 0
-       * @private
-       */
-      _this._prevPosition = 0;
-      /**
-       * The time remaining from the previous tick, only applicable when .framerate is set.
-       * @property _t
-       * @type Number
-       * @private
-       */
-      _this._t = 0;
-      /**
-       * List of display objects that are actively being managed by the MovieClip.
-       * @property _managed
-       * @type Object
-       * @private
-       */
-      _this._managed = {};
-      return _this
-    }
-    // static methods:
-    MovieClip.init = function init() {
-      if (MovieClip.inited) {
-        return
-      }
-      // plugins introduce some overhead to Tween, so we only install this if an MC is instantiated.
-      MovieClipPlugin.install();
-      MovieClip.inited = true
-    };
-    // accessor properties:
-    /**
-     * Returns an array of objects with label and position (aka frame) properties, sorted by position.
-     * Shortcut to TweenJS: Timeline.getLabels();
-     * @property labels
-     * @type {Array}
-     * @readonly
-     */
-    // public methods:
-    /**
-     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-     * This does not account for whether it would be visible within the boundaries of the stage.
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method isVisible
-     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-     */
-    MovieClip.prototype.isVisible = function isVisible() {
-      // children are placed in draw, so we can't determine if we have content.
-      return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0)
-    };
-    /**
-     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-     * Returns true if the draw was handled (useful for overriding functionality).
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method draw
-     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-     * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
-     * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-     * into itself).
-     */
-    MovieClip.prototype.draw = function draw(ctx, ignoreCache) {
-      // draw to cache first:
-      if (this.cacheDraw(ctx, ignoreCache)) {
-        return true
-      }
-      this._updateTimeline();
-      _Container.prototype.draw.call(this, ctx, ignoreCache);
-      return true
-    };
-    /**
-     * Sets paused to false.
-     * @method play
-     */
-    MovieClip.prototype.play = function play() {
-      this.paused = false
-    };
-    /**
-     * Sets paused to true.
-     * @method stop
-     */
-    MovieClip.prototype.stop = function stop() {
-      this.paused = true
-    };
-    /**
-     * Advances this movie clip to the specified position or label and sets paused to false.
-     * @method gotoAndPlay
-     * @param {String|Number} positionOrLabel The animation name or frame number to go to.
-     */
-    MovieClip.prototype.gotoAndPlay = function gotoAndPlay(positionOrLabel) {
-      this.paused = false;
-      this._goto(positionOrLabel)
-    };
-    /**
-     * Advances this movie clip to the specified position or label and sets paused to true.
-     * @method gotoAndStop
-     * @param {String|Number} positionOrLabel The animation or frame name to go to.
-     */
-    MovieClip.prototype.gotoAndStop = function gotoAndStop(positionOrLabel) {
-      this.paused = true;
-      this._goto(positionOrLabel)
-    };
-    /**
-     * Advances the playhead. This occurs automatically each tick by default.
-     * @param [time] {Number} The amount of time in ms to advance by. Only applicable if framerate is set.
-     * @method advance
-     */
-    MovieClip.prototype.advance = function advance(time) {
-      // TODO: should we worry at all about clips who change their own modes via frame scripts?
-      var independent = MovieClip.INDEPENDENT;
-      if (this.mode != independent) {
-        return
-      }
-      var o = this,
-        fps = o.framerate;
-      while ((o = o.parent) && fps == null) {
-        if (o.mode == independent) {
-          fps = o._framerate
-        }
-      }
-      this._framerate = fps;
-      var t = fps != null && fps != -1 && time != null ? time / (1e3 / fps) + this._t : 1;
-      var frames = t | 0;
-      this._t = t - frames; // leftover time
-      while (!this.paused && frames--) {
-        this._prevPosition = this._prevPos < 0 ? 0 : this._prevPosition + 1;
-        this._updateTimeline()
-      }
-    };
-    /**
-     * MovieClip instances cannot be cloned.
-     * @method clone
-     */
-    MovieClip.prototype.clone = function clone() {
-      // TODO: add support for this? Need to clone the Timeline & retarget tweens - pretty complex.
-      throw "MovieClip cannot be cloned."
-    };
-    // private methods:
-    /**
-     * @method _tick
-     * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
-     * function.
-     * @protected
-     */
-    MovieClip.prototype._tick = function _tick(evtObj) {
-      this.advance(evtObj && evtObj.delta);
-      _Container.prototype._tick.call(this, evtObj)
-    };
-    /**
-     * @method _goto
-     * @param {String|Number} positionOrLabel The animation name or frame number to go to.
-     * @protected
-     */
-    MovieClip.prototype._goto = function _goto(positionOrLabel) {
-      var pos = this.timeline.resolve(positionOrLabel);
-      if (pos == null) {
-        return
-      }
-      // prevent _updateTimeline from overwriting the new position because of a reset:
-      if (this._prevPos == -1) {
-        this._prevPos = NaN
-      }
-      this._prevPosition = pos;
-      this._t = 0;
-      this._updateTimeline()
-    };
-    /**
-     * @method _reset
-     * @private
-     */
-    MovieClip.prototype._reset = function _reset() {
-      this._prevPos = -1;
-      this._t = this.currentFrame = 0;
-      this.paused = false
-    };
-    /**
-     * @method _updateTimeline
-     * @protected
-     */
-    MovieClip.prototype._updateTimeline = function _updateTimeline() {
-      var tl = this.timeline;
-      var synched = this.mode != MovieClip.INDEPENDENT;
-      tl.loop = this.loop == null ? true : this.loop;
-      var pos = synched ? this.startPosition + (this.mode == MovieClip.SINGLE_FRAME ? 0 : this._synchOffset) : this._prevPos < 0 ? 0 : this._prevPosition;
-      var mode = synched || !this.actionsEnabled ? Tween.NONE : null;
-      // pre-assign currentFrame so it is available to frame scripts:
-      this.currentFrame = tl._calcPosition(pos);
-      // update timeline position, ignoring actions if this is a graphic.
-      tl.setPosition(pos, mode);
-      this._prevPosition = tl._prevPosition;
-      if (this._prevPos == tl._prevPos) {
-        return
-      }
-      this.currentFrame = this._prevPos = tl._prevPos;
-      for (var n in this._managed) {
-        this._managed[n] = 1
-      }
-      var tweens = tl._tweens;
-      for (var _iterator = tl._tweens, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++]
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value
-        }
-        var tween = _ref;
-        var target = tween._target;
-        if (target == this || tween.passive) {
-          continue
-        } // TODO: this assumes actions tween has this as the target. Valid?
-        var offset = tween._stepPosition;
-        if (target instanceof createjs.DisplayObject) {
-          // motion tween.
-          this._addManagedChild(target, offset)
-        } else {
-          // state tween.
-          this._setState(target.state, offset)
-        }
-      }
-      var kids = this.children;
-      for (var i = kids.length - 1; i >= 0; i--) {
-        var id = kids[i].id;
-        if (this._managed[id] == 1) {
-          this.removeChildAt(i);
-          delete this._managed[id]
-        }
-      }
-    };
-    /**
-     * @method _setState
-     * @param {Array} state
-     * @param {Number} offset
-     * @protected
-     */
-    MovieClip.prototype._setState = function _setState(state, offset) {
-      if (!state) {
-        return
-      }
-      for (var i = state.length - 1; i >= 0; i--) {
-        var o = state[i];
-        var target = o.t;
-        var props = o.p;
-        for (var n in props) {
-          target[n] = props[n]
-        }
-        this._addManagedChild(target, offset)
-      }
-    };
-    /**
-     * Adds a child to the timeline, and sets it up as a managed child.
-     * @method _addManagedChild
-     * @param {MovieClip} child The child MovieClip to manage
-     * @param {Number} offset
-     * @private
-     */
-    MovieClip.prototype._addManagedChild = function _addManagedChild(child, offset) {
-      if (child._off) {
-        return
-      }
-      this.addChildAt(child, 0);
-      if (child instanceof MovieClip) {
-        child._synchOffset = offset;
-        // TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
-        if (child.mode == MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) {
-          child._reset()
-        }
-      }
-      this._managed[child.id] = 2
-    };
-    /**
-     * @method _getBounds
-     * @param {Matrix2D} matrix
-     * @param {Boolean} ignoreTransform
-     * @return {Rectangle}
-     * @protected
-     */
-    MovieClip.prototype._getBounds = function _getBounds(matrix, ignoreTransform) {
-      var bounds = this.getBounds();
-      if (!bounds) {
-        this._updateTimeline();
-        if (this.frameBounds) {
-          bounds = this._rectangle.copy(this.frameBounds[this.currentFrame])
-        }
-      }
-      if (bounds) {
-        return this._transformBounds(bounds, matrix, ignoreTransform)
-      }
-      return _Container.prototype._getBounds.call(this, matrix, ignoreTransform)
-    };
-    createClass(MovieClip, [{
-      key: "labels",
-      get: function get() {
-        return this.timeline.getLabels()
-      }
-    }, {
-      key: "currentLabel",
-      get: function get() {
-        this._updateTimeline();
-        return this.timeline.getCurrentLabel()
-      }
-    }, {
-      key: "duration",
-      get: function get() {
-        return this.timeline.duration
-      }
-    }, {
-      key: "totalFrames",
-      get: function get() {
-        return this.duration
-      }
-    }]);
-    return MovieClip
-  }(Container); {
-    MovieClip.INDEPENDENT = "independent";
-    MovieClip.SINGLE_FRAME = "single";
-    MovieClip.SYNCHED = "synched";
-    MovieClip.inited = false
-  }
-  /**
-   * This plugin works with <a href="http://tweenjs.com" target="_blank">TweenJS</a> to prevent the startPosition
-   * property from tweening.
-   * @private
-   * @class MovieClipPlugin
-   */
-  var MovieClipPlugin = function() {
-    /**
-     * @constructor
-     */
-    function MovieClipPlugin() {
-      classCallCheck(this, MovieClipPlugin);
-      throw "MovieClipPlugin cannot be instantiated."
-    }
-    /**
-     * @method install
-     * @private
-     */
-    MovieClipPlugin.install = function install() {
-      Tween.installPlugin(MovieClipPlugin, ["startPosition"])
-    };
-    /**
-     * @method init
-     * @param {Tween} tween
-     * @param {String} prop
-     * @param {String|Number|Boolean} value
-     * @private
-     */
-    MovieClipPlugin.init = function init(tween, prop, value) {
-      return value
-    };
-    /**
-     * @method tween
-     * @param {Tween} tween
-     * @param {String} prop
-     * @param {String | Number | Boolean} value
-     * @param {Array} startValues
-     * @param {Array} endValues
-     * @param {Number} ratio
-     * @param {Object} wait
-     * @param {Object} end
-     * @return {*}
-     */
-    MovieClipPlugin.tween = function tween(_tween, prop, value, startValues, endValues, ratio, wait, end) {
-      if (!(_tween.target instanceof MovieClip)) {
-        return value
-      }
-      return ratio == 1 ? endValues[prop] : startValues[prop]
-    };
-    return MovieClipPlugin
-  }(); {
-    MovieClipPlugin.priority = 100
-  }
-  /**
-   * This class encapsulates the properties required to define a shadow to apply to a {{#crossLink "DisplayObject"}}{{/crossLink}}
-   * via its <code>shadow</code> property.
-   *
-   * <h4>Example</h4>
-   *
-   *      myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
-   *
-   * @class Shadow
-   */
-  var Shadow$1 = function() {
-    // constructor:
-    /**
-     * @constructor
-     * @param {String} color The color of the shadow. This can be any valid CSS color value.
-     * @param {Number} offsetX The x offset of the shadow in pixels.
-     * @param {Number} offsetY The y offset of the shadow in pixels.
-     * @param {Number} blur The size of the blurring effect.
-     */
-    function Shadow() {
-      var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "black";
-      var offsetX = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      var offsetY = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      var blur = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-      classCallCheck(this, Shadow);
-      // public properties:
-      /**
-       * The color of the shadow. This can be any valid CSS color value.
-       * @property color
-       * @type String
-       * @default black
-       */
-      this.color = color;
-      /** The x offset of the shadow.
-       * @property offsetX
-       * @type Number
-       * @default 0
-       */
-      this.offsetX = offsetX;
-      /** The y offset of the shadow.
-       * @property offsetY
-       * @type Number
-       * @default 0
-       */
-      this.offsetY = offsetY;
-      /** The blur of the shadow.
-       * @property blur
-       * @type Number
-       * @default 0
-       */
-      this.blur = blur
-    }
-    // public methods:
-    /**
-     * Returns a string representation of this object.
-     * @method toString
-     * @return {String} a string representation of the instance.
-     */
-    Shadow.prototype.toString = function toString() {
-      return "[Shadow]"
-    };
-    /**
-     * Returns a clone of this Shadow instance.
-     * @method clone
-     * @return {Shadow} A clone of the current Shadow instance.
-     */
-    Shadow.prototype.clone = function clone() {
-      return new Shadow(this.color, this.offsetX, this.offsetY, this.blur)
-    };
-    return Shadow
-  }(); {
-    Shadow$1.identity = new Shadow$1("transparent")
-  }
-  /**
-   * A Shape allows you to display vector art in the display list. It composites a {{#crossLink "Graphics"}}{{/crossLink}}
-   * instance which exposes all of the vector drawing methods. The Graphics instance can be shared between multiple Shape
-   * instances to display the same vector graphics with different positions or transforms.
-   *
-   * If the vector art will not
-   * change between draws, you may want to use the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method to reduce the
-   * rendering cost.
-   *
-   * <h4>Example</h4>
-   *
-   *      var graphics = new createjs.Graphics().beginFill("#ff0000").drawRect(0, 0, 100, 100);
-   *      var shape = new createjs.Shape(graphics);
-   *
-   *      //Alternatively use can also use the graphics property of the Shape class to renderer the same as above.
-   *      var shape = new createjs.Shape();
-   *      shape.graphics.beginFill("#ff0000").drawRect(0, 0, 100, 100);
-   *
-   * @class Shape
-   * @extends DisplayObject
-   */
-  var Shape = function(_DisplayObject) {
-    inherits(Shape, _DisplayObject);
-    // constructor:
-    /**
-     * @constructor
-     * @param {Graphics} [graphics=Graphics] Optional. The graphics instance to display. If null, a new Graphics instance will be created.
-     */
-    function Shape() {
-      var graphics = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Graphics;
-      classCallCheck(this, Shape);
-      // public properties:
-      /**
-       * The graphics instance to display.
-       * @property graphics
-       * @type Graphics
-       */
-      var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
-      _this.graphics = graphics;
-      return _this
-    }
-    // public methods:
-    /**
-     * Returns true or false indicating whether the Shape would be visible if drawn to a canvas.
-     * This does not account for whether it would be visible within the boundaries of the stage.
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method isVisible
-     * @return {Boolean} Boolean indicating whether the Shape would be visible if drawn to a canvas
-     */
-    Shape.prototype.isVisible = function isVisible() {
-      var hasContent = this.cacheCanvas || this.graphics && !this.graphics.isEmpty();
-      return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent)
-    };
-    /**
-     * Draws the Shape into the specified context ignoring its visible, alpha, shadow, and transform. Returns true if
-     * the draw was handled (useful for overriding functionality).
-     *
-     * <i>NOTE: This method is mainly for internal use, though it may be useful for advanced uses.</i>
-     * @method draw
-     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-     * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache. For example,
-     * used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
-     * @return {Boolean}
-     */
-    Shape.prototype.draw = function draw(ctx) {
-      var ignoreCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache)) {
-        return true
-      }
-      this.graphics.draw(ctx, this);
-      return true
-    };
-    /**
-     * Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to
-     * their defaults (for example .parent).
-     * @method clone
-     * @param {Boolean} recursive If true, this Shape's {{#crossLink "Graphics"}}{{/crossLink}} instance will also be
-     * cloned. If false, the Graphics instance will be shared with the new Shape.
-     */
-    Shape.prototype.clone = function clone() {
-      var recursive = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      var g = recursive && this.graphics ? this.graphics.clone() : this.graphics;
-      return this._cloneProps(new Shape(g))
-    };
-    return Shape
-  }(DisplayObject);
-  /**
-   * Encapsulates the properties and methods associated with a sprite sheet. A sprite sheet is a series of images (usually
-   * animation frames) combined into a larger image (or images). For example, an animation consisting of eight 100x100
-   * images could be combined into a single 400x200 sprite sheet (4 frames across by 2 high).
-   *
-   * The data passed to the SpriteSheet constructor defines:
-   * <ol>
-   * 	<li> The source image or images to use.</li>
-   * 	<li> The positions of individual image frames.</li>
-   * 	<li> Sequences of frames that form named animations. Optional.</li>
-   * 	<li> The target playback framerate. Optional.</li>
-   * </ol>
-   * <h3>SpriteSheet Format</h3>
-   * SpriteSheets are an object with two required properties (`images` and `frames`), and two optional properties
-   * (`framerate` and `animations`). This makes them easy to define in javascript code, or in JSON.
-   *
-   * <h4>images</h4>
-   * An array of source images. Images can be either an HTMlimage
-   * instance, or a uri to an image. The former is recommended to control preloading.
-   *
-   * 	images: [image1, "path/to/image2.png"],
-   *
-   * <h4>frames</h4>
-   * Defines the individual frames. There are two supported formats for frame data:
-   * When all of the frames are the same size (in a grid), use an object with `width`, `height`, `regX`, `regY`,
-   * and `count` properties.
-   *
-   * <ul>
-   *  <li>`width` & `height` are required and specify the dimensions of the frames</li>
-   *  <li>`regX` & `regY` indicate the registration point or "origin" of the frames</li>
-   *  <li>`spacing` indicate the spacing between frames</li>
-   *  <li>`margin` specify the margin around the image(s)</li>
-   *  <li>`count` allows you to specify the total number of frames in the spritesheet; if omitted, this will
-   *  be calculated based on the dimensions of the source images and the frames. Frames will be assigned
-   *  indexes based on their position in the source images (left to right, top to bottom).</li>
-   * </ul>
-   *
-   *  	frames: {width:64, height:64, count:20, regX: 32, regY:64, spacing:0, margin:0}
-   *
-   * If the frames are of different sizes, use an array of frame definitions. Each definition is itself an array
-   * with 4 required and 3 optional entries, in the order:
-   *
-   * <ul>
-   *  <li>The first four, `x`, `y`, `width`, and `height` are required and define the frame rectangle.</li>
-   *  <li>The fifth, `imageIndex`, specifies the index of the source image (defaults to 0)</li>
-   *  <li>The last two, `regX` and `regY` specify the registration point of the frame</li>
-   * </ul>
-   *
-   * 	frames: [
-   * 		// x, y, width, height, imageIndex*, regX*, regY*
-   * 		[64, 0, 96, 64],
-   * 		[0, 0, 64, 64, 1, 32, 32]
-   * 		// etc.
-   * 	]
-   *
-   * <h4>animations</h4>
-   * Optional. An object defining sequences of frames to play as named animations. Each property corresponds to an
-   * animation of the same name. Each animation must specify the frames to play, and may
-   * also include a relative playback `speed` (ex. 2 would playback at double speed, 0.5 at half), and
-   * the name of the `next` animation to sequence to after it completes.
-   *
-   * There are three formats supported for defining the frames in an animation, which can be mixed and matched as appropriate:
-   * <ol>
-   * 	<li>for a single frame animation, you can simply specify the frame index
-   *
-   * 		animations: {
-   * 			sit: 7
-   * 		}
-   *
-   * </li>
-   * <li>
-   *      for an animation of consecutive frames, you can use an array with two required, and two optional entries
-   * 		in the order: `start`, `end`, `next`, and `speed`. This will play the frames from start to end inclusive.
-   *
-   * 		animations: {
-   * 			// start, end, next*, speed*
-   * 			run: [0, 8],
-   * 			jump: [9, 12, "run", 2]
-   * 		}
-   *
-   *  </li>
-   *  <li>
-   *     for non-consecutive frames, you can use an object with a `frames` property defining an array of frame
-   *     indexes to play in order. The object can also specify `next` and `speed` properties.
-   *
-   * 		animations: {
-   * 			walk: {
-   * 				frames: [1,2,3,3,2,1]
-   * 			},
-   * 			shoot: {
-   * 				frames: [1,4,5,6],
-   * 				next: "walk",
-   * 				speed: 0.5
-   * 			}
-   * 		}
-   *
-   *  </li>
-   * </ol>
-   * <strong>Note:</strong> the `speed` property was added in EaselJS 0.7.0. Earlier versions had a `frequency`
-   * property instead, which was the inverse of `speed`. For example, a value of "4" would be 1/4 normal speed in
-   * earlier versions, but is 4x normal speed in EaselJS 0.7.0+.
-   *
-   * <h4>framerate</h4>
-   * Optional. Indicates the default framerate to play this spritesheet at in frames per second. See
-   * {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} for more information.
-   *
-   * 		framerate: 20
-   *
-   * Note that the Sprite framerate will only work if the stage update method is provided with the {{#crossLink "Ticker/tick:event"}}{{/crossLink}}
-   * event generated by the {{#crossLink "Ticker"}}{{/crossLink}}.
-   *
-   * 		createjs.Ticker.on("tick", handleTick);
-   * 		function handleTick(event) {
-   *			stage.update(event);
-   *		}
-   *
-   * <h3>Example</h3>
-   * To define a simple sprite sheet, with a single image "sprites.jpg" arranged in a regular 50x50 grid with three
-   * animations: "stand" showing the first frame, "run" looping frame 1-5 inclusive, and "jump" playing frame 6-8 and
-   * sequencing back to run.
-   *
-   * 		var data = {
-   * 			images: ["sprites.jpg"],
-   * 			frames: {width:50, height:50},
-   * 			animations: {
-   * 				stand:0,
-   * 				run:[1,5],
-   * 				jump:[6,8,"run"]
-   * 			}
-   * 		};
-   * 		var spriteSheet = new createjs.SpriteSheet(data);
-   * 		var animation = new createjs.Sprite(spriteSheet, "run");
-   *
-   * <h3>Generating SpriteSheet Images</h3>
-   * Spritesheets can be created manually by combining images in PhotoShop, and specifying the frame size or
-   * coordinates manually, however there are a number of tools that facilitate this.
-   * <ul>
-   *     <li>Exporting SpriteSheets or HTML5 content from Adobe Flash/Animate supports the EaselJS SpriteSheet format.</li>
-   *     <li>The popular <a href="https://www.codeandweb.com/texturepacker/easeljs" target="_blank">Texture Packer</a> has
-   *     EaselJS support.
-   *     <li>SWF animations in Adobe Flash/Animate can be exported to SpriteSheets using <a href="http://createjs.com/zoe" target="_blank"></a></li>
-   * </ul>
-   *
-   * <h3>Cross Origin Issues</h3>
-   * <strong>Warning:</strong> Images loaded cross-origin will throw cross-origin security errors when interacted with
-   * using:
-   * <ul>
-   *     <li>a mouse</li>
-   *     <li>methods such as {{#crossLink "Container/getObjectUnderPoint"}}{{/crossLink}}</li>
-   *     <li>Filters (see {{#crossLink "Filter"}}{{/crossLink}})</li>
-   *     <li>caching (see {{#crossLink "DisplayObject/cache"}}{{/crossLink}})</li>
-   * </ul>
-   * You can get around this by setting `crossOrigin` property on your images before passing them to EaselJS, or
-   * setting the `crossOrigin` property on PreloadJS' LoadQueue or LoadItems.
-   *
-   * 		var image = new Image();
-   * 		img.crossOrigin="Anonymous";
-   * 		img.src = "http://server-with-CORS-support.com/path/to/image.jpg";
-   *
-   * If you pass string paths to SpriteSheets, they will not work cross-origin. The server that stores the image must
-   * support cross-origin requests, or this will not work. For more information, check out
-   * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS" target="_blank">CORS overview on MDN</a>.
-   *
-   * @class SpriteSheet
-   * @extends EventDispatcher
-   */
-  var SpriteSheet = function(_EventDispatcher) {
-    inherits(SpriteSheet, _EventDispatcher);
-    // constructor:
-    /**
-     * @constructor
-     * @param {Object} data An object describing the SpriteSheet data.
-     */
-    function SpriteSheet(data) {
-      classCallCheck(this, SpriteSheet);
-      // public properties:
-      /**
-       * Indicates whether all images are finished loading.
-       * @property complete
-       * @type Boolean
-       * @readonly
-       */
-      var _this = possibleConstructorReturn(this, _EventDispatcher.call(this));
-      _this.complete = true;
-      /**
-       * Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See the Sprite class
-       * {{#crossLink "Sprite/framerate:property"}}{{/crossLink}} for more information.
-       * @property framerate
-       * @type Number
-       */
-      _this.framerate = 0;
-      // private properties:
-      /**
-       * @property _animations
-       * @protected
-       * @type Array
-       */
-      _this._animations = null;
-      /**
-       * @property _frames
-       * @protected
-       * @type Array
-       */
-      _this._frames = null;
-      /**
-       * @property _images
-       * @protected
-       * @type Array
-       */
-      _this._images = null;
-      /**
-       * @property _data
-       * @protected
-       * @type Object
-       */
-      _this._data = null;
-      /**
-       * @property _loadCount
-       * @protected
-       * @type Number
-       */
-      _this._loadCount = 0;
-      // only used for simple frame defs:
-      /**
-       * @property _frameHeight
-       * @protected
-       * @type Number
-       */
-      _this._frameHeight = 0;
-      /**
-       * @property _frameWidth
-       * @protected
-       * @type Number
-       */
-      _this._frameWidth = 0;
-      /**
-       * @property _numFrames
-       * @protected
-       * @type Number
-       */
-      _this._numFrames = 0;
-      /**
-       * @property _regX
-       * @protected
-       * @type Number
-       */
-      _this._regX = 0;
-      /**
-       * @property _regY
-       * @protected
-       * @type Number
-       */
-      _this._regY = 0;
-      /**
-       * @property _spacing
-       * @protected
-       * @type Number
-       */
-      _this._spacing = 0;
-      /**
-       * @property _margin
-       * @protected
-       * @type Number
-       */
-      _this._margin = 0;
-      _this._parseData(data);
-      return _this
-    }
-    // accessor properties:
-    /**
-     * Returns an array of all available animation names available on this sprite sheet as strings.
-     * @property animations
-     * @type {Array}
-     * @readonly
-     */
-    // public methods:
-    /**
-     * Returns the total number of frames in the specified animation, or in the whole sprite
-     * sheet if the animation param is omitted. Returns 0 if the spritesheet relies on calculated frame counts, and
-     * the images have not been fully loaded.
-     * @method getNumFrames
-     * @param {String} animation The name of the animation to get a frame count for.
-     * @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
-     */
-    SpriteSheet.prototype.getNumFrames = function getNumFrames(animation) {
-      if (animation == null) {
-        return this._frames ? this._frames.length : this._numFrames || 0
-      } else {
-        var data = this._data[animation];
-        if (data == null) {
-          return 0
-        } else {
-          return data.frames.length
-        }
-      }
-    };
-    /**
-     * Returns an object defining the specified animation. The returned object contains:<UL>
-     * 	<li>frames: an array of the frame ids in the animation</li>
-     * 	<li>speed: the playback speed for this animation</li>
-     * 	<li>name: the name of the animation</li>
-     * 	<li>next: the default animation to play next. If the animation loops, the name and next property will be the
-     * 	same.</li>
-     * </UL>
-     * @method getAnimation
-     * @param {String} name The name of the animation to get.
-     * @return {Object} a generic object with frames, speed, name, and next properties.
-     */
-    SpriteSheet.prototype.getAnimation = function getAnimation(name) {
-      return this._data[name]
-    };
-    /**
-     * Returns an object specifying the image and source rect of the specified frame. The returned object has:<UL>
-     * 	<li>an image property holding a reference to the image object in which the frame is found</li>
-     * 	<li>a rect property containing a Rectangle instance which defines the boundaries for the frame within that
-     * 	image.</li>
-     * 	<li> A regX and regY property corresponding to the regX/Y values for the frame.
-     * </UL>
-     * @method getFrame
-     * @param {Number} frameIndex The index of the frame.
-     * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist.
-     */
-    SpriteSheet.prototype.getFrame = function getFrame(frameIndex) {
-      var frame = void 0;
-      if (this._frames && (frame = this._frames[frameIndex])) {
-        return frame
-      }
-      return null
-    };
-    /**
-     * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative
-     * to the origin. For example, a 90 x 70 frame with a regX of 50 and a regY of 40 would return:
-     *
-     * 	[x=-50, y=-40, width=90, height=70]
-     *
-     * @method getFrameBounds
-     * @param {Number} frameIndex The index of the frame.
-     * @param {Rectangle} [rectangle=Rectangle] A Rectangle instance to copy the values into. By default a new instance is created.
-     * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.
-     */
-    SpriteSheet.prototype.getFrameBounds = function getFrameBounds(frameIndex) {
-      var rectangle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Rectangle;
-      var frame = this.getFrame(frameIndex);
-      return frame ? rectangle.setValues(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null
-    };
-    /**
-     * Returns a string representation of this object.
-     * @method toString
-     * @return {String} a string representation of the instance.
-     */
-    SpriteSheet.prototype.toString = function toString() {
-      return "[SpriteSheet]"
-    };
-    /**
-     * SpriteSheet cannot be cloned. A SpriteSheet can be shared by multiple Sprite instances without cloning it.
-     * @method clone
-     */
-    SpriteSheet.prototype.clone = function clone() {
-      // TODO-ES6: Add throw docs
-      throw "SpriteSheet cannot be cloned."
-    };
-    // private methods:
-    /**
-     * @method _parseData
-     * @param {Object} data An object describing the SpriteSheet data.
-     * @protected
-     */
-    SpriteSheet.prototype._parseData = function _parseData(data) {
-      var _this2 = this;
-      if (data == null) {
-        return
-      }
-      this.framerate = data.framerate || 0;
-      // parse images:
-      if (data.images) {
-        for (var _iterator = data.images, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-          var _ref;
-          if (_isArray) {
-            if (_i >= _iterator.length) break;
-            _ref = _iterator[_i++]
-          } else {
-            _i = _iterator.next();
-            if (_i.done) break;
-            _ref = _i.value
-          }
-          var img = _ref;
-          var a = this._images = [];
-          if (typeof img == "string") {
-            var _src = img;
-            img = document.createElement("img");
-            img.src = _src
-          }
-          a.push(img);
-          if (!img.getContext && !img.naturalWidth) {
-            this._loadCount++;
-            this.complete = false;
-            img.onload = function() {
-              return _this2._handleImadeLoad(src)
-            };
-            img.onerror = function() {
-              return _this2._handleImageError(src)
-            }
-          }
-        }
-      }
-      // parse frames:
-      if (data.frames != null) {
-        if (Array.isArray(data.frames)) {
-          this._frames = [];
-          for (var _iterator2 = data.frames, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-            var _ref2;
-            if (_isArray2) {
-              if (_i2 >= _iterator2.length) break;
-              _ref2 = _iterator2[_i2++]
-            } else {
-              _i2 = _iterator2.next();
-              if (_i2.done) break;
-              _ref2 = _i2.value
-            }
-            var arr = _ref2;
-            this._frames.push({
-              image: this._images[arr[4] ? arr[4] : 0],
-              rect: new Rectangle(arr[0], arr[1], arr[2], arr[3]),
-              regX: arr[5] || 0,
-              regY: arr[6] || 0
-            })
-          }
-        } else {
-          var o = data.frames;
-          this._frameWidth = o.width;
-          this._frameHeight = o.height;
-          this._regX = o.regX || 0;
-          this._regY = o.regY || 0;
-          this._spacing = o.spacing || 0;
-          this._margin = o.margin || 0;
-          this._numFrames = o.count;
-          if (this._loadCount == 0) {
-            this._calculateFrames()
-          }
-        }
-      }
-      // parse animations:
-      this._animations = [];
-      if (data.animations != null) {
-        this._data = {};
-        var _o = data.animations;
-        for (var name in _o) {
-          var anim = {
-            name: name
-          };
-          var obj = _o[name];
-          var _a = void 0;
-          if (typeof obj == "number") {
-            // single frame
-            _a = anim.frames = [obj]
-          } else if (Array.isArray(obj)) {
-            // simple
-            if (obj.length == 1) {
-              anim.frames = [obj[0]]
-            } else {
-              anim.speed = obj[3];
-              anim.next = obj[2];
-              _a = anim.frames = [];
-              for (var i = obj[0]; i <= obj[1]; i++) {
-                _a.push(i)
-              }
-            }
-          } else {
-            // complex
-            anim.speed = obj.speed;
-            anim.next = obj.next;
-            var frames = obj.frames;
-            _a = anim.frames = typeof frames == "number" ? [frames] : frames.slice(0)
-          }
-          if (anim.next === true || anim.next === undefined) {
-            anim.next = name
-          } // loop
-          if (anim.next === false || _a.length < 2 && anim.next == name) {
-            anim.next = null
-          } // stop
-          if (!anim.speed) {
-            anim.speed = 1
-          }
-          this._animations.push(name);
-          this._data[name] = anim
-        }
-      }
-    };
-    /**
-     * @method _handleImageLoad
-     * @protected
-     */
-    SpriteSheet.prototype._handleImageLoad = function _handleImageLoad(src) {
-      if (--this._loadCount == 0) {
-        this._calculateFrames();
-        this.complete = true;
-        this.dispatchEvent("complete")
-      }
-    };
-    /**
-     * @method _handleImageError
-     * @protected
-     */
-    SpriteSheet.prototype._handleImageError = function _handleImageError(src) {
-      var errorEvent = new Event("error");
-      errorEvent.src = src;
-      this.dispatchEvent(errorEvent);
-      // Complete is still dispatched.
-      if (--this._loadCount == 0) {
-        this.dispatchEvent("complete")
-      }
-    };
-    /**
-     * @method _calculateFrames
-     * @protected
-     */
-    SpriteSheet.prototype._calculateFrames = function _calculateFrames() {
-      if (this._frames || this._frameWidth == 0) {
-        return
-      }
-      this._frames = [];
-      var maxFrames = this._numFrames || 1e5; // if we go over this, something is wrong.
-      var frameCount = 0,
-        frameWidth = this._frameWidth,
-        frameHeight = this._frameHeight;
-      var spacing = this._spacing,
-        margin = this._margin;
-      imgLoop: for (var i = 0, imgs = this._images, l = imgs.length; i < l; i++) {
-        var img = imgs[i],
-          imgW = img.width,
-          imgH = img.height;
-        var y = margin;
-        while (y <= imgH - margin - frameHeight) {
-          var x = margin;
-          while (x <= imgW - margin - frameWidth) {
-            if (frameCount >= maxFrames) {
-              break imgLoop
-            }
-            frameCount++;
-            this._frames.push({
-              image: img,
-              rect: new Rectangle(x, y, frameWidth, frameHeight),
-              regX: this._regX,
-              regY: this._regY
-            });
-            x += frameWidth + spacing
-          }
-          y += frameHeight + spacing
-        }
-      }
-      this._numFrames = frameCount
-    };
-    createClass(SpriteSheet, [{
-      key: "animations",
-      get: function get() {
-        return this._animations.slice()
-      }
-    }]);
-    return SpriteSheet
-  }(EventDispatcher);
-  /**
-   * Passed as the parameter to all mouse/pointer/touch related events. For a listing of mouse events and their properties,
-   * see the {{#crossLink "DisplayObject"}}{{/crossLink}} and {{#crossLink "Stage"}}{{/crossLink}} event listings.
-   * @class MouseEvent
-   * @extends Event
-   */
   var MouseEvent = function(_Event) {
     inherits(MouseEvent, _Event);
     // constructor:
@@ -9502,26 +4646,6 @@
     }]);
     return MouseEvent
   }(Event);
-  /**
-   * A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
-   * method is called, it will render its display list to its target canvas.
-   *
-   * <h4>Example</h4>
-   * This example creates a stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
-   * and redraw the stage using {{#crossLink "Stage/update"}}{{/crossLink}}.
-   *
-   *      var stage = new createjs.Stage("canvasElementId");
-   *      var image = new createjs.Bitmap("imagePath.png");
-   *      stage.addChild(image);
-   *      createjs.Ticker.addEventListener("tick", handleTick);
-   *      function handleTick(event) {
-   *          image.x += 10;
-   *          stage.update();
-   *      }
-   *
-   * @class Stage
-   * @extends Container
-   */
   var Stage = function(_Container) {
     inherits(Stage, _Container);
     // constructor:
@@ -10285,70 +5409,62 @@
     }]);
     return Stage
   }(Container);
-  /*
-   * README IF EDITING:
-   * Terminology for developers:
-   *
-   * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
-   * Vertex Property: a piece of information attached to the vertex like a vector3 containing x,y,z
-   * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render modes do not use these)
-   * Card: a group of 2 triangles used to display a rectangular image
-   * U/V: common names for the [0-1] texture co-ordinates on an image
-   * Batch: a single call to the renderer, best done as little as possible so multiple cards are put into a single batch
-   * Buffer: WebGL array data
-   * Program/Shader: For every vertex we run the Vertex shader. The results are used per pixel by the Fragment shader. When combined and paired these are a shader "program"
-   * Texture: WebGL representation of image data and associated extra information
-   * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
+  // events:
+  /**
+   * Dispatched when the user moves the mouse over the canvas.
+   * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+   * @event stagemousemove
+   * @since 0.6.0
    */
   /**
-   * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL-optimized display list,
-   * which is used in place of the usual {{#crossLink "Stage"}}{{/crossLink}}. This class should behave identically to
-   * a {{#crossLink "Stage"}}{{/crossLink}} except for WebGL-specific functionality.
-   *
-   * Each time the {{#crossLink "Stage/tick"}}{{/crossLink}} method is called, the display list is rendered to the
-   * target &lt;canvas/&gt; instance, ignoring non-WebGL-compatible display objects. On devices and browsers that don't
-   * support WebGL, content will automatically be rendered to canvas 2D context instead.
-   *
-   * <h4>Limitations</h4>
-   * - {{#crossLink "Shape"}}{{/crossLink}}, {{#crossLink "Shadow"}}{{/crossLink}}, and {{#crossLink "Text"}}{{/crossLink}}
-   * 	are not rendered when added to the display list.
-   * - Images are wrapped as a webGL texture. Graphics cards have a limit to concurrent textures, and too many
-   *	textures can slow performance. Caching may slow WebGL.
-   * - To display something StageGL cannot render, {{#crossLink "displayObject/cache"}}{{/crossLink}} the object.
-   *	Caches can be rendered regardless of source. Be wary of creating a lot of small caches, and instead use
-   *	techniques such as SpriteSheets to generate images that contain multiple objects.
-   * - Clone image nodes (DOM Image/Canvas Element) to re-use them between multiple StageGL instances, otherwise the
-   *	GPU texture loading and tracking will get confused.
-   * - You must call {{#crossLink "StageGL/updateViewport"}}{{/crossLink}} if you resize your canvas after
-   *	initializing StageGL to properly size the 3D context stored in memory.
-   * - Best performance will come from manual management of texture memory, but it is handled automatically by default.
-   * 	See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for more information.
-   *
-   * <h4>Example</h4>
-   * This example creates a StageGL instance, adds a child to it, then uses the EaselJS {{#crossLink "Ticker"}}{{/crossLink}}
-   * to update the child and redraw the stage.
-   *
-   *      var stage = new createjs.StageGL("canvasElementId", false, false);
-   *      stage.updateViewport(800, 600); //LM: Is this necessary in this example? Could you use canvas.width instead?
-   *
-   *      var image = new createjs.Bitmap("imagePath.png");
-   *      stage.addChild(image);
-   *
-   *      createjs.Ticker.on("tick", handleTick);
-   *
-   *      function handleTick(event) {
-   *          image.x += 10;
-   *          stage.update();
-   *      }
-   *
-   * <h4>Notes</h4>
-   * - StageGL is not currently included in the minified version of EaselJS.
-   * - {{#crossLink "SpriteContainer"}}{{/crossLink}} (the previous approach to WebGL with EaselJS) has been deprecated.
-   * - Earlier versions of WebGL support in EaselJS (SpriteStage and SpriteContainer) had hard limitations on images
-   * 	per container, which have been solved.
-   *
-   * @class StageGL
-   * @extends Stage
+   * Dispatched when the user presses their left mouse button on the canvas. See the {{#crossLink "MouseEvent"}}{{/crossLink}}
+   * class for a listing of event properties.
+   * @event stagemousedown
+   * @since 0.6.0
+   */
+  /**
+   * Dispatched when the user the user presses somewhere on the stage, then releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
+   * You can use {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}} to check whether the mouse is currently within the stage bounds.
+   * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+   * @event stagemouseup
+   * @since 0.6.0
+   */
+  /**
+   * Dispatched when the mouse moves from within the canvas area (mouseInBounds == true) to outside it (mouseInBounds == false).
+   * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
+   * class for a listing of event properties.
+   * @event mouseleave
+   * @since 0.7.0
+   */
+  /**
+   * Dispatched when the mouse moves into the canvas area (mouseInBounds == false) from outside it (mouseInBounds == true).
+   * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
+   * class for a listing of event properties.
+   * @event mouseenter
+   * @since 0.7.0
+   */
+  /**
+   * Dispatched each update immediately before the tick event is propagated through the display list.
+   * You can call preventDefault on the event object to cancel propagating the tick event.
+   * @event tickstart
+   * @since 0.7.0
+   */
+  /**
+   * Dispatched each update immediately after the tick event is propagated through the display list. Does not fire if
+   * tickOnUpdate is false. Precedes the "drawstart" event.
+   * @event tickend
+   * @since 0.7.0
+   */
+  /**
+   * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
+   * You can call preventDefault on the event object to cancel the draw.
+   * @event drawstart
+   * @since 0.7.0
+   */
+  /**
+   * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
+   * @event drawend
+   * @since 0.7.0
    */
   var StageGL = function(_Stage) {
     inherits(StageGL, _Stage);
@@ -12173,7 +7289,191 @@
       }
     }]);
     return StageGL
-  }(Stage); {
+  }(Stage);
+  // static properties:
+  /**
+   * The number of properties defined per vertex (x, y, textureU, textureV, textureIndex, alpha)
+   * @property VERTEX_PROPERTY_COUNT
+   * @static
+   * @final
+   * @type {Number}
+   * @default 6
+   * @readonly
+   */
+  /**
+   * The number of triangle indices it takes to form a Card. 3 per triangle, 2 triangles.
+   * @property INDICIES_PER_CARD
+   * @static
+   * @final
+   * @type {Number}
+   * @default 6
+   * @readonly
+   */
+  /**
+   * The default value for the maximum number of cards we want to process in a batch. See {{#crossLink "StageGL/WEBGL_MAX_INDEX_NUM:property"}}{{/crossLink}}
+   * for a hard limit.
+   * @property DEFAULT_MAX_BATCH_SIZE
+   * @static
+   * @final
+   * @type {Number}
+   * @default 10000
+   * @readonly
+   */
+  /**
+   * The maximum size WebGL allows for element index numbers. Uses a 16 bit unsigned integer. It takes 6 indices to
+   * make a unique card.
+   * @property WEBGL_MAX_INDEX_NUM
+   * @static
+   * @final
+   * @type {Number}
+   * @default 65536
+   * @readonly
+   */
+  /**
+   * Default U/V rect for dealing with full coverage from an image source.
+   * @property UV_RECT
+   * @static
+   * @final
+   * @type {Object}
+   * @default {t:0, l:0, b:1, r:1}
+   * @readonly
+   */
+  /**
+   * Vertex positions for a card that covers the entire render. Used with render targets primarily.
+   * @property COVER_VERT
+   * @static
+   * @final
+   * @type {Float32Array}
+   * @readonly
+   */
+  /**
+   * U/V for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
+   * @property COVER_UV
+   * @static
+   * @final
+   * @type {Float32Array}
+   * @readonly
+   */
+  /**
+   * Flipped U/V for {{#crossLink "StageGL:COVER_VERT:property"}}{{/crossLink}}.
+   * @property COVER_UV_FLIP
+   * @static
+   * @final
+   * @type {Float32Array}
+   * @readonly
+   */
+  /**
+   * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
+   * regular shader is designed to render all expected objects. Shader code may contain templates that are replaced
+   * pre-compile.
+   * @property REGULAR_VARYING_HEADER
+   * @static
+   * @final
+   * @type {String}
+   * @readonly
+   */
+  /**
+   * Actual full header for the vertex shader. Includes the varying header. The regular shader is designed to render
+   * all expected objects. Shader code may contain templates that are replaced pre-compile.
+   * @property REGULAR_VERTEX_HEADER
+   * @static
+   * @final
+   * @type {String}
+   * @readonly
+   */
+  /**
+   * Actual full header for the fragment shader. Includes the varying header. The regular shader is designed to render
+   * all expected objects. Shader code may contain templates that are replaced pre-compile.
+   * @property REGULAR_FRAGMENT_HEADER
+   * @static
+   * @final
+   * @type {String}
+   * @readonly
+   */
+  /**
+   * Body of the vertex shader. The regular shader is designed to render all expected objects. Shader code may contain
+   * templates that are replaced pre-compile.
+   * @property REGULAR_VERTEX_BODY
+   * @static
+   * @final
+   * @type {String}
+   * @readonly
+   */
+  /**
+   * Body of the fragment shader. The regular shader is designed to render all expected objects. Shader code may
+   * contain templates that are replaced pre-compile.
+   * @property REGULAR_FRAGMENT_BODY
+   * @static
+   * @final
+   * @type {String}
+   * @readonly
+   */
+  // TODO: DHG: a real particle shader
+  /**
+   * @property PARTICLE_VERTEX_BODY
+   * @todo
+   * @final
+   * @static
+   * @type {String}
+   * @readonly
+   */
+  /**
+   * @property PARTICLE_FRAGMENT_BODY
+   * @todo
+   * @final
+   * @static
+   * @type {String}
+   * @readonly
+   */
+  /**
+   * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
+   * cover shader is designed to be a simple vertex/uv only texture render that covers the render surface. Shader
+   * code may contain templates that are replaced pre-compile.
+   * @property COVER_VARYING_HEADER
+   * @static
+   * @final
+   * @type {String}
+   * @readonly
+   */
+  /**
+   * Actual full header for the vertex shader. Includes the varying header. The cover shader is designed to be a
+   * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
+   * replaced pre-compile.
+   * @property COVER_VERTEX_HEADER
+   * @static
+   * @final
+   * @type {String}
+   * @readonly
+   */
+  /**
+   * Actual full header for the fragment shader. Includes the varying header. The cover shader is designed to be a
+   * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
+   * replaced pre-compile.
+   * @property COVER_FRAGMENT_HEADER
+   * @static
+   * @final
+   * @type {String}
+   * @readonly
+   */
+  /**
+   * Body of the vertex shader. The cover shader is designed to be a simple vertex/uv only texture render that covers
+   * the render surface. Shader code may contain templates that are replaced pre-compile.
+   * @property COVER_VERTEX_BODY
+   * @static
+   * @final
+   * @type {String}
+   * @readonly
+   */
+  /**
+   * Body of the fragment shader. The cover shader is designed to be a simple vertex/uv only texture render that
+   * covers the render surface. Shader code may contain templates that are replaced pre-compile.
+   * @property COVER_FRAGMENT_BODY
+   * @static
+   * @final
+   * @type {String}
+   * @readonly
+   */
+  {
     StageGL.VERTEX_PROPERTY_COUNT = 6;
     StageGL.INDICIES_PER_CARD = 6;
     StageGL.DEFAULT_MAX_BATCH_SIZE = 1e4;
@@ -12229,157 +7529,4765 @@
    * restored.
    * @event drawend
    */
-  // injected properties and methods:
-  /*
-   * We need to modify other classes, do this during our class initialization
-   */
-  (function _injectWebGLFunctionality() {
-    //TODO: maybe re-examine this approach?
-    // Set which classes are compatible with StageGL. The order is important!!!
-    // Reflect any changes to the drawing loop
-    var candidates = [Sprite, Bitmap];
-    candidates.forEach(function(_class, index) {
-      _class.prototype._webGLRenderStyle = index + 1
-    });
-    var bc = BitmapCache.prototype;
+  var Bitmap = function(_DisplayObject) {
+    inherits(Bitmap, _DisplayObject);
+    // constructor:
     /**
-     * Functionality injected to {{#crossLink "BitmapCache"}}{{/crossLink}}. Ensure StageGL is loaded after all other
-     * standard EaselJS classes are loaded but before making any DisplayObject instances for injection to take full effect.
-     * Replaces the context2D cache draw with the option for WebGL or context2D drawing.
-     * If options is set to "true" a StageGL is created and contained on the object for use when rendering a cache.
-     * If options is a StageGL instance it will not create an instance but use the one provided.
-     * If possible it is best to provide the StageGL instance that is a parent to this DisplayObject for performance reasons.
-     * A StageGL cache does not infer the ability to draw objects a StageGL cannot currently draw,
-     * i.e. do not use a WebGL context cache when caching a Shape, Text, etc.
-     * <h4>Example</h4>
-     * Using WebGL cache with a 2d context
-     *
-     *     var stage = new createjs.Stage();
-     *     var bmp = new createjs.Bitmap(src);
-     *     bmp.cache(0, 0, bmp.width, bmp.height, 1, true);          // no StageGL to use, so make one
-     *     var shape = new createjs.Shape();
-     *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
-     *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
-     *
-     * <h4>Example</h4>
-     * Using WebGL cache with a WebGL context:
-     *
-     *     var stageGL = new createjs.StageGL();
-     *     var bmp = new createjs.Bitmap(src);
-     *     bmp.cache(0, 0, bmp.width, bmp.height, 1, stageGL);       // use our StageGL to cache
-     *     var shape = new createjs.Shape();
-     *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
-     *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
-     *
-     * You can make your own StageGL and have it render to a canvas if you set ".isCacheControlled" to true on your stage.
-     * You may wish to create your own StageGL instance to control factors like background color/transparency, AA, and etc.
-     * You must set "options" to its own stage if you wish to use the fast Render Textures available only to StageGLs.
-     * If you use WebGL cache on a container with Shapes you will have to cache each shape individually before the container,
-     * otherwise the WebGL cache will not render the shapes.
-     * @public
-     * @method BitmapCache.cache
-     * @param {Number} x The x coordinate origin for the cache region.
-     * @param {Number} y The y coordinate origin for the cache region.
-     * @param {Number} width The width of the cache region.
-     * @param {Number} height The height of the cache region.
-     * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
-     * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
-     * 	cached elements with greater fidelity. Default is 1.
-     * @param {Boolean|StageGL} [options=undefined] Select whether to use context 2D, or WebGL rendering, and whether to make a new stage instance or use an existing one.
-     * @for BitmapCache
-     * @todo Doc the rest of BitmapCache
+     * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to
+     * display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use.
+     * If it is a URI, a new Image object will be constructed and assigned to the .image property.
+     * @constructor
      */
-    bc._updateSurfaceBASE = bc._updateSurface;
-    bc._updateSurface = function() {
-      if (!this._options) {
-        this._updateSurfaceBASE();
-        return
-      }
-      // create it if it's missing
-      if (!this._webGLCache) {
-        if (this._options === true || this.target.stage !== this._options) {
-          // a StageGL dedicated to this cache
-          this.target.cacheCanvas = document.createElement("canvas");
-          this._webGLCache = new StageGL(this.target.cacheCanvas, {});
-          this._webGLCache.isCacheControlled = true
-        } else {
-          // a StageGL re-used by this cache
-          try {
-            this.target.cacheCanvas = true; // we'll replace this with a render texture during the draw as it changes per draw
-            this._webGLCache = this._options
-          } catch (e) {
-            throw "Invalid StageGL object used for cache param"
-          }
-        }
-      }
-      // now size render surfaces
-      var stageGL = this._webGLCache;
-      var surface = this.target.cacheCanvas;
-      // if we have a dedicated stage we've gotta size it
-      if (stageGL.isCacheControlled) {
-        surface.width = this._drawWidth;
-        surface.height = this._drawHeight;
-        stageGL.updateViewport(this._drawWidth, this._drawHeight)
-      }
-      if (this.target.filters) {
-        // with filters we can't tell how many we'll need but the most we'll ever need is two, so make them now
-        stageGL.getTargetRenderTexture(this.target, this._drawWidth, this._drawHeight);
-        stageGL.getTargetRenderTexture(this.target, this._drawWidth, this._drawHeight)
+    function Bitmap(imageOrUri) {
+      classCallCheck(this, Bitmap);
+      // public properties:
+      /**
+       * The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially
+       * mobile browsers) support drawing video to a canvas.
+       * @property image
+       * @type HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
+       */
+      var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
+      if (typeof imageOrUri == "string") {
+        _this.image = document.createElement("img");
+        _this.image.src = imageOrUri
       } else {
-        // without filters then we only need one RenderTexture, and that's only if its not a dedicated stage
-        if (!stageGL.isCacheControlled) {
-          stageGL.getTargetRenderTexture(this.target, this._drawWidth, this._drawHeight)
-        }
+        _this.image = imageOrUri
       }
-    };
-    bc._drawToCacheBASE = bc._drawToCache;
-    bc._drawToCache = function(compositeOperation) {
-      var surface = this.target.cacheCanvas;
-      var target = this.target;
-      var webGL = this._webGLCache;
-      if (!webGL) {
-        this._drawToCacheBASE(compositeOperation);
-        surface._invalid = true;
-        return
-      }
-      //TODO: auto split blur into an x/y pass
-      this._webGLCache.cacheDraw(target, target.filters, this);
-      // NOTE: we may of swapped around which element the surface is, so we re-fetch it
-      surface = this.target.cacheCanvas;
-      surface.width = this._drawWidth;
-      surface.height = this._drawHeight;
-      surface._invalid = true
-    };
-    bc.releaseBASE = bc.release;
-    bc.release = function() {
-      if (this._webGLCache) {
-        // if it isn't cache controlled clean up after yourself
-        if (!this._webGLCache.isCacheControlled) {
-          if (this.__lastRT) {
-            this.__lastRT = undefined
-          }
-          if (this.__rtA) {
-            this._webGLCache._killTextureObject(this.__rtA)
-          }
-          if (this.__rtB) {
-            this._webGLCache._killTextureObject(this.__rtB)
-          }
-          if (this.target && this.target.cacheCanvas) {
-            this._webGLCache._killTextureObject(this.target.cacheCanvas)
-          }
-        }
-        // set the context to none and let the garbage collector get the rest when the canvas itself gets removed
-        this._webGLCache = false
-      } else {
-        var stage = this.target.stage;
-        if (stage instanceof StageGL) {
-          stage.releaseTexture(this.target.cacheCanvas);
-          this.target.cacheCanvas.remove()
-        }
-      }
-      this.releaseBASE()
+      /**
+       * Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
+       * Note that video sources must have a width / height set to work correctly with `sourceRect`.
+       * @property sourceRect
+       * @type Rectangle
+       * @default null
+       */
+      _this.sourceRect = null;
+      /**
+       * Set as compatible with WebGL.
+       * @property _webGLRenderStyle
+       * @protected
+       * @type {Number}
+       * @default 2
+       */
+      _this._webGLRenderStyle = 2;
+      return _this
     }
-  })();
+    // public methods:
+    /**
+     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+     * This does not account for whether it would be visible within the boundaries of the stage.
+     *
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method isVisible
+     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+     */
+    Bitmap.prototype.isVisible = function isVisible() {
+      var image = this.image;
+      var hasContent = this.cacheCanvas || image && (image.naturalWidth || image.getContext || image.readyState >= 2);
+      return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent)
+    };
+    /**
+     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
+     * Returns true if the draw was handled (useful for overriding functionality).
+     *
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method draw
+     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+     * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
+     * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+     * into itself).
+     * @return {Boolean}
+     */
+    Bitmap.prototype.draw = function draw(ctx) {
+      var ignoreCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache) || !this.image) {
+        return true
+      }
+      var img = this.image,
+        rect = this.sourceRect;
+      if (rect) {
+        // some browsers choke on out of bound values, so we'll fix them:
+        var x1 = rect.x,
+          y1 = rect.y,
+          x2 = x1 + rect.width,
+          y2 = y1 + rect.height,
+          x = 0,
+          y = 0,
+          w = img.width,
+          h = img.height;
+        if (x1 < 0) {
+          x -= x1;
+          x1 = 0
+        }
+        if (x2 > w) {
+          x2 = w
+        }
+        if (y1 < 0) {
+          y -= y1;
+          y1 = 0
+        }
+        if (y2 > h) {
+          y2 = h
+        }
+        ctx.drawImage(img, x1, y1, x2 - x1, y2 - y1, x, y, x2 - x1, y2 - y1)
+      } else {
+        ctx.drawImage(img, 0, 0)
+      }
+      return true
+    };
+    // Note, the doc sections below document using the specified APIs (from DisplayObject) from
+    // Bitmap. This is why they have no method implementations.
+    /**
+     * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+     * You should <b>not</b> cache Bitmap instances as it can degrade performance.
+     *
+     * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work.</strong>
+     * To see the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
+     * method.
+     * @method cache
+     */
+    /**
+     * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+     * You should <b>not</b> cache Bitmap instances as it can degrade performance.
+     *
+     * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work.</strong>
+     * To see the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
+     * method.
+     * @method updateCache
+     */
+    /**
+     * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
+     * You should <b>not</b> cache Bitmap instances as it can degrade performance.
+     *
+     * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work.</strong>
+     * To see the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
+     * method.
+     * @method uncache
+     */
+    /**
+     * Docced in superclass.
+     */
+    Bitmap.prototype.getBounds = function getBounds() {
+      var rect = _DisplayObject.prototype.getBounds.call(this);
+      if (rect) {
+        return rect
+      }
+      var image = this.image,
+        o = this.sourceRect || image;
+      var hasContent = image && (image.naturalWidth || image.getContext || image.readyState >= 2);
+      return hasContent ? this._rectangle.setValues(0, 0, o.width, o.height) : null
+    };
+    /**
+     * Returns a clone of the Bitmap instance.
+     * @method clone
+     * @return {Bitmap} a clone of the Bitmap instance.
+     */
+    Bitmap.prototype.clone = function clone() {
+      var o = new Bitmap(this.image);
+      if (this.sourceRect) {
+        o.sourceRect = this.sourceRect.clone()
+      }
+      this._cloneProps(o);
+      return o
+    };
+    return Bitmap
+  }(DisplayObject);
+  var Sprite = function(_DisplayObject) {
+    inherits(Sprite, _DisplayObject);
+    // constructor:
+    /**
+     * @constructor
+     * @param {SpriteSheet} spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
+     * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
+     * @param {String|Number} [frameOrAnimation] The frame number or animation to play initially.
+     */
+    function Sprite(spriteSheet, frameOrAnimation) {
+      classCallCheck(this, Sprite);
+      // public properties:
+      /**
+       * The frame index that will be drawn when draw is called. Note that with some {{#crossLink "SpriteSheet"}}{{/crossLink}}
+       * definitions, this will advance non-sequentially. This will always be an integer value.
+       * @property currentFrame
+       * @type {Number}
+       * @default 0
+       * @readonly
+       */
+      var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
+      _this.currentFrame = 0;
+      /**
+       * Returns the name of the currently playing animation.
+       * @property currentAnimation
+       * @type {String}
+       * @final
+       * @readonly
+       */
+      _this.currentAnimation = null;
+      /**
+       * Prevents the animation from advancing each tick automatically. For example, you could create a sprite
+       * sheet of icons, set paused to true, and display the appropriate icon by setting <code>currentFrame</code>.
+       * @property paused
+       * @type {Boolean}
+       * @default false
+       */
+      _this.paused = true;
+      /**
+       * The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame
+       * data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
+       * @property spriteSheet
+       * @type {SpriteSheet}
+       * @readonly
+       */
+      _this.spriteSheet = spriteSheet;
+      /**
+       * Specifies the current frame index within the currently playing animation. When playing normally, this will increase
+       * from 0 to n-1, where n is the number of frames in the current animation.
+       *
+       * This could be a non-integer value if
+       * using time-based playback (see {{#crossLink "Sprite/framerate"}}{{/crossLink}}, or if the animation's speed is
+       * not an integer.
+       * @property currentAnimationFrame
+       * @type {Number}
+       * @default 0
+       */
+      _this.currentAnimationFrame = 0;
+      /**
+       * By default Sprite instances advance one frame per tick. Specifying a framerate for the Sprite (or its related
+       * SpriteSheet) will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
+       * framerate.
+       *
+       * For example, if a Sprite with a framerate of 10 is placed on a Stage being updated at 40fps, then the Sprite will
+       * advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will
+       * vary slightly between frames.
+       *
+       * This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being
+       * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
+       * @property framerate
+       * @type {Number}
+       * @default 0
+       */
+      _this.framerate = 0;
+      // private properties:
+      /**
+       * Current animation object.
+       * @property _animation
+       * @protected
+       * @type {Object}
+       * @default null
+       */
+      _this._animation = null;
+      /**
+       * Current frame index.
+       * @property _currentFrame
+       * @protected
+       * @type {Number}
+       * @default null
+       */
+      _this._currentFrame = null;
+      /**
+       * Skips the next auto advance. Used by gotoAndPlay to avoid immediately jumping to the next frame
+       * @property _skipAdvance
+       * @protected
+       * @type {Boolean}
+       * @default false
+       */
+      _this._skipAdvance = false;
+      /**
+       * Set as compatible with WebGL.
+       * @property _webGLRenderStyle
+       * @protected
+       * @type {Number}
+       * @default 1
+       */
+      _this._webGLRenderStyle = 1;
+      if (frameOrAnimation != null) {
+        _this.gotoAndPlay(frameOrAnimation)
+      }
+      return _this
+    }
+    // public methods:
+    /**
+     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+     * This does not account for whether it would be visible within the boundaries of the stage.
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method isVisible
+     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+     */
+    Sprite.prototype.isVisible = function isVisible() {
+      var hasContent = this.cacheCanvas || this.spriteSheet.complete;
+      return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent)
+    };
+    /**
+     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
+     * Returns true if the draw was handled (useful for overriding functionality).
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method draw
+     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+     * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+     * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+     * into itself).
+     */
+    Sprite.prototype.draw = function draw(ctx, ignoreCache) {
+      if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache)) {
+        return true
+      }
+      this._normalizeFrame();
+      var o = this.spriteSheet.getFrame(this._currentFrame | 0);
+      if (!o) {
+        return false
+      }
+      var rect = o.rect;
+      if (rect.width && rect.height) {
+        ctx.drawImage(o.image, rect.x, rect.y, rect.width, rect.height, -o.regX, -o.regY, rect.width, rect.height)
+      }
+      return true
+    };
+    // Note, the doc sections below document using the specified APIs (from DisplayObject) from
+    // Bitmap. This is why they have no method implementations.
+    /**
+     * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+     * You should not cache Sprite instances as it can degrade performance.
+     * @method cache
+     */
+    /**
+     * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+     * You should not cache Sprite instances as it can degrade performance.
+     * @method updateCache
+     */
+    /**
+     * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+     * You should not cache Sprite instances as it can degrade performance.
+     * @method uncache
+     */
+    /**
+     * Play (unpause) the current animation. The Sprite will be paused if either {{#crossLink "Sprite/stop"}}{{/crossLink}}
+     * or {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} is called. Single frame animations will remain
+     * unchanged.
+     * @method play
+     */
+    Sprite.prototype.play = function play() {
+      this.paused = false
+    };
+    /**
+     * Stop playing a running animation. The Sprite will be playing if {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}}
+     * is called. Note that calling {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}} or {{#crossLink "Sprite/play"}}{{/crossLink}}
+     * will resume playback.
+     * @method stop
+     */
+    Sprite.prototype.stop = function stop() {
+      this.paused = true
+    };
+    /**
+     * Sets paused to false and plays the specified animation name, named frame, or frame number.
+     * @method gotoAndPlay
+     * @param {String|Number} frameOrAnimation The frame number or animation name that the playhead should move to
+     * and begin playing.
+     */
+    Sprite.prototype.gotoAndPlay = function gotoAndPlay(frameOrAnimation) {
+      this.paused = false;
+      this._skipAdvance = true;
+      this._goto(frameOrAnimation)
+    };
+    /**
+     * Sets paused to true and seeks to the specified animation name, named frame, or frame number.
+     * @method gotoAndStop
+     * @param {String|Number} frameOrAnimation The frame number or animation name that the playhead should move to
+     * and stop.
+     */
+    Sprite.prototype.gotoAndStop = function gotoAndStop(frameOrAnimation) {
+      this.paused = true;
+      this._goto(frameOrAnimation)
+    };
+    /**
+     * Advances the playhead. This occurs automatically each tick by default.
+     * @param [time] {Number} The amount of time in ms to advance by. Only applicable if framerate is set on the Sprite
+     * or its SpriteSheet.
+     * @method advance
+     */
+    Sprite.prototype.advance = function advance(time) {
+      var fps = this.framerate || this.spriteSheet.framerate;
+      var t = fps && time != null ? time / (1e3 / fps) : 1;
+      this._normalizeFrame(t)
+    };
+    /**
+     * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the current frame relative to
+     * the origin. For example, a 90 x 70 frame with <code>regX=50</code> and <code>regY=40</code> would return a
+     * rectangle with [x=-50, y=-40, width=90, height=70]. This ignores transformations on the display object.
+     *
+     * Also see the SpriteSheet {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}} method.
+     * @method getBounds
+     * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully
+     * loaded.
+     */
+    Sprite.prototype.getBounds = function getBounds() {
+      // TODO: should this normalizeFrame?
+      return _DisplayObject.prototype.getBounds.call(this) || this.spriteSheet.getFrameBounds(this.currentFrame, this._rectangle)
+    };
+    /**
+     * Returns a clone of the Sprite instance. Note that the same SpriteSheet is shared between cloned
+     * instances.
+     * @method clone
+     * @return {Sprite} a clone of the Sprite instance.
+     */
+    Sprite.prototype.clone = function clone() {
+      return this._cloneProps(new Sprite(this.spriteSheet))
+    };
+    // private methods:
+    /**
+     * @method _cloneProps
+     * @param {Sprite} o
+     * @return {Sprite} o
+     * @protected
+     */
+    Sprite.prototype._cloneProps = function _cloneProps(o) {
+      _DisplayObject.prototype._cloneProps.call(this, o);
+      o.currentFrame = this.currentFrame;
+      o.currentAnimation = this.currentAnimation;
+      o.paused = this.paused;
+      o.currentAnimationFrame = this.currentAnimationFrame;
+      o.framerate = this.framerate;
+      o._animation = this._animation;
+      o._currentFrame = this._currentFrame;
+      o._skipAdvance = this._skipAdvance;
+      return o
+    };
+    /**
+     * Advances the <code>currentFrame</code> if paused is not true. This is called automatically when the {{#crossLink "Stage"}}{{/crossLink}}
+     * ticks.
+     * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
+     * @protected
+     * @method _tick
+     */
+    Sprite.prototype._tick = function _tick(evtObj) {
+      if (!this.paused) {
+        if (!this._skipAdvance) {
+          this.advance(evtObj && evtObj.delta)
+        }
+        this._skipAdvance = false
+      }
+      _DisplayObject.prototype._tick.call(this, evtObj)
+    };
+    /**
+     * Normalizes the current frame, advancing animations and dispatching callbacks as appropriate.
+     * @protected
+     * @method _normalizeFrame
+     * @param {Number} [frameDelta=0]
+     */
+    Sprite.prototype._normalizeFrame = function _normalizeFrame() {
+      var frameDelta = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var animation = this._animation;
+      var paused = this.paused;
+      var frame = this._currentFrame;
+      if (animation) {
+        var speed = animation.speed || 1;
+        var animFrame = this.currentAnimationFrame;
+        var l = animation.frames.length;
+        if (animFrame + frameDelta * speed >= l) {
+          var next = animation.next;
+          if (this._dispatchAnimationEnd(animation, frame, paused, next, l - 1)) {
+            // something changed in the event stack, so we shouldn't make any more changes here.
+            return
+          } else if (next) {
+            // sequence. Automatically calls _normalizeFrame again with the remaining frames.
+            return this._goto(next, frameDelta - (l - animFrame) / speed)
+          } else {
+            // end.
+            this.paused = true;
+            animFrame = animation.frames.length - 1
+          }
+        } else {
+          animFrame += frameDelta * speed
+        }
+        this.currentAnimationFrame = animFrame;
+        this._currentFrame = animation.frames[animFrame | 0]
+      } else {
+        frame = this._currentFrame += frameDelta;
+        var _l = this.spriteSheet.getNumFrames();
+        if (frame >= _l && _l > 0) {
+          if (!this._dispatchAnimationEnd(animation, frame, paused, _l - 1)) {
+            // looped.
+            if ((this._currentFrame -= _l) >= _l) {
+              return this._normalizeFrame()
+            }
+          }
+        }
+      }
+      frame = this._currentFrame | 0;
+      if (this.currentFrame != frame) {
+        this.currentFrame = frame;
+        this.dispatchEvent("change")
+      }
+    };
+    /**
+     * Dispatches the "animationend" event. Returns true if a handler changed the animation (ex. calling {{#crossLink "Sprite/stop"}}{{/crossLink}},
+     * {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}}, etc.)
+     * @method _dispatchAnimationEnd
+     * @param animation
+     * @param frame
+     * @param paused
+     * @param next
+     * @param end
+     * @private
+     */
+    Sprite.prototype._dispatchAnimationEnd = function _dispatchAnimationEnd(animation, frame, paused, next, end) {
+      var name = animation ? animation.name : null;
+      if (this.hasEventListener("animationend")) {
+        var evt = new Event("animationend");
+        evt.name = name;
+        evt.next = next;
+        this.dispatchEvent(evt)
+      }
+      // did the animation get changed in the event stack?:
+      var changed = this._animation != animation || this._currentFrame != frame;
+      // if the animation hasn't changed, but the sprite was paused, then we want to stick to the last frame:
+      if (!changed && !paused && this.paused) {
+        this.currentAnimationFrame = end;
+        changed = true
+      }
+      return changed
+    };
+    /**
+     * Moves the playhead to the specified frame number or animation.
+     * @method _goto
+     * @param {String|Number} frameOrAnimation The frame number or animation that the playhead should move to.
+     * @param {Boolean} [frame] The frame of the animation to go to. Defaults to 0.
+     * @protected
+     */
+    Sprite.prototype._goto = function _goto(frameOrAnimation, frame) {
+      this.currentAnimationFrame = 0;
+      if (isNaN(frameOrAnimation)) {
+        var data = this.spriteSheet.getAnimation(frameOrAnimation);
+        if (data) {
+          this._animation = data;
+          this.currentAnimation = frameOrAnimation;
+          this._normalizeFrame(frame)
+        }
+      } else {
+        this.currentAnimation = this._animation = null;
+        this._currentFrame = frameOrAnimation;
+        this._normalizeFrame()
+      }
+    };
+    return Sprite
+  }(DisplayObject);
+  // events:
+  /**
+   * Dispatched when an animation reaches its ends.
+   * @event animationend
+   * @param {Object} target The object that dispatched the event.
+   * @param {String} type The event type.
+   * @param {String} name The name of the animation that just ended.
+   * @param {String} next The name of the next animation that will be played, or null. This will be the same as name if the animation is looping.
+   * @since 0.6.0
+   */
+  /**
+   * Dispatched any time the current frame changes. For example, this could be due to automatic advancement on a tick,
+   * or calling gotoAndPlay() or gotoAndStop().
+   * @event change
+   * @param {Object} target The object that dispatched the event.
+   * @param {String} type The event type.
+   */
+  var _maxPoolSize = 100;
+  var _spritePool = [];
+  /**
+   * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
+   * using new line characters, but automatic wrapping is not supported. See the
+   * {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
+   * property for more information on defining glyphs.
+   *
+   * <strong>Important:</strong> BitmapText extends Container, but is not designed to be used as one.
+   * As such, methods like addChild and removeChild are disabled.
+   * @class BitmapText
+   * @extends Container
+   * @module EaselJS
+   */
+  var BitmapText = function(_Container) {
+    inherits(BitmapText, _Container);
+    // constructor:
+    /**
+     * @param {String} [text=""] The text to display.
+     * @param {SpriteSheet} [spriteSheet=null] The spritesheet that defines the character glyphs.
+     * @constructor
+     */
+    function BitmapText() {
+      var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+      var spriteSheet = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      classCallCheck(this, BitmapText);
+      // public properties:
+      /**
+       * The text to display.
+       * @property text
+       * @type String
+       * @default ""
+       */
+      var _this = possibleConstructorReturn(this, _Container.call(this));
+      _this.text = text;
+      /**
+       * A SpriteSheet instance that defines the glyphs for this bitmap text. Each glyph/character
+       * should have a single frame animation defined in the sprite sheet named the same as
+       * corresponding character. For example, the following animation definition:
+       *
+       * 		"A": {frames: [0]}
+       *
+       * would indicate that the frame at index 0 of the spritesheet should be drawn for the "A" character. The short form
+       * is also acceptable:
+       *
+       * 		"A": 0
+       *
+       * Note that if a character in the text is not found in the sprite sheet, it will also
+       * try to use the alternate case (upper or lower).
+       *
+       * See SpriteSheet for more information on defining sprite sheet data.
+       * @property spriteSheet
+       * @type SpriteSheet
+       * @default null
+       */
+      _this.spriteSheet = spriteSheet;
+      /**
+       * The height of each line of text. If 0, then it will use a line height calculated
+       * by checking for the height of the "1", "T", or "L" character (in that order). If
+       * those characters are not defined, it will use the height of the first frame of the
+       * sprite sheet.
+       * @property lineHeight
+       * @type Number
+       * @default 0
+       */
+      _this.lineHeight = 0;
+      /**
+       * This spacing (in pixels) will be added after each character in the output.
+       * @property letterSpacing
+       * @type Number
+       * @default 0
+       */
+      _this.letterSpacing = 0;
+      /**
+       * If a space character is not defined in the sprite sheet, then empty pixels equal to
+       * spaceWidth will be inserted instead. If 0, then it will use a value calculated
+       * by checking for the width of the "1", "l", "E", or "A" character (in that order). If
+       * those characters are not defined, it will use the width of the first frame of the
+       * sprite sheet.
+       * @property spaceWidth
+       * @type Number
+       * @default 0
+       */
+      _this.spaceWidth = 0;
+      // private properties:
+      /**
+       * @property _oldProps
+       * @type Object
+       * @protected
+       */
+      _this._oldProps = {
+        text: 0,
+        spriteSheet: 0,
+        lineHeight: 0,
+        letterSpacing: 0,
+        spaceWidth: 0
+      };
+      return _this
+    }
+    // static properties:
+    /**
+     * BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains
+     * an internal object pool of sprite instances to reuse. Increasing this value can cause more sprites to be
+     * retained, slightly increasing memory use, but reducing instantiation.
+     * @property maxPoolSize
+     * @type Number
+     * @static
+     * @default 100
+     */
+    // public methods:
+    /**
+     * Docced in superclass.
+     */
+    BitmapText.prototype.draw = function draw(ctx, ignoreCache) {
+      _Container.prototype.draw.call(this, ctx, ignoreCache)
+    };
+    /**
+     * Docced in superclass.
+     */
+    BitmapText.prototype.getBounds = function getBounds() {
+      this._updateText();
+      return _Container.prototype.getBounds.call(this)
+    };
+    /**
+     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+     * This does not account for whether it would be visible within the boundaries of the stage.
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method isVisible
+     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+     */
+    BitmapText.prototype.isVisible = function isVisible() {
+      var hasContent = this.cacheCanvas || this.spriteSheet && this.spriteSheet.complete && this.text;
+      return !!(this.visible && this.alpha > 0 && this.scaleX !== 0 && this.scaleY !== 0 && hasContent)
+    };
+    BitmapText.prototype.clone = function clone() {
+      return this._cloneProps(new BitmapText(this.text, this.spriteSheet))
+    };
+    /**
+     * <strong>Disabled in BitmapText.</strong>
+     * @method addChild
+     */
+    BitmapText.prototype.addChild = function addChild() {};
+    /**
+     * <strong>Disabled in BitmapText.</strong>
+     * @method addChildAt
+     */
+    BitmapText.prototype.addChildAt = function addChildAt() {};
+    /**
+     * <strong>Disabled in BitmapText.</strong>
+     * @method removeChild
+     */
+    BitmapText.prototype.removeChild = function removeChild() {};
+    /**
+     * <strong>Disabled in BitmapText.</strong>
+     * @method removeChildAt
+     */
+    BitmapText.prototype.removeChildAt = function removeChildAt() {};
+    /**
+     * <strong>Disabled in BitmapText.</strong>
+     * @method removeAllChildren
+     */
+    BitmapText.prototype.removeAllChildren = function removeAllChildren() {};
+    // private methods:
+    /**
+     * @method _cloneProps
+     * @param {BitmapText} o
+     * @return {BitmapText} o
+     * @protected
+     */
+    BitmapText.prototype._cloneProps = function _cloneProps(o) {
+      _Container.prototype._cloneProps.call(this, o);
+      o.lineHeight = this.lineHeight;
+      o.letterSpacing = this.letterSpacing;
+      o.spaceWidth = this.spaceWidth;
+      return o
+    };
+    /**
+     * @method _getFrameIndex
+     * @param {String} character
+     * @param {SpriteSheet} spriteSheet
+     * @return {Number}
+     * @protected
+     */
+    BitmapText.prototype._getFrameIndex = function _getFrameIndex(character, spriteSheet) {
+      var c = void 0,
+        o = spriteSheet.getAnimation(character);
+      if (!o) {
+        character != (c = character.toUpperCase()) || character != (c = character.toLowerCase()) || (c = null);
+        if (c) {
+          o = spriteSheet.getAnimation(c)
+        }
+      }
+      return o && o.frames[0]
+    };
+    /**
+     * @method _getFrame
+     * @param {String} character
+     * @param {SpriteSheet} spriteSheet
+     * @return {Object}
+     * @protected
+     */
+    BitmapText.prototype._getFrame = function _getFrame(character, spriteSheet) {
+      var index = this._getFrameIndex(character, spriteSheet);
+      return index == null ? index : spriteSheet.getFrame(index)
+    };
+    /**
+     * @method _getLineHeight
+     * @param {SpriteSheet} ss
+     * @return {Number}
+     * @protected
+     */
+    BitmapText.prototype._getLineHeight = function _getLineHeight(ss) {
+      var frame = this._getFrame("1", ss) || this._getFrame("T", ss) || this._getFrame("L", ss) || ss.getFrame(0);
+      return frame ? frame.rect.height : 1
+    };
+    /**
+     * @method _getSpaceWidth
+     * @param {SpriteSheet} ss
+     * @return {Number}
+     * @protected
+     */
+    BitmapText.prototype._getSpaceWidth = function _getSpaceWidth(ss) {
+      var frame = this._getFrame("1", ss) || this._getFrame("l", ss) || this._getFrame("e", ss) || this._getFrame("a", ss) || ss.getFrame(0);
+      return frame ? frame.rect.width : 1
+    };
+    BitmapText.prototype._tick = function _tick(evtObj) {
+      var stage = this.stage;
+      stage && stage.on("drawstart", this._updateText, this, true);
+      _Container.prototype._tick.call(this, evtObj)
+    };
+    /**
+     * @method _updateText
+     * @protected
+     */
+    BitmapText.prototype._updateText = function _updateText() {
+      var x = 0,
+        y = 0,
+        o = this._oldProps,
+        change = false,
+        spaceW = this.spaceWidth,
+        lineH = this.lineHeight,
+        ss = this.spriteSheet;
+      var pool = BitmapText._spritePool,
+        kids = this.children,
+        childIndex = 0,
+        numKids = kids.length,
+        sprite = void 0;
+      for (var n in o) {
+        if (o[n] != this[n]) {
+          o[n] = this[n];
+          change = true
+        }
+      }
+      if (!change) {
+        return
+      }
+      var hasSpace = !!this._getFrame(" ", ss);
+      if (!hasSpace && !spaceW) {
+        spaceW = this._getSpaceWidth(ss)
+      }
+      if (!lineH) {
+        lineH = this._getLineHeight(ss)
+      }
+      for (var i = 0, l = this.text.length; i < l; i++) {
+        var character = this.text.charAt(i);
+        if (character == " " && !hasSpace) {
+          x += spaceW;
+          continue
+        } else if (character == "\n" || character == "\r") {
+          if (character == "\r" && this.text.charAt(i + 1) == "\n") {
+            i++
+          } // crlf
+          x = 0;
+          y += lineH;
+          continue
+        }
+        var index = this._getFrameIndex(character, ss);
+        if (index == null) {
+          continue
+        }
+        if (childIndex < numKids) {
+          sprite = kids[childIndex]
+        } else {
+          kids.push(sprite = pool.length ? pool.pop() : new Sprite);
+          sprite.parent = this;
+          numKids++
+        }
+        sprite.spriteSheet = ss;
+        sprite.gotoAndStop(index);
+        sprite.x = x;
+        sprite.y = y;
+        childIndex++;
+        x += sprite.getBounds().width + this.letterSpacing
+      }
+      while (numKids > childIndex) {
+        // faster than removeChild.
+        pool.push(sprite = kids.pop());
+        sprite.parent = null;
+        numKids--
+      }
+      if (pool.length > BitmapText.maxPoolSize) {
+        pool.length = BitmapText.maxPoolSize
+      }
+    };
+    createClass(BitmapText, null, [{
+      key: "maxPoolSize",
+      get: function get() {
+        return _maxPoolSize
+      },
+      set: function set(maxPoolSize) {
+        _maxPoolSize = maxPoolSize
+      }
+    }, {
+      key: "_spritePool",
+      get: function get() {
+        return _spritePool
+      }
+    }]);
+    return BitmapText
+  }(Container);
+  var DOMElement = function(_DisplayObject) {
+    inherits(DOMElement, _DisplayObject);
+    // constructor:
+    /**
+     * @constructor
+     * @param {HTMLElement|String} htmlElement A reference or id for the DOM element to manage.
+     */
+    function DOMElement(htmlElement) {
+      classCallCheck(this, DOMElement);
+      var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
+      if (typeof htmlElement == "string") {
+        htmlElement = document.getElementById(htmlElement)
+      }
+      _this.mouseEnabled = false;
+      var style = htmlElement.style;
+      style.position = "absolute";
+      style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
+      // public properties:
+      /**
+       * The DOM object to manage.
+       * @property htmlElement
+       * @type HTMLElement
+       */
+      _this.htmlElement = htmlElement;
+      // private properties:
+      /**
+       * @property _oldMtx
+       * @type Matrix2D
+       * @protected
+       */
+      _this._oldProps = null;
+      return _this
+    }
+    // public methods:
+    /**
+     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+     * This does not account for whether it would be visible within the boundaries of the stage.
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method isVisible
+     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+     */
+    DOMElement.prototype.isVisible = function isVisible() {
+      return this.htmlElement != null
+    };
+    /**
+     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
+     * Returns true if the draw was handled (useful for overriding functionality).
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method draw
+     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+     * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+     * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+     * into itself).
+     * @return {Boolean}
+     */
+    DOMElement.prototype.draw = function draw(ctx, ignoreCache) {
+      // this relies on the _tick method because draw isn't called if the parent is not visible.
+      // the actual update happens in _handleDrawEnd
+      return true
+    };
+    /**
+     * Not applicable to DOMElement.
+     * @method cache
+     */
+    DOMElement.prototype.cache = function cache() {};
+    /**
+     * Not applicable to DOMElement.
+     * @method uncache
+     */
+    DOMElement.prototype.uncache = function uncache() {};
+    /**
+     * Not applicable to DOMElement.
+     * @method updateCache
+     */
+    DOMElement.prototype.updateCache = function updateCache() {};
+    /**
+     * Not applicable to DOMElement.
+     * @method hitTest
+     */
+    DOMElement.prototype.hitTest = function hitTest() {};
+    /**
+     * Not applicable to DOMElement.
+     * @method localToGlobal
+     */
+    DOMElement.prototype.localToGlobal = function localToGlobal() {};
+    /**
+     * Not applicable to DOMElement.
+     * @method globalToLocal
+     */
+    DOMElement.prototype.globalToLocal = function globalToLocal() {};
+    /**
+     * Not applicable to DOMElement.
+     * @method localToLocal
+     */
+    DOMElement.prototype.localToLocal = function localToLocal() {};
+    /**
+     * DOMElement cannot be cloned. Throws an error.
+     * @method clone
+     */
+    DOMElement.prototype.clone = function clone() {
+      throw "DOMElement cannot be cloned."
+    };
+    // private methods:
+    /**
+     * @method _tick
+     * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
+     * function.
+     * @protected
+     */
+    DOMElement.prototype._tick = function _tick(evtObj) {
+      var stage = this.stage;
+      stage && stage.on("drawend", this._handleDrawEnd, this, true);
+      _DisplayObject.prototype._tick.call(this, evtObj)
+    };
+    /**
+     * @method _handleDrawEnd
+     * @param {Event} evt
+     * @protected
+     */
+    DOMElement.prototype._handleDrawEnd = function _handleDrawEnd(evt) {
+      var o = this.htmlElement;
+      if (!o) {
+        return
+      }
+      var style = o.style;
+      var props = this.getConcatenatedDisplayProps(this._props),
+        mtx = props.matrix;
+      var visibility = props.visible ? "visible" : "hidden";
+      if (visibility != style.visibility) {
+        style.visibility = visibility
+      }
+      if (!props.visible) {
+        return
+      }
+      var oldProps = this._oldProps,
+        oldMtx = oldProps && oldProps.matrix;
+      var n = 1e4; // precision
+      if (!oldMtx || !oldMtx.equals(mtx)) {
+        var str = "matrix(" + (mtx.a * n | 0) / n + "," + (mtx.b * n | 0) / n + "," + (mtx.c * n | 0) / n + "," + (mtx.d * n | 0) / n + "," + (mtx.tx + .5 | 0);
+        style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str + "," + (mtx.ty + .5 | 0) + ")";
+        style.MozTransform = str + "px," + (mtx.ty + .5 | 0) + "px)";
+        if (!oldProps) {
+          oldProps = this._oldProps = new DisplayProps(true, NaN)
+        }
+        oldProps.matrix.copy(mtx)
+      }
+      if (oldProps.alpha != props.alpha) {
+        style.opacity = "" + (props.alpha * n | 0) / n;
+        oldProps.alpha = props.alpha
+      }
+    };
+    return DOMElement
+  }(DisplayObject);
+  /**
+   * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
+   * are not full EaselJS display objects and do not participate in EaselJS mouse events.
+   * @event click
+   */
+  /**
+   * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
+   * are not full EaselJS display objects and do not participate in EaselJS mouse events.
+   * @event dblClick
+   */
+  /**
+   * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
+   * are not full EaselJS display objects and do not participate in EaselJS mouse events.
+   * @event mousedown
+   */
+  /**
+   * The HTMLElement can listen for the mouseover event, not the DOMElement instance.
+   * Since DOMElement instances are not full EaselJS display objects and do not participate in EaselJS mouse events.
+   * @event mouseover
+   */
+  /**
+   * Not applicable to DOMElement.
+   * @event tick
+   */
+  /**
+   * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a
+   * specified context. Note that you can use Graphics without any dependency on the EaselJS framework by calling {{#crossLink "Graphics/draw"}}{{/crossLink}}
+   * directly, or it can be used with the {{#crossLink "Shape"}}{{/crossLink}} object to draw vector graphics within the
+   * context of an EaselJS display list.
+   *
+   * There are two approaches to working with Graphics object: calling methods on a Graphics instance (the "Graphics API"), or
+   * instantiating Graphics command objects and adding them to the graphics queue via {{#crossLink "Graphics/append"}}{{/crossLink}}.
+   * The former abstracts the latter, simplifying beginning and ending paths, fills, and strokes.
+   *
+   *      var g = new createjs.Graphics();
+   *      g.setStrokeStyle(1);
+   *      g.beginStroke("#000000");
+   *      g.beginFill("red");
+   *      g.drawCircle(0,0,30);
+   *
+   * All drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
+   * the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill:
+   *
+   *      myGraphics.beginStroke("red").beginFill("blue").drawRect(20, 20, 100, 50);
+   *
+   * Each graphics API call generates a command object (see below). The last command to be created can be accessed via
+   * {{#crossLink "Graphics/command:property"}}{{/crossLink}}:
+   *
+   *      var fillCommand = myGraphics.beginFill("red").command;
+   *      // ... later, update the fill style/color:
+   *      fillCommand.style = "blue";
+   *      // or change it to a bitmap fill:
+   *      fillCommand.bitmap(myImage);
+   *
+   * For more direct control of rendering, you can instantiate and append command objects to the graphics queue directly. In this case, you
+   * need to manage path creation manually, and ensure that fill/stroke is applied to a defined path:
+   *
+   *      // start a new path. Graphics.beginCmd is a reusable BeginPath instance:
+   *      myGraphics.append(createjs.Graphics.beginCmd);
+   *      // we need to define the path before applying the fill:
+   *      var circle = new createjs.Graphics.Circle(0,0,30);
+   *      myGraphics.append(circle);
+   *      // fill the path we just defined:
+   *      var fill = new createjs.Graphics.Fill("red");
+   *      myGraphics.append(fill);
+   *
+   * These approaches can be used together, for example to insert a custom command:
+   *
+   *      myGraphics.beginFill("red");
+   *      var customCommand = new CustomSpiralCommand(etc);
+   *      myGraphics.append(customCommand);
+   *      myGraphics.beginFill("blue");
+   *      myGraphics.drawCircle(0, 0, 30);
+   *
+   * See {{#crossLink "Graphics/append"}}{{/crossLink}} for more info on creating custom commands.
+   *
+   * <h4>Tiny API</h4>
+   * The Graphics class also includes a "tiny API", which is one or two-letter methods that are shortcuts for all of the
+   * Graphics methods. These methods are great for creating compact instructions, and is used by the Toolkit for CreateJS
+   * to generate readable code. All tiny methods are marked as protected, so you can view them by enabling protected
+   * descriptions in the docs.
+   *
+   * <table>
+   *     <tr><td><b>Tiny</b></td><td><b>Method</b></td><td><b>Tiny</b></td><td><b>Method</b></td></tr>
+   *     <tr><td>mt</td><td>{{#crossLink "Graphics/moveTo"}}{{/crossLink}} </td>
+   *     <td>lt</td> <td>{{#crossLink "Graphics/lineTo"}}{{/crossLink}}</td></tr>
+   *     <tr><td>a/at</td><td>{{#crossLink "Graphics/arc"}}{{/crossLink}} / {{#crossLink "Graphics/arcTo"}}{{/crossLink}} </td>
+   *     <td>bt</td><td>{{#crossLink "Graphics/bezierCurveTo"}}{{/crossLink}} </td></tr>
+   *     <tr><td>qt</td><td>{{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} (also curveTo)</td>
+   *     <td>r</td><td>{{#crossLink "Graphics/rect"}}{{/crossLink}} </td></tr>
+   *     <tr><td>cp</td><td>{{#crossLink "Graphics/closePath"}}{{/crossLink}} </td>
+   *     <td>c</td><td>{{#crossLink "Graphics/clear"}}{{/crossLink}} </td></tr>
+   *     <tr><td>f</td><td>{{#crossLink "Graphics/beginFill"}}{{/crossLink}} </td>
+   *     <td>lf</td><td>{{#crossLink "Graphics/beginLinearGradientFill"}}{{/crossLink}} </td></tr>
+   *     <tr><td>rf</td><td>{{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} </td>
+   *     <td>bf</td><td>{{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} </td></tr>
+   *     <tr><td>ef</td><td>{{#crossLink "Graphics/endFill"}}{{/crossLink}} </td>
+   *     <td>ss / sd</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} / {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} </td></tr>
+   *     <tr><td>s</td><td>{{#crossLink "Graphics/beginStroke"}}{{/crossLink}} </td>
+   *     <td>ls</td><td>{{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} </td></tr>
+   *     <tr><td>rs</td><td>{{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} </td>
+   *     <td>bs</td><td>{{#crossLink "Graphics/beginBitmapStroke"}}{{/crossLink}} </td></tr>
+   *     <tr><td>es</td><td>{{#crossLink "Graphics/endStroke"}}{{/crossLink}} </td>
+   *     <td>dr</td><td>{{#crossLink "Graphics/drawRect"}}{{/crossLink}} </td></tr>
+   *     <tr><td>rr</td><td>{{#crossLink "Graphics/drawRoundRect"}}{{/crossLink}} </td>
+   *     <td>rc</td><td>{{#crossLink "Graphics/drawRoundRectComplex"}}{{/crossLink}} </td></tr>
+   *     <tr><td>dc</td><td>{{#crossLink "Graphics/drawCircle"}}{{/crossLink}} </td>
+   *     <td>de</td><td>{{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} </td></tr>
+   *     <tr><td>dp</td><td>{{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} </td>
+   *     <td>p</td><td>{{#crossLink "Graphics/decodePath"}}{{/crossLink}} </td></tr>
+   * </table>
+   *
+   * Here is the above example, using the tiny API instead.
+   *
+   *      myGraphics.s("red").f("blue").r(20, 20, 100, 50);
+   *
+   * @class Graphics
+   * @module EaselJS
+   */
+  var Graphics = function() {
+    // constructor:
+    /**
+     * @constructor
+     */
+    function Graphics() {
+      classCallCheck(this, Graphics);
+      // public properties
+      /**
+       * Holds a reference to the last command that was created or appended. For example, you could retain a reference
+       * to a Fill command in order to dynamically update the color later by using:
+       *
+       * 		var myFill = myGraphics.beginFill("red").command;
+       * 		// update color later:
+       * 		myFill.style = "yellow";
+       *
+       * @property command
+       * @type Object
+       */
+      this.command = null;
+      // private properties
+      /**
+       * @property _stroke
+       * @protected
+       * @type {Stroke}
+       */
+      this._stroke = null;
+      /**
+       * @property _strokeStyle
+       * @protected
+       * @type {StrokeStyle}
+       */
+      this._strokeStyle = null;
+      /**
+       * @property _oldStrokeStyle
+       * @protected
+       * @type {StrokeStyle}
+       */
+      this._oldStrokeStyle = null;
+      /**
+       * @property _strokeDash
+       * @protected
+       * @type {StrokeDash}
+       */
+      this._strokeDash = null;
+      /**
+       * @property _oldStrokeDash
+       * @protected
+       * @type {StrokeDash}
+       */
+      this._oldStrokeDash = null;
+      /**
+       * @property _strokeIgnoreScale
+       * @protected
+       * @type Boolean
+       */
+      this._strokeIgnoreScale = false;
+      /**
+       * @property _fill
+       * @protected
+       * @type {Fill}
+       */
+      this._fill = null;
+      /**
+       * @property _instructions
+       * @protected
+       * @type {Array}
+       */
+      this._instructions = [];
+      /**
+       * Indicates the last instruction index that was committed.
+       * @property _commitIndex
+       * @protected
+       * @type {Number}
+       */
+      this._commitIndex = 0;
+      /**
+       * Uncommitted instructions.
+       * @property _activeInstructions
+       * @protected
+       * @type {Array}
+       */
+      this._activeInstructions = [];
+      /**
+       * This indicates that there have been changes to the activeInstruction list since the last updateInstructions call.
+       * @property _dirty
+       * @protected
+       * @type {Boolean}
+       * @default false
+       */
+      this._dirty = false;
+      /**
+       * Index to draw from if a store operation has happened.
+       * @property _storeIndex
+       * @protected
+       * @type {Number}
+       * @default 0
+       */
+      this._storeIndex = 0;
+      // ActionScript mappings:
+      /**
+       * Maps the familiar ActionScript <code>curveTo()</code> method to the functionally similar {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}}
+       * method.
+       * @method curveTo
+       * @param {Number} cpx
+       * @param {Number} cpy
+       * @param {Number} x
+       * @param {Number} y
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       */
+      this.curveTo = this.quadraticCurveTo;
+      /**
+       * Maps the familiar ActionScript <code>drawRect()</code> method to the functionally similar {{#crossLink "Graphics/rect"}}{{/crossLink}}
+       * method.
+       * @method drawRect
+       * @param {Number} x
+       * @param {Number} y
+       * @param {Number} w Width of the rectangle
+       * @param {Number} h Height of the rectangle
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       */
+      this.drawRect = this.rect;
+      // tiny API:
+      /**
+       * Shortcut to moveTo.
+       * @method mt
+       * @param {Number} x The x coordinate the drawing point should move to.
+       * @param {Number} y The y coordinate the drawing point should move to.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls).
+       * @chainable
+       * @protected
+       */
+      this.mt = this.moveTo;
+      /**
+       * Shortcut to lineTo.
+       * @method lt
+       * @param {Number} x The x coordinate the drawing point should draw to.
+       * @param {Number} y The y coordinate the drawing point should draw to.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.lt = this.lineTo;
+      /**
+       * Shortcut to arcTo.
+       * @method at
+       * @param {Number} x1
+       * @param {Number} y1
+       * @param {Number} x2
+       * @param {Number} y2
+       * @param {Number} radius
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.at = this.arcTo;
+      /**
+       * Shortcut to bezierCurveTo.
+       * @method bt
+       * @param {Number} cp1x
+       * @param {Number} cp1y
+       * @param {Number} cp2x
+       * @param {Number} cp2y
+       * @param {Number} x
+       * @param {Number} y
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.bt = this.bezierCurveTo;
+      /**
+       * Shortcut to quadraticCurveTo / curveTo.
+       * @method qt
+       * @param {Number} cpx
+       * @param {Number} cpy
+       * @param {Number} x
+       * @param {Number} y
+       * @protected
+       * @chainable
+       */
+      this.qt = this.quadraticCurveTo;
+      /**
+       * Shortcut to arc.
+       * @method a
+       * @param {Number} x
+       * @param {Number} y
+       * @param {Number} radius
+       * @param {Number} startAngle Measured in radians.
+       * @param {Number} endAngle Measured in radians.
+       * @param {Boolean} anticlockwise
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @protected
+       * @chainable
+       */
+      this.a = this.arc;
+      /**
+       * Shortcut to rect.
+       * @method r
+       * @param {Number} x
+       * @param {Number} y
+       * @param {Number} w Width of the rectangle
+       * @param {Number} h Height of the rectangle
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.r = this.rect;
+      /**
+       * Shortcut to closePath.
+       * @method cp
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.cp = this.closePath;
+      /**
+       * Shortcut to clear.
+       * @method c
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.c = this.clear;
+      /**
+       * Shortcut to beginFill.
+       * @method f
+       * @param {String} color A CSS compatible color value (ex. "red", "#FF0000", or "rgba(255,0,0,0.5)"). Setting to
+       * null will result in no fill.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.f = this.beginFill;
+      /**
+       * Shortcut to beginLinearGradientFill.
+       * @method lf
+       * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient
+       * drawing from red to blue.
+       * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw
+       * the first color to 10% then interpolating to the second color at 90%.
+       * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
+       * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
+       * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
+       * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.lf = this.beginLinearGradientFill;
+      /**
+       * Shortcut to beginRadialGradientFill.
+       * @method rf
+       * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+       * a gradient drawing from red to blue.
+       * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+       * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+       * @param {Number} x0 Center position of the inner circle that defines the gradient.
+       * @param {Number} y0 Center position of the inner circle that defines the gradient.
+       * @param {Number} r0 Radius of the inner circle that defines the gradient.
+       * @param {Number} x1 Center position of the outer circle that defines the gradient.
+       * @param {Number} y1 Center position of the outer circle that defines the gradient.
+       * @param {Number} r1 Radius of the outer circle that defines the gradient.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.rf = this.beginRadialGradientFill;
+      /**
+       * Shortcut to beginBitmapFill.
+       * @method bf
+       * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
+       * as the pattern.
+       * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
+       * "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat". Note that Firefox does not support "repeat-x" or
+       * "repeat-y" (latest tests were in FF 20.0), and will default to "repeat".
+       * @param {Matrix2D} matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation
+       * will be applied relative to the parent transform.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.bf = this.beginBitmapFill;
+      /**
+       * Shortcut to endFill.
+       * @method ef
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.ef = this.endFill;
+      /**
+       * Shortcut to setStrokeStyle.
+       * @method ss
+       * @param {Number} thickness The width of the stroke.
+       * @param {String | Number} [caps=0] Indicates the type of caps to use at the end of lines. One of butt,
+       * round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with
+       * the tiny API.
+       * @param {String | Number} [joints=0] Specifies the type of joints that should be used where two lines meet.
+       * One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel)
+       * for use with the tiny API.
+       * @param {Number} [miterLimit=10] If joints is set to "miter", then you can specify a miter limit ratio which
+       * controls at what point a mitered joint will be clipped.
+       * @param {Boolean} [ignoreScale=false] If true, the stroke will be drawn at the specified thickness regardless
+       * of active transformations.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.ss = this.setStrokeStyle;
+      /**
+       * Shortcut to setStrokeDash.
+       * @method sd
+       * @param {Array} [segments] An array specifying the dash pattern, alternating between line and gap.
+       * For example, [20,10] would create a pattern of 20 pixel lines with 10 pixel gaps between them.
+       * Passing null or an empty array will clear any existing dash.
+       * @param {Number} [offset=0] The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.sd = this.setStrokeDash;
+      /**
+       * Shortcut to beginStroke.
+       * @method s
+       * @param {String} color A CSS compatible color value (ex. "#FF0000", "red", or "rgba(255,0,0,0.5)"). Setting to
+       * null will result in no stroke.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.s = this.beginStroke;
+      /**
+       * Shortcut to beginLinearGradientStroke.
+       * @method ls
+       * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+       * a gradient drawing from red to blue.
+       * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+       * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+       * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
+       * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
+       * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
+       * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.ls = this.beginLinearGradientStroke;
+      /**
+       * Shortcut to beginRadialGradientStroke.
+       * @method rs
+       * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+       * a gradient drawing from red to blue.
+       * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+       * 0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color
+       * to 100%.
+       * @param {Number} x0 Center position of the inner circle that defines the gradient.
+       * @param {Number} y0 Center position of the inner circle that defines the gradient.
+       * @param {Number} r0 Radius of the inner circle that defines the gradient.
+       * @param {Number} x1 Center position of the outer circle that defines the gradient.
+       * @param {Number} y1 Center position of the outer circle that defines the gradient.
+       * @param {Number} r1 Radius of the outer circle that defines the gradient.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.rs = this.beginRadialGradientStroke;
+      /**
+       * Shortcut to beginBitmapStroke.
+       * @method bs
+       * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
+       * as the pattern.
+       * @param {String} [repetition=repeat] Optional. Indicates whether to repeat the image in the fill area. One of
+       * "repeat", "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.bs = this.beginBitmapStroke;
+      /**
+       * Shortcut to endStroke.
+       * @method es
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.es = this.endStroke;
+      /**
+       * Shortcut to drawRect.
+       * @method dr
+       * @param {Number} x
+       * @param {Number} y
+       * @param {Number} w Width of the rectangle
+       * @param {Number} h Height of the rectangle
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.dr = this.drawRect;
+      /**
+       * Shortcut to drawRoundRect.
+       * @method rr
+       * @param {Number} x
+       * @param {Number} y
+       * @param {Number} w
+       * @param {Number} h
+       * @param {Number} radius Corner radius.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.rr = this.drawRoundRect;
+      /**
+       * Shortcut to drawRoundRectComplex.
+       * @method rc
+       * @param {Number} x The horizontal coordinate to draw the round rect.
+       * @param {Number} y The vertical coordinate to draw the round rect.
+       * @param {Number} w The width of the round rect.
+       * @param {Number} h The height of the round rect.
+       * @param {Number} radiusTL Top left corner radius.
+       * @param {Number} radiusTR Top right corner radius.
+       * @param {Number} radiusBR Bottom right corner radius.
+       * @param {Number} radiusBL Bottom left corner radius.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.rc = this.drawRoundRectComplex;
+      /**
+       * Shortcut to drawCircle.
+       * @method dc
+       * @param {Number} x x coordinate center point of circle.
+       * @param {Number} y y coordinate center point of circle.
+       * @param {Number} radius Radius of circle.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.dc = this.drawCircle;
+      /**
+       * Shortcut to drawEllipse.
+       * @method de
+       * @param {Number} x The left coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+       * which draws from center.
+       * @param {Number} y The top coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+       * which draws from the center.
+       * @param {Number} w The height (horizontal diameter) of the ellipse. The horizontal radius will be half of this
+       * number.
+       * @param {Number} h The width (vertical diameter) of the ellipse. The vertical radius will be half of this number.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.de = this.drawEllipse;
+      /**
+       * Shortcut to drawPolyStar.
+       * @method dp
+       * @param {Number} x Position of the center of the shape.
+       * @param {Number} y Position of the center of the shape.
+       * @param {Number} radius The outer radius of the shape.
+       * @param {Number} sides The number of points on the star or sides on the polygon.
+       * @param {Number} pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular
+       * polygon (no points), a pointSize of 1 will draw nothing because the points are infinitely pointy.
+       * @param {Number} angle The angle of the first point / corner. For example a value of 0 will draw the first point
+       * directly to the right of the center.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.dp = this.drawPolyStar;
+      /**
+       * Shortcut to decodePath.
+       * @method p
+       * @param {String} str The path string to decode.
+       * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+       * @chainable
+       * @protected
+       */
+      this.p = this.decodePath;
+      this.clear()
+    }
+    // static public methods:
+    /**
+     * Returns a CSS compatible color string based on the specified RGB numeric color values in the format
+     * "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)". For example,
+     *
+     *      createjs.Graphics.getRGB(50, 100, 150, 0.5);
+     *      // Returns "rgba(50,100,150,0.5)"
+     *
+     * It also supports passing a single hex color value as the first param, and an optional alpha value as the second
+     * param. For example,
+     *
+     *      createjs.Graphics.getRGB(0xFF00FF, 0.2);
+     *      // Returns "rgba(255,0,255,0.2)"
+     *
+     * @method getRGB
+     * @static
+     * @param {Number} r The red component for the color, between 0 and 0xFF (255).
+     * @param {Number} g The green component for the color, between 0 and 0xFF (255).
+     * @param {Number} b The blue component for the color, between 0 and 0xFF (255).
+     * @param {Number} [alpha] The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
+     * @return {String} A CSS compatible color string based on the specified RGB numeric color values in the format
+     * "rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)".
+     */
+    Graphics.getRGB = function getRGB(r, g, b, alpha) {
+      if (r != null && b == null) {
+        alpha = g;
+        b = r & 255;
+        g = r >> 8 & 255;
+        r = r >> 16 & 255
+      }
+      if (alpha == null) {
+        return "rgb(" + r + "," + g + "," + b + ")"
+      } else {
+        return "rgba(" + r + "," + g + "," + b + "," + alpha + ")"
+      }
+    };
+    /**
+     * Returns a CSS compatible color string based on the specified HSL numeric color values in the format "hsla(360,100,100,1.0)",
+     * or if alpha is null then in the format "hsl(360,100,100)".
+     *
+     *      createjs.Graphics.getHSL(150, 100, 70);
+     *      // Returns "hsl(150,100,70)"
+     *
+     * @method getHSL
+     * @static
+     * @param {Number} hue The hue component for the color, between 0 and 360.
+     * @param {Number} saturation The saturation component for the color, between 0 and 100.
+     * @param {Number} lightness The lightness component for the color, between 0 and 100.
+     * @param {Number} [alpha] The alpha component for the color where 0 is fully transparent and 1 is fully opaque.
+     * @return {String} A CSS compatible color string based on the specified HSL numeric color values in the format
+     * "hsla(360,100,100,1.0)", or if alpha is null then in the format "hsl(360,100,100)".
+     */
+    Graphics.getHSL = function getHSL(hue, saturation, lightness, alpha) {
+      if (alpha == null) {
+        return "hsl(" + hue % 360 + "," + saturation + "%," + lightness + "%)"
+      } else {
+        return "hsl(" + hue % 360 + "," + saturation + "%," + lightness + "%," + alpha + ")"
+      }
+    };
+    // accessor properties:
+    /**
+     * Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect)
+     * Modifying the returned array directly is not recommended, and is likely to result in unexpected behaviour.
+     *
+     * This property is mainly intended for introspection of the instructions (ex. for graphics export).
+     * @property instructions
+     * @type {Array}
+     * @readonly
+     */
+    // public methods:
+    /**
+     * Returns true if this Graphics instance has no drawing commands.
+     * @method isEmpty
+     * @return {Boolean} Returns true if this Graphics instance has no drawing commands.
+     */
+    Graphics.prototype.isEmpty = function isEmpty() {
+      return !(this._instructions.length || this._activeInstructions.length)
+    };
+    /**
+     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
+     * Returns true if the draw was handled (useful for overriding functionality).
+     *
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method draw
+     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+     * @param {Object} data Optional data that is passed to graphics command exec methods. When called from a Shape instance, the shape passes itself as the data parameter. This can be used by custom graphic commands to insert contextual data.
+     */
+    Graphics.prototype.draw = function draw(ctx, data) {
+      this._updateInstructions();
+      var instr = this._instructions;
+      var l = instr.length;
+      for (var i = this._storeIndex; i < l; i++) {
+        instr[i].exec(ctx, data)
+      }
+    };
+    /**
+     * Draws only the path described for this Graphics instance, skipping any non-path instructions, including fill and
+     * stroke descriptions. Used for <code>DisplayObject.mask</code> to draw the clipping path, for example.
+     *
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method drawAsPath
+     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+     */
+    Graphics.prototype.drawAsPath = function drawAsPath(ctx) {
+      this._updateInstructions();
+      var instr = void 0,
+        instrs = this._instructions;
+      var l = instrs.length;
+      for (var i = this._storeIndex; i < l; i++) {
+        // the first command is always a beginPath command.
+        if ((instr = instrs[i]).path !== false) {
+          instr.exec(ctx)
+        }
+      }
+    };
+    // public methods that map directly to context 2D calls:
+    /**
+     * Moves the drawing point to the specified position. A tiny API method "mt" also exists.
+     * @method moveTo
+     * @param {Number} x The x coordinate the drawing point should move to.
+     * @param {Number} y The y coordinate the drawing point should move to.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls).
+     * @chainable
+     */
+    Graphics.prototype.moveTo = function moveTo(x, y) {
+      return this.append(new MoveTo(x, y), true)
+    };
+    /**
+     * Draws a line from the current drawing point to the specified position, which become the new current drawing
+     * point. Note that you *must* call {{#crossLink "Graphics/moveTo"}}{{/crossLink}} before the first `lineTo()`.
+     * A tiny API method "lt" also exists.
+     *
+     * For detailed information, read the
+     * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
+     * whatwg spec</a>.
+     * @method lineTo
+     * @param {Number} x The x coordinate the drawing point should draw to.
+     * @param {Number} y The y coordinate the drawing point should draw to.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.lineTo = function lineTo(x, y) {
+      return this.append(new LineTo(x, y))
+    };
+    /**
+     * Draws an arc with the specified control points and radius.  For detailed information, read the
+     * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arcto">
+     * whatwg spec</a>. A tiny API method "at" also exists.
+     * @method arcTo
+     * @param {Number} x1
+     * @param {Number} y1
+     * @param {Number} x2
+     * @param {Number} y2
+     * @param {Number} radius
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.arcTo = function arcTo(x1, y1, x2, y2, radius) {
+      return this.append(new ArcTo(x1, y1, x2, y2, radius))
+    };
+    /**
+     * Draws an arc defined by the radius, startAngle and endAngle arguments, centered at the position (x, y). For
+     * example, to draw a full circle with a radius of 20 centered at (100, 100):
+     *
+     *      arc(100, 100, 20, 0, Math.PI*2);
+     *
+     * For detailed information, read the
+     * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arc">whatwg spec</a>.
+     * A tiny API method "a" also exists.
+     * @method arc
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} radius
+     * @param {Number} startAngle Measured in radians.
+     * @param {Number} endAngle Measured in radians.
+     * @param {Boolean} anticlockwise
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.arc = function arc(x, y, radius, startAngle, endAngle, anticlockwise) {
+      return this.append(new Arc(x, y, radius, startAngle, endAngle, anticlockwise))
+    };
+    /**
+     * Draws a quadratic curve from the current drawing point to (x, y) using the control point (cpx, cpy). For detailed
+     * information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-quadraticcurveto">
+     * whatwg spec</a>. A tiny API method "qt" also exists.
+     * @method quadraticCurveTo
+     * @param {Number} cpx
+     * @param {Number} cpy
+     * @param {Number} x
+     * @param {Number} y
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.quadraticCurveTo = function quadraticCurveTo(cpx, cpy, x, y) {
+      return this.append(new QuadraticCurveTo(cpx, cpy, x, y))
+    };
+    /**
+     * Draws a bezier curve from the current drawing point to (x, y) using the control points (cp1x, cp1y) and (cp2x,
+     * cp2y). For detailed information, read the
+     * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-beziercurveto">
+     * whatwg spec</a>. A tiny API method "bt" also exists.
+     * @method bezierCurveTo
+     * @param {Number} cp1x
+     * @param {Number} cp1y
+     * @param {Number} cp2x
+     * @param {Number} cp2y
+     * @param {Number} x
+     * @param {Number} y
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.bezierCurveTo = function bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) {
+      return this.append(new BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y))
+    };
+    /**
+     * Draws a rectangle at (x, y) with the specified width and height using the current fill and/or stroke.
+     * For detailed information, read the
+     * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-rect">
+     * whatwg spec</a>. A tiny API method "r" also exists.
+     * @method rect
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} w Width of the rectangle
+     * @param {Number} h Height of the rectangle
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.rect = function rect(x, y, w, h) {
+      return this.append(new Rect(x, y, w, h))
+    };
+    /**
+     * Closes the current path, effectively drawing a line from the current drawing point to the first drawing point specified
+     * since the fill or stroke was last set. A tiny API method "cp" also exists.
+     * @method closePath
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.closePath = function closePath() {
+      return this._activeInstructions.length ? this.append(new ClosePath) : this
+    };
+    // public methods that roughly map to Adobe Flash/Animate graphics APIs:
+    /**
+     * Clears all drawing instructions, effectively resetting this Graphics instance. Any line and fill styles will need
+     * to be redefined to draw shapes following a clear call. A tiny API method "c" also exists.
+     * @method clear
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.clear = function clear() {
+      this._instructions.length = this._activeInstructions.length = this._commitIndex = 0;
+      this._strokeStyle = this._oldStrokeStyle = this._stroke = this._fill = this._strokeDash = this._oldStrokeDash = null;
+      this._dirty = this._strokeIgnoreScale = false;
+      return this
+    };
+    /**
+     * Begins a fill with the specified color. This ends the current sub-path. A tiny API method "f" also exists.
+     * @method beginFill
+     * @param {String} color A CSS compatible color value (ex. "red", "#FF0000", or "rgba(255,0,0,0.5)"). Setting to
+     * null will result in no fill.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.beginFill = function beginFill(color) {
+      return this._setFill(color ? new Fill(color) : null)
+    };
+    /**
+     * Begins a linear gradient fill defined by the line (x0, y0) to (x1, y1). This ends the current sub-path. For
+     * example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a
+     * square to display it:
+     *
+     *      myGraphics.beginLinearGradientFill(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
+     *
+     * A tiny API method "lf" also exists.
+     * @method beginLinearGradientFill
+     * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient
+     * drawing from red to blue.
+     * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw
+     * the first color to 10% then interpolating to the second color at 90%.
+     * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
+     * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
+     * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
+     * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.beginLinearGradientFill = function beginLinearGradientFill(colors, ratios, x0, y0, x1, y1) {
+      return this._setFill((new Fill).linearGradient(colors, ratios, x0, y0, x1, y1))
+    };
+    /**
+     * Begins a radial gradient fill. This ends the current sub-path. For example, the following code defines a red to
+     * blue radial gradient centered at (100, 100), with a radius of 50, and draws a circle to display it:
+     *
+     *      myGraphics.beginRadialGradientFill(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50).drawCircle(100, 100, 50);
+     *
+     * A tiny API method "rf" also exists.
+     * @method beginRadialGradientFill
+     * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+     * a gradient drawing from red to blue.
+     * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+     * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+     * @param {Number} x0 Center position of the inner circle that defines the gradient.
+     * @param {Number} y0 Center position of the inner circle that defines the gradient.
+     * @param {Number} r0 Radius of the inner circle that defines the gradient.
+     * @param {Number} x1 Center position of the outer circle that defines the gradient.
+     * @param {Number} y1 Center position of the outer circle that defines the gradient.
+     * @param {Number} r1 Radius of the outer circle that defines the gradient.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.beginRadialGradientFill = function beginRadialGradientFill(colors, ratios, x0, y0, r0, x1, y1, r1) {
+      return this._setFill((new Fill).radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1))
+    };
+    /**
+     * Begins a pattern fill using the specified image. This ends the current sub-path. A tiny API method "bf" also
+     * exists.
+     * @method beginBitmapFill
+     * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
+     * as the pattern. Must be loaded prior to creating a bitmap fill, or the fill will be empty.
+     * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
+     * "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat". Note that Firefox does not support "repeat-x" or
+     * "repeat-y" (latest tests were in FF 20.0), and will default to "repeat".
+     * @param {Matrix2D} matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation
+     * will be applied relative to the parent transform.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.beginBitmapFill = function beginBitmapFill(image, repetition, matrix) {
+      return this._setFill(new Fill(null, matrix).bitmap(image, repetition))
+    };
+    /**
+     * Ends the current sub-path, and begins a new one with no fill. Functionally identical to <code>beginFill(null)</code>.
+     * A tiny API method "ef" also exists.
+     * @method endFill
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.endFill = function endFill() {
+      return this.beginFill()
+    };
+    /**
+     * Sets the stroke style. Like all drawing methods, this can be chained, so you can define
+     * the stroke style and color in a single line of code like so:
+     *
+     * 	myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
+     *
+     * A tiny API method "ss" also exists.
+     * @method setStrokeStyle
+     * @param {Number} thickness The width of the stroke.
+     * @param {String | Number} [caps=0] Indicates the type of caps to use at the end of lines. One of butt,
+     * round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with
+     * the tiny API.
+     * @param {String | Number} [joints=0] Specifies the type of joints that should be used where two lines meet.
+     * One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel)
+     * for use with the tiny API.
+     * @param {Number} [miterLimit=10] If joints is set to "miter", then you can specify a miter limit ratio which
+     * controls at what point a mitered joint will be clipped.
+     * @param {Boolean} [ignoreScale=false] If true, the stroke will be drawn at the specified thickness regardless
+     * of active transformations.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.setStrokeStyle = function setStrokeStyle(thickness) {
+      var caps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var joints = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+      var miterLimit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10;
+      var ignoreScale = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+      this._updateInstructions(true);
+      this._strokeStyle = this.command = new StrokeStyle(thickness, caps, joints, miterLimit, ignoreScale);
+      // ignoreScale lives on Stroke, not StrokeStyle, so we do a little trickery:
+      if (this._stroke) {
+        this._stroke.ignoreScale = ignoreScale
+      }
+      this._strokeIgnoreScale = ignoreScale;
+      return this
+    };
+    /**
+     * Sets or clears the stroke dash pattern.
+     *
+     * 	myGraphics.setStrokeDash([20, 10], 0);
+     *
+     * A tiny API method `sd` also exists.
+     * @method setStrokeDash
+     * @param {Array} [segments] An array specifying the dash pattern, alternating between line and gap.
+     * For example, `[20,10]` would create a pattern of 20 pixel lines with 10 pixel gaps between them.
+     * Passing null or an empty array will clear the existing stroke dash.
+     * @param {Number} [offset=0] The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.setStrokeDash = function setStrokeDash(segments) {
+      var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      this._updateInstructions(true);
+      this._strokeDash = this.command = new StrokeDash(segments, offset);
+      return this
+    };
+    /**
+     * Begins a stroke with the specified color. This ends the current sub-path. A tiny API method "s" also exists.
+     * @method beginStroke
+     * @param {String} color A CSS compatible color value (ex. "#FF0000", "red", or "rgba(255,0,0,0.5)"). Setting to
+     * null will result in no stroke.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.beginStroke = function beginStroke(color) {
+      return this._setStroke(color ? new Stroke(color) : null)
+    };
+    /**
+     * Begins a linear gradient stroke defined by the line (x0, y0) to (x1, y1). This ends the current sub-path. For
+     * example, the following code defines a black to white vertical gradient ranging from 20px to 120px, and draws a
+     * square to display it:
+     *
+     *      myGraphics.setStrokeStyle(10).
+     *          beginLinearGradientStroke(["#000","#FFF"], [0, 1], 0, 20, 0, 120).drawRect(20, 20, 120, 120);
+     *
+     * A tiny API method "ls" also exists.
+     * @method beginLinearGradientStroke
+     * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+     * a gradient drawing from red to blue.
+     * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+     * 0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+     * @param {Number} x0 The position of the first point defining the line that defines the gradient direction and size.
+     * @param {Number} y0 The position of the first point defining the line that defines the gradient direction and size.
+     * @param {Number} x1 The position of the second point defining the line that defines the gradient direction and size.
+     * @param {Number} y1 The position of the second point defining the line that defines the gradient direction and size.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.beginLinearGradientStroke = function beginLinearGradientStroke(colors, ratios, x0, y0, x1, y1) {
+      return this._setStroke((new Stroke).linearGradient(colors, ratios, x0, y0, x1, y1))
+    };
+    /**
+     * Begins a radial gradient stroke. This ends the current sub-path. For example, the following code defines a red to
+     * blue radial gradient centered at (100, 100), with a radius of 50, and draws a rectangle to display it:
+     *
+     *      myGraphics.setStrokeStyle(10)
+     *          .beginRadialGradientStroke(["#F00","#00F"], [0, 1], 100, 100, 0, 100, 100, 50)
+     *          .drawRect(50, 90, 150, 110);
+     *
+     * A tiny API method "rs" also exists.
+     * @method beginRadialGradientStroke
+     * @param {Array} colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+     * a gradient drawing from red to blue.
+     * @param {Array} ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+     * 0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color
+     * to 100%.
+     * @param {Number} x0 Center position of the inner circle that defines the gradient.
+     * @param {Number} y0 Center position of the inner circle that defines the gradient.
+     * @param {Number} r0 Radius of the inner circle that defines the gradient.
+     * @param {Number} x1 Center position of the outer circle that defines the gradient.
+     * @param {Number} y1 Center position of the outer circle that defines the gradient.
+     * @param {Number} r1 Radius of the outer circle that defines the gradient.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.beginRadialGradientStroke = function beginRadialGradientStroke(colors, ratios, x0, y0, r0, x1, y1, r1) {
+      return this._setStroke((new Stroke).radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1))
+    };
+    /**
+     * Begins a pattern fill using the specified image. This ends the current sub-path. Note that unlike bitmap fills,
+     * strokes do not currently support a matrix parameter due to limitations in the canvas API. A tiny API method "bs"
+     * also exists.
+     * @method beginBitmapStroke
+     * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
+     * as the pattern. Must be loaded prior to creating a bitmap fill, or the fill will be empty.
+     * @param {String} [repetition=repeat] Optional. Indicates whether to repeat the image in the fill area. One of
+     * "repeat", "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.beginBitmapStroke = function beginBitmapStroke(image) {
+      var repetition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "repeat";
+      // NOTE: matrix is not supported for stroke because transforms on strokes also affect the drawn stroke width.
+      return this._setStroke((new Stroke).bitmap(image, repetition))
+    };
+    /**
+     * Ends the current sub-path, and begins a new one with no stroke. Functionally identical to <code>beginStroke(null)</code>.
+     * A tiny API method "es" also exists.
+     * @method endStroke
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.endStroke = function endStroke() {
+      return this.beginStroke()
+    };
+    /**
+     * Draws a rounded rectangle with all corners with the specified radius.
+     * @method drawRoundRect
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} w
+     * @param {Number} h
+     * @param {Number} radius Corner radius.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.drawRoundRect = function drawRoundRect(x, y, w, h, radius) {
+      return this.drawRoundRectComplex(x, y, w, h, radius, radius, radius, radius)
+    };
+    /**
+     * Draws a rounded rectangle with different corner radii. Supports positive and negative corner radii. A tiny API
+     * method "rc" also exists.
+     * @method drawRoundRectComplex
+     * @param {Number} x The horizontal coordinate to draw the round rect.
+     * @param {Number} y The vertical coordinate to draw the round rect.
+     * @param {Number} w The width of the round rect.
+     * @param {Number} h The height of the round rect.
+     * @param {Number} radiusTL Top left corner radius.
+     * @param {Number} radiusTR Top right corner radius.
+     * @param {Number} radiusBR Bottom right corner radius.
+     * @param {Number} radiusBL Bottom left corner radius.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.drawRoundRectComplex = function drawRoundRectComplex(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
+      return this.append(new RoundRect(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL))
+    };
+    /**
+     * Draws a circle with the specified radius at (x, y).
+     *
+     *      var g = new createjs.Graphics();
+     *	    g.setStrokeStyle(1);
+     *	    g.beginStroke(createjs.Graphics.getRGB(0,0,0));
+     *	    g.beginFill(createjs.Graphics.getRGB(255,0,0));
+     *	    g.drawCircle(0,0,3);
+     *
+     *	    var s = new createjs.Shape(g);
+     *		  s.x = 100;
+     *		  s.y = 100;
+     *
+     *	    stage.addChild(s);
+     *	    stage.update();
+     *
+     * A tiny API method "dc" also exists.
+     * @method drawCircle
+     * @param {Number} x x coordinate center point of circle.
+     * @param {Number} y y coordinate center point of circle.
+     * @param {Number} radius Radius of circle.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.drawCircle = function drawCircle(x, y, radius) {
+      return this.append(new Circle(x, y, radius))
+    };
+    /**
+     * Draws an ellipse (oval) with a specified width (w) and height (h). Similar to {{#crossLink "Graphics/drawCircle"}}{{/crossLink}},
+     * except the width and height can be different. A tiny API method "de" also exists.
+     * @method drawEllipse
+     * @param {Number} x The left coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+     * which draws from center.
+     * @param {Number} y The top coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+     * which draws from the center.
+     * @param {Number} w The height (horizontal diameter) of the ellipse. The horizontal radius will be half of this
+     * number.
+     * @param {Number} h The width (vertical diameter) of the ellipse. The vertical radius will be half of this number.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.drawEllipse = function drawEllipse(x, y, w, h) {
+      return this.append(new Ellipse(x, y, w, h))
+    };
+    /**
+     * Draws a star if pointSize is greater than 0, or a regular polygon if pointSize is 0 with the specified number of
+     * points. For example, the following code will draw a familiar 5 pointed star shape centered at 100, 100 and with a
+     * radius of 50:
+     *
+     *      myGraphics.beginFill("#FF0").drawPolyStar(100, 100, 50, 5, 0.6, -90);
+     *      // Note: -90 makes the first point vertical
+     *
+     * A tiny API method "dp" also exists.
+     *
+     * @method drawPolyStar
+     * @param {Number} x Position of the center of the shape.
+     * @param {Number} y Position of the center of the shape.
+     * @param {Number} radius The outer radius of the shape.
+     * @param {Number} sides The number of points on the star or sides on the polygon.
+     * @param {Number} pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular
+     * polygon (no points), a pointSize of 1 will draw nothing because the points are infinitely pointy.
+     * @param {Number} angle The angle of the first point / corner. For example a value of 0 will draw the first point
+     * directly to the right of the center.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.drawPolyStar = function drawPolyStar(x, y, radius, sides, pointSize, angle) {
+      return this.append(new PolyStar(x, y, radius, sides, pointSize, angle))
+    };
+    /**
+     * Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
+     * that accepts two parameters: the Context2D to operate on, and an arbitrary data object passed into
+     * {{#crossLink "Graphics/draw"}}{{/crossLink}}. The latter will usually be the Shape instance that called draw.
+     *
+     * This method is used internally by Graphics methods, such as drawCircle, but can also be used directly to insert
+     * built-in or custom graphics commands. For example:
+     *
+     * 		// attach data to our shape, so we can access it during the draw:
+     * 		myShape.color = "red";
+     *
+     * 		// append a Circle command object:
+     * 		myShape.graphics.append(new createjs.Graphics.Circle(50, 50, 30));
+     *
+     * 		// append a custom command object with an exec method that sets the fill style
+     * 		// based on the shape's data, and then fills the circle.
+     * 		myShape.graphics.append({exec:function(ctx, shape) {
+     * 			ctx.fillStyle = shape.color;
+     * 			ctx.fill();
+     * 		}});
+     *
+     * @method append
+     * @param {Object} command A graphics command object exposing an "exec" method.
+     * @param {boolean} clean The clean param is primarily for internal use. A value of true indicates that a command does not generate a path that should be stroked or filled.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.append = function append(command, clean) {
+      this._activeInstructions.push(command);
+      this.command = command;
+      if (!clean) {
+        this._dirty = true
+      }
+      return this
+    };
+    /**
+     * Decodes a compact encoded path string into a series of draw instructions.
+     * This format is not intended to be human readable, and is meant for use by authoring tools.
+     * The format uses a base64 character set, with each character representing 6 bits, to define a series of draw
+     * commands.
+     *
+     * Each command is comprised of a single "header" character followed by a variable number of alternating x and y
+     * position values. Reading the header bits from left to right (most to least significant): bits 1 to 3 specify the
+     * type of operation (0-moveTo, 1-lineTo, 2-quadraticCurveTo, 3-bezierCurveTo, 4-closePath, 5-7 unused). Bit 4
+     * indicates whether position values use 12 bits (2 characters) or 18 bits (3 characters), with a one indicating the
+     * latter. Bits 5 and 6 are currently unused.
+     *
+     * Following the header is a series of 0 (closePath), 2 (moveTo, lineTo), 4 (quadraticCurveTo), or 6 (bezierCurveTo)
+     * parameters. These parameters are alternating x/y positions represented by 2 or 3 characters (as indicated by the
+     * 4th bit in the command char). These characters consist of a 1 bit sign (1 is negative, 0 is positive), followed
+     * by an 11 (2 char) or 17 (3 char) bit integer value. All position values are in tenths of a pixel. Except in the
+     * case of move operations which are absolute, this value is a delta from the previous x or y position (as
+     * appropriate).
+     *
+     * For example, the string "A3cAAMAu4AAA" represents a line starting at -150,0 and ending at 150,0.
+     * <br />A - bits 000000. First 3 bits (000) indicate a moveTo operation. 4th bit (0) indicates 2 chars per
+     * parameter.
+     * <br />n0 - 110111011100. Absolute x position of -150.0px. First bit indicates a negative value, remaining bits
+     * indicate 1500 tenths of a pixel.
+     * <br />AA - 000000000000. Absolute y position of 0.
+     * <br />I - 001100. First 3 bits (001) indicate a lineTo operation. 4th bit (1) indicates 3 chars per parameter.
+     * <br />Au4 - 000000101110111000. An x delta of 300.0px, which is added to the previous x value of -150.0px to
+     * provide an absolute position of +150.0px.
+     * <br />AAA - 000000000000000000. A y delta value of 0.
+     *
+     * A tiny API method "p" also exists.
+     * @method decodePath
+     * @param {String} str The path string to decode.
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.decodePath = function decodePath(str) {
+      var instructions = [this.moveTo, this.lineTo, this.quadraticCurveTo, this.bezierCurveTo, this.closePath];
+      var paramCount = [2, 2, 4, 6, 0];
+      var i = 0;
+      var l = str.length;
+      var params = [];
+      var x = 0,
+        y = 0;
+      var base64 = Graphics.BASE_64;
+      while (i < l) {
+        var c = str.charAt(i);
+        var n = base64[c];
+        var fi = n >> 3; // highest order bits 1-3 code for operation.
+        var f = instructions[fi];
+        // check that we have a valid instruction & that the unused bits are empty:
+        if (!f || n & 3) {
+          throw "bad path data (@" + i + "):c"
+        }
+        var pl = paramCount[fi];
+        if (!fi) {
+          x = y = 0
+        } // move operations reset the position.
+        params.length = 0;
+        i++;
+        var charCount = (n >> 2 & 1) + 2; // 4th header bit indicates number size for this operation.
+        for (var p = 0; p < pl; p++) {
+          var num = base64[str.charAt(i)];
+          var sign = num >> 5 ? -1 : 1;
+          num = (num & 31) << 6 | base64[str.charAt(i + 1)];
+          if (charCount == 3) {
+            num = num << 6 | base64[str.charAt(i + 2)]
+          }
+          num = sign * num / 10;
+          if (p % 2) {
+            x = num += x
+          } else {
+            y = num += y
+          }
+          params[p] = num;
+          i += charCount
+        }
+        f.apply(this, params)
+      }
+      return this
+    };
+    /**
+     * Stores all graphics commands so they won't be executed in future draws. Calling store() a second time adds to
+     * the existing store. This also affects `drawAsPath()`.
+     *
+     * This is useful in cases where you are creating vector graphics in an iterative manner (ex. generative art), so
+     * that only new graphics need to be drawn (which can provide huge performance benefits), but you wish to retain all
+     * of the vector instructions for later use (ex. scaling, modifying, or exporting).
+     *
+     * Note that calling store() will force the active path (if any) to be ended in a manner similar to changing
+     * the fill or stroke.
+     *
+     * For example, consider a application where the user draws lines with the mouse. As each line segment (or collection of
+     * segments) are added to a Shape, it can be rasterized using {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}},
+     * and then stored, so that it can be redrawn at a different scale when the application is resized, or exported to SVGraphics.
+     *
+     * 	// set up cache:
+     * 	myShape.cache(0,0,500,500,scale);
+     *
+     * 	// when the user drags, draw a new line:
+     * 	myShape.graphics.moveTo(oldX,oldY).lineTo(newX,newY);
+     * 	// then draw it into the existing cache:
+     * 	myShape.updateCache("source-over");
+     * 	// store the new line, so it isn't redrawn next time:
+     * 	myShape.store();
+     *
+     * 	// then, when the window resizes, we can re-render at a different scale:
+     * 	// first, unstore all our lines:
+     * 	myShape.unstore();
+     * 	// then cache using the new scale:
+     * 	myShape.cache(0,0,500,500,newScale);
+     * 	// finally, store the existing commands again:
+     * 	myShape.store();
+     *
+     * @method store
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.store = function store() {
+      this._updateInstructions(true);
+      this._storeIndex = this._instructions.length;
+      return this
+    };
+    /**
+     * Unstores any graphics commands that were previously stored using {{#crossLink "Graphics/store"}}{{/crossLink}}
+     * so that they will be executed in subsequent draw calls.
+     *
+     * @method unstore
+     * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+     * @chainable
+     */
+    Graphics.prototype.unstore = function unstore() {
+      this._storeIndex = 0;
+      return this
+    };
+    /**
+     * Returns a clone of this Graphics instance. Note that the individual command objects are not cloned.
+     * @method clone
+     * @return {Graphics} A clone of the current Graphics instance.
+     */
+    Graphics.prototype.clone = function clone() {
+      var o = new Graphics;
+      o.command = this.command;
+      o._stroke = this._stroke;
+      o._strokeStyle = this._strokeStyle;
+      o._strokeDash = this._strokeDash;
+      o._strokeIgnoreScale = this._strokeIgnoreScale;
+      o._fill = this._fill;
+      o._instructions = this._instructions.slice();
+      o._commitIndex = this._commitIndex;
+      o._activeInstructions = this._activeInstructions.slice();
+      o._dirty = this._dirty;
+      o._storeIndex = this._storeIndex;
+      return o
+    };
+    /**
+     * Returns a string representation of this object.
+     * @method toString
+     * @return {String} a string representation of the instance.
+     */
+    Graphics.prototype.toString = function toString() {
+      return "[Graphics]"
+    };
+    // private methods:
+    /**
+     * @method _updateInstructions
+     * @param commit
+     * @protected
+     */
+    Graphics.prototype._updateInstructions = function _updateInstructions(commit) {
+      var instr = this._instructions,
+        active = this._activeInstructions,
+        commitIndex = this._commitIndex;
+      if (this._dirty && active.length) {
+        instr.length = commitIndex; // remove old, uncommitted commands
+        instr.push(Graphics.beginCmd);
+        var l = active.length,
+          ll = instr.length;
+        instr.length = ll + l;
+        for (var i = 0; i < l; i++) {
+          instr[i + ll] = active[i]
+        }
+        if (this._fill) {
+          instr.push(this._fill)
+        }
+        if (this._stroke) {
+          // doesn't need to be re-applied if it hasn't changed.
+          if (this._strokeDash !== this._oldStrokeDash) {
+            this._oldStrokeDash = this._strokeDash;
+            instr.push(this._strokeDash)
+          }
+          if (this._strokeStyle !== this._oldStrokeStyle) {
+            this._oldStrokeStyle = this._strokeStyle;
+            instr.push(this._strokeStyle)
+          }
+          instr.push(this._stroke)
+        }
+        this._dirty = false
+      }
+      if (commit) {
+        active.length = 0;
+        this._commitIndex = instr.length
+      }
+    };
+    /**
+     * @method _setFill
+     * @param fill
+     * @protected
+     */
+    Graphics.prototype._setFill = function _setFill(fill) {
+      this._updateInstructions(true);
+      this.command = this._fill = fill;
+      return this
+    };
+    /**
+     * @method _setStroke
+     * @param stroke
+     * @protected
+     */
+    Graphics.prototype._setStroke = function _setStroke(stroke) {
+      this._updateInstructions(true);
+      if (this.command = this._stroke = stroke) {
+        stroke.ignoreScale = this._strokeIgnoreScale
+      }
+      return this
+    };
+    createClass(Graphics, [{
+      key: "instructions",
+      get: function get() {
+        this._updateInstructions();
+        return this._instructions
+      }
+    }]);
+    return Graphics
+  }();
+  // Command Objects:
+  /**
+   * @namespace Graphics
+   */
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/lineTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class LineTo
+   */
+  var LineTo = function() {
+    /**
+     * @constructor
+     * @param {Number} x
+     * @param {Number} y
+     */
+    function LineTo(x, y) {
+      classCallCheck(this, LineTo);
+      /**
+       * @property x
+       * @type Number
+       */
+      this.x = x;
+      /**
+       * @property y
+       * @type Number
+       */
+      this.y = y
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    LineTo.prototype.exec = function exec(ctx) {
+      ctx.lineTo(this.x, this.y)
+    };
+    return LineTo
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/moveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class MoveTo
+   */
+  var MoveTo = function() {
+    /**
+     * @constructor
+     * @param {Number} x
+     * @param {Number} y
+     */
+    function MoveTo(x, y) {
+      classCallCheck(this, MoveTo);
+      /**
+       * @property x
+       * @type Number
+       */
+      this.x = x;
+      /**
+       * @property y
+       * @type Number
+       */
+      this.y = y
+    }
+    /**
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx
+     */
+    MoveTo.prototype.exec = function exec(ctx) {
+      ctx.moveTo(this.x, this.y)
+    };
+    return MoveTo
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/arcTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class ArcTo
+   */
+  var ArcTo = function() {
+    /**
+     * @constructor
+     * @param {Number} x1
+     * @param {Number} y1
+     * @param {Number} x2
+     * @param {Number} y2
+     * @param {Number} radius
+     */
+    function ArcTo(x1, y1, x2, y2, radius) {
+      classCallCheck(this, ArcTo);
+      /**
+       * @property x1
+       * @type Number
+       */
+      this.x1 = x1;
+      /**
+       * @property y1
+       * @type Number
+       */
+      this.y1 = y1;
+      /**
+       * @property x2
+       * @type Number
+       */
+      this.x2 = x2;
+      /**
+       * @property y2
+       * @type Number
+       */
+      this.y2 = y2;
+      /**
+       * @property radius
+       * @type Number
+       */
+      this.radius = radius
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    ArcTo.prototype.exec = function exec(ctx) {
+      ctx.arcTo(this.x1, this.y1, this.x2, this.y2, this.radius)
+    };
+    return ArcTo
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/arc"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class Arc
+   */
+  var Arc = function() {
+    /**
+     * @constructor
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} radius
+     * @param {Number} startAngle
+     * @param {Number} endAngle
+     * @param {Number} anticlockwise
+     */
+    function Arc(x, y, radius, startAngle, endAngle, anticlockwise) {
+      classCallCheck(this, Arc);
+      /**
+       * @property x
+       * @type Number
+       */
+      this.x = x;
+      /**
+       * @property y
+       * @type Number
+       */
+      this.y = y;
+      /**
+       * @property radius
+       * @type Number
+       */
+      this.radius = radius;
+      /**
+       * @property startAngle
+       * @type Number
+       */
+      this.startAngle = startAngle;
+      /**
+       * @property endAngle
+       * @type Number
+       */
+      this.endAngle = endAngle;
+      /**
+       * @property anticlockwise
+       * @type Number
+       */
+      this.anticlockwise = !!anticlockwise
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    Arc.prototype.exec = function exec(ctx) {
+      ctx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle, this.anticlockwise)
+    };
+    return Arc
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class QuadraticCurveTo
+   */
+  var QuadraticCurveTo = function() {
+    /**
+     * @constructor
+     * @param {Number} cpx
+     * @param {Number} cpy
+     * @param {Number} x
+     * @param {Number} y
+     */
+    function QuadraticCurveTo(cpx, cpy, x, y) {
+      classCallCheck(this, QuadraticCurveTo);
+      /**
+       * @property cpx
+       * @type Number
+       */
+      this.cpx = cpx;
+      /**
+       * @property cpy
+       * @type Number
+       */
+      this.cpy = cpy;
+      /**
+       * @property x
+       * @type Number
+       */
+      this.x = x;
+      /**
+       * @property y
+       * @type Number
+       */
+      this.y = y
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    QuadraticCurveTo.prototype.exec = function exec(ctx) {
+      ctx.quadraticCurveTo(this.cpx, this.cpy, this.x, this.y)
+    };
+    return QuadraticCurveTo
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/bezierCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class BezierCurveTo
+   */
+  var BezierCurveTo = function() {
+    /**
+     * @constructor
+     * @param {Number} cp1x
+     * @param {Number} cp1y
+     * @param {Number} cp2x
+     * @param {Number} cp2y
+     * @param {Number} x
+     * @param {Number} y
+     */
+    function BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) {
+      classCallCheck(this, BezierCurveTo);
+      /**
+       * @property cp1x
+       * @type Number
+       */
+      this.cp1x = cp1x;
+      /**
+       * @property cp1y
+       * @type Number
+       */
+      this.cp1y = cp1y;
+      /**
+       * @property cp2x
+       * @type Number
+       */
+      this.cp2x = cp2x;
+      /**
+       * @property cp2y
+       * @type Number
+       */
+      this.cp2y = cp2y;
+      /**
+       * @property x
+       * @type Number
+       */
+      this.x = x;
+      /**
+       * @property y
+       * @type Number
+       */
+      this.y = y
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    BezierCurveTo.prototype.exec = function exec(ctx) {
+      ctx.bezierCurveTo(this.cp1x, this.cp1y, this.cp2x, this.cp2y, this.x, this.y)
+    };
+    return BezierCurveTo
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/rect"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class Rect
+   */
+  var Rect = function() {
+    /**
+     * @constructor
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} w
+     * @param {Number} h
+     */
+    function Rect(x, y, w, h) {
+      classCallCheck(this, Rect);
+      /**
+       * @property x
+       * @type Number
+       */
+      this.x = x;
+      /**
+       * @property y
+       * @type Number
+       */
+      this.y = y;
+      /**
+       * @property w
+       * @type Number
+       */
+      this.w = w;
+      /**
+       * @property h
+       * @type Number
+       */
+      this.h = h
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    Rect.prototype.exec = function exec(ctx) {
+      ctx.rect(this.x, this.y, this.w, this.h)
+    };
+    return Rect
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/closePath"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class ClosePath
+   */
+  var ClosePath = function() {
+    /**
+     * @constructor
+     */
+    function ClosePath() {
+      classCallCheck(this, ClosePath)
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    ClosePath.prototype.exec = function exec(ctx) {
+      ctx.closePath()
+    };
+    return ClosePath
+  }();
+  /**
+   * Graphics command object to begin a new path. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class BeginPath
+   */
+  var BeginPath = function() {
+    /**
+     * @constructor
+     */
+    function BeginPath() {
+      classCallCheck(this, BeginPath)
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    BeginPath.prototype.exec = function exec(ctx) {
+      ctx.beginPath()
+    };
+    return BeginPath
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/beginFill"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class Fill
+   */
+  var Fill = function() {
+    /**
+     * @constructor
+     * @param {Object} style A valid Context2D fillStyle.
+     * @param {Matrix2D} matrix
+     */
+    function Fill(style, matrix) {
+      classCallCheck(this, Fill);
+      /**
+       * A valid Context2D fillStyle.
+       * @property style
+       * @type Object
+       */
+      this.style = style;
+      /**
+       * @property matrix
+       * @type Matrix2D
+       */
+      this.matrix = matrix;
+      /**
+       * @property path
+       * @type {Boolean}
+       */
+      this.path = false
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    Fill.prototype.exec = function exec(ctx) {
+      if (!this.style) {
+        return
+      }
+      ctx.fillStyle = this.style;
+      var mtx = this.matrix;
+      if (mtx) {
+        ctx.save();
+        ctx.transform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty)
+      }
+      ctx.fill();
+      if (mtx) {
+        ctx.restore()
+      }
+    };
+    /**
+     * Creates a linear gradient style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+     * See {{#crossLink "Graphics/beginLinearGradientFill"}}{{/crossLink}} for more information.
+     * @method linearGradient
+     * @param {Array} colors
+     *
+     * @param {Array} ratios
+     * @param {Number} x0
+     * @param {Number} y0
+     * @param {Number} x1
+     * @param {Number} y1
+     * @return {Fill} Returns this Fill object for chaining or assignment.
+     */
+    Fill.prototype.linearGradient = function linearGradient(colors, ratios, x0, y0, x1, y1) {
+      var o = this.style = Graphics._ctx.createLinearGradient(x0, y0, x1, y1);
+      var l = colors.length;
+      for (var i = 0; i < l; i++) {
+        o.addColorStop(ratios[i], colors[i])
+      }
+      o.props = {
+        colors: colors,
+        ratios: ratios,
+        x0: x0,
+        y0: y0,
+        x1: x1,
+        y1: y1,
+        type: "linear"
+      };
+      return this
+    };
+    /**
+     * Creates a radial gradient style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+     * See {{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} for more information.
+     * @method radialGradient
+     * @param {Array} colors
+     * @param {Array} ratios
+     * @param {Number} x0
+     * @param {Number} y0
+     * @param {Number} r0
+     * @param {Number} x1
+     * @param {Number} y1
+     * @param {Number} r1
+     * @return {Fill} Returns this Fill object for chaining or assignment.
+     */
+    Fill.prototype.radialGradient = function radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1) {
+      var o = this.style = Graphics._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
+      var l = colors.length;
+      for (var i = 0; i < l; i++) {
+        o.addColorStop(ratios[i], colors[i])
+      }
+      o.props = {
+        colors: colors,
+        ratios: ratios,
+        x0: x0,
+        y0: y0,
+        r0: r0,
+        x1: x1,
+        y1: y1,
+        r1: r1,
+        type: "radial"
+      };
+      return this
+    };
+    /**
+     * Creates a bitmap fill style and assigns it to the {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+     * See {{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} for more information.
+     * @method bitmap
+     * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image  Must be loaded prior to creating a bitmap fill, or the fill will be empty.
+     * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
+     * @return {Fill} Returns this Fill object for chaining or assignment.
+     */
+    Fill.prototype.bitmap = function bitmap(image) {
+      var repetition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+      if (image.naturalWidth || image.getContext || image.readyState >= 2) {
+        var o = this.style = Graphics._ctx.createPattern(image, repetition);
+        o.props = {
+          image: image,
+          repetition: repetition,
+          type: "bitmap"
+        }
+      }
+      return this
+    };
+    return Fill
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/beginStroke"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class Stroke
+   */
+  var Stroke = function() {
+    /**
+     * @constructor
+     * @param {Object} style A valid Context2D fillStyle.
+     * @param {Boolean} ignoreScale
+     */
+    function Stroke(style, ignoreScale) {
+      classCallCheck(this, Stroke);
+      /**
+       * A valid Context2D strokeStyle.
+       * @property style
+       * @type Object
+       */
+      this.style = style;
+      /**
+       * @property ignoreScale
+       * @type Boolean
+       */
+      this.ignoreScale = ignoreScale;
+      /**
+       * @property path
+       * @type {Boolean}
+       */
+      this.path = false
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    Stroke.prototype.exec = function exec(ctx) {
+      if (!this.style) {
+        return
+      }
+      ctx.strokeStyle = this.style;
+      if (this.ignoreScale) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0)
+      }
+      ctx.stroke();
+      if (this.ignoreScale) {
+        ctx.restore()
+      }
+    };
+    /**
+     * Creates a linear gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
+     * See {{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} for more information.
+     * @method linearGradient
+     * @param {Array} colors
+     * @param {Array} ratios
+     * @param {Number} x0
+     * @param {Number} y0
+     * @param {Number} x1
+     * @param {Number} y1
+     * @return {Fill} Returns this Stroke object for chaining or assignment.
+     */
+    Stroke.prototype.linearGradient = function linearGradient() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key]
+      }
+      // TODO-ES6: Anything but this...
+      Fill.prototype.linearGradient.apply(this, args)
+    };
+    /**
+     * Creates a radial gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
+     * See {{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} for more information.
+     * @method radialGradient
+     * @param {Array} colors
+     * @param {Array} ratios
+     * @param {Number} x0
+     * @param {Number} y0
+     * @param {Number} r0
+     * @param {Number} x1
+     * @param {Number} y1
+     * @param {Number} r1
+     * @return {Fill} Returns this Stroke object for chaining or assignment.
+     */
+    Stroke.prototype.radialGradient = function radialGradient() {
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2]
+      }
+      Fill.prototype.radialGradient.apply(this, args)
+    };
+    /**
+     * Creates a bitmap fill style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
+     * See {{#crossLink "Graphics/beginBitmapStroke"}}{{/crossLink}} for more information.
+     * @method bitmap
+     * @param {HTMLImageElement} image
+     * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
+     * @return {Fill} Returns this Stroke object for chaining or assignment.
+     */
+    Stroke.prototype.bitmap = function bitmap() {
+      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3]
+      }
+      Fill.prototype.bitmap.apply(this, args)
+    };
+    return Stroke
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class StrokeStyle
+   */
+  var StrokeStyle = function() {
+    /**
+     * @constructor
+     * @param {Number} [width=1]
+     * @param {String} [caps=butt]
+     * @param {String} [joints=miter]
+     * @param {Number} [miterLimit=10]
+     * @param {Boolean} [ignoreScale=false]
+     * @type {String}
+     */
+    function StrokeStyle(width) {
+      var caps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "butt";
+      var joints = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "miter";
+      var miterLimit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10;
+      var ignoreScale = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+      classCallCheck(this, StrokeStyle);
+      /**
+       * @property width
+       * @type Number
+       */
+      this.width = width;
+      /**
+       * One of: butt, round, square
+       * @property caps
+       * @type String
+       */
+      this.caps = caps;
+      /**
+       * One of: round, bevel, miter
+       * @property joints
+       * @type String
+       */
+      this.joints = joints;
+      /**
+       * @property miterLimit
+       * @type Number
+       */
+      this.miterLimit = miterLimit;
+      /**
+       * @property ignoreScale
+       * @type Boolean
+       */
+      this.ignoreScale = ignoreScale;
+      /**
+       * @property path
+       * @type {Boolean}
+       */
+      this.path = false
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    StrokeStyle.prototype.exec = function exec(ctx) {
+      ctx.lineWidth = this.width;
+      ctx.lineCap = isNaN(this.caps) ? this.caps : Graphics.STROKE_CAPS_MAP[this.caps];
+      ctx.lineJoin = isNaN(this.joints) ? this.joints : Graphics.STROKE_JOINTS_MAP[this.joints];
+      ctx.miterLimit = this.miterLimit;
+      ctx.ignoreScale = this.ignoreScale
+    };
+    return StrokeStyle
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class StrokeDash
+   */
+  var StrokeDash = function() {
+    /**
+     * @constructor
+     * @param {Array} [segments=[]]
+     * @param {Number} [offset=0]
+     */
+    function StrokeDash() {
+      var segments = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : StrokeDash.EMPTY_SEGMENTS;
+      var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      classCallCheck(this, StrokeDash);
+      /**
+       * @property segments
+       * @type Array
+       */
+      this.segments = segments;
+      /**
+       * @property offset
+       * @type Number
+       */
+      this.offset = offset
+    }
+    /**
+     * The default value for segments (ie. no dash).
+     * Used instead of [] to reduce churn.
+     * @property EMPTY_SEGMENTS
+     * @static
+     * @final
+     * @readonly
+     * @protected
+     * @type {Array}
+     */
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    StrokeDash.prototype.exec = function exec(ctx) {
+      if (ctx.setLineDash) {
+        // feature detection.
+        ctx.setLineDash(this.segments);
+        ctx.lineDashOffset = this.offset
+      }
+    };
+    createClass(StrokeDash, null, [{
+      key: "EMPTY_SEGMENTS",
+      get: function get() {
+        return _EMPTY_SEGMENTS
+      }
+    }]);
+    return StrokeDash
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/drawRoundRectComplex"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class RoundRect
+   */
+  var RoundRect = function() {
+    /**
+     * @constructor
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} w
+     * @param {Number} h
+     * @param {Number} radiusTL
+     * @param {Number} radiusTR
+     * @param {Number} radiusBR
+     * @param {Number} radiusBL
+     */
+    function RoundRect(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
+      classCallCheck(this, RoundRect);
+      /**
+       * @property x
+       * @type Number
+       */
+      this.x = x;
+      /**
+       * @property y
+       * @type Number
+       */
+      this.y = y;
+      /**
+       * @property w
+       * @type Number
+       */
+      this.w = w;
+      /**
+       * @property h
+       * @type Number
+       */
+      this.h = h;
+      /**
+       * @property radiusTL
+       * @type Number
+       */
+      this.radiusTL = radiusTL;
+      /**
+       * @property radiusTR
+       * @type Number
+       */
+      this.radiusTR = radiusTR;
+      /**
+       * @property radiusBR
+       * @type Number
+       */
+      this.radiusBR = radiusBR;
+      /**
+       * @property radiusBL
+       * @type Number
+       */
+      this.radiusBL = radiusBL
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    RoundRect.prototype.exec = function exec(ctx) {
+      var max = (w < h ? w : h) / 2;
+      var mTL = 0,
+        mTR = 0,
+        mBR = 0,
+        mBL = 0;
+      var x = this.x,
+        y = this.y,
+        w = this.w,
+        h = this.h;
+      var rTL = this.radiusTL,
+        rTR = this.radiusTR,
+        rBR = this.radiusBR,
+        rBL = this.radiusBL;
+      if (rTL < 0) {
+        rTL *= mTL = -1
+      }
+      if (rTL > max) {
+        rTL = max
+      }
+      if (rTR < 0) {
+        rTR *= mTR = -1
+      }
+      if (rTR > max) {
+        rTR = max
+      }
+      if (rBR < 0) {
+        rBR *= mBR = -1
+      }
+      if (rBR > max) {
+        rBR = max
+      }
+      if (rBL < 0) {
+        rBL *= mBL = -1
+      }
+      if (rBL > max) {
+        rBL = max
+      }
+      ctx.moveTo(x + w - rTR, y);
+      ctx.arcTo(x + w + rTR * mTR, y - rTR * mTR, x + w, y + rTR, rTR);
+      ctx.lineTo(x + w, y + h - rBR);
+      ctx.arcTo(x + w + rBR * mBR, y + h + rBR * mBR, x + w - rBR, y + h, rBR);
+      ctx.lineTo(x + rBL, y + h);
+      ctx.arcTo(x - rBL * mBL, y + h + rBL * mBL, x, y + h - rBL, rBL);
+      ctx.lineTo(x, y + rTL);
+      ctx.arcTo(x - rTL * mTL, y - rTL * mTL, x + rTL, y, rTL);
+      ctx.closePath()
+    };
+    return RoundRect
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/drawCircle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class Circle
+   */
+  var Circle = function() {
+    /**
+     * @constructor
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} radius
+     */
+    function Circle(x, y, radius) {
+      classCallCheck(this, Circle);
+      /**
+       * @property x
+       * @type Number
+       */
+      this.x = x;
+      /**
+       * @property y
+       * @type Number
+       */
+      this.y = y;
+      /**
+       * @property radius
+       * @type Number
+       */
+      this.radius = radius
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    Circle.prototype.exec = function exec(ctx) {
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
+    };
+    return Circle
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class Ellipse
+   */
+  var Ellipse = function() {
+    /**
+     * @constructor
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} w
+     * @param {Number} h
+     */
+    function Ellipse(x, y, w, h) {
+      classCallCheck(this, Ellipse);
+      /**
+       * @property x
+       * @type Number
+       */
+      this.x = x;
+      /**
+       * @property y
+       * @type Number
+       */
+      this.y = y;
+      /**
+       * @property w
+       * @type Number
+       */
+      this.w = w;
+      /**
+       * @property h
+       * @type Number
+       */
+      this.h = h
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    Ellipse.prototype.exec = function exec(ctx) {
+      var x = this.x,
+        y = this.y;
+      var w = this.w,
+        h = this.h;
+      var k = .5522848;
+      var ox = w / 2 * k;
+      var oy = h / 2 * k;
+      var xe = x + w;
+      var ye = y + h;
+      var xm = x + w / 2;
+      var ym = y + h / 2;
+      ctx.moveTo(x, ym);
+      ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+      ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+      ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+      ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym)
+    };
+    return Ellipse
+  }();
+  /**
+   * Graphics command object. See {{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+   * @class PolyStar
+   */
+  var PolyStar = function() {
+    /**
+     * @constructor
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} radius
+     * @param {Number} sides
+     * @param {Number} [pointSize=0]
+     * @param {Number} [angle=0]
+     */
+    function PolyStar(x, y, radius, sides) {
+      var pointSize = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
+      var angle = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
+      classCallCheck(this, PolyStar);
+      /**
+       * @property x
+       * @type Number
+       */
+      this.x = x;
+      /**
+       * @property y
+       * @type Number
+       */
+      this.y = y;
+      /**
+       * @property radius
+       * @type Number
+       */
+      this.radius = radius;
+      /**
+       * @property sides
+       * @type Number
+       */
+      this.sides = sides;
+      /**
+       * @property pointSize
+       * @type Number
+       */
+      this.pointSize = pointSize;
+      /**
+       * @property angle
+       * @type Number
+       */
+      this.angle = angle
+    }
+    /**
+     * Execute the Graphics command in the provided Canvas context.
+     * @method exec
+     * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     */
+    PolyStar.prototype.exec = function exec(ctx) {
+      var x = this.x,
+        y = this.y;
+      var radius = this.radius;
+      var angle = this.angle / 180 * Math.PI;
+      var sides = this.sides;
+      var ps = 1 - this.pointSize;
+      var a = Math.PI / sides;
+      ctx.moveTo(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius);
+      for (var i = 0; i < sides; i++) {
+        angle += a;
+        if (ps != 1) {
+          ctx.lineTo(x + Math.cos(angle) * radius * ps, y + Math.sin(angle) * radius * ps)
+        }
+        angle += a;
+        ctx.lineTo(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius)
+      }
+      ctx.closePath()
+    };
+    return PolyStar
+  }();
+  // static properties:
+  /**
+   * A reusable instance of {{#crossLink "Graphics/BeginPath"}}{{/crossLink}} to avoid
+   * unnecessary instantiation.
+   * @property beginCmd
+   * @type {Graphics.BeginPath}
+   * @static
+   * @readonly
+   */
+  /**
+   * Map of Base64 characters to values. Used by {{#crossLink "Graphics/decodePath"}}{{/crossLink}}.
+   * @property BASE_64
+   * @static
+   * @final
+   * @readonly
+   * @type {Object}
+   */
+  /**
+   * Maps numeric values for the caps parameter of {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} to
+   * corresponding string values. This is primarily for use with the tiny API. The mappings are as follows: 0 to
+   * "butt", 1 to "round", and 2 to "square".
+   * For example, to set the line caps to "square":
+   *
+   *      myGraphics.ss(16, 2);
+   *
+   * @property STROKE_CAPS_MAP
+   * @static
+   * @final
+   * @readonly
+   * @type {Array}
+   */
+  /**
+   * Maps numeric values for the joints parameter of {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} to
+   * corresponding string values. This is primarily for use with the tiny API. The mappings are as follows: 0 to
+   * "miter", 1 to "round", and 2 to "bevel".
+   * For example, to set the line joints to "bevel":
+   *
+   *      myGraphics.ss(16, 0, 2);
+   *
+   * @property STROKE_JOINTS_MAP
+   * @static
+   * @final
+   * @readonly
+   * @type {Array}
+   */
+  /**
+   * @property _ctx
+   * @static
+   * @protected
+   * @type {CanvasRenderingContext2D}
+   */
+  {
+    var canvas$1 = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+    if (canvas$1.getContext) {
+      Graphics._ctx = canvas$1.getContext("2d");
+      canvas$1.width = canvas$1.height = 1
+    }
+    Graphics.beginCmd = new BeginPath;
+    Graphics.BASE_64 = {
+      A: 0,
+      B: 1,
+      C: 2,
+      D: 3,
+      E: 4,
+      F: 5,
+      G: 6,
+      H: 7,
+      I: 8,
+      J: 9,
+      K: 10,
+      L: 11,
+      M: 12,
+      N: 13,
+      O: 14,
+      P: 15,
+      Q: 16,
+      R: 17,
+      S: 18,
+      T: 19,
+      U: 20,
+      V: 21,
+      W: 22,
+      X: 23,
+      Y: 24,
+      Z: 25,
+      a: 26,
+      b: 27,
+      c: 28,
+      d: 29,
+      e: 30,
+      f: 31,
+      g: 32,
+      h: 33,
+      i: 34,
+      j: 35,
+      k: 36,
+      l: 37,
+      m: 38,
+      n: 39,
+      o: 40,
+      p: 41,
+      q: 42,
+      r: 43,
+      s: 44,
+      t: 45,
+      u: 46,
+      v: 47,
+      w: 48,
+      x: 49,
+      y: 50,
+      z: 51,
+      0: 52,
+      1: 53,
+      2: 54,
+      3: 55,
+      4: 56,
+      5: 57,
+      6: 58,
+      7: 59,
+      8: 60,
+      9: 61,
+      "+": 62,
+      "/": 63
+    };
+    Graphics.STROKE_CAPS_MAP = ["butt", "round", "square"];
+    Graphics.STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
+    Graphics.EMPTY_SEGMENTS = []
+  }
+  var MovieClip = function(_Container) {
+    inherits(MovieClip, _Container);
+    // constructor:
+    /**
+     * @constructor
+     * @param {String} [mode=independent] Initial value for the mode property. One of {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}},
+     * {{#crossLink "MovieClip/SINGLE_FRAME:property"}}{{/crossLink}}, or {{#crossLink "MovieClip/SYNCHED:property"}}{{/crossLink}}.
+     * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
+     * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
+     * property.
+     * @param {Boolean} [loop=true] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
+     * property. The default is `true`.
+     * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
+     * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
+     */
+    function MovieClip() {
+      var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : MovieClip.INDEPENDENT;
+      var startPosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var loop = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+      var labels = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+      classCallCheck(this, MovieClip);
+      var _this = possibleConstructorReturn(this, _Container.call(this));
+      !MovieClip.inited && MovieClip.init(); // static init
+      // public properties:
+      /**
+       * Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED).
+       * See each constant for a description of the behaviour.
+       * @property mode
+       * @type String
+       * @default null
+       */
+      _this.mode = mode;
+      /**
+       * Specifies what the first frame to play in this movieclip, or the only frame to display if mode is SINGLE_FRAME.
+       * @property startPosition
+       * @type Number
+       * @default 0
+       */
+      _this.startPosition = startPosition;
+      /**
+       * Indicates whether this MovieClip should loop when it reaches the end of its timeline.
+       * @property loop
+       * @type Boolean
+       * @default true
+       */
+      _this.loop = loop;
+      /**
+       * The current frame of the movieclip.
+       * @property currentFrame
+       * @type Number
+       * @default 0
+       * @readonly
+       */
+      _this.currentFrame = 0;
+      /**
+       * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
+       * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
+       * instances to the timeline.
+       *
+       * <h4>Example</h4>
+       *
+       *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
+       *      var mc = new createjs.MovieClip();
+       *      mc.timeline.addTween(tween);
+       *
+       * Elements can be added and removed from the timeline by toggling an "_off" property
+       * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
+       * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
+       * frame 1. You can use the "visible" property to achieve the same effect.
+       *
+       *      var tween = createjs.Tween.get(target).to({_off:false})
+       *          .wait(1).to({_off:true})
+       *          .wait(1).to({_off:false});
+       *
+       * @property timeline
+       * @type Timeline
+       * @default null
+       */
+      _this.timeline = new Timeline(null, labels, {
+        paused: true,
+        position: startPosition,
+        useTicks: true
+      });
+      /**
+       * If true, the MovieClip's position will not advance when ticked.
+       * @property paused
+       * @type Boolean
+       * @default false
+       */
+      _this.paused = false;
+      /**
+       * If true, actions in this MovieClip's tweens will be run when the playhead advances.
+       * @property actionsEnabled
+       * @type Boolean
+       * @default true
+       */
+      _this.actionsEnabled = true;
+      /**
+       * If true, the MovieClip will automatically be reset to its first frame whenever the timeline adds
+       * it back onto the display list. This only applies to MovieClip instances with mode=INDEPENDENT.
+       * <br><br>
+       * For example, if you had a character animation with a "body" child MovieClip instance
+       * with different costumes on each frame, you could set body.autoReset = false, so that
+       * you can manually change the frame it is on, without worrying that it will be reset
+       * automatically.
+       * @property autoReset
+       * @type Boolean
+       * @default true
+       */
+      _this.autoReset = true;
+      /**
+       * An array of bounds for each frame in the MovieClip. This is mainly intended for tool output.
+       * @property frameBounds
+       * @type Array
+       * @default null
+       */
+      _this.frameBounds = _this.frameBounds || null; // TODO: Deprecated. This is for backwards support of Flash/Animate
+      /**
+       * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
+       * will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
+       * framerate.
+       *
+       * For example, if a MovieClip with a framerate of 10 is placed on a Stage being updated at 40fps, then the MovieClip will
+       * advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will
+       * vary slightly between frames.
+       *
+       * This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being
+       * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
+       * @property framerate
+       * @type {Number}
+       * @default null
+       */
+      _this.framerate = null;
+      // private properties:
+      /**
+       * @property _synchOffset
+       * @type Number
+       * @default 0
+       * @private
+       */
+      _this._synchOffset = 0;
+      /**
+       * @property _prevPos
+       * @type Number
+       * @default -1
+       * @private
+       */
+      _this._prevPos = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
+      /**
+       * @property _prevPosition
+       * @type Number
+       * @default 0
+       * @private
+       */
+      _this._prevPosition = 0;
+      /**
+       * The time remaining from the previous tick, only applicable when .framerate is set.
+       * @property _t
+       * @type Number
+       * @private
+       */
+      _this._t = 0;
+      /**
+       * List of display objects that are actively being managed by the MovieClip.
+       * @property _managed
+       * @type Object
+       * @private
+       */
+      _this._managed = {};
+      return _this
+    }
+    // static methods:
+    MovieClip.init = function init() {
+      if (MovieClip.inited) {
+        return
+      }
+      // plugins introduce some overhead to Tween, so we only install this if an MC is instantiated.
+      MovieClipPlugin.install();
+      MovieClip.inited = true
+    };
+    // accessor properties:
+    /**
+     * Returns an array of objects with label and position (aka frame) properties, sorted by position.
+     * Shortcut to TweenJS: Timeline.getLabels();
+     * @property labels
+     * @type {Array}
+     * @readonly
+     */
+    // public methods:
+    /**
+     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+     * This does not account for whether it would be visible within the boundaries of the stage.
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method isVisible
+     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+     */
+    MovieClip.prototype.isVisible = function isVisible() {
+      // children are placed in draw, so we can't determine if we have content.
+      return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0)
+    };
+    /**
+     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
+     * Returns true if the draw was handled (useful for overriding functionality).
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method draw
+     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+     * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+     * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+     * into itself).
+     */
+    MovieClip.prototype.draw = function draw(ctx, ignoreCache) {
+      // draw to cache first:
+      if (this.cacheDraw(ctx, ignoreCache)) {
+        return true
+      }
+      this._updateTimeline();
+      _Container.prototype.draw.call(this, ctx, ignoreCache);
+      return true
+    };
+    /**
+     * Sets paused to false.
+     * @method play
+     */
+    MovieClip.prototype.play = function play() {
+      this.paused = false
+    };
+    /**
+     * Sets paused to true.
+     * @method stop
+     */
+    MovieClip.prototype.stop = function stop() {
+      this.paused = true
+    };
+    /**
+     * Advances this movie clip to the specified position or label and sets paused to false.
+     * @method gotoAndPlay
+     * @param {String|Number} positionOrLabel The animation name or frame number to go to.
+     */
+    MovieClip.prototype.gotoAndPlay = function gotoAndPlay(positionOrLabel) {
+      this.paused = false;
+      this._goto(positionOrLabel)
+    };
+    /**
+     * Advances this movie clip to the specified position or label and sets paused to true.
+     * @method gotoAndStop
+     * @param {String|Number} positionOrLabel The animation or frame name to go to.
+     */
+    MovieClip.prototype.gotoAndStop = function gotoAndStop(positionOrLabel) {
+      this.paused = true;
+      this._goto(positionOrLabel)
+    };
+    /**
+     * Advances the playhead. This occurs automatically each tick by default.
+     * @param [time] {Number} The amount of time in ms to advance by. Only applicable if framerate is set.
+     * @method advance
+     */
+    MovieClip.prototype.advance = function advance(time) {
+      // TODO: should we worry at all about clips who change their own modes via frame scripts?
+      var independent = MovieClip.INDEPENDENT;
+      if (this.mode != independent) {
+        return
+      }
+      var o = this,
+        fps = o.framerate;
+      while ((o = o.parent) && fps == null) {
+        if (o.mode == independent) {
+          fps = o._framerate
+        }
+      }
+      this._framerate = fps;
+      var t = fps != null && fps != -1 && time != null ? time / (1e3 / fps) + this._t : 1;
+      var frames = t | 0;
+      this._t = t - frames; // leftover time
+      while (!this.paused && frames--) {
+        this._prevPosition = this._prevPos < 0 ? 0 : this._prevPosition + 1;
+        this._updateTimeline()
+      }
+    };
+    /**
+     * MovieClip instances cannot be cloned.
+     * @method clone
+     */
+    MovieClip.prototype.clone = function clone() {
+      // TODO: add support for this? Need to clone the Timeline & retarget tweens - pretty complex.
+      throw "MovieClip cannot be cloned."
+    };
+    // private methods:
+    /**
+     * @method _tick
+     * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
+     * function.
+     * @protected
+     */
+    MovieClip.prototype._tick = function _tick(evtObj) {
+      this.advance(evtObj && evtObj.delta);
+      _Container.prototype._tick.call(this, evtObj)
+    };
+    /**
+     * @method _goto
+     * @param {String|Number} positionOrLabel The animation name or frame number to go to.
+     * @protected
+     */
+    MovieClip.prototype._goto = function _goto(positionOrLabel) {
+      var pos = this.timeline.resolve(positionOrLabel);
+      if (pos == null) {
+        return
+      }
+      // prevent _updateTimeline from overwriting the new position because of a reset:
+      if (this._prevPos == -1) {
+        this._prevPos = NaN
+      }
+      this._prevPosition = pos;
+      this._t = 0;
+      this._updateTimeline()
+    };
+    /**
+     * @method _reset
+     * @private
+     */
+    MovieClip.prototype._reset = function _reset() {
+      this._prevPos = -1;
+      this._t = this.currentFrame = 0;
+      this.paused = false
+    };
+    /**
+     * @method _updateTimeline
+     * @protected
+     */
+    MovieClip.prototype._updateTimeline = function _updateTimeline() {
+      var tl = this.timeline;
+      var synched = this.mode != MovieClip.INDEPENDENT;
+      tl.loop = this.loop == null ? true : this.loop;
+      var pos = synched ? this.startPosition + (this.mode == MovieClip.SINGLE_FRAME ? 0 : this._synchOffset) : this._prevPos < 0 ? 0 : this._prevPosition;
+      var mode = synched || !this.actionsEnabled ? Tween.NONE : null;
+      // pre-assign currentFrame so it is available to frame scripts:
+      this.currentFrame = tl._calcPosition(pos);
+      // update timeline position, ignoring actions if this is a graphic.
+      tl.setPosition(pos, mode);
+      this._prevPosition = tl._prevPosition;
+      if (this._prevPos == tl._prevPos) {
+        return
+      }
+      this.currentFrame = this._prevPos = tl._prevPos;
+      for (var n in this._managed) {
+        this._managed[n] = 1
+      }
+      var tweens = tl._tweens;
+      for (var _iterator = tl._tweens, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+        var _ref;
+        if (_isArray) {
+          if (_i >= _iterator.length) break;
+          _ref = _iterator[_i++]
+        } else {
+          _i = _iterator.next();
+          if (_i.done) break;
+          _ref = _i.value
+        }
+        var tween = _ref;
+        var target = tween._target;
+        if (target == this || tween.passive) {
+          continue
+        } // TODO: this assumes actions tween has this as the target. Valid?
+        var offset = tween._stepPosition;
+        if (target instanceof createjs.DisplayObject) {
+          // motion tween.
+          this._addManagedChild(target, offset)
+        } else {
+          // state tween.
+          this._setState(target.state, offset)
+        }
+      }
+      var kids = this.children;
+      for (var i = kids.length - 1; i >= 0; i--) {
+        var id = kids[i].id;
+        if (this._managed[id] == 1) {
+          this.removeChildAt(i);
+          delete this._managed[id]
+        }
+      }
+    };
+    /**
+     * @method _setState
+     * @param {Array} state
+     * @param {Number} offset
+     * @protected
+     */
+    MovieClip.prototype._setState = function _setState(state, offset) {
+      if (!state) {
+        return
+      }
+      for (var i = state.length - 1; i >= 0; i--) {
+        var o = state[i];
+        var target = o.t;
+        var props = o.p;
+        for (var n in props) {
+          target[n] = props[n]
+        }
+        this._addManagedChild(target, offset)
+      }
+    };
+    /**
+     * Adds a child to the timeline, and sets it up as a managed child.
+     * @method _addManagedChild
+     * @param {MovieClip} child The child MovieClip to manage
+     * @param {Number} offset
+     * @private
+     */
+    MovieClip.prototype._addManagedChild = function _addManagedChild(child, offset) {
+      if (child._off) {
+        return
+      }
+      this.addChildAt(child, 0);
+      if (child instanceof MovieClip) {
+        child._synchOffset = offset;
+        // TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
+        if (child.mode == MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) {
+          child._reset()
+        }
+      }
+      this._managed[child.id] = 2
+    };
+    /**
+     * @method _getBounds
+     * @param {Matrix2D} matrix
+     * @param {Boolean} ignoreTransform
+     * @return {Rectangle}
+     * @protected
+     */
+    MovieClip.prototype._getBounds = function _getBounds(matrix, ignoreTransform) {
+      var bounds = this.getBounds();
+      if (!bounds) {
+        this._updateTimeline();
+        if (this.frameBounds) {
+          bounds = this._rectangle.copy(this.frameBounds[this.currentFrame])
+        }
+      }
+      if (bounds) {
+        return this._transformBounds(bounds, matrix, ignoreTransform)
+      }
+      return _Container.prototype._getBounds.call(this, matrix, ignoreTransform)
+    };
+    createClass(MovieClip, [{
+      key: "labels",
+      get: function get() {
+        return this.timeline.getLabels()
+      }
+    }, {
+      key: "currentLabel",
+      get: function get() {
+        this._updateTimeline();
+        return this.timeline.getCurrentLabel()
+      }
+    }, {
+      key: "duration",
+      get: function get() {
+        return this.timeline.duration
+      }
+    }, {
+      key: "totalFrames",
+      get: function get() {
+        return this.duration
+      }
+    }]);
+    return MovieClip
+  }(Container);
+  // static constants:
+  /**
+   * The MovieClip will advance independently of its parent, even if its parent is paused.
+   * This is the default mode.
+   * @property INDEPENDENT
+   * @static
+   * @type String
+   * @default "independent"
+   * @readonly
+   */
+  /**
+   * The MovieClip will only display a single frame (as determined by the startPosition property).
+   * @property SINGLE_FRAME
+   * @static
+   * @type String
+   * @default "single"
+   * @readonly
+   */
+  /**
+   * The MovieClip will be advanced only when its parent advances and will be synched to the position of
+   * the parent MovieClip.
+   * @property SYNCHED
+   * @static
+   * @type String
+   * @default "synched"
+   * @readonly
+   */
+  {
+    MovieClip.INDEPENDENT = "independent";
+    MovieClip.SINGLE_FRAME = "single";
+    MovieClip.SYNCHED = "synched";
+    MovieClip.inited = false
+  }
+  /**
+   * This plugin works with <a href="http://tweenjs.com" target="_blank">TweenJS</a> to prevent the startPosition
+   * property from tweening.
+   * @private
+   * @class MovieClipPlugin
+   */
+  var MovieClipPlugin = function() {
+    /**
+     * @constructor
+     */
+    function MovieClipPlugin() {
+      classCallCheck(this, MovieClipPlugin);
+      throw "MovieClipPlugin cannot be instantiated."
+    }
+    /**
+     * @method install
+     * @private
+     */
+    MovieClipPlugin.install = function install() {
+      Tween.installPlugin(MovieClipPlugin, ["startPosition"])
+    };
+    /**
+     * @method init
+     * @param {Tween} tween
+     * @param {String} prop
+     * @param {String|Number|Boolean} value
+     * @private
+     */
+    MovieClipPlugin.init = function init(tween, prop, value) {
+      return value
+    };
+    /**
+     * @method tween
+     * @param {Tween} tween
+     * @param {String} prop
+     * @param {String | Number | Boolean} value
+     * @param {Array} startValues
+     * @param {Array} endValues
+     * @param {Number} ratio
+     * @param {Object} wait
+     * @param {Object} end
+     * @return {*}
+     */
+    MovieClipPlugin.tween = function tween(_tween, prop, value, startValues, endValues, ratio, wait, end) {
+      if (!(_tween.target instanceof MovieClip)) {
+        return value
+      }
+      return ratio == 1 ? endValues[prop] : startValues[prop]
+    };
+    return MovieClipPlugin
+  }();
+  /**
+   * @property priority
+   * @static
+   */
+  {
+    MovieClipPlugin.priority = 100
+  }
+  /**
+   * This class encapsulates the properties required to define a shadow to apply to a {{#crossLink "DisplayObject"}}{{/crossLink}}
+   * via its <code>shadow</code> property.
+   *
+   * <h4>Example</h4>
+   *
+   *      myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
+   *
+   * @class Shadow
+   * @module EaselJS
+   */
+  var Shadow$1 = function() {
+    // constructor:
+    /**
+     * @constructor
+     * @param {String} color The color of the shadow. This can be any valid CSS color value.
+     * @param {Number} offsetX The x offset of the shadow in pixels.
+     * @param {Number} offsetY The y offset of the shadow in pixels.
+     * @param {Number} blur The size of the blurring effect.
+     */
+    function Shadow() {
+      var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "black";
+      var offsetX = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var offsetY = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+      var blur = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+      classCallCheck(this, Shadow);
+      // public properties:
+      /**
+       * The color of the shadow. This can be any valid CSS color value.
+       * @property color
+       * @type String
+       * @default black
+       */
+      this.color = color;
+      /** The x offset of the shadow.
+       * @property offsetX
+       * @type Number
+       * @default 0
+       */
+      this.offsetX = offsetX;
+      /** The y offset of the shadow.
+       * @property offsetY
+       * @type Number
+       * @default 0
+       */
+      this.offsetY = offsetY;
+      /** The blur of the shadow.
+       * @property blur
+       * @type Number
+       * @default 0
+       */
+      this.blur = blur
+    }
+    // public methods:
+    /**
+     * Returns a string representation of this object.
+     * @method toString
+     * @return {String} a string representation of the instance.
+     */
+    Shadow.prototype.toString = function toString() {
+      return "[Shadow]"
+    };
+    /**
+     * Returns a clone of this Shadow instance.
+     * @method clone
+     * @return {Shadow} A clone of the current Shadow instance.
+     */
+    Shadow.prototype.clone = function clone() {
+      return new Shadow(this.color, this.offsetX, this.offsetY, this.blur)
+    };
+    return Shadow
+  }();
+  // static public properties:
+  /**
+   * An identity shadow object (all properties are set to 0).
+   * @property identity
+   * @type Shadow
+   * @static
+   * @final
+   * @readonly
+   */
+  {
+    Shadow$1.identity = new Shadow$1("transparent")
+  }
+  var Shape = function(_DisplayObject) {
+    inherits(Shape, _DisplayObject);
+    // constructor:
+    /**
+     * @constructor
+     * @param {Graphics} [graphics=Graphics] Optional. The graphics instance to display. If null, a new Graphics instance will be created.
+     */
+    function Shape() {
+      var graphics = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Graphics;
+      classCallCheck(this, Shape);
+      // public properties:
+      /**
+       * The graphics instance to display.
+       * @property graphics
+       * @type Graphics
+       */
+      var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
+      _this.graphics = graphics;
+      return _this
+    }
+    // public methods:
+    /**
+     * Returns true or false indicating whether the Shape would be visible if drawn to a canvas.
+     * This does not account for whether it would be visible within the boundaries of the stage.
+     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+     * @method isVisible
+     * @return {Boolean} Boolean indicating whether the Shape would be visible if drawn to a canvas
+     */
+    Shape.prototype.isVisible = function isVisible() {
+      var hasContent = this.cacheCanvas || this.graphics && !this.graphics.isEmpty();
+      return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent)
+    };
+    /**
+     * Draws the Shape into the specified context ignoring its visible, alpha, shadow, and transform. Returns true if
+     * the draw was handled (useful for overriding functionality).
+     *
+     * <i>NOTE: This method is mainly for internal use, though it may be useful for advanced uses.</i>
+     * @method draw
+     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+     * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache. For example,
+     * used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
+     * @return {Boolean}
+     */
+    Shape.prototype.draw = function draw(ctx) {
+      var ignoreCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache)) {
+        return true
+      }
+      this.graphics.draw(ctx, this);
+      return true
+    };
+    /**
+     * Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to
+     * their defaults (for example .parent).
+     * @method clone
+     * @param {Boolean} recursive If true, this Shape's {{#crossLink "Graphics"}}{{/crossLink}} instance will also be
+     * cloned. If false, the Graphics instance will be shared with the new Shape.
+     */
+    Shape.prototype.clone = function clone() {
+      var recursive = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var g = recursive && this.graphics ? this.graphics.clone() : this.graphics;
+      return this._cloneProps(new Shape(g))
+    };
+    return Shape
+  }(DisplayObject);
+  var SpriteSheet = function(_EventDispatcher) {
+    inherits(SpriteSheet, _EventDispatcher);
+    // constructor:
+    /**
+     * @constructor
+     * @param {Object} data An object describing the SpriteSheet data.
+     */
+    function SpriteSheet(data) {
+      classCallCheck(this, SpriteSheet);
+      // public properties:
+      /**
+       * Indicates whether all images are finished loading.
+       * @property complete
+       * @type Boolean
+       * @readonly
+       */
+      var _this = possibleConstructorReturn(this, _EventDispatcher.call(this));
+      _this.complete = true;
+      /**
+       * Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See the Sprite class
+       * {{#crossLink "Sprite/framerate:property"}}{{/crossLink}} for more information.
+       * @property framerate
+       * @type Number
+       */
+      _this.framerate = 0;
+      // private properties:
+      /**
+       * @property _animations
+       * @protected
+       * @type Array
+       */
+      _this._animations = null;
+      /**
+       * @property _frames
+       * @protected
+       * @type Array
+       */
+      _this._frames = null;
+      /**
+       * @property _images
+       * @protected
+       * @type Array
+       */
+      _this._images = null;
+      /**
+       * @property _data
+       * @protected
+       * @type Object
+       */
+      _this._data = null;
+      /**
+       * @property _loadCount
+       * @protected
+       * @type Number
+       */
+      _this._loadCount = 0;
+      // only used for simple frame defs:
+      /**
+       * @property _frameHeight
+       * @protected
+       * @type Number
+       */
+      _this._frameHeight = 0;
+      /**
+       * @property _frameWidth
+       * @protected
+       * @type Number
+       */
+      _this._frameWidth = 0;
+      /**
+       * @property _numFrames
+       * @protected
+       * @type Number
+       */
+      _this._numFrames = 0;
+      /**
+       * @property _regX
+       * @protected
+       * @type Number
+       */
+      _this._regX = 0;
+      /**
+       * @property _regY
+       * @protected
+       * @type Number
+       */
+      _this._regY = 0;
+      /**
+       * @property _spacing
+       * @protected
+       * @type Number
+       */
+      _this._spacing = 0;
+      /**
+       * @property _margin
+       * @protected
+       * @type Number
+       */
+      _this._margin = 0;
+      _this._parseData(data);
+      return _this
+    }
+    // accessor properties:
+    /**
+     * Returns an array of all available animation names available on this sprite sheet as strings.
+     * @property animations
+     * @type {Array}
+     * @readonly
+     */
+    // public methods:
+    /**
+     * Returns the total number of frames in the specified animation, or in the whole sprite
+     * sheet if the animation param is omitted. Returns 0 if the spritesheet relies on calculated frame counts, and
+     * the images have not been fully loaded.
+     * @method getNumFrames
+     * @param {String} animation The name of the animation to get a frame count for.
+     * @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
+     */
+    SpriteSheet.prototype.getNumFrames = function getNumFrames(animation) {
+      if (animation == null) {
+        return this._frames ? this._frames.length : this._numFrames || 0
+      } else {
+        var data = this._data[animation];
+        if (data == null) {
+          return 0
+        } else {
+          return data.frames.length
+        }
+      }
+    };
+    /**
+     * Returns an object defining the specified animation. The returned object contains:<UL>
+     * 	<li>frames: an array of the frame ids in the animation</li>
+     * 	<li>speed: the playback speed for this animation</li>
+     * 	<li>name: the name of the animation</li>
+     * 	<li>next: the default animation to play next. If the animation loops, the name and next property will be the
+     * 	same.</li>
+     * </UL>
+     * @method getAnimation
+     * @param {String} name The name of the animation to get.
+     * @return {Object} a generic object with frames, speed, name, and next properties.
+     */
+    SpriteSheet.prototype.getAnimation = function getAnimation(name) {
+      return this._data[name]
+    };
+    /**
+     * Returns an object specifying the image and source rect of the specified frame. The returned object has:<UL>
+     * 	<li>an image property holding a reference to the image object in which the frame is found</li>
+     * 	<li>a rect property containing a Rectangle instance which defines the boundaries for the frame within that
+     * 	image.</li>
+     * 	<li> A regX and regY property corresponding to the regX/Y values for the frame.
+     * </UL>
+     * @method getFrame
+     * @param {Number} frameIndex The index of the frame.
+     * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist.
+     */
+    SpriteSheet.prototype.getFrame = function getFrame(frameIndex) {
+      var frame = void 0;
+      if (this._frames && (frame = this._frames[frameIndex])) {
+        return frame
+      }
+      return null
+    };
+    /**
+     * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative
+     * to the origin. For example, a 90 x 70 frame with a regX of 50 and a regY of 40 would return:
+     *
+     * 	[x=-50, y=-40, width=90, height=70]
+     *
+     * @method getFrameBounds
+     * @param {Number} frameIndex The index of the frame.
+     * @param {Rectangle} [rectangle=Rectangle] A Rectangle instance to copy the values into. By default a new instance is created.
+     * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.
+     */
+    SpriteSheet.prototype.getFrameBounds = function getFrameBounds(frameIndex) {
+      var rectangle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Rectangle;
+      var frame = this.getFrame(frameIndex);
+      return frame ? rectangle.setValues(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null
+    };
+    /**
+     * Returns a string representation of this object.
+     * @method toString
+     * @return {String} a string representation of the instance.
+     */
+    SpriteSheet.prototype.toString = function toString() {
+      return "[SpriteSheet]"
+    };
+    /**
+     * SpriteSheet cannot be cloned. A SpriteSheet can be shared by multiple Sprite instances without cloning it.
+     * @method clone
+     */
+    SpriteSheet.prototype.clone = function clone() {
+      // TODO-ES6: Add throw docs
+      throw "SpriteSheet cannot be cloned."
+    };
+    // private methods:
+    /**
+     * @method _parseData
+     * @param {Object} data An object describing the SpriteSheet data.
+     * @protected
+     */
+    SpriteSheet.prototype._parseData = function _parseData(data) {
+      var _this2 = this;
+      if (data == null) {
+        return
+      }
+      this.framerate = data.framerate || 0;
+      // parse images:
+      if (data.images) {
+        for (var _iterator = data.images, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+          var _ref;
+          if (_isArray) {
+            if (_i >= _iterator.length) break;
+            _ref = _iterator[_i++]
+          } else {
+            _i = _iterator.next();
+            if (_i.done) break;
+            _ref = _i.value
+          }
+          var img = _ref;
+          var a = this._images = [];
+          if (typeof img == "string") {
+            var _src = img;
+            img = document.createElement("img");
+            img.src = _src
+          }
+          a.push(img);
+          if (!img.getContext && !img.naturalWidth) {
+            this._loadCount++;
+            this.complete = false;
+            img.onload = function() {
+              return _this2._handleImadeLoad(src)
+            };
+            img.onerror = function() {
+              return _this2._handleImageError(src)
+            }
+          }
+        }
+      }
+      // parse frames:
+      if (data.frames != null) {
+        if (Array.isArray(data.frames)) {
+          this._frames = [];
+          for (var _iterator2 = data.frames, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+            var _ref2;
+            if (_isArray2) {
+              if (_i2 >= _iterator2.length) break;
+              _ref2 = _iterator2[_i2++]
+            } else {
+              _i2 = _iterator2.next();
+              if (_i2.done) break;
+              _ref2 = _i2.value
+            }
+            var arr = _ref2;
+            this._frames.push({
+              image: this._images[arr[4] ? arr[4] : 0],
+              rect: new Rectangle(arr[0], arr[1], arr[2], arr[3]),
+              regX: arr[5] || 0,
+              regY: arr[6] || 0
+            })
+          }
+        } else {
+          var o = data.frames;
+          this._frameWidth = o.width;
+          this._frameHeight = o.height;
+          this._regX = o.regX || 0;
+          this._regY = o.regY || 0;
+          this._spacing = o.spacing || 0;
+          this._margin = o.margin || 0;
+          this._numFrames = o.count;
+          if (this._loadCount == 0) {
+            this._calculateFrames()
+          }
+        }
+      }
+      // parse animations:
+      this._animations = [];
+      if (data.animations != null) {
+        this._data = {};
+        var _o = data.animations;
+        for (var name in _o) {
+          var anim = {
+            name: name
+          };
+          var obj = _o[name];
+          var _a = void 0;
+          if (typeof obj == "number") {
+            // single frame
+            _a = anim.frames = [obj]
+          } else if (Array.isArray(obj)) {
+            // simple
+            if (obj.length == 1) {
+              anim.frames = [obj[0]]
+            } else {
+              anim.speed = obj[3];
+              anim.next = obj[2];
+              _a = anim.frames = [];
+              for (var i = obj[0]; i <= obj[1]; i++) {
+                _a.push(i)
+              }
+            }
+          } else {
+            // complex
+            anim.speed = obj.speed;
+            anim.next = obj.next;
+            var frames = obj.frames;
+            _a = anim.frames = typeof frames == "number" ? [frames] : frames.slice(0)
+          }
+          if (anim.next === true || anim.next === undefined) {
+            anim.next = name
+          } // loop
+          if (anim.next === false || _a.length < 2 && anim.next == name) {
+            anim.next = null
+          } // stop
+          if (!anim.speed) {
+            anim.speed = 1
+          }
+          this._animations.push(name);
+          this._data[name] = anim
+        }
+      }
+    };
+    /**
+     * @method _handleImageLoad
+     * @protected
+     */
+    SpriteSheet.prototype._handleImageLoad = function _handleImageLoad(src) {
+      if (--this._loadCount == 0) {
+        this._calculateFrames();
+        this.complete = true;
+        this.dispatchEvent("complete")
+      }
+    };
+    /**
+     * @method _handleImageError
+     * @protected
+     */
+    SpriteSheet.prototype._handleImageError = function _handleImageError(src) {
+      var errorEvent = new Event("error");
+      errorEvent.src = src;
+      this.dispatchEvent(errorEvent);
+      // Complete is still dispatched.
+      if (--this._loadCount == 0) {
+        this.dispatchEvent("complete")
+      }
+    };
+    /**
+     * @method _calculateFrames
+     * @protected
+     */
+    SpriteSheet.prototype._calculateFrames = function _calculateFrames() {
+      if (this._frames || this._frameWidth == 0) {
+        return
+      }
+      this._frames = [];
+      var maxFrames = this._numFrames || 1e5; // if we go over this, something is wrong.
+      var frameCount = 0,
+        frameWidth = this._frameWidth,
+        frameHeight = this._frameHeight;
+      var spacing = this._spacing,
+        margin = this._margin;
+      imgLoop: for (var i = 0, imgs = this._images, l = imgs.length; i < l; i++) {
+        var img = imgs[i],
+          imgW = img.width,
+          imgH = img.height;
+        var y = margin;
+        while (y <= imgH - margin - frameHeight) {
+          var x = margin;
+          while (x <= imgW - margin - frameWidth) {
+            if (frameCount >= maxFrames) {
+              break imgLoop
+            }
+            frameCount++;
+            this._frames.push({
+              image: img,
+              rect: new Rectangle(x, y, frameWidth, frameHeight),
+              regX: this._regX,
+              regY: this._regY
+            });
+            x += frameWidth + spacing
+          }
+          y += frameHeight + spacing
+        }
+      }
+      this._numFrames = frameCount
+    };
+    createClass(SpriteSheet, [{
+      key: "animations",
+      get: function get() {
+        return this._animations.slice()
+      }
+    }]);
+    return SpriteSheet
+  }(EventDispatcher);
+  // events:
+  /**
+   * Dispatched when all images are loaded.  Note that this only fires if the images
+   * were not fully loaded when the sprite sheet was initialized. You should check the complete property
+   * to prior to adding a listener. Ex.
+   *
+   * 	var sheet = new createjs.SpriteSheet(data);
+   * 	if (!sheet.complete) {
+   * 		// not preloaded, listen for the complete event:
+   * 		sheet.addEventListener("complete", handler);
+   * 	}
+   *
+   * @event complete
+   * @param {Object} target The object that dispatched the event.
+   * @param {String} type The event type.
+   * @since 0.6.0
+   */
+  /**
+   * Dispatched when getFrame is called with a valid frame index. This is primarily intended for use by {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}}
+   * when doing on-demand rendering.
+   * @event getframe
+   * @param {Number} index The frame index.
+   * @param {Object} frame The frame object that getFrame will return.
+   */
+  /**
+   * Dispatched when an image encounters an error. A SpriteSheet will dispatch an error event for each image that
+   * encounters an error, and will still dispatch a {{#crossLink "SpriteSheet/complete:event"}}{{/crossLink}}
+   * event once all images are finished processing, even if an error is encountered.
+   * @event error
+   * @param {String} src The source of the image that failed to load.
+   * @since 0.8.2
+   */
   var _H_OFFSETS = {
     start: 0,
     left: 0,
@@ -12395,29 +12303,6 @@
     ideographic: -.85,
     bottom: -1
   };
-  /**
-   * Display one or more lines of dynamic text (not user editable) in the display list. Line wrapping support (using the
-   * lineWidth) is very basic, wrapping on spaces and tabs only. Note that as an alternative to Text, you can position HTML
-   * text above or below the canvas relative to items in the display list using the {{#crossLink "DisplayObject/localToGlobal"}}{{/crossLink}}
-   * method, or using {{#crossLink "DOMElement"}}{{/crossLink}}.
-   *
-   * <b>Please note that Text does not support HTML text, and can only display one font style at a time.</b> To use
-   * multiple font styles, you will need to create multiple text instances, and position them manually.
-   *
-   * <h4>Example</h4>
-   *
-   *      var text = new createjs.Text("Hello World", "20px Arial", "#ff7700");
-   *      text.x = 100;
-   *      text.textBaseline = "alphabetic";
-   *
-   * CreateJS Text supports web fonts (the same rules as Canvas). The font must be loaded and supported by the browser
-   * before it can be displayed.
-   *
-   * <strong>Note:</strong> Text can be expensive to generate, so cache instances where possible. Be aware that not all
-   * browsers will render Text exactly the same.
-   * @class Text
-   * @extends DisplayObject
-   */
   var Text = function(_DisplayObject) {
     inherits(Text, _DisplayObject);
     // constructor:
@@ -12786,32 +12671,6 @@
       canvas$2.width = canvas$2.height = 1
     }
   }
-  /**
-   * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
-   * be copied from the red channel of the map, and the RGB channels will be copied from the target.
-   *
-   * Generally, it is recommended that you use {{#crossLink "AlphaMaskFilter"}}{{/crossLink}}, because it has much
-   * better performance.
-   *
-   * <h4>Example</h4>
-   * This example draws a red->blue box, caches it, and then uses the cache canvas as an alpha map on a 100x100 image.
-   *
-   *       var box = new createjs.Shape();
-   *       box.graphics.beginLinearGradientFill(["#ff0000", "#0000ff"], [0, 1], 0, 0, 0, 100)
-   *       box.graphics.drawRect(0, 0, 100, 100);
-   *       box.cache(0, 0, 100, 100);
-   *
-   *       var bmp = new createjs.Bitmap("path/to/image.jpg");
-   *       bmp.filters = [
-   *           new createjs.AlphaMapFilter(box.cacheCanvas)
-   *       ];
-   *       bmp.cache(0, 0, 100, 100);
-   *       stage.addChild(bmp);
-   *
-   * See {{#crossLink "Filter"}}{{/crossLink}} for more information on applying filters.
-   * @class AlphaMapFilter
-   * @extends Filter
-   */
   var AlphaMapFilter = function(_Filter) {
     inherits(AlphaMapFilter, _Filter);
     // constructor:
@@ -12925,32 +12784,6 @@
     };
     return AlphaMapFilter
   }(Filter);
-  /**
-   * Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
-   * be derived from the mask, and the RGB channels will be copied from the target. This can be used, for example, to
-   * apply an alpha mask to a display object. This can also be used to combine a JPG compressed RGB image with a PNG32
-   * alpha mask, which can result in a much smaller file size than a single PNG32 containing ARGB.
-   *
-   * <b>IMPORTANT NOTE: This filter currently does not support the targetCtx, or targetX/Y parameters correctly.</b>
-   *
-   * <h4>Example</h4>
-   * This example draws a gradient box, then caches it and uses the "cacheCanvas" as the alpha mask on a 100x100 image.
-   *
-   *      var box = new createjs.Shape();
-   *      box.graphics.beginLinearGradientFill(["#000000", "rgba(0, 0, 0, 0)"], [0, 1], 0, 0, 100, 100)
-   *      box.graphics.drawRect(0, 0, 100, 100);
-   *      box.cache(0, 0, 100, 100);
-   *
-   *      var bmp = new createjs.Bitmap("path/to/image.jpg");
-   *      bmp.filters = [
-   *          new createjs.AlphaMaskFilter(box.cacheCanvas)
-   *      ];
-   *      bmp.cache(0, 0, 100, 100);
-   *
-   * See {{#crossLink "Filter"}}{{/crossLink}} for more information on applying filters.
-   * @class AlphaMaskFilter
-   * @extends Filter
-   */
   var AlphaMaskFilter = function(_Filter) {
     inherits(AlphaMaskFilter, _Filter);
     // constructor:
@@ -13031,29 +12864,11 @@
     };
     return AlphaMaskFilter
   }(Filter);
+  /**
+   * @module EaselJS
+   */
   var _MUL_TABLE = [1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1];
   var _SHG_TABLE = [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9];
-  /**
-   * Applies a box blur to DisplayObjects. Note that this filter is fairly CPU intensive, particularly if the quality is
-   * set higher than 1.
-   *
-   * <h4>Example</h4>
-   * This example creates a red circle, and then applies a 5 pixel blur to it. It uses the {{#crossLink "Filter/getBounds"}}{{/crossLink}}
-   * method to account for the spread that the blur causes.
-   *
-   *      let shape = new createjs.Shape().set({x:100,y:100});
-   *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
-   *
-   *      let blurFilter = new createjs.BlurFilter(5, 5, 1);
-   *      shape.filters = [blurFilter];
-   *      let bounds = blurFilter.getBounds();
-   *
-   *      shape.cache(-50+bounds.x, -50+bounds.y, 100+bounds.width, 100+bounds.height);
-   *
-   * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
-   * @class BlurFilter
-   * @extends Filter
-   */
   var BlurFilter = function(_Filter) {
     inherits(BlurFilter, _Filter);
     // constructor:
@@ -13413,23 +13228,7 @@
     return BlurFilter
   }(Filter);
   /**
-   * Applies a color transform to DisplayObjects.
-   *
-   * <h4>Example</h4>
-   * This example draws a red circle, and then transforms it to Blue. This is accomplished by multiplying all the channels
-   * to 0 (except alpha, which is set to 1), and then adding 255 to the blue channel.
-   *
-   *      var shape = new createjs.Shape().set({x:100,y:100});
-   *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
-   *
-   *      shape.filters = [
-   *          new createjs.ColorFilter(0,0,0,1, 0,0,255,0)
-   *      ];
-   *      shape.cache(-50, -50, 100, 100);
-   *
-   * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
-   * @class ColorFilter
-   * @extends Filter
+   * @module EaselJS
    */
   var ColorFilter = function(_Filter) {
     inherits(ColorFilter, _Filter);
@@ -13540,6 +13339,9 @@
     };
     return ColorFilter
   }(Filter);
+  /**
+   * @module EaselJS
+   */
   var _DELTA_INDEX = [0, .01, .02, .04, .05, .06, .07, .08, .1, .11, .12, .14, .15, .16, .17, .18, .2, .21, .22, .24, .25, .27, .28, .3, .32, .34, .36, .38, .4, .42, .44, .46, .48, .5, .53, .56, .59, .62, .65, .68, .71, .74, .77, .8, .83, .86, .89, .92, .95, .98, 1, 1.06, 1.12, 1.18, 1.24, 1.3, 1.36, 1.42, 1.48, 1.54, 1.6, 1.66, 1.72, 1.78, 1.84, 1.9, 1.96, 2, 2.12, 2.25, 2.37, 2.5, 2.62, 2.75, 2.87, 3, 3.2, 3.4, 3.6, 3.8, 4, 4.3, 4.7, 4.9, 5, 5.5, 6, 6.5, 6.8, 7, 7.3, 7.5, 7.8, 8, 8.4, 8.7, 9, 9.4, 9.6, 9.8, 10];
   var _IDENTITY_MATRIX = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1];
   var _LENGTH = 25;
@@ -13826,26 +13628,7 @@
     return ColorMatrix
   }();
   /**
-   * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
-   * {{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors. For an easier color transform,
-   * consider the {{#crossLink "ColorFilter"}}{{/crossLink}}.
-   *
-   * <h4>Example</h4>
-   * This example creates a red circle, inverts its hue, and then saturates it to brighten it up.
-   *
-   *      var shape = new createjs.Shape().set({x:100,y:100});
-   *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
-   *
-   *      var matrix = new createjs.ColorMatrix().adjustHue(180).adjustSaturation(100);
-   *      shape.filters = [
-   *          new createjs.ColorMatrixFilter(matrix)
-   *      ];
-   *
-   *      shape.cache(-50, -50, 100, 100);
-   *
-   * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
-   * @class ColorMatrixFilter
-   * @extends Filter
+   * @module EaselJS
    */
   var ColorMatrixFilter = function(_Filter) {
     inherits(ColorMatrixFilter, _Filter);
@@ -13947,6 +13730,7 @@
    *      }
    *
    * @class ButtonHelper
+   * @module EaselJS
    */
   var ButtonHelper = function() {
     // constructor:
@@ -14149,6 +13933,7 @@
    *
    * @class Touch
    * @static
+   * @module EaselJS
    */
   var Touch = function() {
     // constructor:
@@ -14446,22 +14231,6 @@
   }();
   var _ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
   var _ERR_RUNNING = "a build is already running";
-  /**
-   * The SpriteSheetBuilder allows you to generate {{#crossLink "SpriteSheet"}}{{/crossLink}} instances at run time
-   * from any display object. This can allow you to maintain your assets as vector graphics (for low file size), and
-   * render them at run time as SpriteSheets for better performance.
-   *
-   * SpriteSheets can be built either synchronously, or asynchronously, so that large SpriteSheets can be generated
-   * without locking the UI.
-   *
-   * Note that the "images" used in the generated SpriteSheet are actually canvas elements, and that they will be
-   * sized to the nearest power of 2 up to the value of {{#crossLink "SpriteSheetBuilder/maxWidth:property"}}{{/crossLink}}
-   * or {{#crossLink "SpriteSheetBuilder/maxHeight:property"}}{{/crossLink}}.
-   * @class SpriteSheetBuilder
-   * @param {Number} [framerate=0] The {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} of
-   * {{#crossLink "SpriteSheet"}}{{/crossLink}} instances that are created.
-   * @extends EventDispatcher
-   */
   var SpriteSheetBuilder = function(_EventDispatcher) {
     inherits(SpriteSheetBuilder, _EventDispatcher);
     // constructor:
@@ -14971,6 +14740,22 @@
     }]);
     return SpriteSheetBuilder
   }(EventDispatcher);
+  // events:
+  /**
+   * Dispatched when a build completes.
+   * @event complete
+   * @param {Object} target The object that dispatched the event.
+   * @param {String} type The event type.
+   * @since 0.6.0
+   */
+  /**
+   * Dispatched when an asynchronous build has progress.
+   * @event progress
+   * @param {Object} target The object that dispatched the event.
+   * @param {String} type The event type.
+   * @param {Number} progress The current progress value (0-1).
+   * @since 0.6.0
+   */
   /**
    * The SpriteSheetUtils class is a collection of static methods for working with {{#crossLink "SpriteSheet"}}{{/crossLink}}s.
    * A sprite sheet is a series of images (usually animation frames) combined into a single image on a regular grid. For
@@ -14978,6 +14763,7 @@
    * by 2 high). The SpriteSheetUtils class uses a static interface and should not be instantiated.
    * @class SpriteSheetUtils
    * @static
+   * @module EaselJS
    */
   var SpriteSheetUtils = function() {
     // constructor:
@@ -15119,7 +14905,21 @@
       }
     };
     return SpriteSheetUtils
-  }(); {
+  }();
+  // private static properties:
+  /**
+   * @property _workingCanvas
+   * @static
+   * @type HTMLCanvasElement | Object
+   * @protected
+   */
+  /**
+   * @property _workingContext
+   * @static
+   * @type CanvasRenderingContext2D
+   * @protected
+   */
+  {
     var canvas$3 = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
     if (canvas$3.getContext) {
       SpriteSheetUtils._workingCanvas = canvas$3;
@@ -15128,13 +14928,6 @@
     }
   }
   var _alternateOutput = null;
-  /**
-   * A utility and helper class designed to work with {{#crossLink "StageGL"}}{{/crossLink}} to help investigate and
-   * test performance or display problems. It contains logging functions to analyze behaviour and performance testing
-   * utilities.
-   * @class WebGLInspector
-   * @extends EventDispatcher
-   */
   var WebGLInspector = function(_EventDispatcher) {
     inherits(WebGLInspector, _EventDispatcher);
     // constructor:
@@ -15324,13 +15117,113 @@
     }]);
     return WebGLInspector
   }(EventDispatcher);
-  // createjs deps
-  // TODO: Export version?
+  /**
+   * The EaselJS Javascript library provides a retained graphics mode for canvas including a full hierarchical display
+   * list, a core interaction model, and helper classes to make working with 2D graphics in Canvas much easier.
+   * EaselJS provides straight forward solutions for working with rich graphics and interactivity with HTML5 Canvas...
+   *
+   * <h4>Getting Started</h4>
+   * To get started with Easel, create a {{#crossLink "Stage"}}{{/crossLink}} that wraps a CANVAS element, and add
+   * {{#crossLink "DisplayObject"}}{{/crossLink}} instances as children. EaselJS supports:
+   * <ul>
+   *      <li>Images using {{#crossLink "Bitmap"}}{{/crossLink}}</li>
+   *      <li>Vector graphics using {{#crossLink "Shape"}}{{/crossLink}} and {{#crossLink "Graphics"}}{{/crossLink}}</li>
+   *      <li>Animated bitmaps using {{#crossLink "SpriteSheet"}}{{/crossLink}} and {{#crossLink "Sprite"}}{{/crossLink}}
+   *      <li>Simple text instances using {{#crossLink "Text"}}{{/crossLink}}</li>
+   *      <li>Containers that hold other DisplayObjects using {{#crossLink "Container"}}{{/crossLink}}</li>
+   *      <li>Control HTML DOM elements using {{#crossLink "DOMElement"}}{{/crossLink}}</li>
+   * </ul>
+   *
+   * All display objects can be added to the stage as children, or drawn to a canvas directly.
+   *
+   * <b>User Interactions</b><br />
+   * All display objects on stage (except DOMElement) will dispatch events when interacted with using a mouse or
+   * touch. EaselJS supports hover, press, and release events, as well as an easy-to-use drag-and-drop model. Check out
+   * {{#crossLink "MouseEvent"}}{{/crossLink}} for more information.
+   *
+   * <h4>Simple Example</h4>
+   * This example illustrates how to create and position a {{#crossLink "Shape"}}{{/crossLink}} on the {{#crossLink "Stage"}}{{/crossLink}}
+   * using EaselJS' drawing API.
+   *
+   *	    //Create a stage by getting a reference to the canvas
+   *	    stage = new createjs.Stage("demoCanvas");
+   *	    //Create a Shape DisplayObject.
+   *	    circle = new createjs.Shape();
+   *	    circle.graphics.beginFill("red").drawCircle(0, 0, 40);
+   *	    //Set position of Shape instance.
+   *	    circle.x = circle.y = 50;
+   *	    //Add Shape instance to stage display list.
+   *	    stage.addChild(circle);
+   *	    //Update stage will render next frame
+   *	    stage.update();
+   *
+   * <b>Simple Interaction Example</b><br>
+   *
+   *      displayObject.addEventListener("click", handleClick);
+   *      function handleClick(event){
+   *          // Click happenened
+   *      }
+   *
+   *      displayObject.addEventListener("mousedown", handlePress);
+   *      function handlePress(event) {
+   *          // A mouse press happened.
+   *          // Listen for mouse move while the mouse is down:
+   *          event.addEventListener("mousemove", handleMove);
+   *      }
+   *      function handleMove(event) {
+   *          // Check out the DragAndDrop example in GitHub for more
+   *      }
+   *
+   * <b>Simple Animation Example</b><br />
+   * This example moves the shape created in the previous demo across the screen.
+   *
+   *	    //Update stage will render next frame
+   *	    createjs.Ticker.addEventListener("tick", handleTick);
+   *
+   *	    function handleTick() {
+   *          //Circle will move 10 units to the right.
+   *	    	circle.x += 10;
+   *	    	//Will cause the circle to wrap back
+   * 	    	if (circle.x > stage.canvas.width) { circle.x = 0; }
+   *	    	stage.update();
+   *	    }
+   *
+   * <h4>Other Features</h4>
+   * EaselJS also has built in support for
+   * <ul><li>Canvas features such as {{#crossLink "Shadow"}}{{/crossLink}} and CompositeOperation</li>
+   *      <li>{{#crossLink "Ticker"}}{{/crossLink}}, a global heartbeat that objects can subscribe to</li>
+   *      <li>Filters, including a provided {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}, {{#crossLink "AlphaMaskFilter"}}{{/crossLink}},
+   *      {{#crossLink "AlphaMapFilter"}}{{/crossLink}}, and {{#crossLink "BlurFilter"}}{{/crossLink}}. See {{#crossLink "Filter"}}{{/crossLink}}
+   *      for more information</li>
+   *      <li>A {{#crossLink "ButtonHelper"}}{{/crossLink}} utility, to easily create interactive buttons</li>
+   *      <li>{{#crossLink "SpriteSheetUtils"}}{{/crossLink}} and a {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} to
+   *      help build and manage {{#crossLink "SpriteSheet"}}{{/crossLink}} functionality at run-time.</li>
+   * </ul>
+   *
+   * <h4>Browser Support</h4>
+   * All modern browsers that support Canvas will support EaselJS (<a href="http://caniuse.com/canvas">http://caniuse.com/canvas</a>).
+   * Browser performance may vary between platforms, for example, Android Canvas has poor hardware support, and is much
+   * slower on average than most other browsers.
+   *
+   * @main EaselJS
+   */
+  /**
+   * README: Export Order
+   *
+   * Due to some classes having circular import bindings (whether at the top of the import chain or deeper in),
+   * some exports here are in reverse order (such as Container being exported before DisplayObject).
+   * This is explained here: https://github.com/rollup/rollup/issues/845#issuecomment-240277194
+   */
+  // re-export shared classes
+  var version = "1.0.0";
+  exports.version = version;
   exports.EventDispatcher = EventDispatcher;
   exports.Event = Event;
   exports.Ticker = Ticker;
-  exports.DisplayObject = DisplayObject;
+  exports.StageGL = StageGL;
+  exports.Stage = Stage;
   exports.Container = Container;
+  exports.DisplayObject = DisplayObject;
   exports.Bitmap = Bitmap;
   exports.BitmapText = BitmapText;
   exports.DOMElement = DOMElement;
@@ -15353,12 +15246,11 @@
   exports.StrokeDash = StrokeDash;
   exports.StrokeStyle = StrokeStyle;
   exports.MovieClip = MovieClip;
+  exports.MovieClipPlugin = MovieClipPlugin;
   exports.Shadow = Shadow$1;
   exports.Shape = Shape;
   exports.Sprite = Sprite;
   exports.SpriteSheet = SpriteSheet;
-  exports.Stage = Stage;
-  exports.StageGL = StageGL;
   exports.Text = Text;
   exports.MouseEvent = MouseEvent;
   exports.AlphaMapFilter = AlphaMapFilter;
