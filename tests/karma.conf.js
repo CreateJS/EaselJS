@@ -14,8 +14,8 @@ module.exports = function (config) {
       /*"dist/easeljs.old.js",
       "dist/webgl.old.js",*/
        "dist/easeljs-NEXT.js",
-      // { pattern: "src/**/*.js", included: false },
-      // { pattern: "dist/easeljs-NEXT.map", included: false },
+      { pattern: "src/**/*.js", included: false },
+      { pattern: "dist/easeljs-NEXT.map", included: false },
       // helpers
       "tests/helpers/helpers.js",
       "tests/helpers/js-imagediff/imagediff.js",

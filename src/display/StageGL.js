@@ -27,6 +27,8 @@
 */
 
 /*
+ * @uglify
+ *
  * README IF EDITING:
  * Terminology for developers:
  *
