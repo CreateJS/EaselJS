@@ -618,6 +618,13 @@ this.createjs = this.createjs||{};
 	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressmove
 	 * event will be generated on that object whenever the mouse moves until the mouse press is released. This can be
 	 * useful for dragging and similar operations.
+	 *
+	 * **Please note** that if the initial mouse target from a `mousedown` event is removed from the stage after being pressed
+	 * (e.g. during a `pressmove` event), a `pressmove` event is still generated. However since it is no longer in the
+	 * display list, the event can not bubble. This means that previous ancestors (parent containers) will not receive
+	 * the event, and therefore can not re-dispatch it. If you intend to listen for `{{#crossLink "DisplayObject/pressup:event"}}{{/crossLink}}`
+	 * or `pressmove` on a dynamic object (such as a {{#crossLink "MovieClip"}}{{/crossLink}} or {{#crossLink "Container"}}{{/crossLink}}),
+	 * then ensure you set {{#crossLink "Container/mouseChildren:property"}}{{/crossLink}} to `false`.
 	 * @event pressmove
 	 * @since 0.7.0
 	 */
@@ -626,6 +633,13 @@ this.createjs = this.createjs||{};
 	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressup event
 	 * will be generated on that object when that mouse press is released. This can be useful for dragging and similar
 	 * operations.
+	 *
+	 * **Please note** that if the initial mouse target from a `mousedown` event is removed from the stage after being pressed
+	 * (e.g. during a `pressmove` event), a `pressup` event is still generated. However since it is no longer in the
+	 * display list, the event can not bubble. This means that previous ancestors (parent containers) will not receive
+	 * the event, and therefore can not re-dispatch it. If you intend to listen for `{{#crossLink "DisplayObject/pressmove:event"}}{{/crossLink}}`
+	 * or `pressup` on a dynamic object (such as a {{#crossLink "MovieClip"}}{{/crossLink}} or {{#crossLink "Container"}}{{/crossLink}}),
+	 * then ensure you set {{#crossLink "Container/mouseChildren:property"}}{{/crossLink}} to `false`.
 	 * @event pressup
 	 * @since 0.7.0
 	 */
