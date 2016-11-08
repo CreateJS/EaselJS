@@ -149,6 +149,7 @@ this.createjs = this.createjs||{};
 
 
 // public methods:
+	/** docced in super class **/
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
 		gl.uniform4f(
 			gl.getUniformLocation(shaderProgram, "uColorMultiplier"),

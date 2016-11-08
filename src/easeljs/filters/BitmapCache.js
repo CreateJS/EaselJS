@@ -42,15 +42,15 @@ this.createjs = this.createjs||{};
 	 * The BitmapCache is an internal representation of all the cache properties and logic required in order to "cache" an object.
 	 * This information and functionality used to be located on a DisplayObject.{{#crossLink "DisplayObject/cache:method"}}{{/crossLink}} but was moved here.
 	 * Caching in this context is purely visual and will render the DisplayObject out into an image to be used instead of the object.
-	 * The actual cache itself is still stored on the target with the {{#crossLink "DisplayObject/cacheCavnas:property"}}{{/crossLink}}
+	 * The actual cache itself is still stored on the target with the DisplayObject.{{#crossLink "DisplayObject/cacheCanvas:property"}}{{/crossLink}} property.
 	 *
 	 * Working with a singular image like a {{#crossLink "Bitmap"}}{{/crossLink}} there is little benefit to performing a cache as it is already a single image.
-	 * Caching is best done on containers containing multiple complex parts that do not move often so that rendering the image will improve overall rendering speed.
+	 * Caching is best done on containers containing multiple complex parts that do not move often, so that rendering the image instead will improve overall rendering speed.
 	 * A cached object will not visually update until explicitly told to do so with a call to update, much like a Stage.
-	 * If a cache is being updated every frame it is likely not improving rendering performance, cache are best used when updates will be sparse.
+	 * If a cache is being updated every frame it is likely _not_ improving rendering performance, cache are best used when updates will be sparse.
 	 *
-	 * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need.
-	 * The BitmapCache is also responsible for applying filters to objects and reads each {{#crossLink "Filter"}}{{/crossLink}}.
+	 * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need, and to physically enable some effects.
+	 * The BitmapCache is also responsible for applying filters to objects and reads each {{#crossLink "Filter"}}{{/crossLink}} due to this relationship.
 	 * Real-time Filters are not recommended performance wise when dealing with a Context2D canvas.
 	 * For best performance and to still allow for some visual effects use a compositeOperation.
 	 * @class BitmapCache
@@ -316,7 +316,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Returns a data URL for the cache, or null if this display object is not cached.
+	 * Returns a data URL for the cache, or null if there is no cache.
 	 * Uses {{#crossLink "BitmapCache/cacheID:property"}}{{/crossLink}} to ensure a new data URL is not generated if the cache has not changed.
 	 * @method getCacheDataURL
 	 * @return {String} The image data url for the cache.
@@ -348,8 +348,8 @@ this.createjs = this.createjs||{};
 
 // private methods:
 	/**
-	 * Basic context2D caching works by creating a new canvas element at setting its physical size.
-	 * This function will create and or size the canvas as needed.
+	 * Create or resize the invisible canvas/surface that is needed for the display object(s) to draw to,
+	 * and in turn used in their stead.
 	 * @protected
 	 * @method _updateSurface
 	 **/
@@ -366,7 +366,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Now all the setup properties have been performed, do the actual cache draw out for context 2D.
+	 * Physically draw to the surface of the canvas use context appropriate commands.
 	 * @protected
 	 * @method _drawToCache
 	 **/
@@ -391,7 +391,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Work through every filter and apply its individual transformation to it.
+	 * Work through every filter and apply its individual visual transformation.
 	 * @protected
 	 * @method _applyFilters
 	 **/
