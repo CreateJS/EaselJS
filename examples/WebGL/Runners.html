@@ -20,7 +20,9 @@
 		var stage;
 		var runnerSS, textSS, sparkleSS;
 		var runnerContainer, sparkleContainer;
-		var sparklePool, maxRunners = 300, maxSparkles = 1000;
+		var sparklePool;
+		var maxRunners = 300;
+		var maxSparkles = 1000;
 
 		function init() {
 			if (location.search.match(/c2d/i)) {
@@ -57,13 +59,14 @@
 
 		function tick(evt) {
 			// runners:
+			var i;
 			var l = runnerContainer.getNumChildren();
 			if (l < maxRunners && Math.random() < 0.3) {
 				addRunner();
 				l++;
 			}
 
-			for (var i = 0; i < l; i++) {
+			for (i=0; i<l; i++) {
 				var runner = runnerContainer.getChildAt(i);
 				runner.x += runner.velX;
 				if (runner.x > 1000) {
@@ -72,7 +75,7 @@
 			}
 
 			l = sparkleContainer.getNumChildren();
-			for (var i = 0; i < l; i++) {
+			for (i=0; i<l; i++) {
 				var sparkle = sparkleContainer.getChildAt(i);
 				sparkle.x += sparkle.velX;
 				sparkle.y += sparkle.velY;
@@ -162,18 +165,29 @@
 		function setupSpriteSheets(queue) {
 			runnerSS = new createjs.SpriteSheet({
 				framerate: 30,
-				"images": [queue.getResult("runner")],
-				"frames": {"regX": 82, "height": 292, "count": 64, "regY": 292, "width": 165},
-				"animations": {
-					"run": [0, 25, "run"],
-					"jump": [26, 63, "run"]
+				images: [queue.getResult("runner")],
+				frames: {
+					regX: 82,
+					regY: 292,
+					height: 292,
+					width: 165,
+					count: 64
+				},
+				animations: {
+					run: [0, 25, "run"],
+					jump: [26, 63, "run"]
 				}
 			});
 
 			sparkleSS = new createjs.SpriteSheet({
 				framerate: 60,
 				images: [queue.getResult("sparkle")],
-				frames: {width: 21, height: 23, regX: 10, regY: 11}
+				frames: {
+					regX: 11,
+					regY: 10,
+					height: 24,
+					width: 21
+				}
 			});
 
 			textSS = new createjs.SpriteSheet({
@@ -211,7 +225,36 @@
 					[966, 2, 9, 10, 0, -17, -31]
 				],
 				animations: {
-					"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6, "H": 7, "I": 8, "J": 9, "K": 10, "L": 11, "M": 12, "N": 13, "O": 14, "P": 15, "Q": 16, "R": 17, "S": 18, "T": 19, "U": 20, "V": 21, "W": 22, "X": 23, "Y": 24, "Z": 25, ",": 26, "!": 27, "?": 28, ".": 29
+					A: 0,
+					B: 1,
+					C: 2,
+					D: 3,
+					E: 4,
+					F: 5,
+					G: 6,
+					H: 7,
+					I: 8,
+					J: 9,
+					K: 10,
+					L: 11,
+					M: 12,
+					N: 13,
+					O: 14,
+					P: 15,
+					Q: 16,
+					R: 17,
+					S: 18,
+					T: 19,
+					U: 20,
+					V: 21,
+					W: 22,
+					X: 23,
+					Y: 24,
+					Z: 25,
+					",": 26,
+					"!": 27,
+					"?": 28,
+					".": 29
 				}
 			});
 		}

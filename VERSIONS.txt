@@ -1,5 +1,14 @@
 Version NEXT [Not Released]
 ****************************************************************************************************
+WEBGL UPDATES
+An in-progress update and refactor, which introduces StageGL, a drop-in replacement for the EaselJS Stage class that
+fully supports a WebGL pipeline. StageGL is much more performant than the (deprecated) SpriteStage, and way less strict.
+Any content can be added the a StageGL display list, and it will intelligently batch WebGL draw calls, removing the
+requirement for a single SpriteSheet.
+
+A few additional classes have been added, and changes to core classes have been made to support StageGL.
+
+More details and a release date to come.
 
 
 Version 0.8.2 [November 26, 2015]

@@ -39,7 +39,12 @@
 		// it will auto-calculate the number of frames from the image dimensions and loop them
 		var data = {
 			images: ["../../_assets/art/spritesheet_sparkle.png"],
-			frames: {width: 21, height: 23, regX: 10, regY: 11}
+			frames: {
+				regX: 10,
+				regY: 11,
+				height: 23,
+				width: 21
+			}
 		};
 
 		// set up an animation instance, which we will clone
@@ -60,7 +65,7 @@
 		stage.addChild(fpsLabel);
 		fpsLabel.x = 10;
 		fpsLabel.y = 20;
-		fpsLabel.cache(0,0, 128, 16);
+		fpsLabel.cache(0, 0, 128, 16);
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
 		createjs.Ticker.timingMode = createjs.Ticker.RAF;
@@ -72,7 +77,7 @@
 		var l = spkls.getNumChildren();
 		var m = event.delta / 16;
 		for (var i = 0; i < l; i++) {
-			var sparkle = spkls.children[i];
+			var sparkle = stage.getChildAt(i);
 
 			if(--sparkle.life <= 0) {
 				spkls.removeChild(sparkle);
@@ -102,28 +107,25 @@
 			}
 		}
 
-		var str = "";
-		str += l + " @ ";
-		str += Math.round(createjs.Ticker.getMeasuredFPS()) + " fps";
-		fpsLabel.text = str;
+		fpsLabel.text = l + " @ " + Math.round(createjs.Ticker.getMeasuredFPS()) + " fps";
 		fpsLabel.updateCache();
 
 		// draw the updates to stage
 		stage.update(event);
 	}
 
-	//sparkle explosion
+	// sparkle explosion
 	function clickCanvas(evt) {
 		addSparkles(Math.random() * 500 + 200 | 0, stage.mouseX, stage.mouseY, 1);
 	}
 
-	//sparkle trail
+	// sparkle trail
 	function moveCanvas(evt) {
 		addSparkles(Math.random() * 4 | 0, stage.mouseX, stage.mouseY, 0.1);
 	}
 
 	function addSparkles(count, x, y, speed) {
-		//create the specified number of sparkles
+		// create the specified number of sparkles
 		for (var i = 0; i < count; i++) {
 			// clone the original sparkle, so we don't need to set shared properties:
 			var sparkle = sprite.clone();
@@ -170,8 +172,7 @@
 </header>
 
 <div>
-	<canvas id="testCanvas" width="960" height="400"
-			style="background:black"></canvas>
+	<canvas id="testCanvas" width="960" height="400" style="background:black"></canvas>
 </div>
 </body>
 </html>
