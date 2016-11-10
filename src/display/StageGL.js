@@ -26,27 +26,29 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import Stage from "./Stage";
+import Container from "./Container";
+import Matrix2D from "../geom/Matrix2D";
+
 /*
- * @uglify
- *
  * README IF EDITING:
  * Terminology for developers:
  *
  * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
  * Vertex Property: a piece of information attached to the vertex like a vector3 containing x,y,z
- * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render modes do not use these)
+ * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render
+ * 		modes do not use these)
  * Card: a group of 2 triangles used to display a rectangular image
  * U/V: common names for the [0-1] texture co-ordinates on an image
  * Batch: a single call to the renderer, best done as little as possible so multiple cards are put into a single batch
  * Buffer: WebGL array data
- * Program/Shader: For every vertex we run the Vertex shader. The results are used per pixel by the Fragment shader. When combined and paired these are a shader "program"
+ * Program/Shader: For every vertex we run the Vertex shader. The results are used per pixel by the Fragment shader. When
+ * 		combined and paired these are a shader "program"
  * Texture: WebGL representation of image data and associated extra information
  * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
+ *
+ * @uglify
  */
-
-import Stage from "./Stage";
-import Container from "./Container";
-import Matrix2D from "../geom/Matrix2D";
 
 /**
  * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL-optimized display list,
@@ -60,24 +62,24 @@ import Matrix2D from "../geom/Matrix2D";
  * <h4>Limitations</h4>
  * - {{#crossLink "Shape"}}{{/crossLink}}, {{#crossLink "Shadow"}}{{/crossLink}}, and {{#crossLink "Text"}}{{/crossLink}}
  * 	are not rendered when added to the display list.
- * - Images are wrapped as a webGL texture. Graphics cards have a limit to concurrent textures, and too many
- *	textures can slow performance. Caching may slow WebGL.
  * - To display something StageGL cannot render, {{#crossLink "displayObject/cache"}}{{/crossLink}} the object.
- *	Caches can be rendered regardless of source. Be wary of creating a lot of small caches, and instead use
- *	techniques such as SpriteSheets to generate images that contain multiple objects.
- * - Clone image nodes (DOM Image/Canvas Element) to re-use them between multiple StageGL instances, otherwise the
- *	GPU texture loading and tracking will get confused.
- * - You must call {{#crossLink "StageGL/updateViewport"}}{{/crossLink}} if you resize your canvas after
- *	initializing StageGL to properly size the 3D context stored in memory.
+ *	Caches can be rendered regardless of source.
+ * - Images are wrapped as a webGL "Texture". Each graphics card has a limit to its concurrent Textures, too many
+ * Textures will noticeably slow performance.
+ * - Each cache counts as an individual Texture. As such {{#crossLink "SpriteSheet"}}{{/crossLink}} and
+ * {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} are recommended practices to help keep texture counts low.
+ * - To use any image node (DOM Image/Canvas Element) between multiple StageGL instances it must be a
+ * {{#crossLink "Bitmap/clone"}}{{/crossLink}}, otherwise the GPU texture loading and tracking  will get confused.
+ * - You must call {{#crossLink "StageGL/updateViewport"}}{{/crossLink}} if you resize your canvas after making
+ * a StageGL instance, this will properly size the WebGL context stored in memory, this won't change the DOM element.
  * - Best performance will come from manual management of texture memory, but it is handled automatically by default.
- * 	See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for more information.
+ * See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for details.
  *
  * <h4>Example</h4>
  * This example creates a StageGL instance, adds a child to it, then uses the EaselJS {{#crossLink "Ticker"}}{{/crossLink}}
  * to update the child and redraw the stage.
  *
  *      var stage = new createjs.StageGL("canvasElementId", false, false);
- *      stage.updateViewport(800, 600); //LM: Is this necessary in this example? Could you use canvas.width instead?
  *
  *      var image = new createjs.Bitmap("imagePath.png");
  *      stage.addChild(image);
@@ -97,8 +99,7 @@ import Matrix2D from "../geom/Matrix2D";
  *
  * @class StageGL
  * @extends Stage
- * @module EaselJS
- */
+ **/
 export default class StageGL extends Stage {
 
 // constructor:
@@ -117,7 +118,7 @@ export default class StageGL extends Stage {
 	 * account for pre-multiplied alpha. This can help avoid visual halo effects with some assets, but may also cause
 	 * problems with other assets.
 	 * @param {Integer} [options.autoPurge=1200] How often the system should automatically dump unused textures with
-	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "purgeTextures"}}{{/crossLink}} for more
+	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}} for more
 	 * information.
 	 */
 	constructor (canvas, {preserveBuffer = false, antialias = false, transparent = false, premultiply = false, autoPurge = 1200}) {
@@ -352,13 +353,11 @@ export default class StageGL extends Stage {
 		this._baseTextures = [];
 
 		/**
-		 * The number of concurrent textures the GPU can handle. This value is dynamically set from WebGL during
-		 * initialization. The WebGL spec states that the lowest guaranteed value is 8, but it could be higher. Do not
-		 * set this value higher than the value returned by the GPU. Setting it lower will potentially reduce
-		 * performance.
-		 *
-		 * 		// Can also act as a length for _batchTextures
-		 *      gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)
+		 * The number of concurrent textures the GPU can handle. This value is dynamically set from WebGL during initialization
+		 * via `gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)`. The WebGL spec states that the lowest guaranteed value is 8,
+		 * but it could be higher. Do not set this value higher than the value returned by the GPU. Setting it lower will
+		 * probably reduce performance, but may be advisable to reserve slots for custom filter work.
+		 * NOTE: Can also act as a length for {{#crossLink "StageGL/_batchTextures:property"}}.
 		 * @property _batchTextureCount
 		 * @protected
 		 * @type {Number}
@@ -425,8 +424,8 @@ export default class StageGL extends Stage {
 		this._lastTrackedCanvas = 0;
 
 		/**
-		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} is the canvas or a render texture.
-		 * See the {{#crossLink "cache"}}{{/crossLink}} function modifications for full implications and discussion.
+		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} is the canvas or a render
+		 * texture. See the {{#crossLink "cache"}}{{/crossLink}} function modifications for full implications and discussion.
 		 * @property isCacheControlled
 		 * @protected
 		 * @type {Boolean}
@@ -444,18 +443,25 @@ export default class StageGL extends Stage {
 		 */
 		this._cacheContainer = new Container();
 
-		this._textureName = 0;
-
 		this._initializeWebGL();
 	}
 
 // static methods:
 	/**
-	 * Calculate the U/V co-ordinate-based info for sprite frames. Instead of pixel count it uses a 0-1 space. It also
-	 * includes the ability to get info back for a specific frame, or only calculate that one frame.
+	 * Calculate the U/V co-ordinate based info for sprite frames. Instead of pixel count it uses a 0-1 space. Also includes
+	 * the ability to get info back for a specific frame, or only calculate that one frame.
+	 *
+	 *     //generate UV rects for all entries
+	 *     StageGL.buildUVRects( spriteSheetA );
+	 *     //generate all, fetch the first
+	 *     var firstFrame = StageGL.buildUVRects( spriteSheetB, 0 );
+	 *     //generate the rect for just a single frame for performance's sake
+	 *     var newFrame = StageGL.buildUVRects( dynamicSpriteSheet, newFrameIndex, true );
+	 *
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method buildUVRects
-	 * @param  {SpriteSheet} spritesheet The sprite sheet to find {{#crossLink "StageGL/_frames:property"}}{{/crossLink}} on.
-	 * @param  {frame} [target=-1] The frame to return
+	 * @param  {SpriteSheet} spritesheet The spritesheet to find the frames on
+	 * @param  {int} [target=-1] The index of the frame to return
 	 * @param  {Boolean} [onlyTarget=false] Whether "target" is the only frame that gets calculated
 	 * @static
 	 * @return {Object} the target frame if supplied and present or a generic frame {t, l, b, r}
@@ -465,7 +471,7 @@ export default class StageGL extends Stage {
 
 		let start = (target != -1 && onlyTarget) ? target : 0;
 		let end = (target != -1 && onlyTarget) ? target+1 : spritesheet._frames.length;
-		for (let i=start;i<end;i++) {
+		for (let i=start; i<end; i++) {
 			let f = spritesheet._frames[i];
 			if (f.uvRect || f.image.width <= 0 || f.image.height <= 0) { continue; }
 
@@ -478,8 +484,8 @@ export default class StageGL extends Stage {
 			};
 		}
 
-		return spritesheet._frames[(target != -1) ? target : 0].uvRect || StageGL.UV_RECT;
-	}
+		return spritesheet._frames[(target != -1) ? target : 0].uvRect || {t:0, l:0, b:1, r:1};
+	};
 
 	/**
 	 * Test a context to see if it has WebGL enabled on it.
@@ -615,9 +621,9 @@ export default class StageGL extends Stage {
 	}
 
 	/**
-	 * Draws the stage into the supplied context if possible. Many WebGL properties only exist on their context.
-	 * As such you cannot share contexts among many StageGLs and each context requires a unique StageGL instance.
-	 * Contexts that don't match the context managed by this StageGL will be treated as a 2D context.
+	 * Draws the stage into the supplied context if possible. Many WebGL properties only exist on their context. As such
+	 * you cannot share contexts among many StageGLs and each context requires a unique StageGL instance. Contexts that
+	 * don't match the context managed by this StageGL will be treated as a 2D context.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
@@ -658,9 +664,9 @@ export default class StageGL extends Stage {
 
 	/**
 	 * Blocks, or frees a texture "slot" on the GPU. Can be useful if you are overflowing textures. When overflowing
-	 * textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large
-	 * textures. By blocking the slot you reduce available slots, potentially increasing draw calls, but mostly you
-	 * prevent a texture being re-uploaded if it would have moved slots due to overflow.
+	 * textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large textures.
+	 * By blocking the slot you reduce available slots, potentially increasing draw calls, but mostly you prevent a
+	 * texture being re-uploaded if it would have moved slots due to overflow.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * For example, block the slot a background image is stored in so there is less re-loading of that image.
@@ -672,12 +678,12 @@ export default class StageGL extends Stage {
 		if (id > this._maxTextureSlots || id < 0) {
 			throw "Slot outside of acceptable range";
 		}
-		this._slotBlacklist[id] = lock;
+		this._slotBlacklist[id] = !!lock;
 	}
 
 	/**
-	 * Render textures can't draw into themselves so any item being used for renderTextures needs two. This function
-	 * creates, gets, and toggles the render surface.
+	 * Render textures can't draw into themselves so any item being used for renderTextures needs two to alternate between.
+	 * This function creates, gets, and toggles the render surface between the two.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method getTargetRenderTexture
@@ -720,14 +726,18 @@ export default class StageGL extends Stage {
 	}
 
 	/**
-	 * For every image encountered it is registered and tracked automatically. When all items using an image are removed
-	 * from the stage it's recommended to remove it manually to prevent memory leaks. This function will remove all
-	 * textures found on the object and its children, cache, etc. Specifically it will also un-cache, cached objects
-	 * that it finds. This happens instantly, so aggressive use could result in performance problems. If you remove a
-	 * texture and add it again later(by rendering an object using it for example) the texture will get re-added and
-	 * need re-removing later.
+	 * For every image encountered StageGL registers and tracks it automatically. This tracking can cause memory leaks 
+	 * if not purged. StageGL, by default, automatically fixes this. This does take performance and may unfortunately 
+	 * feature false positives. This function is for manual management of this memory instead of the automatic system.
+	 *
+	 * This function will recursively remove all textures found on the object, its children, cache, etc. It will uncache 
+	 * objects and remove any texture it finds REGARDLESS of whether it is currently in use elsewhere. It is up to the user 
+	 * to ensure that a texture in use is not removed.
+	 *
+	 * Textures in use, or to be used again shortly, should not be removed. This is simply for performance reasons.
+	 * Removing a texture in use will cause the texture to have to be re-uploaded slowing rendering.
 	 * @method releaseTexture
-	 * @param  {DisplayObject | Texture | Image | Canvas} item An object that used the texture you are no longer using.
+	 * @param  {DisplayObject | Texture | Image | Canvas} item An object that used the texture to be discarded.
 	 */
 	releaseTexture (item) {
 		if (!item) { return; }
@@ -742,9 +752,6 @@ export default class StageGL extends Stage {
 		// this has a cache canvas
 		if (item.cacheCanvas) {
 			item.uncache();
-			if (this.vocalDebug) {
-				console.log("Automatic uncache call, potentially unexpected behaviour. Recommend manual uncache calling.");
-			}
 		}
 
 		let foundImage;
@@ -819,6 +826,7 @@ export default class StageGL extends Stage {
 		let gl = this._webGLContext;
 		let success = false;
 
+		if (count < 1) { count = 1; }
 		this._batchTextureCount = count;
 
 		while (!success) {
@@ -879,7 +887,7 @@ export default class StageGL extends Stage {
 	 * use and returned on subsequent calls.
 	 * @method getFilterShader
 	 * @param  {Filter|Object} filter The object which will provide the information needed to construct the filter shader.
-	 * @return {FilterShader}
+	 * @return {Shader}
 	 * @todo Review return type
 	 */
 	getFilterShader (filter) {
@@ -914,9 +922,8 @@ export default class StageGL extends Stage {
 	 * Returns a base texture that has no image or data loaded. Not intended for loading images. It may return `null`
 	 * in some error cases, and trying to use a "null" texture can cause renders to fail.
 	 * @method getBaseTexture
-	 * @param  {uint} [w=1] The width of the texture in pixels
-	 * @param  {uint} [h=1] The height of the texture in pixels
-	 * @todo Remove the console.log in this function. Please check for other instances.
+	 * @param  {uint} [w=1] The width of the texture in pixels, defaults to 1
+	 * @param  {uint} [h=1] The height of the texture in pixels, defaults to 1
 	 */
 	getBaseTexture (w = 1, h = 1) {
 		let width = Math.ceil(w > 0 ? w : 1);
@@ -927,20 +934,18 @@ export default class StageGL extends Stage {
 		this.resizeTexture(texture, width, height);
 		this.setTextureParams(gl, false);
 
-		texture.__trackName = this._textureName++;
-
 		return texture;
 	};
 
 	/**
-	 * Resizes a supplied texture element. It may return `null` in some error cases, such as when the texture is too
-	 * large, an out of texture memory error occurs, etc. Trying to use a "null" texture can cause renders to fail.
-	 * NOTE: The texture must have been made with "texImage2D", all default APIs in StageGL use this so this only
-	 * matters for changes.
-	 * @method getBaseTexture
+	 * Resizes a supplied texture element. It may return `null` in some error cases, such as when the texture is too large,
+	 * an out of texture memory error occurs, etc. Trying to use a "null" texture can cause renders to fail.
+	 * NOTE: The texture must have been made with "texImage2D", all default APIs in StageGL use this, so this note
+	 * only matters for changes and plugins.
+	 * @method resizeTexture
 	 * @param  {WebGLTexture} texture The GL Texture to be modified.
-	 * @param  {uint} [width=1] The width of the texture in pixels
-	 * @param  {uint} [height=1] The height of the texture in pixels
+	 * @param  {uint} [width=1] The width of the texture in pixels, defaults to 1
+	 * @param  {uint} [height=1] The height of the texture in pixels, defaults to 1
 	 */
 	resizeTexture (texture, width = 1, height = 1) {
 		let gl = this._webGLContext;
@@ -959,8 +964,9 @@ export default class StageGL extends Stage {
 	}
 
 	/**
-	 * Returns a base texture (see {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}) with an attached render buffer
-	 * in `texture._frameBuffer`.
+	 * Returns a base texture (see {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}) for details. Also includes an
+	 * attached and linked render buffer in `texture._frameBuffer`. RenderTextures  can be thought of as an internal
+	 * canvas that can be drawn to.
 	 * @method getRenderBufferTexture
 	 * @param  {Number} w The width of the texture in pixels.
 	 * @param  {Number} h The height of the texture in pixels.
@@ -975,7 +981,7 @@ export default class StageGL extends Stage {
 
 		// get the frame buffer
 		let frameBuffer = gl.createFramebuffer();
-		if (!renderTexture) { return null; }
+		if (!frameBuffer) { return null; }
 
 		// set its width and height for spoofing as an image
 		renderTexture.width = w;
@@ -1019,8 +1025,8 @@ export default class StageGL extends Stage {
 	 *
 	 * The clear color will also be used for filters and other "render textures". The stage background will ignore the
 	 * transparency value and display a solid color normally. For the stage to recognize and use transparency it must be
-	 * created with the transparent flag set to `true`. Using "transparent white" to demonstrate, the valid data formats
-	 * are as follows:
+	 * created with the transparent flag set to `true` (see {{#crossLink "StageGL/constructor"}}{{/crossLink}})). Using
+	 * "transparent white" to demonstrate, the valid data formats are as follows:
 	 * <ul>
 	 *     <li>"#FFF"</li>
 	 *     <li>"#FFFFFF"</li>
@@ -1029,7 +1035,7 @@ export default class StageGL extends Stage {
 	 *     <li>0xFFFFFF00</li>
 	 * </ul>
 	 * @method setClearColor
-	 * @param {String|uint} [color=0x00000000] The new colour to use as the background
+	 * @param {String|int} [color=0x00000000] The new color to use as the background
 	 */
 	setClearColor (color = 0x00000000) {
 		let r, g, b, a, output;
@@ -1066,15 +1072,22 @@ export default class StageGL extends Stage {
 		this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 	}
 
+	/**
+	 * docced in subclass
+	 */
+	toString () {
+		return "[StageGL (name="+  this.name +")]";
+	}
+
 // private methods:
 	/**
-	 * Sets up and returns the WebGL context for the canvas.
+	 * Sets up and returns the WebGL context for the canvas. May return undefined in error scenarios. These can include 
+	 * situations wher the canvas element already has a context.
 	 * @param  {Canvas} canvas The DOM canvas element to attach to
 	 * @param  {Object} options The options to be handed into the WebGL object, see WebGL spec
 	 * @method _fetchWebGLContext
 	 * @protected
-	 * @return {WebGLRenderingContext}
-	 * @todo Review return type and add description.
+	 * @return {WebGLRenderingContext} The WebGL context, may return undefined in error scenarios
 	 */
 	_fetchWebGLContext (canvas, options) {
 		let gl;
@@ -1087,7 +1100,6 @@ export default class StageGL extends Stage {
 
 		if (!gl) {
 			let msg = "Could not initialize WebGL";
-			// TODO-ES6: vocalDebug?
 			console.error?console.error(msg):console.log(msg);
 		} else {
 			gl.viewportWidth = canvas.width;
@@ -1105,12 +1117,13 @@ export default class StageGL extends Stage {
 	 * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param  {String} [shaderName="regular"] Working values: "regular", "override", and "filter". Which type of shader to build.
 	 * Filter and override both accept the custom params. Regular and override have all features. Filter is a special case reduced feature shader meant to be over-ridden.
-	 * @param  {String} [customVTX] Extra vertex shader information to replace a regular draw, see {{#crossLink "COVER_VERTEX_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
-	 * @param  {String} [customFRAG] Extra fragment shader information to replace a regular draw, see {{#crossLink "COVER_FRAGMENT_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
+	 * @param  {String} [customVTX] Extra vertex shader information to replace a regular draw, see 
+	 * {{#crossLink "StageGL/COVER_VERTEX_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
+	 * @param  {String} [customFRAG] Extra fragment shader information to replace a regular draw, see 
+	 * {{#crossLink "StageGL/COVER_FRAGMENT_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
 	 * @param  {Function} [shaderParamSetup] Function to run so custom shader parameters can get applied for the render.
 	 * @protected
-	 * @return {ShaderProgram}
-	 * @todo Review the return type
+	 * @return {ShaderProgram} The compiled and linked shader
 	 */
 	_fetchShaderProgram (gl, shaderName = "regular", customVTX, customFRAG, shaderParamSetup) {
 		gl.useProgram(null); // safety to avoid collisions
@@ -1122,7 +1135,7 @@ export default class StageGL extends Stage {
 				targetVtx = StageGL.COVER_VERTEX_HEADER + (customVTX || StageGL.COVER_VERTEX_BODY);
 				targetFrag = StageGL.COVER_FRAGMENT_HEADER + (customFRAG || StageGL.COVER_FRAGMENT_BODY);
 				break;
-			case "particle":
+			case "particle": //TODO
 				targetVtx = StageGL.REGULAR_VERTEX_HEADER + StageGL.PARTICLE_VERTEX_BODY;
 				targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + StageGL.PARTICLE_FRAGMENT_BODY;
 				break;
@@ -1173,7 +1186,7 @@ export default class StageGL extends Stage {
 				gl.uniform1f(shaderProgram.uprightUniform, 0);
 
 				// if there's some custom attributes be sure to hook them up
-				if(shaderParamSetup) {
+				if (shaderParamSetup) {
 					shaderParamSetup(gl, this, shaderProgram);
 				}
 				break;
@@ -1196,9 +1209,8 @@ export default class StageGL extends Stage {
 				gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
 
 				let samplers = [];
-				// create array of integers
 				for (let i = 0; i < this._batchTextureCount; i++) {
-						samplers[i] = i;
+					samplers[i] = i;
 				}
 
 				shaderProgram.samplerData = samplers;
@@ -1214,7 +1226,7 @@ export default class StageGL extends Stage {
 	}
 
 	/**
-	 * Creates a shader from the specified string. Replaces several template items marked with {{name}}.
+	 * Creates a shader from the specified string. Replaces several template items marked like `{{` `key` `}}``.
 	 * @method _createShader
 	 * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param  {Number} type The type of shader to create. gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
@@ -1228,10 +1240,11 @@ export default class StageGL extends Stage {
 
 		// resolve issue with no dynamic samplers by creating correct samplers in if else chain
 		let insert = "";
-		for(let i = 1; i<this._batchTextureCount; i++) {
+		for (let i = 1; i<this._batchTextureCount; i++) {
 			insert += `} else if (src == ${i}) { color = texture2D(uSampler[${i}], vTextureCoord);`;
 		}
-		str = str.replace(/{{alternates}}/g, insert).replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
+		str = str.replace(/{{alternates}}/g, insert);
+		str = str.replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
 
 		// actually compile the shader
 		let shader = gl.createShader(type);
@@ -1266,14 +1279,14 @@ export default class StageGL extends Stage {
 		// track the sizes on the buffer object
 
 		// INFO:
-		// a single buffer may be optimal in some situations and would be approached like this
+		// a single buffer may be optimal in some situations and would be approached like this,
 		// currently not implemented due to lack of need and potential complications with drawCover
 
 		// var vertexBuffer = this._vertexBuffer = gl.createBuffer();
 		// gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 		// groupSize = 2 + 2 + 1 + 1; //x/y, u/v, index, alpha
 		// var vertexData = this._vertexData = new Float32Array(groupCount * groupSize);
-		// for(i=0; i<vertexData.length; i+=groupSize) {
+		// for (i=0; i<vertexData.length; i+=groupSize) {
 		// 	vertexData[i+0] = vertexData[i+1] = 0;
 		// 	vertexData[i+2] = vertexData[i+3] = 0.5;
 		// 	vertexData[i+4] = 0;
@@ -1345,7 +1358,7 @@ export default class StageGL extends Stage {
 		for (let i=0; i<this._batchTextureCount;i++) {
 			let t = this.getBaseTexture();
 			this._baseTextures[i] = this._batchTextures[i] = t;
-			if(!t) {
+			if (!t) {
 				throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
 			}
 		}
@@ -1388,10 +1401,9 @@ export default class StageGL extends Stage {
 
 			// get the data into the texture or wait for it to load
 			image._storeID = storeID;
-			if (image.complete || image.naturalWidth || image._isCanvas) { // is it already loaded
+			if (image.complete || image.naturalWidth || image._isCanvas) {	// is it already loaded
 				this._updateTextureImageData(gl, image);
 			} else  {
-				//image.onload = this._updateTextureImageData.bind(this, gl, image);										//TODO: DHG: EventListener instead of callback
 				image.addEventListener("load", this._updateTextureImageData.bind(this, gl, image));
 			}
 		} else {
@@ -1410,8 +1422,9 @@ export default class StageGL extends Stage {
 	}
 
 	/**
-	 * Necessary to upload the actual image data to the GPU. Without this the texture will be blank.
-	 * @method _updateTextureImageData
+	 * Necessary to upload the actual image data to the GPU. Without this the texture will be blank. Called automatically
+	 * in most cases due to loading and caching APIs. Flagging an image source with `_invalid = true` will trigger this
+	 * next time the image is rendered.
 	 * @param {WebGLRenderingContext} gl
 	 * @param {Image | Canvas} image The image data to be uploaded
 	 * @protected
@@ -1431,7 +1444,7 @@ export default class StageGL extends Stage {
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		} catch(e) {
 			let errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
-			if(console.error) {
+			if (console.error) {
 				//TODO: LM: I recommend putting this into a log function internally, since you do it so often, and each is implemented differently.
 				console.error(e, errString);
 			} else {
@@ -1508,7 +1521,9 @@ export default class StageGL extends Stage {
 	}
 
 	/**
-	 * removed and cleaned the texture. Mostly for internal use, recommended to call {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead.
+	 * Remove and clean the texture, expects a texture and is inflexible. Mostly for internal use, recommended to call 
+	 * {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead as it will call this with the correct texture object(s).
+	 * Note: Testing shows this may not happen immediately, have to wait for WebGL to have actually adjust memory.
 	 * @method _killTextureObject
 	 * @param {Texture} tex The texture to be cleaned out
 	 * @protected
@@ -1523,7 +1538,7 @@ export default class StageGL extends Stage {
 			for (let n in this._textureIDs) {
 				if (this._textureIDs[n] == tex._storeID) { delete this._textureIDs[n]; }
 			}
-			tex._storeID = undefined;
+			tex._imageData._storeID = tex._storeID = undefined;
 		}
 
 		// make sure to drop it out of an active slot
@@ -1542,7 +1557,6 @@ export default class StageGL extends Stage {
 
 		// remove entry
 		try {
-			console.log("KILL", tex.__trackName);
 			gl.deleteTexture(tex);
 		} catch(e) {
 			/* suppress delete errors because it's already gone or didn't need deleting probably */
@@ -1582,8 +1596,8 @@ export default class StageGL extends Stage {
 	 * Begin the drawing process for a regular render.
 	 * @method _batchDraw
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"}}{{/crossLink}} object with all that needs to rendered, preferably a stage
-	 * @param {WebGLRenderingContext} ignoreCache
+	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"}}{{/crossLink}} object with all that needs to rendered, preferably a Stage.
+	 * @param {Boolean} ignoreCache
 	 * @protected
 	 * @todo Review the ignoreCache parameter. Is it a context or a boolean?
 	 */
@@ -1597,7 +1611,7 @@ export default class StageGL extends Stage {
 		this.batchCardCount = 0;
 		this.depth = 0;
 
-		this._appendToBatchGroup(sceneGraph, gl, new Matrix2D(), this.alpha, ignoreCache);											//TODO: DHG: isn't there a global alpha or something?
+		this._appendToBatchGroup(sceneGraph, gl, new Matrix2D(), this.alpha, ignoreCache);
 
 		this.batchReason = "drawFinish";
 		this._drawBuffers(gl);								// <--------------------------------------------------------
@@ -1605,23 +1619,23 @@ export default class StageGL extends Stage {
 	}
 
 	/**
-	 * Perform the drawing process to create cache textures, including applying filters
+	 * Perform the drawing process to fill a specific cache texture, including applying filters.
 	 * @method _cacheDraw
 	 * @param {DisplayObject} target The object we're drawing into the cache. For example, used for drawing the cache
 	 * (to prevent it from simply drawing an existing cache back into itself).
 	 * @param {Array} filters The filters we're drawing into cache.
 	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
-	 * @return {Boolean} If the draw was handled by this function
 	 * @protected
 	 */
 	_cacheDraw (target, filters, manager) {
 		/*
-		Implicitly there are 4 modes to this function: filteredSameContext, filteredUniqueContext, sameContext, uniqueContext.
-		Each situation must be handled slightly differently as uniqueContext or sameContext define how the output works,
+		Implicitly there are 4 modes to this function: filtered-sameContext, filtered-uniqueContext, sameContext, uniqueContext.
+		Each situation must be handled slightly differently as 'sameContext' or 'uniqueContext' define how the output works,
 		one drawing directly into the main context and the other drawing into a stored renderTexture respectively.
-		When the draw is a filtered draw the filters are applied sequentially in order to draw into saved textures repeatedly.
-		Once the final filter is up the final output is treated depending upon whether it is a same or unique context.
-		The internal complexity comes from sahring information, and issues like textures needing to be flipped sometimes when written to render textures.
+		When the draw is a 'filtered' draw, the filters are applied sequentially and will draw into saved textures repeatedly.
+		Once the final filter is done the final output is treated depending upon whether it is a same or unique context.
+		The internal complexity comes from reducing over-draw, shared code, and issues like textures needing to be flipped
+		sometimes when written to render textures.
 		*/
 		let gl = this._webGLContext;
 		let renderTexture;
@@ -1683,10 +1697,11 @@ export default class StageGL extends Stage {
 	};
 
 	/**
+	 * Sub portion of _cacheDraw, split off for readability. Do not call independently.
 	 * @method _drawFilters
-	 * @param target
-	 * @param filters
-	 * @param manager
+	 * @param {DisplayObject} target The object we're drawing with a filter.
+	 * @param {Array} filters The filters we're drawing into cache.
+	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
 	 * @protected
 	 * @todo Please doc this method
 	 */
@@ -1718,12 +1733,12 @@ export default class StageGL extends Stage {
 		let flipY = false;
 
 		// apply each filter in order, but remember to toggle used texture and render buffer
-		for(let i=0; i<filterCount; i++) {
+		for (let i=0; i<filterCount; i++) {
 			let filter = filters[i];
 
 			// swap to correct shader
 			this._activeShader = this.getFilterShader(filter);
-			if(!this._activeShader) { continue; }
+			if (!this._activeShader) { continue; }
 
 			// now the old result is stored in slot 0, make a new render texture
 			gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
@@ -1777,7 +1792,7 @@ export default class StageGL extends Stage {
 
 	/**
 	 * Add all the contents of a container to the pending buffers, called recursively on each container. This may
-	 * trigger a draw if a buffer runs out of space.
+	 * trigger a draw if a buffer runs out of space. This is the main workforce of the render loop.
 	 * @method _appendToBatchGroup
 	 * @param {Container} container The {{#crossLink "Container"}}{{/crossLink}} that contains everything to be drawn.
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
@@ -1865,6 +1880,11 @@ export default class StageGL extends Stage {
 			} else {
 				// fetch the texture (render textures know how to look themselves up to simplify this logic)
 				texture = this._textureDictionary[image._storeID];
+				if (!texture){
+					if (this.vocalDebug){ console.log("Texture should not be looked up while not being stored."); }
+					continue;
+				}
+
 				// put it in the batch if needed
 				if (texture._batchID !== this._batchID) {
 					this._insertTextureInBatch(gl, texture);
@@ -1952,7 +1972,7 @@ export default class StageGL extends Stage {
 	 * @protected
 	 */
 	_drawBuffers (gl) {
-		if (this.batchCardCount <= 0) { return; }	// prevents error spam on stages filled with unrenederable content.
+		if (this.batchCardCount <= 0) { return; }	// prevents error logs on stages filled with un-renederable content.
 
 		if (this.vocalDebug) {
 			console.log(`Draw[${this._drawID}:${this._batchID}] : ${this.batchReason}`);
@@ -1995,11 +2015,11 @@ export default class StageGL extends Stage {
 	};
 
 	/**
-	 * Draws a card that covers the entire render surface.
+	 * Draws a card that covers the entire render surface. Mainly used for filters.
 	 * @method _drawBuffers
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param {Boolean} flipY Covers are used for things like RenderTextures and because of 3D vs Canvas space this can
-	 * end up meaning `y` sometimes, and requires flipping in the render
+	 * end up meaning the `y` space sometimes requires flipping in the render.
 	 * @protected
 	 */
 	_drawCover (gl, flipY) {
