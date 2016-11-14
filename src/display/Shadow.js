@@ -89,7 +89,7 @@ export default class Shadow {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[Shadow]";
+		return `[${this.constructor.name}]`;
 	}
 
 	/**

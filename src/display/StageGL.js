@@ -1245,8 +1245,8 @@ export default class StageGL extends Stage {
 
 		// actually compile the shader
 		let shader = gl.createShader(type);
-		gl.shaderSource(shader, str);
-		gl.compileShader(shader);
+		gl.shaderSource(shader, str)
+			.compileShader(shader);
 
 		// check compile status
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {

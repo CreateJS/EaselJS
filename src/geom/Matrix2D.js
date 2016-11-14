@@ -494,7 +494,7 @@ export default class Matrix2D {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return `[Matrix2D (a=${this.a} b=${this.b} c=${this.c} d=${this.d} tx=${this.tx} ty=${this.ty})]`;
+		return `[${this.constructor.name} (a=${this.a} b=${this.b} c=${this.c} d=${this.d} tx=${this.tx} ty=${this.ty})]`;
 	}
 
 }

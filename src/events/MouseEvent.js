@@ -171,7 +171,7 @@ export default class MouseEvent extends Event {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return `[MouseEvent (type=${this.type} stageX=${this.stageX} stageY=${this.stageY})]`;
+		return `[${this.constructor.name} (type=${this.type} stageX=${this.stageX} stageY=${this.stageY})]`;
 	}
 
 }

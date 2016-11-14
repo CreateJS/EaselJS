@@ -274,7 +274,7 @@ export default class Text extends DisplayObject {
  	 * @return {String} a string representation of the instance.
  	 */
  	toString () {
- 		return `[Text (text=${this.text.length > 20 ? `${this.text.substr(0, 17)}...` : this.text})]`;
+ 		return `[${this.constructor.name} (text=${this.text.length > 20 ? `${this.text.substr(0, 17)}...` : this.text})]`;
  	}
 
 // private methods:

@@ -216,7 +216,7 @@ export default class Rectangle {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return `[Rectangle (x=${this.x} y=${this.y} width=${this.width} height=${this.height})]`;
+		return `[${this.constructor.name} (x=${this.x} y=${this.y} width=${this.width} height=${this.height})]`;
 	}
 
 }

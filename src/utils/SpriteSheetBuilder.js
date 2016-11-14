@@ -346,7 +346,7 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[SpriteSheetBuilder]";
+		return `[${this.constructor.name}]`;
 	}
 
 

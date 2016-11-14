@@ -180,7 +180,7 @@ export default class ButtonHelper {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[ButtonHelper]";
+		return `[${this.constructor.name}]`;
 	}
 
 

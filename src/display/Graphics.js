@@ -1452,7 +1452,7 @@ export default class Graphics {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[Graphics]";
+		return `[${this.constructor.name}]`;
 	}
 
 // private methods:

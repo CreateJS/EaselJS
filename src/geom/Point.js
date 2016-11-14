@@ -109,7 +109,7 @@ export default class Point {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return `[Point (x=${this.x} y=${this.y})]`;
+		return `[${this.constructor.name} (x=${this.x} y=${this.y})]`;
 	}
 
 }

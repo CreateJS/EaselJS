@@ -313,7 +313,7 @@ export default class ColorMatrix {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[ColorMatrix]";
+		return `[${this.constructor.name}]`;
 	}
 
 

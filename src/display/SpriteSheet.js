@@ -399,7 +399,7 @@ export default class SpriteSheet extends EventDispatcher {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[SpriteSheet]";
+		return `[${this.constructor.name}]`;
 	}
 
 	/**
