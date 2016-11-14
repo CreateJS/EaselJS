@@ -486,9 +486,9 @@ export default class StageGL extends Stage {
 		}
 		// make a copy of the default rect to avoid users modifying the returned object
 		// only create it if needed to avoid slowing down the normal path
-		let defaultRect = StageGL.UV_RECT;
+		let r = StageGL.UV_RECT;
 		return spritesheet._frames[(target != -1) ? target : 0].uvRect
-			|| { t: defaultRect.t, l: defaultRect.l, b: defaultRect.b, r: defaultRect.r };
+			|| { t: r.t, l: r.l, b: r.b, r: r.r };
 	}
 
 	/**
@@ -1240,7 +1240,8 @@ export default class StageGL extends Stage {
 		for (let i = 1; i<this._batchTextureCount; i++) {
 			insert += `} else if (src == ${i}) { color = texture2D(uSampler[${i}], vTextureCoord);`;
 		}
-		str = str.replace(/{{alternates}}/g, insert).replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
+		str = str.replace(/{{alternates}}/g, insert)
+						 .replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
 
 		// actually compile the shader
 		let shader = gl.createShader(type);
