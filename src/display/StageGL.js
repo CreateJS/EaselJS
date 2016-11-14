@@ -99,7 +99,8 @@ import Matrix2D from "../geom/Matrix2D";
  *
  * @class StageGL
  * @extends Stage
- **/
+ * @module EaselJS
+ */
 export default class StageGL extends Stage {
 
 // constructor:
@@ -484,8 +485,8 @@ export default class StageGL extends Stage {
 			};
 		}
 
-		return spritesheet._frames[(target != -1) ? target : 0].uvRect || {t:0, l:0, b:1, r:1};
-	};
+		return spritesheet._frames[(target != -1) ? target : 0].uvRect || StageGL.UV_RECT;
+	}
 
 	/**
 	 * Test a context to see if it has WebGL enabled on it.
@@ -726,12 +727,12 @@ export default class StageGL extends Stage {
 	}
 
 	/**
-	 * For every image encountered StageGL registers and tracks it automatically. This tracking can cause memory leaks 
-	 * if not purged. StageGL, by default, automatically fixes this. This does take performance and may unfortunately 
+	 * For every image encountered StageGL registers and tracks it automatically. This tracking can cause memory leaks
+	 * if not purged. StageGL, by default, automatically fixes this. This does take performance and may unfortunately
 	 * feature false positives. This function is for manual management of this memory instead of the automatic system.
 	 *
-	 * This function will recursively remove all textures found on the object, its children, cache, etc. It will uncache 
-	 * objects and remove any texture it finds REGARDLESS of whether it is currently in use elsewhere. It is up to the user 
+	 * This function will recursively remove all textures found on the object, its children, cache, etc. It will uncache
+	 * objects and remove any texture it finds REGARDLESS of whether it is currently in use elsewhere. It is up to the user
 	 * to ensure that a texture in use is not removed.
 	 *
 	 * Textures in use, or to be used again shortly, should not be removed. This is simply for performance reasons.
@@ -787,7 +788,7 @@ export default class StageGL extends Stage {
 		// remove it
 		this._killTextureObject(this._textureDictionary[foundImage._storeID]);
 		foundImage._storeID = undefined;
-	};
+	}
 
 	/**
 	 * Similar to {{#crossLink "releaseTexture"}}{{/crossLink}}, but this function differs by searching for textures to
@@ -916,7 +917,7 @@ export default class StageGL extends Stage {
 			}
 		}
 		return targetShader;
-	};
+	}
 
 	/**
 	 * Returns a base texture that has no image or data loaded. Not intended for loading images. It may return `null`
@@ -935,7 +936,7 @@ export default class StageGL extends Stage {
 		this.setTextureParams(gl, false);
 
 		return texture;
-	};
+	}
 
 	/**
 	 * Resizes a supplied texture element. It may return `null` in some error cases, such as when the texture is too large,
@@ -1072,16 +1073,9 @@ export default class StageGL extends Stage {
 		this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 	}
 
-	/**
-	 * docced in subclass
-	 */
-	toString () {
-		return "[StageGL (name="+  this.name +")]";
-	}
-
 // private methods:
 	/**
-	 * Sets up and returns the WebGL context for the canvas. May return undefined in error scenarios. These can include 
+	 * Sets up and returns the WebGL context for the canvas. May return undefined in error scenarios. These can include
 	 * situations wher the canvas element already has a context.
 	 * @param  {Canvas} canvas The DOM canvas element to attach to
 	 * @param  {Object} options The options to be handed into the WebGL object, see WebGL spec
@@ -1117,9 +1111,9 @@ export default class StageGL extends Stage {
 	 * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param  {String} [shaderName="regular"] Working values: "regular", "override", and "filter". Which type of shader to build.
 	 * Filter and override both accept the custom params. Regular and override have all features. Filter is a special case reduced feature shader meant to be over-ridden.
-	 * @param  {String} [customVTX] Extra vertex shader information to replace a regular draw, see 
+	 * @param  {String} [customVTX] Extra vertex shader information to replace a regular draw, see
 	 * {{#crossLink "StageGL/COVER_VERTEX_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
-	 * @param  {String} [customFRAG] Extra fragment shader information to replace a regular draw, see 
+	 * @param  {String} [customFRAG] Extra fragment shader information to replace a regular draw, see
 	 * {{#crossLink "StageGL/COVER_FRAGMENT_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
 	 * @param  {Function} [shaderParamSetup] Function to run so custom shader parameters can get applied for the render.
 	 * @protected
@@ -1243,8 +1237,7 @@ export default class StageGL extends Stage {
 		for (let i = 1; i<this._batchTextureCount; i++) {
 			insert += `} else if (src == ${i}) { color = texture2D(uSampler[${i}], vTextureCoord);`;
 		}
-		str = str.replace(/{{alternates}}/g, insert);
-		str = str.replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
+		str = str.replace(/{{alternates}}/g, insert).replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
 
 		// actually compile the shader
 		let shader = gl.createShader(type);
@@ -1422,6 +1415,7 @@ export default class StageGL extends Stage {
 	}
 
 	/**
+	 * @method _updateTextureImageData
 	 * Necessary to upload the actual image data to the GPU. Without this the texture will be blank. Called automatically
 	 * in most cases due to loading and caching APIs. Flagging an image source with `_invalid = true` will trigger this
 	 * next time the image is rendered.
@@ -1465,7 +1459,7 @@ export default class StageGL extends Stage {
 				console && console.error("Oversized Texture: "+ image.width+"x"+image.height +" vs "+ gl.MAX_TEXTURE_SIZE +"max");
 			}
 		}
-	};
+	}
 
 	/**
 	 * Adds the texture to a spot in the current batch, forcing a draw if no spots are free.
@@ -1521,7 +1515,7 @@ export default class StageGL extends Stage {
 	}
 
 	/**
-	 * Remove and clean the texture, expects a texture and is inflexible. Mostly for internal use, recommended to call 
+	 * Remove and clean the texture, expects a texture and is inflexible. Mostly for internal use, recommended to call
 	 * {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead as it will call this with the correct texture object(s).
 	 * Note: Testing shows this may not happen immediately, have to wait for WebGL to have actually adjust memory.
 	 * @method _killTextureObject
@@ -1590,7 +1584,7 @@ export default class StageGL extends Stage {
 		}
 
 		if (restore && target === this._backupTextures) { this._backupTextures = []; }
-	};
+	}
 
 	/**
 	 * Begin the drawing process for a regular render.
@@ -1694,7 +1688,7 @@ export default class StageGL extends Stage {
 		this.protectTextureSlot(lastTextureSlot, false);
 		this._activeShader = shaderBackup;
 		this._slotBlacklist = blackListBackup;
-	};
+	}
 
 	/**
 	 * Sub portion of _cacheDraw, split off for readability. Do not call independently.
@@ -1788,7 +1782,7 @@ export default class StageGL extends Stage {
 			// make sure the last texture is the active thing to draw
 			target.cacheCanvas = renderTexture;
 		}
-	};
+	}
 
 	/**
 	 * Add all the contents of a container to the pending buffers, called recursively on each container. This may
@@ -1963,7 +1957,7 @@ export default class StageGL extends Stage {
 
 			this.batchCardCount++;
 		}
-	};
+	}
 
 	/**
 	 * Draws all the currently defined cards in the buffer to the render surface.
@@ -2012,7 +2006,7 @@ export default class StageGL extends Stage {
 
 		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*StageGL.INDICIES_PER_CARD);
 		this._batchID++;
-	};
+	}
 
 	/**
 	 * Draws a card that covers the entire render surface. Mainly used for filters.
@@ -2048,7 +2042,7 @@ export default class StageGL extends Stage {
 		gl.uniform1f(shaderProgram.uprightUniform, flipY?0:1);
 
 		gl.drawArrays(gl.TRIANGLES, 0, StageGL.INDICIES_PER_CARD);
-	};
+	}
 
 }
 
