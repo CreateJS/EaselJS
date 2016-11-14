@@ -484,8 +484,11 @@ export default class StageGL extends Stage {
 				r: (r.x + r.width) / f.image.width
 			};
 		}
-
-		return spritesheet._frames[(target != -1) ? target : 0].uvRect || StageGL.UV_RECT;
+		// make a copy of the default rect to avoid users modifying the returned object
+		// only create it if needed to avoid slowing down the normal path
+		let defaultRect = StageGL.UV_RECT;
+		return spritesheet._frames[(target != -1) ? target : 0].uvRect
+			|| { t: defaultRect.t, l: defaultRect.l, b: defaultRect.b, r: defaultRect.r };
 	}
 
 	/**
