@@ -1745,7 +1745,7 @@ this.createjs = this.createjs||{};
 			texture._storeID = storeID;
 			texture._imageData = image;
 			this._insertTextureInBatch(gl, texture);
-	
+
 			// get the data into the texture or wait for it to load
 			image._storeID = storeID;
 			if(image.complete || image.naturalWidth || image._isCanvas) {		// is it already loaded
@@ -1790,12 +1790,14 @@ this.createjs = this.createjs||{};
 		try{
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		} catch(e) {
-			var errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
+			var errString = "WebGL: An error has occurred. This is most likely due to security restrictions on WebGL images with cross-domain origins. WebGL images cannot be displayed locally, try running on a server.";
 			if(console.error) {
 				//TODO: LM: I recommend putting this into a log function internally, since you do it so often, and each is implemented differently.
-				console.error(e, errString);
-			} else {
-				console && console.log(e, errString);
+				console.error(errString);
+				console.error(e);
+			} else if (console) {
+				console.log(errString);
+				console.log(e);
 			}
 		}
 
