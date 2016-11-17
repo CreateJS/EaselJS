@@ -1,5 +1,4 @@
 _assets/
-build/
 docs/
 examples/
 extras/
@@ -8,6 +7,7 @@ tutorials/
 
 bower.json
 yuidoc.json
+CONTRIBUTING.md
 icon.png
 VERSIONS.txt
 README_SECURITY_ERROR.txt
