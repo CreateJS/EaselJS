@@ -2,7 +2,7 @@
  * @license WebGLInspector
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
- * Copyright (c) 2010 gskinner.com, inc.
+ * Copyright (c) 2017 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
