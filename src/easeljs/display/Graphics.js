@@ -597,7 +597,7 @@ this.createjs = this.createjs||{};
 	};
 
 
-// public methods that roughly map to Flash graphics APIs:
+// public methods that roughly map to Adobe Flash/Animate graphics APIs:
 	/**
 	 * Clears all drawing instructions, effectively resetting this Graphics instance. Any line and fill styles will need
 	 * to be redefined to draw shapes following a clear call. A tiny API method "c" also exists.
@@ -850,7 +850,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Maps the familiar ActionScript <code>curveTo()</code> method to the functionally similar {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}}
 	 * method.
-	 * @method quadraticCurveTo
+	 * @method curveTo
 	 * @param {Number} cpx
 	 * @param {Number} cpy
 	 * @param {Number} x

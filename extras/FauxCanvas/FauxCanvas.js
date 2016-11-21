@@ -52,7 +52,9 @@
 		// gecko / mozilla:
 		"mozCurrentTransform","mozCurrentTransformInverse","mozDash","mozDashOffset","mozFillRule","mozImageSmoothingEnabled","mozTextStyle",
 		// webkit:
-		"webkitLineDash", "webkitLineDashOffset"
+		"webkitLineDash", "webkitLineDashOffset",
+		// canvas:
+		"style"
 		];
 	FauxCanvas.METHODS = [
 		// all browsers:
@@ -62,7 +64,12 @@
 		// webkit:
 		"clearShadow","drawImageFromRect","setAlpha","setCompositeOperation","setLineWidth","setLineCap","setLineJoin","setMiterLimit","setStrokeColor","setFillColor","setShadow",
 		// canvas:
-		"addEventListener","removeEventListener"
+		"addEventListener","removeEventListener",
+		// webgl:
+		"enable","blendFuncSeparate","pixelStorei","clearColor","viewport","attachShader","linkProgram","getProgramParameter","getProgramInfoLog","getAttribLocation","getUniformLocation","enableVertexAttribArray","useProgram","createShader","shaderSource","compileShader","getShaderParameter","createBuffer","bindBuffer","vertexAttribPointer","bufferData","bindTexture","texImage2D","texParameteri","activeTexture","uniform1i","uniformMatrix3fv","bufferSubData","drawElements","bindFrameBuffer","createFrameBuffer","uniform1iv","getShaderInfoLog","uniformMatrix4fv","uniformMatrix1i","createProgram","drawArrays","createTexture"
+		];
+	FauxCanvas.WEBGL_PROPERTIES = [
+		"ACTIVE_TEXTURE","ALIASED_LINE_WIDTH_RANGE","ALIASED_POINT_SIZE_RANGE","ALPHA_BITS","ARRAY_BUFFER_BINDING","BLEND","BLEND_COLOR","BLEND_DST_ALPHA","BLEND_DST_RGB","BLEND_EQUATION_ALPHA","BLEND_EQUATION_RGB","BLEND_SRC_ALPHA","BLEND_SRC_RGB","BLUE_BITS","COLOR_CLEAR_VALUE","COLOR_WRITEMASK","COMPRESSED_TEXTURE_FORMATS","CULL_FACE","CULL_FACE_MODE","CURRENT_PROGRAM","DEPTH_BITS","DEPTH_CLEAR_VALUE","DEPTH_FUNC","DEPTH_RANGE","DEPTH_TEST","DEPTH_WRITEMASK","DITHER","ELEMENT_ARRAY_BUFFER_BINDING","FRAMEBUFFER_BINDING","FRONT_FACE","GENERATE_MIPMAP_HINT","GREEN_BITS","LINE_WIDTH","MAX_TEXTURE_MAX_ANISOTROPY_EXT","MAX_COMBINED_TEXTURE_IMAGE_UNITS","MAX_CUBE_MAP_TEXTURE_SIZE","MAX_FRAGMENT_UNIFORM_VECTORS","MAX_RENDERBUFFER_SIZE","MAX_TEXTURE_IMAGE_UNITS","MAX_TEXTURE_SIZE","MAX_VARYING_VECTORS","MAX_VERTEX_ATTRIBS","MAX_VERTEX_TEXTURE_IMAGE_UNITS","MAX_VERTEX_UNIFORM_VECTORS","MAX_VIEWPORT_DIMS","PACK_ALIGNMENT","POLYGON_OFFSET_FACTOR","POLYGON_OFFSET_FILL","POLYGON_OFFSET_UNITS","RED_BITS","RENDERBUFFER_BINDING","RENDERER","SAMPLE_BUFFERS","SAMPLE_COVERAGE_INVERT","SAMPLE_COVERAGE_VALUE","SAMPLES","SCISSOR_BOX","SCISSOR_TEST","SHADING_LANGUAGE_VERSION","STENCIL_BACK_FAIL","STENCIL_BACK_FUNC","STENCIL_BACK_PASS_DEPTH_FAIL","STENCIL_BACK_PASS_DEPTH_PASS","STENCIL_BACK_REF","STENCIL_BACK_VALUE_MASK","STENCIL_BACK_WRITEMASK","STENCIL_BITS","STENCIL_CLEAR_VALUE","STENCIL_FAIL","STENCIL_FUNC","STENCIL_PASS_DEPTH_FAIL","STENCIL_PASS_DEPTH_PASS","STENCIL_REF","STENCIL_TEST","STENCIL_VALUE_MASK","STENCIL_WRITEMASK","SUBPIXEL_BITS","TEXTURE_BINDING_2D","TEXTURE_BINDING_CUBE_MAP","UNPACK_ALIGNMENT","UNPACK_COLORSPACE_CONVERSION_WEBGL","UNPACK_FLIP_Y_WEBGL","UNPACK_PREMULTIPLY_ALPHA_WEBGL","VENDOR","VERSION","VIEWPORT"
 		];
 
 // initialization:
@@ -74,12 +81,12 @@
 	p.initialize = function (width, height, replaceInternal) {
 		var methods = FauxCanvas.METHODS;
 		for (var i= 0, l=methods.length; i<l; i++) {
-			this[methods[i]] = function() {};
+			this[methods[i]] = function() { return {}; };
 		}
 		
 		var props = FauxCanvas.PROPERTIES;
 		for (i= 0, l=props.length; i<l; i++) {
-			this[props[i]] = null;
+			this[props[i]] = {};
 		}
 		
 		this.width = width||300;
@@ -101,13 +108,34 @@
 	
 	/**
 	 * Enables or disables logging by overriding (or restoring) the getContext method on the target canvas to return
-	 * the FauxCanvas instance as a proxy for the "2d" context.
-	 * @method setEnabled
-	 * @param {Boolean} val True or false.
+	 * the FauxCanvas instance as a proxy for the "2d", "webgl", or "experimental-webgl" contexts.
+	 * @method getContext
+	 * @param {String} type
+	 * @param {Object} options
 	 **/
-	p.getContext = function(type) {
+	p.getContext = function(type, options) {
 		if (type == "2d") { return this; }
+
+		if (type === "webgl" || type === "experimental-webgl"){
+			var canvas = document.createElement("canvas");
+			this._glCtx = canvas.getContext(type, options);
+
+			var props = FauxCanvas.WEBGL_PROPERTIES;
+			for (var i=0, l=props.length; i<l; i++) {
+				this[props[i]] = this._glCtx[props[i]];
+			}
+			return this;
+		}
+
 		throw("Context not supported: "+type);
+	};
+
+	/**
+	 * Mimics the return values of WebGl's context.
+	 * @param {Number} type The parameter to look up.
+	 */
+	p.getParameter = function(type) {
+		return this._glCtx.getParameter(type);
 	};
 
 // private methods:

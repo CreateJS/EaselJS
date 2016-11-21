@@ -1,5 +1,18 @@
 Version NEXT [Not Released]
 ****************************************************************************************************
+- Add Ticker._pausedTime in Ticker.reset() (thanks @abouthiroppy)
+- Updated and new tests
+- Updated README
+- Updated documentation and examples
+	* Fixed broken links
+	* Change the YUI docs so that when they're displaying source files they can use the whole width
+	  of the document (thanks @MannyC)
+	* Changed Flash references to Adobe Animate
+	* Fixed inheritance example to show proper parameter usage
+- Added a few missing APIs on FauxCanvas helper
+
+Please see the StageGL-beta branch for a new, more flexible and performant WebGL implementation, which
+will be merged into master in the near future.
 
 
 Version 0.8.2 [November 26, 2015]

@@ -143,8 +143,8 @@ this.createjs = this.createjs||{};
 	 * @method pad
 	 * @param {Number} top
 	 * @param {Number} left
-	 * @param {Number} right
 	 * @param {Number} bottom
+	 * @param {Number} right
 	 * @return {Rectangle} This instance. Useful for chaining method calls.
 	 * @chainable
 	*/

@@ -40,9 +40,8 @@ this.createjs = this.createjs||{};
 // constructor:
 	/**
 	 * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
-	 * you to create objects which encapsulate timeline animations, state changes, and synched actions. Due to the
-	 * complexities inherent in correctly setting up a MovieClip, it is largely intended for tool output and is not included
-	 * in the main EaselJS library.
+	 * you to create objects which encapsulate timeline animations, state changes, and synched actions. The MovieClip
+	 * class has been included in the EaselJS minified file since 0.7.0.
 	 *
 	 * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
 	 * been made to support time-based timelines in the future.
@@ -193,7 +192,7 @@ this.createjs = this.createjs||{};
 		 * @type Array
 		 * @default null
 		 */
-		this.frameBounds = this.frameBounds||null; // TODO: Deprecated. This is for backwards support of FlashCC
+		this.frameBounds = this.frameBounds||null; // TODO: Deprecated. This is for backwards support of Flash/Animate
 		
 		/**
 		 * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
@@ -354,7 +353,7 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * Returns the duration of this MovieClip in seconds or ticks. Identical to {{#crossLink "MovieClip/duration:property"}}{{/crossLink}}
-	 * and provided for Flash API compatibility.
+	 * and provided for Adobe Flash/Animate API compatibility.
 	 * @property totalFrames
 	 * @type {Number}
 	 * @readonly
@@ -383,7 +382,7 @@ this.createjs = this.createjs||{};
 	 * @method initialize
 	 * @deprecated in favour of `createjs.promote()`
 	 **/
-	p.initialize = MovieClip; // TODO: Deprecated. This is for backwards support of FlashCC
+	p.initialize = MovieClip; // TODO: Deprecated. This is for backwards support of Adobe Flash/Animate
 
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
@@ -613,7 +612,7 @@ this.createjs = this.createjs||{};
 
 		if (child instanceof MovieClip) {
 			child._synchOffset = offset;
-			// TODO: this does not precisely match Flash. Flash loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
+			// TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
 			if (child.mode == MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
 		}
 		this._managed[child.id] = 2;
