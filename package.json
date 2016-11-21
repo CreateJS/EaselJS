@@ -31,9 +31,10 @@
     "url": "https://github.com:CreateJS/EaselJS"
   },
   "scripts": {
+    "travis": "cd node_modules/createjs && npm run travis",
+    "lint": "cd node_modules/createjs && npm run lint",
     "test": "cd node_modules/createjs && npm run test",
     "test:headless": "cd node_modules/createjs && npm run test:headless",
-    "test:travis": "cd node_modules/createjs && npm run test:travis",
     "dev": "cd node_modules/createjs && npm run dev",
     "build": "cd node_modules/createjs && npm run build",
     "build:next": "cd node_modules/createjs && npm run build:next",
