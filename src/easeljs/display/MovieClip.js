@@ -85,8 +85,8 @@ this.createjs = this.createjs||{};
 	 * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
 	 * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
 	 * property.
-	 * @param {Boolean} [loop=true] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
-	 * property. The default is `true`.
+	 * @param {Boolean} [loop=0] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
+	 * property. The default is `0`.
 	 * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
 	 * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
 	 **/
@@ -111,7 +111,7 @@ this.createjs = this.createjs||{};
 		 * @type Number
 		 * @default 0
 		 */
-		this.startPosition = startPosition || 0;
+		this.startPosition = startPosition||0;
 	
 		/**
 		 * Indicates whether this MovieClip should loop when it reaches the end of its timeline.
@@ -119,7 +119,7 @@ this.createjs = this.createjs||{};
 		 * @type Boolean
 		 * @default true
 		 */
-		this.loop = loop;
+		this.loop = loop === true ? -1 : (loop || 0);
 	
 		/**
 		 * The current frame of the movieclip.
@@ -154,7 +154,7 @@ this.createjs = this.createjs||{};
 		 * @type Timeline
 		 * @default null
 		 */
-		this.timeline = new createjs.Timeline(null, labels, {paused:true, position:startPosition, useTicks:true});
+		this.timeline = new createjs.Timeline({paused:true, useTicks:true, labels:labels});
 	
 		/**
 		 * If true, the MovieClip's position will not advance when ticked.
@@ -222,20 +222,13 @@ this.createjs = this.createjs||{};
 		this._synchOffset = 0;
 	
 		/**
-		 * @property _prevPos
+		 * @property _rawPosition
 		 * @type Number
 		 * @default -1
 		 * @private
 		 */
-		this._prevPos = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
+		this._rawPosition = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
 	
-		/**
-		 * @property _prevPosition
-		 * @type Number
-		 * @default 0
-		 * @private
-		 */
-		this._prevPosition = 0;
 	
 		/**
 		 * The time remaining from the previous tick, only applicable when .framerate is set.
@@ -321,7 +314,6 @@ this.createjs = this.createjs||{};
 	 * @deprecated
 	 **/
 	p.getCurrentLabel = function() {
-		this._updateTimeline();
 		return this.timeline.getCurrentLabel();
 	};
 	
@@ -371,6 +363,7 @@ this.createjs = this.createjs||{};
 			currentLabel: { get: p.getCurrentLabel },
 			totalFrames: { get: p.getDuration },
 			duration: { get: p.getDuration }
+			// TODO: can we just proxy .currentFrame to tl.position as well? Ditto for .loop (or just remove entirely).
 		});
 	} catch (e) {}
 
@@ -409,7 +402,6 @@ this.createjs = this.createjs||{};
 	p.draw = function(ctx, ignoreCache) {
 		// draw to cache first:
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		this._updateTimeline();
 		this.Container_draw(ctx, ignoreCache);
 		return true;
 	};
@@ -458,22 +450,22 @@ this.createjs = this.createjs||{};
 	p.advance = function(time) {
 		// TODO: should we worry at all about clips who change their own modes via frame scripts?
 		var independent = MovieClip.INDEPENDENT;
-		if (this.mode != independent) { return; }
+		if (this.mode !== independent) { return; }
 		
+		// if this MC doesn't have a framerate, hunt ancestors for one:
 		var o=this, fps = o.framerate;
-		while ((o = o.parent) && fps == null) {
-			if (o.mode == independent) { fps = o._framerate; }
-		}
+		while ((o = o.parent) && fps == null) { if (o.mode === independent) { fps = o._framerate; } }
 		this._framerate = fps;
 		
-		var t = (fps != null && fps != -1 && time != null) ? time/(1000/fps) + this._t : 1;
-		var frames = t|0;
-		this._t = t-frames; // leftover time
+		if (this.paused) { return; }
 		
-		while (!this.paused && frames--) {
-			this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
-			this._updateTimeline();
-		}
+		// TODO: strict equality here?
+		// calculate how many frames to advance:
+		var t = (fps !== null && fps !== -1 && time !== null) ? time/(1000/fps) + this._t : 1;
+		var frames = t|0;
+		this._t = t-frames; // leftover time, save to add to next advance.
+		
+		while (frames--) { this._updateTimeline(this._rawPosition+1, false); }
 	};
 	
 	/**
@@ -482,7 +474,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clone = function() {
 		// TODO: add support for this? Need to clone the Timeline & retarget tweens - pretty complex.
-		throw("MovieClip cannot be cloned.")
+		throw("MovieClip cannot be cloned.");
 	};
 	
 	/**
@@ -515,11 +507,8 @@ this.createjs = this.createjs||{};
 	p._goto = function(positionOrLabel) {
 		var pos = this.timeline.resolve(positionOrLabel);
 		if (pos == null) { return; }
-		// prevent _updateTimeline from overwriting the new position because of a reset:
-		if (this._prevPos == -1) { this._prevPos = NaN; }
-		this._prevPosition = pos;
 		this._t = 0;
-		this._updateTimeline();
+		this._updateTimeline(pos, true);
 	};
 	
 	/**
@@ -527,40 +516,47 @@ this.createjs = this.createjs||{};
 	 * @private
 	 **/
 	p._reset = function() {
-		this._prevPos = -1;
+		this._rawPosition = -1;
 		this._t = this.currentFrame = 0;
 		this.paused = false;
 	};
 	
 	/**
 	 * @method _updateTimeline
+	 * @param {Boolean} jump Indicates whether this update is due to jumping (via gotoAndXX) to a new position.
 	 * @protected
 	 **/
-	p._updateTimeline = function() {
-		var tl = this.timeline;
-		var synched = this.mode != MovieClip.INDEPENDENT;
-		tl.loop = (this.loop==null) ? true : this.loop;
+	p._updateTimeline = function(rawPosition, jump) {
+		if (rawPosition < 0) { rawPosition = 0; }
+		if (this._rawPosition === rawPosition) { return; }
+		this._rawPosition = rawPosition;
 		
-		var pos = synched ? this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset) : (this._prevPos < 0 ? 0 : this._prevPosition);
-		var mode = synched || !this.actionsEnabled ? createjs.Tween.NONE : null;
+		var tl = this.timeline, synced = this.mode !== MovieClip.INDEPENDENT;
+		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline.
 		
-		// pre-assign currentFrame so it is available to frame scripts:
-		this.currentFrame = tl._calcPosition(pos);
+		var pos = synced ? this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset) : (rawPosition === -1 ? 0 : rawPosition);
 		
 		// update timeline position, ignoring actions if this is a graphic.
-		tl.setPosition(pos, mode);
-
-		this._prevPosition = tl._prevPosition;
-		if (this._prevPos == tl._prevPos) { return; }
-		this.currentFrame = this._prevPos = tl._prevPos;
-
+		// TODO: better way to bind scope?
+		var _this = this;
+		tl.setPosition(pos, !this.actionsEnabled || synced, jump, function() { _this._resolveState(); });
+	};
+	
+	/**
+	 * Runs via a callback after timeline property updates and before actions.
+	 * @method _resolveState
+	 * @protected
+	 **/
+	p._resolveState = function() {
+		var tl = this.timeline;
+		this.currentFrame = tl.position;
+		
 		for (var n in this._managed) { this._managed[n] = 1; }
 
 		var tweens = tl._tweens;
 		for (var i=0, l=tweens.length; i<l; i++) {
-			var tween = tweens[i];
-			var target = tween._target;
-			if (target == this || tween.passive) { continue; } // TODO: this assumes actions tween has this as the target. Valid?
+			var tween = tweens[i],  target = tween.target;
+			if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. Likely a better approach.
 			var offset = tween._stepPosition;
 
 			if (target instanceof createjs.DisplayObject) {
@@ -613,7 +609,7 @@ this.createjs = this.createjs||{};
 		if (child instanceof MovieClip) {
 			child._synchOffset = offset;
 			// TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
-			if (child.mode == MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
+			if (child.mode === MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
 		}
 		this._managed[child.id] = 2;
 	};
@@ -628,7 +624,6 @@ this.createjs = this.createjs||{};
 	p._getBounds = function(matrix, ignoreTransform) {
 		var bounds = this.DisplayObject_getBounds();
 		if (!bounds) {
-			this._updateTimeline();
 			if (this.frameBounds) { bounds = this._rectangle.copy(this.frameBounds[this.currentFrame]); }
 		}
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
@@ -663,7 +658,8 @@ this.createjs = this.createjs||{};
 	 * @private
 	 **/
 	MovieClipPlugin.install = function() {
-		createjs.Tween.installPlugin(MovieClipPlugin, ["startPosition"]);
+		// TODO: update.
+		//createjs.Tween._installPlugin(MovieClipPlugin);
 	};
 	
 	/**
@@ -674,6 +670,7 @@ this.createjs = this.createjs||{};
 	 * @private
 	 **/
 	MovieClipPlugin.init = function(tween, prop, value) {
+		// TODO: update.
 		return value;
 	};
 	
