@@ -323,11 +323,12 @@ this.createjs = this.createjs || {};
 			}
 			sprite.spriteSheet = ss;
 			sprite.gotoAndStop(index);
-			sprite.x = x;
+			var spriteBounds = sprite.getBounds();
+			sprite.x = x - spriteBounds.x;
 			sprite.y = y;
 			childIndex++;
 			
-			x += sprite.getBounds().width + this.letterSpacing;
+			x += spriteBounds.width + this.letterSpacing;
 		}
 		while (numKids > childIndex) {
 			 // faster than removeChild.
