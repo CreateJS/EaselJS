@@ -296,6 +296,7 @@ this.createjs = this.createjs || {};
 	};
 
 	p._tick = function(evtObj) {
+		var stage = this.stage;
 		if(stage && stage !== this._oldStage) {
 			this._drawAction && stage.off("drawstart", this._drawAction);
 			this._drawAction = stage.on("drawstart", this._updateText, this);

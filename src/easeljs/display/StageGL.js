@@ -123,6 +123,7 @@ this.createjs = this.createjs||{};
 		this.Stage_constructor(canvas);
 
 		if (options !== undefined) {
+			if (typeof options !== "object"){ throw("Invalid options object"); }
 			var premultiply = options.premultiply;
 			var transparent = options.transparent;
 			var antialias = options.antialias;
@@ -1705,8 +1706,8 @@ this.createjs = this.createjs||{};
 		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for safety code
 		for (var i=0; i<this._batchTextureCount;i++) {
 			var tex = this.getBaseTexture();
-			this._baseTextures[i] = this._batchTextures[i] = t;
-			if (!t) {
+			this._baseTextures[i] = this._batchTextures[i] = tex;
+			if (!tex) {
 				throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
 			}
 		}
