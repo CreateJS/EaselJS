@@ -194,6 +194,9 @@ this.createjs = this.createjs||{};
 		child.parent = this;
 		this.children.push(child);
 		child.dispatchEvent("added");
+
+		this.sortChildren(this._sortDefault);
+
 		return child;
 	};
 
@@ -357,7 +360,7 @@ this.createjs = this.createjs||{};
 	 * documentation for details.
 	 **/
 	p.sortChildren = function(sortFunction) {
-		this.children.sort(sortFunction);
+		this.children.sort(sortFunction || this._sortDefault);
 	};
 
 	/**
@@ -685,6 +688,16 @@ this.createjs = this.createjs||{};
 		return rect;
 	};
 
+	/**
+	 * @method _sortDefault
+	 * @param {DisplayObject} a
+	 * @param {DisplayObject} b
+	 * @return {Number}
+	 * @protected
+	 **/
+	p._sortDefault = function(a, b) {
+		return a.zIndex - b.zIndex;
+	};
 
 	createjs.Container = createjs.promote(Container, "DisplayObject");
 }());

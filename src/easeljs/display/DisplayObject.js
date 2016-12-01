@@ -314,6 +314,13 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 **/
 		this.y = 0;
+
+		/** The zIndex position of the display object for sorting
+		 * @property zIndex
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.zIndex = 0;
 		
 		/**
 		 * If set, defines the transformation for this display object, overriding all other transformation properties
@@ -1071,6 +1078,19 @@ this.createjs = this.createjs||{};
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, 2, 2);
 		return hit;
+	};
+
+	/**
+	 * Removes the Display Object from the parent container, if part of a container
+	 *
+	 * @method remove
+	 * @return {DisplayObject} Returns the instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	*/
+	p.remove = function() {
+		if ( this.parent instanceof createjs.Container )
+			this.parent.removeChild(this);
+		return this;
 	};
 	
 	/**

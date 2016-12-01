@@ -421,14 +421,16 @@ this.createjs = this.createjs||{};
 	 * @method tick
 	 * @param {Object} [props] An object with properties that should be copied to the event object. Should usually be a Ticker event object, or similar object with a delta property.
 	 **/
+	var tickEvent = null;
 	p.tick = function(props) {
 		if (!this.tickEnabled || this.dispatchEvent("tickstart", false, true) === false) { return; }
-		var evtObj = new createjs.Event("tick");
+		var evtObj = tickEvent || new createjs.Event("tick");
 		if (props) {
 			for (var n in props) {
 				if (props.hasOwnProperty(n)) { evtObj[n] = props[n]; }
 			}
 		}
+		tickEvent = evtObj;
 		this._tick(evtObj);
 		this.dispatchEvent("tickend");
 	};
@@ -587,6 +589,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 * @param {HTMLElement} e
 	 **/
+	var elementRect = { left : 0, right : 0, top : 0, bottom : 0 };
 	p._getElementRect = function(e) {
 		var bounds;
 		try { bounds = e.getBoundingClientRect(); } // this can fail on disconnected DOM elements in IE9
@@ -601,13 +604,12 @@ this.createjs = this.createjs||{};
 		var padR = parseInt(styles.paddingRight)+parseInt(styles.borderRightWidth);
 		var padB = parseInt(styles.paddingBottom)+parseInt(styles.borderBottomWidth);
 
-		// note: in some browsers bounds properties are read only.
-		return {
-			left: bounds.left+offX+padL,
-			right: bounds.right+offX-padR,
-			top: bounds.top+offY+padT,
-			bottom: bounds.bottom+offY-padB
-		}
+		elementRect.left = bounds.left + offX + padL;
+		elementRect.right = bounds.right + offX - padR;
+		elementRect.top = bounds.top + offY + padT;
+		elementRect.bottom = bounds.bottom + offY - padB;
+
+		return elementRect;
 	};
 
 	/**
@@ -860,6 +862,7 @@ this.createjs = this.createjs||{};
 	 * @param {MouseEvent} [nativeEvent]
 	 * @param {DisplayObject} [relatedTarget]
 	 **/
+	var mouseEvent = null;
 	p._dispatchMouseEvent = function(target, type, bubbles, pointerId, o, nativeEvent, relatedTarget) {
 		// TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
 		if (!target || (!bubbles && !target.hasEventListener(type))) { return; }
@@ -869,7 +872,27 @@ this.createjs = this.createjs||{};
 		var pt = this._mtx.transformPoint(o.x, o.y);
 		var evt = new createjs.MouseEvent(type, bubbles, false, pt.x, pt.y, nativeEvent, pointerId, pointerId==this._primaryPointerID || pointerId==-1, o.rawX, o.rawY);
 		*/
-		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId === this._primaryPointerID || pointerId === -1, o.rawX, o.rawY, relatedTarget);
+		var evt = mouseEvent || new createjs.MouseEvent();
+
+		for ( var prop in evt )
+			if ( typeof evt[prop] !== 'function' )
+				evt[prop] = null;
+
+		evt.type = type;
+		evt.bubbles = bubbles;
+		evt.cancelable = false;
+		evt.timeStamp = Date.now();
+		evt.stageX = o.x;
+		evt.stageY = o.y;
+		evt.rawX = o.rawX || o.x;
+		evt.rawY = o.rawY || o.y;
+		evt.nativeEvent = nativeEvent;
+		evt.pointerID = pointerId;
+		evt.primary = pointerId === this._primaryPointerID || pointerId === -1;
+		evt.relatedTarget = relatedTarget;
+
+		mouseEvent = evt;
+
 		target.dispatchEvent(evt);
 	};
 
