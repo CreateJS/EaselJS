@@ -9,6 +9,9 @@
 		
 		function init() {
 			stage = new createjs.Stage("demoCanvas");
+
+			// For mobile devices.
+			createjs.Touch.enable(stage);
 			
 			// this lets our drag continue to track the mouse even when it leaves the canvas:
 			// play with commenting this out to see the difference.
