@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EaselJS: Simple SpriteSheet Example</title>
+<meta name="viewport" content="minimal-ui,target-densitydpi=device-dpi, width=750, user-scalable=no">
+<meta content="telephone=no" name="format-detection">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+</style>
+<body>
+<canvas id="myCanvas"></canvas>
+<script src="../lib/easeljs-NEXT.combined.js"></script>
+<script>
+    var stage;
+    var myCanvas = document.getElementById("myCanvas"),
+            winWidth = document.documentElement.clientWidth,//获取页面宽度
+            winHeight = document.documentElement.clientHeight;//获取页面高度
+    myCanvas.width = winWidth;//设置画布宽度
+    myCanvas.height = winHeight;//设置画布高度
+    function init() {
+        stage = new createjs.Stage(myCanvas);
+        var spriteSheet = new createjs.SpriteSheet({
+            framerate: 24,
+            "images": ["../_assets/art/spritesheet_grant.png"],
+            "frames": {
+                "regX": Math.floor(165 / 2),// 正值往左偏，负值往右偏
+                "regY": 292 / 2,
+                "width": 165,
+                "height": 292,
+                "count": 64
+            },
+            "animations": {
+                "run": [0, 25, "run", 1.5],
+                "jump": [26, 63, "run"]
+            }
+        });
+        spriteSheet.on("complete", function (event) {
+            console.log("Complete", event);
+        });
+        spriteSheet.on("error", function (event) {
+            console.log("Error", event);
+        });
+        var grant = new createjs.Sprite(spriteSheet, "run");
+        grant.x = stage.canvas.width / 2;
+        grant.y = stage.canvas.height / 2;
+        stage.addChild(grant);
+        createjs.Ticker.timingMode = createjs.Ticker.RAF;
+        createjs.Ticker.addEventListener("tick", stage);
+    }
+    window.addEventListener("load", function () {
+        init();
+    });
+</script>
+</body>
+</html>

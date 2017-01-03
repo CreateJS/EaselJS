@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EaselJS: Simple SpriteSheet Example</title>
+<meta name="viewport" content="minimal-ui,target-densitydpi=device-dpi, width=750, user-scalable=no">
+<meta content="telephone=no" name="format-detection">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<body>
+<canvas id="testCanvas" width="960" height="400"></canvas>
+<script src="../lib/easeljs-NEXT.combined.js"></script>
+<script>
+    var stage;
+    var myCanvas = document.getElementById('testCanvas'),
+            winWidth = document.documentElement.clientWidth,//获取页面宽度
+            winHeight = document.documentElement.clientHeight;//获取页面高度
+    myCanvas.width = winWidth;//设置画布宽度
+    myCanvas.height = winHeight;//设置画布高度
+    function init() {
+        stage = new createjs.Stage(myCanvas);
+        var spriteSheet = new createjs.SpriteSheet({
+            framerate: 30,
+            "images": ["../_assets/art/spritesheet_grant.png"],
+            "frames": {"regX": 82, "height": 292, "count": 64, "regY": 0, "width": 165},
+            "animations": {
+                "run": [0, 25, "run", 1.5],
+                "jump": [26, 63, "run"]
+            }
+        });
+        spriteSheet.on("complete", function (event) {
+            console.log("Complete", event);
+        });
+        spriteSheet.on("error", function (event) {
+            console.log("Error", event);
+        });
+        var grant = new createjs.Sprite(spriteSheet, "run");
+        grant.x = stage.canvas.width / 2;
+        grant.y = 22;
+        stage.addChild(grant);
+        createjs.Ticker.timingMode = createjs.Ticker.RAF;
+        createjs.Ticker.addEventListener("tick", stage);
+    }
+    window.addEventListener('load', function () {
+        init();
+    });
+</script>
+</body>
+</html>
