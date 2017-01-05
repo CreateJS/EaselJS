@@ -1357,7 +1357,7 @@ export default class Graphics {
 				let num = base64[str.charAt(i)];
 				let sign = (num>>5) ? -1 : 1;
 				num = ((num&31)<<6)|(base64[str.charAt(i+1)]);
-				if (charCount == 3) { num = (num<<6)|(base64[str.charAt(i+2)]); }
+				if (charCount === 3) { num = (num<<6)|(base64[str.charAt(i+2)]); }
 				num = sign*num/10;
 				if (p%2) { x = (num += x); }
 				else { y = (num += y); }

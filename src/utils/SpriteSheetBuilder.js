@@ -283,7 +283,7 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 			for (let i=0,l=lbls.length; i<l; i++) {
 				let label = lbls[i].label;
 				let start = baseFrameIndex+lbls[i].index;
-				let end = baseFrameIndex+((i == l-1) ? duration : lbls[i+1].index);
+				let end = baseFrameIndex+((i === l-1) ? duration : lbls[i+1].index);
 				let frames = [];
 				for (let i=start; i<end; i++) { frames.push(i); }
 				if (labelFunction) {

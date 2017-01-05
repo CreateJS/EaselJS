@@ -71,7 +71,7 @@ export default class Bitmap extends DisplayObject {
 		 * @property image
 		 * @type HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
 		 */
-		if (typeof imageOrUri == "string") {
+		if (typeof imageOrUri === "string") {
 			this.image = document.createElement("img");
 			this.image.src = imageOrUri;
 		} else {

@@ -153,7 +153,7 @@ export default class ButtonHelper {
 	}
 
 	set enabled (enabled) {
-		if (enabled == this._enabled) { return; }
+		if (enabled === this._enabled) { return; }
 		let o = this.target;
 		this._enabled = enabled;
 		if (enabled) {
@@ -192,13 +192,13 @@ export default class ButtonHelper {
 	 */
 	handleEvent (evt) {
 		let label, t = this.target, type = evt.type;
-		if (type == "mousedown") {
+		if (type === "mousedown") {
 			this._isPressed = true;
 			label = this.downLabel;
-		} else if (type == "pressup") {
+		} else if (type === "pressup") {
 			this._isPressed = false;
 			label = this._isOver ? this.overLabel : this.outLabel;
-		} else if (type == "rollover") {
+		} else if (type === "rollover") {
 			this._isOver = true;
 			label = this._isPressed ? this.downLabel : this.overLabel;
 		} else { // rollout and default

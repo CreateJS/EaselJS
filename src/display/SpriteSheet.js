@@ -425,7 +425,7 @@ export default class SpriteSheet extends EventDispatcher {
 		if (data.images) {
 			for (let img of data.images) {
 				let a = this._images = [];
-				if (typeof img == "string") {
+				if (typeof img === "string") {
 					let src = img;
 					img = document.createElement("img");
 					img.src = src;
@@ -456,7 +456,7 @@ export default class SpriteSheet extends EventDispatcher {
 				this._spacing = o.spacing||0;
 				this._margin = o.margin||0;
 				this._numFrames = o.count;
-				if (this._loadCount == 0) { this._calculateFrames(); }
+				if (this._loadCount === 0) { this._calculateFrames(); }
 			}
 		}
 
@@ -469,10 +469,10 @@ export default class SpriteSheet extends EventDispatcher {
 				let anim = { name };
 				let obj = o[name];
 				let a;
-				if (typeof obj == "number") { // single frame
+				if (typeof obj === "number") { // single frame
 					a = anim.frames = [obj];
 				} else if (Array.isArray(obj)) { // simple
-					if (obj.length == 1) { anim.frames = [obj[0]]; }
+					if (obj.length === 1) { anim.frames = [obj[0]]; }
 					else {
 						anim.speed = obj[3];
 						anim.next = obj[2];
@@ -485,10 +485,10 @@ export default class SpriteSheet extends EventDispatcher {
 					anim.speed = obj.speed;
 					anim.next = obj.next;
 					let frames = obj.frames;
-					a = anim.frames = (typeof frames == "number") ? [frames] : frames.slice(0);
+					a = anim.frames = (typeof frames === "number") ? [frames] : frames.slice(0);
 				}
 				if (anim.next === true || anim.next === undefined) { anim.next = name; } // loop
-				if (anim.next === false || (a.length < 2 && anim.next == name)) { anim.next = null; } // stop
+				if (anim.next === false || (a.length < 2 && anim.next === name)) { anim.next = null; } // stop
 				if (!anim.speed) { anim.speed = 1; }
 				this._animations.push(name);
 				this._data[name] = anim;
@@ -501,7 +501,7 @@ export default class SpriteSheet extends EventDispatcher {
 	 * @protected
 	 */
 	 _handleImageLoad (src) {
-		if (--this._loadCount == 0) {
+		if (--this._loadCount === 0) {
 			this._calculateFrames();
 			this.complete = true;
 			this.dispatchEvent("complete");
@@ -518,7 +518,7 @@ export default class SpriteSheet extends EventDispatcher {
 		this.dispatchEvent(errorEvent);
 
 		// Complete is still dispatched.
-		if (--this._loadCount == 0) {
+		if (--this._loadCount === 0) {
 			this.dispatchEvent("complete");
 		}
 	}
@@ -528,7 +528,7 @@ export default class SpriteSheet extends EventDispatcher {
 	 * @protected
 	 */
 	_calculateFrames () {
-		if (this._frames || this._frameWidth == 0) { return; }
+		if (this._frames || this._frameWidth === 0) { return; }
 
 		this._frames = [];
 

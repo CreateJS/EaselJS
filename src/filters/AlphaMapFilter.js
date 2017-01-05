@@ -157,7 +157,7 @@ export default class AlphaMapFilter extends Filter {
 	 */
 	_prepAlphaMap () {
 		if (!this.alphaMap) { return false; }
-		if (this.alphaMap == this._alphaMap && this._mapData) { return true; }
+		if (this.alphaMap === this._alphaMap && this._mapData) { return true; }
 		this._mapData = null;
 
 		let map = this._alphaMap = this.alphaMap;

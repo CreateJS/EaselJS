@@ -304,11 +304,11 @@ export default class BitmapText extends Container {
 
 		for (let i = 0, l = this.text.length; i < l; i++) {
 			let character = this.text.charAt(i);
-			if (character == " " && !hasSpace) {
+			if (character === " " && !hasSpace) {
 				x += spaceW;
 				continue;
-			} else if (character == "\n" || character == "\r") {
-				if (character == "\r" && this.text.charAt(i+1) == "\n") { i++; } // crlf
+			} else if (character === "\n" || character === "\r") {
+				if (character === "\r" && this.text.charAt(i+1) === "\n") { i++; } // crlf
 				x = 0;
 				y += lineH;
 				continue;

@@ -200,13 +200,13 @@ export default class WebGLInspector extends EventDispatcher {
 		for (let n in dict) {
 			let str = n.replace(window.location.origin, "");
 			let tex = dict[n];
-			let shifted = tex._lastActiveIndex?tex._lastActiveIndex == tex._activeIndex:false;
+			let shifted = tex._lastActiveIndex?tex._lastActiveIndex === tex._activeIndex:false;
 			output.push({src, element:tex, shifted});
 			tex._lastActiveIndex = tex._activeIndex;
 		}
 
 		output.sort((a,b) => {
-			if (a.element._drawID == stage._drawID) { return 1; }
+			if (a.element._drawID === stage._drawID) { return 1; }
 			if (a.element._drawID < b.element._drawID) { return -1; }
 			return 0;
 		});
@@ -214,7 +214,7 @@ export default class WebGLInspector extends EventDispatcher {
 		const l = output.length;
 		for (let i=0; i<l; i++) {
 			let out = output[i];
-			let active = out.element._drawID == stage._drawID;
+			let active = out.element._drawID === stage._drawID;
 			WebGLInspector._log(`[${out.src}] ${active?"ACTIVE":"stale"} ${out.shifted?"steady":"DRIFT"}`, out.element);
 		}
 	}

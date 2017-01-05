@@ -838,7 +838,7 @@ export default class StageGL extends Stage {
 				this._activeShader = this._fetchShaderProgram(gl);
 				success = true;
 			} catch(e) {
-				if (this._batchTextureCount == 1) {
+				if (this._batchTextureCount === 1) {
 					throw `Cannot compile shader ${e}`;
 				}
 
@@ -1044,16 +1044,16 @@ export default class StageGL extends Stage {
 	setClearColor (color = 0x00000000) {
 		let r, g, b, a, output;
 
-		if (typeof color == "string") {
-			if (color.indexOf("#") == 0) {
-				if (color.length == 4) {
+		if (typeof color === "string") {
+			if (color.indexOf("#") === 0) {
+				if (color.length === 4) {
 					color = `#${color.charAt(1)+color.charAt(1) + color.charAt(2)+color.charAt(2) + color.charAt(3)+color.charAt(3)}`;
 				}
 				r = Number(`0x${color.slice(1, 3)}`)/255;
 				g = Number(`0x${color.slice(3, 5)}`)/255;
 				b = Number(`0x${color.slice(5, 7)}`)/255;
 				a = Number(`0x${color.slice(7, 9)}`)/255;
-			} else if (color.indexOf("rgba(") == 0) {
+			} else if (color.indexOf("rgba(") === 0) {
 				output = color.slice(5, -1).split(",");
 				r = Number(output[0])/255;
 				g = Number(output[1])/255;
@@ -1238,7 +1238,7 @@ export default class StageGL extends Stage {
 		// resolve issue with no dynamic samplers by creating correct samplers in if else chain
 		let insert = "";
 		for (let i = 1; i<this._batchTextureCount; i++) {
-			insert += `} else if (src == ${i}) { color = texture2D(uSampler[${i}], vTextureCoord);`;
+			insert += `} else if (src === ${i}) { color = texture2D(uSampler[${i}], vTextureCoord);`;
 		}
 		str = str.replace(/{{alternates}}/g, insert)
 						 .replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
@@ -1534,7 +1534,7 @@ export default class StageGL extends Stage {
 		if (tex._storeID !== undefined && tex._storeID >= 0) {
 			this._textureDictionary[tex._storeID] = undefined;
 			for (let n in this._textureIDs) {
-				if (this._textureIDs[n] == tex._storeID) { delete this._textureIDs[n]; }
+				if (this._textureIDs[n] === tex._storeID) { delete this._textureIDs[n]; }
 			}
 			tex._imageData._storeID = tex._storeID = undefined;
 		}
@@ -2303,7 +2303,7 @@ export default class StageGL extends Stage {
 			int src = int(indexPicker);
 			vec4 color = vec4(1.0, 0.0, 0.0, 1.0);
 
-			if (src == 0) {
+			if (src === 0) {
 				color = texture2D(uSampler[0], vTextureCoord);
 				{{alternates}}
 			}

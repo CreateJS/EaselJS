@@ -70,7 +70,7 @@ export default class DOMElement extends DisplayObject {
 	constructor (htmlElement) {
 		super();
 
-		if (typeof(htmlElement) == "string") { htmlElement = document.getElementById(htmlElement); }
+		if (typeof(htmlElement) === "string") { htmlElement = document.getElementById(htmlElement); }
 		this.mouseEnabled = false;
 
 		let style = htmlElement.style;

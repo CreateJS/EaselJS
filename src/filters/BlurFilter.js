@@ -259,7 +259,7 @@ export default class BlurFilter extends Filter {
 		if (isNaN(radiusX) || radiusX < 0) return false;
 		let radiusY = this._blurY >> 1;
 		if (isNaN(radiusY) || radiusY < 0) return false;
-		if (radiusX == 0 && radiusY == 0) return false;
+		if (radiusX === 0 && radiusY === 0) return false;
 
 		let iterations = this.quality;
 		if (isNaN(iterations) || iterations < 1) iterations = 1;

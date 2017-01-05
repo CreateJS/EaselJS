@@ -159,7 +159,7 @@ export default class ColorMatrix {
 	 * @chainable
 	 */
 	adjustBrightness (value) {
-		if (value == 0 || isNaN(value)) { return this; }
+		if (value === 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value, 255);
 		this._multiplyMatrix([
 			1,0,0,0,value,
@@ -180,14 +180,14 @@ export default class ColorMatrix {
 	 * @chainable
 	 */
 	adjustContrast (value) {
-		if (value == 0 || isNaN(value)) { return this; }
+		if (value === 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value, 100);
 		let x;
 		if (value<0) {
 			x = 127+value/100*127;
 		} else {
 			x = value%1;
-			if (x == 0) {
+			if (x === 0) {
 				x = ColorMatrix.DELTA_INDEX[value];
 			} else {
 				x = ColorMatrix.DELTA_INDEX[(value<<0)]*(1-x)+ColorMatrix.DELTA_INDEX[(value<<0)+1]*x; // use linear interpolation for more granularity.
@@ -213,7 +213,7 @@ export default class ColorMatrix {
 	 * @chainable
 	 */
 	adjustSaturation (value) {
-		if (value == 0 || isNaN(value)) { return this; }
+		if (value === 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value, 100);
 		let x = 1+((value > 0) ? 3*value/100 : value/100);
 		let lumR = 0.3086;
@@ -238,7 +238,7 @@ export default class ColorMatrix {
 	 * @chainable
 	 */
 	adjustHue (value) {
-		if (value == 0 || isNaN(value)) { return this; }
+		if (value === 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value, 180)/180*Math.PI;
 		let cosVal = Math.cos(value);
 		let sinVal = Math.sin(value);

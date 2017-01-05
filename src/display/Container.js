@@ -162,7 +162,7 @@ export default class Container extends DisplayObject {
 	 */
 	addChild (...children) {
 		const l = children.length;
-		if (l == 0) { return null; }
+		if (l === 0) { return null; }
 		let child = children[0];
 		if (l > 1) {
 			for (let i = 0; i < l; i++) { child = this.addChild(children[i]); }
@@ -178,7 +178,7 @@ export default class Container extends DisplayObject {
 	TODO-ES6: Perf test rest param loops vs arguments.
 	addChild (...children) {
 		const l = children.length;
-		if (l == 0) { return null; }
+		if (l === 0) { return null; }
 		let child;
 		for (let i = 0; i < l; i++) {
 			child = children[0];
@@ -375,7 +375,7 @@ export default class Container extends DisplayObject {
 		let kids = this.children;
 		const l = kids.length;
 		for (let i = 0; i < l; i++) {
-			if (kids[i].name == name) { return kids[i]; }
+			if (kids[i].name === name) { return kids[i]; }
 		}
 		return null;
 	}
@@ -442,11 +442,11 @@ export default class Container extends DisplayObject {
 		const l = kids.length;
 		let index1,index2;
 		for (var i = 0; i < l; i++) {
-			if (kids[i] == child1) { index1 = i; }
-			if (kids[i] == child2) { index2 = i; }
+			if (kids[i] === child1) { index1 = i; }
+			if (kids[i] === child2) { index2 = i; }
 			if (index1 != null && index2 != null) { break; }
 		}
-		if (i == l) { return; } // TODO: throw error?
+		if (i === l) { return; } // TODO: throw error?
 		kids[index1] = child2;
 		kids[index2] = child1;
 	}
@@ -462,9 +462,9 @@ export default class Container extends DisplayObject {
 		const l = kids.length;
 		if (child.parent != this || index < 0 || index >= l) { return; }
 		for (var i = 0; i < l; i++) {
-			if (kids[i] == child) { break; }
+			if (kids[i] === child) { break; }
 		}
-		if (i == l || i == index) { return; }
+		if (i === l || i === index) { return; }
 		kids.splice(i, 1);
 		kids.splice(index, 0, child);
 	}
@@ -478,7 +478,7 @@ export default class Container extends DisplayObject {
 	 */
 	contains (child) {
 		while (child) {
-			if (child == this) { return true; }
+			if (child === this) { return true; }
 			child = child.parent;
 		}
 		return false;
@@ -527,7 +527,7 @@ export default class Container extends DisplayObject {
 	getObjectsUnderPoint (x, y, mode = 0) {
 		let arr = [];
 		let pt = this.localToGlobal(x, y);
-		this._getObjectsUnderPoint(pt.x, pt.y, arr, mode > 0, mode == 1);
+		this._getObjectsUnderPoint(pt.x, pt.y, arr, mode > 0, mode === 1);
 		return arr;
 	}
 
@@ -543,7 +543,7 @@ export default class Container extends DisplayObject {
 	 */
 	getObjectUnderPoint (x, y, mode = 0) {
 		let pt = this.localToGlobal(x, y);
-		return this._getObjectsUnderPoint(pt.x, pt.y, null, mode > 0, mode == 1);
+		return this._getObjectsUnderPoint(pt.x, pt.y, null, mode > 0, mode === 1);
 	}
 
 	/**

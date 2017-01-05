@@ -94,7 +94,7 @@ export default class Stage extends Container {
 		 * @property canvas
 		 * @type HTMLCanvasElement | Object
 		 */
-		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
+		this.canvas = (typeof canvas === "string") ? document.getElementById(canvas) : canvas;
 
 		/**
 		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
@@ -353,7 +353,7 @@ export default class Stage extends Container {
 	 * @type Function
 	 */
 	handleEvent (evt) {
-		if (evt.type == "tick") { this.update(evt); }
+		if (evt.type === "tick") { this.update(evt); }
 	}
 
 	/**
@@ -420,7 +420,7 @@ export default class Stage extends Container {
 		if (this._mouseOverIntervalID) {
 			clearInterval(this._mouseOverIntervalID);
 			this._mouseOverIntervalID = null;
-			if (frequency == 0) {
+			if (frequency === 0) {
 				this._testMouseOver(true);
 			}
 		}
@@ -540,7 +540,7 @@ export default class Stage extends Container {
 		let inBounds = o.inBounds;
 		this._updatePointerPosition(id, e, pageX, pageY);
 		if (inBounds || o.inBounds || this.mouseMoveOutside) {
-			if (id === -1 && o.inBounds == !inBounds) {
+			if (id === -1 && o.inBounds === !inBounds) {
 				this._dispatchMouseEvent(this, (inBounds ? "mouseleave" : "mouseenter"), false, id, o, e);
 			}
 
@@ -614,7 +614,7 @@ export default class Stage extends Container {
 
 		if (o.down) { this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e, target); o.down = false; }
 
-		if (target == oTarget) { this._dispatchMouseEvent(oTarget, "click", true, id, o, e); }
+		if (target === oTarget) { this._dispatchMouseEvent(oTarget, "click", true, id, o, e); }
 		this._dispatchMouseEvent(oTarget, "pressup", true, id, o, e);
 
 		if (clear) {
@@ -675,10 +675,10 @@ export default class Stage extends Container {
 		}
 		let o = this._getPointerData(-1);
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
-		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
+		if (!o || (!clear && this.mouseX === this._mouseOverX && this.mouseY === this._mouseOverY && this.mouseInBounds)) { return; }
 
 		let e = o.posEvtObj;
-		let isEventTarget = eventTarget || e&&(e.target == this.canvas);
+		let isEventTarget = eventTarget || e&&(e.target === this.canvas);
 		let target=null, common = -1, cursor="";
 
 		if (!owner && (clear || this.mouseInBounds && isEventTarget)) {
@@ -791,7 +791,7 @@ export default class Stage extends Container {
  */
 
 /**
- * Dispatched when the mouse moves from within the canvas area (mouseInBounds == true) to outside it (mouseInBounds == false).
+ * Dispatched when the mouse moves from within the canvas area (mouseInBounds === true) to outside it (mouseInBounds === false).
  * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
  * class for a listing of event properties.
  * @event mouseleave
@@ -799,7 +799,7 @@ export default class Stage extends Container {
  */
 
 /**
- * Dispatched when the mouse moves into the canvas area (mouseInBounds == false) from outside it (mouseInBounds == true).
+ * Dispatched when the mouse moves into the canvas area (mouseInBounds === false) from outside it (mouseInBounds === true).
  * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
  * class for a listing of event properties.
  * @event mouseenter
