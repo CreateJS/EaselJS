@@ -6,7 +6,7 @@ node_js:
   - 4.2.x
 before_script:
   - npm install gulp -g
-script: npm run test:travis
+script: npm run travis
 before_install:
   - export CHROME_BIN=chromium-browser
   - export DISPLAY=:99.0
