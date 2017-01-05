@@ -4,6 +4,7 @@
   "description": "The Easel Javascript library provides a full, hierarchical display list, a core interaction model, and helper classes to make working with the HTML5 Canvas element much easier. Part of the CreateJS suite of libraries.",
   "keywords": [
     "html5",
+    "webgl",
     "canvas",
     "easeljs",
     "createjs",
@@ -20,7 +21,6 @@
     "Grant Skinner <grant@gskinner.com> (https://github.com/gskinner)",
     "Lanny McNie <lanny@gskinner.com> (https://github.com/lannymcnie)",
     "Wes Gorgichuk <wes@gskinner.com> (https://github.com/wdamien)",
-    "Patrick McGuckin <patrick@gskinner.com> (https://github.com/tehvgg)",
     "Mike Chambers <> (https://github.com/mikechambers)"
   ],
   "main": "dist/easeljs.cjs.js",
@@ -41,12 +41,13 @@
     "docs": "cd node_modules/createjs && npm run docs"
   },
   "dependencies": {
-    "createjs": "0.0.1"
+    "createjs": "2.0.0",
+    "tweenjs": "2.0.0"
   },
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.8.0",
     "babel-preset-es2015": "^6.14.0",
-    "createjs": "0.0.1",
+    "createjs": "2.0.0",
     "js-imagediff": "tehvgg/js-imagediff"
   },
   "engine": "node >= 4.2.2"
