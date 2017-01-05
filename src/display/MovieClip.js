@@ -27,7 +27,8 @@
 */
 
 import Container from "./Container";
-// TODO: Get Tween and Timeline imports.
+import Tween from "tweenjs/src/Tween";
+import Timeline from "tweenjs/src/Timeline";
 
 /**
  * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
@@ -82,12 +83,12 @@ export default class MovieClip extends Container {
 	 * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
 	 * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
 	 * property.
-	 * @param {Boolean} [loop=true] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
-	 * property. The default is `true`.
+	 * @param {Boolean} [loop=0] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
+	 * property. The default is `0`.
 	 * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
 	 * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
 	 */
-	constructor (mode = MovieClip.INDEPENDENT, startPosition = 0, loop = true, labels = null) {
+	constructor (mode = MovieClip.INDEPENDENT, startPosition = 0, loop = 0, labels = null) {
 		super();
 		!MovieClip.inited && MovieClip.init(); // static init
 
@@ -115,7 +116,7 @@ export default class MovieClip extends Container {
 		 * @type Boolean
 		 * @default true
 		 */
-		this.loop = loop;
+		this.loop = loop === true ? -1 : loop;
 
 		/**
 		 * The current frame of the movieclip.
@@ -150,7 +151,7 @@ export default class MovieClip extends Container {
 		 * @type Timeline
 		 * @default null
 		 */
-		this.timeline = new Timeline(null, labels, {paused:true, position:startPosition, useTicks:true});
+		this.timeline = new Timeline({ paused: true, useTicks: true, labels });
 
 		/**
 		 * If true, the MovieClip's position will not advance when ticked.
@@ -217,20 +218,12 @@ export default class MovieClip extends Container {
 		this._synchOffset = 0;
 
 		/**
-		 * @property _prevPos
+		 * @property _rawPosition
 		 * @type Number
 		 * @default -1
 		 * @private
 		 */
-		this._prevPos = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
-
-		/**
-		 * @property _prevPosition
-		 * @type Number
-		 * @default 0
-		 * @private
-		 */
-		this._prevPosition = 0;
+		this._rawPosition = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
 
 		/**
 		 * The time remaining from the previous tick, only applicable when .framerate is set.
@@ -257,6 +250,7 @@ export default class MovieClip extends Container {
 		MovieClip.inited = true;
 	}
 
+// TODO: can we just proxy `get currentFrame` to timeline.position as well? Ditto for `get loop` (or just remove entirely).
 // accessor properties:
 	/**
 	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
@@ -277,7 +271,6 @@ export default class MovieClip extends Container {
 	 * @readonly
 	 */
 	get currentLabel () {
-		this._updateTimeline();
 		return this.timeline.getCurrentLabel();
 	}
 
@@ -328,7 +321,6 @@ export default class MovieClip extends Container {
 	draw (ctx, ignoreCache) {
 		// draw to cache first:
 		if (this.cacheDraw(ctx, ignoreCache)) { return true; }
-		this._updateTimeline();
 		super.draw(ctx, ignoreCache);
 		return true;
 	}
@@ -377,21 +369,23 @@ export default class MovieClip extends Container {
 	advance (time) {
 		// TODO: should we worry at all about clips who change their own modes via frame scripts?
 		let independent = MovieClip.INDEPENDENT;
-		if (this.mode != independent) { return; }
-
+		if (this.mode !== independent) { return; }
+		// if this MC doesn't have a framerate, hunt ancestors for one:
 		let o = this, fps = o.framerate;
 		while ((o = o.parent) && fps == null) {
-			if (o.mode == independent) { fps = o._framerate; }
+			if (o.mode === independent) { fps = o._framerate; }
 		}
 		this._framerate = fps;
 
-		let t = (fps != null && fps != -1 && time != null) ? time/(1000/fps) + this._t : 1;
-		let frames = t|0;
-		this._t = t-frames; // leftover time
+		if (this.paused) { return; }
+		// TODO: strict equality here?
+		// calculate how many frames to advance:
+		let t = (fps !== null && fps !== -1 && time !== null) ? time / (1000 / fps) + this._t : 1;
+		let frames = t | 0;
+		this._t = t - frames; // leftover time, save to add to next advance.
 
-		while (!this.paused && frames--) {
-			this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
-			this._updateTimeline();
+		while (frames--) {
+			this._updateTimeline(this._rawPosition + 1, false);
 		}
 	}
 
@@ -401,7 +395,7 @@ export default class MovieClip extends Container {
 	 */
 	clone () {
 		// TODO: add support for this? Need to clone the Timeline & retarget tweens - pretty complex.
-		throw("MovieClip cannot be cloned.")
+		throw "MovieClip cannot be cloned.";
 	}
 
 // private methods:
@@ -424,11 +418,8 @@ export default class MovieClip extends Container {
 	_goto (positionOrLabel) {
 		let pos = this.timeline.resolve(positionOrLabel);
 		if (pos == null) { return; }
-		// prevent _updateTimeline from overwriting the new position because of a reset:
-		if (this._prevPos == -1) { this._prevPos = NaN; }
-		this._prevPosition = pos;
 		this._t = 0;
-		this._updateTimeline();
+		this._updateTimeline(pos, true);
 	}
 
 	/**
@@ -436,42 +427,47 @@ export default class MovieClip extends Container {
 	 * @private
 	 */
 	_reset () {
-		this._prevPos = -1;
+		this._rawPosition = -1;
 		this._t = this.currentFrame = 0;
 		this.paused = false;
 	}
 
 	/**
 	 * @method _updateTimeline
+	 * @param {Number} rawPosition
+	 * @param {Boolean} jump Indicates whether this update is due to jumping (via gotoAndXX) to a new position.
 	 * @protected
 	 */
-	_updateTimeline () {
+	_updateTimeline (rawPosition, jump) {
+		if (rawPosition < 1) { rawPosition = 0; }
+		if (this._rawPosition === rawPosition) { return; }
+		this._rawPosition = rawPosition;
+
+		let tl = this.timeline, synced = this.mode !== MovieClip.INDEPENDENT;
+		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline.
+		let pos = synced ? this.startPosition + (this.mode === MovieClip.SINGLE_FRAME ? 0 : this._synchOffset) : (rawPosition === -1 ? 0 : rawPosition);
+
+		tl.setPosition(pos, !this.actionsEnabled || synced, jump, () => this._resolveState());
+	}
+
+	/**
+	 * Runs via a callback after timeline property updates and before actions.
+	 * @method _resolveState
+	 * @protected
+	 */
+	_resolveState () {
 		let tl = this.timeline;
-		let synched = this.mode != MovieClip.INDEPENDENT;
-		tl.loop = (this.loop == null) ? true : this.loop;
-
-		let pos = synched ? this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset) : (this._prevPos < 0 ? 0 : this._prevPosition);
-		let mode = synched || !this.actionsEnabled ? Tween.NONE : null;
-
-		// pre-assign currentFrame so it is available to frame scripts:
-		this.currentFrame = tl._calcPosition(pos);
-
-		// update timeline position, ignoring actions if this is a graphic.
-		tl.setPosition(pos, mode);
-
-		this._prevPosition = tl._prevPosition;
-		if (this._prevPos == tl._prevPos) { return; }
-		this.currentFrame = this._prevPos = tl._prevPos;
+		this.currentFrame = tl.position;
 
 		for (let n in this._managed) { this._managed[n] = 1; }
 
 		let tweens = tl._tweens;
 		for (let tween of tl._tweens) {
 			let target = tween._target;
-			if (target == this || tween.passive) { continue; } // TODO: this assumes actions tween has this as the target. Valid?
+			if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. Likely a better approach.
 			let offset = tween._stepPosition;
 
-			if (target instanceof createjs.DisplayObject) {
+			if (target instanceof DisplayObject) {
 				// motion tween.
 				this._addManagedChild(target, offset);
 			} else {
@@ -483,7 +479,7 @@ export default class MovieClip extends Container {
 		let kids = this.children;
 		for (let i=kids.length-1; i>=0; i--) {
 			let id = kids[i].id;
-			if (this._managed[id] == 1) {
+			if (this._managed[id] === 1) {
 				this.removeChildAt(i);
 				delete(this._managed[id]);
 			}
@@ -498,7 +494,7 @@ export default class MovieClip extends Container {
 	 */
 	_setState (state, offset) {
 		if (!state) { return; }
-		for (let i=state.length-1;i>=0;i--) {
+		for (let i = state.length - 1; i >= 0; i--) {
 			let o = state[i];
 			let target = o.t;
 			let props = o.p;
@@ -521,7 +517,7 @@ export default class MovieClip extends Container {
 		if (child instanceof MovieClip) {
 			child._synchOffset = offset;
 			// TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
-			if (child.mode == MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
+			if (child.mode === MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
 		}
 		this._managed[child.id] = 2;
 	}
@@ -535,10 +531,7 @@ export default class MovieClip extends Container {
 	 */
 	_getBounds (matrix, ignoreTransform) {
 		let bounds = this.getBounds();
-		if (!bounds) {
-			this._updateTimeline();
-			if (this.frameBounds) { bounds = this._rectangle.copy(this.frameBounds[this.currentFrame]); }
-		}
+		if (!bounds && (this.frameBounds) { bounds = this._rectangle.copy(this.frameBounds[this.currentFrame]); }
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
 		return super._getBounds(matrix, ignoreTransform);
 	}
@@ -582,16 +575,19 @@ export default class MovieClip extends Container {
 /**
  * This plugin works with <a href="http://tweenjs.com" target="_blank">TweenJS</a> to prevent the startPosition
  * property from tweening.
- * @private
  * @class MovieClipPlugin
+ * @todo update to new plugin model
+ * @static
+ * @private
  */
-export class MovieClipPlugin {
+class MovieClipPlugin {
 
+// constructor:
 	/**
 	 * @constructor
 	 */
 	constructor () {
-		throw("MovieClipPlugin cannot be instantiated.");
+		throw "MovieClipPlugin cannot be instantiated.";
 	}
 
 	/**
@@ -599,7 +595,7 @@ export class MovieClipPlugin {
 	 * @private
 	 */
 	static install () {
-		Tween.installPlugin(MovieClipPlugin, ["startPosition"]);
+		// Tween._installPlugin(MovieClipPlugin);
 	}
 
 	/**
@@ -627,7 +623,7 @@ export class MovieClipPlugin {
 	 */
 	static tween (tween, prop, value, startValues, endValues, ratio, wait, end) {
 		if (!(tween.target instanceof MovieClip)) { return value; }
-		return (ratio == 1 ? endValues[prop] : startValues[prop]);
+		return (ratio === 1 ? endValues[prop] : startValues[prop]);
 	}
 
 }
