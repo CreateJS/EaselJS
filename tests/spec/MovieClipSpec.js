@@ -14,7 +14,7 @@ describe("MovieClip", function () {
 
 		this.mc.timeline.addTween(createjs.Tween.get(child1).to({x: 0}).to({x: 60}, 50).to({x: 0}, 50));
 		this.mc.timeline.addTween(createjs.Tween.get(child2).to({x: 60}).to({x: 0}, 50).to({x: 60}, 50));
-		this.mc.timeline.setLabels({start: "startLbl", end: "endLbl"});
+		this.mc.timeline.labels = {start: "startLbl", end: "endLbl"};
 	});
 
 	it("getCurrentLabel", function () {
@@ -24,7 +24,7 @@ describe("MovieClip", function () {
 	});
 
 	it("getLabels", function () {
-		var lbls = this.mc.timeline.getLabels();
+		var lbls = this.mc.labels;
 		expect(lbls[0].position).toBe("startLbl");
 	});
 

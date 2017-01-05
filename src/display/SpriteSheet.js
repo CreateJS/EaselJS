@@ -425,8 +425,9 @@ export default class SpriteSheet extends EventDispatcher {
 		if (data.images) {
 			for (let img of data.images) {
 				let a = this._images = [];
+				let src;
 				if (typeof img === "string") {
-					let src = img;
+					src = img;
 					img = document.createElement("img");
 					img.src = src;
 				}
@@ -434,7 +435,7 @@ export default class SpriteSheet extends EventDispatcher {
 				if (!img.getContext && !img.naturalWidth) {
 					this._loadCount++;
 					this.complete = false;
-					img.onload = () => this._handleImadeLoad(src);
+					img.onload = () => this._handleImageLoad(src);
 					img.onerror = () => this._handleImageError(src);
 				}
 			}

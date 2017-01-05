@@ -27,6 +27,7 @@
 */
 
 import Container from "./Container";
+import DisplayObject from "./DisplayObject";
 import Tween from "tweenjs/src/Tween";
 import Timeline from "tweenjs/src/Timeline";
 
@@ -90,7 +91,7 @@ export default class MovieClip extends Container {
 	 */
 	constructor (mode = MovieClip.INDEPENDENT, startPosition = 0, loop = 0, labels = null) {
 		super();
-		!MovieClip.inited && MovieClip.init(); // static init
+		!MovieClip.inited && MovieClip.init();
 
 // public properties:
 		/**
@@ -260,7 +261,7 @@ export default class MovieClip extends Container {
 	 * @readonly
 	 */
 	get labels () {
-		return this.timeline.getLabels();
+		return this.timeline.labels;
 	}
 
 	/**
@@ -320,7 +321,7 @@ export default class MovieClip extends Container {
 	 */
 	draw (ctx, ignoreCache) {
 		// draw to cache first:
-		if (this.cacheDraw(ctx, ignoreCache)) { return true; }
+		if (this.drawCache(ctx, ignoreCache)) { return true; }
 		super.draw(ctx, ignoreCache);
 		return true;
 	}

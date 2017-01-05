@@ -3947,7 +3947,7 @@
         children[_key] = arguments[_key]
       }
       var l = children.length;
-      if (l == 0) {
+      if (l === 0) {
         return null
       }
       var child = children[0];
@@ -3969,7 +3969,7 @@
      TODO-ES6: Perf test rest param loops vs arguments.
      addChild (...children) {
      	const l = children.length;
-     	if (l == 0) { return null; }
+     	if (l === 0) { return null; }
      	let child;
      	for (let i = 0; i < l; i++) {
      		child = children[0];
@@ -4187,7 +4187,7 @@
       var kids = this.children;
       var l = kids.length;
       for (var i = 0; i < l; i++) {
-        if (kids[i].name == name) {
+        if (kids[i].name === name) {
           return kids[i]
         }
       }
@@ -4255,17 +4255,17 @@
       var index1 = void 0,
         index2 = void 0;
       for (var i = 0; i < l; i++) {
-        if (kids[i] == child1) {
+        if (kids[i] === child1) {
           index1 = i
         }
-        if (kids[i] == child2) {
+        if (kids[i] === child2) {
           index2 = i
         }
         if (index1 != null && index2 != null) {
           break
         }
       }
-      if (i == l) {
+      if (i === l) {
         return
       } // TODO: throw error?
       kids[index1] = child2;
@@ -4284,11 +4284,11 @@
         return
       }
       for (var i = 0; i < l; i++) {
-        if (kids[i] == child) {
+        if (kids[i] === child) {
           break
         }
       }
-      if (i == l || i == index) {
+      if (i === l || i === index) {
         return
       }
       kids.splice(i, 1);
@@ -4303,7 +4303,7 @@
      */
     Container.prototype.contains = function contains(child) {
       while (child) {
-        if (child == this) {
+        if (child === this) {
           return true
         }
         child = child.parent
@@ -4353,7 +4353,7 @@
       var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
       var arr = [];
       var pt = this.localToGlobal(x, y);
-      this._getObjectsUnderPoint(pt.x, pt.y, arr, mode > 0, mode == 1);
+      this._getObjectsUnderPoint(pt.x, pt.y, arr, mode > 0, mode === 1);
       return arr
     };
     /**
@@ -4369,7 +4369,7 @@
     Container.prototype.getObjectUnderPoint = function getObjectUnderPoint(x, y) {
       var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
       var pt = this.localToGlobal(x, y);
-      return this._getObjectsUnderPoint(pt.x, pt.y, null, mode > 0, mode == 1)
+      return this._getObjectsUnderPoint(pt.x, pt.y, null, mode > 0, mode === 1)
     };
     /**
      * Docced in superclass.
@@ -4734,7 +4734,7 @@
        * @property canvas
        * @type HTMLCanvasElement | Object
        */
-      _this.canvas = typeof canvas == "string" ? document.getElementById(canvas) : canvas;
+      _this.canvas = typeof canvas === "string" ? document.getElementById(canvas) : canvas;
       /**
        * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
        * position over the canvas, and mouseInBounds will be set to false.
@@ -4978,7 +4978,7 @@
      * @type Function
      */
     Stage.prototype.handleEvent = function handleEvent(evt) {
-      if (evt.type == "tick") {
+      if (evt.type === "tick") {
         this.update(evt)
       }
     };
@@ -5047,7 +5047,7 @@
       if (this._mouseOverIntervalID) {
         clearInterval(this._mouseOverIntervalID);
         this._mouseOverIntervalID = null;
-        if (frequency == 0) {
+        if (frequency === 0) {
           this._testMouseOver(true)
         }
       }
@@ -5203,7 +5203,7 @@
       var inBounds = o.inBounds;
       this._updatePointerPosition(id, e, pageX, pageY);
       if (inBounds || o.inBounds || this.mouseMoveOutside) {
-        if (id === -1 && o.inBounds == !inBounds) {
+        if (id === -1 && o.inBounds === !inBounds) {
           this._dispatchMouseEvent(this, inBounds ? "mouseleave" : "mouseenter", false, id, o, e)
         }
         this._dispatchMouseEvent(this, "stagemousemove", false, id, o, e);
@@ -5275,7 +5275,7 @@
         this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e, target);
         o.down = false
       }
-      if (target == oTarget) {
+      if (target === oTarget) {
         this._dispatchMouseEvent(oTarget, "click", true, id, o, e)
       }
       this._dispatchMouseEvent(oTarget, "pressup", true, id, o, e);
@@ -5348,11 +5348,11 @@
       }
       var o = this._getPointerData(-1);
       // only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
-      if (!o || !clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds) {
+      if (!o || !clear && this.mouseX === this._mouseOverX && this.mouseY === this._mouseOverY && this.mouseInBounds) {
         return
       }
       var e = o.posEvtObj;
-      var isEventTarget = eventTarget || e && e.target == this.canvas;
+      var isEventTarget = eventTarget || e && e.target === this.canvas;
       var target = null,
         common = -1,
         cursor = "";
@@ -5477,14 +5477,14 @@
    * @since 0.6.0
    */
   /**
-   * Dispatched when the mouse moves from within the canvas area (mouseInBounds == true) to outside it (mouseInBounds == false).
+   * Dispatched when the mouse moves from within the canvas area (mouseInBounds === true) to outside it (mouseInBounds === false).
    * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
    * class for a listing of event properties.
    * @event mouseleave
    * @since 0.7.0
    */
   /**
-   * Dispatched when the mouse moves into the canvas area (mouseInBounds == false) from outside it (mouseInBounds == true).
+   * Dispatched when the mouse moves into the canvas area (mouseInBounds === false) from outside it (mouseInBounds === true).
    * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
    * class for a listing of event properties.
    * @event mouseenter
@@ -5512,6 +5512,57 @@
    * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
    * @event drawend
    * @since 0.7.0
+   */
+  /**
+   * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL-optimized display list,
+   * which is used in place of the usual {{#crossLink "Stage"}}{{/crossLink}}. This class should behave identically to
+   * a {{#crossLink "Stage"}}{{/crossLink}} except for WebGL-specific functionality.
+   *
+   * Each time the {{#crossLink "Stage/tick"}}{{/crossLink}} method is called, the display list is rendered to the
+   * target &lt;canvas/&gt; instance, ignoring non-WebGL-compatible display objects. On devices and browsers that don't
+   * support WebGL, content will automatically be rendered to canvas 2D context instead.
+   *
+   * <h4>Limitations</h4>
+   * - {{#crossLink "Shape"}}{{/crossLink}}, {{#crossLink "Shadow"}}{{/crossLink}}, and {{#crossLink "Text"}}{{/crossLink}}
+   * 	are not rendered when added to the display list.
+   * - To display something StageGL cannot render, {{#crossLink "displayObject/cache"}}{{/crossLink}} the object.
+   *	Caches can be rendered regardless of source.
+   * - Images are wrapped as a webGL "Texture". Each graphics card has a limit to its concurrent Textures, too many
+   * Textures will noticeably slow performance.
+   * - Each cache counts as an individual Texture. As such {{#crossLink "SpriteSheet"}}{{/crossLink}} and
+   * {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} are recommended practices to help keep texture counts low.
+   * - To use any image node (DOM Image/Canvas Element) between multiple StageGL instances it must be a
+   * {{#crossLink "Bitmap/clone"}}{{/crossLink}}, otherwise the GPU texture loading and tracking  will get confused.
+   * - You must call {{#crossLink "StageGL/updateViewport"}}{{/crossLink}} if you resize your canvas after making
+   * a StageGL instance, this will properly size the WebGL context stored in memory, this won't change the DOM element.
+   * - Best performance will come from manual management of texture memory, but it is handled automatically by default.
+   * See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for details.
+   *
+   * <h4>Example</h4>
+   * This example creates a StageGL instance, adds a child to it, then uses the EaselJS {{#crossLink "Ticker"}}{{/crossLink}}
+   * to update the child and redraw the stage.
+   *
+   *      var stage = new createjs.StageGL("canvasElementId", false, false);
+   *
+   *      var image = new createjs.Bitmap("imagePath.png");
+   *      stage.addChild(image);
+   *
+   *      createjs.Ticker.on("tick", handleTick);
+   *
+   *      function handleTick(event) {
+   *          image.x += 10;
+   *          stage.update();
+   *      }
+   *
+   * <h4>Notes</h4>
+   * - StageGL is not currently included in the minified version of EaselJS.
+   * - {{#crossLink "SpriteContainer"}}{{/crossLink}} (the previous approach to WebGL with EaselJS) has been deprecated.
+   * - Earlier versions of WebGL support in EaselJS (SpriteStage and SpriteContainer) had hard limitations on images
+   * 	per container, which have been solved.
+   *
+   * @class StageGL
+   * @extends Stage
+   * @module EaselJS
    */
   var StageGL = function(_Stage) {
     inherits(StageGL, _Stage);
@@ -6214,7 +6265,7 @@
           this._activeShader = this._fetchShaderProgram(gl);
           success = true
         } catch (e) {
-          if (this._batchTextureCount == 1) {
+          if (this._batchTextureCount === 1) {
             throw "Cannot compile shader " + e
           }
           this._batchTextureCount -= 4;
@@ -6405,16 +6456,16 @@
         b = void 0,
         a = void 0,
         output = void 0;
-      if (typeof color == "string") {
-        if (color.indexOf("#") == 0) {
-          if (color.length == 4) {
+      if (typeof color === "string") {
+        if (color.indexOf("#") === 0) {
+          if (color.length === 4) {
             color = "#" + (color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2) + color.charAt(3) + color.charAt(3))
           }
           r = Number("0x" + color.slice(1, 3)) / 255;
           g = Number("0x" + color.slice(3, 5)) / 255;
           b = Number("0x" + color.slice(5, 7)) / 255;
           a = Number("0x" + color.slice(7, 9)) / 255
-        } else if (color.indexOf("rgba(") == 0) {
+        } else if (color.indexOf("rgba(") === 0) {
           output = color.slice(5, -1).split(",");
           r = Number(output[0]) / 255;
           g = Number(output[1]) / 255;
@@ -6581,7 +6632,7 @@
       // resolve issue with no dynamic samplers by creating correct samplers in if else chain
       var insert = "";
       for (var i = 1; i < this._batchTextureCount; i++) {
-        insert += "} else if (src == " + i + ") { color = texture2D(uSampler[" + i + "], vTextureCoord);"
+        insert += "} else if (src === " + i + ") { color = texture2D(uSampler[" + i + "], vTextureCoord);"
       }
       str = str.replace(/{{alternates}}/g, insert).replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
       // actually compile the shader
@@ -6850,7 +6901,7 @@
       if (tex._storeID !== undefined && tex._storeID >= 0) {
         this._textureDictionary[tex._storeID] = undefined;
         for (var n in this._textureIDs) {
-          if (this._textureIDs[n] == tex._storeID) {
+          if (this._textureIDs[n] === tex._storeID) {
             delete this._textureIDs[n]
           }
         }
@@ -7361,191 +7412,7 @@
       }
     }]);
     return StageGL
-  }(Stage);
-  // static properties:
-  /**
-   * The number of properties defined per vertex (x, y, textureU, textureV, textureIndex, alpha)
-   * @property VERTEX_PROPERTY_COUNT
-   * @static
-   * @final
-   * @type {Number}
-   * @default 6
-   * @readonly
-   */
-  /**
-   * The number of triangle indices it takes to form a Card. 3 per triangle, 2 triangles.
-   * @property INDICIES_PER_CARD
-   * @static
-   * @final
-   * @type {Number}
-   * @default 6
-   * @readonly
-   */
-  /**
-   * The default value for the maximum number of cards we want to process in a batch. See {{#crossLink "StageGL/WEBGL_MAX_INDEX_NUM:property"}}{{/crossLink}}
-   * for a hard limit.
-   * @property DEFAULT_MAX_BATCH_SIZE
-   * @static
-   * @final
-   * @type {Number}
-   * @default 10000
-   * @readonly
-   */
-  /**
-   * The maximum size WebGL allows for element index numbers. Uses a 16 bit unsigned integer. It takes 6 indices to
-   * make a unique card.
-   * @property WEBGL_MAX_INDEX_NUM
-   * @static
-   * @final
-   * @type {Number}
-   * @default 65536
-   * @readonly
-   */
-  /**
-   * Default U/V rect for dealing with full coverage from an image source.
-   * @property UV_RECT
-   * @static
-   * @final
-   * @type {Object}
-   * @default {t:0, l:0, b:1, r:1}
-   * @readonly
-   */
-  /**
-   * Vertex positions for a card that covers the entire render. Used with render targets primarily.
-   * @property COVER_VERT
-   * @static
-   * @final
-   * @type {Float32Array}
-   * @readonly
-   */
-  /**
-   * U/V for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
-   * @property COVER_UV
-   * @static
-   * @final
-   * @type {Float32Array}
-   * @readonly
-   */
-  /**
-   * Flipped U/V for {{#crossLink "StageGL:COVER_VERT:property"}}{{/crossLink}}.
-   * @property COVER_UV_FLIP
-   * @static
-   * @final
-   * @type {Float32Array}
-   * @readonly
-   */
-  /**
-   * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
-   * regular shader is designed to render all expected objects. Shader code may contain templates that are replaced
-   * pre-compile.
-   * @property REGULAR_VARYING_HEADER
-   * @static
-   * @final
-   * @type {String}
-   * @readonly
-   */
-  /**
-   * Actual full header for the vertex shader. Includes the varying header. The regular shader is designed to render
-   * all expected objects. Shader code may contain templates that are replaced pre-compile.
-   * @property REGULAR_VERTEX_HEADER
-   * @static
-   * @final
-   * @type {String}
-   * @readonly
-   */
-  /**
-   * Actual full header for the fragment shader. Includes the varying header. The regular shader is designed to render
-   * all expected objects. Shader code may contain templates that are replaced pre-compile.
-   * @property REGULAR_FRAGMENT_HEADER
-   * @static
-   * @final
-   * @type {String}
-   * @readonly
-   */
-  /**
-   * Body of the vertex shader. The regular shader is designed to render all expected objects. Shader code may contain
-   * templates that are replaced pre-compile.
-   * @property REGULAR_VERTEX_BODY
-   * @static
-   * @final
-   * @type {String}
-   * @readonly
-   */
-  /**
-   * Body of the fragment shader. The regular shader is designed to render all expected objects. Shader code may
-   * contain templates that are replaced pre-compile.
-   * @property REGULAR_FRAGMENT_BODY
-   * @static
-   * @final
-   * @type {String}
-   * @readonly
-   */
-  // TODO: DHG: a real particle shader
-  /**
-   * @property PARTICLE_VERTEX_BODY
-   * @todo
-   * @final
-   * @static
-   * @type {String}
-   * @readonly
-   */
-  /**
-   * @property PARTICLE_FRAGMENT_BODY
-   * @todo
-   * @final
-   * @static
-   * @type {String}
-   * @readonly
-   */
-  /**
-   * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
-   * cover shader is designed to be a simple vertex/uv only texture render that covers the render surface. Shader
-   * code may contain templates that are replaced pre-compile.
-   * @property COVER_VARYING_HEADER
-   * @static
-   * @final
-   * @type {String}
-   * @readonly
-   */
-  /**
-   * Actual full header for the vertex shader. Includes the varying header. The cover shader is designed to be a
-   * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
-   * replaced pre-compile.
-   * @property COVER_VERTEX_HEADER
-   * @static
-   * @final
-   * @type {String}
-   * @readonly
-   */
-  /**
-   * Actual full header for the fragment shader. Includes the varying header. The cover shader is designed to be a
-   * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
-   * replaced pre-compile.
-   * @property COVER_FRAGMENT_HEADER
-   * @static
-   * @final
-   * @type {String}
-   * @readonly
-   */
-  /**
-   * Body of the vertex shader. The cover shader is designed to be a simple vertex/uv only texture render that covers
-   * the render surface. Shader code may contain templates that are replaced pre-compile.
-   * @property COVER_VERTEX_BODY
-   * @static
-   * @final
-   * @type {String}
-   * @readonly
-   */
-  /**
-   * Body of the fragment shader. The cover shader is designed to be a simple vertex/uv only texture render that
-   * covers the render surface. Shader code may contain templates that are replaced pre-compile.
-   * @property COVER_FRAGMENT_BODY
-   * @static
-   * @final
-   * @type {String}
-   * @readonly
-   */
-  {
+  }(Stage); {
     StageGL.VERTEX_PROPERTY_COUNT = 6;
     StageGL.INDICIES_PER_CARD = 6;
     StageGL.DEFAULT_MAX_BATCH_SIZE = 1e4;
@@ -7581,7 +7448,7 @@
     StageGL.REGULAR_VERTEX_HEADER = "\n\t\t" + StageGL.REGULAR_VARYING_HEADER + "\n\t\tattribute vec2 vertexPosition;\n\t\tattribute vec2 uvPosition;\n\t\tattribute lowp float textureIndex;\n\t\tattribute lowp float objectAlpha;\n\t\tuniform mat4 pMatrix;\n\t";
     StageGL.REGULAR_FRAGMENT_HEADER = "\n\t\t" + StageGL.REGULAR_VARYING_HEADER + "\n\t\tuniform sampler2D uSampler[{{count}}];\n\t";
     StageGL.REGULAR_VERTEX_BODY = "\n\t\tvoid main (void) {\n\t\t\t// DHG TODO: This doesn't work. Must be something wrong with the hand built matrix see js... bypass for now\n\t\t\t// vertexPosition, round if flag\n\t\t\t// gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);\n\t\t\tgl_Position = vec4(\n\t\t\t\t(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0],\n\t\t\t\t(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1],\n\t\t\t\tpMatrix[3][2],\n\t\t\t\t1.0\n\t\t\t);\n\t\t\talphaValue = objectAlpha;\n\t\t\tindexPicker = textureIndex;\n\t\t\tvTextureCoord = uvPosition;\n\t\t}\n\t";
-    StageGL.REGULAR_FRAGMENT_BODY = "\n\t\tvoid main (void) {\n\t\t\tint src = int(indexPicker);\n\t\t\tvec4 color = vec4(1.0, 0.0, 0.0, 1.0);\n\n\t\t\tif (src == 0) {\n\t\t\t\tcolor = texture2D(uSampler[0], vTextureCoord);\n\t\t\t\t{{alternates}}\n\t\t\t}\n\n\t\t\tgl_FragColor = vec4(color.rgb{{premultiply}}, color.a * alphaValue);\n\t\t}\n\t";
+    StageGL.REGULAR_FRAGMENT_BODY = "\n\t\tvoid main (void) {\n\t\t\tint src = int(indexPicker);\n\t\t\tvec4 color = vec4(1.0, 0.0, 0.0, 1.0);\n\n\t\t\tif (src === 0) {\n\t\t\t\tcolor = texture2D(uSampler[0], vTextureCoord);\n\t\t\t\t{{alternates}}\n\t\t\t}\n\n\t\t\tgl_FragColor = vec4(color.rgb{{premultiply}}, color.a * alphaValue);\n\t\t}\n\t";
     StageGL.PARTICLE_VERTEX_BODY = "\n\t\t" + StageGL.REGULAR_VERTEX_BODY + "\n\t";
     StageGL.PARTICLE_FRAGMENT_BODY = "\n\t\t" + StageGL.REGULAR_FRAGMENT_BODY + "\n\t";
     StageGL.COVER_VARYING_HEADER = "\n\t\tprecision mediump float;\n\t\tvarying highp vec2 vRenderCoord;\n\t\tvarying highp vec2 vTextureCoord;\n\t";
@@ -7620,7 +7487,7 @@
        * @type HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
        */
       var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
-      if (typeof imageOrUri == "string") {
+      if (typeof imageOrUri === "string") {
         _this.image = document.createElement("img");
         _this.image.src = imageOrUri
       } else {
@@ -8423,11 +8290,11 @@
       }
       for (var i = 0, l = this.text.length; i < l; i++) {
         var character = this.text.charAt(i);
-        if (character == " " && !hasSpace) {
+        if (character === " " && !hasSpace) {
           x += spaceW;
           continue
-        } else if (character == "\n" || character == "\r") {
-          if (character == "\r" && this.text.charAt(i + 1) == "\n") {
+        } else if (character === "\n" || character === "\r") {
+          if (character === "\r" && this.text.charAt(i + 1) === "\n") {
             i++
           } // crlf
           x = 0;
@@ -8488,7 +8355,7 @@
     function DOMElement(htmlElement) {
       classCallCheck(this, DOMElement);
       var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
-      if (typeof htmlElement == "string") {
+      if (typeof htmlElement === "string") {
         htmlElement = document.getElementById(htmlElement)
       }
       _this.mouseEnabled = false;
@@ -9918,7 +9785,7 @@
           var num = base64[str.charAt(i)];
           var sign = num >> 5 ? -1 : 1;
           num = (num & 31) << 6 | base64[str.charAt(i + 1)];
-          if (charCount == 3) {
+          if (charCount === 3) {
             num = num << 6 | base64[str.charAt(i + 2)]
           }
           num = sign * num / 10;
@@ -12058,12 +11925,14 @@
      * @return {String} The name of the current label or null if there is no label
      */
     AbstractTween.prototype.getCurrentLabel = function getCurrentLabel(pos) {
-      var labels = this.labels;
+      var labels = this.labels,
+        i = void 0,
+        l = void 0;
       if (pos == null) {
         pos = this.position
       }
-      for (var _i2 = 0, l = labels.length; _i2 < l; _i2++) {
-        if (pos < labels[_i2].position) {
+      for (i = 0, l = labels.length; i < l; i++) {
+        if (pos < labels[i].position) {
           break
         }
       }
@@ -14074,49 +13943,6 @@
     };
     return Timeline
   }(AbstractTween);
-  /**
-   * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
-   * you to create objects which encapsulate timeline animations, state changes, and synched actions. Due to the
-   * complexities inherent in correctly setting up a MovieClip, it is largely intended for tool output and is not included
-   * in the main EaselJS library.
-   *
-   * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
-   * been made to support time-based timelines in the future.
-   *
-   * <h4>Example</h4>
-   * This example animates two shapes back and forth. The grey shape starts on the left, but we jump to a mid-point in
-   * the animation using {{#crossLink "MovieClip/gotoAndPlay"}}{{/crossLink}}.
-   *
-   *      var stage = new createjs.Stage("canvas");
-   *      createjs.Ticker.addEventListener("tick", stage);
-   *
-   *      var mc = new createjs.MovieClip(null, 0, true, {start:20});
-   *      stage.addChild(mc);
-   *
-   *      var child1 = new createjs.Shape(
-   *          new createjs.Graphics().beginFill("#999999")
-   *              .drawCircle(30,30,30));
-   *      var child2 = new createjs.Shape(
-   *          new createjs.Graphics().beginFill("#5a9cfb")
-   *              .drawCircle(30,30,30));
-   *
-   *      mc.timeline.addTween(
-   *          createjs.Tween.get(child1)
-   *              .to({x:0}).to({x:60}, 50).to({x:0}, 50));
-   *      mc.timeline.addTween(
-   *          createjs.Tween.get(child2)
-   *              .to({x:60}).to({x:0}, 50).to({x:60}, 50));
-   *
-   *      mc.gotoAndPlay("start");
-   *
-   * It is recommended to use <code>tween.to()</code> to animate and set properties (use no duration to have it set
-   * immediately), and the <code>tween.wait()</code> method to create delays between animations. Note that using the
-   * <code>tween.set()</code> method to affect properties will likely not provide the desired result.
-   *
-   * @class MovieClip
-   * @extends Container
-   * @module EaselJS
-   */
   var MovieClip = function(_Container) {
     inherits(MovieClip, _Container);
     // constructor:
@@ -14127,19 +13953,19 @@
      * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
      * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
      * property.
-     * @param {Boolean} [loop=true] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
-     * property. The default is `true`.
+     * @param {Boolean} [loop=0] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
+     * property. The default is `0`.
      * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
      * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
      */
     function MovieClip() {
       var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : MovieClip.INDEPENDENT;
       var startPosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      var loop = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+      var loop = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
       var labels = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
       classCallCheck(this, MovieClip);
       var _this = possibleConstructorReturn(this, _Container.call(this));
-      !MovieClip.inited && MovieClip.init(); // static init
+      !MovieClip.inited && MovieClip.init();
       // public properties:
       /**
        * Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED).
@@ -14162,7 +13988,7 @@
        * @type Boolean
        * @default true
        */
-      _this.loop = loop;
+      _this.loop = loop === true ? -1 : loop;
       /**
        * The current frame of the movieclip.
        * @property currentFrame
@@ -14195,10 +14021,10 @@
        * @type Timeline
        * @default null
        */
-      _this.timeline = new Timeline(null, labels, {
+      _this.timeline = new Timeline({
         paused: true,
-        position: startPosition,
-        useTicks: true
+        useTicks: true,
+        labels: labels
       });
       /**
        * If true, the MovieClip's position will not advance when ticked.
@@ -14259,19 +14085,12 @@
        */
       _this._synchOffset = 0;
       /**
-       * @property _prevPos
+       * @property _rawPosition
        * @type Number
        * @default -1
        * @private
        */
-      _this._prevPos = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
-      /**
-       * @property _prevPosition
-       * @type Number
-       * @default 0
-       * @private
-       */
-      _this._prevPosition = 0;
+      _this._rawPosition = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
       /**
        * The time remaining from the previous tick, only applicable when .framerate is set.
        * @property _t
@@ -14297,6 +14116,7 @@
       MovieClipPlugin.install();
       MovieClip.inited = true
     };
+    // TODO: can we just proxy `get currentFrame` to timeline.position as well? Ditto for `get loop` (or just remove entirely).
     // accessor properties:
     /**
      * Returns an array of objects with label and position (aka frame) properties, sorted by position.
@@ -14329,10 +14149,9 @@
      */
     MovieClip.prototype.draw = function draw(ctx, ignoreCache) {
       // draw to cache first:
-      if (this.cacheDraw(ctx, ignoreCache)) {
+      if (this.drawCache(ctx, ignoreCache)) {
         return true
       }
-      this._updateTimeline();
       _Container.prototype.draw.call(this, ctx, ignoreCache);
       return true
     };
@@ -14376,23 +14195,28 @@
     MovieClip.prototype.advance = function advance(time) {
       // TODO: should we worry at all about clips who change their own modes via frame scripts?
       var independent = MovieClip.INDEPENDENT;
-      if (this.mode != independent) {
+      if (this.mode !== independent) {
         return
       }
+      // if this MC doesn't have a framerate, hunt ancestors for one:
       var o = this,
         fps = o.framerate;
       while ((o = o.parent) && fps == null) {
-        if (o.mode == independent) {
+        if (o.mode === independent) {
           fps = o._framerate
         }
       }
       this._framerate = fps;
-      var t = fps != null && fps != -1 && time != null ? time / (1e3 / fps) + this._t : 1;
+      if (this.paused) {
+        return
+      }
+      // TODO: strict equality here?
+      // calculate how many frames to advance:
+      var t = fps !== null && fps !== -1 && time !== null ? time / (1e3 / fps) + this._t : 1;
       var frames = t | 0;
-      this._t = t - frames; // leftover time
-      while (!this.paused && frames--) {
-        this._prevPosition = this._prevPos < 0 ? 0 : this._prevPosition + 1;
-        this._updateTimeline()
+      this._t = t - frames; // leftover time, save to add to next advance.
+      while (frames--) {
+        this._updateTimeline(this._rawPosition + 1, false)
       }
     };
     /**
@@ -14424,42 +14248,49 @@
       if (pos == null) {
         return
       }
-      // prevent _updateTimeline from overwriting the new position because of a reset:
-      if (this._prevPos == -1) {
-        this._prevPos = NaN
-      }
-      this._prevPosition = pos;
       this._t = 0;
-      this._updateTimeline()
+      this._updateTimeline(pos, true)
     };
     /**
      * @method _reset
      * @private
      */
     MovieClip.prototype._reset = function _reset() {
-      this._prevPos = -1;
+      this._rawPosition = -1;
       this._t = this.currentFrame = 0;
       this.paused = false
     };
     /**
      * @method _updateTimeline
+     * @param {Number} rawPosition
+     * @param {Boolean} jump Indicates whether this update is due to jumping (via gotoAndXX) to a new position.
      * @protected
      */
-    MovieClip.prototype._updateTimeline = function _updateTimeline() {
-      var tl = this.timeline;
-      var synched = this.mode != MovieClip.INDEPENDENT;
-      tl.loop = this.loop == null ? true : this.loop;
-      var pos = synched ? this.startPosition + (this.mode == MovieClip.SINGLE_FRAME ? 0 : this._synchOffset) : this._prevPos < 0 ? 0 : this._prevPosition;
-      var mode = synched || !this.actionsEnabled ? Tween.NONE : null;
-      // pre-assign currentFrame so it is available to frame scripts:
-      this.currentFrame = tl._calcPosition(pos);
-      // update timeline position, ignoring actions if this is a graphic.
-      tl.setPosition(pos, mode);
-      this._prevPosition = tl._prevPosition;
-      if (this._prevPos == tl._prevPos) {
+    MovieClip.prototype._updateTimeline = function _updateTimeline(rawPosition, jump) {
+      var _this2 = this;
+      if (rawPosition < 1) {
+        rawPosition = 0
+      }
+      if (this._rawPosition === rawPosition) {
         return
       }
-      this.currentFrame = this._prevPos = tl._prevPos;
+      this._rawPosition = rawPosition;
+      var tl = this.timeline,
+        synced = this.mode !== MovieClip.INDEPENDENT;
+      tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline.
+      var pos = synced ? this.startPosition + (this.mode === MovieClip.SINGLE_FRAME ? 0 : this._synchOffset) : rawPosition === -1 ? 0 : rawPosition;
+      tl.setPosition(pos, !this.actionsEnabled || synced, jump, function() {
+        return _this2._resolveState()
+      })
+    };
+    /**
+     * Runs via a callback after timeline property updates and before actions.
+     * @method _resolveState
+     * @protected
+     */
+    MovieClip.prototype._resolveState = function _resolveState() {
+      var tl = this.timeline;
+      this.currentFrame = tl.position;
       for (var n in this._managed) {
         this._managed[n] = 1
       }
@@ -14476,11 +14307,11 @@
         }
         var tween = _ref;
         var target = tween._target;
-        if (target == this || tween.passive) {
+        if (target === this || tween.passive) {
           continue
-        } // TODO: this assumes actions tween has this as the target. Valid?
+        } // TODO: this assumes the actions tween from Animate has `this` as the target. Likely a better approach.
         var offset = tween._stepPosition;
-        if (target instanceof createjs.DisplayObject) {
+        if (target instanceof DisplayObject) {
           // motion tween.
           this._addManagedChild(target, offset)
         } else {
@@ -14491,7 +14322,7 @@
       var kids = this.children;
       for (var i = kids.length - 1; i >= 0; i--) {
         var id = kids[i].id;
-        if (this._managed[id] == 1) {
+        if (this._managed[id] === 1) {
           this.removeChildAt(i);
           delete this._managed[id]
         }
@@ -14532,7 +14363,7 @@
       if (child instanceof MovieClip) {
         child._synchOffset = offset;
         // TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
-        if (child.mode == MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) {
+        if (child.mode === MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) {
           child._reset()
         }
       }
@@ -14547,11 +14378,8 @@
      */
     MovieClip.prototype._getBounds = function _getBounds(matrix, ignoreTransform) {
       var bounds = this.getBounds();
-      if (!bounds) {
-        this._updateTimeline();
-        if (this.frameBounds) {
-          bounds = this._rectangle.copy(this.frameBounds[this.currentFrame])
-        }
+      if (!bounds && this.frameBounds) {
+        bounds = this._rectangle.copy(this.frameBounds[this.currentFrame])
       }
       if (bounds) {
         return this._transformBounds(bounds, matrix, ignoreTransform)
@@ -14561,12 +14389,11 @@
     createClass(MovieClip, [{
       key: "labels",
       get: function get() {
-        return this.timeline.getLabels()
+        return this.timeline.labels
       }
     }, {
       key: "currentLabel",
       get: function get() {
-        this._updateTimeline();
         return this.timeline.getCurrentLabel()
       }
     }, {
@@ -14581,7 +14408,35 @@
       }
     }]);
     return MovieClip
-  }(Container); {
+  }(Container);
+  // static constants:
+  /**
+   * The MovieClip will advance independently of its parent, even if its parent is paused.
+   * This is the default mode.
+   * @property INDEPENDENT
+   * @static
+   * @type String
+   * @default "independent"
+   * @readonly
+   */
+  /**
+   * The MovieClip will only display a single frame (as determined by the startPosition property).
+   * @property SINGLE_FRAME
+   * @static
+   * @type String
+   * @default "single"
+   * @readonly
+   */
+  /**
+   * The MovieClip will be advanced only when its parent advances and will be synched to the position of
+   * the parent MovieClip.
+   * @property SYNCHED
+   * @static
+   * @type String
+   * @default "synched"
+   * @readonly
+   */
+  {
     MovieClip.INDEPENDENT = "independent";
     MovieClip.SINGLE_FRAME = "single";
     MovieClip.SYNCHED = "synched";
@@ -14591,6 +14446,7 @@
    * This plugin works with <a href="http://tweenjs.com" target="_blank">TweenJS</a> to prevent the startPosition
    * property from tweening.
    * @class MovieClipPlugin
+   * @todo update to new plugin model
    * @static
    * @private
    */
@@ -14607,16 +14463,7 @@
      * @method install
      * @private
      */
-    MovieClipPlugin.install = function install() {
-      Tween._installPlugin(MovieClipPlugin, ["startPosition"])
-    };
-    /**
-     * @method init
-     * @param {Tween} tween
-     * @param {String} prop
-     * @param {String|Number|Boolean} value
-     * @private
-     */
+    MovieClipPlugin.install = function install() {};
     MovieClipPlugin.init = function init(tween, prop, value) {
       return value
     };
@@ -14636,7 +14483,7 @@
       if (!(_tween.target instanceof MovieClip)) {
         return value
       }
-      return ratio == 1 ? endValues[prop] : startValues[prop]
+      return ratio === 1 ? endValues[prop] : startValues[prop]
     };
     return MovieClipPlugin
   }();
@@ -15008,34 +14855,39 @@
       this.framerate = data.framerate || 0;
       // parse images:
       if (data.images) {
-        for (var _iterator = data.images, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-          var _ref;
+        var _loop = function _loop() {
           if (_isArray) {
-            if (_i >= _iterator.length) break;
+            if (_i >= _iterator.length) return "break";
             _ref = _iterator[_i++]
           } else {
             _i = _iterator.next();
-            if (_i.done) break;
+            if (_i.done) return "break";
             _ref = _i.value
           }
           var img = _ref;
-          var a = this._images = [];
-          if (typeof img == "string") {
-            var _src = img;
+          var a = _this2._images = [];
+          var src = void 0;
+          if (typeof img === "string") {
+            src = img;
             img = document.createElement("img");
-            img.src = _src
+            img.src = src
           }
           a.push(img);
           if (!img.getContext && !img.naturalWidth) {
-            this._loadCount++;
-            this.complete = false;
+            _this2._loadCount++;
+            _this2.complete = false;
             img.onload = function() {
-              return _this2._handleImadeLoad(src)
+              return _this2._handleImageLoad(src)
             };
             img.onerror = function() {
               return _this2._handleImageError(src)
             }
           }
+        };
+        for (var _iterator = data.images, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+          var _ref;
+          var _ret = _loop();
+          if (_ret === "break") break
         }
       }
       // parse frames:
@@ -15069,7 +14921,7 @@
           this._spacing = o.spacing || 0;
           this._margin = o.margin || 0;
           this._numFrames = o.count;
-          if (this._loadCount == 0) {
+          if (this._loadCount === 0) {
             this._calculateFrames()
           }
         }
@@ -15084,20 +14936,20 @@
             name: name
           };
           var obj = _o[name];
-          var _a = void 0;
-          if (typeof obj == "number") {
+          var a = void 0;
+          if (typeof obj === "number") {
             // single frame
-            _a = anim.frames = [obj]
+            a = anim.frames = [obj]
           } else if (Array.isArray(obj)) {
             // simple
-            if (obj.length == 1) {
+            if (obj.length === 1) {
               anim.frames = [obj[0]]
             } else {
               anim.speed = obj[3];
               anim.next = obj[2];
-              _a = anim.frames = [];
+              a = anim.frames = [];
               for (var i = obj[0]; i <= obj[1]; i++) {
-                _a.push(i)
+                a.push(i)
               }
             }
           } else {
@@ -15105,12 +14957,12 @@
             anim.speed = obj.speed;
             anim.next = obj.next;
             var frames = obj.frames;
-            _a = anim.frames = typeof frames == "number" ? [frames] : frames.slice(0)
+            a = anim.frames = typeof frames === "number" ? [frames] : frames.slice(0)
           }
           if (anim.next === true || anim.next === undefined) {
             anim.next = name
           } // loop
-          if (anim.next === false || _a.length < 2 && anim.next == name) {
+          if (anim.next === false || a.length < 2 && anim.next === name) {
             anim.next = null
           } // stop
           if (!anim.speed) {
@@ -15126,7 +14978,7 @@
      * @protected
      */
     SpriteSheet.prototype._handleImageLoad = function _handleImageLoad(src) {
-      if (--this._loadCount == 0) {
+      if (--this._loadCount === 0) {
         this._calculateFrames();
         this.complete = true;
         this.dispatchEvent("complete")
@@ -15141,7 +14993,7 @@
       errorEvent.src = src;
       this.dispatchEvent(errorEvent);
       // Complete is still dispatched.
-      if (--this._loadCount == 0) {
+      if (--this._loadCount === 0) {
         this.dispatchEvent("complete")
       }
     };
@@ -15150,7 +15002,7 @@
      * @protected
      */
     SpriteSheet.prototype._calculateFrames = function _calculateFrames() {
-      if (this._frames || this._frameWidth == 0) {
+      if (this._frames || this._frameWidth === 0) {
         return
       }
       this._frames = [];
@@ -15161,9 +15013,9 @@
       var spacing = this._spacing,
         margin = this._margin;
       imgLoop: for (var i = 0, imgs = this._images, l = imgs.length; i < l; i++) {
-        var img = imgs[i],
-          imgW = img.width,
-          imgH = img.height;
+        var _img = imgs[i],
+          imgW = _img.width,
+          imgH = _img.height;
         var y = margin;
         while (y <= imgH - margin - frameHeight) {
           var x = margin;
@@ -15173,7 +15025,7 @@
             }
             frameCount++;
             this._frames.push({
-              image: img,
+              image: _img,
               rect: new Rectangle(x, y, frameWidth, frameHeight),
               regX: this._regX,
               regY: this._regY
@@ -15695,7 +15547,7 @@
       if (!this.alphaMap) {
         return false
       }
-      if (this.alphaMap == this._alphaMap && this._mapData) {
+      if (this.alphaMap === this._alphaMap && this._mapData) {
         return true
       }
       this._mapData = null;
@@ -15931,7 +15783,7 @@
       if (isNaN(radiusX) || radiusX < 0) return false;
       var radiusY = this._blurY >> 1;
       if (isNaN(radiusY) || radiusY < 0) return false;
-      if (radiusX == 0 && radiusY == 0) return false;
+      if (radiusX === 0 && radiusY === 0) return false;
       var iterations = this.quality;
       if (isNaN(iterations) || iterations < 1) iterations = 1;
       iterations |= 0;
@@ -16365,7 +16217,7 @@
      * @chainable
      */
     ColorMatrix.prototype.adjustBrightness = function adjustBrightness(value) {
-      if (value == 0 || isNaN(value)) {
+      if (value === 0 || isNaN(value)) {
         return this
       }
       value = this._cleanValue(value, 255);
@@ -16381,7 +16233,7 @@
      * @chainable
      */
     ColorMatrix.prototype.adjustContrast = function adjustContrast(value) {
-      if (value == 0 || isNaN(value)) {
+      if (value === 0 || isNaN(value)) {
         return this
       }
       value = this._cleanValue(value, 100);
@@ -16390,7 +16242,7 @@
         x = 127 + value / 100 * 127
       } else {
         x = value % 1;
-        if (x == 0) {
+        if (x === 0) {
           x = ColorMatrix.DELTA_INDEX[value]
         } else {
           x = ColorMatrix.DELTA_INDEX[value << 0] * (1 - x) + ColorMatrix.DELTA_INDEX[(value << 0) + 1] * x
@@ -16409,7 +16261,7 @@
      * @chainable
      */
     ColorMatrix.prototype.adjustSaturation = function adjustSaturation(value) {
-      if (value == 0 || isNaN(value)) {
+      if (value === 0 || isNaN(value)) {
         return this
       }
       value = this._cleanValue(value, 100);
@@ -16428,7 +16280,7 @@
      * @chainable
      */
     ColorMatrix.prototype.adjustHue = function adjustHue(value) {
-      if (value == 0 || isNaN(value)) {
+      if (value === 0 || isNaN(value)) {
         return this
       }
       value = this._cleanValue(value, 180) / 180 * Math.PI;
@@ -16785,13 +16637,13 @@
       var label = void 0,
         t = this.target,
         type = evt.type;
-      if (type == "mousedown") {
+      if (type === "mousedown") {
         this._isPressed = true;
         label = this.downLabel
-      } else if (type == "pressup") {
+      } else if (type === "pressup") {
         this._isPressed = false;
         label = this._isOver ? this.overLabel : this.outLabel
-      } else if (type == "rollover") {
+      } else if (type === "rollover") {
         this._isOver = true;
         label = this._isPressed ? this.downLabel : this.overLabel
       } else {
@@ -16822,7 +16674,7 @@
         return this._enabled
       },
       set: function set(enabled) {
-        if (enabled == this._enabled) {
+        if (enabled === this._enabled) {
           return
         }
         var o = this.target;
@@ -17013,11 +16865,11 @@
         if (touch.target != stage.canvas) {
           continue
         }
-        if (type == "touchstart") {
+        if (type === "touchstart") {
           this._handleStart(stage, id, e, touch.pageX, touch.pageY)
-        } else if (type == "touchmove") {
+        } else if (type === "touchmove") {
           this._handleMove(stage, id, e, touch.pageX, touch.pageY)
-        } else if (type == "touchend" || type == "touchcancel") {
+        } else if (type === "touchend" || type === "touchcancel") {
           this._handleEnd(stage, id, e)
         }
       }
@@ -17093,7 +16945,7 @@
       var type = e.type;
       var id = e.pointerId;
       var ids = stage.__touch.activeIDs;
-      if (type == "MSPointerDown" || type == "pointerdown") {
+      if (type === "MSPointerDown" || type === "pointerdown") {
         if (e.srcElement != stage.canvas) {
           return
         }
@@ -17101,9 +16953,9 @@
         this._handleStart(stage, id, e, e.pageX, e.pageY)
       } else if (ids[id]) {
         // it's an id we're watching
-        if (type == "MSPointerMove" || type == "pointermove") {
+        if (type === "MSPointerMove" || type === "pointermove") {
           this._handleMove(stage, id, e, e.pageX, e.pageY)
-        } else if (type == "MSPointerUp" || type == "MSPointerCancel" || type == "pointerup" || type == "pointercancel") {
+        } else if (type === "MSPointerUp" || type === "MSPointerCancel" || type === "pointerup" || type === "pointercancel") {
           delete ids[id];
           this._handleEnd(stage, id, e)
         }
@@ -17419,7 +17271,7 @@
         for (var _i = 0, l = lbls.length; _i < l; _i++) {
           var label = lbls[_i].label;
           var start = baseFrameIndex + lbls[_i].index;
-          var end = baseFrameIndex + (_i == l - 1 ? duration : lbls[_i + 1].index);
+          var end = baseFrameIndex + (_i === l - 1 ? duration : lbls[_i + 1].index);
           var frames = [];
           for (var _i2 = start; _i2 < end; _i2++) {
             frames.push(_i2)
@@ -18019,7 +17871,7 @@
       for (var n in dict) {
         var str = n.replace(window.location.origin, "");
         var tex = dict[n];
-        var shifted = tex._lastActiveIndex ? tex._lastActiveIndex == tex._activeIndex : false;
+        var shifted = tex._lastActiveIndex ? tex._lastActiveIndex === tex._activeIndex : false;
         output.push({
           src: src,
           element: tex,
@@ -18028,7 +17880,7 @@
         tex._lastActiveIndex = tex._activeIndex
       }
       output.sort(function(a, b) {
-        if (a.element._drawID == stage._drawID) {
+        if (a.element._drawID === stage._drawID) {
           return 1
         }
         if (a.element._drawID < b.element._drawID) {
@@ -18039,7 +17891,7 @@
       var l = output.length;
       for (var i = 0; i < l; i++) {
         var out = output[i];
-        var active = out.element._drawID == stage._drawID;
+        var active = out.element._drawID === stage._drawID;
         WebGLInspector._log("[" + out.src + "] " + (active ? "ACTIVE" : "stale") + " " + (out.shifted ? "steady" : "DRIFT"), out.element)
       }
     };

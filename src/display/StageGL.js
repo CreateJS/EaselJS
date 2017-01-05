@@ -122,7 +122,7 @@ export default class StageGL extends Stage {
 	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}} for more
 	 * information.
 	 */
-	constructor (canvas, {preserveBuffer = false, antialias = false, transparent = false, premultiply = false, autoPurge = 1200}) {
+	constructor (canvas, { preserveBuffer = false, antialias = false, transparent = false, premultiply = false, autoPurge = 1200 }) {
 		super(canvas);
 
 // public properties:
