@@ -1,4 +1,5 @@
-docs/
+docs/**
+!docs/*.zip
 node_modules/
 *TMP*
 .idea/

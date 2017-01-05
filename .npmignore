@@ -5,9 +5,9 @@ extras/
 tests/
 tutorials/
 
+icon.png
 bower.json
 yuidoc.json
 CONTRIBUTING.md
-icon.png
-VERSIONS.txt
+CHANGELOG
 README_SECURITY_ERROR.txt
