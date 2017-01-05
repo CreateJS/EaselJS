@@ -531,7 +531,7 @@ export default class MovieClip extends Container {
 	 */
 	_getBounds (matrix, ignoreTransform) {
 		let bounds = this.getBounds();
-		if (!bounds && (this.frameBounds) { bounds = this._rectangle.copy(this.frameBounds[this.currentFrame]); }
+		if (!bounds && this.frameBounds) { bounds = this._rectangle.copy(this.frameBounds[this.currentFrame]); }
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
 		return super._getBounds(matrix, ignoreTransform);
 	}
