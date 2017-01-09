@@ -2,7 +2,7 @@
  * @license easeljs
  * Visit http://createjs.com for documentation, updates and examples.
  *
- * Copyright (c) 2010 gskinner.com, inc.
+ * Copyright (c) 2017 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -30,7 +30,7 @@
 * @license Event
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -268,7 +268,7 @@ class Event {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return `[Event (type=${this.type})]`;
+		return `[${this.constructor.name} (type=${this.type})]`;
 	}
 
 }
@@ -277,7 +277,7 @@ class Event {
 * @license EventDispatcher
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -675,7 +675,7 @@ class EventDispatcher {
 * @license Ticker
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -725,13 +725,20 @@ class TickerAPI extends EventDispatcher {
 
 // constructor:
 	/**
+	 * @param name {String} The name assigned to this instance.
 	 * @constructor
 	 * TODO-ES6: Pass timingMode, maxDelta, paused values as instantiation arguments?
 	 */
-	constructor () {
+	constructor (name) {
 		super();
 
 // public properties:
+		/**
+		 * The name of this instance.
+		 * @property name
+		 * @type {String}
+		 */
+		this.name = name;
 		/**
 		 * Specifies the timing api (setTimeout or requestAnimationFrame) and mode to use. See
 		 * {{#crossLink "Ticker/TIMEOUT"}}{{/crossLink}}, {{#crossLink "Ticker/RAF"}}{{/crossLink}}, and
@@ -899,6 +906,18 @@ class TickerAPI extends EventDispatcher {
 	}
 
 // public methods:
+	/**
+	 * Call createjs.Ticker.create() to get a new TickerAPI instance.
+	 * It is not initalized by default and its ticks are not synched with any other instance.
+	 *
+	 * @param name {String} The name given to the new instance.
+	 * @method create
+	 * @return {TickerAPI} A new TickerAPI instance.
+	 */
+	create (name) {
+		return new TickerAPI(name);
+	}
+
 	/**
 	 * Starts the tick. This is called automatically when the first listener is added.
 	 * @method init
@@ -1193,17 +1212,19 @@ TickerAPI.TIMEOUT = "timeout";
  */
 
 /**
- * The default TickerAPI instance, globally available on the namespace.
- * @type {TickerAPI}
+ * The Ticker object is a singleton instance of the TickerAPI class.
+ * See the {{#crossLink "TickerAPI"}}{{/crossLink}} documentation for its usage.
+ * @class Ticker
+ * @static
  * @module CreateJS
  */
-const Ticker = new TickerAPI();
+const Ticker = new TickerAPI("createjs.global");
 
 /*
 * @license UID
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -1272,7 +1293,7 @@ class UID {
 * @license Point
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -1379,7 +1400,7 @@ class Point {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return `[Point (x=${this.x} y=${this.y})]`;
+		return `[${this.constructor.name} (x=${this.x} y=${this.y})]`;
 	}
 
 }
@@ -1388,7 +1409,7 @@ class Point {
 * @license Matrix2D
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -1878,7 +1899,7 @@ class Matrix2D {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return `[Matrix2D (a=${this.a} b=${this.b} c=${this.c} d=${this.d} tx=${this.tx} ty=${this.ty})]`;
+		return `[${this.constructor.name} (a=${this.a} b=${this.b} c=${this.c} d=${this.d} tx=${this.tx} ty=${this.ty})]`;
 	}
 
 }
@@ -1909,7 +1930,7 @@ class Matrix2D {
 * @license DisplayProps
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -2089,7 +2110,7 @@ class DisplayProps {
 * @license Rectangle
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -2303,7 +2324,7 @@ class Rectangle {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return `[Rectangle (x=${this.x} y=${this.y} width=${this.width} height=${this.height})]`;
+		return `[${this.constructor.name} (x=${this.x} y=${this.y} width=${this.width} height=${this.height})]`;
 	}
 
 }
@@ -2312,7 +2333,7 @@ class Rectangle {
 * @license Filter
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -2481,7 +2502,7 @@ class Filter {
 * @license Filter
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -3003,7 +3024,7 @@ class BitmapCache extends Filter {
 * @license DisplayObject
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -4094,7 +4115,7 @@ class DisplayObject extends EventDispatcher {
  * @protected
  */
 {
-	let canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); // prevent errors on load in browsers without canvas.
+	let canvas = createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); // prevent errors on load in browsers without canvas.
 	if (canvas.getContext) {
 		DisplayObject._hitTestCanvas = canvas;
 		DisplayObject._hitTestContext = canvas.getContext("2d");
@@ -4228,7 +4249,7 @@ class DisplayObject extends EventDispatcher {
 * @license Container
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -4386,7 +4407,7 @@ class Container extends DisplayObject {
 	 */
 	addChild (...children) {
 		const l = children.length;
-		if (l == 0) { return null; }
+		if (l === 0) { return null; }
 		let child = children[0];
 		if (l > 1) {
 			for (let i = 0; i < l; i++) { child = this.addChild(children[i]); }
@@ -4402,7 +4423,7 @@ class Container extends DisplayObject {
 	TODO-ES6: Perf test rest param loops vs arguments.
 	addChild (...children) {
 		const l = children.length;
-		if (l == 0) { return null; }
+		if (l === 0) { return null; }
 		let child;
 		for (let i = 0; i < l; i++) {
 			child = children[0];
@@ -4599,7 +4620,7 @@ class Container extends DisplayObject {
 		let kids = this.children;
 		const l = kids.length;
 		for (let i = 0; i < l; i++) {
-			if (kids[i].name == name) { return kids[i]; }
+			if (kids[i].name === name) { return kids[i]; }
 		}
 		return null;
 	}
@@ -4666,11 +4687,11 @@ class Container extends DisplayObject {
 		const l = kids.length;
 		let index1,index2;
 		for (var i = 0; i < l; i++) {
-			if (kids[i] == child1) { index1 = i; }
-			if (kids[i] == child2) { index2 = i; }
+			if (kids[i] === child1) { index1 = i; }
+			if (kids[i] === child2) { index2 = i; }
 			if (index1 != null && index2 != null) { break; }
 		}
-		if (i == l) { return; } // TODO: throw error?
+		if (i === l) { return; } // TODO: throw error?
 		kids[index1] = child2;
 		kids[index2] = child1;
 	}
@@ -4686,9 +4707,9 @@ class Container extends DisplayObject {
 		const l = kids.length;
 		if (child.parent != this || index < 0 || index >= l) { return; }
 		for (var i = 0; i < l; i++) {
-			if (kids[i] == child) { break; }
+			if (kids[i] === child) { break; }
 		}
-		if (i == l || i == index) { return; }
+		if (i === l || i === index) { return; }
 		kids.splice(i, 1);
 		kids.splice(index, 0, child);
 	}
@@ -4702,7 +4723,7 @@ class Container extends DisplayObject {
 	 */
 	contains (child) {
 		while (child) {
-			if (child == this) { return true; }
+			if (child === this) { return true; }
 			child = child.parent;
 		}
 		return false;
@@ -4751,7 +4772,7 @@ class Container extends DisplayObject {
 	getObjectsUnderPoint (x, y, mode = 0) {
 		let arr = [];
 		let pt = this.localToGlobal(x, y);
-		this._getObjectsUnderPoint(pt.x, pt.y, arr, mode > 0, mode == 1);
+		this._getObjectsUnderPoint(pt.x, pt.y, arr, mode > 0, mode === 1);
 		return arr;
 	}
 
@@ -4767,7 +4788,7 @@ class Container extends DisplayObject {
 	 */
 	getObjectUnderPoint (x, y, mode = 0) {
 		let pt = this.localToGlobal(x, y);
-		return this._getObjectsUnderPoint(pt.x, pt.y, null, mode > 0, mode == 1);
+		return this._getObjectsUnderPoint(pt.x, pt.y, null, mode > 0, mode === 1);
 	}
 
 	/**
@@ -4949,7 +4970,7 @@ class Container extends DisplayObject {
 * @license MouseEvent
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -5116,7 +5137,7 @@ class MouseEvent extends Event {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return `[MouseEvent (type=${this.type} stageX=${this.stageX} stageY=${this.stageY})]`;
+		return `[${this.constructor.name} (type=${this.type} stageX=${this.stageX} stageY=${this.stageY})]`;
 	}
 
 }
@@ -5125,7 +5146,7 @@ class MouseEvent extends Event {
 * @license Stage
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -5212,7 +5233,7 @@ class Stage extends Container {
 		 * @property canvas
 		 * @type HTMLCanvasElement | Object
 		 */
-		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
+		this.canvas = (typeof canvas === "string") ? document.getElementById(canvas) : canvas;
 
 		/**
 		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
@@ -5471,7 +5492,7 @@ class Stage extends Container {
 	 * @type Function
 	 */
 	handleEvent (evt) {
-		if (evt.type == "tick") { this.update(evt); }
+		if (evt.type === "tick") { this.update(evt); }
 	}
 
 	/**
@@ -5538,7 +5559,7 @@ class Stage extends Container {
 		if (this._mouseOverIntervalID) {
 			clearInterval(this._mouseOverIntervalID);
 			this._mouseOverIntervalID = null;
-			if (frequency == 0) {
+			if (frequency === 0) {
 				this._testMouseOver(true);
 			}
 		}
@@ -5658,7 +5679,7 @@ class Stage extends Container {
 		let inBounds = o.inBounds;
 		this._updatePointerPosition(id, e, pageX, pageY);
 		if (inBounds || o.inBounds || this.mouseMoveOutside) {
-			if (id === -1 && o.inBounds == !inBounds) {
+			if (id === -1 && o.inBounds === !inBounds) {
 				this._dispatchMouseEvent(this, (inBounds ? "mouseleave" : "mouseenter"), false, id, o, e);
 			}
 
@@ -5732,7 +5753,7 @@ class Stage extends Container {
 
 		if (o.down) { this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e, target); o.down = false; }
 
-		if (target == oTarget) { this._dispatchMouseEvent(oTarget, "click", true, id, o, e); }
+		if (target === oTarget) { this._dispatchMouseEvent(oTarget, "click", true, id, o, e); }
 		this._dispatchMouseEvent(oTarget, "pressup", true, id, o, e);
 
 		if (clear) {
@@ -5793,10 +5814,10 @@ class Stage extends Container {
 		}
 		let o = this._getPointerData(-1);
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
-		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
+		if (!o || (!clear && this.mouseX === this._mouseOverX && this.mouseY === this._mouseOverY && this.mouseInBounds)) { return; }
 
 		let e = o.posEvtObj;
-		let isEventTarget = eventTarget || e&&(e.target == this.canvas);
+		let isEventTarget = eventTarget || e&&(e.target === this.canvas);
 		let target=null, common = -1, cursor="";
 
 		if (!owner && (clear || this.mouseInBounds && isEventTarget)) {
@@ -5909,7 +5930,7 @@ class Stage extends Container {
  */
 
 /**
- * Dispatched when the mouse moves from within the canvas area (mouseInBounds == true) to outside it (mouseInBounds == false).
+ * Dispatched when the mouse moves from within the canvas area (mouseInBounds === true) to outside it (mouseInBounds === false).
  * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
  * class for a listing of event properties.
  * @event mouseleave
@@ -5917,7 +5938,7 @@ class Stage extends Container {
  */
 
 /**
- * Dispatched when the mouse moves into the canvas area (mouseInBounds == false) from outside it (mouseInBounds == true).
+ * Dispatched when the mouse moves into the canvas area (mouseInBounds === false) from outside it (mouseInBounds === true).
  * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
  * class for a listing of event properties.
  * @event mouseenter
@@ -5955,7 +5976,7 @@ class Stage extends Container {
 * @license StageGL
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -5980,21 +6001,23 @@ class Stage extends Container {
 */
 
 /*
- * @uglify
- *
  * README IF EDITING:
  * Terminology for developers:
  *
  * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
  * Vertex Property: a piece of information attached to the vertex like a vector3 containing x,y,z
- * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render modes do not use these)
+ * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render
+ * 		modes do not use these)
  * Card: a group of 2 triangles used to display a rectangular image
  * U/V: common names for the [0-1] texture co-ordinates on an image
  * Batch: a single call to the renderer, best done as little as possible so multiple cards are put into a single batch
  * Buffer: WebGL array data
- * Program/Shader: For every vertex we run the Vertex shader. The results are used per pixel by the Fragment shader. When combined and paired these are a shader "program"
+ * Program/Shader: For every vertex we run the Vertex shader. The results are used per pixel by the Fragment shader. When
+ * 		combined and paired these are a shader "program"
  * Texture: WebGL representation of image data and associated extra information
  * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
+ *
+ * @uglify
  */
 
 /**
@@ -6009,24 +6032,24 @@ class Stage extends Container {
  * <h4>Limitations</h4>
  * - {{#crossLink "Shape"}}{{/crossLink}}, {{#crossLink "Shadow"}}{{/crossLink}}, and {{#crossLink "Text"}}{{/crossLink}}
  * 	are not rendered when added to the display list.
- * - Images are wrapped as a webGL texture. Graphics cards have a limit to concurrent textures, and too many
- *	textures can slow performance. Caching may slow WebGL.
  * - To display something StageGL cannot render, {{#crossLink "displayObject/cache"}}{{/crossLink}} the object.
- *	Caches can be rendered regardless of source. Be wary of creating a lot of small caches, and instead use
- *	techniques such as SpriteSheets to generate images that contain multiple objects.
- * - Clone image nodes (DOM Image/Canvas Element) to re-use them between multiple StageGL instances, otherwise the
- *	GPU texture loading and tracking will get confused.
- * - You must call {{#crossLink "StageGL/updateViewport"}}{{/crossLink}} if you resize your canvas after
- *	initializing StageGL to properly size the 3D context stored in memory.
+ *	Caches can be rendered regardless of source.
+ * - Images are wrapped as a webGL "Texture". Each graphics card has a limit to its concurrent Textures, too many
+ * Textures will noticeably slow performance.
+ * - Each cache counts as an individual Texture. As such {{#crossLink "SpriteSheet"}}{{/crossLink}} and
+ * {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} are recommended practices to help keep texture counts low.
+ * - To use any image node (DOM Image/Canvas Element) between multiple StageGL instances it must be a
+ * {{#crossLink "Bitmap/clone"}}{{/crossLink}}, otherwise the GPU texture loading and tracking  will get confused.
+ * - You must call {{#crossLink "StageGL/updateViewport"}}{{/crossLink}} if you resize your canvas after making
+ * a StageGL instance, this will properly size the WebGL context stored in memory, this won't change the DOM element.
  * - Best performance will come from manual management of texture memory, but it is handled automatically by default.
- * 	See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for more information.
+ * See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for details.
  *
  * <h4>Example</h4>
  * This example creates a StageGL instance, adds a child to it, then uses the EaselJS {{#crossLink "Ticker"}}{{/crossLink}}
  * to update the child and redraw the stage.
  *
  *      var stage = new createjs.StageGL("canvasElementId", false, false);
- *      stage.updateViewport(800, 600); //LM: Is this necessary in this example? Could you use canvas.width instead?
  *
  *      var image = new createjs.Bitmap("imagePath.png");
  *      stage.addChild(image);
@@ -6066,10 +6089,10 @@ class StageGL extends Stage {
 	 * account for pre-multiplied alpha. This can help avoid visual halo effects with some assets, but may also cause
 	 * problems with other assets.
 	 * @param {Integer} [options.autoPurge=1200] How often the system should automatically dump unused textures with
-	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "purgeTextures"}}{{/crossLink}} for more
+	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}} for more
 	 * information.
 	 */
-	constructor (canvas, {preserveBuffer = false, antialias = false, transparent = false, premultiply = false, autoPurge = 1200}) {
+	constructor (canvas, { preserveBuffer = false, antialias = false, transparent = false, premultiply = false, autoPurge = 1200 }) {
 		super(canvas);
 
 // public properties:
@@ -6301,13 +6324,11 @@ class StageGL extends Stage {
 		this._baseTextures = [];
 
 		/**
-		 * The number of concurrent textures the GPU can handle. This value is dynamically set from WebGL during
-		 * initialization. The WebGL spec states that the lowest guaranteed value is 8, but it could be higher. Do not
-		 * set this value higher than the value returned by the GPU. Setting it lower will potentially reduce
-		 * performance.
-		 *
-		 * 		// Can also act as a length for _batchTextures
-		 *      gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)
+		 * The number of concurrent textures the GPU can handle. This value is dynamically set from WebGL during initialization
+		 * via `gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)`. The WebGL spec states that the lowest guaranteed value is 8,
+		 * but it could be higher. Do not set this value higher than the value returned by the GPU. Setting it lower will
+		 * probably reduce performance, but may be advisable to reserve slots for custom filter work.
+		 * NOTE: Can also act as a length for {{#crossLink "StageGL/_batchTextures:property"}}.
 		 * @property _batchTextureCount
 		 * @protected
 		 * @type {Number}
@@ -6374,8 +6395,8 @@ class StageGL extends Stage {
 		this._lastTrackedCanvas = 0;
 
 		/**
-		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} is the canvas or a render texture.
-		 * See the {{#crossLink "cache"}}{{/crossLink}} function modifications for full implications and discussion.
+		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} is the canvas or a render
+		 * texture. See the {{#crossLink "cache"}}{{/crossLink}} function modifications for full implications and discussion.
 		 * @property isCacheControlled
 		 * @protected
 		 * @type {Boolean}
@@ -6393,18 +6414,25 @@ class StageGL extends Stage {
 		 */
 		this._cacheContainer = new Container();
 
-		this._textureName = 0;
-
 		this._initializeWebGL();
 	}
 
 // static methods:
 	/**
-	 * Calculate the U/V co-ordinate-based info for sprite frames. Instead of pixel count it uses a 0-1 space. It also
-	 * includes the ability to get info back for a specific frame, or only calculate that one frame.
+	 * Calculate the U/V co-ordinate based info for sprite frames. Instead of pixel count it uses a 0-1 space. Also includes
+	 * the ability to get info back for a specific frame, or only calculate that one frame.
+	 *
+	 *     //generate UV rects for all entries
+	 *     StageGL.buildUVRects( spriteSheetA );
+	 *     //generate all, fetch the first
+	 *     var firstFrame = StageGL.buildUVRects( spriteSheetB, 0 );
+	 *     //generate the rect for just a single frame for performance's sake
+	 *     var newFrame = StageGL.buildUVRects( dynamicSpriteSheet, newFrameIndex, true );
+	 *
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method buildUVRects
-	 * @param  {SpriteSheet} spritesheet The sprite sheet to find {{#crossLink "StageGL/_frames:property"}}{{/crossLink}} on.
-	 * @param  {frame} [target=-1] The frame to return
+	 * @param  {SpriteSheet} spritesheet The spritesheet to find the frames on
+	 * @param  {int} [target=-1] The index of the frame to return
 	 * @param  {Boolean} [onlyTarget=false] Whether "target" is the only frame that gets calculated
 	 * @static
 	 * @return {Object} the target frame if supplied and present or a generic frame {t, l, b, r}
@@ -6414,7 +6442,7 @@ class StageGL extends Stage {
 
 		let start = (target != -1 && onlyTarget) ? target : 0;
 		let end = (target != -1 && onlyTarget) ? target+1 : spritesheet._frames.length;
-		for (let i=start;i<end;i++) {
+		for (let i=start; i<end; i++) {
 			let f = spritesheet._frames[i];
 			if (f.uvRect || f.image.width <= 0 || f.image.height <= 0) { continue; }
 
@@ -6426,8 +6454,11 @@ class StageGL extends Stage {
 				r: (r.x + r.width) / f.image.width
 			};
 		}
-
-		return spritesheet._frames[(target != -1) ? target : 0].uvRect || StageGL.UV_RECT;
+		// make a copy of the default rect to avoid users modifying the returned object
+		// only create it if needed to avoid slowing down the normal path
+		let r = StageGL.UV_RECT;
+		return spritesheet._frames[(target != -1) ? target : 0].uvRect
+			|| { t: r.t, l: r.l, b: r.b, r: r.r };
 	}
 
 	/**
@@ -6564,9 +6595,9 @@ class StageGL extends Stage {
 	}
 
 	/**
-	 * Draws the stage into the supplied context if possible. Many WebGL properties only exist on their context.
-	 * As such you cannot share contexts among many StageGLs and each context requires a unique StageGL instance.
-	 * Contexts that don't match the context managed by this StageGL will be treated as a 2D context.
+	 * Draws the stage into the supplied context if possible. Many WebGL properties only exist on their context. As such
+	 * you cannot share contexts among many StageGLs and each context requires a unique StageGL instance. Contexts that
+	 * don't match the context managed by this StageGL will be treated as a 2D context.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
@@ -6607,9 +6638,9 @@ class StageGL extends Stage {
 
 	/**
 	 * Blocks, or frees a texture "slot" on the GPU. Can be useful if you are overflowing textures. When overflowing
-	 * textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large
-	 * textures. By blocking the slot you reduce available slots, potentially increasing draw calls, but mostly you
-	 * prevent a texture being re-uploaded if it would have moved slots due to overflow.
+	 * textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large textures.
+	 * By blocking the slot you reduce available slots, potentially increasing draw calls, but mostly you prevent a
+	 * texture being re-uploaded if it would have moved slots due to overflow.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * For example, block the slot a background image is stored in so there is less re-loading of that image.
@@ -6621,12 +6652,12 @@ class StageGL extends Stage {
 		if (id > this._maxTextureSlots || id < 0) {
 			throw "Slot outside of acceptable range";
 		}
-		this._slotBlacklist[id] = lock;
+		this._slotBlacklist[id] = !!lock;
 	}
 
 	/**
-	 * Render textures can't draw into themselves so any item being used for renderTextures needs two. This function
-	 * creates, gets, and toggles the render surface.
+	 * Render textures can't draw into themselves so any item being used for renderTextures needs two to alternate between.
+	 * This function creates, gets, and toggles the render surface between the two.
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method getTargetRenderTexture
@@ -6669,14 +6700,18 @@ class StageGL extends Stage {
 	}
 
 	/**
-	 * For every image encountered it is registered and tracked automatically. When all items using an image are removed
-	 * from the stage it's recommended to remove it manually to prevent memory leaks. This function will remove all
-	 * textures found on the object and its children, cache, etc. Specifically it will also un-cache, cached objects
-	 * that it finds. This happens instantly, so aggressive use could result in performance problems. If you remove a
-	 * texture and add it again later(by rendering an object using it for example) the texture will get re-added and
-	 * need re-removing later.
+	 * For every image encountered StageGL registers and tracks it automatically. This tracking can cause memory leaks
+	 * if not purged. StageGL, by default, automatically fixes this. This does take performance and may unfortunately
+	 * feature false positives. This function is for manual management of this memory instead of the automatic system.
+	 *
+	 * This function will recursively remove all textures found on the object, its children, cache, etc. It will uncache
+	 * objects and remove any texture it finds REGARDLESS of whether it is currently in use elsewhere. It is up to the user
+	 * to ensure that a texture in use is not removed.
+	 *
+	 * Textures in use, or to be used again shortly, should not be removed. This is simply for performance reasons.
+	 * Removing a texture in use will cause the texture to have to be re-uploaded slowing rendering.
 	 * @method releaseTexture
-	 * @param  {DisplayObject | Texture | Image | Canvas} item An object that used the texture you are no longer using.
+	 * @param  {DisplayObject | Texture | Image | Canvas} item An object that used the texture to be discarded.
 	 */
 	releaseTexture (item) {
 		if (!item) { return; }
@@ -6691,9 +6726,6 @@ class StageGL extends Stage {
 		// this has a cache canvas
 		if (item.cacheCanvas) {
 			item.uncache();
-			if (this.vocalDebug) {
-				console.log("Automatic uncache call, potentially unexpected behaviour. Recommend manual uncache calling.");
-			}
 		}
 
 		let foundImage;
@@ -6729,7 +6761,7 @@ class StageGL extends Stage {
 		// remove it
 		this._killTextureObject(this._textureDictionary[foundImage._storeID]);
 		foundImage._storeID = undefined;
-	};
+	}
 
 	/**
 	 * Similar to {{#crossLink "releaseTexture"}}{{/crossLink}}, but this function differs by searching for textures to
@@ -6768,6 +6800,7 @@ class StageGL extends Stage {
 		let gl = this._webGLContext;
 		let success = false;
 
+		if (count < 1) { count = 1; }
 		this._batchTextureCount = count;
 
 		while (!success) {
@@ -6775,7 +6808,7 @@ class StageGL extends Stage {
 				this._activeShader = this._fetchShaderProgram(gl);
 				success = true;
 			} catch(e) {
-				if (this._batchTextureCount == 1) {
+				if (this._batchTextureCount === 1) {
 					throw `Cannot compile shader ${e}`;
 				}
 
@@ -6828,7 +6861,7 @@ class StageGL extends Stage {
 	 * use and returned on subsequent calls.
 	 * @method getFilterShader
 	 * @param  {Filter|Object} filter The object which will provide the information needed to construct the filter shader.
-	 * @return {FilterShader}
+	 * @return {Shader}
 	 * @todo Review return type
 	 */
 	getFilterShader (filter) {
@@ -6857,15 +6890,14 @@ class StageGL extends Stage {
 			}
 		}
 		return targetShader;
-	};
+	}
 
 	/**
 	 * Returns a base texture that has no image or data loaded. Not intended for loading images. It may return `null`
 	 * in some error cases, and trying to use a "null" texture can cause renders to fail.
 	 * @method getBaseTexture
-	 * @param  {uint} [w=1] The width of the texture in pixels
-	 * @param  {uint} [h=1] The height of the texture in pixels
-	 * @todo Remove the console.log in this function. Please check for other instances.
+	 * @param  {uint} [w=1] The width of the texture in pixels, defaults to 1
+	 * @param  {uint} [h=1] The height of the texture in pixels, defaults to 1
 	 */
 	getBaseTexture (w = 1, h = 1) {
 		let width = Math.ceil(w > 0 ? w : 1);
@@ -6876,20 +6908,18 @@ class StageGL extends Stage {
 		this.resizeTexture(texture, width, height);
 		this.setTextureParams(gl, false);
 
-		texture.__trackName = this._textureName++;
-
 		return texture;
-	};
+	}
 
 	/**
-	 * Resizes a supplied texture element. It may return `null` in some error cases, such as when the texture is too
-	 * large, an out of texture memory error occurs, etc. Trying to use a "null" texture can cause renders to fail.
-	 * NOTE: The texture must have been made with "texImage2D", all default APIs in StageGL use this so this only
-	 * matters for changes.
-	 * @method getBaseTexture
+	 * Resizes a supplied texture element. It may return `null` in some error cases, such as when the texture is too large,
+	 * an out of texture memory error occurs, etc. Trying to use a "null" texture can cause renders to fail.
+	 * NOTE: The texture must have been made with "texImage2D", all default APIs in StageGL use this, so this note
+	 * only matters for changes and plugins.
+	 * @method resizeTexture
 	 * @param  {WebGLTexture} texture The GL Texture to be modified.
-	 * @param  {uint} [width=1] The width of the texture in pixels
-	 * @param  {uint} [height=1] The height of the texture in pixels
+	 * @param  {uint} [width=1] The width of the texture in pixels, defaults to 1
+	 * @param  {uint} [height=1] The height of the texture in pixels, defaults to 1
 	 */
 	resizeTexture (texture, width = 1, height = 1) {
 		let gl = this._webGLContext;
@@ -6908,8 +6938,9 @@ class StageGL extends Stage {
 	}
 
 	/**
-	 * Returns a base texture (see {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}) with an attached render buffer
-	 * in `texture._frameBuffer`.
+	 * Returns a base texture (see {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}) for details. Also includes an
+	 * attached and linked render buffer in `texture._frameBuffer`. RenderTextures  can be thought of as an internal
+	 * canvas that can be drawn to.
 	 * @method getRenderBufferTexture
 	 * @param  {Number} w The width of the texture in pixels.
 	 * @param  {Number} h The height of the texture in pixels.
@@ -6924,7 +6955,7 @@ class StageGL extends Stage {
 
 		// get the frame buffer
 		let frameBuffer = gl.createFramebuffer();
-		if (!renderTexture) { return null; }
+		if (!frameBuffer) { return null; }
 
 		// set its width and height for spoofing as an image
 		renderTexture.width = w;
@@ -6968,8 +6999,8 @@ class StageGL extends Stage {
 	 *
 	 * The clear color will also be used for filters and other "render textures". The stage background will ignore the
 	 * transparency value and display a solid color normally. For the stage to recognize and use transparency it must be
-	 * created with the transparent flag set to `true`. Using "transparent white" to demonstrate, the valid data formats
-	 * are as follows:
+	 * created with the transparent flag set to `true` (see {{#crossLink "StageGL/constructor"}}{{/crossLink}})). Using
+	 * "transparent white" to demonstrate, the valid data formats are as follows:
 	 * <ul>
 	 *     <li>"#FFF"</li>
 	 *     <li>"#FFFFFF"</li>
@@ -6978,21 +7009,21 @@ class StageGL extends Stage {
 	 *     <li>0xFFFFFF00</li>
 	 * </ul>
 	 * @method setClearColor
-	 * @param {String|uint} [color=0x00000000] The new colour to use as the background
+	 * @param {String|int} [color=0x00000000] The new color to use as the background
 	 */
 	setClearColor (color = 0x00000000) {
 		let r, g, b, a, output;
 
-		if (typeof color == "string") {
-			if (color.indexOf("#") == 0) {
-				if (color.length == 4) {
+		if (typeof color === "string") {
+			if (color.indexOf("#") === 0) {
+				if (color.length === 4) {
 					color = `#${color.charAt(1)+color.charAt(1) + color.charAt(2)+color.charAt(2) + color.charAt(3)+color.charAt(3)}`;
 				}
 				r = Number(`0x${color.slice(1, 3)}`)/255;
 				g = Number(`0x${color.slice(3, 5)}`)/255;
 				b = Number(`0x${color.slice(5, 7)}`)/255;
 				a = Number(`0x${color.slice(7, 9)}`)/255;
-			} else if (color.indexOf("rgba(") == 0) {
+			} else if (color.indexOf("rgba(") === 0) {
 				output = color.slice(5, -1).split(",");
 				r = Number(output[0])/255;
 				g = Number(output[1])/255;
@@ -7017,13 +7048,13 @@ class StageGL extends Stage {
 
 // private methods:
 	/**
-	 * Sets up and returns the WebGL context for the canvas.
+	 * Sets up and returns the WebGL context for the canvas. May return undefined in error scenarios. These can include
+	 * situations wher the canvas element already has a context.
 	 * @param  {Canvas} canvas The DOM canvas element to attach to
 	 * @param  {Object} options The options to be handed into the WebGL object, see WebGL spec
 	 * @method _fetchWebGLContext
 	 * @protected
-	 * @return {WebGLRenderingContext}
-	 * @todo Review return type and add description.
+	 * @return {WebGLRenderingContext} The WebGL context, may return undefined in error scenarios
 	 */
 	_fetchWebGLContext (canvas, options) {
 		let gl;
@@ -7036,7 +7067,6 @@ class StageGL extends Stage {
 
 		if (!gl) {
 			let msg = "Could not initialize WebGL";
-			// TODO-ES6: vocalDebug?
 			console.error?console.error(msg):console.log(msg);
 		} else {
 			gl.viewportWidth = canvas.width;
@@ -7054,12 +7084,13 @@ class StageGL extends Stage {
 	 * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param  {String} [shaderName="regular"] Working values: "regular", "override", and "filter". Which type of shader to build.
 	 * Filter and override both accept the custom params. Regular and override have all features. Filter is a special case reduced feature shader meant to be over-ridden.
-	 * @param  {String} [customVTX] Extra vertex shader information to replace a regular draw, see {{#crossLink "COVER_VERTEX_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
-	 * @param  {String} [customFRAG] Extra fragment shader information to replace a regular draw, see {{#crossLink "COVER_FRAGMENT_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
+	 * @param  {String} [customVTX] Extra vertex shader information to replace a regular draw, see
+	 * {{#crossLink "StageGL/COVER_VERTEX_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
+	 * @param  {String} [customFRAG] Extra fragment shader information to replace a regular draw, see
+	 * {{#crossLink "StageGL/COVER_FRAGMENT_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
 	 * @param  {Function} [shaderParamSetup] Function to run so custom shader parameters can get applied for the render.
 	 * @protected
-	 * @return {ShaderProgram}
-	 * @todo Review the return type
+	 * @return {ShaderProgram} The compiled and linked shader
 	 */
 	_fetchShaderProgram (gl, shaderName = "regular", customVTX, customFRAG, shaderParamSetup) {
 		gl.useProgram(null); // safety to avoid collisions
@@ -7071,7 +7102,7 @@ class StageGL extends Stage {
 				targetVtx = StageGL.COVER_VERTEX_HEADER + (customVTX || StageGL.COVER_VERTEX_BODY);
 				targetFrag = StageGL.COVER_FRAGMENT_HEADER + (customFRAG || StageGL.COVER_FRAGMENT_BODY);
 				break;
-			case "particle":
+			case "particle": //TODO
 				targetVtx = StageGL.REGULAR_VERTEX_HEADER + StageGL.PARTICLE_VERTEX_BODY;
 				targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + StageGL.PARTICLE_FRAGMENT_BODY;
 				break;
@@ -7122,7 +7153,7 @@ class StageGL extends Stage {
 				gl.uniform1f(shaderProgram.uprightUniform, 0);
 
 				// if there's some custom attributes be sure to hook them up
-				if(shaderParamSetup) {
+				if (shaderParamSetup) {
 					shaderParamSetup(gl, this, shaderProgram);
 				}
 				break;
@@ -7145,9 +7176,8 @@ class StageGL extends Stage {
 				gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
 
 				let samplers = [];
-				// create array of integers
 				for (let i = 0; i < this._batchTextureCount; i++) {
-						samplers[i] = i;
+					samplers[i] = i;
 				}
 
 				shaderProgram.samplerData = samplers;
@@ -7163,7 +7193,7 @@ class StageGL extends Stage {
 	}
 
 	/**
-	 * Creates a shader from the specified string. Replaces several template items marked with {{name}}.
+	 * Creates a shader from the specified string. Replaces several template items marked like `{{` `key` `}}``.
 	 * @method _createShader
 	 * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param  {Number} type The type of shader to create. gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
@@ -7177,15 +7207,16 @@ class StageGL extends Stage {
 
 		// resolve issue with no dynamic samplers by creating correct samplers in if else chain
 		let insert = "";
-		for(let i = 1; i<this._batchTextureCount; i++) {
-			insert += `} else if (src == ${i}) { color = texture2D(uSampler[${i}], vTextureCoord);`;
+		for (let i = 1; i<this._batchTextureCount; i++) {
+			insert += `} else if (src === ${i}) { color = texture2D(uSampler[${i}], vTextureCoord);`;
 		}
-		str = str.replace(/{{alternates}}/g, insert).replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
+		str = str.replace(/{{alternates}}/g, insert)
+						 .replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
 
 		// actually compile the shader
 		let shader = gl.createShader(type);
-		gl.shaderSource(shader, str);
-		gl.compileShader(shader);
+		gl.shaderSource(shader, str)
+			.compileShader(shader);
 
 		// check compile status
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -7215,14 +7246,14 @@ class StageGL extends Stage {
 		// track the sizes on the buffer object
 
 		// INFO:
-		// a single buffer may be optimal in some situations and would be approached like this
+		// a single buffer may be optimal in some situations and would be approached like this,
 		// currently not implemented due to lack of need and potential complications with drawCover
 
 		// var vertexBuffer = this._vertexBuffer = gl.createBuffer();
 		// gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 		// groupSize = 2 + 2 + 1 + 1; //x/y, u/v, index, alpha
 		// var vertexData = this._vertexData = new Float32Array(groupCount * groupSize);
-		// for(i=0; i<vertexData.length; i+=groupSize) {
+		// for (i=0; i<vertexData.length; i+=groupSize) {
 		// 	vertexData[i+0] = vertexData[i+1] = 0;
 		// 	vertexData[i+2] = vertexData[i+3] = 0.5;
 		// 	vertexData[i+4] = 0;
@@ -7294,7 +7325,7 @@ class StageGL extends Stage {
 		for (let i=0; i<this._batchTextureCount;i++) {
 			let t = this.getBaseTexture();
 			this._baseTextures[i] = this._batchTextures[i] = t;
-			if(!t) {
+			if (!t) {
 				throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
 			}
 		}
@@ -7337,10 +7368,9 @@ class StageGL extends Stage {
 
 			// get the data into the texture or wait for it to load
 			image._storeID = storeID;
-			if (image.complete || image.naturalWidth || image._isCanvas) { // is it already loaded
+			if (image.complete || image.naturalWidth || image._isCanvas) {	// is it already loaded
 				this._updateTextureImageData(gl, image);
 			} else  {
-				//image.onload = this._updateTextureImageData.bind(this, gl, image);										//TODO: DHG: EventListener instead of callback
 				image.addEventListener("load", this._updateTextureImageData.bind(this, gl, image));
 			}
 		} else {
@@ -7359,8 +7389,10 @@ class StageGL extends Stage {
 	}
 
 	/**
-	 * Necessary to upload the actual image data to the GPU. Without this the texture will be blank.
 	 * @method _updateTextureImageData
+	 * Necessary to upload the actual image data to the GPU. Without this the texture will be blank. Called automatically
+	 * in most cases due to loading and caching APIs. Flagging an image source with `_invalid = true` will trigger this
+	 * next time the image is rendered.
 	 * @param {WebGLRenderingContext} gl
 	 * @param {Image | Canvas} image The image data to be uploaded
 	 * @protected
@@ -7380,7 +7412,7 @@ class StageGL extends Stage {
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		} catch(e) {
 			let errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
-			if(console.error) {
+			if (console.error) {
 				//TODO: LM: I recommend putting this into a log function internally, since you do it so often, and each is implemented differently.
 				console.error(e, errString);
 			} else {
@@ -7401,7 +7433,7 @@ class StageGL extends Stage {
 				console && console.error("Oversized Texture: "+ image.width+"x"+image.height +" vs "+ gl.MAX_TEXTURE_SIZE +"max");
 			}
 		}
-	};
+	}
 
 	/**
 	 * Adds the texture to a spot in the current batch, forcing a draw if no spots are free.
@@ -7457,7 +7489,9 @@ class StageGL extends Stage {
 	}
 
 	/**
-	 * removed and cleaned the texture. Mostly for internal use, recommended to call {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead.
+	 * Remove and clean the texture, expects a texture and is inflexible. Mostly for internal use, recommended to call
+	 * {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead as it will call this with the correct texture object(s).
+	 * Note: Testing shows this may not happen immediately, have to wait for WebGL to have actually adjust memory.
 	 * @method _killTextureObject
 	 * @param {Texture} tex The texture to be cleaned out
 	 * @protected
@@ -7470,9 +7504,9 @@ class StageGL extends Stage {
 		if (tex._storeID !== undefined && tex._storeID >= 0) {
 			this._textureDictionary[tex._storeID] = undefined;
 			for (let n in this._textureIDs) {
-				if (this._textureIDs[n] == tex._storeID) { delete this._textureIDs[n]; }
+				if (this._textureIDs[n] === tex._storeID) { delete this._textureIDs[n]; }
 			}
-			tex._storeID = undefined;
+			tex._imageData._storeID = tex._storeID = undefined;
 		}
 
 		// make sure to drop it out of an active slot
@@ -7491,7 +7525,6 @@ class StageGL extends Stage {
 
 		// remove entry
 		try {
-			console.log("KILL", tex.__trackName);
 			gl.deleteTexture(tex);
 		} catch(e) {
 			/* suppress delete errors because it's already gone or didn't need deleting probably */
@@ -7525,14 +7558,14 @@ class StageGL extends Stage {
 		}
 
 		if (restore && target === this._backupTextures) { this._backupTextures = []; }
-	};
+	}
 
 	/**
 	 * Begin the drawing process for a regular render.
 	 * @method _batchDraw
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"}}{{/crossLink}} object with all that needs to rendered, preferably a stage
-	 * @param {WebGLRenderingContext} ignoreCache
+	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"}}{{/crossLink}} object with all that needs to rendered, preferably a Stage.
+	 * @param {Boolean} ignoreCache
 	 * @protected
 	 * @todo Review the ignoreCache parameter. Is it a context or a boolean?
 	 */
@@ -7546,7 +7579,7 @@ class StageGL extends Stage {
 		this.batchCardCount = 0;
 		this.depth = 0;
 
-		this._appendToBatchGroup(sceneGraph, gl, new Matrix2D(), this.alpha, ignoreCache);											//TODO: DHG: isn't there a global alpha or something?
+		this._appendToBatchGroup(sceneGraph, gl, new Matrix2D(), this.alpha, ignoreCache);
 
 		this.batchReason = "drawFinish";
 		this._drawBuffers(gl);								// <--------------------------------------------------------
@@ -7554,23 +7587,23 @@ class StageGL extends Stage {
 	}
 
 	/**
-	 * Perform the drawing process to create cache textures, including applying filters
+	 * Perform the drawing process to fill a specific cache texture, including applying filters.
 	 * @method _cacheDraw
 	 * @param {DisplayObject} target The object we're drawing into the cache. For example, used for drawing the cache
 	 * (to prevent it from simply drawing an existing cache back into itself).
 	 * @param {Array} filters The filters we're drawing into cache.
 	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
-	 * @return {Boolean} If the draw was handled by this function
 	 * @protected
 	 */
 	_cacheDraw (target, filters, manager) {
 		/*
-		Implicitly there are 4 modes to this function: filteredSameContext, filteredUniqueContext, sameContext, uniqueContext.
-		Each situation must be handled slightly differently as uniqueContext or sameContext define how the output works,
+		Implicitly there are 4 modes to this function: filtered-sameContext, filtered-uniqueContext, sameContext, uniqueContext.
+		Each situation must be handled slightly differently as 'sameContext' or 'uniqueContext' define how the output works,
 		one drawing directly into the main context and the other drawing into a stored renderTexture respectively.
-		When the draw is a filtered draw the filters are applied sequentially in order to draw into saved textures repeatedly.
-		Once the final filter is up the final output is treated depending upon whether it is a same or unique context.
-		The internal complexity comes from sahring information, and issues like textures needing to be flipped sometimes when written to render textures.
+		When the draw is a 'filtered' draw, the filters are applied sequentially and will draw into saved textures repeatedly.
+		Once the final filter is done the final output is treated depending upon whether it is a same or unique context.
+		The internal complexity comes from reducing over-draw, shared code, and issues like textures needing to be flipped
+		sometimes when written to render textures.
 		*/
 		let gl = this._webGLContext;
 		let renderTexture;
@@ -7629,13 +7662,14 @@ class StageGL extends Stage {
 		this.protectTextureSlot(lastTextureSlot, false);
 		this._activeShader = shaderBackup;
 		this._slotBlacklist = blackListBackup;
-	};
+	}
 
 	/**
+	 * Sub portion of _cacheDraw, split off for readability. Do not call independently.
 	 * @method _drawFilters
-	 * @param target
-	 * @param filters
-	 * @param manager
+	 * @param {DisplayObject} target The object we're drawing with a filter.
+	 * @param {Array} filters The filters we're drawing into cache.
+	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
 	 * @protected
 	 * @todo Please doc this method
 	 */
@@ -7667,12 +7701,12 @@ class StageGL extends Stage {
 		let flipY = false;
 
 		// apply each filter in order, but remember to toggle used texture and render buffer
-		for(let i=0; i<filterCount; i++) {
+		for (let i=0; i<filterCount; i++) {
 			let filter = filters[i];
 
 			// swap to correct shader
 			this._activeShader = this.getFilterShader(filter);
-			if(!this._activeShader) { continue; }
+			if (!this._activeShader) { continue; }
 
 			// now the old result is stored in slot 0, make a new render texture
 			gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
@@ -7722,11 +7756,11 @@ class StageGL extends Stage {
 			// make sure the last texture is the active thing to draw
 			target.cacheCanvas = renderTexture;
 		}
-	};
+	}
 
 	/**
 	 * Add all the contents of a container to the pending buffers, called recursively on each container. This may
-	 * trigger a draw if a buffer runs out of space.
+	 * trigger a draw if a buffer runs out of space. This is the main workforce of the render loop.
 	 * @method _appendToBatchGroup
 	 * @param {Container} container The {{#crossLink "Container"}}{{/crossLink}} that contains everything to be drawn.
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
@@ -7814,6 +7848,11 @@ class StageGL extends Stage {
 			} else {
 				// fetch the texture (render textures know how to look themselves up to simplify this logic)
 				texture = this._textureDictionary[image._storeID];
+				if (!texture){
+					if (this.vocalDebug){ console.log("Texture should not be looked up while not being stored."); }
+					continue;
+				}
+
 				// put it in the batch if needed
 				if (texture._batchID !== this._batchID) {
 					this._insertTextureInBatch(gl, texture);
@@ -7892,7 +7931,7 @@ class StageGL extends Stage {
 
 			this.batchCardCount++;
 		}
-	};
+	}
 
 	/**
 	 * Draws all the currently defined cards in the buffer to the render surface.
@@ -7901,7 +7940,7 @@ class StageGL extends Stage {
 	 * @protected
 	 */
 	_drawBuffers (gl) {
-		if (this.batchCardCount <= 0) { return; }	// prevents error spam on stages filled with unrenederable content.
+		if (this.batchCardCount <= 0) { return; }	// prevents error logs on stages filled with un-renederable content.
 
 		if (this.vocalDebug) {
 			console.log(`Draw[${this._drawID}:${this._batchID}] : ${this.batchReason}`);
@@ -7941,14 +7980,14 @@ class StageGL extends Stage {
 
 		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*StageGL.INDICIES_PER_CARD);
 		this._batchID++;
-	};
+	}
 
 	/**
-	 * Draws a card that covers the entire render surface.
+	 * Draws a card that covers the entire render surface. Mainly used for filters.
 	 * @method _drawBuffers
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param {Boolean} flipY Covers are used for things like RenderTextures and because of 3D vs Canvas space this can
-	 * end up meaning `y` sometimes, and requires flipping in the render
+	 * end up meaning the `y` space sometimes requires flipping in the render.
 	 * @protected
 	 */
 	_drawCover (gl, flipY) {
@@ -7977,7 +8016,7 @@ class StageGL extends Stage {
 		gl.uniform1f(shaderProgram.uprightUniform, flipY?0:1);
 
 		gl.drawArrays(gl.TRIANGLES, 0, StageGL.INDICIES_PER_CARD);
-	};
+	}
 
 }
 
@@ -8234,7 +8273,7 @@ class StageGL extends Stage {
 			int src = int(indexPicker);
 			vec4 color = vec4(1.0, 0.0, 0.0, 1.0);
 
-			if (src == 0) {
+			if (src === 0) {
 				color = texture2D(uSampler[0], vTextureCoord);
 				{{alternates}}
 			}
@@ -8295,7 +8334,7 @@ class StageGL extends Stage {
 * @license Bitmap
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -8362,7 +8401,7 @@ class Bitmap extends DisplayObject {
 		 * @property image
 		 * @type HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
 		 */
-		if (typeof imageOrUri == "string") {
+		if (typeof imageOrUri === "string") {
 			this.image = document.createElement("img");
 			this.image.src = imageOrUri;
 		} else {
@@ -8494,7 +8533,7 @@ class Bitmap extends DisplayObject {
 * @license Sprite
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -8954,7 +8993,7 @@ class Sprite extends DisplayObject {
 * @license BitmapText
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -9253,11 +9292,11 @@ class BitmapText extends Container {
 
 		for (let i = 0, l = this.text.length; i < l; i++) {
 			let character = this.text.charAt(i);
-			if (character == " " && !hasSpace) {
+			if (character === " " && !hasSpace) {
 				x += spaceW;
 				continue;
-			} else if (character == "\n" || character == "\r") {
-				if (character == "\r" && this.text.charAt(i+1) == "\n") { i++; } // crlf
+			} else if (character === "\n" || character === "\r") {
+				if (character === "\r" && this.text.charAt(i+1) === "\n") { i++; } // crlf
 				x = 0;
 				y += lineH;
 				continue;
@@ -9297,7 +9336,7 @@ class BitmapText extends Container {
 * @license DOMElement
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -9362,7 +9401,7 @@ class DOMElement extends DisplayObject {
 	constructor (htmlElement) {
 		super();
 
-		if (typeof(htmlElement) == "string") { htmlElement = document.getElementById(htmlElement); }
+		if (typeof(htmlElement) === "string") { htmlElement = document.getElementById(htmlElement); }
 		this.mouseEnabled = false;
 
 		let style = htmlElement.style;
@@ -9546,7 +9585,7 @@ class DOMElement extends DisplayObject {
 * @license Graphics
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -10901,7 +10940,7 @@ class Graphics {
 				let num = base64[str.charAt(i)];
 				let sign = (num>>5) ? -1 : 1;
 				num = ((num&31)<<6)|(base64[str.charAt(i+1)]);
-				if (charCount == 3) { num = (num<<6)|(base64[str.charAt(i+2)]); }
+				if (charCount === 3) { num = (num<<6)|(base64[str.charAt(i+2)]); }
 				num = sign*num/10;
 				if (p%2) { x = (num += x); }
 				else { y = (num += y); }
@@ -10996,7 +11035,7 @@ class Graphics {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[Graphics]";
+		return `[${this.constructor.name}]`;
 	}
 
 // private methods:
@@ -12028,7 +12067,7 @@ class PolyStar {
  * @type {CanvasRenderingContext2D}
  */
 {
-	let canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	let canvas = (createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
 	if (canvas.getContext) {
 		Graphics._ctx = canvas.getContext("2d");
 		canvas.width = canvas.height = 1;
@@ -12041,7 +12080,652 @@ class PolyStar {
 }
 
 /*
-* @license MovieClip
+* @license Event
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2017 gskinner.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/**
+ * A collection of classes that are shared across the CreateJS libraries.
+ * Classes required by a library are compiled with that library.
+ *
+ * @module CreateJS
+ * @main CreateJS
+ */
+
+/**
+ * Contains properties and methods shared by all events for use with {{#crossLink "EventDispatcher"}}{{/crossLink}}.
+ * Note that Event objects are often reused, so you should never
+ * rely on an event object's state outside of the call stack it was received in.
+ *
+ * @class Event
+ * @module CreateJS
+ */
+class Event$1 {
+
+// constructor:
+	/**
+	 * @param {String} type The event type.
+	 * @param {Boolean} [bubbles=false] Indicates whether the event will bubble through the display list.
+	 * @param {Boolean} [cancelable=false] Indicates whether the default behaviour of this event can be cancelled.
+	 * @constructor
+	 */
+	constructor (type, bubbles = false, cancelable = false) {
+		/**
+		 * The type of event.
+		 * @property type
+		 * @type String
+		 */
+		this.type = type;
+
+		/**
+		 * The object that generated an event.
+		 * @property target
+		 * @type Object
+		 * @default null
+		 * @readonly
+		 */
+		this.target = null;
+
+		/**
+		 * The current target that a bubbling event is being dispatched from. For non-bubbling events, this will
+		 * always be the same as target. For example, if childObj.parent = parentObj, and a bubbling event
+		 * is generated from childObj, then a listener on parentObj would receive the event with
+		 * target=childObj (the original target) and currentTarget=parentObj (where the listener was added).
+		 * @property currentTarget
+		 * @type Object
+		 * @default null
+		 * @readonly
+		 */
+		this.currentTarget = null;
+
+		/**
+		 * For bubbling events, this indicates the current event phase:<OL>
+		 * 	<LI> capture phase: starting from the top parent to the target</LI>
+		 * 	<LI> at target phase: currently being dispatched from the target</LI>
+		 * 	<LI> bubbling phase: from the target to the top parent</LI>
+		 * </OL>
+		 * @property eventPhase
+		 * @type Number
+		 * @default 0
+		 * @readonly
+		 */
+		this.eventPhase = 0;
+
+		/**
+		 * Indicates whether the event will bubble through the display list.
+		 * @property bubbles
+		 * @type Boolean
+		 * @default false
+		 * @readonly
+		 */
+		this.bubbles = bubbles;
+
+		/**
+		 * Indicates whether the default behaviour of this event can be cancelled via
+		 * {{#crossLink "Event/preventDefault"}}{{/crossLink}}. This is set via the Event constructor.
+		 * @property cancelable
+		 * @type Boolean
+		 * @default false
+		 * @readonly
+		 */
+		this.cancelable = cancelable;
+
+		/**
+		 * The epoch time at which this event was created.
+		 * @property timeStamp
+		 * @type Number
+		 * @default 0
+		 * @readonly
+		 */
+		this.timeStamp = new Date().getTime();
+
+		/**
+		 * Indicates if {{#crossLink "Event/preventDefault"}}{{/crossLink}} has been called
+		 * on this event.
+		 * @property defaultPrevented
+		 * @type Boolean
+		 * @default false
+		 * @readonly
+		 */
+		this.defaultPrevented = false;
+
+		/**
+		 * Indicates if {{#crossLink "Event/stopPropagation"}}{{/crossLink}} or
+		 * {{#crossLink "Event/stopImmediatePropagation"}}{{/crossLink}} has been called on this event.
+		 * @property propagationStopped
+		 * @type Boolean
+		 * @default false
+		 * @readonly
+		 */
+		this.propagationStopped = false;
+
+		/**
+		 * Indicates if {{#crossLink "Event/stopImmediatePropagation"}}{{/crossLink}} has been called
+		 * on this event.
+		 * @property immediatePropagationStopped
+		 * @type Boolean
+		 * @default false
+		 * @readonly
+		 */
+		this.immediatePropagationStopped = false;
+
+		/**
+		 * Indicates if {{#crossLink "Event/remove"}}{{/crossLink}} has been called on this event.
+		 * @property removed
+		 * @type Boolean
+		 * @default false
+		 * @readonly
+		 */
+		this.removed = false;
+	}
+
+// public methods:
+	/**
+	 * Sets {{#crossLink "Event/defaultPrevented"}}{{/crossLink}} to true if the event is cancelable.
+	 * Mirrors the DOM level 2 event standard. In general, cancelable events that have `preventDefault()` called will
+	 * cancel the default behaviour associated with the event.
+	 * @method preventDefault
+	 */
+	preventDefault () {
+		this.defaultPrevented = this.cancelable;
+	}
+
+	/**
+	 * Sets {{#crossLink "Event/propagationStopped"}}{{/crossLink}} to true.
+	 * Mirrors the DOM event standard.
+	 * @method stopPropagation
+	 */
+	stopPropagation () {
+		this.propagationStopped = true;
+	}
+
+	/**
+	 * Sets {{#crossLink "Event/propagationStopped"}}{{/crossLink}} and
+	 * {{#crossLink "Event/immediatePropagationStopped"}}{{/crossLink}} to true.
+	 * Mirrors the DOM event standard.
+	 * @method stopImmediatePropagation
+	 */
+	stopImmediatePropagation () {
+		this.immediatePropagationStopped = this.propagationStopped = true;
+	}
+
+	/**
+	 * Causes the active listener to be removed via removeEventListener();
+	 *
+	 * 		myBtn.addEventListener("click", function(evt) {
+	 * 			// do stuff...
+	 * 			evt.remove(); // removes this listener.
+	 * 		});
+	 *
+	 * @method remove
+	 */
+	remove () {
+		this.removed = true;
+	}
+
+	/**
+	 * Returns a clone of the Event instance.
+	 * @method clone
+	 * @return {Event} a clone of the Event instance.
+	 */
+	clone () {
+		let event = new Event$1(this.type, this.bubbles, this.cancelable);
+		for (let n in this) {
+			if (this.hasOwnProperty(n)) {
+				event[n] = this[n];
+			}
+		}
+
+		return event;
+	}
+
+	/**
+	 * Provides a chainable shortcut method for setting a number of properties on the instance.
+	 *
+	 * @method set
+	 * @param {Object} props A generic object containing properties to copy to the instance.
+	 * @return {Event} Returns the instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	 */
+	set (props) {
+		for (let n in props) { this[n] = props[n]; }
+		return this;
+	}
+
+	/**
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 */
+	toString () {
+		return `[${this.constructor.name} (type=${this.type})]`;
+	}
+
+}
+
+/*
+* @license EventDispatcher
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2017 gskinner.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/**
+ * EventDispatcher provides methods for managing queues of event listeners and dispatching events.
+ *
+ * You can either extend EventDispatcher or mix its methods into an existing prototype or instance by using the
+ * EventDispatcher {{#crossLink "EventDispatcher/initialize"}}{{/crossLink}} method.
+ *
+ * Together with the CreateJS Event class, EventDispatcher provides an extended event model that is based on the
+ * DOM Level 2 event model, including addEventListener, removeEventListener, and dispatchEvent. It supports
+ * bubbling / capture, preventDefault, stopPropagation, stopImmediatePropagation, and handleEvent.
+ *
+ * EventDispatcher also exposes a {{#crossLink "EventDispatcher/on"}}{{/crossLink}} method, which makes it easier
+ * to create scoped listeners, listeners that only run once, and listeners with associated arbitrary data. The
+ * {{#crossLink "EventDispatcher/off"}}{{/crossLink}} method is merely an alias to
+ * {{#crossLink "EventDispatcher/removeEventListener"}}{{/crossLink}}.
+ *
+ * Another addition to the DOM Level 2 model is the {{#crossLink "EventDispatcher/removeAllEventListeners"}}{{/crossLink}}
+ * method, which can be used to listeners for all events, or listeners for a specific event. The Event object also
+ * includes a {{#crossLink "Event/remove"}}{{/crossLink}} method which removes the active listener.
+ *
+ * <h4>Example</h4>
+ * Add EventDispatcher capabilities to the "MyClass" class.
+ *
+ *      EventDispatcher.initialize(MyClass.prototype);
+ *
+ * Add an event (see {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}}).
+ *
+ *      instance.addEventListener("eventName", handlerMethod);
+ *      function handlerMethod(event) {
+	 *          console.log(event.target + " Was Clicked");
+	 *      }
+ *
+ * <b>Maintaining proper scope</b><br />
+ * Scope (ie. "this") can be be a challenge with events. Using the {{#crossLink "EventDispatcher/on"}}{{/crossLink}}
+ * method to subscribe to events simplifies this.
+ *
+ *      instance.addEventListener("click", function(event) {
+	 *          console.log(instance == this); // false, scope is ambiguous.
+	 *      });
+ *
+ *      instance.on("click", function(event) {
+	 *          console.log(instance == this); // true, "on" uses dispatcher scope by default.
+	 *      });
+ *
+ * If you want to use addEventListener instead, you may want to use function.bind() or a similar proxy to manage scope.
+ *
+ *
+ * @class EventDispatcher
+ * @module CreateJS
+ */
+class EventDispatcher$1 {
+
+// static methods:
+	/**
+	 * Static initializer to mix EventDispatcher methods into a target object or prototype.
+	 *
+	 * 		EventDispatcher.initialize(MyClass.prototype); // add to the prototype of the class
+	 * 		EventDispatcher.initialize(myObject); // add to a specific instance
+	 *
+	 * @method initialize
+	 * @static
+	 * @param {Object} target The target object to inject EventDispatcher methods into. This can be an instance or a
+	 * prototype.
+	 */
+	static initialize (target) {
+		const p = EventDispatcher$1.prototype;
+		target.addEventListener = p.addEventListener;
+		target.on = p.on;
+		target.removeEventListener = target.off = p.removeEventListener;
+		target.removeAllEventListeners = p.removeAllEventListeners;
+		target.hasEventListener = p.hasEventListener;
+		target.dispatchEvent = p.dispatchEvent;
+		target._dispatchEvent = p._dispatchEvent;
+		target.willTrigger = p.willTrigger;
+	}
+
+// constructor:
+	/**
+	 * @constructor
+	 */
+	constructor () {
+		/**
+		 * @protected
+		 * @property _listeners
+		 * @type Object
+		 */
+		this._listeners = null;
+
+		/**
+		 * @protected
+		 * @property _captureListeners
+		 * @type Object
+		 */
+		this._captureListeners = null;
+	}
+
+// public methods:
+	/**
+	 * Adds the specified event listener. Note that adding multiple listeners to the same function will result in
+	 * multiple callbacks getting fired.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      displayObject.addEventListener("click", handleClick);
+	 *      function handleClick(event) {
+	 *         // Click happened.
+	 *      }
+	 *
+	 * @method addEventListener
+	 * @param {String} type The string type of the event.
+	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
+	 * the event is dispatched.
+	 * @param {Boolean} [useCapture] For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
+	 * @return {Function | Object} Returns the listener for chaining or assignment.
+	 */
+	addEventListener (type, listener, useCapture) {
+		let listeners;
+		if (useCapture) {
+			listeners = this._captureListeners = this._captureListeners||{};
+		} else {
+			listeners = this._listeners = this._listeners||{};
+		}
+		let arr = listeners[type];
+		if (arr) { this.removeEventListener(type, listener, useCapture); }
+		arr = listeners[type]; // remove may have deleted the array
+		if (!arr) { listeners[type] = [listener];  }
+		else { arr.push(listener); }
+		return listener;
+	}
+
+	/**
+	 * A shortcut method for using addEventListener that makes it easier to specify an execution scope, have a listener
+	 * only run once, associate arbitrary data with the listener, and remove the listener.
+	 *
+	 * This method works by creating an anonymous wrapper function and subscribing it with addEventListener.
+	 * The wrapper function is returned for use with `removeEventListener` (or `off`).
+	 *
+	 * <b>IMPORTANT:</b> To remove a listener added with `on`, you must pass in the returned wrapper function as the listener, or use
+	 * {{#crossLink "Event/remove"}}{{/crossLink}}. Likewise, each time you call `on` a NEW wrapper function is subscribed, so multiple calls
+	 * to `on` with the same params will create multiple listeners.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 * 		var listener = myBtn.on("click", handleClick, null, false, {count:3});
+	 * 		function handleClick(evt, data) {
+	 * 			data.count -= 1;
+	 * 			console.log(this == myBtn); // true - scope defaults to the dispatcher
+	 * 			if (data.count == 0) {
+	 * 				alert("clicked 3 times!");
+	 * 				myBtn.off("click", listener);
+	 * 				// alternately: evt.remove();
+	 * 			}
+	 * 		}
+	 *
+	 * @method on
+	 * @param {String} type The string type of the event.
+	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
+	 * the event is dispatched.
+	 * @param {Object} [scope] The scope to execute the listener in. Defaults to the dispatcher/currentTarget for function listeners, and to the listener itself for object listeners (ie. using handleEvent).
+	 * @param {Boolean} [once=false] If true, the listener will remove itself after the first time it is triggered.
+	 * @param {*} [data] Arbitrary data that will be included as the second parameter when the listener is called.
+	 * @param {Boolean} [useCapture=false] For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
+	 * @return {Function} Returns the anonymous function that was created and assigned as the listener. This is needed to remove the listener later using .removeEventListener.
+	 */
+	on (type, listener, scope = null, once = false, data = {}, useCapture = false) {
+		if (listener.handleEvent) {
+			scope = scope||listener;
+			listener = listener.handleEvent;
+		}
+		scope = scope||this;
+		return this.addEventListener(type, function(evt) {
+			listener.call(scope, evt, data);
+			once&&evt.remove();
+		}, useCapture);
+	}
+
+	/**
+	 * Removes the specified event listener.
+	 *
+	 * <b>Important Note:</b> that you must pass the exact function reference used when the event was added. If a proxy
+	 * function, or function closure is used as the callback, the proxy/closure reference must be used - a new proxy or
+	 * closure will not work.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      displayObject.removeEventListener("click", handleClick);
+	 *
+	 * @method removeEventListener
+	 * @param {String} type The string type of the event.
+	 * @param {Function | Object} listener The listener function or object.
+	 * @param {Boolean} [useCapture] For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
+	 */
+	removeEventListener (type, listener, useCapture) {
+		const listeners = useCapture ? this._captureListeners : this._listeners;
+		if (!listeners) { return; }
+		const arr = listeners[type];
+		if (!arr) { return; }
+		const l = arr.length;
+		for (let i=0; i<l; i++) {
+			if (arr[i] == listener) {
+				if (l==1) { delete(listeners[type]); } // allows for faster checks.
+				else { arr.splice(i,1); }
+				break;
+			}
+		}
+	}
+
+	/**
+	 * A shortcut to the removeEventListener method, with the same parameters and return value. This is a companion to the
+	 * .on method.
+	 *
+	 * <b>IMPORTANT:</b> To remove a listener added with `on`, you must pass in the returned wrapper function as the listener. See
+	 * {{#crossLink "EventDispatcher/on"}}{{/crossLink}} for an example.
+	 *
+	 * @method off
+	 * @param {String} type The string type of the event.
+	 * @param {Function | Object} listener The listener function or object.
+	 * @param {Boolean} [useCapture] For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
+	 */
+	off (type, listener, useCapture) {
+		this.removeEventListener(type, listener, useCapture);
+	}
+
+	/**
+	 * Removes all listeners for the specified type, or all listeners of all types.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      // Remove all listeners
+	 *      displayObject.removeAllEventListeners();
+	 *
+	 *      // Remove all click listeners
+	 *      displayObject.removeAllEventListeners("click");
+	 *
+	 * @method removeAllEventListeners
+	 * @param {String} [type] The string type of the event. If omitted, all listeners for all types will be removed.
+	 */
+	removeAllEventListeners (type) {
+		if (!type) { this._listeners = this._captureListeners = null; }
+		else {
+			if (this._listeners) { delete(this._listeners[type]); }
+			if (this._captureListeners) { delete(this._captureListeners[type]); }
+		}
+	}
+
+	/**
+	 * Dispatches the specified event to all listeners.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      // Use a string event
+	 *      this.dispatchEvent("complete");
+	 *
+	 *      // Use an Event instance
+	 *      var event = new createjs.Event("progress");
+	 *      this.dispatchEvent(event);
+	 *
+	 * @method dispatchEvent
+	 * @param {Object | String | Event} eventObj An object with a "type" property, or a string type.
+	 * While a generic object will work, it is recommended to use a CreateJS Event instance. If a string is used,
+	 * dispatchEvent will construct an Event instance if necessary with the specified type. This latter approach can
+	 * be used to avoid event object instantiation for non-bubbling events that may not have any listeners.
+	 * @param {Boolean} [bubbles] Specifies the `bubbles` value when a string was passed to eventObj.
+	 * @param {Boolean} [cancelable] Specifies the `cancelable` value when a string was passed to eventObj.
+	 * @return {Boolean} Returns false if `preventDefault()` was called on a cancelable event, true otherwise.
+	 */
+	dispatchEvent (eventObj, bubbles = false, cancelable = false) {
+		if (typeof eventObj == "string") {
+			// skip everything if there's no listeners and it doesn't bubble:
+			const listeners = this._listeners;
+			if (!bubbles && (!listeners || !listeners[eventObj])) { return true; }
+			eventObj = new Event$1(eventObj, bubbles, cancelable);
+		} else if (eventObj.target && eventObj.clone) {
+			// redispatching an active event object, so clone it:
+			eventObj = eventObj.clone();
+		}
+
+		// TODO: it would be nice to eliminate this. Maybe in favour of evtObj instanceof Event? Or !!evtObj.createEvent
+		try { eventObj.target = this; } catch (e) {} // try/catch allows redispatching of native events
+
+		if (!eventObj.bubbles || !this.parent) {
+			this._dispatchEvent(eventObj, 2);
+		} else {
+			let top = this, i;
+			const list = [top];
+			while (top.parent) { list.push(top = top.parent); }
+			const l = list.length;
+
+			// capture & atTarget
+			for (i=l-1; i>=0 && !eventObj.propagationStopped; i--) {
+				list[i]._dispatchEvent(eventObj, 1+(i==0));
+			}
+			// bubbling
+			for (i=1; i<l && !eventObj.propagationStopped; i++) {
+				list[i]._dispatchEvent(eventObj, 3);
+			}
+		}
+		return !eventObj.defaultPrevented;
+	}
+
+	/**
+	 * Indicates whether there is at least one listener for the specified event type.
+	 * @method hasEventListener
+	 * @param {String} type The string type of the event.
+	 * @return {Boolean} Returns true if there is at least one listener for the specified event.
+	 */
+	hasEventListener (type) {
+		const listeners = this._listeners, captureListeners = this._captureListeners;
+		return !!((listeners && listeners[type]) || (captureListeners && captureListeners[type]));
+	}
+
+	/**
+	 * Indicates whether there is at least one listener for the specified event type on this object or any of its
+	 * ancestors (parent, parent's parent, etc). A return value of true indicates that if a bubbling event of the
+	 * specified type is dispatched from this object, it will trigger at least one listener.
+	 *
+	 * This is similar to {{#crossLink "EventDispatcher/hasEventListener"}}{{/crossLink}}, but it searches the entire
+	 * event flow for a listener, not just this object.
+	 * @method willTrigger
+	 * @param {String} type The string type of the event.
+	 * @return {Boolean} Returns `true` if there is at least one listener for the specified event.
+	 */
+	willTrigger (type) {
+		let o = this;
+		while (o) {
+			if (o.hasEventListener(type)) { return true; }
+			o = o.parent;
+		}
+		return false;
+	}
+
+	/**
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 */
+	toString () {
+		return "[EventDispatcher]";
+	}
+
+	// private methods:
+	/**
+	 * @method _dispatchEvent
+	 * @param {Object | String | Event} eventObj
+	 * @param {Object} eventPhase
+	 * @protected
+	 */
+	_dispatchEvent (eventObj, eventPhase) {
+		const listeners = (eventPhase==1) ? this._captureListeners : this._listeners;
+		let l;
+		if (eventObj && listeners) {
+			let arr = listeners[eventObj.type];
+			if (!arr||!(l=arr.length)) { return; }
+			try { eventObj.currentTarget = this; } catch (e) {}
+			try { eventObj.eventPhase = eventPhase; } catch (e) {}
+			eventObj.removed = false;
+
+			arr = arr.slice(); // to avoid issues with items being removed or added during the dispatch
+			for (let i=0; i<l && !eventObj.immediatePropagationStopped; i++) {
+				let o = arr[i];
+				if (o.handleEvent) { o.handleEvent(eventObj); }
+				else { o(eventObj); }
+				if (eventObj.removed) {
+					this.off(eventObj.type, o, eventPhase==1);
+					eventObj.removed = false;
+				}
+			}
+		}
+	}
+
+}
+
+/*
+* TweenJS
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
@@ -12068,7 +12752,2502 @@ class PolyStar {
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// TODO: Get Tween and Timeline imports.
+/**
+ * Base class that both {{#crossLink "Tween"}}{{/crossLink}} and {{#crossLink "Timeline"}}{{/crossLink}} extend. Should not be instantiated directly.
+ * @class AbstractTween
+ * @param {Object} [props]
+ * @extends EventDispatcher
+ * @module TweenJS
+ * @constructor
+ */
+class AbstractTween extends EventDispatcher$1 {
+
+// constructor:
+  /**
+   * @constructor
+   * @param {Object} [props]
+   */
+  constructor (props) {
+    super();
+
+  // public properties:
+		/**
+		 * Causes this tween to continue playing when a global pause is active. For example, if TweenJS is using {{#crossLink "Ticker"}}{{/crossLink}},
+		 * then setting this to false (the default) will cause this tween to be paused when `Ticker.setPaused(true)`
+		 * is called. See the {{#crossLink "Tween/tick"}}{{/crossLink}} method for more info. Can be set via the `props`
+		 * parameter.
+		 * @property ignoreGlobalPause
+		 * @type Boolean
+		 * @default false
+		 */
+		this.ignoreGlobalPause = false;
+
+		/**
+		 * Indicates the number of times to loop. If set to -1, the tween will loop continuously.
+		 * @property loop
+		 * @type {Number}
+		 * @default 0
+		 */
+		this.loop = 0;
+
+		/**
+		 * Uses ticks for all durations instead of milliseconds. This also changes the behaviour of some actions (such as `call`).
+		 * Changing this value on a running tween could have unexpected results.
+		 * @property useTicks
+		 * @type {Boolean}
+		 * @default false
+		 * @readonly
+		 */
+		this.useTicks = false;
+
+		/**
+		 * Causes the tween to play in reverse.
+		 * @property reversed
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.reversed = false;
+
+		/**
+		 * Causes the tween to reverse direction at the end of each loop.
+		 * @property bounce
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.bounce = false;
+
+		/**
+		 * Changes the rate at which the tween advances. For example, a `timeScale` value of `2` will double the
+		 * playback speed, a value of `0.5` would halve it.
+		 * @property timeScale
+		 * @type {Number}
+		 * @default 1
+		 */
+		this.timeScale = 1;
+
+		/**
+		 * Indicates the duration of this tween in milliseconds (or ticks if `useTicks` is true), irrespective of `loops`.
+		 * This value is automatically updated as you modify the tween. Changing it directly could result in unexpected
+		 * behaviour.
+		 * @property duration
+		 * @type {Number}
+		 * @default 0
+		 * @readonly
+		 */
+		this.duration = 0;
+
+		/**
+		 * The current normalized position of the tween. This will always be a value between 0 and `duration`.
+		 * Changing this property directly will have unexpected results, use {{#crossLink "Tween/setPosition"}}{{/crossLink}}.
+		 * @property position
+		 * @type {Object}
+		 * @default 0
+		 * @readonly
+		 */
+		this.position = 0;
+
+		/**
+		 * The raw tween position. This value will be between `0` and `loops * duration` while the tween is active, or -1 before it activates.
+		 * @property rawPosition
+		 * @type {Number}
+		 * @default -1
+		 * @readonly
+		 */
+		this.rawPosition = -1;
+
+
+	// private properties:
+		/**
+		 * @property _paused
+		 * @type {Boolean}
+		 * @default false
+		 * @protected
+		 */
+		this._paused = true;
+
+		/**
+		 * @property _next
+		 * @type {Tween}
+		 * @default null
+		 * @protected
+		 */
+		this._next = null;
+
+		/**
+		 * @property _prev
+		 * @type {Tween}
+		 * @default null
+		 * @protected
+		 */
+		this._prev = null;
+
+		/**
+		 * @property _parent
+		 * @type {Object}
+		 * @default null
+		 * @protected
+		 */
+		this._parent = null;
+
+		/**
+		 * @property _labels
+		 * @type Object
+		 * @protected
+		 */
+		this._labels = null;
+
+		/**
+		 * @property _labelList
+		 * @type Array[Object]
+		 * @protected
+		 */
+		this._labelList = null;
+
+		if (props) {
+			this.useTicks = !!props.useTicks;
+			this.ignoreGlobalPause = !!props.ignoreGlobalPause;
+			this.loop = props.loop === true ? -1 : (props.loop||0);
+			this.reversed = !!props.reversed;
+			this.bounce = !!props.bounce;
+			this.timeScale = props.timeScale||1;
+			props.onChange && this.addEventListener("change", props.onChange);
+			props.onComplete && this.addEventListener("complete", props.onComplete);
+		}
+
+		// while `position` is shared, it needs to happen after ALL props are set, so it's handled in _init()
+  }
+
+// accessor properties:
+	/**
+	 * Returns a list of the labels defined on this tween sorted by position.
+	 * @property labels
+	 * @return {Array[Object]} A sorted array of objects with label and position properties.
+	 */
+	get labels () {
+		let list = this._labelList;
+		if (!list) {
+			list = this._labelList = [];
+			let labels = this._labels;
+			for (let label in labels) {
+				list.push({ label, position: labels[label] });
+			}
+			list.sort((a, b) => a.position - b.position);
+		}
+		return list;
+	}
+
+  /**
+	 * Defines labels for use with gotoAndPlay/Stop. Overwrites any previously set labels.
+	 * @param {Object} labels An object defining labels for using {{#crossLink "Timeline/gotoAndPlay"}}{{/crossLink}}/{{#crossLink "Timeline/gotoAndStop"}}{{/crossLink}}
+	 * in the form `{myLabelName:time}` where time is in milliseconds (or ticks if `useTicks` is `true`).
+	 */
+	set labels (labels) {
+		this._labels = labels;
+		this._labelList = null;
+	}
+
+// public methods:
+	/**
+	 * Advances the tween by a specified amount.
+	 * @method advance
+	 * @param {Number} delta The amount to advance in milliseconds (or ticks if useTicks is true). Negative values are supported.
+	 * @param {Boolean} [ignoreActions=false] If true, actions will not be executed due to this change in position.
+	 */
+	advance (delta, ignoreActions = false) {
+		this.setPosition(this.rawPosition+delta*this.timeScale, ignoreActions);
+	}
+
+	/**
+	 * Advances the tween to a specified position.
+	 * @method setPosition
+	 * @param {Number} rawPosition The raw position to seek to in milliseconds (or ticks if useTicks is true).
+	 * @param {Boolean} [ignoreActions=false] If true, do not run any actions that would be triggered by this operation.
+	 * @param {Boolean} [jump=false] If true, only actions at the new position will be run. If false, actions between the old and new position are run.
+	 * @param {Function} [callback] Primarily for use with MovieClip, this callback is called after properties are updated, but before actions are run.
+	 */
+	setPosition (rawPosition, ignoreActions = false, jump = false, callback) {
+		let d = this.duration, loopCount = this.loop, prevRawPos = this.rawPosition;
+		let loop = 0, t = 0, end = false;
+
+		// normalize position:
+		if (rawPosition < 0) { rawPosition = 0; }
+
+		if (d === 0) {
+			// deal with 0 length tweens.
+			end = true;
+			if (prevRawPos !== -1) { return end; } // we can avoid doing anything else if we're already at 0.
+		} else {
+			loop = rawPosition / d | 0;
+			t = rawPosition - loop * d;
+
+			end = (loopCount !== -1 && rawPosition >= loopCount * d + d);
+			if (end) { rawPosition = (t = d) * (loop = loopCount) + d; }
+			if (rawPosition === prevRawPos) { return end; } // no need to update
+
+			let rev = !this.reversed !== !(this.bounce && loop % 2); // current loop is reversed
+			if (rev) { t = d - t; }
+		}
+
+		// set this in advance in case an action modifies position:
+		this.position = t;
+		this.rawPosition = rawPosition;
+
+		this._updatePosition(jump, end);
+		if (end) { this.setPaused(true); }
+
+		callback && callback(this);
+
+		if (!ignoreActions) { this._runActions(prevRawPos, rawPosition, jump, !jump && prevRawPos === -1); }
+
+		this.dispatchEvent("change");
+		if (end) { this.dispatchEvent("complete"); }
+	}
+
+	/**
+	 * Calculates a normalized position based on a raw position. For example, given a tween with a duration of 3000ms set to loop:
+	 * 	console.log(myTween.calculatePosition(3700); // 700
+	 * @method calculatePosition
+	 * @param {Number} rawPosition A raw position.
+	 */
+	calculatePosition (rawPosition) {
+		// largely duplicated from setPosition, but necessary to avoid having to instantiate generic objects to pass values (end, loop, position) back.
+		let d = this.duration, loopCount = this.loop, loop = 0, t = 0;
+
+		if (d === 0) { return 0; }
+		if (loopCount !== -1 && rawPosition >= loopCount * d + d) { t = d; loop = loopCount; } // end
+		else if (rawPosition < 0) { t = 0; }
+		else { loop = rawPosition /d | 0; t = rawPosition - loop * d; }
+
+		let rev = !this.reversed !== !(this.bounce && loop % 2); // current loop is reversed
+		return rev ? d - t : t;
+	}
+
+	/**
+	 * Adds a label that can be used with {{#crossLink "Timeline/gotoAndPlay"}}{{/crossLink}}/{{#crossLink "Timeline/gotoAndStop"}}{{/crossLink}}.
+	 * @method addLabel
+	 * @param {String} label The label name.
+	 * @param {Number} position The position this label represents.
+	 */
+	addLabel (label, position) {
+		if (!this._labels) { this._labels = {}; }
+		this._labels[label] = position;
+		let list = this._labelList;
+		if (list) {
+			for (let i = 0, l = list.length; i < l; i++) { if (position < list[i].position) { break; } }
+			list.splice(i, 0, { label, position });
+		}
+	}
+
+	/**
+	 * Returns the name of the label on or immediately before the current position. For example, given a tween with
+	 * two labels, "first" on frame index 4, and "second" on frame 8, getCurrentLabel would return:
+	 * <UL>
+	 * 		<LI>null if the current position is 2.</LI>
+	 * 		<LI>"first" if the current position is 4.</LI>
+	 * 		<LI>"first" if the current position is 7.</LI>
+	 * 		<LI>"second" if the current position is 15.</LI>
+	 * </UL>
+	 * @method getCurrentLabel
+	 * @return {String} The name of the current label or null if there is no label
+	 */
+	getCurrentLabel (pos) {
+		let labels = this.labels, i, l;
+		if (pos == null) { pos = this.position; }
+		for (i = 0, l = labels.length; i < l; i++) { if (pos < labels[i].position) { break; } }
+		return i === 0 ? null : labels[i - 1].label;
+	}
+
+	/**
+	 * Unpauses this timeline and jumps to the specified position or label.
+	 * @method gotoAndPlay
+	 * @param {String|Number} positionOrLabel The position in milliseconds (or ticks if `useTicks` is `true`)
+	 * or label to jump to.
+	 */
+	gotoAndPlay (positionOrLabel) {
+		this.setPaused(false);
+		this._goto(positionOrLabel);
+	}
+
+	/**
+	 * Pauses this timeline and jumps to the specified position or label.
+	 * @method gotoAndStop
+	 * @param {String|Number} positionOrLabel The position in milliseconds (or ticks if `useTicks` is `true`) or label
+	 * to jump to.
+	 */
+	gotoAndStop (positionOrLabel) {
+		this.setPaused(true);
+		this._goto(positionOrLabel);
+	}
+
+	/**
+	 * If a numeric position is passed, it is returned unchanged. If a string is passed, the position of the
+	 * corresponding frame label will be returned, or `null` if a matching label is not defined.
+	 * @method resolve
+	 * @param {String|Number} positionOrLabel A numeric position value or label string.
+	 */
+	resolve (positionOrLabel) {
+		let pos = Number(positionOrLabel);
+		if (isNaN(pos)) { pos = this._labels && this._labels[positionOrLabel]; }
+		return pos;
+	}
+
+	/**
+	 * Pauses or plays this tween.
+	 * @method setPaused
+	 * @param {Boolean} [value=true] Indicates whether the tween should be paused (`true`) or played (`false`).
+	 * @return {Tween} This tween instance (for chaining calls)
+	 * @chainable
+	 */
+	setPaused (value) {
+		Tween._register(this, value);
+		return this;
+	}
+
+	/**
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 */
+	toString () {
+		return `[${this.constructor.name}${this.name ? ` (name=${this.name})` : ""}]`;
+	}
+
+	/**
+	 * @method clone
+	 * @protected
+	 */
+	clone () {
+		throw("AbstractTween can not be cloned.")
+	}
+
+// private methods:
+	/**
+	 * Shared logic that executes at the end of the subclass constructor.
+	 * @method _init
+	 * @protected
+	 */
+	_init (props) {
+		if (!props || !props.paused) { this.setPaused(false); }
+		if (props && props.position != null) { this.setPosition(props.position); }
+	}
+
+	/**
+	 * @method _goto
+	 * @protected
+	 */
+	_goto (positionOrLabel) {
+		let pos = this.resolve(positionOrLabel);
+		if (pos != null) { this.setPosition(pos, false, true); }
+	}
+
+	/**
+   * Runs actions between startPos & endPos. Separated to support action deferral.
+	 * @method _runActions
+	 * @protected
+	 */
+	_runActions (startRawPos, endRawPos, jump, includeStart) {
+	  // console.log(this.passive === false ? " > Tween" : "Timeline", "run", startRawPos, endRawPos, jump, includeStart);
+		// if we don't have any actions, and we're not a Timeline, then return:
+		// TODO: a cleaner way to handle this would be to override this method in Tween, but I'm not sure it's worth the overhead.
+		if (!this._actionHead && !this._tweens) { return; }
+
+		let d = this.duration, reversed = this.reversed, bounce = this.bounce, loopCount = this.loop;
+		let loop0, loop1, t0, t1;
+
+		if (d === 0) {
+			// deal with 0 length tweens:
+			loop0 = loop1 = t0 = t1 = 0;
+			reversed = bounce = false;
+		} else {
+			loop0 = startRawPos / d | 0;
+			loop1 = endRawPos / d | 0;
+			t0 = startRawPos - loop0 * d;
+			t1 = endRawPos - loop1 * d;
+		}
+
+		// catch positions that are past the end:
+		if (loopCount !== -1) {
+			if (loop1 > loopCount) { t1 = d; loop1 = loopCount; }
+			if (loop0 > loopCount) { t0 = d; loop0 = loopCount; }
+		}
+
+		// special cases:
+		if (jump) { return this._runActionsRange(t1, t1, jump, includeStart); } // jump.
+		else if (loop0 === loop1 && t0 === t1 && !jump) { return; } // no actions if the position is identical.
+		else if (loop0 === -1) { loop0 = t0 = 0; } // correct the -1 value for first advance, important with useTicks.
+
+		let dir = (startRawPos <= endRawPos), loop = loop0;
+		do {
+			let rev = !reversed !== !(bounce && loop % 2);
+
+			let start = (loop === loop0) ? t0 : dir ? 0 : d;
+			let end = (loop === loop1) ? t1 : dir ? d : 0;
+
+			if (rev) {
+				start = d - start;
+				end = d - end;
+			}
+
+			if (bounce && loop !== loop0 && start === end) { /* bounced onto the same time/frame, don't re-execute end actions */ }
+			else if (this._runActionsRange(start, end, jump, includeStart || (loop !== loop0 && !bounce))) { return true; }
+
+			includeStart = false;
+		} while ((dir && ++loop <= loop1) || (!dir && --loop >= loop1));
+	}
+
+  /**
+	 * @method _runActionsRange
+   * @abstract
+	 * @protected
+	 */
+	_runActionsRange (startPos, endPos, jump, includeStart) {
+		// throw("_runActionsRange is abstract and must be overridden by a subclass");
+	}
+
+  /**
+	 * @method _updatePosition
+   * @abstract
+	 * @protected
+	 */
+	_updatePosition (jump, end) {
+    // throw("_updatePosition is abstract and must be overridden by a subclass");
+	}
+
+}
+
+// events:
+/**
+ * Dispatched whenever the tween's position changes.
+ * @event change
+ */
+/**
+ * Dispatched when the tween reaches its end and has paused itself. This does not fire until all loops are complete;
+ * tweens that loop continuously will never fire a complete event.
+ * @event complete
+ */
+
+/*
+* Ease
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2010 gskinner.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/**
+ * The Ease class provides a collection of easing functions for use with TweenJS. It does not use the standard 4 param
+ * easing signature. Instead it uses a single param which indicates the current linear ratio (0 to 1) of the tween.
+ *
+ * Most methods on Ease can be passed directly as easing functions:
+ *
+ *      Tween.get(target).to({x:100}, 500, Ease.linear);
+ *
+ * However, methods beginning with "get" will return an easing function based on parameter values:
+ *
+ *      Tween.get(target).to({y:200}, 500, Ease.getPowIn(2.2));
+ *
+ * Please see the <a href="http://www.createjs.com/Demos/TweenJS/Tween_SparkTable">spark table demo</a> for an
+ * overview of the different ease types on <a href="http://tweenjs.com">TweenJS.com</a>.
+ *
+ * <em>Equations derived from work by Robert Penner.</em>
+ * @class Ease
+ * @static
+ * @module TweenJS
+ */
+class Ease {
+
+	constructor () {
+		throw "Ease is static and cannot be instantiated.";
+	}
+
+// static methods:
+	/**
+	 * @method linear
+	 * @param {Number} t
+	 * @static
+	 * @return {Number}
+	 */
+	static linear (t) {
+		return t;
+	}
+
+	/**
+	 * Mimics the simple -100 to 100 easing in Flash Pro.
+	 * @method get
+	 * @param {Number} amount A value from -1 (ease in) to 1 (ease out) indicating the strength and direction of the ease.
+	 * @static
+	 * @return {Function}
+	 */
+	static get (amount) {
+		if (amount < -1) { amount = -1; }
+		else if (amount > 1) { amount = 1; }
+		return function (t) {
+			if (amount == 0) { return t; }
+			if (amount < 0) { return t * (t * -amount + 1 + amount); }
+			return t * ((2 - t) * amount + (1 - amount));
+		};
+	}
+
+	/**
+	 * Configurable exponential ease.
+	 * @method getPowIn
+	 * @param {Number} pow The exponent to use (ex. 3 would return a cubic ease).
+	 * @static
+	 * @return {Function}
+	 */
+	static getPowIn (pow) {
+		return function (t) {
+			return Math.pow(t, pow);
+		};
+	}
+
+	/**
+	 * Configurable exponential ease.
+	 * @method getPowOut
+	 * @param {Number} pow The exponent to use (ex. 3 would return a cubic ease).
+	 * @static
+	 * @return {Function}
+	 */
+	static getPowOut (pow) {
+		return function (t) {
+			return 1 - Math.pow(1 - t, pow);
+		};
+	}
+
+	/**
+	 * Configurable exponential ease.
+	 * @method getPowInOut
+	 * @param {Number} pow The exponent to use (ex. 3 would return a cubic ease).
+	 * @static
+	 * @return {Function}
+	 */
+	static getPowInOut (pow) {
+		return function (t) {
+			if ((t *= 2) < 1) return 0.5 * Math.pow(t, pow);
+			return 1 - 0.5 * Math.abs(Math.pow(2 - t, pow));
+		};
+	}
+
+	/**
+	 * @method sineIn
+	 * @param {Number} t
+	 * @static
+	 * @return {Number}
+	 */
+	static sineIn (t) {
+		return 1 - Math.cos(t * Math.PI / 2);
+	}
+
+	/**
+	 * @method sineOut
+	 * @param {Number} t
+	 * @static
+	 * @return {Number}
+	 */
+	static sineOut (t) {
+		return Math.sin(t * Math.PI / 2);
+	}
+
+	/**
+	 * @method sineInOut
+	 * @param {Number} t
+	 * @static
+	 * @return {Number}
+	 */
+	static sineInOut (t) {
+		return -0.5 * (Math.cos(Math.PI * t) - 1);
+	}
+
+	/**
+	 * Configurable "back in" ease.
+	 * @method getBackIn
+	 * @param {Number} amount The strength of the ease.
+	 * @static
+	 * @return {Function}
+	 */
+	static getBackIn (amount) {
+		return function (t) {
+			return t * t * ((amount + 1) * t - amount);
+		};
+	}
+
+	/**
+	 * Configurable "back out" ease.
+	 * @method getBackOut
+	 * @param {Number} amount The strength of the ease.
+	 * @static
+	 * @return {Function}
+	 */
+	static getBackOut (amount) {
+		return function (t) {
+			return (--t * t * ((amount + 1) * t + amount) + 1);
+		};
+	}
+
+	/**
+	 * Configurable "back in out" ease.
+	 * @method getBackInOut
+	 * @param {Number} amount The strength of the ease.
+	 * @static
+	 * @return {Function}
+	 */
+	static getBackInOut (amount) {
+		amount *= 1.525;
+		return function (t) {
+			if ((t *= 2) < 1) return 0.5 * (t * t * ((amount + 1) * t - amount));
+			return 0.5 * ((t -= 2) * t * ((amount + 1) * t + amount) + 2);
+		};
+	}
+
+	/**
+	 * @method circIn
+	 * @param {Number} t
+	 * @static
+	 * @return {Number}
+	 */
+	static circIn (t) {
+		return -(Math.sqrt(1 - t * t) - 1);
+	}
+
+	/**
+	 * @method circOut
+	 * @param {Number} t
+	 * @static
+	 * @return {Number}
+	 */
+	static circOut (t) {
+		return Math.sqrt(1 - --t * t);
+	}
+
+	/**
+	 * @method circInOut
+	 * @param {Number} t
+	 * @static
+	 * @return {Number}
+	 */
+	static circInOut (t) {
+		if ((t *= 2) < 1) return -0.5 * (Math.sqrt(1 - t * t) - 1);
+		return 0.5 * (Math.sqrt(1 - (t -= 2) * t) + 1);
+	}
+
+	/**
+	 * @method bounceIn
+	 * @param {Number} t
+	 * @static
+	 * @return {Number}
+	 */
+	static bounceIn (t) {
+		return 1 - Ease.bounceOut(1 - t);
+	}
+
+	/**
+	 * @method bounceOut
+	 * @param {Number} t
+	 * @static
+	 * @return {Number}
+	 */
+	static bounceOut (t) {
+		if (t < 1 / 2.75) {
+			return 7.5625 * t * t;
+		} else if (t < 2 / 2.75) {
+			return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
+		} else if (t < 2.5 / 2.75) {
+			return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
+		} else {
+			return 7.5625 * ( t-= 2.625 / 2.75) * t + 0.984375;
+		}
+	}
+
+	/**
+	 * @method bounceInOut
+	 * @param {Number} t
+	 * @static
+	 * @return {Number}
+	 */
+	static bounceInOut (t) {
+		if (t < 0.5) return Ease.bounceIn(t * 2) * 0.5;
+		return Ease.bounceOut(t * 2 - 1) * 0.5 + 0.5;
+	}
+
+	/**
+	 * Configurable elastic ease.
+	 * @method getElasticIn
+	 * @param {Number} amplitude
+	 * @param {Number} period
+	 * @static
+	 * @return {Function}
+	 */
+	static getElasticIn (amplitude, period) {
+		let pi2 = Math.PI * 2;
+		return function (t) {
+			if (t === 0 || t === 1) return t;
+			let s = period / pi2 * Math.asin(1 / amplitude);
+			return -(amplitude * Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * pi2 / period));
+		};
+	}
+
+	/**
+	 * Configurable elastic ease.
+	 * @method getElasticOut
+	 * @param {Number} amplitude
+	 * @param {Number} period
+	 * @static
+	 * @return {Function}
+	 */
+	static getElasticOut (amplitude, period) {
+		let pi2 = Math.PI * 2;
+		return function (t) {
+			if (t === 0 || t === 1) return t;
+			let s = period / pi2 * Math.asin(1 / amplitude);
+			return amplitude * Math.pow(2, -10 * t) * Math.sin((t - s) * pi2 / period) + 1;
+		};
+	}
+
+	/**
+	 * Configurable elastic ease.
+	 * @method getElasticInOut
+	 * @param {Number} amplitude
+	 * @param {Number} period
+	 * @static
+	 * @return {Function}
+	 */
+	static getElasticInOut (amplitude, period) {
+		let pi2 = Math.PI * 2;
+		return function (t) {
+			let s = period / pi2 * Math.asin(1 / amplitude);
+			if ((t *= 2) < 1) return -0.5 * (amplitude * Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * pi2 / period));
+			return amplitude * Math.pow(2, -10 * (t -= 1)) * Math.sin((t - s) * pi2 / period) * 0.5 + 1;
+		};
+	}
+
+}
+
+// static properties
+/**
+ * Identical to linear.
+ * @method none
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.none = Ease.linear;
+/**
+ * @method quadIn
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.quadIn = Ease.getPowIn(2);
+/**
+ * @method quadOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.quadOut = Ease.getPowOut(2);
+/**
+ * @method quadInOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.quadInOut = Ease.getPowInOut(2);
+/**
+ * @method cubicIn
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.cubicIn = Ease.getPowIn(3);
+/**
+ * @method cubicOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.cubicOut = Ease.getPowOut(3);
+/**
+ * @method cubicInOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.cubicInOut = Ease.getPowInOut(3);
+/**
+ * @method quartIn
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.quartIn = Ease.getPowIn(4);
+/**
+ * @method quartOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.quartOut = Ease.getPowOut(4);
+/**
+ * @method quartInOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.quartInOut = Ease.getPowInOut(4);
+/**
+ * @method quintIn
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.quintIn = Ease.getPowIn(5);
+/**
+ * @method quintOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.quintOut = Ease.getPowOut(5);
+/**
+ * @method quintInOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.quintInOut = Ease.getPowInOut(5);
+/**
+ * @method backIn
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.backIn = Ease.getBackIn(1.7);
+/**
+ * @method backOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.backOut = Ease.getBackOut(1.7);
+/**
+ * @method backInOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.backInOut = Ease.getBackInOut(1.7);
+/**
+ * @method elasticIn
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.elasticIn = Ease.getElasticIn(1, 0.3);
+/**
+ * @method elasticOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.elasticOut = Ease.getElasticOut(1, 0.3);
+/**
+ * @method elasticInOut
+ * @param {Number} t
+ * @static
+ * @return {Number}
+ */
+Ease.elasticInOut = Ease.getElasticInOut(1, 0.3 * 1.5);
+
+/*
+* @license Ticker
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2017 gskinner.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/**
+ * The Ticker provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe to the tick
+ * event to be notified when a set time interval has elapsed.
+ *
+ * Note that the interval that the tick event is called is a target interval, and may be broadcast at a slower interval
+ * when under high CPU load. The Ticker class uses a static interface (ex. `Ticker.framerate = 30;`) and
+ * can not be instantiated.
+ *
+ * <h4>Example</h4>
+ *
+ *      createjs.Ticker.addEventListener("tick", handleTick);
+ *      function handleTick(event) {
+ *          // Actions carried out each tick (aka frame)
+ *          if (!event.paused) {
+ *              // Actions carried out when the Ticker is not paused.
+ *          }
+ *      }
+ *
+ * @class TickerAPI
+ * @extends EventDispatcher
+ * @module CreateJS
+ */
+class TickerAPI$1 extends EventDispatcher$1 {
+
+// constructor:
+	/**
+	 * @param name {String} The name assigned to this instance.
+	 * @constructor
+	 * TODO-ES6: Pass timingMode, maxDelta, paused values as instantiation arguments?
+	 */
+	constructor (name) {
+		super();
+
+// public properties:
+		/**
+		 * The name of this instance.
+		 * @property name
+		 * @type {String}
+		 */
+		this.name = name;
+		/**
+		 * Specifies the timing api (setTimeout or requestAnimationFrame) and mode to use. See
+		 * {{#crossLink "Ticker/TIMEOUT"}}{{/crossLink}}, {{#crossLink "Ticker/RAF"}}{{/crossLink}}, and
+		 * {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} for mode details.
+		 * @property timingMode
+		 * @type {String}
+		 * @default Ticker.TIMEOUT
+		 */
+		this.timingMode = TickerAPI$1.TIMEOUT;
+
+		/**
+		 * Specifies a maximum value for the delta property in the tick event object. This is useful when building time
+		 * based animations and systems to prevent issues caused by large time gaps caused by background tabs, system sleep,
+		 * alert dialogs, or other blocking routines. Double the expected frame duration is often an effective value
+		 * (ex. maxDelta=50 when running at 40fps).
+		 *
+		 * This does not impact any other values (ex. time, runTime, etc), so you may experience issues if you enable maxDelta
+		 * when using both delta and other values.
+		 *
+		 * If 0, there is no maximum.
+		 * @property maxDelta
+		 * @type {number}
+		 * @default 0
+		 */
+		this.maxDelta = 0;
+
+		/**
+		 * When the ticker is paused, all listeners will still receive a tick event, but the <code>paused</code> property
+		 * of the event will be `true`. Also, while paused the `runTime` will not increase. See {{#crossLink "Ticker/tick:event"}}{{/crossLink}},
+		 * {{#crossLink "Ticker/getTime"}}{{/crossLink}}, and {{#crossLink "Ticker/getEventTime"}}{{/crossLink}} for more
+		 * info.
+		 *
+		 * <h4>Example</h4>
+		 *
+		 *      createjs.Ticker.addEventListener("tick", handleTick);
+		 *      createjs.Ticker.paused = true;
+		 *      function handleTick(event) {
+		 *          console.log(event.paused,
+		 *          	createjs.Ticker.getTime(false),
+		 *          	createjs.Ticker.getTime(true));
+		 *      }
+		 *
+		 * @property paused
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.paused = false;
+
+// private properties:
+		/**
+		 * @property _inited
+		 * @type {Boolean}
+		 * @protected
+		 */
+		this._inited = false;
+
+		/**
+		 * @property _startTime
+		 * @type {Number}
+		 * @protected
+		 */
+		this._startTime = 0;
+
+		/**
+		 * @property _pausedTime
+		 * @type {Number}
+		 * @protected
+		 */
+		this._pausedTime = 0;
+
+		/**
+		 * The number of ticks that have passed
+		 * @property _ticks
+		 * @type {Number}
+		 * @protected
+		 */
+		this._ticks = 0;
+
+		/**
+		 * The number of ticks that have passed while Ticker has been paused
+		 * @property _pausedTicks
+		 * @type {Number}
+		 * @protected
+		 */
+		this._pausedTicks = 0;
+
+		/**
+		 * @property _interval
+		 * @type {Number}
+		 * @protected
+		 */
+		this._interval = 50;
+
+		/**
+		 * @property _lastTime
+		 * @type {Number}
+		 * @protected
+		 */
+		this._lastTime = 0;
+
+		/**
+		 * @property _times
+		 * @type {Array}
+		 * @protected
+		 */
+		this._times = null;
+
+		/**
+		 * @property _tickTimes
+		 * @type {Array}
+		 * @protected
+		 */
+		this._tickTimes = null;
+
+		/**
+		 * Stores the timeout or requestAnimationFrame id.
+		 * @property _timerId
+		 * @type {Number}
+		 * @protected
+		 */
+		this._timerId = null;
+
+		/**
+		 * True if currently using requestAnimationFrame, false if using setTimeout. This may be different than timingMode
+		 * if that property changed and a tick hasn't fired.
+		 * @property _raf
+		 * @type {Boolean}
+		 * @protected
+		 */
+		this._raf = true;
+	}
+
+// accessor properties:
+	/**
+	 * Indicates the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
+	 * Note that actual time between ticks may be more than specified depending on CPU load.
+	 * This property is ignored if the ticker is using the `RAF` timing mode.
+	 * @property interval
+	 * @static
+	 * @type {Number}
+	 */
+	get interval () {
+		return this._interval;
+	}
+
+	set interval (interval) {
+		this._interval = interval;
+		if (!this._inited) { return; }
+		this._setupTick();
+	}
+
+	/**
+	 * Indicates the target frame rate in frames per second (FPS). Effectively just a shortcut to `interval`, where
+	 * `framerate == 1000/interval`.
+	 * @property framerate
+	 * @static
+	 * @type {Number}
+	 */
+	get framerate () {
+		return 1000/this._interval;
+	}
+
+	set framerate (fps) {
+		this.interval = 1000/fps;
+	}
+
+// public methods:
+	/**
+	 * Call createjs.Ticker.create() to get a new TickerAPI instance.
+	 * It is not initalized by default and its ticks are not synched with any other instance.
+	 *
+	 * @param name {String} The name given to the new instance.
+	 * @method create
+	 * @return {TickerAPI} A new TickerAPI instance.
+	 */
+	create (name) {
+		return new TickerAPI$1(name);
+	}
+
+	/**
+	 * Starts the tick. This is called automatically when the first listener is added.
+	 * @method init
+	 */
+	init () {
+		if (this._inited) { return; }
+		this._inited = true;
+		this._times = [];
+		this._tickTimes = [];
+		this._startTime = this._getTime();
+		this._times.push(this._lastTime = 0);
+		this._setupTick();
+	}
+
+	/**
+	 * Stops the Ticker and removes all listeners. Use init() to restart the Ticker.
+	 * @method reset
+	 */
+	reset () {
+		if (this._raf) {
+			let f = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.oCancelAnimationFrame || window.msCancelAnimationFrame;
+			f&&f(this._timerId);
+		} else {
+			clearTimeout(this._timerId);
+		}
+		this.removeAllEventListeners("tick");
+		this._timerId = this._times = this._tickTimes = null;
+		this._startTime = this._lastTime = this._ticks = 0;
+		this._inited = false;
+	}
+
+	/**
+	 * Init the Ticker instance if it hasn't been already.
+	 * Docced in superclass.
+	 */
+	addEventListener (type, listener, useCapture) {
+		!this._inited && this.init();
+		return super.addEventListener(type, listener, useCapture);
+	}
+
+	/**
+	 * Returns the average time spent within a tick. This can vary significantly from the value provided by getMeasuredFPS
+	 * because it only measures the time spent within the tick execution stack.
+	 *
+	 * Example 1: With a target FPS of 20, getMeasuredFPS() returns 20fps, which indicates an average of 50ms between
+	 * the end of one tick and the end of the next. However, getMeasuredTickTime() returns 15ms. This indicates that
+	 * there may be up to 35ms of "idle" time between the end of one tick and the start of the next.
+	 *
+	 * Example 2: With a target FPS of 30, getFPS() returns 10fps, which indicates an average of 100ms between the end of
+	 * one tick and the end of the next. However, getMeasuredTickTime() returns 20ms. This would indicate that something
+	 * other than the tick is using ~80ms (another script, DOM rendering, etc).
+	 * @method getMeasuredTickTime
+	 * @param {Number} [ticks] The number of previous ticks over which to measure the average time spent in a tick.
+	 * Defaults to the number of ticks per second. To get only the last tick's time, pass in 1.
+	 * @return {Number} The average time spent in a tick in milliseconds.
+	 */
+	getMeasuredTickTime (ticks) {
+		let times=this._tickTimes;
+		if (!times || times.length < 1) { return -1; }
+
+		// by default, calculate average for the past ~1 second:
+		ticks = Math.min(times.length, ticks||(this.framerate|0));
+		let ttl = times.reduce((a, b) => a + b, 0);
+		return ttl/ticks;
+	}
+
+	/**
+	 * Returns the actual frames / ticks per second.
+	 * @method getMeasuredFPS
+	 * @param {Number} [ticks] The number of previous ticks over which to measure the actual frames / ticks per second.
+	 * Defaults to the number of ticks per second.
+	 * @return {Number} The actual frames / ticks per second. Depending on performance, this may differ
+	 * from the target frames per second.
+	 */
+	getMeasuredFPS (ticks) {
+		let times = this._times;
+		if (!times || times.length < 2) { return -1; }
+
+		// by default, calculate fps for the past ~1 second:
+		ticks = Math.min(times.length-1, ticks||(this.framerate|0));
+		return 1000/((times[0]-times[ticks])/ticks);
+	}
+
+	/**
+	 * Returns the number of milliseconds that have elapsed since Ticker was initialized via {{#crossLink "Ticker/init"}}.
+	 * Returns -1 if Ticker has not been initialized. For example, you could use
+	 * this in a time synchronized animation to determine the exact amount of time that has elapsed.
+	 * @method getTime
+	 * @param {Boolean} [runTime=false] If true only time elapsed while Ticker was not paused will be returned.
+	 * If false, the value returned will be total time elapsed since the first tick event listener was added.
+	 * @return {Number} Number of milliseconds that have elapsed since Ticker was initialized or -1.
+	 */
+	getTime (runTime = false) {
+		return this._startTime ? this._getTime() - (runTime ? this._pausedTime : 0) : -1;
+	}
+
+	/**
+	 * Similar to the {{#crossLink "Ticker/getTime"}}{{/crossLink}} method, but returns the time on the most recent {{#crossLink "Ticker/tick:event"}}{{/crossLink}}
+	 * event object.
+	 * @method getEventTime
+	 * @param runTime {Boolean} [runTime=false] If true, the runTime property will be returned instead of time.
+	 * @returns {number} The time or runTime property from the most recent tick event or -1.
+	 */
+	getEventTime (runTime = false) {
+		return this._startTime ? (this._lastTime || this._startTime) - (runTime ? this._pausedTime : 0) : -1;
+	}
+
+	/**
+	 * Returns the number of ticks that have been broadcast by Ticker.
+	 * @method getTicks
+	 * @param {Boolean} [pauseable=false] Indicates whether to include ticks that would have been broadcast
+	 * while Ticker was paused. If true only tick events broadcast while Ticker is not paused will be returned.
+	 * If false, tick events that would have been broadcast while Ticker was paused will be included in the return
+	 * value.
+	 * @return {Number} of ticks that have been broadcast.
+	 */
+	getTicks (pauseable = false) {
+		return this._ticks - (pauseable ? this._pausedTicks : 0);
+	}
+
+
+// private methods:
+	/**
+	 * @method _handleSynch
+	 * @protected
+	 */
+	_handleSynch () {
+		this._timerId = null;
+		this._setupTick();
+
+		// run if enough time has elapsed, with a little bit of flexibility to be early:
+		if (this._getTime() - this._lastTime >= (this._interval-1)*0.97) {
+			this._tick();
+		}
+	}
+
+	/**
+	 * @method _handleRAF
+	 * @protected
+	 */
+	_handleRAF () {
+		this._timerId = null;
+		this._setupTick();
+		this._tick();
+	}
+
+	/**
+	 * @method _handleTimeout
+	 * @protected
+	 */
+	_handleTimeout () {
+		this._timerId = null;
+		this._setupTick();
+		this._tick();
+	}
+
+	/**
+	 * @method _setupTick
+	 * @protected
+	 */
+	_setupTick () {
+		if (this._timerId != null) { return; } // avoid duplicates
+
+		let mode = this.timingMode || (this._raf && TickerAPI$1.RAF); // TODO-ES6: Verify that this is desired, since Ticker.useRAF was removed.
+		if (mode == TickerAPI$1.RAF_SYNCHED || mode == TickerAPI$1.RAF) {
+			let f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+			if (f) {
+				this._timerId = f(mode == TickerAPI$1.RAF ? this._handleRAF.bind(this) : this._handleSynch.bind(this));
+				this._raf = true;
+				return;
+			}
+		}
+		this._raf = false;
+		this._timerId = setTimeout(this._handleTimeout.bind(this), this._interval);
+	}
+
+	/**
+	 * @method _tick
+	 * @protected
+	 */
+	_tick () {
+		let paused = this.paused;
+		let time = this._getTime();
+		let elapsedTime = time-this._lastTime;
+		this._lastTime = time;
+		this._ticks++;
+
+		if (paused) {
+			this._pausedTicks++;
+			this._pausedTime += elapsedTime;
+		}
+
+		if (this.hasEventListener("tick")) {
+			let event = new Event$1("tick");
+			let maxDelta = this.maxDelta;
+			event.delta = (maxDelta && elapsedTime > maxDelta) ? maxDelta : elapsedTime;
+			event.paused = paused;
+			event.time = time;
+			event.runTime = time-this._pausedTime;
+			this.dispatchEvent(event);
+		}
+
+		this._tickTimes.unshift(this._getTime()-time);
+		while (this._tickTimes.length > 100) { this._tickTimes.pop(); }
+
+		this._times.unshift(time);
+		while (this._times.length > 100) { this._times.pop(); }
+	}
+
+	/**
+	 * @method _getTime
+	 * @protected
+	 */
+	_getTime () {
+		let now = window.performance.now;
+		return ((now&&now.call(performance))||(new Date().getTime())) - this._startTime;
+	}
+
+}
+
+// constants:
+/**
+ * In this mode, Ticker uses the requestAnimationFrame API, but attempts to synch the ticks to target framerate. It
+ * uses a simple heuristic that compares the time of the RAF return to the target time for the current frame and
+ * dispatches the tick when the time is within a certain threshold.
+ *
+ * This mode has a higher variance for time between frames than {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}},
+ * but does not require that content be time based as with {{#crossLink "Ticker/RAF:property"}}{{/crossLink}} while
+ * gaining the benefits of that API (screen synch, background throttling).
+ *
+ * Variance is usually lowest for framerates that are a divisor of the RAF frequency. This is usually 60, so
+ * framerates of 10, 12, 15, 20, and 30 work well.
+ *
+ * Falls back to {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}} if the requestAnimationFrame API is not
+ * supported.
+ * @property RAF_SYNCHED
+ * @static
+ * @type {String}
+ * @default "synched"
+ * @readonly
+ */
+TickerAPI$1.RAF_SYNCHED = "synched";
+
+/**
+ * In this mode, Ticker passes through the requestAnimationFrame heartbeat, ignoring the target framerate completely.
+ * Because requestAnimationFrame frequency is not deterministic, any content using this mode should be time based.
+ * You can leverage {{#crossLink "Ticker/getTime"}}{{/crossLink}} and the {{#crossLink "Ticker/tick:event"}}{{/crossLink}}
+ * event object's "delta" properties to make this easier.
+ *
+ * Falls back on {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}} if the requestAnimationFrame API is not
+ * supported.
+ * @property RAF
+ * @static
+ * @type {String}
+ * @default "raf"
+ * @readonly
+ */
+TickerAPI$1.RAF = "raf";
+
+/**
+ * In this mode, Ticker uses the setTimeout API. This provides predictable, adaptive frame timing, but does not
+ * provide the benefits of requestAnimationFrame (screen synch, background throttling).
+ * @property TIMEOUT
+ * @static
+ * @type {String}
+ * @default "timeout"
+ * @readonly
+ */
+TickerAPI$1.TIMEOUT = "timeout";
+
+// events:
+/**
+ * Dispatched each tick. The event will be dispatched to each listener even when the Ticker has been paused using
+ * {{#crossLink "Ticker/setPaused"}}{{/crossLink}}.
+ *
+ * <h4>Example</h4>
+ *
+ *      createjs.Ticker.addEventListener("tick", handleTick);
+ *      function handleTick(event) {
+ *          console.log("Paused:", event.paused, event.delta);
+ *      }
+ *
+ * @event tick
+ * @param {Object} target The object that dispatched the event.
+ * @param {String} type The event type.
+ * @param {Boolean} paused Indicates whether the ticker is currently paused.
+ * @param {Number} delta The time elapsed in ms since the last tick.
+ * @param {Number} time The total time in ms since Ticker was initialized.
+ * @param {Number} runTime The total time in ms that Ticker was not paused since it was initialized. For example,
+ * 	you could determine the amount of time that the Ticker has been paused since initialization with `time-runTime`.
+ * @since 0.6.0
+ */
+
+/**
+ * The Ticker object is a singleton instance of the TickerAPI class.
+ * See the {{#crossLink "TickerAPI"}}{{/crossLink}} documentation for its usage.
+ * @class Ticker
+ * @static
+ * @module CreateJS
+ */
+const Ticker$2 = new TickerAPI$1("createjs.global");
+
+/*
+* Tween
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2010 gskinner.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/**
+ * Tweens properties for a single target. Methods can be chained to create complex animation sequences:
+ *
+ * <h4>Example</h4>
+ *
+ *	createjs.Tween.get(target)
+ *		.wait(500)
+ *		.to({alpha:0, visible:false}, 1000)
+ *		.call(handleComplete);
+ *
+ * Multiple tweens can share a target, however if they affect the same properties there could be unexpected
+ * behaviour. To stop all tweens on an object, use {{#crossLink "Tween/removeTweens"}}{{/crossLink}} or pass `override:true`
+ * in the props argument.
+ *
+ * 	createjs.Tween.get(target, {override:true}).to({x:100});
+ *
+ * Subscribe to the {{#crossLink "Tween/change:event"}}{{/crossLink}} event to be notified when the tween position changes.
+ *
+ * 	createjs.Tween.get(target, {override:true}).to({x:100}).addEventListener("change", handleChange);
+ * 	function handleChange(event) {
+ * 		// The tween changed.
+ * 	}
+ *
+ * See the {{#crossLink "Tween/get"}}{{/crossLink}} method also.
+ * @class Tween
+ * @extends AbstractTween
+ * @module TweenJS
+ */
+class Tween extends AbstractTween {
+
+// constructor:
+	/**
+	 * @constructor
+	 * @param {Object} target The target object that will have its properties tweened.
+	 * @param {Object} [props] The configuration properties to apply to this instance (ex. `{loop:-1, paused:true}`).
+	 * Supported props are listed below. These props are set on the corresponding instance properties except where
+	 * specified.<UL>
+	 *    <LI> `useTicks`</LI>
+	 *    <LI> `ignoreGlobalPause`</LI>
+	 *    <LI> `loop`</LI>
+	 *    <LI> `reversed`</LI>
+	 *    <LI> `bounce`</LI>
+	 *    <LI> `timeScale`</LI>
+	 *    <LI> `pluginData`</LI>
+	 *    <LI> `paused`: indicates whether to start the tween paused.</LI>
+	 *    <LI> `position`: indicates the initial position for this tween.</LI>
+	 *    <LI> `onChange`: adds the specified function as a listener to the `change` event</LI>
+	 *    <LI> `onComplete`: adds the specified function as a listener to the `complete` event</LI>
+	 *    <LI> `override`: if true, removes all existing tweens for the target</LI>
+	 * </UL>
+	 */
+	constructor (target, props) {
+		super(props);
+
+	// public properties:
+		/**
+		 * Allows you to specify data that will be used by installed plugins. Each plugin uses this differently, but in general
+		 * you specify data by assigning it to a property of `pluginData` with the same name as the plugin.
+		 * Note that in many cases, this data is used as soon as the plugin initializes itself for the tween.
+		 * As such, this data should be set before the first `to` call in most cases.
+		 * @example
+		 *	myTween.pluginData.SmartRotation = data;
+		 *
+		 * Most plugins also support a property to disable them for a specific tween. This is typically the plugin name followed by "_disabled".
+		 * @example
+		 *	myTween.pluginData.SmartRotation_disabled = true;
+		 *
+		 * Some plugins also store working data in this object, usually in a property named `_PluginClassName`.
+		 * See the documentation for individual plugins for more details.
+		 * @property pluginData
+		 * @type {Object}
+		 */
+		this.pluginData = null;
+
+		/**
+		 * The target of this tween. This is the object on which the tweened properties will be changed.
+		 * @property target
+		 * @type {Object}
+		 * @readonly
+		 */
+		this.target = target;
+
+		/**
+		 * Indicates the tween's current position is within a passive wait.
+		 * @property passive
+		 * @type {Boolean}
+		 * @default false
+		 * @readonly
+		 */
+		this.passive = false;
+
+	// private properties:
+		/**
+		 * @property _stepHead
+		 * @type {TweenStep}
+		 * @protected
+		 */
+		this._stepHead = new TweenStep(null, 0, 0, {}, null, true);
+
+		/**
+		 * @property _stepTail
+		 * @type {TweenStep}
+		 * @protected
+		 */
+		this._stepTail = this._stepHead;
+
+		/**
+		 * The position within the current step. Used by MovieClip.
+		 * @property _stepPosition
+		 * @type {Number}
+		 * @default 0
+		 * @protected
+		 */
+		this._stepPosition = 0;
+
+		/**
+		 * @property _actionHead
+		 * @type {TweenAction}
+		 * @protected
+		 */
+		this._actionHead = null;
+
+		/**
+		 * @property _actionTail
+		 * @type {TweenAction}
+		 * @protected
+		 */
+		this._actionTail = null;
+
+		/**
+		 * Plugins added to this tween instance.
+		 * @property _plugins
+		 * @type Array[Object]
+		 * @default null
+		 * @protected
+		 */
+		this._plugins = null;
+
+		/**
+		 * Used by plugins to inject new properties.
+		 * @property _injected
+		 * @type {Object}
+		 * @default null
+		 * @protected
+		 */
+		this._injected = null;
+
+		if (props) {
+			this.pluginData = props.pluginData;
+			if (props.override) { Tween.removeTweens(target); }
+		}
+		if (!this.pluginData) { this.pluginData = {}; }
+
+		this._init(props);
+	}
+
+// static methods:
+	/**
+	 * Returns a new tween instance. This is functionally identical to using `new Tween(...)`, but may look cleaner
+	 * with the chained syntax of TweenJS.
+	 * <h4>Example</h4>
+	 *
+	 *	var tween = createjs.Tween.get(target).to({x:100}, 500);
+	 *	// equivalent to:
+	 *	var tween = new createjs.Tween(target).to({x:100}, 500);
+	 *
+	 * @method get
+	 * @param {Object} target The target object that will have its properties tweened.
+	 * @param {Object} [props] The configuration properties to apply to this instance (ex. `{loop:-1, paused:true}`).
+	 * Supported props are listed below. These props are set on the corresponding instance properties except where
+	 * specified.<UL>
+	 *    <LI> `useTicks`</LI>
+	 *    <LI> `ignoreGlobalPause`</LI>
+	 *    <LI> `loop`</LI>
+	 *    <LI> `reversed`</LI>
+	 *    <LI> `bounce`</LI>
+	 *    <LI> `timeScale`</LI>
+	 *    <LI> `pluginData`</LI>
+	 *    <LI> `paused`: indicates whether to start the tween paused.</LI>
+	 *    <LI> `position`: indicates the initial position for this tween.</LI>
+	 *    <LI> `onChange`: adds the specified function as a listener to the `change` event</LI>
+	 *    <LI> `onComplete`: adds the specified function as a listener to the `complete` event</LI>
+	 *    <LI> `override`: if true, removes all existing tweens for the target</LI>
+	 * </UL>
+	 * @return {Tween} A reference to the created tween.
+	 * @static
+	 */
+	static get (target, props) {
+		return new Tween(target, props);
+	}
+
+	/**
+	 * Advances all tweens. This typically uses the {{#crossLink "Ticker"}}{{/crossLink}} class, but you can call it
+	 * manually if you prefer to use your own "heartbeat" implementation.
+	 * @method tick
+	 * @param {Number} delta The change in time in milliseconds since the last tick. Required unless all tweens have
+	 * `useTicks` set to true.
+	 * @param {Boolean} paused Indicates whether a global pause is in effect. Tweens with {{#crossLink "Tween/ignoreGlobalPause:property"}}{{/crossLink}}
+	 * will ignore this, but all others will pause if this is `true`.
+	 * @static
+	 */
+	static tick (delta, paused) {
+		let tween = Tween._tweenHead;
+		while (tween) {
+			let next = tween._next; // in case it completes and wipes its _next property
+			if ((paused && !tween.ignoreGlobalPause) || tween._paused) { /* paused */ }
+			else { tween.advance(tween.useTicks ? 1: delta); }
+			tween = next;
+		}
+	}
+
+	/**
+	 * Handle events that result from Tween being used as an event handler. This is included to allow Tween to handle
+	 * {{#crossLink "Ticker/tick:event"}}{{/crossLink}} events from the createjs {{#crossLink "Ticker"}}{{/crossLink}}.
+	 * No other events are handled in Tween.
+	 * @method handleEvent
+	 * @param {Object} event An event object passed in by the {{#crossLink "EventDispatcher"}}{{/crossLink}}. Will
+	 * usually be of type "tick".
+	 * @private
+	 * @static
+	 * @since 0.4.2
+	 */
+	static handleEvent (event) {
+		if (event.type === "tick") {
+			this.tick(event.delta, event.paused);
+		}
+	}
+
+	/**
+	 * Removes all existing tweens for a target. This is called automatically by new tweens if the `override`
+	 * property is `true`.
+	 * @method removeTweens
+	 * @param {Object} target The target object to remove existing tweens from.
+	 * @static
+	 */
+	static removeTweens (target) {
+		if (!target.tweenjs_count) { return; }
+		let tween = Tween._tweenHead;
+		while (tween) {
+			let next = tween._next;
+			if (tween.target === target) { Tween._register(tween, true); }
+			tween = next;
+		}
+		target.tweenjs_count = 0;
+	}
+
+	/**
+	 * Stop and remove all existing tweens.
+	 * @method removeAllTweens
+	 * @static
+	 * @since 0.4.1
+	 */
+	static removeAllTweens () {
+		let tween = Tween._tweenHead;
+		while (tween) {
+			let next = tween._next;
+			tween._paused = true;
+			tween.target && (tween.target.tweenjs_count = 0);
+			tween._next = tween._prev = null;
+			tween = next;
+		}
+		Tween._tweenHead = Tween._tweenTail = null;
+	}
+
+	/**
+	 * Indicates whether there are any active tweens on the target object (if specified) or in general.
+	 * @method hasActiveTweens
+	 * @param {Object} [target] The target to check for active tweens. If not specified, the return value will indicate
+	 * if there are any active tweens on any target.
+	 * @return {Boolean} Indicates if there are active tweens.
+	 * @static
+	 */
+	static hasActiveTweens (target) {
+		if (target) { return !!target.tweenjs_count; }
+		return !!Tween._tweenHead;
+	}
+
+	/**
+	 * Installs a plugin, which can modify how certain properties are handled when tweened. See the {{#crossLink "SamplePlugin"}}{{/crossLink}}
+	 * for an example of how to write TweenJS plugins. Plugins should generally be installed via their own `install` method, in order to provide
+	 * the plugin with an opportunity to configure itself.
+	 * @method _installPlugin
+	 * @param {Object} plugin The plugin to install
+	 * @static
+	 * @protected
+	 */
+	static _installPlugin (plugin) {
+		let priority = plugin.priority, arr = Tween._plugins;
+		if (priority == null) { plugin.priority = priority = 0; }
+		if (!arr) { arr = Tween._plugins = []; }
+		for (let i = 0, l = arr.length; i < l; i++) {
+			if (priority < arr[i].priority) { break; }
+		}
+		arr.splice(i, 0, plugin);
+	}
+
+	/**
+	 * Registers or unregisters a tween with the ticking system.
+	 * @method _register
+	 * @param {Tween} tween The tween instance to register or unregister.
+	 * @param {Boolean} paused If `false`, the tween is registered. If `true` the tween is unregistered.
+	 * @static
+	 * @protected
+	 */
+	static _register (tween, paused) {
+		let target = tween.target;
+		if (!paused && tween._paused) {
+			// TODO: this approach might fail if a dev is using sealed objects in ES5
+			if (target) { target.tweenjs_count = target.tweenjs_count ? target.tweenjs_count + 1 : 1; }
+			let tail = Tween._tweenTail;
+			if (!tail) { Tween._tweenHead = Tween._tweenTail = tween; }
+			else {
+				Tween._tweenTail = tail._next = tween;
+				tween._prev = tail;
+			}
+			if (!Tween._inited) { Ticker$2.addEventListener("tick", Tween); Tween._inited = true; }
+		} else if (paused && !tween._paused) {
+			if (target) { target.tweenjs_count--; }
+			let next = tween._next, prev = tween._prev;
+
+			if (next) { next._prev = prev; }
+			else { Tween._tweenTail = prev; } // was tail
+			if (prev) { prev._next = next; }
+			else { Tween._tweenHead = next; } // was head.
+
+			tween._next = tween._prev = null;
+		}
+		tween._paused = paused;
+	}
+
+// public methods:
+	/**
+	 * Adds a wait (essentially an empty tween).
+	 * <h4>Example</h4>
+	 *
+	 *	//This tween will wait 1s before alpha is faded to 0.
+	 *	createjs.Tween.get(target).wait(1000).to({alpha:0}, 1000);
+	 *
+	 * @method wait
+	 * @param {Number} duration The duration of the wait in milliseconds (or in ticks if `useTicks` is true).
+	 * @param {Boolean} [passive=false] Tween properties will not be updated during a passive wait. This
+	 * is mostly useful for use with {{#crossLink "Timeline"}}{{/crossLink}} instances that contain multiple tweens
+	 * affecting the same target at different times.
+	 * @return {Tween} This tween instance (for chaining calls).
+	 * @chainable
+	 */
+	wait (duration, passive = false) {
+		if (duration > 0) { this._addStep(duration, this._stepTail.props, null, passive); }
+		return this;
+	}
+
+	/**
+	 * Adds a tween from the current values to the specified properties. Set duration to 0 to jump to these value.
+	 * Numeric properties will be tweened from their current value in the tween to the target value. Non-numeric
+	 * properties will be set at the end of the specified duration.
+	 * <h4>Example</h4>
+	 *
+	 *	createjs.Tween.get(target).to({alpha:0, visible:false}, 1000);
+	 *
+	 * @method to
+	 * @param {Object} props An object specifying property target values for this tween (Ex. `{x:300}` would tween the x
+	 * property of the target to 300).
+	 * @param {Number} [duration=0] The duration of the tween in milliseconds (or in ticks if `useTicks` is true).
+	 * @param {Function} [ease=Ease.linear] The easing function to use for this tween. See the {{#crossLink "Ease"}}{{/crossLink}}
+	 * class for a list of built-in ease functions.
+	 * @return {Tween} This tween instance (for chaining calls).
+	 * @chainable
+	 */
+	to (props, duration = 0, ease = Ease.linear) {
+		if (duration < 0) { duration = 0; }
+		let step = this._addStep(duration, null, ease);
+		this._appendProps(props, step);
+		return this;
+	}
+
+	/**
+	 * Adds a label that can be used with {{#crossLink "Tween/gotoAndPlay"}}{{/crossLink}}/{{#crossLink "Tween/gotoAndStop"}}{{/crossLink}}
+	 * at the current point in the tween. For example:
+	 *
+	 * 	var tween = createjs.Tween.get(foo)
+	 * 					.to({x:100}, 1000)
+	 * 					.label("myLabel")
+	 * 					.to({x:200}, 1000);
+	 * // ...
+	 * tween.gotoAndPlay("myLabel"); // would play from 1000ms in.
+	 *
+	 * @method addLabel
+	 * @param {String} label The label name.
+	 * @param {Number} position The position this label represents.
+	 * @return {Tween} This tween instance (for chaining calls).
+	 * @chainable
+	 */
+	label (name) {
+		this.addLabel(name, this.duration);
+		return this;
+	}
+
+	/**
+	 * Adds an action to call the specified function.
+	 * <h4>Example</h4>
+	 *
+	 * 	//would call myFunction() after 1 second.
+	 * 	createjs.Tween.get().wait(1000).call(myFunction);
+	 *
+	 * @method call
+	 * @param {Function} callback The function to call.
+	 * @param {Array} [params]. The parameters to call the function with. If this is omitted, then the function
+	 * will be called with a single param pointing to this tween.
+	 * @param {Object} [scope]. The scope to call the function in. If omitted, it will be called in the target's scope.
+	 * @return {Tween} This tween instance (for chaining calls).
+	 * @chainable
+	 */
+	call (callback, params, scope) {
+		return this._addAction(scope || this.target, callback, params || [ this ]);
+	}
+
+	/**
+	 * Adds an action to set the specified props on the specified target. If `target` is null, it will use this tween's
+	 * target. Note that for properties on the target object, you should consider using a zero duration {{#crossLink "Tween/to"}}{{/crossLink}}
+	 * operation instead so the values are registered as tweened props.
+	 * <h4>Example</h4>
+	 *
+	 *	myTween.wait(1000).set({visible:false}, foo);
+	 *
+	 * @method set
+	 * @param {Object} props The properties to set (ex. `{visible:false}`).
+	 * @param {Object} [target] The target to set the properties on. If omitted, they will be set on the tween's target.
+	 * @return {Tween} This tween instance (for chaining calls).
+	 * @chainable
+	 */
+	set (props, target) {
+		return this._addAction(target || this.target, this._set, [ props ]);
+	}
+
+	/**
+	 * Adds an action to play (unpause) the specified tween. This enables you to sequence multiple tweens.
+	 * <h4>Example</h4>
+	 *
+	 *	myTween.to({x:100}, 500).play(otherTween);
+	 *
+	 * @method play
+	 * @param {Tween} tween The tween to play.
+	 * @return {Tween} This tween instance (for chaining calls).
+	 * @chainable
+	 */
+	play (tween) {
+		return this.call(this.setPaused, [ false ], tween || this);
+	}
+
+	/**
+	 * Adds an action to pause the specified tween.
+	 *
+	 * 	myTween.pause(otherTween).to({alpha:1}, 1000).play(otherTween);
+	 *
+	 * @method pause
+	 * @param {Tween} tween The tween to pause. If null, it pauses this tween.
+	 * @return {Tween} This tween instance (for chaining calls)
+	 * @chainable
+	 */
+	pause (tween) {
+		return this.call(this.setPaused, [ true ], tween || this);
+	}
+
+	/**
+	 * @method clone
+	 * @protected
+	 */
+	clone () {
+		throw("Tween can not be cloned.")
+	}
+
+// private methods:
+	/**
+	 * Adds a plugin to this tween.
+	 * @method _addPlugin
+	 * @param {Object} plugin
+	 * @protected
+	 */
+	_addPlugin (plugin) {
+		let plugins = this._plugins, priority = plugin.priority, added = false;
+		if (!plugins) { plugins = this._plugins = []; }
+		for (let i = 0, l = plugins.length; i < l; i++) {
+			if (plugins[i] === plugin) {
+				if (!added) { return; }
+				else { plugins.splice(i, 1); }
+			} else if (!added && priority < plugins[i].priority) {
+				plugins.splice(i, 0, plugin);
+				added = true;
+			}
+		}
+		if (!added) { plugins.push(plugin); }
+	};
+
+	/**
+   * @method _updatePosition
+   * @override
+   */
+	_updatePosition (jump, end) {
+		let step = this._stepHead.next, t = this.position, d = this.duration;
+		if (this.target && step) {
+			// find our new step index:
+			let stepNext = step.next;
+			while (stepNext && stepNext.t <= t) { step = step.next; stepNext = step.next; }
+			let ratio = end ? t / d : (t - step.t) / step.d; // TODO: revisit this.
+			this._updateTargetProps(step, ratio, end);
+		}
+		this._stepPosition = step ? t - step.t : 0;
+	}
+
+	/**
+	 * @method _updateTargetProps
+	 * @param {Object} step
+	 * @param {Number} ratio
+	 * @param {Boolean} end Indicates to plugins that the full tween has ended.
+	 * @protected
+	 */
+	_updateTargetProps (step, ratio, end) {
+		if (this.passive = !!step.passive) { return; } // don't update props.
+
+		let v, v0, v1, ease;
+		let p0 = step.prev.props;
+		let p1 = step.props;
+		if (ease = step.ease) { ratio = ease(ratio, 0, 1, 1); }
+
+		let plugins = this._plugins;
+		for (let n in p0) {
+			v = v0 = p0[n];
+			v1 = p1[n];
+
+			// values are different & it is numeric then interpolate:
+			if (v0 !== v1 && (typeof(v0) === "number")) {
+				v = v0 + (v1 - v0) * ratio;
+			}
+
+			if (plugins) {
+				for (let i = 0, l = plugins.length; i < l; i++) {
+					let value = plugins[i].tween(this, step, n, v, ratio, end);
+					if (v === Tween.IGNORE) { return; }
+					if (value !== undefined) { v = value; }
+				}
+			}
+			this.target[n] = v;
+		}
+
+	}
+
+	/**
+	 * @method _runActionsRange
+	 * @param {Number} startPos
+	 * @param {Number} endPos
+	 * @param {Boolean} includeStart
+	 * @protected
+	 * @override
+	 */
+	_runActionsRange (startPos, endPos, jump, includeStart) {
+		//console.log("	range", startPos, endPos, jump, includeStart);
+		let rev = startPos > endPos;
+		let action = rev ? this._actionTail : this._actionHead;
+		let ePos = endPos, sPos = startPos;
+		if (rev) { ePos = startPos; sPos = endPos; }
+		let t = this.position;
+		while (action) {
+			let pos = action.t;
+			if (pos === endPos || (pos > sPos && pos < ePos) || (includeStart && pos === startPos)) {
+				//console.log(pos, "start", sPos, startPos, "end", ePos, endPos);
+				action.funct.apply(action.scope, action.params);
+				if (t !== this.position) { return true; }
+			}
+			action = rev ? action.prev : action.next;
+		}
+	}
+
+	/**
+	 * @method _appendProps
+	 * @param {Object} props
+	 * @protected
+	 */
+	_appendProps (props, step) {
+		let initProps = this._stepHead.props, target = this.target, plugins = Tween._plugins;
+		let inject, ignored;
+
+		let oldStep = step.prev, oldProps = oldStep.props;
+		let stepProps = step.props = this._cloneProps(oldProps);
+
+		for (let n in props) {
+			stepProps[n] = props[n];
+
+			if (initProps[n] !== undefined) { continue; }
+
+			let oldValue = undefined; // accessing missing properties on DOMElements when using CSSPlugin is INSANELY expensive.
+			if (plugins) {
+				for (let i = 0, l = plugins.length; i < l; i++) {
+					let value = plugins[i].init(this, n, oldValue);
+					if (value !== undefined) { oldValue = value; }
+					if (oldValue === Tween.IGNORE) {
+						(ignored = ignored || {})[n] = true;
+						delete(stepProps[n]);
+						break;
+					}
+				}
+			}
+
+			if (oldValue !== Tween.IGNORE) {
+				if (oldValue === undefined) { oldValue = target[n]; }
+				oldProps[n] = (oldValue === undefined) ? null : oldValue;
+			}
+		}
+
+		plugins = this._plugins;
+		for (let n in props) {
+			if (ignored && ignored[n]) { continue; }
+			let value = props[n];
+
+			// propagate old value to previous steps:
+			let o, prev = oldStep;
+			while ((o = prev) && (prev = o.prev)) {
+				if (prev.props === o.props) { continue; } // wait step
+				if (prev.props[n] !== undefined) { break; } // already has a value, we're done.
+				prev.props[n] = oldProps[n];
+			}
+
+			if (plugins) {
+				for (let i = 0, l = plugins.length; i < l; i++) {
+					let value = plugins[i].step(this, step, n, value);
+					if (value !== undefined) { step.props[n] = value; }
+				}
+			}
+		}
+
+		if (inject = this._injected) {
+			this._injected = null;
+			this._appendProps(inject, step);
+		}
+	}
+
+	/**
+	 * Used by plugins to inject properties. Called from within `Plugin.step` calls.
+	 * @method _injectProps
+	 * @param {Object} props
+	 * @protected
+	 */
+	_injectProps (props) {
+		let o = this._injected;
+		if (!this._injected) { o = this._injected = {}; }
+		for (let n in props) { o[n] = props[n]; }
+	}
+
+	/**
+	 * @method _addStep
+	 * @param {Number} duration
+	 * @param {Object} props
+	 * @param {Function} ease
+	 * @param {Boolean} [passive=false]
+	 * @protected
+	 */
+	_addStep (duration, props, ease, passive = false) {
+		let step = new TweenStep(this._stepTail, this.duration, duration, props, ease, passive);
+		this.duration += duration;
+		return this._stepTail = (this._stepTail.next = step);
+	}
+
+	/**
+	 * @method _addAction
+	 * @param {Object} scope
+	 * @param {Function} funct
+	 * @param {Array} params
+	 * @protected
+	 */
+	_addAction (scope, funct, params) {
+		let action = new TweenAction(this._actionTail, this.duration, scope, funct, params);
+		if (this._actionTail) { this._actionTail.next = action; }
+		else { this._actionHead = action; }
+		this._actionTail = action;
+		return this;
+	}
+
+	/**
+	 * @method _set
+	 * @param {Object} props
+	 * @protected
+	 */
+	_set (props) {
+		for (let n in props) {
+			this[n] = props[n];
+		}
+	}
+
+	/**
+	 * @method _cloneProps
+	 * @param {Object} props
+	 * @protected
+	 */
+	_cloneProps (props) {
+		let o = {};
+		for (let n in props) { o[n] = props[n]; }
+		return o;
+	}
+
+}
+
+// tiny api (primarily for tool output):
+{
+	let p = Tween.prototype;
+	p.w = p.wait;
+	p.t = p.to;
+	p.c = p.call;
+	p.s = p.set;
+}
+
+// static properties
+/**
+ * Constant returned by plugins to tell the tween not to use default assignment.
+ * @property IGNORE
+ * @type Object
+ * @static
+ */
+Tween.IGNORE = {};
+
+/**
+ * @property _listeners
+ * @type Array[Tween]
+ * @static
+ * @protected
+ */
+Tween._tweens = [];
+
+/**
+ * @property _plugins
+ * @type Object
+ * @static
+ * @protected
+ */
+Tween._plugins = null;
+
+/**
+ * @property _tweenHead
+ * @type Tween
+ * @static
+ * @protected
+ */
+Tween._tweenHead = null;
+
+/**
+ * @property _tweenTail
+ * @type Tween
+ * @static
+ * @protected
+ */
+Tween._tweenTail = null;
+
+// helpers:
+
+class TweenStep {
+
+	constructor (prev, t, d, props, ease, passive) {
+		this.next = null;
+		this.prev = prev;
+		this.t = t;
+		this.d = d;
+		this.props = props;
+		this.ease = ease;
+		this.passive = passive;
+		this.index = prev ? prev.index + 1 : 0;
+	}
+
+}
+
+class TweenAction {
+
+	constructor (prev, t, scope, funct, params) {
+		this.next = null;
+		this.d = 0;
+		this.prev = prev;
+		this.t = t;
+		this.scope = scope;
+		this.funct = funct;
+		this.params = params;
+	}
+
+}
+
+/*
+* Timeline
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2010 gskinner.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/**
+ * The Timeline class synchronizes multiple tweens and allows them to be controlled as a group. Please note that if a
+ * timeline is looping, the tweens on it may appear to loop even if the "loop" property of the tween is false.
+ *
+ * NOTE: Timeline currently also accepts a param list in the form: `tweens, labels, props`. This is for backwards
+ * compatibility only and will be removed in the future. Include tweens and labels as properties on the props object.
+ * @class Timeline
+ * @param {Object} [props] The configuration properties to apply to this instance (ex. `{loop:-1, paused:true}`).
+ * Supported props are listed below. These props are set on the corresponding instance properties except where
+ * specified.<UL>
+ *    <LI> `useTicks`</LI>
+ *    <LI> `ignoreGlobalPause`</LI>
+ *    <LI> `loop`</LI>
+ *    <LI> `reversed`</LI>
+ *    <LI> `bounce`</LI>
+ *    <LI> `timeScale`</LI>
+ *    <LI> `paused`: indicates whether to start the tween paused.</LI>
+ *    <LI> `position`: indicates the initial position for this tween.</LI>
+ *    <LI> `onChange`: adds the specified function as a listener to the `change` event</LI>
+ *    <LI> `onComplete`: adds the specified function as a listener to the `complete` event</LI>
+ * </UL>
+ * @extends AbstractTween
+ * @module TweenJS
+ */
+class Timeline extends AbstractTween {
+
+// constructor
+	/**
+	 * @constructor
+	 * @param {Object} props
+	 */
+	constructor (props) {
+		super(props);
+
+	// private properties:
+		/**
+		 * @property _tweens
+		 * @type Array[Tween]
+		 * @protected
+		 */
+		this._tweens = [];
+
+		if (props.tweens) { this.addTween(...tweens); }
+		this.labels = props.labels;
+
+		this._init(props);
+	}
+
+
+// public methods:
+	/**
+	 * Adds one or more tweens (or timelines) to this timeline. The tweens will be paused (to remove them from the
+	 * normal ticking system) and managed by this timeline. Adding a tween to multiple timelines will result in
+	 * unexpected behaviour.
+	 * @method addTween
+	 * @param {Tween} ...tween The tween(s) to add. Accepts multiple arguments.
+	 * @return {Tween} The first tween that was passed in.
+	 */
+	addTween (...args) {
+		let l = args.length;
+		if (l === 1) {
+			let tween = args[0];
+			this._tweens.push(tween);
+			tween._parent = this;
+			tween.setPaused(true);
+			let d = tween.duration;
+			if (tween.loop > 0) { d *= tween.loop + 1; }
+			if (d > this.duration) { this.duration = d; }
+			if (this.rawPosition >= 0) { tween.setPosition(this.rawPosition); }
+			return tween;
+		}
+		if (l > 1) {
+			for (let i = 0; i < l; i++) { this.addTween(args[i]); }
+			return args[l - 1];
+		}
+		return null;
+	}
+
+	/**
+	 * Removes one or more tweens from this timeline.
+	 * @method removeTween
+	 * @param {Tween} ...args The tween(s) to remove. Accepts multiple arguments.
+	 * @return Boolean Returns `true` if all of the tweens were successfully removed.
+	 */
+	removeTween (...args) {
+		let l = args.length;
+		if (l === 1) {
+			let tweens = this._tweens;
+			let i = tweens.length;
+			while (i--) {
+				if (tweens[i] === tween) {
+					tweens.splice(i, 1);
+					tween._parent = null;
+					if (tween.duration >= this.duration) { this.updateDuration(); }
+					return true;
+				}
+			}
+			return false;
+		}
+		if (l > 1) {
+			let good = true;
+			for (let i = 0; i < l; i++) { good = good && this.removeTween(args[i]); }
+			return good;
+		}
+		return true;
+	}
+
+	/**
+	 * Recalculates the duration of the timeline. The duration is automatically updated when tweens are added or removed,
+	 * but this method is useful if you modify a tween after it was added to the timeline.
+	 * @method updateDuration
+	 */
+	updateDuration () {
+		this.duration = 0;
+		for (let i = 0, l = this._tweens.length; i < l; i++) {
+			let tween = this._tweens[i];
+			let d = tween.duration;
+			if (tween.loop > 0) { d *= tween.loop + 1; }
+			if (d > this.duration) { this.duration = d; }
+		}
+	}
+
+	/**
+	 * @method clone
+	 * @protected
+	 */
+	clone () {
+		throw("Timeline can not be cloned.")
+	}
+
+// private methods:
+	/**
+	 * @method _updatePosition
+	 * @override
+	 */
+	_updatePosition (jump, end) {
+		let t = this.position;
+		for (let i = 0, l = this._tweens.length; i < l; i++) {
+			this._tweens[i].setPosition(t, true, jump); // actions will run after all the tweens update.
+		}
+	}
+
+	/**
+	 * @method _runActionsRange
+	 * @override
+	 */
+	_runActionsRange (startPos, endPos, jump, includeStart) {
+		//console.log("	range", startPos, endPos, jump, includeStart);
+		let t = this.position;
+		for (let i = 0, l = this._tweens.length; i < l; i++) {
+			this._tweens[i]._runActions(startPos, endPos, jump, includeStart);
+			if (t !== this.position) { return true; } // an action changed this timeline's position.
+		}
+	}
+
+}
+
+/*
+* @license MovieClip
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2017 gskinner.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 /**
  * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
@@ -12123,14 +15302,14 @@ class MovieClip extends Container {
 	 * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
 	 * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
 	 * property.
-	 * @param {Boolean} [loop=true] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
-	 * property. The default is `true`.
+	 * @param {Boolean} [loop=0] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
+	 * property. The default is `0`.
 	 * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
 	 * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
 	 */
-	constructor (mode = MovieClip.INDEPENDENT, startPosition = 0, loop = true, labels = null) {
+	constructor (mode = MovieClip.INDEPENDENT, startPosition = 0, loop = 0, labels = null) {
 		super();
-		!MovieClip.inited && MovieClip.init(); // static init
+		!MovieClip.inited && MovieClip.init();
 
 // public properties:
 		/**
@@ -12156,7 +15335,7 @@ class MovieClip extends Container {
 		 * @type Boolean
 		 * @default true
 		 */
-		this.loop = loop;
+		this.loop = loop === true ? -1 : loop;
 
 		/**
 		 * The current frame of the movieclip.
@@ -12191,7 +15370,7 @@ class MovieClip extends Container {
 		 * @type Timeline
 		 * @default null
 		 */
-		this.timeline = new Timeline(null, labels, {paused:true, position:startPosition, useTicks:true});
+		this.timeline = new Timeline({ paused: true, useTicks: true, labels });
 
 		/**
 		 * If true, the MovieClip's position will not advance when ticked.
@@ -12258,20 +15437,12 @@ class MovieClip extends Container {
 		this._synchOffset = 0;
 
 		/**
-		 * @property _prevPos
+		 * @property _rawPosition
 		 * @type Number
 		 * @default -1
 		 * @private
 		 */
-		this._prevPos = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
-
-		/**
-		 * @property _prevPosition
-		 * @type Number
-		 * @default 0
-		 * @private
-		 */
-		this._prevPosition = 0;
+		this._rawPosition = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
 
 		/**
 		 * The time remaining from the previous tick, only applicable when .framerate is set.
@@ -12298,6 +15469,7 @@ class MovieClip extends Container {
 		MovieClip.inited = true;
 	}
 
+// TODO: can we just proxy `get currentFrame` to timeline.position as well? Ditto for `get loop` (or just remove entirely).
 // accessor properties:
 	/**
 	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
@@ -12307,7 +15479,7 @@ class MovieClip extends Container {
 	 * @readonly
 	 */
 	get labels () {
-		return this.timeline.getLabels();
+		return this.timeline.labels;
 	}
 
 	/**
@@ -12318,7 +15490,6 @@ class MovieClip extends Container {
 	 * @readonly
 	 */
 	get currentLabel () {
-		this._updateTimeline();
 		return this.timeline.getCurrentLabel();
 	}
 
@@ -12368,8 +15539,7 @@ class MovieClip extends Container {
 	 */
 	draw (ctx, ignoreCache) {
 		// draw to cache first:
-		if (this.cacheDraw(ctx, ignoreCache)) { return true; }
-		this._updateTimeline();
+		if (this.drawCache(ctx, ignoreCache)) { return true; }
 		super.draw(ctx, ignoreCache);
 		return true;
 	}
@@ -12418,21 +15588,23 @@ class MovieClip extends Container {
 	advance (time) {
 		// TODO: should we worry at all about clips who change their own modes via frame scripts?
 		let independent = MovieClip.INDEPENDENT;
-		if (this.mode != independent) { return; }
-
+		if (this.mode !== independent) { return; }
+		// if this MC doesn't have a framerate, hunt ancestors for one:
 		let o = this, fps = o.framerate;
 		while ((o = o.parent) && fps == null) {
-			if (o.mode == independent) { fps = o._framerate; }
+			if (o.mode === independent) { fps = o._framerate; }
 		}
 		this._framerate = fps;
 
-		let t = (fps != null && fps != -1 && time != null) ? time/(1000/fps) + this._t : 1;
-		let frames = t|0;
-		this._t = t-frames; // leftover time
+		if (this.paused) { return; }
+		// TODO: strict equality here?
+		// calculate how many frames to advance:
+		let t = (fps !== null && fps !== -1 && time !== null) ? time / (1000 / fps) + this._t : 1;
+		let frames = t | 0;
+		this._t = t - frames; // leftover time, save to add to next advance.
 
-		while (!this.paused && frames--) {
-			this._prevPosition = (this._prevPos < 0) ? 0 : this._prevPosition+1;
-			this._updateTimeline();
+		while (frames--) {
+			this._updateTimeline(this._rawPosition + 1, false);
 		}
 	}
 
@@ -12442,7 +15614,7 @@ class MovieClip extends Container {
 	 */
 	clone () {
 		// TODO: add support for this? Need to clone the Timeline & retarget tweens - pretty complex.
-		throw("MovieClip cannot be cloned.")
+		throw "MovieClip cannot be cloned.";
 	}
 
 // private methods:
@@ -12465,11 +15637,8 @@ class MovieClip extends Container {
 	_goto (positionOrLabel) {
 		let pos = this.timeline.resolve(positionOrLabel);
 		if (pos == null) { return; }
-		// prevent _updateTimeline from overwriting the new position because of a reset:
-		if (this._prevPos == -1) { this._prevPos = NaN; }
-		this._prevPosition = pos;
 		this._t = 0;
-		this._updateTimeline();
+		this._updateTimeline(pos, true);
 	}
 
 	/**
@@ -12477,42 +15646,47 @@ class MovieClip extends Container {
 	 * @private
 	 */
 	_reset () {
-		this._prevPos = -1;
+		this._rawPosition = -1;
 		this._t = this.currentFrame = 0;
 		this.paused = false;
 	}
 
 	/**
 	 * @method _updateTimeline
+	 * @param {Number} rawPosition
+	 * @param {Boolean} jump Indicates whether this update is due to jumping (via gotoAndXX) to a new position.
 	 * @protected
 	 */
-	_updateTimeline () {
+	_updateTimeline (rawPosition, jump) {
+		if (rawPosition < 1) { rawPosition = 0; }
+		if (this._rawPosition === rawPosition) { return; }
+		this._rawPosition = rawPosition;
+
+		let tl = this.timeline, synced = this.mode !== MovieClip.INDEPENDENT;
+		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline.
+		let pos = synced ? this.startPosition + (this.mode === MovieClip.SINGLE_FRAME ? 0 : this._synchOffset) : (rawPosition === -1 ? 0 : rawPosition);
+
+		tl.setPosition(pos, !this.actionsEnabled || synced, jump, () => this._resolveState());
+	}
+
+	/**
+	 * Runs via a callback after timeline property updates and before actions.
+	 * @method _resolveState
+	 * @protected
+	 */
+	_resolveState () {
 		let tl = this.timeline;
-		let synched = this.mode != MovieClip.INDEPENDENT;
-		tl.loop = (this.loop == null) ? true : this.loop;
-
-		let pos = synched ? this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset) : (this._prevPos < 0 ? 0 : this._prevPosition);
-		let mode = synched || !this.actionsEnabled ? Tween.NONE : null;
-
-		// pre-assign currentFrame so it is available to frame scripts:
-		this.currentFrame = tl._calcPosition(pos);
-
-		// update timeline position, ignoring actions if this is a graphic.
-		tl.setPosition(pos, mode);
-
-		this._prevPosition = tl._prevPosition;
-		if (this._prevPos == tl._prevPos) { return; }
-		this.currentFrame = this._prevPos = tl._prevPos;
+		this.currentFrame = tl.position;
 
 		for (let n in this._managed) { this._managed[n] = 1; }
 
 		let tweens = tl._tweens;
 		for (let tween of tl._tweens) {
 			let target = tween._target;
-			if (target == this || tween.passive) { continue; } // TODO: this assumes actions tween has this as the target. Valid?
+			if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. Likely a better approach.
 			let offset = tween._stepPosition;
 
-			if (target instanceof createjs.DisplayObject) {
+			if (target instanceof DisplayObject) {
 				// motion tween.
 				this._addManagedChild(target, offset);
 			} else {
@@ -12524,7 +15698,7 @@ class MovieClip extends Container {
 		let kids = this.children;
 		for (let i=kids.length-1; i>=0; i--) {
 			let id = kids[i].id;
-			if (this._managed[id] == 1) {
+			if (this._managed[id] === 1) {
 				this.removeChildAt(i);
 				delete(this._managed[id]);
 			}
@@ -12539,7 +15713,7 @@ class MovieClip extends Container {
 	 */
 	_setState (state, offset) {
 		if (!state) { return; }
-		for (let i=state.length-1;i>=0;i--) {
+		for (let i = state.length - 1; i >= 0; i--) {
 			let o = state[i];
 			let target = o.t;
 			let props = o.p;
@@ -12562,7 +15736,7 @@ class MovieClip extends Container {
 		if (child instanceof MovieClip) {
 			child._synchOffset = offset;
 			// TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
-			if (child.mode == MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
+			if (child.mode === MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
 		}
 		this._managed[child.id] = 2;
 	}
@@ -12576,10 +15750,7 @@ class MovieClip extends Container {
 	 */
 	_getBounds (matrix, ignoreTransform) {
 		let bounds = this.getBounds();
-		if (!bounds) {
-			this._updateTimeline();
-			if (this.frameBounds) { bounds = this._rectangle.copy(this.frameBounds[this.currentFrame]); }
-		}
+		if (!bounds && this.frameBounds) { bounds = this._rectangle.copy(this.frameBounds[this.currentFrame]); }
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
 		return super._getBounds(matrix, ignoreTransform);
 	}
@@ -12623,16 +15794,19 @@ class MovieClip extends Container {
 /**
  * This plugin works with <a href="http://tweenjs.com" target="_blank">TweenJS</a> to prevent the startPosition
  * property from tweening.
- * @private
  * @class MovieClipPlugin
+ * @todo update to new plugin model
+ * @static
+ * @private
  */
 class MovieClipPlugin {
 
+// constructor:
 	/**
 	 * @constructor
 	 */
 	constructor () {
-		throw("MovieClipPlugin cannot be instantiated.");
+		throw "MovieClipPlugin cannot be instantiated.";
 	}
 
 	/**
@@ -12640,7 +15814,7 @@ class MovieClipPlugin {
 	 * @private
 	 */
 	static install () {
-		Tween.installPlugin(MovieClipPlugin, ["startPosition"]);
+		// Tween._installPlugin(MovieClipPlugin);
 	}
 
 	/**
@@ -12668,7 +15842,7 @@ class MovieClipPlugin {
 	 */
 	static tween (tween, prop, value, startValues, endValues, ratio, wait, end) {
 		if (!(tween.target instanceof MovieClip)) { return value; }
-		return (ratio == 1 ? endValues[prop] : startValues[prop]);
+		return (ratio === 1 ? endValues[prop] : startValues[prop]);
 	}
 
 }
@@ -12685,7 +15859,7 @@ class MovieClipPlugin {
 * @license Shadow
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -12772,7 +15946,7 @@ class Shadow$1 {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[Shadow]";
+		return `[${this.constructor.name}]`;
 	}
 
 	/**
@@ -12803,7 +15977,7 @@ class Shadow$1 {
 * @license Shape
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -12916,7 +16090,7 @@ class Shape extends DisplayObject {
  * @license SpriteSheet
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
- * Copyright (c) 2010 gskinner.com, inc.
+ * Copyright (c) 2017 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -13309,7 +16483,7 @@ class SpriteSheet extends EventDispatcher {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[SpriteSheet]";
+		return `[${this.constructor.name}]`;
 	}
 
 	/**
@@ -13335,8 +16509,9 @@ class SpriteSheet extends EventDispatcher {
 		if (data.images) {
 			for (let img of data.images) {
 				let a = this._images = [];
-				if (typeof img == "string") {
-					let src = img;
+				let src;
+				if (typeof img === "string") {
+					src = img;
 					img = document.createElement("img");
 					img.src = src;
 				}
@@ -13344,7 +16519,7 @@ class SpriteSheet extends EventDispatcher {
 				if (!img.getContext && !img.naturalWidth) {
 					this._loadCount++;
 					this.complete = false;
-					img.onload = () => this._handleImadeLoad(src);
+					img.onload = () => this._handleImageLoad(src);
 					img.onerror = () => this._handleImageError(src);
 				}
 			}
@@ -13366,7 +16541,7 @@ class SpriteSheet extends EventDispatcher {
 				this._spacing = o.spacing||0;
 				this._margin = o.margin||0;
 				this._numFrames = o.count;
-				if (this._loadCount == 0) { this._calculateFrames(); }
+				if (this._loadCount === 0) { this._calculateFrames(); }
 			}
 		}
 
@@ -13379,10 +16554,10 @@ class SpriteSheet extends EventDispatcher {
 				let anim = { name };
 				let obj = o[name];
 				let a;
-				if (typeof obj == "number") { // single frame
+				if (typeof obj === "number") { // single frame
 					a = anim.frames = [obj];
 				} else if (Array.isArray(obj)) { // simple
-					if (obj.length == 1) { anim.frames = [obj[0]]; }
+					if (obj.length === 1) { anim.frames = [obj[0]]; }
 					else {
 						anim.speed = obj[3];
 						anim.next = obj[2];
@@ -13395,10 +16570,10 @@ class SpriteSheet extends EventDispatcher {
 					anim.speed = obj.speed;
 					anim.next = obj.next;
 					let frames = obj.frames;
-					a = anim.frames = (typeof frames == "number") ? [frames] : frames.slice(0);
+					a = anim.frames = (typeof frames === "number") ? [frames] : frames.slice(0);
 				}
 				if (anim.next === true || anim.next === undefined) { anim.next = name; } // loop
-				if (anim.next === false || (a.length < 2 && anim.next == name)) { anim.next = null; } // stop
+				if (anim.next === false || (a.length < 2 && anim.next === name)) { anim.next = null; } // stop
 				if (!anim.speed) { anim.speed = 1; }
 				this._animations.push(name);
 				this._data[name] = anim;
@@ -13411,7 +16586,7 @@ class SpriteSheet extends EventDispatcher {
 	 * @protected
 	 */
 	 _handleImageLoad (src) {
-		if (--this._loadCount == 0) {
+		if (--this._loadCount === 0) {
 			this._calculateFrames();
 			this.complete = true;
 			this.dispatchEvent("complete");
@@ -13428,7 +16603,7 @@ class SpriteSheet extends EventDispatcher {
 		this.dispatchEvent(errorEvent);
 
 		// Complete is still dispatched.
-		if (--this._loadCount == 0) {
+		if (--this._loadCount === 0) {
 			this.dispatchEvent("complete");
 		}
 	}
@@ -13438,7 +16613,7 @@ class SpriteSheet extends EventDispatcher {
 	 * @protected
 	 */
 	_calculateFrames () {
-		if (this._frames || this._frameWidth == 0) { return; }
+		if (this._frames || this._frameWidth === 0) { return; }
 
 		this._frames = [];
 
@@ -13511,7 +16686,7 @@ class SpriteSheet extends EventDispatcher {
 * @license Text
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -13781,7 +16956,7 @@ class Text extends DisplayObject {
  	 * @return {String} a string representation of the instance.
  	 */
  	toString () {
- 		return `[Text (text=${this.text.length > 20 ? `${this.text.substr(0, 17)}...` : this.text})]`;
+ 		return `[${this.constructor.name} (text=${this.text.length > 20 ? `${this.text.substr(0, 17)}...` : this.text})]`;
  	}
 
 // private methods:
@@ -13912,7 +17087,7 @@ class Text extends DisplayObject {
 	 * @private
 	 * @static
 	 */
-	let canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+	let canvas = createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 	if (canvas.getContext) {
 		Text._workingContext = canvas.getContext("2d");
 		canvas.width = canvas.height = 1;
@@ -13923,7 +17098,7 @@ class Text extends DisplayObject {
  * @license AlphaMapFilter
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
- * Copyright (c) 2010 gskinner.com, inc.
+ * Copyright (c) 2017 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -14076,7 +17251,7 @@ class AlphaMapFilter extends Filter {
 	 */
 	_prepAlphaMap () {
 		if (!this.alphaMap) { return false; }
-		if (this.alphaMap == this._alphaMap && this._mapData) { return true; }
+		if (this.alphaMap === this._alphaMap && this._mapData) { return true; }
 		this._mapData = null;
 
 		let map = this._alphaMap = this.alphaMap;
@@ -14085,7 +17260,7 @@ class AlphaMapFilter extends Filter {
 		if (map instanceof HTMLCanvasElement) {
 			ctx = canvas.getContext("2d");
 		} else {
-			canvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+			canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
 			canvas.width = map.width;
 			canvas.height = map.height;
 			ctx = canvas.getContext("2d");
@@ -14107,7 +17282,7 @@ class AlphaMapFilter extends Filter {
  * @license AlphaMaskFilter
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
- * Copyright (c) 2010 gskinner.com, inc.
+ * Copyright (c) 2017 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -14254,7 +17429,7 @@ class AlphaMaskFilter extends Filter {
  * @license BlurFilter
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
- * Copyright (c) 2010 gskinner.com, inc.
+ * Copyright (c) 2017 gskinner.com, inc.
  *
  * BoxBlur Algorithm by Mario Klingemann, quasimondo.com
  *
@@ -14508,7 +17683,7 @@ class BlurFilter extends Filter {
 		if (isNaN(radiusX) || radiusX < 0) return false;
 		let radiusY = this._blurY >> 1;
 		if (isNaN(radiusY) || radiusY < 0) return false;
-		if (radiusX == 0 && radiusY == 0) return false;
+		if (radiusX === 0 && radiusY === 0) return false;
 
 		let iterations = this.quality;
 		if (isNaN(iterations) || iterations < 1) iterations = 1;
@@ -14713,7 +17888,7 @@ class BlurFilter extends Filter {
 * @license ColorFilter
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -14896,7 +18071,7 @@ class ColorFilter extends Filter {
 * @license ColorMatrix
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -15053,7 +18228,7 @@ class ColorMatrix {
 	 * @chainable
 	 */
 	adjustBrightness (value) {
-		if (value == 0 || isNaN(value)) { return this; }
+		if (value === 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value, 255);
 		this._multiplyMatrix([
 			1,0,0,0,value,
@@ -15074,14 +18249,14 @@ class ColorMatrix {
 	 * @chainable
 	 */
 	adjustContrast (value) {
-		if (value == 0 || isNaN(value)) { return this; }
+		if (value === 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value, 100);
 		let x;
 		if (value<0) {
 			x = 127+value/100*127;
 		} else {
 			x = value%1;
-			if (x == 0) {
+			if (x === 0) {
 				x = ColorMatrix.DELTA_INDEX[value];
 			} else {
 				x = ColorMatrix.DELTA_INDEX[(value<<0)]*(1-x)+ColorMatrix.DELTA_INDEX[(value<<0)+1]*x; // use linear interpolation for more granularity.
@@ -15107,7 +18282,7 @@ class ColorMatrix {
 	 * @chainable
 	 */
 	adjustSaturation (value) {
-		if (value == 0 || isNaN(value)) { return this; }
+		if (value === 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value, 100);
 		let x = 1+((value > 0) ? 3*value/100 : value/100);
 		let lumR = 0.3086;
@@ -15132,7 +18307,7 @@ class ColorMatrix {
 	 * @chainable
 	 */
 	adjustHue (value) {
-		if (value == 0 || isNaN(value)) { return this; }
+		if (value === 0 || isNaN(value)) { return this; }
 		value = this._cleanValue(value, 180)/180*Math.PI;
 		let cosVal = Math.cos(value);
 		let sinVal = Math.sin(value);
@@ -15207,7 +18382,7 @@ class ColorMatrix {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[ColorMatrix]";
+		return `[${this.constructor.name}]`;
 	}
 
 
@@ -15267,7 +18442,7 @@ class ColorMatrix {
 * @license ColorMatrixFilter
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -15416,7 +18591,7 @@ class ColorMatrixFilter extends Filter {
 * @license ButtonHelper
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -15567,7 +18742,7 @@ class ButtonHelper {
 	}
 
 	set enabled (enabled) {
-		if (enabled == this._enabled) { return; }
+		if (enabled === this._enabled) { return; }
 		let o = this.target;
 		this._enabled = enabled;
 		if (enabled) {
@@ -15594,7 +18769,7 @@ class ButtonHelper {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[ButtonHelper]";
+		return `[${this.constructor.name}]`;
 	}
 
 
@@ -15606,13 +18781,13 @@ class ButtonHelper {
 	 */
 	handleEvent (evt) {
 		let label, t = this.target, type = evt.type;
-		if (type == "mousedown") {
+		if (type === "mousedown") {
 			this._isPressed = true;
 			label = this.downLabel;
-		} else if (type == "pressup") {
+		} else if (type === "pressup") {
 			this._isPressed = false;
 			label = this._isOver ? this.overLabel : this.outLabel;
-		} else if (type == "rollover") {
+		} else if (type === "rollover") {
 			this._isOver = true;
 			label = this._isPressed ? this.downLabel : this.overLabel;
 		} else { // rollout and default
@@ -15644,7 +18819,7 @@ class ButtonHelper {
 * @license Touch
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -15803,11 +18978,11 @@ class Touch {
 			let id = touch.identifier;
 			if (touch.target != stage.canvas) { continue; }
 
-			if (type == "touchstart") {
+			if (type === "touchstart") {
 				this._handleStart(stage, id, e, touch.pageX, touch.pageY);
-			} else if (type == "touchmove") {
+			} else if (type === "touchmove") {
 				this._handleMove(stage, id, e, touch.pageX, touch.pageY);
-			} else if (type == "touchend" || type == "touchcancel") {
+			} else if (type === "touchend" || type === "touchcancel") {
 				this._handleEnd(stage, id, e);
 			}
 		}
@@ -15880,15 +19055,15 @@ class Touch {
 		let id = e.pointerId;
 		let ids = stage.__touch.activeIDs;
 
-		if (type == "MSPointerDown" || type == "pointerdown") {
+		if (type === "MSPointerDown" || type === "pointerdown") {
 			if (e.srcElement != stage.canvas) { return; }
 			ids[id] = true;
 			this._handleStart(stage, id, e, e.pageX, e.pageY);
 		} else if (ids[id]) { // it's an id we're watching
-			if (type == "MSPointerMove" || type == "pointermove") {
+			if (type === "MSPointerMove" || type === "pointermove") {
 				this._handleMove(stage, id, e, e.pageX, e.pageY);
-			} else if (type == "MSPointerUp" || type == "MSPointerCancel"
-					|| type == "pointerup" || type == "pointercancel") {
+			} else if (type === "MSPointerUp" || type === "MSPointerCancel"
+					|| type === "pointerup" || type === "pointercancel") {
 				delete(ids[id]);
 				this._handleEnd(stage, id, e);
 			}
@@ -15951,7 +19126,7 @@ class Touch {
 * @license SpriteSheetBuilder
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -16227,7 +19402,7 @@ class SpriteSheetBuilder extends EventDispatcher {
 			for (let i=0,l=lbls.length; i<l; i++) {
 				let label = lbls[i].label;
 				let start = baseFrameIndex+lbls[i].index;
-				let end = baseFrameIndex+((i == l-1) ? duration : lbls[i+1].index);
+				let end = baseFrameIndex+((i === l-1) ? duration : lbls[i+1].index);
 				let frames = [];
 				for (let i=start; i<end; i++) { frames.push(i); }
 				if (labelFunction) {
@@ -16290,7 +19465,7 @@ class SpriteSheetBuilder extends EventDispatcher {
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
-		return "[SpriteSheetBuilder]";
+		return `[${this.constructor.name}]`;
 	}
 
 
@@ -16481,7 +19656,7 @@ class SpriteSheetBuilder extends EventDispatcher {
 * @license SpriteSheetUtils
 * Visit http://createjs.com/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2017 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -16572,7 +19747,7 @@ class SpriteSheetUtils {
 	 * @deprecated Tools such as ImageAlpha generally provide better results. This will be moved to sandbox in the future.
 	*/
 	static mergeAlpha (rgbImage, alphaImage, canvas) {
-		if (!canvas) { canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
+		if (!canvas) { canvas = createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
 		canvas.width = Math.max(alphaImage.width, rgbImage.width);
 		canvas.height = Math.max(alphaImage.height, rgbImage.height);
 		let ctx = canvas.getContext("2d");
@@ -16661,7 +19836,7 @@ class SpriteSheetUtils {
  * @protected
 */
 {
-	let canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	let canvas = (createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
 	if (canvas.getContext) {
 		SpriteSheetUtils._workingCanvas = canvas;
 		SpriteSheetUtils._workingContext = canvas.getContext("2d");
@@ -16673,7 +19848,7 @@ class SpriteSheetUtils {
  * @license WebGLInspector
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
- * Copyright (c) 2010 gskinner.com, inc.
+ * Copyright (c) 2017 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -16869,13 +20044,13 @@ class WebGLInspector extends EventDispatcher {
 		for (let n in dict) {
 			let str = n.replace(window.location.origin, "");
 			let tex = dict[n];
-			let shifted = tex._lastActiveIndex?tex._lastActiveIndex == tex._activeIndex:false;
+			let shifted = tex._lastActiveIndex?tex._lastActiveIndex === tex._activeIndex:false;
 			output.push({src, element:tex, shifted});
 			tex._lastActiveIndex = tex._activeIndex;
 		}
 
 		output.sort((a,b) => {
-			if (a.element._drawID == stage._drawID) { return 1; }
+			if (a.element._drawID === stage._drawID) { return 1; }
 			if (a.element._drawID < b.element._drawID) { return -1; }
 			return 0;
 		});
@@ -16883,7 +20058,7 @@ class WebGLInspector extends EventDispatcher {
 		const l = output.length;
 		for (let i=0; i<l; i++) {
 			let out = output[i];
-			let active = out.element._drawID == stage._drawID;
+			let active = out.element._drawID === stage._drawID;
 			WebGLInspector._log(`[${out.src}] ${active?"ACTIVE":"stale"} ${out.shifted?"steady":"DRIFT"}`, out.element);
 		}
 	}
@@ -16992,8 +20167,8 @@ class WebGLInspector extends EventDispatcher {
 // re-export shared classes
 // TODO: Review this version export.
 // version (templated in gulpfile, pulled from package).
-const version = "1.0.0";
+const version = "2.0.0";
 
-export { version, EventDispatcher, Event, Ticker, TickerAPI, StageGL, Stage, Container, DisplayObject, Bitmap, BitmapText, DOMElement, Graphics, Arc, ArcTo, BeginPath, BezierCurveTo, Circle, ClosePath, Ellipse, Fill, LineTo, MoveTo, PolyStar, QuadraticCurveTo, Rect, RoundRect, Stroke, StrokeDash, StrokeStyle, MovieClip, MovieClipPlugin, Shadow$1 as Shadow, Shape, Sprite, SpriteSheet, Text, MouseEvent, AlphaMapFilter, AlphaMaskFilter, BitmapCache, BlurFilter, ColorFilter, ColorMatrix, ColorMatrixFilter, Filter, DisplayProps, Matrix2D, Point, Rectangle, ButtonHelper, Touch, SpriteSheetBuilder, SpriteSheetUtils, UID, WebGLInspector };
+export { version, EventDispatcher, Event, Ticker, StageGL, Stage, Container, DisplayObject, Bitmap, BitmapText, DOMElement, Graphics, Arc, ArcTo, BeginPath, BezierCurveTo, Circle, ClosePath, Ellipse, Fill, LineTo, MoveTo, PolyStar, QuadraticCurveTo, Rect, RoundRect, Stroke, StrokeDash, StrokeStyle, MovieClip, Shadow$1 as Shadow, Shape, Sprite, SpriteSheet, Text, MouseEvent, AlphaMapFilter, AlphaMaskFilter, BitmapCache, BlurFilter, ColorFilter, ColorMatrix, ColorMatrixFilter, Filter, DisplayProps, Matrix2D, Point, Rectangle, ButtonHelper, Touch, SpriteSheetBuilder, SpriteSheetUtils, UID, WebGLInspector };
 
-//# sourceMappingURL=easeljs.es6.map
+//# sourceMappingURL=easeljs-2.0.0.es6.map

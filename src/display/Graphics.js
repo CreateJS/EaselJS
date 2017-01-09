@@ -2484,7 +2484,7 @@ export class PolyStar {
  * @type {CanvasRenderingContext2D}
  */
 {
-	let canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	let canvas = (createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
 	if (canvas.getContext) {
 		Graphics._ctx = canvas.getContext("2d");
 		canvas.width = canvas.height = 1;

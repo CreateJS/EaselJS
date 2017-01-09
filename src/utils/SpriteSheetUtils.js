@@ -93,7 +93,7 @@ export default class SpriteSheetUtils {
 	 * @deprecated Tools such as ImageAlpha generally provide better results. This will be moved to sandbox in the future.
 	*/
 	static mergeAlpha (rgbImage, alphaImage, canvas) {
-		if (!canvas) { canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
+		if (!canvas) { canvas = createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
 		canvas.width = Math.max(alphaImage.width, rgbImage.width);
 		canvas.height = Math.max(alphaImage.height, rgbImage.height);
 		let ctx = canvas.getContext("2d");
@@ -182,7 +182,7 @@ export default class SpriteSheetUtils {
  * @protected
 */
 {
-	let canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	let canvas = (createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
 	if (canvas.getContext) {
 		SpriteSheetUtils._workingCanvas = canvas;
 		SpriteSheetUtils._workingContext = canvas.getContext("2d");
