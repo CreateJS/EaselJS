@@ -775,7 +775,7 @@ this.createjs = this.createjs||{};
 	 *
 	 *      var shape = new createjs.Shape();
 	 *      shape.graphics.beginFill("#ff0000").drawCircle(0, 0, 25);
-	 *      myShape.cache(-25, -25, 50, 50);
+	 *      shape.cache(-25, -25, 50, 50);
 	 *
 	 * Note that filters need to be defined <em>before</em> the cache is applied. Check out the {{#crossLink "Filter"}}{{/crossLink}}
 	 * class for more information. Some filters (ex. BlurFilter) will not work as expected in conjunction with the scale param.
