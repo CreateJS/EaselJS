@@ -90,9 +90,28 @@ this.createjs = this.createjs||{};
 	 * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
 	 * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
 	 **/
-	function MovieClip(mode, startPosition, loop, labels) {
+	function MovieClip(props) {
 		this.Container_constructor();
 		!MovieClip.inited&&MovieClip.init(); // static init
+		
+		var mode, startPosition, loop, labels;
+		
+		// handle old params (tweens, labels, props):
+		// TODO: deprecated.
+		if (props instanceof String || arguments.length > 1) {
+			mode = props;
+			startPosition = arguments[1];
+			loop = arguments[2];
+			labels = arguments[3];
+			if (loop == null) { loop = -1; }
+			props = null;
+		} else if (props) {
+			mode = props.mode;
+			startPosition = props.startPosition;
+			loop = props.loop;
+			labels = props.labels;
+		}
+		if (!props) { props = {}; }
 		
 		
 	// public properties:
@@ -114,10 +133,11 @@ this.createjs = this.createjs||{};
 		this.startPosition = startPosition||0;
 	
 		/**
-		 * Indicates whether this MovieClip should loop when it reaches the end of its timeline.
+		 * Specifies how many times this MovieClip should loop. A value of -1 indicates it should loop indefinitely. A value of
+		 * 1 would cause it to loop once (ie. play a total of twice).
 		 * @property loop
-		 * @type Boolean
-		 * @default true
+		 * @type Number
+		 * @default -1
 		 */
 		this.loop = loop === true ? -1 : (loop || 0);
 	
@@ -131,38 +151,12 @@ this.createjs = this.createjs||{};
 		this.currentFrame = 0;
 	
 		/**
-		 * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
-		 * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
-		 * instances to the timeline.
-		 *
-		 * <h4>Example</h4>
-		 *
-		 *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
-		 *      var mc = new createjs.MovieClip();
-		 *      mc.timeline.addTween(tween);
-		 *
-		 * Elements can be added and removed from the timeline by toggling an "_off" property
-		 * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
-		 * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
-		 * frame 1. You can use the "visible" property to achieve the same effect.
-		 *
-		 *      var tween = createjs.Tween.get(target).to({_off:false})
-		 *          .wait(1).to({_off:true})
-		 *          .wait(1).to({_off:false});
-		 *
-		 * @property timeline
-		 * @type Timeline
-		 * @default null
-		 */
-		this.timeline = new createjs.Timeline({paused:true, useTicks:true, labels:labels});
-	
-		/**
 		 * If true, the MovieClip's position will not advance when ticked.
 		 * @property paused
 		 * @type Boolean
 		 * @default false
 		 */
-		this.paused = false;
+		this.paused = props&&props.paused||false;
 	
 		/**
 		 * If true, actions in this MovieClip's tweens will be run when the playhead advances.
@@ -192,7 +186,7 @@ this.createjs = this.createjs||{};
 		 * @type Array
 		 * @default null
 		 */
-		this.frameBounds = this.frameBounds||null; // TODO: Deprecated. This is for backwards support of Flash/Animate
+		this.frameBounds = this.frameBounds||props.frameBounds; // TODO: Deprecated. This is for backwards support of Flash/Animate
 		
 		/**
 		 * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
@@ -210,6 +204,35 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this.framerate = null;
+		
+		// set up the needed props for Timeline:
+		props.useTicks = props.paused = true;
+		
+		/**
+		 * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
+		 * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
+		 * instances to the timeline.
+		 *
+		 * <h4>Example</h4>
+		 *
+		 *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
+		 *      var mc = new createjs.MovieClip();
+		 *      mc.timeline.addTween(tween);
+		 *
+		 * Elements can be added and removed from the timeline by toggling an "_off" property
+		 * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
+		 * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
+		 * frame 1. You can use the "visible" property to achieve the same effect.
+		 *
+		 *      var tween = createjs.Tween.get(target).to({_off:false})
+		 *          .wait(1).to({_off:true})
+		 *          .wait(1).to({_off:false});
+		 *
+		 * @property timeline
+		 * @type Timeline
+		 * @default null
+		 */
+		this.timeline = new createjs.Timeline(props);
 		
 		
 	// private properties:
@@ -402,6 +425,7 @@ this.createjs = this.createjs||{};
 	p.draw = function(ctx, ignoreCache) {
 		// draw to cache first:
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+		if (this._rawPosition === -1) { this._updateTimeline(-1); } // updateTimeline has not been called previously.
 		this.Container_draw(ctx, ignoreCache);
 		return true;
 	};
@@ -609,7 +633,8 @@ this.createjs = this.createjs||{};
 		if (child instanceof MovieClip) {
 			child._synchOffset = offset;
 			// TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
-			if (child.mode === MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
+			// TODO: should also reset when MovieClip loops, though that will be a bit tricky to detect.
+			if (child.mode === MovieClip.INDEPENDENT && child.autoReset && (!this._managed[child.id])) { child._reset(); }
 		}
 		this._managed[child.id] = 2;
 	};
