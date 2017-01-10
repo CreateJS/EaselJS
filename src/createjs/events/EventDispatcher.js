@@ -393,7 +393,7 @@ this.createjs = this.createjs||{};
 // private methods:
 	/**
 	 * @method _dispatchEvent
-	 * @param {Object | String | Event} eventObj
+	 * @param {Object | Event} eventObj
 	 * @param {Object} eventPhase
 	 * @protected
 	 **/
