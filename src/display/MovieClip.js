@@ -79,17 +79,19 @@ export default class MovieClip extends Container {
 // constructor:
 	/**
 	 * @constructor
+	 * @param {Object} props
 	 * @param {String} [mode=independent] Initial value for the mode property. One of {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}},
 	 * {{#crossLink "MovieClip/SINGLE_FRAME:property"}}{{/crossLink}}, or {{#crossLink "MovieClip/SYNCHED:property"}}{{/crossLink}}.
 	 * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
 	 * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
 	 * property.
-	 * @param {Boolean} [loop=0] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
+	 * @param {Number|Boolean} [loop=-1] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
 	 * property. The default is `0`.
+	 * @param {Boolean} [paused=false] Pause
 	 * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
 	 * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
 	 */
-	constructor (mode = MovieClip.INDEPENDENT, startPosition = 0, loop = 0, labels = null) {
+	constructor ({ mode = MovieClip.INDEPENDENT, startPosition = 0, loop = -1, paused = false, frameBounds = null, labels = null }) {
 		super();
 		!MovieClip.inited && MovieClip.init();
 
@@ -112,12 +114,13 @@ export default class MovieClip extends Container {
 		this.startPosition = startPosition;
 
 		/**
-		 * Indicates whether this MovieClip should loop when it reaches the end of its timeline.
+    * Specifies how many times this MovieClip should loop. A value of -1 indicates it should loop indefinitely. A value of
+    * 1 would cause it to loop once (ie. play a total of twice).
 		 * @property loop
-		 * @type Boolean
-		 * @default true
+		 * @type Number
+		 * @default -1
 		 */
-		this.loop = loop === true ? -1 : loop;
+		this.loop = loop === true ? -1 : (loop || 0);
 
 		/**
 		 * The current frame of the movieclip.
@@ -129,30 +132,30 @@ export default class MovieClip extends Container {
 		this.currentFrame = 0;
 
 		/**
-		 * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
-		 * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
-		 * instances to the timeline.
-		 *
-		 * <h4>Example</h4>
-		 *
-		 *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
-		 *      var mc = new createjs.MovieClip();
-		 *      mc.timeline.addTween(tween);
-		 *
-		 * Elements can be added and removed from the timeline by toggling an "_off" property
-		 * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
-		 * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
-		 * frame 1. You can use the "visible" property to achieve the same effect.
-		 *
-		 *      var tween = createjs.Tween.get(target).to({_off:false})
-		 *          .wait(1).to({_off:true})
-		 *          .wait(1).to({_off:false});
-		 *
-		 * @property timeline
-		 * @type Timeline
-		 * @default null
+     * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
+     * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
+     * instances to the timeline.
+     *
+     * <h4>Example</h4>
+     *
+     *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
+     *      var mc = new createjs.MovieClip();
+     *      mc.timeline.addTween(tween);
+     *
+     * Elements can be added and removed from the timeline by toggling an "_off" property
+     * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
+     * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
+     * frame 1. You can use the "visible" property to achieve the same effect.
+     *
+     *      var tween = createjs.Tween.get(target).to({_off:false})
+     *          .wait(1).to({_off:true})
+     *          .wait(1).to({_off:false});
+     *
+     * @property timeline
+     * @type Timeline
+		 * @default Timeline
 		 */
-		this.timeline = new Timeline({ paused: true, useTicks: true, labels });
+		this.timeline = new Timeline({ useTicks: true, paused: true, mode, startPosition, loop, frameBounds, labels });
 
 		/**
 		 * If true, the MovieClip's position will not advance when ticked.
@@ -160,7 +163,7 @@ export default class MovieClip extends Container {
 		 * @type Boolean
 		 * @default false
 		 */
-		this.paused = false;
+		this.paused = paused;
 
 		/**
 		 * If true, actions in this MovieClip's tweens will be run when the playhead advances.
@@ -190,7 +193,7 @@ export default class MovieClip extends Container {
 		 * @type Array
 		 * @default null
 		 */
-		this.frameBounds = this.frameBounds||null; // TODO: Deprecated. This is for backwards support of Flash/Animate
+		this.frameBounds = this.frameBounds || null; // TODO: Deprecated. This is for backwards support of Flash/Animate
 
 		/**
 		 * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
@@ -322,6 +325,7 @@ export default class MovieClip extends Container {
 	draw (ctx, ignoreCache) {
 		// draw to cache first:
 		if (this.drawCache(ctx, ignoreCache)) { return true; }
+    if (this._rawPosition === -1) { this._updateTimeline(-1); } // updateTimeline has not been called previously.
 		super.draw(ctx, ignoreCache);
 		return true;
 	}
@@ -518,6 +522,7 @@ export default class MovieClip extends Container {
 		if (child instanceof MovieClip) {
 			child._synchOffset = offset;
 			// TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
+      // TODO: should also reset when MovieClip loops, though that will be a bit tricky to detect.
 			if (child.mode === MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) { child._reset(); }
 		}
 		this._managed[child.id] = 2;
