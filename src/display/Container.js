@@ -168,27 +168,14 @@ export default class Container extends DisplayObject {
 			for (let i = 0; i < l; i++) { child = this.addChild(children[i]); }
 			return child;
 		}
-		if (child.parent) { child.parent.removeChild(child); }
+    // Note: a lot of duplication with addChildAt, but push is WAY faster than splice.
+    let parent = child.parent, silent = parent === this;
+    parent && parent._removeChildAt(parent.children.indexOf(child), silent);
 		child.parent = this;
 		this.children.push(child);
-		child.dispatchEvent("added");
+    if (!silent) { child.dispatchEvent("added"); }
 		return child;
 	}
-	/*
-	TODO-ES6: Perf test rest param loops vs arguments.
-	addChild (...children) {
-		const l = children.length;
-		if (l === 0) { return null; }
-		let child;
-		for (let i = 0; i < l; i++) {
-			child = children[0];
-			if (child.parent) { child.parent.removeChild(child); }
-			child.parent = this;
-			this.children.push(child);
-			child.dispatchEvent("added");
-		}
-		return child;
-	}*/
 
 	/**
 	 * Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and
@@ -214,37 +201,23 @@ export default class Container extends DisplayObject {
 	 * @param {Number} index The index to add the child at.
 	 * @return {DisplayObject} Returns the last child that was added, or the last child if multiple children were added.
 	 */
-	addChildAt(...children) {
-		let index = children.pop();
+	addChildAt (...children) {
 		const l = children.length;
-		if (index < 0 || index > this.children.length) { return children[l-2]; }
+    if (l === 0) { return null; }
+    let index = children.pop();
+		if (index < 0 || index > this.children.length) { return children[l - 2]; }
 		if (l > 2) {
 			for (let i = 0; i < l - 1; i++) { this.addChildAt(children[i], index++); }
 			return children[l - 2];
 		}
 		let child = children[0];
-		if (child.parent) { child.parent.removeChild(child); }
+    let parent = child.parent, silent = parent === this;
+    parent && parent._removeChildAt(parent.children.indexOf(child), silent);
 		child.parent = this;
 		this.children.splice(index++, 0, child);
-		child.dispatchEvent("added");
+    if (!silent) { child.dispatchEvent("added"); }
 		return child;
 	}
-	/*
-	addChildAt (...children) {
-		let index = children.pop();
-		const l = children.length;
-		if (index < 0 || index > this.children.length) { return children[l-2]; }
-		let child;
-		for (let i = 0; i < l; i++) {
-			child = children[i];
-			if (child.parent) { child.parent.removeChild(child); }
-			child.parent = this;
-			this.children.splice(index++, 0, child);
-			child.dispatchEvent("added");
-		}
-		return child;
-	}
-	*/
 
 	/**
 	 * Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is
@@ -265,24 +238,14 @@ export default class Container extends DisplayObject {
 	 */
 	removeChild (...children) {
 		const l = children.length;
+    if (l === 0) { return true; }
 		if (l > 1) {
 			let good = true;
 			for (let i = 0; i < l; i++) { good = good && this.removeChild(children[i]); }
 			return good;
 		}
-		return this.removeChildAt(this.children.indexOf(children[0]));
+		return this._removeChildAt(this.children.indexOf(children[0]));
 	}
-  /*
-	removeChild(...children) {
-		const l = children.length;
-		let good = true;
-		let child;
-		for (let i = 0; i < l; i++) {
-			good = good && this.removeChildAt(this.children.indexOf(children[i]));
-		}
-		return good;
-	}
-  */
 
 	/**
 	 * Removes the child at the specified index from the display list, and sets its parent to null.
@@ -297,44 +260,20 @@ export default class Container extends DisplayObject {
 	 *
 	 * Returns true if the child (or children) was removed, or false if any index was out of range.
 	 * @method removeChildAt
-	 * @param {...Number} index The index of the child to remove.
+	 * @param {...Number} indexes The indexes of children to remove.
 	 * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
 	 */
 	removeChildAt (...indexes) {
 		const l = indexes.length;
+    if (l === 0) { return true; }
 		if (l > 1) {
 			indexes.sort((a, b) => b - a);
 			let good = true;
-			for (let i = 0; i < l; i++) { good = good && this.removeChildAt(indexes[i]); }
+			for (let i = 0; i < l; i++) { good = good && this._removeChildAt(indexes[i]); }
 			return good;
 		}
-		let index = indexes[0];
-		if (index < 0 || index > this.children.length - 1) { return false; }
-		let child = this.children[index];
-		if (child) { child.parent = null; }
-		this.children.splice(index, 1);
-		child.dispatchEvent("removed");
-		return true;
+		return this._removeChildAt(indexes[0]);
 	}
-	/*
-	removeChildAt (...indexes) {
-		const l = indexes.length;
-		if (l > 1) { indexes.sort((a, b) => b - a); }
-		let good = true;
-		for (let i = 0; i < l; i++) {
-			let index = indexes[0];
-			if (index < 0 || index > this.children.length - 1) {
-				good = false;
-				continue;
-			}
-			let child = this.children[index];
-			if (child) { child.parent = null; }
-			this.children.splice(index, 1);
-			child.dispatchEvent("removed");
-		}
-		return good;
-	}
-	*/
 
 	/**
 	 * Removes all children from the display list.
@@ -347,7 +286,7 @@ export default class Container extends DisplayObject {
 	 */
 	removeAllChildren () {
 		let kids = this.children;
-		while (kids.length) { this.removeChildAt(0); }
+		while (kids.length) { this._removeChildAt(0); }
 	}
 
 	/**
@@ -607,6 +546,24 @@ export default class Container extends DisplayObject {
 			arr.push(clone);
 		}
 	}
+
+  /**
+   * Removes the child at the specified index from the display list, and sets its parent to null.
+   * Used by `removeChildAt`, `addChild`, and `addChildAt`.
+   * @method removeChildAt
+   * @protected
+   * @param {Number} index The index of the child to remove.
+   * @param {Boolean} [silent] Prevents dispatch of `removed` event if true.
+   * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
+   **/
+  _removeChildAt (index, silent = false) {
+    if (index < 0 || index > this.children.length - 1) { return false; }
+    let child = this.children[index];
+    if (child) { child.parent = null; }
+    this.children.splice(index, 1);
+    if (!silent) { child.dispatchEvent("removed"); }
+    return true;
+  }
 
 	/**
 	 * @method _getObjectsUnderPoint
