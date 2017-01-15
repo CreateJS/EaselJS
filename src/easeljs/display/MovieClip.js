@@ -53,7 +53,7 @@ this.createjs = this.createjs||{};
 	 *      var stage = new createjs.Stage("canvas");
 	 *      createjs.Ticker.addEventListener("tick", stage);
 	 *
-	 *      var mc = new createjs.MovieClip(null, 0, true, {start:20});
+	 *      var mc = new createjs.MovieClip({loop:-1, labels:{myLabel:20}});
 	 *      stage.addChild(mc);
 	 *
 	 *      var child1 = new createjs.Shape(
@@ -78,17 +78,18 @@ this.createjs = this.createjs||{};
 	 *
 	 * @class MovieClip
 	 * @main MovieClip
+	 * @param {Object} [props] The configuration properties to apply to this instance (ex. `{mode:MovieClip.SYNCHED}`).
+	 * Supported props for the MovieClip are listed below. These props are set on the corresponding instance properties except where
+	 * specified.<UL>
+	 *    <LI> `mode`</LI>
+	 *    <LI> `startPosition`</LI>
+	 *    <LI> `frameBounds`</LI>
+	 * </UL>
+	 * 
+	 * This object will also be passed into the Timeline instance associated with this MovieClip. See the documentation
+	 * for Timeline for a list of supported props (ex. `paused`, `labels`, `loop`, `reversed`, etc.)
 	 * @extends Container
 	 * @constructor
-	 * @param {String} [mode=independent] Initial value for the mode property. One of {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}},
-	 * {{#crossLink "MovieClip/SINGLE_FRAME:property"}}{{/crossLink}}, or {{#crossLink "MovieClip/SYNCHED:property"}}{{/crossLink}}.
-	 * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
-	 * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
-	 * property.
-	 * @param {Boolean} [loop=0] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
-	 * property. The default is `0`.
-	 * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
-	 * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
 	 **/
 	function MovieClip(props) {
 		this.Container_constructor();
@@ -97,7 +98,7 @@ this.createjs = this.createjs||{};
 		var mode, startPosition, loop, labels;
 		
 		// handle old params (tweens, labels, props):
-		// TODO: deprecated.
+		// TODO: deprecated param handling:
 		if (props instanceof String || arguments.length > 1) {
 			mode = props;
 			startPosition = arguments[1];
