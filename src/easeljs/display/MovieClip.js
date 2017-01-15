@@ -673,55 +673,61 @@ this.createjs = this.createjs||{};
 	}
 	
 	/**
-	 * @method priority
-	 * @private
+	 * @property priority
+	 * @type {Number}
+	 * @static
+	 * @readonly
 	 **/
 	MovieClipPlugin.priority = 100; // very high priority, should run first
+	
+	/**
+	 * @property ID
+	 * @type {String}
+	 * @static
+	 * @readonly
+	 **/
+	MovieClipPlugin.ID = "MovieClip";
 
 	/**
 	 * @method install
-	 * @private
+	 * @static
 	 **/
 	MovieClipPlugin.install = function() {
-		// TODO: update.
-		//createjs.Tween._installPlugin(MovieClipPlugin);
+		createjs.Tween._installPlugin(MovieClipPlugin);
 	};
 	
 	/**
 	 * @method init
 	 * @param {Tween} tween
 	 * @param {String} prop
-	 * @param {String|Number|Boolean} value
-	 * @private
+	 * @param {*} value
+	 * @static
 	 **/
 	MovieClipPlugin.init = function(tween, prop, value) {
-		// TODO: update.
-		return value;
+		if (prop === "startPosition" && tween.target instanceof MovieClip) { tween._addPlugin(MovieClipPlugin); }
 	};
 	
 	/**
 	 * @method step
-	 * @private
+	 * @param {Tween} tween
+	 * @param {TweenStep} step
+	 * @param {Object} props
+	 * @static
 	 **/
-	MovieClipPlugin.step = function() {
-		// unused.
-	};
+	MovieClipPlugin.step = function(tween, step, props) {};
 
 	/**
-	 * @method tween
+	 * @method change
 	 * @param {Tween} tween
-	 * @param {String} prop
-	 * @param {String | Number | Boolean} value
-	 * @param {Array} startValues
-	 * @param {Array} endValues
+	 * @param {TweenStep} step
+	 * @param {*} value
 	 * @param {Number} ratio
-	 * @param {Object} wait
 	 * @param {Object} end
 	 * @return {*}
+	 * @static
 	 */
-	MovieClipPlugin.tween = function(tween, prop, value, startValues, endValues, ratio, wait, end) {
-		if (!(tween.target instanceof MovieClip)) { return value; }
-		return (ratio == 1 ? endValues[prop] : startValues[prop]);
+	MovieClipPlugin.change = function(tween, step, prop, value, ratio, end) {
+		if (prop === "startPosition") { return (ratio === 1 ? step.props[prop] : step.prev.props[prop]); }
 	};
 
 }());
