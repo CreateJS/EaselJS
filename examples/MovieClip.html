@@ -13,9 +13,8 @@
 <header class="EaselJS">
 	<h1>MovieClip</h1>
 
-	<p>Demonstrates creating a <code>MovieClip</code> using JavaScript. Each
-		shape instance tweened, and then the tweens are
-		added to the <code>MovieClip.timeline</code>. The timeline can then be
+	<p>Demonstrates creating a <code>MovieClip</code> using JavaScript. A tween is created to animate each Shape instance
+		and is added to the <code>MovieClip.timeline</code>. The timeline can then be
 		controlled by JavaScript. Requires <code>TweenJS</code>.</p>
 </header>
 
@@ -36,26 +35,29 @@
 		createjs.Ticker.addEventListener("tick", stage);
 
 		// Create the MovieClip
-		var mc = new createjs.MovieClip(null, 0, true, {start: 0, middle: 40});
+		var mc = new createjs.MovieClip({loop:-1, labels: {start: 0, middle: 20}});
 		stage.addChild(mc);
 
 		// Create the States. Each state is just a circle shape.
-		var state1 = new createjs.Shape(
+		var greyCircle = new createjs.Shape(
 				new createjs.Graphics().beginFill("#999999")
-						.drawCircle(100, 200, 50));
-		var state2 = new createjs.Shape(
+						.drawCircle(110, 200, 50));
+						
+		var blueCircle = new createjs.Shape(
 				new createjs.Graphics().beginFill("#6699FF")
 						.drawCircle(100, 200, 50));
 
 		// Create a tween for each shape, animating from one side to the other.
 		mc.timeline.addTween(
-				createjs.Tween.get(state1)
+				createjs.Tween.get(greyCircle, {paused:true})
 						.to({x: 0}).to({x: 760}, 40).to({x: 0}, 40));
 		mc.timeline.addTween(
-				createjs.Tween.get(state2)
+				createjs.Tween.get(blueCircle, {paused:true})
 						.to({x: 760}).to({x: 0}, 40).to({x: 760}, 40));
+		
+		//mc.stop();
 
-		// Play the animation starting from the middle. See the MovieClip constructor above where the labels are specified.
+		// Play the animation starting when the circles are in the middle. See the MovieClip constructor above where the labels are specified.
 		mc.gotoAndPlay("middle");
 	}
 </script>
