@@ -111,7 +111,7 @@ this.createjs = this.createjs||{};
 			loop = props.loop;
 			labels = props.labels;
 		}
-		if (!props) { props = {}; }
+		if (!props) { props = {labels:labels}; }
 		
 		
 	// public properties:
@@ -156,7 +156,7 @@ this.createjs = this.createjs||{};
 		 * @type Boolean
 		 * @default false
 		 */
-		this.paused = props&&props.paused||false;
+		this.paused = props.paused||false;
 	
 		/**
 		 * If true, actions in this MovieClip's tweens will be run when the playhead advances.
@@ -186,7 +186,7 @@ this.createjs = this.createjs||{};
 		 * @type Array
 		 * @default null
 		 */
-		this.frameBounds = this.frameBounds||props.frameBounds; // TODO: Deprecated. This is for backwards support of Flash/Animate
+		this.frameBounds = this.frameBounds||props.frameBounds; // frameBounds are set on the prototype in Animate.
 		
 		/**
 		 * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
@@ -556,7 +556,7 @@ this.createjs = this.createjs||{};
 		this._rawPosition = rawPosition;
 		
 		var tl = this.timeline, synced = this.mode !== MovieClip.INDEPENDENT;
-		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline.
+		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline?
 		
 		var pos = synced ? this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset) : (rawPosition === -1 ? 0 : rawPosition);
 		
