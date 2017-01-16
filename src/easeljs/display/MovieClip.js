@@ -578,7 +578,7 @@ this.createjs = this.createjs||{};
 		
 		for (var n in this._managed) { this._managed[n] = 1; }
 
-		var tweens = tl._tweens;
+		var tweens = tl.tweens;
 		for (var i=0, l=tweens.length; i<l; i++) {
 			var tween = tweens[i],  target = tween.target;
 			if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. Likely a better approach.
