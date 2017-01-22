@@ -338,7 +338,7 @@ this.createjs = this.createjs||{};
 	 * @deprecated
 	 **/
 	p.getCurrentLabel = function() {
-		return this.timeline.getCurrentLabel();
+		return this.timeline.currentLabel;
 	};
 	
 	/**
@@ -426,7 +426,7 @@ this.createjs = this.createjs||{};
 	p.draw = function(ctx, ignoreCache) {
 		// draw to cache first:
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		if (this._rawPosition === -1) { this._updateTimeline(-1); } // updateTimeline has not been called previously.
+		if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) { this._updateTimeline(-1); }
 		this.Container_draw(ctx, ignoreCache);
 		return true;
 	};
@@ -473,18 +473,16 @@ this.createjs = this.createjs||{};
 	 * @method advance
 	*/
 	p.advance = function(time) {
-		// TODO: should we worry at all about clips who change their own modes via frame scripts?
 		var independent = MovieClip.INDEPENDENT;
-		if (this.mode !== independent) { return; }
+		if (this.mode !== independent) { return; } // update happens in draw for synched clips
 		
 		// if this MC doesn't have a framerate, hunt ancestors for one:
 		var o=this, fps = o.framerate;
-		while ((o = o.parent) && fps == null) { if (o.mode === independent) { fps = o._framerate; } }
+		while ((o = o.parent) && fps === null) { if (o.mode === independent) { fps = o._framerate; } }
 		this._framerate = fps;
 		
 		if (this.paused) { return; }
 		
-		// TODO: strict equality here?
 		// calculate how many frames to advance:
 		var t = (fps !== null && fps !== -1 && time !== null) ? time/(1000/fps) + this._t : 1;
 		var frames = t|0;
@@ -552,19 +550,15 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._updateTimeline = function(rawPosition, jump) {
+		var synced = this.mode !== MovieClip.INDEPENDENT, tl = this.timeline;
+		if (synced) { rawPosition = this.startPosition + (this.mode===MovieClip.SINGLE_FRAME?0:this._synchOffset); }
 		if (rawPosition < 0) { rawPosition = 0; }
-		if (this._rawPosition === rawPosition) { return; }
+		if (this._rawPosition === rawPosition && !synced) { return; }
 		this._rawPosition = rawPosition;
 		
-		var tl = this.timeline, synced = this.mode !== MovieClip.INDEPENDENT;
-		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline?
-		
-		var pos = synced ? this.startPosition + (this.mode==MovieClip.SINGLE_FRAME?0:this._synchOffset) : (rawPosition === -1 ? 0 : rawPosition);
-		
 		// update timeline position, ignoring actions if this is a graphic.
-		// TODO: better way to bind scope?
-		var _this = this;
-		tl.setPosition(pos, !this.actionsEnabled || synced, jump, function() { _this._resolveState(); });
+		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline?
+		tl.setPosition(rawPosition, synced || !this.actionsEnabled, jump, this._resolveState.bind(this));
 	};
 	
 	/**
@@ -596,7 +590,7 @@ this.createjs = this.createjs||{};
 		var kids = this.children;
 		for (i=kids.length-1; i>=0; i--) {
 			var id = kids[i].id;
-			if (this._managed[id] == 1) {
+			if (this._managed[id] === 1) {
 				this.removeChildAt(i);
 				delete(this._managed[id]);
 			}
