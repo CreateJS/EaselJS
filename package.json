@@ -38,6 +38,7 @@
     "dev": "cd node_modules/createjs && npm run dev",
     "build": "cd node_modules/createjs && npm run build",
     "build:next": "cd node_modules/createjs && npm run build:next",
+    "plugins": "cd node_modules/createjs && npm run plugins",
     "docs": "cd node_modules/createjs && npm run docs"
   },
   "dependencies": {
