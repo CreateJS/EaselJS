@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>EaselJS Example: Text</title>
+<meta charset="utf-8">
+<title>EaselJS Example: Text</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+<script src="../_assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
-	<!-- We also provide hosted minified versions of all CreateJS libraries.
-	  http://code.createjs.com -->
+<script src="../lib/easeljs-NEXT.combined.js"></script>
+<!-- We also provide hosted minified versions of all CreateJS libraries.
+  http://code.createjs.com -->
 
 <script id="editable">
 	var canvas;
@@ -19,6 +19,7 @@
 	var txt;
 	var shape;
 	var count = 0;
+	var count2 = 10;
 
 	function init() {
 		//find canvas and load images, wait for last image to load
@@ -51,9 +52,13 @@
 
 		// update the text:
 		txt.text = "text on the canvas... " + count + "!";
-
-		// draw a vector box of the appropriate width behind the text:
-		shape.graphics.clear().beginFill("#F00").drawRect(-10, -10, txt.getMeasuredWidth() + 20, 36 + 20);
+		// avoid executing every time
+		if (count === count2) {
+			console.log(count);
+			// draw a vector box of the appropriate width behind the text:
+			shape.graphics.clear().beginFill("#F00").drawRect(-10, -10, txt.getMeasuredWidth() + 20, 36 + 20);
+			count2 *= 10;
+		}
 
 		// update the stage:
 		stage.update(event);
