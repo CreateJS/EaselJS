@@ -52,9 +52,9 @@
 
 		// update the text:
 		txt.text = "text on the canvas... " + count + "!";
+
 		// avoid executing every time
 		if (count === count2) {
-			console.log(count);
 			// draw a vector box of the appropriate width behind the text:
 			shape.graphics.clear().beginFill("#F00").drawRect(-10, -10, txt.getMeasuredWidth() + 20, 36 + 20);
 			count2 *= 10;
