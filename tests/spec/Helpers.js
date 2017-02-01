@@ -1,26 +1,26 @@
-beforeEach(function (done) {
-	this.assetsBasePath = "_assets/art/";
+var customMatchers = {
+	toBeInRange: function(util, customEqualityTesters) {
+		return {
+			compare: function(actual, excpected, range) {
+				var result = {};
+				range = range || 0;
 
+				if (actual <= (excpected + range) && actual >= (excpected - range)) {
+					result.pass = true;
+				} else {
+					result.pass = false;
+				}
+				return result;
+			}
+		};
+	}
+};
+
+beforeAll(function(done) {
+	this.assetsBasePath = "_assets/art/";
 	this.sColor = "#000";
 	this.fColor = "#ff0000";
-
-	this.stage = new createjs.Stage(imagediff.createCanvas(200, 200));
-
-	jasmine.addMatchers(imagediff.jasmine);
-
-	var img = this.img = new Image();
-
-	img.onload = function () {
-		done();
-	};
-
-	img.onerror = function () {
-		fail(img.src + ' failed to load');
-		done();
-	};
-
-	img.src = this.assetsBasePath + "daisy.png";
-
+	
 	/**
 	 * Compare each drawing to a pre-saved base line image.
 	 * Need to has a small tolerance (100),
@@ -47,31 +47,32 @@ beforeEach(function (done) {
 			done();
 		};
 	};
-
+	
 	this.merge = function(dest, src) {
 		for (var n in src) {
 			dest[n] = src[n];
 		}
 		return dest;
 	}
+	
+	var img = this.img = new Image();
 
-	var customMatchers = {
-		toBeInRange: function(util, customEqualityTesters) {
-			return {
-				compare: function(actual, excpected, range) {
-					var result = {};
-					range = range || 0;
-
-					if (actual <= (excpected + range) && actual >= (excpected - range)) {
-						result.pass = true;
-					} else {
-						result.pass = false;
-					}
-					return result;
-				}
-			};
-		}
+	img.onload = function () {
+		done();
 	};
 
+	img.onerror = function () {
+		fail(img.src + ' failed to load');
+		done();
+	};
+	
+	img.src = "_assets/art/" + "daisy.png";
+}, 5000)
+
+beforeEach(function () {
+
+	this.stage = new createjs.Stage(imagediff.createCanvas(200, 200));
+
+	jasmine.addMatchers(imagediff.jasmine);
 	jasmine.addMatchers(customMatchers);
 });

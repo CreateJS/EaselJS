@@ -19,7 +19,8 @@ module.exports = function (grunt) {
 							'../_assets/libs/tweenjs-NEXT.min.js',
 							'../_assets/libs/preloadjs-NEXT.min.js'
 						],
-						host : 'http://127.0.0.1:<%=connect.phantom.options.port%>/'
+						host : 'http://127.0.0.1:<%=connect.phantom.options.port%>/',
+						styles: "styles.css"
 					}
 				}
 			},
@@ -48,7 +49,7 @@ module.exports = function (grunt) {
 							}
 						}, '..'],
 						useAvailablePort: true,
-						port: 8000,
+						port: 8000
 					}
 				}
 			},

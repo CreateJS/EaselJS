@@ -1,0 +1,7 @@
+.jasmine-stack-trace, .stack-trace { display: none; }
+.jasmine-description, .description { padding: 0.75em !important; }
+.jasmine-spec-detail, .spec-detail { margin: 0 0 1em 0 !important; }
+.jasmine-result-message, .result-message { margin: 0; padding: 0.5em !important; background: white; }
+li.jasmine-failed, li.failed { font-weight: bold; }
+li.jasmine-suite-detail, li.suite-detail { font-size: 1.5em; margin: 1.25em 0 0.25em 0; }
+body { background: #eee; }
