@@ -78,17 +78,16 @@ export default class MovieClip extends Container {
 // constructor:
 	/**
 	 * @constructor
-	 * @param {Object} props
-	 * @param {String} [mode=independent] Initial value for the mode property. One of {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}},
-	 * {{#crossLink "MovieClip/SINGLE_FRAME:property"}}{{/crossLink}}, or {{#crossLink "MovieClip/SYNCHED:property"}}{{/crossLink}}.
-	 * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
-	 * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
-	 * property.
-	 * @param {Number|Boolean} [loop=-1] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
-	 * property. The default is `0`.
-	 * @param {Boolean} [paused=false] Pause
-	 * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
-	 * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
+	 * @param {Object} [props] The configuration properties to apply to this instance (ex. `{mode:MovieClip.SYNCHED}`).
+   * Supported props for the MovieClip are listed below. These props are set on the corresponding instance properties except where
+   * specified.<UL>
+   *    <LI> `mode`</LI>
+   *    <LI> `startPosition`</LI>
+   *    <LI> `frameBounds`</LI>
+   * </UL>
+   *
+   * This object will also be passed into the Timeline instance associated with this MovieClip. See the documentation
+   * for Timeline for a list of supported props (ex. `paused`, `labels`, `loop`, `reversed`, etc.)
 	 */
 	constructor ({ mode = MovieClip.INDEPENDENT, startPosition = 0, loop = -1, paused = false, frameBounds = null, labels = null }) {
 		super();
@@ -192,7 +191,7 @@ export default class MovieClip extends Container {
 		 * @type Array
 		 * @default null
 		 */
-		this.frameBounds = this.frameBounds || null; // TODO: Deprecated. This is for backwards support of Flash/Animate
+		this.frameBounds = this.frameBounds || props.frameBounds; // frameBounds are set on the prototype in Animate.
 
 		/**
 		 * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
@@ -324,7 +323,7 @@ export default class MovieClip extends Container {
 	draw (ctx, ignoreCache) {
 		// draw to cache first:
 		if (this.drawCache(ctx, ignoreCache)) { return true; }
-    if (this._rawPosition === -1) { this._updateTimeline(-1); } // updateTimeline has not been called previously.
+    if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) { this._updateTimeline(-1); }
 		super.draw(ctx, ignoreCache);
 		return true;
 	}
@@ -371,18 +370,16 @@ export default class MovieClip extends Container {
 	 * @method advance
 	*/
 	advance (time) {
-		// TODO: should we worry at all about clips who change their own modes via frame scripts?
-		let independent = MovieClip.INDEPENDENT;
-		if (this.mode !== independent) { return; }
+		let INDEPENDENT = MovieClip.INDEPENDENT;
+		if (this.mode !== INDEPENDENT) { return; } // update happens in draw for synched clips
 		// if this MC doesn't have a framerate, hunt ancestors for one:
 		let o = this, fps = o.framerate;
-		while ((o = o.parent) && fps == null) {
-			if (o.mode === independent) { fps = o._framerate; }
+		while ((o = o.parent) && fps === null) {
+			if (o.mode === INDEPENDENT) { fps = o._framerate; }
 		}
 		this._framerate = fps;
 
 		if (this.paused) { return; }
-		// TODO: strict equality here?
 		// calculate how many frames to advance:
 		let t = (fps !== null && fps !== -1 && time !== null) ? time / (1000 / fps) + this._t : 1;
 		let frames = t | 0;
@@ -443,15 +440,15 @@ export default class MovieClip extends Container {
 	 * @protected
 	 */
 	_updateTimeline (rawPosition, jump) {
+		let synced = this.mode !== MovieClip.INDEPENDENT, tl = this.timeline;
+		if (synced) { rawPosition = this.startPosition + (this.mode === MovieClip.SINGLE_FRAME ? 0 : this._synchOffset); }
 		if (rawPosition < 1) { rawPosition = 0; }
-		if (this._rawPosition === rawPosition) { return; }
+		if (this._rawPosition === rawPosition && !synced) { return; }
 		this._rawPosition = rawPosition;
 
-		let tl = this.timeline, synced = this.mode !== MovieClip.INDEPENDENT;
-		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline.
-		let pos = synced ? this.startPosition + (this.mode === MovieClip.SINGLE_FRAME ? 0 : this._synchOffset) : (rawPosition === -1 ? 0 : rawPosition);
-
-		tl.setPosition(pos, !this.actionsEnabled || synced, jump, () => this._resolveState());
+		// update timeline position, ignoring actions if this is a graphic.
+		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline?
+		tl.setPosition(rawPosition, synced || !this.actionsEnabled, jump, this._resolveState.bind(this));
 	}
 
 	/**
@@ -465,9 +462,9 @@ export default class MovieClip extends Container {
 
 		for (let n in this._managed) { this._managed[n] = 1; }
 
-		let tweens = tl._tweens;
-		for (let tween of tl._tweens) {
-			let target = tween._target;
+		let tweens = tl.tweens;
+		for (let tween of tweens) {
+			let target = tween.target;
 			if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. Likely a better approach.
 			let offset = tween._stepPosition;
 

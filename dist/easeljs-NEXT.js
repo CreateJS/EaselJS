@@ -27,105 +27,6 @@
  */
 (function(exports) {
   "use strict";
-  var asyncGenerator = function() {
-    function AwaitValue(value) {
-      this.value = value
-    }
-
-    function AsyncGenerator(gen) {
-      var front, back;
-
-      function send(key, arg) {
-        return new Promise(function(resolve, reject) {
-          var request = {
-            key: key,
-            arg: arg,
-            resolve: resolve,
-            reject: reject,
-            next: null
-          };
-          if (back) {
-            back = back.next = request
-          } else {
-            front = back = request;
-            resume(key, arg)
-          }
-        })
-      }
-
-      function resume(key, arg) {
-        try {
-          var result = gen[key](arg);
-          var value = result.value;
-          if (value instanceof AwaitValue) {
-            Promise.resolve(value.value).then(function(arg) {
-              resume("next", arg)
-            }, function(arg) {
-              resume("throw", arg)
-            })
-          } else {
-            settle(result.done ? "return" : "normal", result.value)
-          }
-        } catch (err) {
-          settle("throw", err)
-        }
-      }
-
-      function settle(type, value) {
-        switch (type) {
-          case "return":
-            front.resolve({
-              value: value,
-              done: true
-            });
-            break;
-          case "throw":
-            front.reject(value);
-            break;
-          default:
-            front.resolve({
-              value: value,
-              done: false
-            });
-            break
-        }
-        front = front.next;
-        if (front) {
-          resume(front.key, front.arg)
-        } else {
-          back = null
-        }
-      }
-      this._invoke = send;
-      if (typeof gen.return !== "function") {
-        this.return = undefined
-      }
-    }
-    if (typeof Symbol === "function" && Symbol.asyncIterator) {
-      AsyncGenerator.prototype[Symbol.asyncIterator] = function() {
-        return this
-      }
-    }
-    AsyncGenerator.prototype.next = function(arg) {
-      return this._invoke("next", arg)
-    };
-    AsyncGenerator.prototype.throw = function(arg) {
-      return this._invoke("throw", arg)
-    };
-    AsyncGenerator.prototype.return = function(arg) {
-      return this._invoke("return", arg)
-    };
-    return {
-      wrap: function(fn) {
-        return function() {
-          return new AsyncGenerator(fn.apply(this, arguments))
-        }
-      },
-      await: function(value) {
-        return new AwaitValue(value)
-      }
-    }
-  }();
   var classCallCheck = function(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function")
@@ -407,6 +308,55 @@
     };
     return Event
   }();
+  /**
+   * EventDispatcher provides methods for managing queues of event listeners and dispatching events.
+   *
+   * You can either extend EventDispatcher or mix its methods into an existing prototype or instance by using the
+   * EventDispatcher {{#crossLink "EventDispatcher/initialize"}}{{/crossLink}} method.
+   *
+   * Together with the CreateJS Event class, EventDispatcher provides an extended event model that is based on the
+   * DOM Level 2 event model, including addEventListener, removeEventListener, and dispatchEvent. It supports
+   * bubbling / capture, preventDefault, stopPropagation, stopImmediatePropagation, and handleEvent.
+   *
+   * EventDispatcher also exposes a {{#crossLink "EventDispatcher/on"}}{{/crossLink}} method, which makes it easier
+   * to create scoped listeners, listeners that only run once, and listeners with associated arbitrary data. The
+   * {{#crossLink "EventDispatcher/off"}}{{/crossLink}} method is merely an alias to
+   * {{#crossLink "EventDispatcher/removeEventListener"}}{{/crossLink}}.
+   *
+   * Another addition to the DOM Level 2 model is the {{#crossLink "EventDispatcher/removeAllEventListeners"}}{{/crossLink}}
+   * method, which can be used to listeners for all events, or listeners for a specific event. The Event object also
+   * includes a {{#crossLink "Event/remove"}}{{/crossLink}} method which removes the active listener.
+   *
+   * <h4>Example</h4>
+   * Add EventDispatcher capabilities to the "MyClass" class.
+   *
+   *      EventDispatcher.initialize(MyClass.prototype);
+   *
+   * Add an event (see {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}}).
+   *
+   *      instance.addEventListener("eventName", handlerMethod);
+   *      function handlerMethod(event) {
+   *          console.log(event.target + " Was Clicked");
+   *      }
+   *
+   * <b>Maintaining proper scope</b><br />
+   * Scope (ie. "this") can be be a challenge with events. Using the {{#crossLink "EventDispatcher/on"}}{{/crossLink}}
+   * method to subscribe to events simplifies this.
+   *
+   *      instance.addEventListener("click", function(event) {
+   *          console.log(instance == this); // false, scope is ambiguous.
+   *      });
+   *
+   *      instance.on("click", function(event) {
+   *          console.log(instance == this); // true, "on" uses dispatcher scope by default.
+   *      });
+   *
+   * If you want to use addEventListener instead, you may want to use function.bind() or a similar proxy to manage scope.
+   *
+   *
+   * @class EventDispatcher
+   * @module CreateJS
+   */
   var EventDispatcher = function() {
     // static methods:
     /**
@@ -753,6 +703,28 @@
     };
     return EventDispatcher
   }();
+  /**
+   * The Ticker provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe to the tick
+   * event to be notified when a set time interval has elapsed.
+   *
+   * Note that the interval that the tick event is called is a target interval, and may be broadcast at a slower interval
+   * when under high CPU load. The Ticker class uses a static interface (ex. `Ticker.framerate = 30;`) and
+   * can not be instantiated.
+   *
+   * <h4>Example</h4>
+   *
+   *      createjs.Ticker.addEventListener("tick", handleTick);
+   *      function handleTick(event) {
+   *          // Actions carried out each tick (aka frame)
+   *          if (!event.paused) {
+   *              // Actions carried out when the Ticker is not paused.
+   *          }
+   *      }
+   *
+   * @class TickerAPI
+   * @extends EventDispatcher
+   * @module CreateJS
+   */
   var TickerAPI = function(_EventDispatcher) {
     inherits(TickerAPI, _EventDispatcher);
     // constructor:
@@ -1342,6 +1314,19 @@
   /**
    * @module EaselJS
    */
+  /**
+   * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrices.
+   *
+   * This matrix can be visualized as:
+   *
+   * 	[ a  c  tx
+   * 	  b  d  ty
+   * 	  0  0  1  ]
+   *
+   * Note the locations of b and c.
+   *
+   * @class Matrix2D
+   */
   var Matrix2D = function() {
     // constructor:
     /**
@@ -1747,30 +1732,16 @@
       return "[" + this.constructor.name + " (a=" + this.a + " b=" + this.b + " c=" + this.c + " d=" + this.d + " tx=" + this.tx + " ty=" + this.ty + ")]"
     };
     return Matrix2D
-  }();
-  // constants:
-  /**
-   * Multiplier for converting degrees to radians. Used internally by Matrix2D.
-   * @property DEG_TO_RAD
-   * @static
-   * @final
-   * @type Number
-   * @readonly
-   */
-  // static public properties:
-  /**
-   * An identity matrix, representing a null transformation.
-   * @property identity
-   * @static
-   * @type Matrix2D
-   * @readonly
-   */
-  {
+  }(); {
     Matrix2D.DEG_TO_RAD = Math.PI / 180;
     Matrix2D.identity = new Matrix2D
   }
   /**
    * @module EaselJS
+   */
+  /**
+   * Used for calculating and encapsulating display related properties.
+   * @class DisplayProps
    */
   var DisplayProps = function() {
     // constructor:
@@ -2210,6 +2181,30 @@
     };
     return Filter
   }();
+  /**
+   * The BitmapCache is an internal representation of all the cache properties and logic required in order to "cache"
+   * an object. This information and functionality used to be located on a {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
+   * method in {{#crossLink "DisplayObject"}}{{/crossLink}}, but was moved to its own class.
+   *
+   * Caching in this context is purely visual, and will render the DisplayObject out into an image to be used instead
+   * of the object. The actual cache itself is still stored on the target with the {{#crossLink "DisplayObject/cacheCanvas:property"}}{{/crossLink}}.
+   *
+   * Working with a singular image like a {{#crossLink "Bitmap"}}{{/crossLink}}, there is little benefit to performing
+   * a cache operation, as it is already a single image. Caching is best done on containers that have multiple complex
+   * parts that do not change often, so that rendering the image will improve overall rendering speed. A cached object
+   * will not visually update until explicitly told to do so with a call to {{#crossLink "Stage/update"}}{{/crossLink}},
+   * much like a Stage. If a cache is being updated every frame, it is likely not improving rendering performance.
+   * Caches are best used when updates will be sparse.
+   *
+   * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need.
+   * The BitmapCache is also responsible for applying filters to objects, and reads each {{#crossLink "Filter"}}{{/crossLink}}.
+   * Real-time Filters are not recommended when dealing with a Context2D canvas if performance is a concern. For best
+   * performance and to still allow for some visual effects, use a {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}}
+   * when possible.
+   *
+   * @class BitmapCache
+   * @module EaselJS
+   */
   var BitmapCache = function(_Filter) {
     inherits(BitmapCache, _Filter);
     // constructor:
@@ -2618,48 +2613,14 @@
     return BitmapCache
   }(Filter);
   /**
-   * Functionality injected to {{#crossLink "BitmapCache"}}{{/crossLink}}. Ensure StageGL is loaded after all other
-   * standard EaselJS classes are loaded but before making any DisplayObject instances for injection to take full effect.
-   * Replaces the context2D cache draw with the option for WebGL or context2D drawing.
-   * If options is set to "true" a StageGL is created and contained on the object for use when rendering a cache.
-   * If options is a StageGL instance it will not create an instance but use the one provided.
-   * If possible it is best to provide the StageGL instance that is a parent to this DisplayObject for performance reasons.
-   * A StageGL cache does not infer the ability to draw objects a StageGL cannot currently draw,
-   * i.e. do not use a WebGL context cache when caching a Shape, Text, etc.
-   * <h4>Example</h4>
-   * Using WebGL cache with a 2d context
-   *
-   *     var stage = new createjs.Stage();
-   *     var bmp = new createjs.Bitmap(src);
-   *     bmp.cache(0, 0, bmp.width, bmp.height, 1, true);          // no StageGL to use, so make one
-   *     var shape = new createjs.Shape();
-   *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
-   *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
-   *
-   * <h4>Example</h4>
-   * Using WebGL cache with a WebGL context:
-   *
-   *     var stageGL = new createjs.StageGL();
-   *     var bmp = new createjs.Bitmap(src);
-   *     bmp.cache(0, 0, bmp.width, bmp.height, 1, stageGL);       // use our StageGL to cache
-   *     var shape = new createjs.Shape();
-   *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
-   *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
-   *
-   * You can make your own StageGL and have it render to a canvas if you set ".isCacheControlled" to true on your stage.
-   * You may wish to create your own StageGL instance to control factors like background color/transparency, AA, and etc.
-   * You must set "options" to its own stage if you wish to use the fast Render Textures available only to StageGLs.
-   * If you use WebGL cache on a container with Shapes you will have to cache each shape individually before the container,
-   * otherwise the WebGL cache will not render the shapes.
-   * @method cache
-   * @param {Number} x The x coordinate origin for the cache region.
-   * @param {Number} y The y coordinate origin for the cache region.
-   * @param {Number} width The width of the cache region.
-   * @param {Number} height The height of the cache region.
-   * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
-   * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
-   * 	cached elements with greater fidelity. Default is 1.
-   * @param {Boolean|StageGL} [options] Select whether to use context 2D, or WebGL rendering, and whether to make a new stage instance or use an existing one.
+   * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
+   * {{#crossLink "Container"}}{{/crossLink}}, {{#crossLink "Bitmap"}}{{/crossLink}}, and {{#crossLink "Shape"}}{{/crossLink}}.
+   * DisplayObject is the base class for all display classes in the EaselJS library. It defines the core properties and
+   * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
+   * caching, and mouse handlers.
+   * @class DisplayObject
+   * @extends EventDispatcher
+   * @module EaselJS
    */
   var DisplayObject = function(_EventDispatcher) {
     inherits(DisplayObject, _EventDispatcher);
@@ -3681,45 +3642,8 @@
       }
     }]);
     return DisplayObject
-  }(EventDispatcher);
-  // static properties:
-  /**
-   * Listing of mouse event names. Used in _hasMouseEventListener.
-   * @property _MOUSE_EVENTS
-   * @protected
-   * @static
-   * @type {Array}
-   * @readonly
-   */
-  /**
-   * Suppresses errors generated when using features like hitTest, mouse events, and {{#crossLink "getObjectsUnderPoint"}}{{/crossLink}}
-   * with cross domain content.
-   * @property suppressCrossDomainErrors
-   * @static
-   * @type {Boolean}
-   * @default false
-   */
-  /**
-   * @property _snapToPixelEnabled
-   * @protected
-   * @static
-   * @type {Boolean}
-   * @default false
-   */
-  /**
-   * @property _hitTestCanvas
-   * @type {HTMLCanvasElement | Object}
-   * @static
-   * @protected
-   */
-  /**
-   * @property _hitTestContext
-   * @type {CanvasRenderingContext2D}
-   * @static
-   * @protected
-   */
-  {
-    var canvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas"); // prevent errors on load in browsers without canvas.
+  }(EventDispatcher); {
+    var canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas"); // prevent errors on load in browsers without canvas.
     if (canvas.getContext) {
       DisplayObject._hitTestCanvas = canvas;
       DisplayObject._hitTestContext = canvas.getContext("2d");
@@ -3835,6 +3759,27 @@
    * @param {Array} params An array containing any arguments that were passed to the Stage.update() method. For
    *      example if you called stage.update("hello"), then the params would be ["hello"].
    * @since 0.6.0
+   */
+  /**
+   * A Container is a nestable display list that allows you to work with compound display elements. For  example you could
+   * group arm, leg, torso and head {{#crossLink "Bitmap"}}{{/crossLink}} instances together into a Person Container, and
+   * transform them as a group, while still being able to move the individual parts relative to each other. Children of
+   * containers have their <code>transform</code> and <code>alpha</code> properties concatenated with their parent
+   * Container.
+   *
+   * For example, a {{#crossLink "Shape"}}{{/crossLink}} with x=100 and alpha=0.5, placed in a Container with <code>x=50</code>
+   * and <code>alpha=0.7</code> will be rendered to the canvas at <code>x=150</code> and <code>alpha=0.35</code>.
+   * Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
+   *
+   * <h4>Example</h4>
+   *
+   *      var container = new createjs.Container();
+   *      container.addChild(bitmapInstance, shapeInstance);
+   *      container.x = 100;
+   *
+   * @class Container
+   * @extends DisplayObject
+   * @module EaselJS
    */
   var Container = function(_DisplayObject) {
     inherits(Container, _DisplayObject);
@@ -3957,29 +3902,17 @@
         }
         return child
       }
-      if (child.parent) {
-        child.parent.removeChild(child)
-      }
+      // Note: a lot of duplication with addChildAt, but push is WAY faster than splice.
+      var parent = child.parent,
+        silent = parent === this;
+      parent && parent._removeChildAt(parent.children.indexOf(child), silent);
       child.parent = this;
       this.children.push(child);
-      child.dispatchEvent("added");
+      if (!silent) {
+        child.dispatchEvent("added")
+      }
       return child
     };
-    /*
-     TODO-ES6: Perf test rest param loops vs arguments.
-     addChild (...children) {
-     	const l = children.length;
-     	if (l === 0) { return null; }
-     	let child;
-     	for (let i = 0; i < l; i++) {
-     		child = children[0];
-     		if (child.parent) { child.parent.removeChild(child); }
-     		child.parent = this;
-     		this.children.push(child);
-     		child.dispatchEvent("added");
-     	}
-     	return child;
-     }*/
     /**
      * Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and
      * setting its parent to this Container.
@@ -4008,8 +3941,11 @@
       for (var _len2 = arguments.length, children = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
         children[_key2] = arguments[_key2]
       }
-      var index = children.pop();
       var l = children.length;
+      if (l === 0) {
+        return null
+      }
+      var index = children.pop();
       if (index < 0 || index > this.children.length) {
         return children[l - 2]
       }
@@ -4020,30 +3956,16 @@
         return children[l - 2]
       }
       var child = children[0];
-      if (child.parent) {
-        child.parent.removeChild(child)
-      }
+      var parent = child.parent,
+        silent = parent === this;
+      parent && parent._removeChildAt(parent.children.indexOf(child), silent);
       child.parent = this;
       this.children.splice(index++, 0, child);
-      child.dispatchEvent("added");
+      if (!silent) {
+        child.dispatchEvent("added")
+      }
       return child
     };
-    /*
-     addChildAt (...children) {
-     	let index = children.pop();
-     	const l = children.length;
-     	if (index < 0 || index > this.children.length) { return children[l-2]; }
-     	let child;
-     	for (let i = 0; i < l; i++) {
-     		child = children[i];
-     		if (child.parent) { child.parent.removeChild(child); }
-     		child.parent = this;
-     		this.children.splice(index++, 0, child);
-     		child.dispatchEvent("added");
-     	}
-     	return child;
-     }
-     */
     /**
      * Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is
      * already known.
@@ -4066,6 +3988,9 @@
         children[_key3] = arguments[_key3]
       }
       var l = children.length;
+      if (l === 0) {
+        return true
+      }
       if (l > 1) {
         var good = true;
         for (var i = 0; i < l; i++) {
@@ -4073,19 +3998,8 @@
         }
         return good
       }
-      return this.removeChildAt(this.children.indexOf(children[0]))
+      return this._removeChildAt(this.children.indexOf(children[0]))
     };
-    /*
-     removeChild(...children) {
-     const l = children.length;
-     let good = true;
-     let child;
-     for (let i = 0; i < l; i++) {
-     	good = good && this.removeChildAt(this.children.indexOf(children[i]));
-     }
-     return good;
-     }
-     */
     /**
      * Removes the child at the specified index from the display list, and sets its parent to null.
      *
@@ -4099,7 +4013,7 @@
      *
      * Returns true if the child (or children) was removed, or false if any index was out of range.
      * @method removeChildAt
-     * @param {...Number} index The index of the child to remove.
+     * @param {...Number} indexes The indexes of children to remove.
      * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
      */
     Container.prototype.removeChildAt = function removeChildAt() {
@@ -4107,47 +4021,21 @@
         indexes[_key4] = arguments[_key4]
       }
       var l = indexes.length;
+      if (l === 0) {
+        return true
+      }
       if (l > 1) {
         indexes.sort(function(a, b) {
           return b - a
         });
         var good = true;
         for (var i = 0; i < l; i++) {
-          good = good && this.removeChildAt(indexes[i])
+          good = good && this._removeChildAt(indexes[i])
         }
         return good
       }
-      var index = indexes[0];
-      if (index < 0 || index > this.children.length - 1) {
-        return false
-      }
-      var child = this.children[index];
-      if (child) {
-        child.parent = null
-      }
-      this.children.splice(index, 1);
-      child.dispatchEvent("removed");
-      return true
+      return this._removeChildAt(indexes[0])
     };
-    /*
-     removeChildAt (...indexes) {
-     	const l = indexes.length;
-     	if (l > 1) { indexes.sort((a, b) => b - a); }
-     	let good = true;
-     	for (let i = 0; i < l; i++) {
-     		let index = indexes[0];
-     		if (index < 0 || index > this.children.length - 1) {
-     			good = false;
-     			continue;
-     		}
-     		let child = this.children[index];
-     		if (child) { child.parent = null; }
-     		this.children.splice(index, 1);
-     		child.dispatchEvent("removed");
-     	}
-     	return good;
-     }
-     */
     /**
      * Removes all children from the display list.
      *
@@ -4160,7 +4048,7 @@
     Container.prototype.removeAllChildren = function removeAllChildren() {
       var kids = this.children;
       while (kids.length) {
-        this.removeChildAt(0)
+        this._removeChildAt(0)
       }
     };
     /**
@@ -4435,6 +4323,30 @@
       }
     };
     /**
+     * Removes the child at the specified index from the display list, and sets its parent to null.
+     * Used by `removeChildAt`, `addChild`, and `addChildAt`.
+     * @method removeChildAt
+     * @protected
+     * @param {Number} index The index of the child to remove.
+     * @param {Boolean} [silent] Prevents dispatch of `removed` event if true.
+     * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
+     **/
+    Container.prototype._removeChildAt = function _removeChildAt(index) {
+      var silent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      if (index < 0 || index > this.children.length - 1) {
+        return false
+      }
+      var child = this.children[index];
+      if (child) {
+        child.parent = null
+      }
+      this.children.splice(index, 1);
+      if (!silent) {
+        child.dispatchEvent("removed")
+      }
+      return true
+    };
+    /**
      * @method _getObjectsUnderPoint
      * @param {Number} x
      * @param {Number} y
@@ -4569,6 +4481,13 @@
     }]);
     return Container
   }(DisplayObject);
+  /**
+   * Passed as the parameter to all mouse/pointer/touch related events. For a listing of mouse events and their properties,
+   * see the {{#crossLink "DisplayObject"}}{{/crossLink}} and {{#crossLink "Stage"}}{{/crossLink}} event listings.
+   * @class MouseEvent
+   * @extends Event
+   * @module EaselJS
+   */
   var MouseEvent = function(_Event) {
     inherits(MouseEvent, _Event);
     // constructor:
@@ -4693,6 +4612,27 @@
     }]);
     return MouseEvent
   }(Event);
+  /**
+   * A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
+   * method is called, it will render its display list to its target canvas.
+   *
+   * <h4>Example</h4>
+   * This example creates a stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
+   * and redraw the stage using {{#crossLink "Stage/update"}}{{/crossLink}}.
+   *
+   *      var stage = new createjs.Stage("canvasElementId");
+   *      var image = new createjs.Bitmap("imagePath.png");
+   *      stage.addChild(image);
+   *      createjs.Ticker.addEventListener("tick", handleTick);
+   *      function handleTick(event) {
+   *          image.x += 10;
+   *          stage.update();
+   *      }
+   *
+   * @class Stage
+   * @extends Container
+   * @module EaselJS
+   */
   var Stage = function(_Container) {
     inherits(Stage, _Container);
     // constructor:
@@ -5456,63 +5396,6 @@
     }]);
     return Stage
   }(Container);
-  // events:
-  /**
-   * Dispatched when the user moves the mouse over the canvas.
-   * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-   * @event stagemousemove
-   * @since 0.6.0
-   */
-  /**
-   * Dispatched when the user presses their left mouse button on the canvas. See the {{#crossLink "MouseEvent"}}{{/crossLink}}
-   * class for a listing of event properties.
-   * @event stagemousedown
-   * @since 0.6.0
-   */
-  /**
-   * Dispatched when the user the user presses somewhere on the stage, then releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
-   * You can use {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}} to check whether the mouse is currently within the stage bounds.
-   * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-   * @event stagemouseup
-   * @since 0.6.0
-   */
-  /**
-   * Dispatched when the mouse moves from within the canvas area (mouseInBounds === true) to outside it (mouseInBounds === false).
-   * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
-   * class for a listing of event properties.
-   * @event mouseleave
-   * @since 0.7.0
-   */
-  /**
-   * Dispatched when the mouse moves into the canvas area (mouseInBounds === false) from outside it (mouseInBounds === true).
-   * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
-   * class for a listing of event properties.
-   * @event mouseenter
-   * @since 0.7.0
-   */
-  /**
-   * Dispatched each update immediately before the tick event is propagated through the display list.
-   * You can call preventDefault on the event object to cancel propagating the tick event.
-   * @event tickstart
-   * @since 0.7.0
-   */
-  /**
-   * Dispatched each update immediately after the tick event is propagated through the display list. Does not fire if
-   * tickOnUpdate is false. Precedes the "drawstart" event.
-   * @event tickend
-   * @since 0.7.0
-   */
-  /**
-   * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
-   * You can call preventDefault on the event object to cancel the draw.
-   * @event drawstart
-   * @since 0.7.0
-   */
-  /**
-   * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
-   * @event drawend
-   * @since 0.7.0
-   */
   /**
    * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL-optimized display list,
    * which is used in place of the usual {{#crossLink "Stage"}}{{/crossLink}}. This class should behave identically to
@@ -7468,6 +7351,31 @@
    * restored.
    * @event drawend
    */
+  /**
+   * A Bitmap represents an Image, Canvas, or Video in the display list. A Bitmap can be instantiated using an existing
+   * HTML element, or a string.
+   *
+   * <h4>Example</h4>
+   *
+   *      var bitmap = new createjs.Bitmap("imagePath.jpg");
+   *
+   * <strong>Notes:</strong>
+   * <ol>
+   *     <li>When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
+   *      will be displayed.</li>
+   *     <li>Bitmaps with an SVG source currently will not respect an alpha value other than 0 or 1. To get around this,
+   *     the Bitmap can be cached.</li>
+   *     <li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
+   *     happens in all browsers except recent Firefox builds.</li>
+   *     <li>Images loaded cross-origin will throw cross-origin security errors when interacted with using a mouse, using
+   *     methods such as `getObjectUnderPoint`, or using filters, or caching. You can get around this by setting
+   *     `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`</li>
+   * </ol>
+   *
+   * @class Bitmap
+   * @extends DisplayObject
+   * @module EaselJS
+   */
   var Bitmap = function(_DisplayObject) {
     inherits(Bitmap, _DisplayObject);
     // constructor:
@@ -7631,6 +7539,26 @@
     };
     return Bitmap
   }(DisplayObject);
+  /**
+   * Displays a frame or sequence of frames (ie. an animation) from a SpriteSheet instance. A sprite sheet is a series of
+   * images (usually animation frames) combined into a single image. For example, an animation consisting of 8 100x100
+   * images could be combined into a 400x200 sprite sheet (4 frames across by 2 high). You can display individual frames,
+   * play frames as an animation, and even sequence animations together.
+   *
+   * See the {{#crossLink "SpriteSheet"}}{{/crossLink}} class for more information on setting up frames and animations.
+   *
+   * <h4>Example</h4>
+   *
+   *      var instance = new createjs.Sprite(spriteSheet);
+   *      instance.gotoAndStop("frameName");
+   *
+   * Until {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} or {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}} is called,
+   * only the first defined frame defined in the sprite sheet will be displayed.
+   *
+   * @class Sprite
+   * @extends DisplayObject
+   * @module EaselJS
+   */
   var Sprite = function(_DisplayObject) {
     inherits(Sprite, _DisplayObject);
     // constructor:
@@ -8008,23 +7936,7 @@
     };
     return Sprite
   }(DisplayObject);
-  // events:
-  /**
-   * Dispatched when an animation reaches its ends.
-   * @event animationend
-   * @param {Object} target The object that dispatched the event.
-   * @param {String} type The event type.
-   * @param {String} name The name of the animation that just ended.
-   * @param {String} next The name of the next animation that will be played, or null. This will be the same as name if the animation is looping.
-   * @since 0.6.0
-   */
-  /**
-   * Dispatched any time the current frame changes. For example, this could be due to automatic advancement on a tick,
-   * or calling gotoAndPlay() or gotoAndStop().
-   * @event change
-   * @param {Object} target The object that dispatched the event.
-   * @param {String} type The event type.
-   */
+  // ES6 does not support static properties, this is a work around.
   var _maxPoolSize = 100;
   var _spritePool = [];
   /**
@@ -8345,6 +8257,37 @@
     }]);
     return BitmapText
   }(Container);
+  /**
+   * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>
+   *
+   * A DOMElement allows you to associate a HTMLElement with the display list. It will be transformed
+   * within the DOM as though it is child of the {{#crossLink "Container"}}{{/crossLink}} it is added to. However, it is
+   * not rendered to canvas, and as such will retain whatever z-index it has relative to the canvas (ie. it will be
+   * drawn in front of or behind the canvas).
+   *
+   * The position of a DOMElement is relative to their parent node in the DOM. It is recommended that
+   * the DOM Object be added to a div that also contains the canvas so that they share the same position
+   * on the page.
+   *
+   * DOMElement is useful for positioning HTML elements over top of canvas content, and for elements
+   * that you want to display outside the bounds of the canvas. For example, a tooltip with rich HTML
+   * content.
+   *
+   * <h4>Mouse Interaction</h4>
+   *
+   * DOMElement instances are not full EaselJS display objects, and do not participate in EaselJS mouse
+   * events or support methods like hitTest. To get mouse events from a DOMElement, you must instead add handlers to
+   * the htmlElement (note, this does not support EventDispatcher)
+   *
+   *      var domElement = new createjs.DOMElement(htmlElement);
+   *      domElement.htmlElement.onclick = function() {
+   *          console.log("clicked");
+   *      }
+   *
+   * @class DOMElement
+   * @extends DisplayObject
+   * @module EaselJS
+   */
   var DOMElement = function(_DisplayObject) {
     inherits(DOMElement, _DisplayObject);
     // constructor:
@@ -8498,30 +8441,6 @@
     };
     return DOMElement
   }(DisplayObject);
-  /**
-   * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
-   * are not full EaselJS display objects and do not participate in EaselJS mouse events.
-   * @event click
-   */
-  /**
-   * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
-   * are not full EaselJS display objects and do not participate in EaselJS mouse events.
-   * @event dblClick
-   */
-  /**
-   * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
-   * are not full EaselJS display objects and do not participate in EaselJS mouse events.
-   * @event mousedown
-   */
-  /**
-   * The HTMLElement can listen for the mouseover event, not the DOMElement instance.
-   * Since DOMElement instances are not full EaselJS display objects and do not participate in EaselJS mouse events.
-   * @event mouseover
-   */
-  /**
-   * Not applicable to DOMElement.
-   * @event tick
-   */
   /**
    * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a
    * specified context. Note that you can use Graphics without any dependency on the EaselJS framework by calling {{#crossLink "Graphics/draw"}}{{/crossLink}}
@@ -9955,14 +9874,6 @@
     }]);
     return Graphics
   }();
-  // Command Objects:
-  /**
-   * @namespace Graphics
-   */
-  /**
-   * Graphics command object. See {{#crossLink "Graphics/lineTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-   * @class LineTo
-   */
   var LineTo = function() {
     /**
      * @constructor
@@ -11020,7 +10931,7 @@
    * @type {CanvasRenderingContext2D}
    */
   {
-    var canvas$1 = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+    var canvas$1 = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
     if (canvas$1.getContext) {
       Graphics._ctx = canvas$1.getContext("2d");
       canvas$1.width = canvas$1.height = 1
@@ -11299,6 +11210,55 @@
     };
     return Event
   }();
+  /**
+   * EventDispatcher provides methods for managing queues of event listeners and dispatching events.
+   *
+   * You can either extend EventDispatcher or mix its methods into an existing prototype or instance by using the
+   * EventDispatcher {{#crossLink "EventDispatcher/initialize"}}{{/crossLink}} method.
+   *
+   * Together with the CreateJS Event class, EventDispatcher provides an extended event model that is based on the
+   * DOM Level 2 event model, including addEventListener, removeEventListener, and dispatchEvent. It supports
+   * bubbling / capture, preventDefault, stopPropagation, stopImmediatePropagation, and handleEvent.
+   *
+   * EventDispatcher also exposes a {{#crossLink "EventDispatcher/on"}}{{/crossLink}} method, which makes it easier
+   * to create scoped listeners, listeners that only run once, and listeners with associated arbitrary data. The
+   * {{#crossLink "EventDispatcher/off"}}{{/crossLink}} method is merely an alias to
+   * {{#crossLink "EventDispatcher/removeEventListener"}}{{/crossLink}}.
+   *
+   * Another addition to the DOM Level 2 model is the {{#crossLink "EventDispatcher/removeAllEventListeners"}}{{/crossLink}}
+   * method, which can be used to listeners for all events, or listeners for a specific event. The Event object also
+   * includes a {{#crossLink "Event/remove"}}{{/crossLink}} method which removes the active listener.
+   *
+   * <h4>Example</h4>
+   * Add EventDispatcher capabilities to the "MyClass" class.
+   *
+   *      EventDispatcher.initialize(MyClass.prototype);
+   *
+   * Add an event (see {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}}).
+   *
+   *      instance.addEventListener("eventName", handlerMethod);
+   *      function handlerMethod(event) {
+   *          console.log(event.target + " Was Clicked");
+   *      }
+   *
+   * <b>Maintaining proper scope</b><br />
+   * Scope (ie. "this") can be be a challenge with events. Using the {{#crossLink "EventDispatcher/on"}}{{/crossLink}}
+   * method to subscribe to events simplifies this.
+   *
+   *      instance.addEventListener("click", function(event) {
+   *          console.log(instance == this); // false, scope is ambiguous.
+   *      });
+   *
+   *      instance.on("click", function(event) {
+   *          console.log(instance == this); // true, "on" uses dispatcher scope by default.
+   *      });
+   *
+   * If you want to use addEventListener instead, you may want to use function.bind() or a similar proxy to manage scope.
+   *
+   *
+   * @class EventDispatcher
+   * @module CreateJS
+   */
   var EventDispatcher$2 = function() {
     // static methods:
     /**
@@ -11645,6 +11605,14 @@
     };
     return EventDispatcher
   }();
+  /**
+   * Base class that both {{#crossLink "Tween"}}{{/crossLink}} and {{#crossLink "Timeline"}}{{/crossLink}} extend. Should not be instantiated directly.
+   * @class AbstractTween
+   * @param {Object} [props]
+   * @extends EventDispatcher
+   * @module TweenJS
+   * @constructor
+   */
   var AbstractTween = function(_EventDispatcher) {
     inherits(AbstractTween, _EventDispatcher);
     // constructor:
@@ -11789,7 +11757,7 @@
     /**
      * Returns a list of the labels defined on this tween sorted by position.
      * @property labels
-     * @return {Array[Object]} A sorted array of objects with label and position properties.
+     * @type {Array[Object]}
      */
     // public methods:
     /**
@@ -11850,7 +11818,7 @@
       this.rawPosition = rawPosition;
       this._updatePosition(jump, end);
       if (end) {
-        this.setPaused(true)
+        this.paused = true
       }
       callback && callback(this);
       if (!ignoreActions) {
@@ -11913,39 +11881,13 @@
       }
     };
     /**
-     * Returns the name of the label on or immediately before the current position. For example, given a tween with
-     * two labels, "first" on frame index 4, and "second" on frame 8, getCurrentLabel would return:
-     * <UL>
-     * 		<LI>null if the current position is 2.</LI>
-     * 		<LI>"first" if the current position is 4.</LI>
-     * 		<LI>"first" if the current position is 7.</LI>
-     * 		<LI>"second" if the current position is 15.</LI>
-     * </UL>
-     * @method getCurrentLabel
-     * @return {String} The name of the current label or null if there is no label
-     */
-    AbstractTween.prototype.getCurrentLabel = function getCurrentLabel(pos) {
-      var labels = this.labels,
-        i = void 0,
-        l = void 0;
-      if (pos == null) {
-        pos = this.position
-      }
-      for (i = 0, l = labels.length; i < l; i++) {
-        if (pos < labels[i].position) {
-          break
-        }
-      }
-      return i === 0 ? null : labels[i - 1].label
-    };
-    /**
      * Unpauses this timeline and jumps to the specified position or label.
      * @method gotoAndPlay
      * @param {String|Number} positionOrLabel The position in milliseconds (or ticks if `useTicks` is `true`)
      * or label to jump to.
      */
     AbstractTween.prototype.gotoAndPlay = function gotoAndPlay(positionOrLabel) {
-      this.setPaused(false);
+      this.paused = false;
       this._goto(positionOrLabel)
     };
     /**
@@ -11955,7 +11897,7 @@
      * to jump to.
      */
     AbstractTween.prototype.gotoAndStop = function gotoAndStop(positionOrLabel) {
-      this.setPaused(true);
+      this.paused = true;
       this._goto(positionOrLabel)
     };
     /**
@@ -11970,17 +11912,6 @@
         pos = this._labels && this._labels[positionOrLabel]
       }
       return pos
-    };
-    /**
-     * Pauses or plays this tween.
-     * @method setPaused
-     * @param {Boolean} [value=true] Indicates whether the tween should be paused (`true`) or played (`false`).
-     * @return {Tween} This tween instance (for chaining calls)
-     * @chainable
-     */
-    AbstractTween.prototype.setPaused = function setPaused(value) {
-      Tween._register(this, value);
-      return this
     };
     /**
      * Returns a string representation of this object.
@@ -12005,7 +11936,7 @@
      */
     AbstractTween.prototype._init = function _init(props) {
       if (!props || !props.paused) {
-        this.setPaused(false)
+        this.paused = false
       }
       if (props && props.position != null) {
         this.setPosition(props.position)
@@ -12030,7 +11961,7 @@
       // console.log(this.passive === false ? " > Tween" : "Timeline", "run", startRawPos, endRawPos, jump, includeStart);
       // if we don't have any actions, and we're not a Timeline, then return:
       // TODO: a cleaner way to handle this would be to override this method in Tween, but I'm not sure it's worth the overhead.
-      if (!this._actionHead && !this._tweens) {
+      if (!this._actionHead && !this.tweens) {
         return
       }
       var d = this.duration,
@@ -12065,7 +11996,7 @@
       // special cases:
       if (jump) {
         return this._runActionsRange(t1, t1, jump, includeStart)
-      } else if (loop0 === loop1 && t0 === t1 && !jump) {
+      } else if (loop0 === loop1 && t0 === t1 && !jump && !includeStart) {
         return
       } else if (loop0 === -1) {
         loop0 = t0 = 0
@@ -12116,19 +12047,30 @@
         this._labels = labels;
         this._labelList = null
       }
+    }, {
+      key: "currentLabel",
+      get: function get() {
+        var labels = this.getLabels();
+        var pos = this.position;
+        for (var _i2 = 0, l = labels.length; _i2 < l; _i2++) {
+          if (pos < labels[_i2].position) {
+            break
+          }
+        }
+        return i === 0 ? null : labels[i - 1].label
+      }
+    }, {
+      key: "paused",
+      get: function get() {
+        return this._paused
+      },
+      set: function set(paused) {
+        Tween._register(this, paused);
+        this._paused = paused
+      }
     }]);
     return AbstractTween
   }(EventDispatcher$2);
-  // events:
-  /**
-   * Dispatched whenever the tween's position changes.
-   * @event change
-   */
-  /**
-   * Dispatched when the tween reaches its end and has paused itself. This does not fire until all loops are complete;
-   * tweens that loop continuously will never fire a complete event.
-   * @event complete
-   */
   /**
    * The Ease class provides a collection of easing functions for use with TweenJS. It does not use the standard 4 param
    * easing signature. Instead it uses a single param which indicates the current linear ratio (0 to 1) of the tween.
@@ -12403,14 +12345,6 @@
     };
     return Ease
   }();
-  // static properties
-  /**
-   * Identical to linear.
-   * @method none
-   * @param {Number} t
-   * @static
-   * @return {Number}
-   */
   Ease.none = Ease.linear;
   /**
    * @method quadIn
@@ -12538,6 +12472,28 @@
    * @return {Number}
    */
   Ease.elasticInOut = Ease.getElasticInOut(1, .3 * 1.5);
+  /**
+   * The Ticker provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe to the tick
+   * event to be notified when a set time interval has elapsed.
+   *
+   * Note that the interval that the tick event is called is a target interval, and may be broadcast at a slower interval
+   * when under high CPU load. The Ticker class uses a static interface (ex. `Ticker.framerate = 30;`) and
+   * can not be instantiated.
+   *
+   * <h4>Example</h4>
+   *
+   *      createjs.Ticker.addEventListener("tick", handleTick);
+   *      function handleTick(event) {
+   *          // Actions carried out each tick (aka frame)
+   *          if (!event.paused) {
+   *              // Actions carried out when the Ticker is not paused.
+   *          }
+   *      }
+   *
+   * @class TickerAPI
+   * @extends EventDispatcher
+   * @module CreateJS
+   */
   var TickerAPI$1 = function(_EventDispatcher) {
     inherits(TickerAPI, _EventDispatcher);
     // constructor:
@@ -13008,6 +12964,34 @@
    * @module CreateJS
    */
   var Ticker$2 = new TickerAPI$1("createjs.global");
+  /**
+   * Tweens properties for a single target. Methods can be chained to create complex animation sequences:
+   *
+   * <h4>Example</h4>
+   *
+   *	createjs.Tween.get(target)
+   *		.wait(500)
+   *		.to({alpha:0, visible:false}, 1000)
+   *		.call(handleComplete);
+   *
+   * Multiple tweens can share a target, however if they affect the same properties there could be unexpected
+   * behaviour. To stop all tweens on an object, use {{#crossLink "Tween/removeTweens"}}{{/crossLink}} or pass `override:true`
+   * in the props argument.
+   *
+   * 	createjs.Tween.get(target, {override:true}).to({x:100});
+   *
+   * Subscribe to the {{#crossLink "Tween/change:event"}}{{/crossLink}} event to be notified when the tween position changes.
+   *
+   * 	createjs.Tween.get(target, {override:true}).to({x:100}).addEventListener("change", handleChange);
+   * 	function handleChange(event) {
+   * 		// The tween changed.
+   * 	}
+   *
+   * See the {{#crossLink "Tween/get"}}{{/crossLink}} method also.
+   * @class Tween
+   * @extends AbstractTween
+   * @module TweenJS
+   */
   var Tween = function(_AbstractTween) {
     inherits(Tween, _AbstractTween);
     // constructor:
@@ -13024,7 +13008,7 @@
      *    <LI> `bounce`</LI>
      *    <LI> `timeScale`</LI>
      *    <LI> `pluginData`</LI>
-     *    <LI> `paused`: indicates whether to start the tween paused.</LI>
+     *    <LI> `paused`</LI>
      *    <LI> `position`: indicates the initial position for this tween.</LI>
      *    <LI> `onChange`: adds the specified function as a listener to the `change` event</LI>
      *    <LI> `onComplete`: adds the specified function as a listener to the `complete` event</LI>
@@ -13110,6 +13094,14 @@
        */
       _this._plugins = null;
       /**
+       * Hash for quickly looking up added plugins. Null until a plugin is added.
+       * @property _plugins
+       * @type Object
+       * @default null
+       * @protected
+       */
+      _this._pluginIds = null;
+      /**
        * Used by plugins to inject new properties.
        * @property _injected
        * @type {Object}
@@ -13151,7 +13143,7 @@
      *    <LI> `bounce`</LI>
      *    <LI> `timeScale`</LI>
      *    <LI> `pluginData`</LI>
-     *    <LI> `paused`: indicates whether to start the tween paused.</LI>
+     *    <LI> `paused`</LI>
      *    <LI> `position`: indicates the initial position for this tween.</LI>
      *    <LI> `onChange`: adds the specified function as a listener to the `change` event</LI>
      *    <LI> `onComplete`: adds the specified function as a listener to the `complete` event</LI>
@@ -13214,7 +13206,7 @@
       while (tween) {
         var next = tween._next;
         if (tween.target === target) {
-          Tween._register(tween, true)
+          tween.paused = true
         }
         tween = next
       }
@@ -13255,20 +13247,15 @@
      * Installs a plugin, which can modify how certain properties are handled when tweened. See the {{#crossLink "SamplePlugin"}}{{/crossLink}}
      * for an example of how to write TweenJS plugins. Plugins should generally be installed via their own `install` method, in order to provide
      * the plugin with an opportunity to configure itself.
-     * @method _installPlugin
+     * @method installPlugin
      * @param {Object} plugin The plugin to install
+     * @param {Object} props The props to pass to the plugin
      * @static
-     * @protected
      */
-    Tween._installPlugin = function _installPlugin(plugin) {
-      var priority = plugin.priority,
-        arr = Tween._plugins;
-      if (priority == null) {
-        plugin.priority = priority = 0
-      }
-      if (!arr) {
-        arr = Tween._plugins = []
-      }
+    Tween.installPlugin = function installPlugin(plugin, props) {
+      plugin.install(props);
+      var priority = plugin.priority = plugin.priority || 0,
+        arr = Tween._plugins = Tween._plugins || [];
       for (var _i = 0, l = arr.length; _i < l; _i++) {
         if (priority < arr[_i].priority) {
           break
@@ -13287,7 +13274,7 @@
     Tween._register = function _register(tween, paused) {
       var target = tween.target;
       if (!paused && tween._paused) {
-        // TODO: this approach might fail if a dev is using sealed objects in ES5
+        // TODO: this approach might fail if a dev is using sealed objects
         if (target) {
           target.tweenjs_count = target.tweenjs_count ? target.tweenjs_count + 1 : 1
         }
@@ -13320,7 +13307,6 @@
         } // was head.
         tween._next = tween._prev = null
       }
-      tween._paused = paused
     };
     // public methods:
     /**
@@ -13341,7 +13327,7 @@
     Tween.prototype.wait = function wait(duration) {
       var passive = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       if (duration > 0) {
-        this._addStep(duration, this._stepTail.props, null, passive)
+        this._addStep(+duration, this._stepTail.props, null, passive)
       }
       return this
     };
@@ -13368,7 +13354,7 @@
       if (duration < 0) {
         duration = 0
       }
-      var step = this._addStep(duration, null, ease);
+      var step = this._addStep(+duration, null, ease);
       this._appendProps(props, step);
       return this
     };
@@ -13383,9 +13369,8 @@
      * // ...
      * tween.gotoAndPlay("myLabel"); // would play from 1000ms in.
      *
-     * @method addLabel
+     * @method label
      * @param {String} label The label name.
-     * @param {Number} position The position this label represents.
      * @return {Tween} This tween instance (for chaining calls).
      * @chainable
      */
@@ -13435,25 +13420,37 @@
      *	myTween.to({x:100}, 500).play(otherTween);
      *
      * @method play
-     * @param {Tween} tween The tween to play.
+     * @param {Tween} [tween] The tween to play. Defaults to this tween.
      * @return {Tween} This tween instance (for chaining calls).
      * @chainable
      */
     Tween.prototype.play = function play(tween) {
-      return this.call(this.setPaused, [false], tween || this)
+      return this._addAction(tween || this, this._set, [{
+        paused: false
+      }])
     };
     /**
      * Adds an action to pause the specified tween.
      *
-     * 	myTween.pause(otherTween).to({alpha:1}, 1000).play(otherTween);
+     * myTween.pause(otherTween).to({alpha:1}, 1000).play(otherTween);
+     *
+     * Note that this executes at the end of a tween update, so the tween may advance beyond the time the pause
+     * action was inserted at. For example:
+     *
+     * myTween.to({foo:0}, 1000).pause().to({foo:1}, 1000);
+     *
+     * At 60fps the tween will advance by ~16ms per tick, if the tween above was at 999ms prior to the current tick, it
+     * will advance to 1015ms (15ms into the second "step") and then pause.
      *
      * @method pause
-     * @param {Tween} tween The tween to pause. If null, it pauses this tween.
+     * @param {Tween} [tween] The tween to pause. Defaults to this tween.
      * @return {Tween} This tween instance (for chaining calls)
      * @chainable
      */
     Tween.prototype.pause = function pause(tween) {
-      return this.call(this.setPaused, [true], tween || this)
+      return this._addAction(tween || this, this._set, [{
+        paused: false
+      }])
     };
     /**
      * @method clone
@@ -13470,27 +13467,21 @@
      * @protected
      */
     Tween.prototype._addPlugin = function _addPlugin(plugin) {
-      var plugins = this._plugins,
-        priority = plugin.priority,
-        added = false;
-      if (!plugins) {
-        plugins = this._plugins = []
-      }
+      var ids = this._pluginIds || (this._pluginIds = {}),
+        id = plugin.id;
+      if (!id || ids[id]) {
+        return
+      } // already added
+      ids[id] = true;
+      var plugins = this._plugins || (this._plugins = []),
+        priority = plugin.priority || 0;
       for (var _i2 = 0, l = plugins.length; _i2 < l; _i2++) {
-        if (plugins[_i2] === plugin) {
-          if (!added) {
-            return
-          } else {
-            plugins.splice(_i2, 1)
-          }
-        } else if (!added && priority < plugins[_i2].priority) {
+        if (priority < plugins[_i2].priority) {
           plugins.splice(_i2, 0, plugin);
-          added = true
+          return
         }
       }
-      if (!added) {
-        plugins.push(plugin)
-      }
+      plugins.push(plugin)
     };
     /**
      * @method _updatePosition
@@ -13507,7 +13498,7 @@
           step = step.next;
           stepNext = step.next
         }
-        var ratio = end ? t / d : (t - step.t) / step.d; // TODO: revisit this.
+        var ratio = end ? d === 0 ? 1 : t / d : (t - step.t) / step.d; // TODO: revisit this.
         this._updateTargetProps(step, ratio, end)
       }
       this._stepPosition = step ? t - step.t : 0
@@ -13533,18 +13524,20 @@
         ratio = ease(ratio, 0, 1, 1)
       }
       var plugins = this._plugins;
-      for (var n in p0) {
-        v = v0 = p0[n];
+      proploop: for (var n in p0) {
+        v0 = p0[n];
         v1 = p1[n];
         // values are different & it is numeric then interpolate:
         if (v0 !== v1 && typeof v0 === "number") {
           v = v0 + (v1 - v0) * ratio
+        } else {
+          v = ratio >= 1 ? v1 : v0
         }
         if (plugins) {
           for (var _i3 = 0, l = plugins.length; _i3 < l; _i3++) {
-            var value = plugins[_i3].tween(this, step, n, v, ratio, end);
-            if (v === Tween.IGNORE) {
-              return
+            var value = plugins[_i3].change(this, step, n, v, ratio, end);
+            if (value === Tween.IGNORE) {
+              continue proploop
             }
             if (value !== undefined) {
               v = value
@@ -13563,7 +13556,6 @@
      * @override
      */
     Tween.prototype._runActionsRange = function _runActionsRange(startPos, endPos, jump, includeStart) {
-      //console.log("	range", startPos, endPos, jump, includeStart);
       var rev = startPos > endPos;
       var action = rev ? this._actionTail : this._actionHead;
       var ePos = endPos,
@@ -13576,7 +13568,6 @@
       while (action) {
         var pos = action.t;
         if (pos === endPos || pos > sPos && pos < ePos || includeStart && pos === startPos) {
-          //console.log(pos, "start", sPos, startPos, "end", ePos, endPos);
           action.funct.apply(action.scope, action.params);
           if (t !== this.position) {
             return true
@@ -13590,47 +13581,52 @@
      * @param {Object} props
      * @protected
      */
-    Tween.prototype._appendProps = function _appendProps(props, step) {
+    Tween.prototype._appendProps = function _appendProps(props, step, stepPlugins) {
       var initProps = this._stepHead.props,
         target = this.target,
         plugins = Tween._plugins;
-      var inject = void 0,
-        ignored = void 0;
+      var n = void 0,
+        i = void 0,
+        l = void 0,
+        value = void 0,
+        initValue = void 0,
+        inject = void 0;
       var oldStep = step.prev,
         oldProps = oldStep.props;
       var stepProps = step.props = this._cloneProps(oldProps);
-      for (var n in props) {
-        stepProps[n] = props[n];
+      var cleanProps = {};
+      for (n in props) {
+        if (!props.hasOwnProperty(n)) {
+          continue
+        }
+        cleanProps[n] = stepProps[n] = props[n];
         if (initProps[n] !== undefined) {
           continue
         }
-        var oldValue = undefined; // accessing missing properties on DOMElements when using CSSPlugin is INSANELY expensive.
+        initValue = undefined; // accessing missing properties on DOMElements when using CSSPlugin is INSANELY expensive, so we let the plugin take a first swing at it.
         if (plugins) {
-          for (var _i4 = 0, l = plugins.length; _i4 < l; _i4++) {
-            var value = plugins[_i4].init(this, n, oldValue);
+          for (i = plugins.length - 1; i >= 0; i--) {
+            value = plugins[i].init(this, n, initValue);
             if (value !== undefined) {
-              oldValue = value
+              initValue = value
             }
-            if (oldValue === Tween.IGNORE) {
+            if (initValue === Tween.IGNORE) {
               (ignored = ignored || {})[n] = true;
               delete stepProps[n];
+              delete cleanProps[n];
               break
             }
           }
         }
-        if (oldValue !== Tween.IGNORE) {
-          if (oldValue === undefined) {
-            oldValue = target[n]
+        if (initValue !== Tween.IGNORE) {
+          if (initValue === undefined) {
+            initValue = target[n]
           }
-          oldProps[n] = oldValue === undefined ? null : oldValue
+          oldProps[n] = initValue === undefined ? null : initValue
         }
       }
-      plugins = this._plugins;
-      for (var _n in props) {
-        if (ignored && ignored[_n]) {
-          continue
-        }
-        var _value = props[_n];
+      for (n in cleanProps) {
+        value = props[n];
         // propagate old value to previous steps:
         var o = void 0,
           prev = oldStep;
@@ -13638,39 +13634,34 @@
           if (prev.props === o.props) {
             continue
           } // wait step
-          if (prev.props[_n] !== undefined) {
+          if (prev.props[n] !== undefined) {
             break
           } // already has a value, we're done.
-          prev.props[_n] = oldProps[_n]
+          prev.props[n] = oldProps[n]
         }
-        if (plugins) {
-          for (var _i5 = 0, _l = plugins.length; _i5 < _l; _i5++) {
-            var _value2 = plugins[_i5].step(this, step, _n, _value2);
-            if (_value2 !== undefined) {
-              step.props[_n] = _value2
-            }
-          }
+      }
+      if (stepPlugins && (plugins = this._plugins)) {
+        for (i = plugins.length - 1; i >= 0; i--) {
+          plugins[i].step(this, step, cleanProps)
         }
       }
       if (inject = this._injected) {
         this._injected = null;
-        this._appendProps(inject, step)
+        this._appendProps(inject, step, false)
       }
     };
     /**
-     * Used by plugins to inject properties. Called from within `Plugin.step` calls.
-     * @method _injectProps
-     * @param {Object} props
+     * Used by plugins to inject properties onto the current step. Called from within `Plugin.step` calls.
+     * For example, a plugin dealing with color, could read a hex color, and inject red, green, and blue props into the tween.
+     * See the SamplePlugin for more info.
+     * @method _injectProp
+     * @param {String} name
+     * @param {Object} value
      * @protected
      */
-    Tween.prototype._injectProps = function _injectProps(props) {
-      var o = this._injected;
-      if (!this._injected) {
-        o = this._injected = {}
-      }
-      for (var n in props) {
-        o[n] = props[n]
-      }
+    Tween.prototype._injectProp = function _injectProp(name, value) {
+      var o = this._injected || (this._injected = {});
+      o[name] = value
     };
     /**
      * @method _addStep
@@ -13726,9 +13717,7 @@
       return o
     };
     return Tween
-  }(AbstractTween);
-  // tiny api (primarily for tool output):
-  {
+  }(AbstractTween); {
     var p = Tween.prototype;
     p.w = p.wait;
     p.t = p.to;
@@ -13793,6 +13782,30 @@
     this.funct = funct;
     this.params = params
   };
+  /**
+   * The Timeline class synchronizes multiple tweens and allows them to be controlled as a group. Please note that if a
+   * timeline is looping, the tweens on it may appear to loop even if the "loop" property of the tween is false.
+   *
+   * NOTE: Timeline currently also accepts a param list in the form: `tweens, labels, props`. This is for backwards
+   * compatibility only and will be removed in the future. Include tweens and labels as properties on the props object.
+   * @class Timeline
+   * @param {Object} [props] The configuration properties to apply to this instance (ex. `{loop:-1, paused:true}`).
+   * Supported props are listed below. These props are set on the corresponding instance properties except where
+   * specified.<UL>
+   *    <LI> `useTicks`</LI>
+   *    <LI> `ignoreGlobalPause`</LI>
+   *    <LI> `loop`</LI>
+   *    <LI> `reversed`</LI>
+   *    <LI> `bounce`</LI>
+   *    <LI> `timeScale`</LI>
+   *    <LI> `paused`</LI>
+   *    <LI> `position`: indicates the initial position for this tween.</LI>
+   *    <LI> `onChange`: adds the specified function as a listener to the `change` event</LI>
+   *    <LI> `onComplete`: adds the specified function as a listener to the `complete` event</LI>
+   * </UL>
+   * @extends AbstractTween
+   * @module TweenJS
+   */
   var Timeline = function(_AbstractTween) {
     inherits(Timeline, _AbstractTween);
     // constructor
@@ -13800,20 +13813,25 @@
      * @constructor
      * @param {Object} props
      */
-    function Timeline(props) {
+    function Timeline() {
+      var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       classCallCheck(this, Timeline);
       // private properties:
       /**
-       * @property _tweens
-       * @type Array[Tween]
-       * @protected
+       * The array of tweens in the timeline. It is *strongly* recommended that you use
+       * {{#crossLink "Tween/addTween"}}{{/crossLink}} and {{#crossLink "Tween/removeTween"}}{{/crossLink}},
+       * rather than accessing this directly, but it is included for advanced uses.
+       * @property tweens
+       * @type Array
        */
       var _this = possibleConstructorReturn(this, _AbstractTween.call(this, props));
-      _this._tweens = [];
+      _this.tweens = [];
       if (props.tweens) {
-        _this.addTween.apply(_this, tweens)
+        _this.addTween.apply(_this, props.tweens)
       }
-      _this.labels = props.labels;
+      if (props.labels) {
+        _this.labels = props.labels
+      }
       _this._init(props);
       return _this
     }
@@ -13833,9 +13851,9 @@
       var l = args.length;
       if (l === 1) {
         var _tween = args[0];
-        this._tweens.push(_tween);
+        this.tweens.push(_tween);
         _tween._parent = this;
-        _tween.setPaused(true);
+        _tween.paused = true;
         var d = _tween.duration;
         if (_tween.loop > 0) {
           d *= _tween.loop + 1
@@ -13868,11 +13886,11 @@
       }
       var l = args.length;
       if (l === 1) {
-        var _tweens = this._tweens;
-        var i = _tweens.length;
+        var tweens = this.tweens;
+        var i = tweens.length;
         while (i--) {
-          if (_tweens[i] === tween) {
-            _tweens.splice(i, 1);
+          if (tweens[i] === tween) {
+            tweens.splice(i, 1);
             tween._parent = null;
             if (tween.duration >= this.duration) {
               this.updateDuration()
@@ -13898,8 +13916,8 @@
      */
     Timeline.prototype.updateDuration = function updateDuration() {
       this.duration = 0;
-      for (var i = 0, l = this._tweens.length; i < l; i++) {
-        var _tween2 = this._tweens[i];
+      for (var i = 0, l = this.tweens.length; i < l; i++) {
+        var _tween2 = this.tweens[i];
         var d = _tween2.duration;
         if (_tween2.loop > 0) {
           d *= _tween2.loop + 1
@@ -13923,8 +13941,8 @@
      */
     Timeline.prototype._updatePosition = function _updatePosition(jump, end) {
       var t = this.position;
-      for (var i = 0, l = this._tweens.length; i < l; i++) {
-        this._tweens[i].setPosition(t, true, jump)
+      for (var i = 0, l = this.tweens.length; i < l; i++) {
+        this.tweens[i].setPosition(t, true, jump)
       }
     };
     /**
@@ -13934,8 +13952,8 @@
     Timeline.prototype._runActionsRange = function _runActionsRange(startPos, endPos, jump, includeStart) {
       //console.log("	range", startPos, endPos, jump, includeStart);
       var t = this.position;
-      for (var i = 0, l = this._tweens.length; i < l; i++) {
-        this._tweens[i]._runActions(startPos, endPos, jump, includeStart);
+      for (var i = 0, l = this.tweens.length; i < l; i++) {
+        this.tweens[i]._runActions(startPos, endPos, jump, includeStart);
         if (t !== this.position) {
           return true
         }
@@ -13943,26 +13961,78 @@
     };
     return Timeline
   }(AbstractTween);
+  /**
+   * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
+   * you to create objects which encapsulate timeline animations, state changes, and synched actions. Due to the
+   * complexities inherent in correctly setting up a MovieClip, it is largely intended for tool output and is not included
+   * in the main EaselJS library.
+   *
+   * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
+   * been made to support time-based timelines in the future.
+   *
+   * <h4>Example</h4>
+   * This example animates two shapes back and forth. The grey shape starts on the left, but we jump to a mid-point in
+   * the animation using {{#crossLink "MovieClip/gotoAndPlay"}}{{/crossLink}}.
+   *
+   *      var stage = new createjs.Stage("canvas");
+   *      createjs.Ticker.addEventListener("tick", stage);
+   *
+   *      var mc = new createjs.MovieClip(null, 0, true, {start:20});
+   *      stage.addChild(mc);
+   *
+   *      var child1 = new createjs.Shape(
+   *          new createjs.Graphics().beginFill("#999999")
+   *              .drawCircle(30,30,30));
+   *      var child2 = new createjs.Shape(
+   *          new createjs.Graphics().beginFill("#5a9cfb")
+   *              .drawCircle(30,30,30));
+   *
+   *      mc.timeline.addTween(
+   *          createjs.Tween.get(child1)
+   *              .to({x:0}).to({x:60}, 50).to({x:0}, 50));
+   *      mc.timeline.addTween(
+   *          createjs.Tween.get(child2)
+   *              .to({x:60}).to({x:0}, 50).to({x:60}, 50));
+   *
+   *      mc.gotoAndPlay("start");
+   *
+   * It is recommended to use <code>tween.to()</code> to animate and set properties (use no duration to have it set
+   * immediately), and the <code>tween.wait()</code> method to create delays between animations. Note that using the
+   * <code>tween.set()</code> method to affect properties will likely not provide the desired result.
+   *
+   * @class MovieClip
+   * @extends Container
+   * @module EaselJS
+   */
   var MovieClip = function(_Container) {
     inherits(MovieClip, _Container);
     // constructor:
     /**
      * @constructor
-     * @param {String} [mode=independent] Initial value for the mode property. One of {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}},
-     * {{#crossLink "MovieClip/SINGLE_FRAME:property"}}{{/crossLink}}, or {{#crossLink "MovieClip/SYNCHED:property"}}{{/crossLink}}.
-     * The default is {{#crossLink "MovieClip/INDEPENDENT:property"}}{{/crossLink}}.
-     * @param {Number} [startPosition=0] Initial value for the {{#crossLink "MovieClip/startPosition:property"}}{{/crossLink}}
-     * property.
-     * @param {Boolean} [loop=0] Initial value for the {{#crossLink "MovieClip/loop:property"}}{{/crossLink}}
-     * property. The default is `0`.
-     * @param {Object} [labels=null] A hash of labels to pass to the {{#crossLink "MovieClip/timeline:property"}}{{/crossLink}}
-     * instance associated with this MovieClip. Labels only need to be passed if they need to be used.
+     * @param {Object} [props] The configuration properties to apply to this instance (ex. `{mode:MovieClip.SYNCHED}`).
+     * Supported props for the MovieClip are listed below. These props are set on the corresponding instance properties except where
+     * specified.<UL>
+     *    <LI> `mode`</LI>
+     *    <LI> `startPosition`</LI>
+     *    <LI> `frameBounds`</LI>
+     * </UL>
+     *
+     * This object will also be passed into the Timeline instance associated with this MovieClip. See the documentation
+     * for Timeline for a list of supported props (ex. `paused`, `labels`, `loop`, `reversed`, etc.)
      */
-    function MovieClip() {
-      var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : MovieClip.INDEPENDENT;
-      var startPosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      var loop = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      var labels = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+    function MovieClip(_ref) {
+      var _ref$mode = _ref.mode,
+        mode = _ref$mode === undefined ? MovieClip.INDEPENDENT : _ref$mode,
+        _ref$startPosition = _ref.startPosition,
+        startPosition = _ref$startPosition === undefined ? 0 : _ref$startPosition,
+        _ref$loop = _ref.loop,
+        loop = _ref$loop === undefined ? -1 : _ref$loop,
+        _ref$paused = _ref.paused,
+        paused = _ref$paused === undefined ? false : _ref$paused,
+        _ref$frameBounds = _ref.frameBounds,
+        frameBounds = _ref$frameBounds === undefined ? null : _ref$frameBounds,
+        _ref$labels = _ref.labels,
+        labels = _ref$labels === undefined ? null : _ref$labels;
       classCallCheck(this, MovieClip);
       var _this = possibleConstructorReturn(this, _Container.call(this));
       !MovieClip.inited && MovieClip.init();
@@ -13983,12 +14053,13 @@
        */
       _this.startPosition = startPosition;
       /**
-       * Indicates whether this MovieClip should loop when it reaches the end of its timeline.
+       * Specifies how many times this MovieClip should loop. A value of -1 indicates it should loop indefinitely. A value of
+       * 1 would cause it to loop once (ie. play a total of twice).
        * @property loop
-       * @type Boolean
-       * @default true
+       * @type Number
+       * @default -1
        */
-      _this.loop = loop === true ? -1 : loop;
+      _this.loop = loop === true ? -1 : loop || 0;
       /**
        * The current frame of the movieclip.
        * @property currentFrame
@@ -14019,11 +14090,15 @@
        *
        * @property timeline
        * @type Timeline
-       * @default null
+       * @default Timeline
        */
       _this.timeline = new Timeline({
-        paused: true,
         useTicks: true,
+        paused: true,
+        mode: mode,
+        startPosition: startPosition,
+        loop: loop,
+        frameBounds: frameBounds,
         labels: labels
       });
       /**
@@ -14032,7 +14107,7 @@
        * @type Boolean
        * @default false
        */
-      _this.paused = false;
+      _this.paused = paused;
       /**
        * If true, actions in this MovieClip's tweens will be run when the playhead advances.
        * @property actionsEnabled
@@ -14059,7 +14134,7 @@
        * @type Array
        * @default null
        */
-      _this.frameBounds = _this.frameBounds || null; // TODO: Deprecated. This is for backwards support of Flash/Animate
+      _this.frameBounds = _this.frameBounds || props.frameBounds; // frameBounds are set on the prototype in Animate.
       /**
        * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
        * will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
@@ -14152,6 +14227,9 @@
       if (this.drawCache(ctx, ignoreCache)) {
         return true
       }
+      if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) {
+        this._updateTimeline(-1)
+      }
       _Container.prototype.draw.call(this, ctx, ignoreCache);
       return true
     };
@@ -14193,16 +14271,15 @@
      * @method advance
      */
     MovieClip.prototype.advance = function advance(time) {
-      // TODO: should we worry at all about clips who change their own modes via frame scripts?
-      var independent = MovieClip.INDEPENDENT;
-      if (this.mode !== independent) {
+      var INDEPENDENT = MovieClip.INDEPENDENT;
+      if (this.mode !== INDEPENDENT) {
         return
-      }
+      } // update happens in draw for synched clips
       // if this MC doesn't have a framerate, hunt ancestors for one:
       var o = this,
         fps = o.framerate;
-      while ((o = o.parent) && fps == null) {
-        if (o.mode === independent) {
+      while ((o = o.parent) && fps === null) {
+        if (o.mode === INDEPENDENT) {
           fps = o._framerate
         }
       }
@@ -14210,7 +14287,6 @@
       if (this.paused) {
         return
       }
-      // TODO: strict equality here?
       // calculate how many frames to advance:
       var t = fps !== null && fps !== -1 && time !== null ? time / (1e3 / fps) + this._t : 1;
       var frames = t | 0;
@@ -14267,21 +14343,21 @@
      * @protected
      */
     MovieClip.prototype._updateTimeline = function _updateTimeline(rawPosition, jump) {
-      var _this2 = this;
+      var synced = this.mode !== MovieClip.INDEPENDENT,
+        tl = this.timeline;
+      if (synced) {
+        rawPosition = this.startPosition + (this.mode === MovieClip.SINGLE_FRAME ? 0 : this._synchOffset)
+      }
       if (rawPosition < 1) {
         rawPosition = 0
       }
-      if (this._rawPosition === rawPosition) {
+      if (this._rawPosition === rawPosition && !synced) {
         return
       }
       this._rawPosition = rawPosition;
-      var tl = this.timeline,
-        synced = this.mode !== MovieClip.INDEPENDENT;
-      tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline.
-      var pos = synced ? this.startPosition + (this.mode === MovieClip.SINGLE_FRAME ? 0 : this._synchOffset) : rawPosition === -1 ? 0 : rawPosition;
-      tl.setPosition(pos, !this.actionsEnabled || synced, jump, function() {
-        return _this2._resolveState()
-      })
+      // update timeline position, ignoring actions if this is a graphic.
+      tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline?
+      tl.setPosition(rawPosition, synced || !this.actionsEnabled, jump, this._resolveState.bind(this))
     };
     /**
      * Runs via a callback after timeline property updates and before actions.
@@ -14294,19 +14370,19 @@
       for (var n in this._managed) {
         this._managed[n] = 1
       }
-      var tweens = tl._tweens;
-      for (var _iterator = tl._tweens, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
+      var tweens = tl.tweens;
+      for (var _iterator = tweens, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+        var _ref2;
         if (_isArray) {
           if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++]
+          _ref2 = _iterator[_i++]
         } else {
           _i = _iterator.next();
           if (_i.done) break;
-          _ref = _i.value
+          _ref2 = _i.value
         }
-        var tween = _ref;
-        var target = tween._target;
+        var tween = _ref2;
+        var target = tween.target;
         if (target === this || tween.passive) {
           continue
         } // TODO: this assumes the actions tween from Animate has `this` as the target. Likely a better approach.
@@ -14341,9 +14417,9 @@
       for (var i = state.length - 1; i >= 0; i--) {
         var o = state[i];
         var target = o.t;
-        var props = o.p;
-        for (var n in props) {
-          target[n] = props[n]
+        var _props = o.p;
+        for (var n in _props) {
+          target[n] = _props[n]
         }
         this._addManagedChild(target, offset)
       }
@@ -14363,6 +14439,7 @@
       if (child instanceof MovieClip) {
         child._synchOffset = offset;
         // TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
+        // TODO: should also reset when MovieClip loops, though that will be a bit tricky to detect.
         if (child.mode === MovieClip.INDEPENDENT && child.autoReset && !this._managed[child.id]) {
           child._reset()
         }
@@ -14408,35 +14485,7 @@
       }
     }]);
     return MovieClip
-  }(Container);
-  // static constants:
-  /**
-   * The MovieClip will advance independently of its parent, even if its parent is paused.
-   * This is the default mode.
-   * @property INDEPENDENT
-   * @static
-   * @type String
-   * @default "independent"
-   * @readonly
-   */
-  /**
-   * The MovieClip will only display a single frame (as determined by the startPosition property).
-   * @property SINGLE_FRAME
-   * @static
-   * @type String
-   * @default "single"
-   * @readonly
-   */
-  /**
-   * The MovieClip will be advanced only when its parent advances and will be synched to the position of
-   * the parent MovieClip.
-   * @property SYNCHED
-   * @static
-   * @type String
-   * @default "synched"
-   * @readonly
-   */
-  {
+  }(Container); {
     MovieClip.INDEPENDENT = "independent";
     MovieClip.SINGLE_FRAME = "single";
     MovieClip.SYNCHED = "synched";
@@ -14568,19 +14617,31 @@
       return new Shadow(this.color, this.offsetX, this.offsetY, this.blur)
     };
     return Shadow
-  }();
-  // static public properties:
-  /**
-   * An identity shadow object (all properties are set to 0).
-   * @property identity
-   * @type Shadow
-   * @static
-   * @final
-   * @readonly
-   */
-  {
+  }(); {
     Shadow$1.identity = new Shadow$1("transparent")
   }
+  /**
+   * A Shape allows you to display vector art in the display list. It composites a {{#crossLink "Graphics"}}{{/crossLink}}
+   * instance which exposes all of the vector drawing methods. The Graphics instance can be shared between multiple Shape
+   * instances to display the same vector graphics with different positions or transforms.
+   *
+   * If the vector art will not
+   * change between draws, you may want to use the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method to reduce the
+   * rendering cost.
+   *
+   * <h4>Example</h4>
+   *
+   *      var graphics = new createjs.Graphics().beginFill("#ff0000").drawRect(0, 0, 100, 100);
+   *      var shape = new createjs.Shape(graphics);
+   *
+   *      //Alternatively use can also use the graphics property of the Shape class to renderer the same as above.
+   *      var shape = new createjs.Shape();
+   *      shape.graphics.beginFill("#ff0000").drawRect(0, 0, 100, 100);
+   *
+   * @class Shape
+   * @extends DisplayObject
+   * @module EaselJS
+   */
   var Shape = function(_DisplayObject) {
     inherits(Shape, _DisplayObject);
     // constructor:
@@ -14646,6 +14707,173 @@
     };
     return Shape
   }(DisplayObject);
+  /**
+   * Encapsulates the properties and methods associated with a sprite sheet. A sprite sheet is a series of images (usually
+   * animation frames) combined into a larger image (or images). For example, an animation consisting of eight 100x100
+   * images could be combined into a single 400x200 sprite sheet (4 frames across by 2 high).
+   *
+   * The data passed to the SpriteSheet constructor defines:
+   * <ol>
+   * 	<li> The source image or images to use.</li>
+   * 	<li> The positions of individual image frames.</li>
+   * 	<li> Sequences of frames that form named animations. Optional.</li>
+   * 	<li> The target playback framerate. Optional.</li>
+   * </ol>
+   * <h3>SpriteSheet Format</h3>
+   * SpriteSheets are an object with two required properties (`images` and `frames`), and two optional properties
+   * (`framerate` and `animations`). This makes them easy to define in javascript code, or in JSON.
+   *
+   * <h4>images</h4>
+   * An array of source images. Images can be either an HTMlimage
+   * instance, or a uri to an image. The former is recommended to control preloading.
+   *
+   * 	images: [image1, "path/to/image2.png"],
+   *
+   * <h4>frames</h4>
+   * Defines the individual frames. There are two supported formats for frame data:
+   * When all of the frames are the same size (in a grid), use an object with `width`, `height`, `regX`, `regY`,
+   * and `count` properties.
+   *
+   * <ul>
+   *  <li>`width` & `height` are required and specify the dimensions of the frames</li>
+   *  <li>`regX` & `regY` indicate the registration point or "origin" of the frames</li>
+   *  <li>`spacing` indicate the spacing between frames</li>
+   *  <li>`margin` specify the margin around the image(s)</li>
+   *  <li>`count` allows you to specify the total number of frames in the spritesheet; if omitted, this will
+   *  be calculated based on the dimensions of the source images and the frames. Frames will be assigned
+   *  indexes based on their position in the source images (left to right, top to bottom).</li>
+   * </ul>
+   *
+   *  	frames: {width:64, height:64, count:20, regX: 32, regY:64, spacing:0, margin:0}
+   *
+   * If the frames are of different sizes, use an array of frame definitions. Each definition is itself an array
+   * with 4 required and 3 optional entries, in the order:
+   *
+   * <ul>
+   *  <li>The first four, `x`, `y`, `width`, and `height` are required and define the frame rectangle.</li>
+   *  <li>The fifth, `imageIndex`, specifies the index of the source image (defaults to 0)</li>
+   *  <li>The last two, `regX` and `regY` specify the registration point of the frame</li>
+   * </ul>
+   *
+   * 	frames: [
+   * 		// x, y, width, height, imageIndex*, regX*, regY*
+   * 		[64, 0, 96, 64],
+   * 		[0, 0, 64, 64, 1, 32, 32]
+   * 		// etc.
+   * 	]
+   *
+   * <h4>animations</h4>
+   * Optional. An object defining sequences of frames to play as named animations. Each property corresponds to an
+   * animation of the same name. Each animation must specify the frames to play, and may
+   * also include a relative playback `speed` (ex. 2 would playback at double speed, 0.5 at half), and
+   * the name of the `next` animation to sequence to after it completes.
+   *
+   * There are three formats supported for defining the frames in an animation, which can be mixed and matched as appropriate:
+   * <ol>
+   * 	<li>for a single frame animation, you can simply specify the frame index
+   *
+   * 		animations: {
+   * 			sit: 7
+   * 		}
+   *
+   * </li>
+   * <li>
+   *      for an animation of consecutive frames, you can use an array with two required, and two optional entries
+   * 		in the order: `start`, `end`, `next`, and `speed`. This will play the frames from start to end inclusive.
+   *
+   * 		animations: {
+   * 			// start, end, next*, speed*
+   * 			run: [0, 8],
+   * 			jump: [9, 12, "run", 2]
+   * 		}
+   *
+   *  </li>
+   *  <li>
+   *     for non-consecutive frames, you can use an object with a `frames` property defining an array of frame
+   *     indexes to play in order. The object can also specify `next` and `speed` properties.
+   *
+   * 		animations: {
+   * 			walk: {
+   * 				frames: [1,2,3,3,2,1]
+   * 			},
+   * 			shoot: {
+   * 				frames: [1,4,5,6],
+   * 				next: "walk",
+   * 				speed: 0.5
+   * 			}
+   * 		}
+   *
+   *  </li>
+   * </ol>
+   * <strong>Note:</strong> the `speed` property was added in EaselJS 0.7.0. Earlier versions had a `frequency`
+   * property instead, which was the inverse of `speed`. For example, a value of "4" would be 1/4 normal speed in
+   * earlier versions, but is 4x normal speed in EaselJS 0.7.0+.
+   *
+   * <h4>framerate</h4>
+   * Optional. Indicates the default framerate to play this spritesheet at in frames per second. See
+   * {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} for more information.
+   *
+   * 		framerate: 20
+   *
+   * Note that the Sprite framerate will only work if the stage update method is provided with the {{#crossLink "Ticker/tick:event"}}{{/crossLink}}
+   * event generated by the {{#crossLink "Ticker"}}{{/crossLink}}.
+   *
+   * 		createjs.Ticker.on("tick", handleTick);
+   * 		function handleTick(event) {
+   *			stage.update(event);
+   *		}
+   *
+   * <h3>Example</h3>
+   * To define a simple sprite sheet, with a single image "sprites.jpg" arranged in a regular 50x50 grid with three
+   * animations: "stand" showing the first frame, "run" looping frame 1-5 inclusive, and "jump" playing frame 6-8 and
+   * sequencing back to run.
+   *
+   * 		var data = {
+   * 			images: ["sprites.jpg"],
+   * 			frames: {width:50, height:50},
+   * 			animations: {
+   * 				stand:0,
+   * 				run:[1,5],
+   * 				jump:[6,8,"run"]
+   * 			}
+   * 		};
+   * 		var spriteSheet = new createjs.SpriteSheet(data);
+   * 		var animation = new createjs.Sprite(spriteSheet, "run");
+   *
+   * <h3>Generating SpriteSheet Images</h3>
+   * Spritesheets can be created manually by combining images in PhotoShop, and specifying the frame size or
+   * coordinates manually, however there are a number of tools that facilitate this.
+   * <ul>
+   *     <li>Exporting SpriteSheets or HTML5 content from Adobe Flash/Animate supports the EaselJS SpriteSheet format.</li>
+   *     <li>The popular <a href="https://www.codeandweb.com/texturepacker/easeljs" target="_blank">Texture Packer</a> has
+   *     EaselJS support.
+   *     <li>SWF animations in Adobe Flash/Animate can be exported to SpriteSheets using <a href="http://createjs.com/zoe" target="_blank"></a></li>
+   * </ul>
+   *
+   * <h3>Cross Origin Issues</h3>
+   * <strong>Warning:</strong> Images loaded cross-origin will throw cross-origin security errors when interacted with
+   * using:
+   * <ul>
+   *     <li>a mouse</li>
+   *     <li>methods such as {{#crossLink "Container/getObjectUnderPoint"}}{{/crossLink}}</li>
+   *     <li>Filters (see {{#crossLink "Filter"}}{{/crossLink}})</li>
+   *     <li>caching (see {{#crossLink "DisplayObject/cache"}}{{/crossLink}})</li>
+   * </ul>
+   * You can get around this by setting `crossOrigin` property on your images before passing them to EaselJS, or
+   * setting the `crossOrigin` property on PreloadJS' LoadQueue or LoadItems.
+   *
+   * 		var image = new Image();
+   * 		img.crossOrigin="Anonymous";
+   * 		img.src = "http://server-with-CORS-support.com/path/to/image.jpg";
+   *
+   * If you pass string paths to SpriteSheets, they will not work cross-origin. The server that stores the image must
+   * support cross-origin requests, or this will not work. For more information, check out
+   * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS" target="_blank">CORS overview on MDN</a>.
+   *
+   * @class SpriteSheet
+   * @extends EventDispatcher
+   * @module EaselJS
+   */
   var SpriteSheet = function(_EventDispatcher) {
     inherits(SpriteSheet, _EventDispatcher);
     // constructor:
@@ -15045,38 +15273,6 @@
     }]);
     return SpriteSheet
   }(EventDispatcher);
-  // events:
-  /**
-   * Dispatched when all images are loaded.  Note that this only fires if the images
-   * were not fully loaded when the sprite sheet was initialized. You should check the complete property
-   * to prior to adding a listener. Ex.
-   *
-   * 	var sheet = new createjs.SpriteSheet(data);
-   * 	if (!sheet.complete) {
-   * 		// not preloaded, listen for the complete event:
-   * 		sheet.addEventListener("complete", handler);
-   * 	}
-   *
-   * @event complete
-   * @param {Object} target The object that dispatched the event.
-   * @param {String} type The event type.
-   * @since 0.6.0
-   */
-  /**
-   * Dispatched when getFrame is called with a valid frame index. This is primarily intended for use by {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}}
-   * when doing on-demand rendering.
-   * @event getframe
-   * @param {Number} index The frame index.
-   * @param {Object} frame The frame object that getFrame will return.
-   */
-  /**
-   * Dispatched when an image encounters an error. A SpriteSheet will dispatch an error event for each image that
-   * encounters an error, and will still dispatch a {{#crossLink "SpriteSheet/complete:event"}}{{/crossLink}}
-   * event once all images are finished processing, even if an error is encountered.
-   * @event error
-   * @param {String} src The source of the image that failed to load.
-   * @since 0.8.2
-   */
   var _H_OFFSETS = {
     start: 0,
     left: 0,
@@ -15092,6 +15288,30 @@
     ideographic: -.85,
     bottom: -1
   };
+  /**
+   * Display one or more lines of dynamic text (not user editable) in the display list. Line wrapping support (using the
+   * lineWidth) is very basic, wrapping on spaces and tabs only. Note that as an alternative to Text, you can position HTML
+   * text above or below the canvas relative to items in the display list using the {{#crossLink "DisplayObject/localToGlobal"}}{{/crossLink}}
+   * method, or using {{#crossLink "DOMElement"}}{{/crossLink}}.
+   *
+   * <b>Please note that Text does not support HTML text, and can only display one font style at a time.</b> To use
+   * multiple font styles, you will need to create multiple text instances, and position them manually.
+   *
+   * <h4>Example</h4>
+   *
+   *      var text = new createjs.Text("Hello World", "20px Arial", "#ff7700");
+   *      text.x = 100;
+   *      text.textBaseline = "alphabetic";
+   *
+   * CreateJS Text supports web fonts (the same rules as Canvas). The font must be loaded and supported by the browser
+   * before it can be displayed.
+   *
+   * <strong>Note:</strong> Text can be expensive to generate, so cache instances where possible. Be aware that not all
+   * browsers will render Text exactly the same.
+   * @class Text
+   * @extends DisplayObject
+   * @module EaselJS
+   */
   var Text = function(_DisplayObject) {
     inherits(Text, _DisplayObject);
     // constructor:
@@ -15454,12 +15674,39 @@
      * @private
      * @static
      */
-    var canvas$2 = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+    var canvas$2 = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
     if (canvas$2.getContext) {
       Text._workingContext = canvas$2.getContext("2d");
       canvas$2.width = canvas$2.height = 1
     }
   }
+  /**
+   * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
+   * be copied from the red channel of the map, and the RGB channels will be copied from the target.
+   *
+   * Generally, it is recommended that you use {{#crossLink "AlphaMaskFilter"}}{{/crossLink}}, because it has much
+   * better performance.
+   *
+   * <h4>Example</h4>
+   * This example draws a red->blue box, caches it, and then uses the cache canvas as an alpha map on a 100x100 image.
+   *
+   *       var box = new createjs.Shape();
+   *       box.graphics.beginLinearGradientFill(["#ff0000", "#0000ff"], [0, 1], 0, 0, 0, 100)
+   *       box.graphics.drawRect(0, 0, 100, 100);
+   *       box.cache(0, 0, 100, 100);
+   *
+   *       var bmp = new createjs.Bitmap("path/to/image.jpg");
+   *       bmp.filters = [
+   *           new createjs.AlphaMapFilter(box.cacheCanvas)
+   *       ];
+   *       bmp.cache(0, 0, 100, 100);
+   *       stage.addChild(bmp);
+   *
+   * See {{#crossLink "Filter"}}{{/crossLink}} for more information on applying filters.
+   * @class AlphaMapFilter
+   * @extends Filter
+   * @module EaselJS
+   */
   var AlphaMapFilter = function(_Filter) {
     inherits(AlphaMapFilter, _Filter);
     // constructor:
@@ -15557,7 +15804,7 @@
       if (map instanceof HTMLCanvasElement) {
         ctx = canvas.getContext("2d")
       } else {
-        canvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+        canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
         canvas.width = map.width;
         canvas.height = map.height;
         ctx = canvas.getContext("2d");
@@ -15573,6 +15820,33 @@
     };
     return AlphaMapFilter
   }(Filter);
+  /**
+   * Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
+   * be derived from the mask, and the RGB channels will be copied from the target. This can be used, for example, to
+   * apply an alpha mask to a display object. This can also be used to combine a JPG compressed RGB image with a PNG32
+   * alpha mask, which can result in a much smaller file size than a single PNG32 containing ARGB.
+   *
+   * <b>IMPORTANT NOTE: This filter currently does not support the targetCtx, or targetX/Y parameters correctly.</b>
+   *
+   * <h4>Example</h4>
+   * This example draws a gradient box, then caches it and uses the "cacheCanvas" as the alpha mask on a 100x100 image.
+   *
+   *      var box = new createjs.Shape();
+   *      box.graphics.beginLinearGradientFill(["#000000", "rgba(0, 0, 0, 0)"], [0, 1], 0, 0, 100, 100)
+   *      box.graphics.drawRect(0, 0, 100, 100);
+   *      box.cache(0, 0, 100, 100);
+   *
+   *      var bmp = new createjs.Bitmap("path/to/image.jpg");
+   *      bmp.filters = [
+   *          new createjs.AlphaMaskFilter(box.cacheCanvas)
+   *      ];
+   *      bmp.cache(0, 0, 100, 100);
+   *
+   * See {{#crossLink "Filter"}}{{/crossLink}} for more information on applying filters.
+   * @class AlphaMaskFilter
+   * @extends Filter
+   * @module EaselJS
+   */
   var AlphaMaskFilter = function(_Filter) {
     inherits(AlphaMaskFilter, _Filter);
     // constructor:
@@ -15658,6 +15932,27 @@
    */
   var _MUL_TABLE = [1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1];
   var _SHG_TABLE = [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9];
+  /**
+   * Applies a box blur to DisplayObjects. Note that this filter is fairly CPU intensive, particularly if the quality is
+   * set higher than 1.
+   *
+   * <h4>Example</h4>
+   * This example creates a red circle, and then applies a 5 pixel blur to it. It uses the {{#crossLink "Filter/getBounds"}}{{/crossLink}}
+   * method to account for the spread that the blur causes.
+   *
+   *      let shape = new createjs.Shape().set({x:100,y:100});
+   *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
+   *
+   *      let blurFilter = new createjs.BlurFilter(5, 5, 1);
+   *      shape.filters = [blurFilter];
+   *      let bounds = blurFilter.getBounds();
+   *
+   *      shape.cache(-50+bounds.x, -50+bounds.y, 100+bounds.width, 100+bounds.height);
+   *
+   * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
+   * @class BlurFilter
+   * @extends Filter
+   */
   var BlurFilter = function(_Filter) {
     inherits(BlurFilter, _Filter);
     // constructor:
@@ -16018,6 +16313,25 @@
   }(Filter);
   /**
    * @module EaselJS
+   */
+  /**
+   * Applies a color transform to DisplayObjects.
+   *
+   * <h4>Example</h4>
+   * This example draws a red circle, and then transforms it to Blue. This is accomplished by multiplying all the channels
+   * to 0 (except alpha, which is set to 1), and then adding 255 to the blue channel.
+   *
+   *      var shape = new createjs.Shape().set({x:100,y:100});
+   *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
+   *
+   *      shape.filters = [
+   *          new createjs.ColorFilter(0,0,0,1, 0,0,255,0)
+   *      ];
+   *      shape.cache(-50, -50, 100, 100);
+   *
+   * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
+   * @class ColorFilter
+   * @extends Filter
    */
   var ColorFilter = function(_Filter) {
     inherits(ColorFilter, _Filter);
@@ -16418,6 +16732,28 @@
   }();
   /**
    * @module EaselJS
+   */
+  /**
+   * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
+   * {{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors. For an easier color transform,
+   * consider the {{#crossLink "ColorFilter"}}{{/crossLink}}.
+   *
+   * <h4>Example</h4>
+   * This example creates a red circle, inverts its hue, and then saturates it to brighten it up.
+   *
+   *      var shape = new createjs.Shape().set({x:100,y:100});
+   *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
+   *
+   *      var matrix = new createjs.ColorMatrix().adjustHue(180).adjustSaturation(100);
+   *      shape.filters = [
+   *          new createjs.ColorMatrixFilter(matrix)
+   *      ];
+   *
+   *      shape.cache(-50, -50, 100, 100);
+   *
+   * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
+   * @class ColorMatrixFilter
+   * @extends Filter
    */
   var ColorMatrixFilter = function(_Filter) {
     inherits(ColorMatrixFilter, _Filter);
@@ -17020,6 +17356,23 @@
   }();
   var _ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
   var _ERR_RUNNING = "a build is already running";
+  /**
+   * The SpriteSheetBuilder allows you to generate {{#crossLink "SpriteSheet"}}{{/crossLink}} instances at run time
+   * from any display object. This can allow you to maintain your assets as vector graphics (for low file size), and
+   * render them at run time as SpriteSheets for better performance.
+   *
+   * SpriteSheets can be built either synchronously, or asynchronously, so that large SpriteSheets can be generated
+   * without locking the UI.
+   *
+   * Note that the "images" used in the generated SpriteSheet are actually canvas elements, and that they will be
+   * sized to the nearest power of 2 up to the value of {{#crossLink "SpriteSheetBuilder/maxWidth:property"}}{{/crossLink}}
+   * or {{#crossLink "SpriteSheetBuilder/maxHeight:property"}}{{/crossLink}}.
+   * @class SpriteSheetBuilder
+   * @param {Number} [framerate=0] The {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} of
+   * {{#crossLink "SpriteSheet"}}{{/crossLink}} instances that are created.
+   * @extends EventDispatcher
+   * @module EaselJS
+   */
   var SpriteSheetBuilder = function(_EventDispatcher) {
     inherits(SpriteSheetBuilder, _EventDispatcher);
     // constructor:
@@ -17529,22 +17882,6 @@
     }]);
     return SpriteSheetBuilder
   }(EventDispatcher);
-  // events:
-  /**
-   * Dispatched when a build completes.
-   * @event complete
-   * @param {Object} target The object that dispatched the event.
-   * @param {String} type The event type.
-   * @since 0.6.0
-   */
-  /**
-   * Dispatched when an asynchronous build has progress.
-   * @event progress
-   * @param {Object} target The object that dispatched the event.
-   * @param {String} type The event type.
-   * @param {Number} progress The current progress value (0-1).
-   * @since 0.6.0
-   */
   /**
    * The SpriteSheetUtils class is a collection of static methods for working with {{#crossLink "SpriteSheet"}}{{/crossLink}}s.
    * A sprite sheet is a series of images (usually animation frames) combined into a single image on a regular grid. For
@@ -17613,7 +17950,7 @@
      */
     SpriteSheetUtils.mergeAlpha = function mergeAlpha(rgbImage, alphaImage, canvas) {
       if (!canvas) {
-        canvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas")
+        canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas")
       }
       canvas.width = Math.max(alphaImage.width, rgbImage.width);
       canvas.height = Math.max(alphaImage.height, rgbImage.height);
@@ -17694,22 +18031,8 @@
       }
     };
     return SpriteSheetUtils
-  }();
-  // private static properties:
-  /**
-   * @property _workingCanvas
-   * @static
-   * @type HTMLCanvasElement | Object
-   * @protected
-   */
-  /**
-   * @property _workingContext
-   * @static
-   * @type CanvasRenderingContext2D
-   * @protected
-   */
-  {
-    var canvas$3 = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+  }(); {
+    var canvas$3 = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
     if (canvas$3.getContext) {
       SpriteSheetUtils._workingCanvas = canvas$3;
       SpriteSheetUtils._workingContext = canvas$3.getContext("2d");
@@ -17717,6 +18040,14 @@
     }
   }
   var _alternateOutput = null;
+  /**
+   * A utility and helper class designed to work with {{#crossLink "StageGL"}}{{/crossLink}} to help investigate and
+   * test performance or display problems. It contains logging functions to analyze behaviour and performance testing
+   * utilities.
+   * @class WebGLInspector
+   * @extends EventDispatcher
+   * @module EaselJS
+   */
   var WebGLInspector = function(_EventDispatcher) {
     inherits(WebGLInspector, _EventDispatcher);
     // constructor:
@@ -18004,7 +18335,9 @@
    * This is explained here: https://github.com/rollup/rollup/issues/845#issuecomment-240277194
    */
   // re-export shared classes
-  var version = "1.0.0";
+  // TODO: Review this version export.
+  // version (templated in gulpfile, pulled from package).
+  var version = "2.0.0";
   exports.version = version;
   exports.EventDispatcher = EventDispatcher;
   exports.Event = Event;
