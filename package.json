@@ -21,9 +21,9 @@
     "Grant Skinner <grant@gskinner.com> (https://github.com/gskinner)",
     "Lanny McNie <lanny@gskinner.com> (https://github.com/lannymcnie)",
     "Wes Gorgichuk <wes@gskinner.com> (https://github.com/wdamien)",
-    "Mike Chambers <> (https://github.com/mikechambers)"
+    "Mike Chambers <> (https://github.com/mikechambers)",
     "Patrick McGuckin <patrick@gskinner.com> (https://github.com/tehvgg)",
-    "David Gillen <david@gskinner.com> (https://github.com/davidhgillen)",
+    "David Gillen <david@gskinner.com> (https://github.com/davidhgillen)"
   ],
   "main": "dist/easeljs.cjs.js",
   "jsnext:main": "dist/easeljs.es6.js",
