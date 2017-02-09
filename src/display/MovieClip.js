@@ -598,7 +598,7 @@ class MovieClipPlugin {
 	 * @private
 	 */
 	static install () {
-		// Tween._installPlugin(MovieClipPlugin);
+		Tween._installPlugin(MovieClipPlugin);
 	}
 
 	/**
