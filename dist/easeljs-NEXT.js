@@ -25,8 +25,10 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-(function(exports, tweenjs) {
+(function(exports, Tween, Timeline) {
   "use strict";
+  Tween = "default" in Tween ? Tween["default"] : Tween;
+  Timeline = "default" in Timeline ? Timeline["default"] : Timeline;
   var classCallCheck = function(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function")
@@ -11101,7 +11103,7 @@
        * @type Timeline
        * @default Timeline
        */
-      _this.timeline = new tweenjs.Timeline({
+      _this.timeline = new Timeline({
         useTicks: true,
         paused: true,
         mode: mode,
@@ -11521,7 +11523,16 @@
      * @method install
      * @private
      */
-    MovieClipPlugin.install = function install() {};
+    MovieClipPlugin.install = function install() {
+      Tween._installPlugin(MovieClipPlugin)
+    };
+    /**
+     * @method init
+     * @param {Tween} tween
+     * @param {String} prop
+     * @param {String|Number|Boolean} value
+     * @private
+     */
     MovieClipPlugin.init = function init(tween, prop, value) {
       return value
     };
@@ -15401,5 +15412,5 @@
   exports.SpriteSheetUtils = SpriteSheetUtils;
   exports.UID = UID;
   exports.WebGLInspector = WebGLInspector
-})(this.createjs = this.createjs || {}, createjs);
+})(this.createjs = this.createjs || {}, this.createjs.Tween, this.createjs.Timeline);
 //# sourceMappingURL=easeljs-NEXT.map

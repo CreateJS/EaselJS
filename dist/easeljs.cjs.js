@@ -29,7 +29,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var tweenjs = require("tweenjs");
+
+function _interopDefault(ex) {
+  return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex
+}
+var Tween = _interopDefault(require("tweenjs/src/Tween"));
+var Timeline = _interopDefault(require("tweenjs/src/Timeline"));
 var classCallCheck = function(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function")
@@ -11104,7 +11109,7 @@ var MovieClip = function(_Container) {
      * @type Timeline
      * @default Timeline
      */
-    _this.timeline = new tweenjs.Timeline({
+    _this.timeline = new Timeline({
       useTicks: true,
       paused: true,
       mode: mode,
@@ -11524,7 +11529,16 @@ var MovieClipPlugin = function() {
    * @method install
    * @private
    */
-  MovieClipPlugin.install = function install() {};
+  MovieClipPlugin.install = function install() {
+    Tween._installPlugin(MovieClipPlugin)
+  };
+  /**
+   * @method init
+   * @param {Tween} tween
+   * @param {String} prop
+   * @param {String|Number|Boolean} value
+   * @private
+   */
   MovieClipPlugin.init = function init(tween, prop, value) {
     return value
   };
@@ -15404,4 +15418,3 @@ exports.SpriteSheetBuilder = SpriteSheetBuilder;
 exports.SpriteSheetUtils = SpriteSheetUtils;
 exports.UID = UID;
 exports.WebGLInspector = WebGLInspector;
-//# sourceMappingURL=easeljs-NEXT.cjs.map
