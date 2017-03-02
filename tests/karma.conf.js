@@ -10,18 +10,19 @@ module.exports = function (config) {
       // deps
       "_assets/libs/tweenjs-NEXT.min.js",
       "_assets/libs/preloadjs-NEXT.min.js",
-      // lib and sourcemaps
-      /*"dist/easeljs.old.js",
-      "dist/webgl.old.js",*/
-       "dist/easeljs-NEXT.js",
+      // lib and sourcemap
+      "dist/easeljs-NEXT.js",
       { pattern: "src/**/*.js", included: false },
-      { pattern: "dist/easeljs-NEXT.map", included: false },
+      { pattern: "dist/easeljs-NEXT.js.map", included: false },
       // helpers
       "tests/helpers/helpers.js",
       "node_modules/imagediff/js/imagediff.js",
       // specs
       "tests/spec/*.js"
     ],
+    preprocessors: {
+      "**/*.js": [ "sourcemap" ]
+    },
     proxies: {
       '/_assets/': '/base/_assets/',
       '/assets/': '/base/tests/assets/'

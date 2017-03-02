@@ -15413,4 +15413,4 @@
   exports.UID = UID;
   exports.WebGLInspector = WebGLInspector
 })(this.createjs = this.createjs || {}, this.createjs.Tween, this.createjs.Timeline);
-//# sourceMappingURL=easeljs-NEXT.map
+//# sourceMappingURL=easeljs-NEXT.js.map
