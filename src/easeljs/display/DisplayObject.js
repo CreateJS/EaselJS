@@ -1,11 +1,11 @@
 /*
 * DisplayObject
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 * 
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -111,7 +111,7 @@
  *
  * <h4>Browser Support</h4>
  * All modern browsers that support Canvas will support EaselJS (<a href="http://caniuse.com/canvas">http://caniuse.com/canvas</a>).
- * Browser performance may vary between platforms, for example, Android Canvas has poor hardware support, and is much
+ * Browser window.performance may vary between platforms, for example, Android Canvas has poor hardware support, and is much
  * slower on average than most other browsers.
  *
  * @module EaselJS
@@ -192,7 +192,7 @@ this.createjs = this.createjs||{};
 		this.mouseEnabled = true;
 		
 		/**
-		 * If false, the tick will not run on this display object (or its children). This can provide some performance benefits.
+		 * If false, the tick will not run on this display object (or its children). This can provide some window.performance benefits.
 		 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
 		 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
 		 * @property tickEnabled
@@ -520,7 +520,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @protected
 	 **/
-	var canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); // prevent errors on load in browsers without canvas.
+	var canvas = createjs.createCanvas?createjs.createCanvas():window.document.createElement("canvas"); // prevent errors on load in browsers without canvas.
 	if (canvas.getContext) {
 		DisplayObject._hitTestCanvas = canvas;
 		DisplayObject._hitTestContext = canvas.getContext("2d");
@@ -795,7 +795,7 @@ this.createjs = this.createjs||{};
 	p.cache = function(x, y, width, height, scale) {
 		// draw to canvas.
 		scale = scale||1;
-		if (!this.cacheCanvas) { this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
+		if (!this.cacheCanvas) { this.cacheCanvas = createjs.createCanvas?createjs.createCanvas():window.document.createElement("canvas"); }
 		this._cacheWidth = width;
 		this._cacheHeight = height;
 		this._cacheOffsetX = x;
@@ -1271,7 +1271,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._tick = function(evtObj) {
-		// because tick can be really performance sensitive, check for listeners before calling dispatchEvent.
+		// because tick can be really window.performance sensitive, check for listeners before calling dispatchEvent.
 		var ls = this._listeners;
 		if (ls && ls["tick"]) {
 			// reset & reuse the event object to avoid construction / GC costs:

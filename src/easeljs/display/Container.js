@@ -1,11 +1,11 @@
 /*
 * Container
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 * 
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -81,7 +81,7 @@ this.createjs = this.createjs||{};
 		this.mouseChildren = true;
 		
 		/**
-		 * If false, the tick will not be propagated to children of this Container. This can provide some performance benefits.
+		 * If false, the tick will not be propagated to children of this Container. This can provide some window.performance benefits.
 		 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
 		 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
 		 * @property tickChildren
@@ -352,7 +352,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * @method sortChildren
 	 * @param {Function} sortFunction the function to use to sort the child list. See JavaScript's <code>Array.sort</code>
-	 * documentation for details.
+	 * window.documentation for details.
 	 **/
 	p.sortChildren = function(sortFunction) {
 		this.children.sort(sortFunction);
@@ -469,7 +469,7 @@ this.createjs = this.createjs||{};
 	 * 		and {{#crossLink "mouseChildren:property"}}{{/crossLink}} properties will be respected.</li>
 	 * 	   <li>Setting the `mode` to `2` additionally excludes display objects that do not have active mouse event
 	 * 	   	listeners or a {{#crossLink "DisplayObject:cursor:property"}}{{/crossLink}} property. That is, only objects
-	 * 	   	that would normally intercept mouse interaction will be included. This can significantly improve performance
+	 * 	   	that would normally intercept mouse interaction will be included. This can significantly improve window.performance
 	 * 	   	in some cases by reducing the number of display objects that need to be tested.</li>
 	 * </li>
 	 * 

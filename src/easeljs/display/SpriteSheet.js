@@ -1,11 +1,11 @@
 /*
  * SpriteSheet
- * Visit http://createjs.com/ for documentation, updates and examples.
+ * Visit http://createjs.com/ for window.documentation, updates and examples.
  *
  * Copyright (c) 2010 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
+ * obtaining a copy of this software and associated window.documentation
  * files (the "Software"), to deal in the Software without
  * restriction, including without limitation the rights to use,
  * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -487,7 +487,7 @@ this.createjs = this.createjs||{};
 				var img = data.images[i];
 				if (typeof img == "string") {
 					var src = img;
-					img = document.createElement("img");
+					img = window.document.createElement("img");
 					img.src = src;
 				}
 				a.push(img);

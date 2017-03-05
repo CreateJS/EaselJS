@@ -1,11 +1,11 @@
 /*
 * SpriteStage
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -76,7 +76,7 @@ this.createjs = this.createjs||{};
 	 * @extends Stage
 	 * @constructor
 	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the SpriteStage will render to, or the string id
-	 * of a canvas object in the current document.
+	 * of a canvas object in the current window.document.
 	 * @param {Boolean} preserveDrawingBuffer If true, the canvas is NOT auto-cleared by WebGL (spec discourages true). Useful if you want to use p.autoClear = false.
 	 * @param {Boolean} antialias Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
 	 **/

@@ -1,11 +1,11 @@
 /*
 * Graphics
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -382,7 +382,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 * @type {CanvasRenderingContext2D}
 	 **/
-	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	var canvas = (createjs.createCanvas?createjs.createCanvas():window.document.createElement("canvas"));
 	if (canvas.getContext) {
 		Graphics._ctx = canvas.getContext("2d");
 		canvas.width = canvas.height = 1;
@@ -1098,7 +1098,7 @@ this.createjs = this.createjs||{};
 	 * the existing store. This also affects `drawAsPath()`.
 	 *
 	 * This is useful in cases where you are creating vector graphics in an iterative manner (ex. generative art), so
-	 * that only new graphics need to be drawn (which can provide huge performance benefits), but you wish to retain all
+	 * that only new graphics need to be drawn (which can provide huge window.performance benefits), but you wish to retain all
 	 * of the vector instructions for later use (ex. scaling, modifying, or exporting).
 	 *
 	 * Note that calling store() will force the active path (if any) to be ended in a manner similar to changing

@@ -1,11 +1,11 @@
 /*
 * Bitmap
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 * 
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -75,7 +75,7 @@ this.createjs = this.createjs||{};
 		 * @type HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
 		 **/
 		if (typeof imageOrUri == "string") {
-			this.image = document.createElement("img");
+			this.image = window.document.createElement("img");
 			this.image.src = imageOrUri;
 		} else {
 			this.image = imageOrUri;
@@ -145,12 +145,12 @@ this.createjs = this.createjs||{};
 		return true;
 	};
 	
-	//Note, the doc sections below document using the specified APIs (from DisplayObject)  from
+	//Note, the doc sections below window.document using the specified APIs (from DisplayObject)  from
 	//Bitmap. This is why they have no method implementations.
 	
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
+	 * You should <b>not</b> cache Bitmap instances as it can degrade window.performance.
 	 *
 	 * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work.</strong>
 	 * To see the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
@@ -160,7 +160,7 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
+	 * You should <b>not</b> cache Bitmap instances as it can degrade window.performance.
 	 *
 	 * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work.</strong>
 	 * To see the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
@@ -170,7 +170,7 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
+	 * You should <b>not</b> cache Bitmap instances as it can degrade window.performance.
 	 *
 	 * <strong>However: If you want to use a filter on a Bitmap, you <em>MUST</em> cache it, or it will not work.</strong>
 	 * To see the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}}

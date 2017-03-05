@@ -1,11 +1,11 @@
 /*
 * promote
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://createjs.com/ for window.documentation, updates and examples.
 *
 * Copyright (c) 2010 gskinner.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
+* obtaining a copy of this software and associated window.documentation
 * files (the "Software"), to deal in the Software without
 * restriction, including without limitation the rights to use,
 * copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -41,7 +41,7 @@ this.createjs = this.createjs||{};
  * Promotes any methods on the super class that were overridden, by creating an alias in the format `prefix_methodName`.
  * It is recommended to use the super class's name as the prefix.
  * An alias to the super class's constructor is always added in the format `prefix_constructor`.
- * This allows the subclass to call super class methods without using `function.call`, providing better performance.
+ * This allows the subclass to call super class methods without using `function.call`, providing better window.performance.
  *
  * For example, if `MySubClass` extends `MySuperClass`, and both define a `draw` method, then calling `promote(MySubClass, "MySuperClass")`
  * would add a `MySuperClass_constructor` method to MySubClass and promote the `draw` method on `MySuperClass` to the
