@@ -72,7 +72,7 @@ this.createjs = this.createjs||{};
 	 */
 	function DOMElement(htmlElement) {
 		this.DisplayObject_constructor();
-
+		
 		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
 		this.mouseEnabled = false;
 		
