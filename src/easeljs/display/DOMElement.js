@@ -72,10 +72,10 @@ this.createjs = this.createjs||{};
 	 */
 	function DOMElement(htmlElement) {
 		this.DisplayObject_constructor();
-        	
+
 		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
 		this.mouseEnabled = false;
-        	
+		
 		var style = htmlElement.style;
 		style.position = "absolute";
 		style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
