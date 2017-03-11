@@ -72,15 +72,15 @@ this.createjs = this.createjs||{};
 	 */
 	function DOMElement(htmlElement) {
 		this.DisplayObject_constructor();
-
+		
 		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
 		this.mouseEnabled = false;
-
+		
 		var style = htmlElement.style;
 		style.position = "absolute";
 		style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
-
-
+		
+		
 	// public properties:
 		/**
 		 * The DOM object to manage.
@@ -235,7 +235,7 @@ this.createjs = this.createjs||{};
 		stage&&stage.on("drawend", this._handleDrawEnd, this, true);
 		this.DisplayObject__tick(evtObj);
 	};
-
+	
 	/**
 	 * @method _handleDrawEnd
 	 * @param {Event} evt
@@ -245,13 +245,13 @@ this.createjs = this.createjs||{};
 		var o = this.htmlElement;
 		if (!o) { return; }
 		var style = o.style;
-
+		
 		var props = this.getConcatenatedDisplayProps(this._props), mtx = props.matrix;
-
+		
 		var visibility = props.visible ? "visible" : "hidden";
 		if (visibility != style.visibility) { style.visibility = visibility; }
 		if (!props.visible) { return; }
-
+		
 		var oldProps = this._oldProps, oldMtx = oldProps&&oldProps.matrix;
 		var n = 10000; // precision
 		
