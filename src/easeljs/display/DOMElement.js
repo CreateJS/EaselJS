@@ -88,8 +88,8 @@ this.createjs = this.createjs||{};
 		 * @type HTMLElement
 		 */
 		this.htmlElement = htmlElement;
-		
-		
+	
+	
 	// private properties:
 		/**
 		 * @property _oldMtx
