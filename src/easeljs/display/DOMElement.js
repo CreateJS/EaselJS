@@ -36,25 +36,6 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-	// @todo - Move into separate file.
-	function BrowserDetect() {
-		throw "BrowserDetect cannot be instantiated.";
-	}
-
-	// Returns 2 on a retina macbook pro for example.
-	BrowserDetect.getDevicePixelRatio = function() {
-		var ratio = 1;
-    // To account for zoom, change to use deviceXDPI instead of systemXDPI
-    if (window.screen.systemXDPI != null && window.screen.logicalXDPI != null && window.screen.systemXDPI > window.screen.logicalXDPI) {
-      // Only allow for values > 1
-    	ratio = window.screen.systemXDPI / window.screen.logicalXDPI;
-    } else if (window.devicePixelRatio != null) {
-      ratio = window.devicePixelRatio;
-    }
-    return ratio;
-	}
-
-
 // constructor:
 	/**
 	 * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>
@@ -90,15 +71,15 @@ this.createjs = this.createjs||{};
 	 */
 	function DOMElement(htmlElement) {
 		this.DisplayObject_constructor();
-		
+
 		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
 		this.mouseEnabled = false;
-		
+
 		var style = htmlElement.style;
 		style.position = "absolute";
 		style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
-		
-		
+
+
 	// public properties:
 		/**
 		 * The DOM object to manage.
@@ -106,8 +87,8 @@ this.createjs = this.createjs||{};
 		 * @type HTMLElement
 		 */
 		this.htmlElement = htmlElement;
-	
-	
+
+
 	// private properties:
 		/**
 		 * @property _oldMtx
@@ -115,7 +96,7 @@ this.createjs = this.createjs||{};
 		 * @protected
 		 */
 		this._oldProps = null;
-		this._devicePixelRatio = BrowserDetect.getDevicePixelRatio();
+		this._devicePixelRatio = this._getDevicePixelRatio();
 	}
 	var p = createjs.extend(DOMElement, createjs.DisplayObject);
 
@@ -253,7 +234,7 @@ this.createjs = this.createjs||{};
 		stage&&stage.on("drawend", this._handleDrawEnd, this, true);
 		this.DisplayObject__tick(evtObj);
 	};
-	
+
 	/**
 	 * @method _handleDrawEnd
 	 * @param {Event} evt
@@ -263,16 +244,16 @@ this.createjs = this.createjs||{};
 		var o = this.htmlElement;
 		if (!o) { return; }
 		var style = o.style;
-		
+
 		var props = this.getConcatenatedDisplayProps(this._props), mtx = props.matrix;
-		
+
 		var visibility = props.visible ? "visible" : "hidden";
 		if (visibility != style.visibility) { style.visibility = visibility; }
 		if (!props.visible) { return; }
-		
+
 		var oldProps = this._oldProps, oldMtx = oldProps&&oldProps.matrix;
 		var n = 10000; // precision
-		
+
 		if (!oldMtx || !oldMtx.equals(mtx)) {
 			var str = "matrix(" + (mtx.a*n|0)/n/this._devicePixelRatio +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n/this._devicePixelRatio +","+ (mtx.tx+0.5|0)/this._devicePixelRatio;
 			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty+0.5|0)/this._devicePixelRatio +")";
@@ -280,13 +261,26 @@ this.createjs = this.createjs||{};
 			if (!oldProps) { oldProps = this._oldProps = new createjs.DisplayProps(true, NaN); }
 			oldProps.matrix.copy(mtx);
 		}
-		
+
 		if (oldProps.alpha != props.alpha) {
 			style.opacity = ""+(props.alpha*n|0)/n;
 			oldProps.alpha = props.alpha;
 		}
 	};
 
+	p._getDevicePixelRatio = function() {
+		var ratio = 1;
+        // To account for zoom, change to use deviceXDPI instead of systemXDPI
+        if (window.screen.systemXDPI != null &&
+            window.screen.logicalXDPI != null &&
+            window.screen.systemXDPI > window.screen.logicalXDPI) {
+            // Only allow for values > 1
+    	    ratio = window.screen.systemXDPI / window.screen.logicalXDPI;
+        } else if (window.devicePixelRatio != null) {
+            ratio = window.devicePixelRatio;
+        }
+        return ratio;
+	};
 
 	createjs.DOMElement = createjs.promote(DOMElement, "DisplayObject");
 }());
