@@ -275,16 +275,14 @@ this.createjs = this.createjs||{};
      */
 	p._getDevicePixelRatio = function() {
 		var ratio = 1;
-        // To account for zoom, change to use deviceXDPI instead of systemXDPI
-        if (window.screen.systemXDPI != null &&
-            window.screen.logicalXDPI != null &&
-            window.screen.systemXDPI > window.screen.logicalXDPI) {
-            // Only allow for values > 1
-    	    ratio = window.screen.systemXDPI / window.screen.logicalXDPI;
-        } else if (window.devicePixelRatio != null) {
-            ratio = window.devicePixelRatio;
-        }
-        return ratio;
+        	// To account for zoom, change to use deviceXDPI instead of systemXDPI
+        	if (window.screen.systemXDPI != null && window.screen.logicalXDPI != null && window.screen.systemXDPI > window.screen.logicalXDPI) {
+            		// Only allow for values > 1
+    	    		ratio = window.screen.systemXDPI / window.screen.logicalXDPI;
+        	} else if (window.devicePixelRatio != null) {
+            		ratio = window.devicePixelRatio;
+        	}
+        	return ratio;
 	};
 
 	createjs.DOMElement = createjs.promote(DOMElement, "DisplayObject");
