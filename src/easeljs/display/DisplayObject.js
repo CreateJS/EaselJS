@@ -795,7 +795,7 @@ this.createjs = this.createjs||{};
 	 * this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
 	 * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must manually
 	 * update the cache by calling <code>updateCache()</code> again. You must specify the cached area via the x, y, w,
-	 * and h parameters. This defines the rectangle that will be rendered and cached  using this display object's coordinates.
+	 * and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates.
 	 *
 	 * <h4>Example</h4>
 	 * For example if you defined a Shape that drew a circle at 0, 0 with a radius of 25:
@@ -812,7 +812,7 @@ this.createjs = this.createjs||{};
 	 * will add padding to the canvas dimensions.
 	 *
 	 * In previous versions caching was handled on DisplayObject but has since been moved to {{#crossLink "BitmapCache"}}{{/crossLink}}.
-	 * This allows for easier interaction and alternate cache methods like WebGL and {{#crossLink "StageGL"}}{{/crossLink}}.
+	 * This allows for easier interaction and alternate cache methods like WebGL with {{#crossLink "StageGL"}}{{/crossLink}}.
 	 *
 	 * @method cache
 	 * @param {Number} x The x coordinate origin for the cache region.
@@ -822,7 +822,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
 	 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
 	 * 	cached elements with greater fidelity. Default is 1.
-	 * @param {Object} options When using alternate displays there may be extra caching opportunities or needs.
+	 * @param {Object} [options=undefined] Specify additional parameters for the cache logic
 	 **/
 	p.cache = function(x, y, width, height, scale, options) {
 		if(!this.bitmapCache){

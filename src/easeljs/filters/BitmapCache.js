@@ -257,11 +257,8 @@ this.createjs = this.createjs||{};
 	 * @param {Number} y The y coordinate origin for the cache region.
 	 * @param {Number} width The width of the cache region.
 	 * @param {Number} height The height of the cache region.
-	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape
-	 * using `myShape.cache(0,0,100,100,2)`, then the resulting cacheCanvas will be 200x200 pixels. This lets you scale
-	 * and rotate cached elements with greater fidelity. The default is 1.
-	 * @param {Object} [options=undefined] When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be
-	 * extra caching opportunities or requirements.
+	 * @param {Number} [scale=1] The scale at which the cache will be created.
+	 * @param {Object} [options=undefined] Specify additional parameters for the cache logic
 	 **/
 	 p.define = function(target, x, y, width, height, scale, options) {
 		if(!target){ throw "No symbol to cache"; }

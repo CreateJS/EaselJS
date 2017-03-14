@@ -1887,7 +1887,8 @@ this.createjs = this.createjs||{};
 			for (var n in this._textureIDs) {
 				if (this._textureIDs[n] == tex._storeID) { delete this._textureIDs[n]; }
 			}
-			tex._imageData._storeID = tex._storeID = undefined;
+			if(tex._imageData) { tex._imageData._storeID = undefined; }
+			tex._imageData = tex._storeID = undefined;
 		}
 
 		// make sure to drop it out of an active slot
@@ -2117,7 +2118,7 @@ this.createjs = this.createjs||{};
 			gl.clear(gl.COLOR_BUFFER_BIT);
 			this._drawCover(gl, flipY);
 		} else {
-			//TODO: DHG: this is less than ideal a flipped inital render for this circumstance might help, adjust the perspective matrix?
+			//TODO: DHG: this is less than ideal. A flipped initial render for this circumstance might help. Adjust the perspective matrix?
 			if (flipY) {
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
 				renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
@@ -2422,18 +2423,20 @@ this.createjs = this.createjs||{};
 		 *
 		 * Replaces the context2D cache draw with the option for WebGL or context2D drawing.
 		 *
-		 * - If options is set to "true" a StageGL is created and contained on the object for use when rendering a cache.
-		 * - If options is a StageGL instance it will not create one but use the one provided.
-		 * - If options is undefined a Context 2D cache will be performed.
+		 * - If options.useGL is set to "new" a StageGL is created and contained on the object for use when rendering a cache.
+		 * - If options.useGL is set to "stage" if the current stage is a StageGL it will be used. If not then it will default to "new".
+		 * - If options.useGL is a StageGL instance it will not create one but use the one provided.
+		 * - If options.useGL is undefined a Context 2D cache will be performed.
 		 *
 		 * This means you can use any combination of StageGL and 2D with either, neither, or both the stage and cache being
-		 * WebGL. Using true with a StageGL display list is not recommended, but still an option. It should be avoided due
-		 * to performance reasons and the Image loading limitation noted in the class complications above.
+		 * WebGL. Using "new" with a StageGL display list is highly unrecommended, but still an option. It should be avoided
+		 * due to negative performance reasons and the Image loading limitation noted in the class complications above.
 		 * 
-		 * When a "options" is set to its own stage, performance is increased by using "RenderTextures" instead of canvases.
-		 * These are Internal Textures on the graphics card instead of separate canvas elements. Because they are no longer 
-		 * canvases you cannot perform operations you could with a regular canvas. The benefit is that this avoids the 
-		 * slowdown of copying the texture back and forth from the GPU to a Canvas element.
+		 * When "options.useGL" is set to the parent stage of the target, performance is increased by using "RenderTextures"
+		 * instead of canvases. These are internal Textures on the graphics card instead of separate canvas elements.
+		 * Because they are no longer canvases you cannot perform operations you could with a regular canvas. The benefit
+		 * is that this avoids the slowdown of copying the texture back and forth from the GPU to a Canvas element.
+		 * This means "stage" is the recommended option when available.
 		 *
 		 * A StageGL cache does not infer the ability to draw objects a StageGL cannot currently draw, i.e. do not use a
 		 * WebGL context cache when caching a Shape, Text, etc.
@@ -2441,7 +2444,7 @@ this.createjs = this.createjs||{};
 		 *
 		 *     var stage = new createjs.Stage();
 		 *     var bmp = new createjs.Bitmap(src);
-		 *     bmp.cache(0, 0, bmp.width, bmp.height, 1, true);          // no StageGL to use, so make one
+		 *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: "new"});          // no StageGL to use, so make one
 		 *
 		 *     var shape = new createjs.Shape();
 		 *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
@@ -2451,16 +2454,16 @@ this.createjs = this.createjs||{};
 		 *
 		 *     var stageGL = new createjs.StageGL();
 		 *     var bmp = new createjs.Bitmap(src);
-		 *     bmp.cache(0, 0, bmp.width, bmp.height, 1, stageGL);       // use our StageGL to cache
+		 *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: "stage"});       // use our StageGL to cache
 		 *
 		 *     var shape = new createjs.Shape();
 		 *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
 		 *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
 		 *
 		 * You may wish to create your own StageGL instance to control factors like clear color, transparency, AA, and
-		 * others. If you do, pass a new instance in instead of 'true' but set {{#crossLink "StageGL/isCacheControlled"}}{{/crossLink}}
+		 * others. If you do, pass a new instance in instead of "true", set {{#crossLink "StageGL/isCacheControlled"}}{{/crossLink}}
 		 * to true on your instance. This will trigger it to behave correctly, and not assume your main context is WebGL.
-		 * Do not set it to true if you passed in this object's stage.
+		 * Do not set it to true if you passed in this object's stage as this will cause unintended consequences.
 		 *
 		 * @public
 		 * @method BitmapCache.cache
@@ -2471,33 +2474,36 @@ this.createjs = this.createjs||{};
 		 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape
 		 * using myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and
 		 * rotate cached elements with greater fidelity. Default is 1.
-		 * @param {undefined|Boolean|StageGL} [options=undefined] Select whether to use context 2D, or WebGL rendering, and
-		 * whether to make a new stage instance or use an existing one.
-		 * See above for extensive details on use.
+		 * @param {Object} [options=undefined] Specify additional parameters for the cache logic
+		 * @param {undefined|"new"|"stage"|StageGL} [options.useGL=undefined] Select whether to use context 2D, or WebGL rendering, and
+		 * whether to make a new stage instance or use an existing one. See above for extensive details on use.
 		 * @for BitmapCache
 		 */
 		bc._updateSurfacePreGL = bc._updateSurface;
 		bc._updateSurface = function () {
-			if (!this._options) {
+			if (!this._options || !this._options.useGL) {
 				this._updateSurfacePreGL();
 				return;
 			}
 
 			// create it if it's missing
 			if (!this._webGLCache) {
-				if (this._options === true || this.target.stage !== this._options) {
-					// a StageGL dedicated to this cache
+				if (this._options.useGL === "stage" && this.target.stage.isWebGL) {
+					this.target.cacheCanvas = true; // will be replaced with RenderTexture, temporary positive value for old "isCached" checks
+					this._webGLCache = this.target.stage;
+
+				} else if(this._options.useGL === "new" || this._options.useGL === "stage") {
 					this.target.cacheCanvas = document.createElement("canvas");
 					this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, undefined, undefined, true);
 					this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
+
+				} else if(this._options.useGL instanceof createjs.StageGL) {
+					this.target.cacheCanvas = true; // will be replaced with RenderTexture, temporary positive value for old "isCached" checks
+					this._webGLCache = this._options.useGL;
+					this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
+
 				} else {
-					// a StageGL re-used by this cache
-					try{
-						this.target.cacheCanvas = true;	// we'll replace this with a render texture during the draw as it changes per draw
-						this._webGLCache = this._options;
-					} catch(e) {
-						throw "Invalid StageGL object used for cache param";
-					}
+					throw "Invalid cache selection or invalid StageGL object used for cache param";
 				}
 			}
 
