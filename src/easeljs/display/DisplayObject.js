@@ -150,8 +150,8 @@ this.createjs = this.createjs||{};
 		this.alpha = 1;
 
 		/**
-		 * If a cache is active, this returns the canvas that holds the cached version of this display object. See {{#crossLink "DisplayObject/cache:method"}}{{/crossLink}}
-		 * for more information.
+		 * If a cache is active, this returns the canvas that holds the image of this display object. See {{#crossLink "DisplayObject/cache:method"}}{{/crossLink}}
+		 * for more information. Use this to display the result of a cache. This will be a HTMLCanvasElement unless special cache rules have been deliberately enabled for this cache.
 		 * @property cacheCanvas
 		 * @type {HTMLCanvasElement | Object}
 		 * @default null
@@ -161,7 +161,7 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * If a cache has been made, this returns the class that is managing the cacheCanvas and its properties. See {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * for more information.
+		 * for more information. Use this to control, inspect, and change the cache. In special circumstances this may be a modified or subclassed BitmapCache.
 		 * @property bitmapCache
 		 * @type {BitmapCache}
 		 * @default null
@@ -795,7 +795,7 @@ this.createjs = this.createjs||{};
 	 * this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
 	 * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must manually
 	 * update the cache by calling <code>updateCache()</code> again. You must specify the cached area via the x, y, w,
-	 * and h parameters. This defines the rectangle that will be rendered and cached  using this display object's coordinates.
+	 * and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates.
 	 *
 	 * <h4>Example</h4>
 	 * For example if you defined a Shape that drew a circle at 0, 0 with a radius of 25:
@@ -808,11 +808,11 @@ this.createjs = this.createjs||{};
 	 * application. Check out the {{#crossLink "Filter"}}{{/crossLink}} class for more information. Some filters
 	 * (ex. BlurFilter) may not work as expected in conjunction with the scale param.
 	 * 
-	 * Usually, the resulting cacheCanvas will have the dimensions width*scale by height*scale, however some filters (ex. BlurFilter)
+	 * Usually, the resulting cacheCanvas will have the dimensions width * scale, height * scale, however some filters (ex. BlurFilter)
 	 * will add padding to the canvas dimensions.
 	 *
-	 * Actual implementation of the caching mechanism can change with a {{#crossLink "StageGL"}}{{/crossLink}} and so
-	 * all caching and filter behaviour has been moved to the {{#crossLink "BitmapCache"}}{{/crossLink}}
+	 * In previous versions caching was handled on DisplayObject but has since been moved to {{#crossLink "BitmapCache"}}{{/crossLink}}.
+	 * This allows for easier interaction and alternate cache methods like WebGL with {{#crossLink "StageGL"}}{{/crossLink}}.
 	 *
 	 * @method cache
 	 * @param {Number} x The x coordinate origin for the cache region.
@@ -822,7 +822,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
 	 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
 	 * 	cached elements with greater fidelity. Default is 1.
-	 * @param {Object} options When using alternate displays there may be extra caching opportunities or needs.
+	 * @param {Object} [options=undefined] Specify additional parameters for the cache logic
 	 **/
 	p.cache = function(x, y, width, height, scale, options) {
 		if(!this.bitmapCache){
@@ -845,8 +845,8 @@ this.createjs = this.createjs||{};
 	 *      shapeInstance.setStrokeStyle(3).beginStroke("#ff0000").moveTo(100, 100).lineTo(200,200);
 	 *      shapeInstance.updateCache();
 	 *
-	 * Actual implementation of the caching mechanism can change with a {{#crossLink "StageGL"}}{{/crossLink}} and so
-	 * all caching and filter behaviour has been moved to the {{#crossLink "BitmapCache"}}{{/crossLink}}
+	 * In previous versions caching was handled on DisplayObject but has since been moved to {{#crossLink "BitmapCache"}}{{/crossLink}}.
+	 * This allows for easier interaction and alternate cache methods like WebGL and {{#crossLink "StageGL"}}{{/crossLink}}.
 	 *
 	 * @method updateCache
 	 * @param {String} compositeOperation The compositeOperation to use, or null to clear the cache and redraw it.

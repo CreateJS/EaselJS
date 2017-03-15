@@ -192,11 +192,12 @@ this.createjs = this.createjs||{};
 	/**
 	 * Returns a clone of the Bitmap instance.
 	 * @method clone
-	 * @param Boolean node Whether the underlying dom element should be cloned as well.
+	 * @param {Boolean} node Whether the underlying dom element should be cloned as well.
 	 * @return {Bitmap} a clone of the Bitmap instance.
 	 **/
 	p.clone = function(node) {
-		var image = node?this.image.cloneNode():this.image;
+		var image = this.image;
+		if(image && node){ image = image.cloneNode(); }
 		var o = new Bitmap(image);
 		if (this.sourceRect) { o.sourceRect = this.sourceRect.clone(); }
 		this._cloneProps(o);

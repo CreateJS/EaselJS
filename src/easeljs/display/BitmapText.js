@@ -121,6 +121,21 @@ this.createjs = this.createjs || {};
 		 * @protected
 		 **/
 		this._oldProps = {text:0,spriteSheet:0,lineHeight:0,letterSpacing:0,spaceWidth:0};
+
+		/**
+		 * Used to track the object which this class attached listeners to, helps optimize listener attachment.
+		 * @property _oldStage
+		 * @type Stage
+		 * @protected
+		 */
+		this._oldStage = null;
+		/**
+		 * The event listener proxy triggered drawing draw for special circumstances.
+		 * @property _drawAction
+		 * @type function
+		 * @protected
+		 */
+		this._drawAction = null;
 	}
 	var p = createjs.extend(BitmapText, createjs.Container);
 
@@ -282,7 +297,11 @@ this.createjs = this.createjs || {};
 
 	p._tick = function(evtObj) {
 		var stage = this.stage;
-		stage && stage.on("drawstart", this._updateText, this, true);
+		if(stage && stage !== this._oldStage) {
+			this._drawAction && stage.off("drawstart", this._drawAction);
+			this._drawAction = stage.on("drawstart", this._updateText, this);
+			this._oldStage = stage;
+		}
 		this.DisplayObject__tick(evtObj);
 	};
 

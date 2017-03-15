@@ -114,6 +114,7 @@ this.createjs = this.createjs || {};
 	// TODO: deprecated
 	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
+	/** docced in super class **/
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
 		if(!this._mapTexture) { this._mapTexture = gl.createTexture(); }
 

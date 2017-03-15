@@ -97,6 +97,21 @@ this.createjs = this.createjs||{};
 		 * @protected
 		 */
 		this._oldProps = null;
+
+		/**
+		 * Used to track the object which this class attached listeners to, helps optimize listener attachment.
+		 * @property _oldStage
+		 * @type Stage
+		 * @protected
+		 */
+		this._oldStage = null;
+		/**
+		 * The event listener proxy triggered drawing draw for special circumstances.
+		 * @property _drawAction
+		 * @type function
+		 * @protected
+		 */
+		this._drawAction = null;
 	}
 	var p = createjs.extend(DOMElement, createjs.DisplayObject);
 
@@ -231,7 +246,11 @@ this.createjs = this.createjs||{};
 	 */
 	p._tick = function(evtObj) {
 		var stage = this.stage;
-		stage && stage.on("drawend", this._handleDrawEnd, this, true);
+		if(stage && stage !== this._oldStage) {
+			this._drawAction && stage.off("drawend", this._drawAction);
+			this._drawAction = stage.on("drawend", this._handleDrawEnd, this);
+			this._oldStage = stage;
+		}
 		this.DisplayObject__tick(evtObj);
 	};
 	

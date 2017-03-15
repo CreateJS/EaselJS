@@ -1,4 +1,6 @@
-beforeEach(function (done) {
+
+
+beforeAll(function (done) {
 	this.assetsBasePath = "_assets/art/";
 
 	this.sColor = "#000";
@@ -6,23 +8,6 @@ beforeEach(function (done) {
 
 	this.stageWidth = 200;
 	this.stageHeight = 200;
-
-	this.stage = new createjs.Stage(imagediff.createCanvas(this.stageWidth, this.stageHeight));
-
-	jasmine.addMatchers(imagediff.jasmine);
-
-	var img = this.img = new Image();
-
-	img.onload = function () {
-		done();
-	};
-
-	img.onerror = function () {
-		fail(img.src + ' failed to load');
-		done();
-	};
-
-	img.src = this.assetsBasePath + "daisy.png";
 
 	/**
 	 * Compare each drawing to a pre-saved base line image.
@@ -56,25 +41,52 @@ beforeEach(function (done) {
 			dest[n] = src[n];
 		}
 		return dest;
-	}
-
-	var customMatchers = {
-		toBeInRange: function(util, customEqualityTesters) {
-			return {
-				compare: function(actual, excpected, range) {
-					var result = {};
-					range = range || 0;
-
-					if (actual <= (excpected + range) && actual >= (excpected - range)) {
-						result.pass = true;
-					} else {
-						result.pass = false;
-					}
-					return result;
-				}
-			};
-		}
 	};
 
-	jasmine.addMatchers(customMatchers);
+	done();
 });
+
+beforeEach(function (done) {
+	this.stage = new createjs.Stage(imagediff.createCanvas(this.stageWidth, this.stageHeight));
+
+	jasmine.addMatchers(customMatchers);
+	jasmine.addMatchers(imagediff.jasmine);
+
+	// image
+	var img = this.img = new Image();
+	img.onload = function () {
+		done();
+	};
+	img.onerror = function () {
+		fail(img.src + ' failed to load');
+		done();
+	};
+	img.src = this.assetsBasePath + "daisy.png";
+
+	// shape
+	var size = 32;
+	var hr = 1;
+	var rim = hr*2;
+	var gfx = (new createjs.Graphics()).ss(rim).s("#353535").lf(["#22CC22","#006600"], [0,1], 0,0, size,size).r(hr,hr, size-rim,size-rim).ef().es();
+	var shape = this.shape = new createjs.Shape(gfx);
+	shape.width = shape.height = size;
+});
+
+
+var customMatchers = {
+	toBeInRange: function(util, customEqualityTesters) {
+		return {
+			compare: function(actual, expected, range) {
+				var result = {};
+				range = range || 0;
+
+				if (actual <= (expected + range) && actual >= (expected - range)) {
+					result.pass = true;
+				} else {
+					result.pass = false;
+				}
+				return result;
+			}
+		};
+	}
+};

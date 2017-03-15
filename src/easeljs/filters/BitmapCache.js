@@ -45,19 +45,17 @@ this.createjs = this.createjs||{};
 	 *
 	 * Caching in this context is purely visual, and will render the DisplayObject out into an image to be used instead
 	 * of the object. The actual cache itself is still stored on the target with the {{#crossLink "DisplayObject/cacheCanvas:property"}}{{/crossLink}}.
+	 * Working with a singular image like a {{#crossLink "Bitmap"}}{{/crossLink}} there is little benefit to performing 
+	 * a cache as it is already a single image. Caching is best done on containers containing multiple complex parts that 
+	 * do not move often, so that rendering the image instead will improve overall rendering speed. A cached object will 
+	 * not visually update until explicitly told to do so with a call to update, much like a Stage. If a cache is being 
+	 * updated every frame it is likely not improving rendering performance. Cache are best used when updates will be sparse.
 	 *
-	 * Working with a singular image like a {{#crossLink "Bitmap"}}{{/crossLink}}, there is little benefit to performing
-	 * a cache operation, as it is already a single image. Caching is best done on containers that have multiple complex
-	 * parts that do not change often, so that rendering the image will improve overall rendering speed. A cached object
-	 * will not visually update until explicitly told to do so with a call to {{#crossLink "Stage/update"}}{{/crossLink}},
-	 * much like a Stage. If a cache is being updated every frame, it is likely not improving rendering performance.
-	 * Caches are best used when updates will be sparse.
-	 *
-	 * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need.
-	 * The BitmapCache is also responsible for applying filters to objects, and reads each {{#crossLink "Filter"}}{{/crossLink}}.
-	 * Real-time Filters are not recommended when dealing with a Context2D canvas if performance is a concern. For best
-	 * performance and to still allow for some visual effects, use a {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}}
-	 * when possible.
+	 * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need, 
+	 * and to physically enable some effects. The BitmapCache is also responsible for applying filters to objects and 
+	 * reads each {{#crossLink "Filter"}}{{/crossLink}} due to this relationship. Real-time Filters are not recommended 
+	 * performance wise when dealing with a Context2D canvas. For best performance and to still allow for some visual 
+	 * effects use a compositeOperation when possible.
 	 * @class BitmapCache
 	 * @constructor
 	 **/
@@ -103,8 +101,8 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * The internal scale of the cache image, does not affects display size. This is useful to both increase and
-		 * decrease render quality. Objects with increased scales are more likely to look good when scaled up. Objects
-		 * with decreased scales can save on rendering performance.
+		 * decrease render quality. Objects with increased scales are more likely to look good when scaled up or rotated.
+		 * Objects with decreased scales can save on rendering performance.
 		 * @property scale
 		 * @protected
 		 * @type {Number}
@@ -113,8 +111,7 @@ this.createjs = this.createjs||{};
 		this.scale = 1;
 
 		/**
-		 * The relative offset of the {{#crossLink "BitmapCache/x:property"}}{{/crossLink}} position, used for drawing
-		 * into the cache with the correct offsets. Re-calculated every update call before drawing.
+		 * The x offset used for drawing into the cache itself, accounts for both transforms applied.
 		 * @property offX
 		 * @protected
 		 * @type {Number}
@@ -123,8 +120,7 @@ this.createjs = this.createjs||{};
 		this.offX = 0;
 
 		/**
-		 * The relative offset of the {{#crossLink "BitmapCache/y:property"}}{{/crossLink}} position, used for drawing
-		 * into the cache with the correct offsets. Re-calculated every update call before drawing.
+		 * The y offset used for drawing into the cache itself, accounts for both transforms applied.
 		 * @property offY
 		 * @protected
 		 * @type {Number}
@@ -133,8 +129,8 @@ this.createjs = this.createjs||{};
 		this.offY = 0;
 
 		/**
-		 * Track how many times the cache has been updated, mostly used for preventing duplicate cacheURLs. This can be
-		 * useful to see if a cache has been updated.
+		 * Track how many times the cache has been updated, mostly used for preventing duplicate cacheURLs.
+		 * This can be useful to see if a cache has been updated.
 		 * @property cacheID
 		 * @type {Number}
 		 * @default 0
@@ -143,24 +139,22 @@ this.createjs = this.createjs||{};
 
 		// protected:
 		/**
-		 * Relative offset of the x position, used for drawing the cache into other scenes.
+		 * The relative offset of the filter's x position, used for drawing the cache onto its container.
 		 * Re-calculated every update call before drawing.
 		 * @property _filterOffY
 		 * @protected
 		 * @type {Number}
 		 * @default 0
-		 * @todo Is this description right? Its the same as offX.
 		 **/
 		this._filterOffX = 0;
 
 		/**
-		 * Relative offset of the y position, used for drawing into the cache into other scenes.
+		 * The relative offset of the filter's y position, used for drawing the cache onto its container.
 		 * Re-calculated every update call before drawing.
 		 * @property _filterOffY
 		 * @protected
 		 * @type {Number}
 		 * @default 0
-		 * @todo Is this description right? Its the same as offY.
 		 **/
 		this._filterOffY = 0;
 
@@ -183,8 +177,7 @@ this.createjs = this.createjs||{};
 		this._cacheDataURL = null;
 
 		/**
-		 * Internal tracking of final bounding width, approximately `width*scale;` however, filters can complicate the
-		 * actual value.
+		 * Internal tracking of final bounding width, approximately width*scale; however, filters can complicate the actual value.
 		 * @property _drawWidth
 		 * @protected
 		 * @type {Number}
@@ -193,8 +186,7 @@ this.createjs = this.createjs||{};
 		this._drawWidth = 0;
 
 		/**
-		 * Internal tracking of final bounding height, approximately `height*scale;` however, filters can complicate the
-		 * actual value.
+		 * Internal tracking of final bounding height, approximately height*scale; however, filters can complicate the actual value.
 		 * @property _drawHeight
 		 * @protected
 		 * @type {Number}
@@ -218,14 +210,11 @@ this.createjs = this.createjs||{};
 	// p.initialize = function() {}; // searchable for devs wondering where it is.
 
 	/**
-	 * Returns the bounds that surround all applied filters. This relies on each filter to describe how it changes
-	 * bounds.
+	 * Returns the bounds that surround all applied filters, relies on each filter to describe how it changes bounds.
 	 * @method getFilterBounds
 	 * @param {DisplayObject} target The object to check the filter bounds for.
-	 * @param {Rectangle} [output=null] Optional parameter, if provided then calculated bounds will be applied to that
-	 * object.
-	 * @return {Rectangle} a string representation of the instance.
-	 * @todo Please clarify if the return type is a Rectangle or string.
+	 * @param {Rectangle} [output=null] Optional parameter, if provided then calculated bounds will be applied to that object.
+	 * @return {Rectangle} bounds object representing the bounds with filters.
 	 * @static
 	 **/
 	BitmapCache.getFilterBounds = function(target, output) {
@@ -268,11 +257,8 @@ this.createjs = this.createjs||{};
 	 * @param {Number} y The y coordinate origin for the cache region.
 	 * @param {Number} width The width of the cache region.
 	 * @param {Number} height The height of the cache region.
-	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape
-	 * using `myShape.cache(0,0,100,100,2)`, then the resulting cacheCanvas will be 200x200 pixels. This lets you scale
-	 * and rotate cached elements with greater fidelity. The default is 1.
-	 * @param {Object} [options=undefined] When using things like a {{#crossLink "StageGL"}}{{/crossLink}} there may be
-	 * extra caching opportunities or requirements.
+	 * @param {Number} [scale=1] The scale at which the cache will be created.
+	 * @param {Object} [options=undefined] Specify additional parameters for the cache logic
 	 **/
 	 p.define = function(target, x, y, width, height, scale, options) {
 		if(!target){ throw "No symbol to cache"; }
@@ -364,8 +350,9 @@ this.createjs = this.createjs||{};
 
 // private methods:
 	/**
-	 * Basic context2D caching works by creating a new canvas element and setting its physical size. This function will
-	 * create and or size the canvas as needed.
+	 * Create or resize the invisible canvas/surface that is needed for the display object(s) to draw to,
+	 * and in turn be used in their stead when drawing. The surface is resized to the size defined
+	 * by the width and height, factoring in scaling and filters. Adjust them to adjust the output size.
 	 * @method _updateSurface
 	 * @protected
 	 **/
@@ -407,7 +394,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Work through every filter and apply its individual transformation to it.
+	 * Work through every filter and apply its individual visual transformation.
 	 * @method _applyFilters
 	 * @protected
 	 **/

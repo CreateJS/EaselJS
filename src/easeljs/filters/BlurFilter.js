@@ -136,20 +136,20 @@ this.createjs = this.createjs||{};
 		if(isNaN(value) || value < 0){ value = 0; }
 		this._blurY = value;
 		this._blurYTable = this._getTable(value * this._quality);
-		this.updateShader();
+		this._updateShader();
 	};
 	p.setBlurY = function(value) {
 		if(isNaN(value) || value < 0){ value = 0; }
 		this._blurY = value;
 		this._blurYTable = this._getTable(value * this._quality);
-		this.updateShader();
+		this._updateShader();
 	};
 	p.getQuality = function() { return this._quality; };
 	p.setQuality = function(value) {
 		this._quality = value;
 		this._blurXTable = this._getTable(this._blurX * this._quality);
 		this._blurYTable = this._getTable(this._blurY * this._quality);
-		this.updateShader();
+		this._updateShader();
 	};
 
 	try {
@@ -160,6 +160,12 @@ this.createjs = this.createjs||{};
 		});
 	} catch (e) { console.log(e); }
 
+	/**
+	 * Internal lookup function to create gaussian distribution.
+	 * @method _getTable
+	 * @param {Number} spread How many steps in the curve.
+	 * @return {Array<Number>} An array with Math.ceil(spread*2) entries with appropriately distributed weights.
+	 */
 	p._getTable = function(spread) {
 		var EDGE = 4.2;
 		if(spread<=1) { return [1]; }
@@ -176,7 +182,11 @@ this.createjs = this.createjs||{};
 		return result.map(function(currentValue, index, array) { return currentValue/factor; });
 	};
 
-	p.updateShader = function() {
+	/**
+	 * Internal update function to create shader properties.
+	 * @method _updateShader
+	 */
+	p._updateShader = function() {
 		if(this._blurX === undefined || this._blurY === undefined){ return; }
 		var result = this.FRAG_SHADER_TEMPLATE;
 		result = result.replace(/\{\{blurX\}\}/g, (this._blurXTable.length).toFixed(0));
