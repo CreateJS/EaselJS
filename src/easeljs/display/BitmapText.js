@@ -34,13 +34,17 @@ this.createjs = this.createjs || {};
 
 // constructor:
 	/**
-	 * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
-	 * using new line characters, but automatic wrapping is not supported. See the 
-	 * {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
+	 * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported using new line characters,
+	 * but automatic wrapping is not supported. See the {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
 	 * property for more information on defining glyphs.
-	 * 
-	 * <strong>Important:</strong> BitmapText extends Container, but is not designed to be used as one.
+	 *
+	 * <strong>Important:</strong> While BitmapText extends Container, it is not designed to be used as one.
 	 * As such, methods like addChild and removeChild are disabled.
+	 *
+	 * <strong>Important:</strong> This class needs to be notified it is about to be drawn, this will happen automatically
+	 * if you call stage.update, calling stage.draw or disabling tickEnabled will miss important steps and it will render
+	 * stale information.
+	 *
 	 * @class BitmapText
 	 * @extends DisplayObject
 	 * @param {String} [text=""] The text to display.

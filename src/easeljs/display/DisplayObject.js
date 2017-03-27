@@ -195,7 +195,7 @@ this.createjs = this.createjs||{};
 		/**
 		 * If false, the tick will not run on this display object (or its children). This can provide some performance benefits.
 		 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
-		 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+		 * on some display objects (ex. Sprite & MovieClip frame advancing, BitmapText & DOMElement display properties).
 		 * @property tickEnabled
 		 * @type Boolean
 		 * @default true
