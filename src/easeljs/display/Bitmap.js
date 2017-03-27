@@ -89,6 +89,12 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 */
 		this.sourceRect = null;
+
+	// private properties:
+		/**
+		 * Docced in superclass.
+		 */
+		this._webGLRenderStyle = createjs.DisplayObject._StageGL_BITMAP;
 	}
 	var p = createjs.extend(Bitmap, createjs.DisplayObject);
 	

@@ -490,6 +490,16 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this._bounds = null;
+
+		/**
+		 * Where StageGL should look for required display properties, matters only for leaf display objects. Containers
+		 * or cached objects won't use this property, it's for native display of terminal elements.
+		 * @property _webGLRenderStyle
+		 * @protected
+		 * @type {number}
+		 * @default 0
+		 */
+		this._webGLRenderStyle = DisplayObject._StageGL_NONE;
 	}
 	var p = createjs.extend(DisplayObject, createjs.EventDispatcher);
 
@@ -534,6 +544,33 @@ this.createjs = this.createjs||{};
 	 * @default false
 	 **/
 	DisplayObject._snapToPixelEnabled = false; // stage.snapToPixelEnabled is temporarily copied here during a draw to provide global access.
+
+	/**
+	 * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+	 * @property _StageGL_NONE
+	 * @protected
+	 * @static
+	 * @type {number}
+	 */
+	DisplayObject._StageGL_NONE = 0;
+
+	/**
+	 * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+	 * @property _StageGL_SPRITE
+	 * @protected
+	 * @static
+	 * @type {number}
+	 */
+	DisplayObject._StageGL_SPRITE = 1;
+
+	/**
+	 * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+	 * @property _StageGL_BITMAP
+	 * @protected
+	 * @static
+	 * @type {number}
+	 */
+	DisplayObject._StageGL_BITMAP = 2;
 
 	/**
 	 * @property _hitTestCanvas

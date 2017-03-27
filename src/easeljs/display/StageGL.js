@@ -2409,20 +2409,6 @@ this.createjs = this.createjs||{};
 	 * We need to modify other classes, do this during our class initialization
 	 */
 	(function _injectWebGLFunctionality() {
-		//TODO: maybe re-examine this approach?
-		// Set which classes are compatible with StageGL. The order is important!
-		// Reflect any changes to the drawing loop
-		var candidates = [createjs.Sprite, createjs.Bitmap];
-		candidates.forEach(function (_class, index) {
-			_class.prototype._webGLRenderStyle = index + 1;
-		});
-
-		/**
-		 * See {{#crossLink "StageGL/BitmapCache.cache"}}{{/crossLink}}
-		 * @pubic
-		 * @method cache
-		 */
-
 		var bc = createjs.BitmapCache.prototype;
 		/**
 		 * Functionality injected to {{#crossLink "BitmapCache"}}{{/crossLink}}. Ensure StageGL is loaded after all other

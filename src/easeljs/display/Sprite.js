@@ -161,8 +161,12 @@ this.createjs = this.createjs||{};
 		 * @default false
 		 **/
 		this._skipAdvance = false;
-		
-		
+
+		/**
+		 * Docced in superclass.
+		 */
+		this._webGLRenderStyle = createjs.DisplayObject._StageGL_SPRITE;
+
 		if (frameOrAnimation != null) { this.gotoAndPlay(frameOrAnimation); }
 	}
 	var p = createjs.extend(Sprite, createjs.DisplayObject);
