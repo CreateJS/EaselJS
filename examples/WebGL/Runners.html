@@ -21,8 +21,8 @@
 		var runnerSS, textSS, sparkleSS;
 		var runnerContainer, sparkleContainer;
 		var sparklePool;
-		var maxRunners = 300;
-		var maxSparkles = 1000;
+		var maxRunners = 200;
+		var maxSparkles = 800;
 
 		function init() {
 			if (location.search.match(/c2d/i)) {
@@ -31,6 +31,7 @@
 			} else {
 				stage = new createjs.StageGL("testCanvas");
 				stage.setClearColor("#66AA99");
+				//stage.updateSimultaneousTextureCount(1);
 			}
 
 			// reduce visual complexity if WebGL is not supported:

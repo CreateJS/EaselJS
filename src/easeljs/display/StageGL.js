@@ -707,10 +707,9 @@ this.createjs = this.createjs||{};
 	 */
 	StageGL.REGULAR_FRAGMENT_BODY = (
 		"void main(void) {" +
-			"int src = int(indexPicker);" +
 			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
 
-			"if (src == 0) {" +
+			"if (indexPicker <= 0.5) {" +
 				"color = texture2D(uSampler[0], vTextureCoord);" +
 				"{{alternates}}" +
 			"}" +
@@ -1590,7 +1589,7 @@ this.createjs = this.createjs||{};
 		// resolve issue with no dynamic samplers by creating correct samplers in if else chain
 		var insert = "";
 		for (var i = 1; i<this._batchTextureCount; i++) {
-			insert += "} else if (src == "+ i +") { color = texture2D(uSampler["+ i +"], vTextureCoord);";
+			insert += "} else if (indexPicker <= "+ i +".5) { color = texture2D(uSampler["+ i +"], vTextureCoord);";
 		}
 		str = str.replace(/{{alternates}}/g, insert);
 		str = str.replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
