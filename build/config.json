@@ -19,6 +19,7 @@
 	"../src/easeljs/display/DisplayObject.js",
 	"../src/easeljs/display/Container.js",
 	"../src/easeljs/display/Stage.js",
+	"../src/easeljs/display/StageGL.js",
 	"../src/easeljs/display/Bitmap.js",
 	"../src/easeljs/display/Sprite.js",
 	"../src/easeljs/display/Shape.js",
@@ -38,10 +39,6 @@
 	"../src/easeljs/filters/ColorMatrixFilter.js",
 	"../src/easeljs/ui/Touch.js",
 	"../src/easeljs/version.js"
-  ],
-  "gl_source": [
-	  "../src/easeljs/display/StageGL.js",
-	  "../src/easeljs/display/WebGLInspector.js"
   ],
   "docs_out_path": "../../createjs-com_version2/docs/easeljs/",
   "connect_root": "../",

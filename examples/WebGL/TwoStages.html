@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<base href="../"/>
 	<title>EaselJS Example: Passing interactions between a Context2D and WebGL stage.</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 
 	<style>
 		.canvasDiv {
@@ -54,19 +53,15 @@
 	<canvas id="c2dCanvas" width="958" height="160"></canvas>
 </div>
 
-<script src="../_assets/js/examples.js"></script>
+<script src="../../_assets/js/examples.js"></script>
 <!-- Note: All core EaselJS classes are listed here: -->
-<script src="../lib/easeljs-NEXT.combined.js"></script>
+<script src="../../lib/easeljs-NEXT.combined.js"></script>
 <!-- We also provide hosted minified versions of all CreateJS libraries.
   http://code.createjs.com -->
 
-<!-- WebGL specific classes -->
-<script src="../src/easeljs/display/SpriteContainer.js"></script>
-<script src="../src/easeljs/display/StageGL.js"></script>
+<script src="../../_assets/libs/tweenjs-NEXT.min.js"></script>
 
-<script src="../_assets/libs/tweenjs-NEXT.min.js"></script>
-
-<script src="../_assets/art/VectorButton.js"></script>
+<script src="../../_assets/art/VectorButton.js"></script>
 
 <!-- We also provide hosted minified versions of all CreateJS libraries.
   http://code.createjs.com -->
@@ -75,7 +70,7 @@
 	function init() {
 		// load the source image:
 		var image = new Image();
-		image.src = "../_assets/art/spritesheet_button.png";
+		image.src = "../../_assets/art/spritesheet_button.png";
 		image.onload = handleImageLoad;
 	}
 

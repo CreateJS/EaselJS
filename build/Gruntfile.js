@@ -17,8 +17,8 @@ module.exports = function (grunt) {
 				// Setup watch to watch the source and rebuild when it changes.  Also livereload
 				watch: {
 					js: {
-						files: [getConfigValue('easel_source'),
-							getConfigValue('gl_source'),
+						files: [
+							getConfigValue('easel_source'),
 							getConfigValue('watch_exclude_files')
 						],
 						tasks: ['sourceBuild'],
@@ -63,8 +63,7 @@ module.exports = function (grunt) {
 					},
 					build: {
 						files: {
-							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.min.js': getConfigValue('easel_source'),
-							'output/webgl-<%= version %>.min.js': getConfigValue('gl_source')
+							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.min.js': getConfigValue('easel_source')
 						}
 					}
 				},
@@ -107,12 +106,7 @@ module.exports = function (grunt) {
 									[
 										{cwd: '', config:'config.json', source:'easel_source'}
 									]
-							),
-							'output/webgl-<%= version %>.combined.js': combineSource(
-									[
-										{cwd: '', config:'config.json', source:'gl_source'}
-									]
-							),
+							)
 						}
 					}
 				},
@@ -273,7 +267,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-compress');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-sass');
-	grunt.loadNpmTasks('grunt-contrib-clean')
+	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadTasks('tasks/');
