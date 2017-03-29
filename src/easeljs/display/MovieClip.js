@@ -410,9 +410,16 @@ this.createjs = this.createjs||{};
 	p.draw = function(ctx, ignoreCache) {
 		// draw to cache first:
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		this._updateTimeline();
+		this.updateState();
 		this.Container_draw(ctx, ignoreCache);
 		return true;
+	};
+
+	/**
+	 * Docced in superclass.
+	 **/
+	p.updateState = function() {
+		this._updateTimeline();
 	};
 	
 	/**

@@ -2180,6 +2180,9 @@ this.createjs = this.createjs||{};
 
 			if (!(item.visible && concatAlpha)) { continue; }
 			if (!item.cacheCanvas || ignoreCache) {
+				if (item.updateState){
+					item.updateState();
+				}
 				if (item.children) {
 					this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
 					continue;

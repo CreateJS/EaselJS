@@ -41,9 +41,6 @@ this.createjs = this.createjs || {};
 	 * <strong>Important:</strong> While BitmapText extends Container, it is not designed to be used as one.
 	 * As such, methods like addChild and removeChild are disabled.
 	 *
-	 * <strong>Important:</strong> This class needs to be notified it is about to be drawn, this will happen automatically
-	 * if you call stage.update, calling stage.draw or disabling tickEnabled will miss important steps and it will render
-	 * stale information.
 	 *
 	 * @class BitmapText
 	 * @extends DisplayObject
@@ -183,8 +180,15 @@ this.createjs = this.createjs || {};
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return; }
-		//this._updateText();
+		this.updateState();
 		this.Container_draw(ctx, ignoreCache);
+	};
+
+	/**
+	 * Docced in superclass.
+	 **/
+	p.updateState = function() {
+		this._updateText();
 	};
 	
 	/**
@@ -297,16 +301,6 @@ this.createjs = this.createjs || {};
 	p._getSpaceWidth = function(ss) {
 		var frame = this._getFrame("1",ss) || this._getFrame("l",ss) || this._getFrame("e",ss) || this._getFrame("a",ss) || ss.getFrame(0);
 		return frame ? frame.rect.width : 1;
-	};
-
-	p._tick = function(evtObj) {
-		var stage = this.stage;
-		if(stage && stage !== this._oldStage) {
-			this._drawAction && stage.off("drawstart", this._drawAction);
-			this._drawAction = stage.on("drawstart", this._updateText, this);
-			this._oldStage = stage;
-		}
-		this.DisplayObject__tick(evtObj);
 	};
 
 	/**
