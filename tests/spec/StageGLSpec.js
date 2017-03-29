@@ -88,7 +88,12 @@ describe("StageGL", function () {
 	});
 
 	beforeEach(function (done) {
+		this.stageGL = makeStage();
 		this.bmp = new createjs.Bitmap(this.img);
+		this.shape = new createjs.Shape();
+		this.shape.graphics.ss(2).s("#222222").f("#44DD44").dr(2,2, 60,60).ef();
+		this.shape.width = 64;
+		this.shape.height = 64;
 		done();
 	});
 

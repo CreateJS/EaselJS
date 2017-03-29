@@ -214,7 +214,7 @@ describe("DisplayList", function () {
 				expect(clone[n]).toBe(props[n]);
 			}
 		});
-	})
+	});
 	it("getTransformedBounds() should work", function () {
 		var bmp = new createjs.Bitmap(this.img);
 		this.stage.addChild(bmp);
@@ -599,15 +599,13 @@ describe("DisplayList", function () {
 
 		var img = new Image();
 		img.onload = function () {
+			data.images = [img];
 			var ss = new createjs.SpriteSheet(data);
 			var text = new createjs.BitmapText("abcdef\nghijklm\nnopqr\nstuvw\nxyz!,.?", ss);
 			_this.stage.addChild(text);
 
-			// Need to delay this for Safari.
-			setTimeout(function () {
-				_this.stage.update();
-				_this.compareBaseLine("assets/BitmapText.png", done, expect);
-			}, 5);
+			_this.stage.update();
+			_this.compareBaseLine("assets/BitmapText.png", done, expect);
 		};
 		img.onerror = function () {
 			fail(img.src + ' failed to load');
