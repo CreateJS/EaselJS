@@ -13,16 +13,13 @@
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
-	<!-- WebGL specific classes -->
-	<script src="../../src/easeljs/display/StageGL.js"></script>
-
 	<script id="editable">
 		var stage;
 		var runnerSS, textSS, sparkleSS;
 		var runnerContainer, sparkleContainer;
 		var sparklePool;
-		var maxRunners = 300;
-		var maxSparkles = 1000;
+		var maxRunners = 200;
+		var maxSparkles = 800;
 
 		function init() {
 			if (location.search.match(/c2d/i)) {
@@ -31,6 +28,7 @@
 			} else {
 				stage = new createjs.StageGL("testCanvas");
 				stage.setClearColor("#66AA99");
+				//stage.updateSimultaneousTextureCount(1);
 			}
 
 			// reduce visual complexity if WebGL is not supported:
@@ -135,7 +133,7 @@
 				var sc = Math.random() + 1;
 				sparkle.setTransform(x, y, sc, sc, Math.random() * 360);
 				var r = Math.random() * Math.PI * 2;
-				var v = Math.random() * 15;
+				var v = Math.random() * 14.5 + 0.5; // if this was 0 there was a bit of a central clump, too high leaves a dead spot
 				sparkle.velX = velX + Math.cos(r) * v;
 				sparkle.velY = velY + Math.sin(r) * v;
 				sparkleContainer.addChild(sparkle);

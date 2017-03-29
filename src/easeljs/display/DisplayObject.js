@@ -195,7 +195,7 @@ this.createjs = this.createjs||{};
 		/**
 		 * If false, the tick will not run on this display object (or its children). This can provide some performance benefits.
 		 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
-		 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+		 * on some display objects (ex. Sprite & MovieClip frame advancing, and DOMElement display properties).
 		 * @property tickEnabled
 		 * @type Boolean
 		 * @default true
@@ -490,6 +490,16 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 **/
 		this._bounds = null;
+
+		/**
+		 * Where StageGL should look for required display properties, matters only for leaf display objects. Containers
+		 * or cached objects won't use this property, it's for native display of terminal elements.
+		 * @property _webGLRenderStyle
+		 * @protected
+		 * @type {number}
+		 * @default 0
+		 */
+		this._webGLRenderStyle = DisplayObject._StageGL_NONE;
 	}
 	var p = createjs.extend(DisplayObject, createjs.EventDispatcher);
 
@@ -534,6 +544,33 @@ this.createjs = this.createjs||{};
 	 * @default false
 	 **/
 	DisplayObject._snapToPixelEnabled = false; // stage.snapToPixelEnabled is temporarily copied here during a draw to provide global access.
+
+	/**
+	 * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+	 * @property _StageGL_NONE
+	 * @protected
+	 * @static
+	 * @type {number}
+	 */
+	DisplayObject._StageGL_NONE = 0;
+
+	/**
+	 * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+	 * @property _StageGL_SPRITE
+	 * @protected
+	 * @static
+	 * @type {number}
+	 */
+	DisplayObject._StageGL_SPRITE = 1;
+
+	/**
+	 * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+	 * @property _StageGL_BITMAP
+	 * @protected
+	 * @static
+	 * @type {number}
+	 */
+	DisplayObject._StageGL_BITMAP = 2;
 
 	/**
 	 * @property _hitTestCanvas
@@ -756,7 +793,7 @@ this.createjs = this.createjs||{};
 		}
 		return false;
 	};
-	
+
 	/**
 	 * Applies this display object's transformation, alpha, globalCompositeOperation, clipping path (mask), and shadow
 	 * to the specified context. This is typically called prior to {{#crossLink "DisplayObject/draw"}}{{/crossLink}}.
@@ -813,6 +850,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * In previous versions caching was handled on DisplayObject but has since been moved to {{#crossLink "BitmapCache"}}{{/crossLink}}.
 	 * This allows for easier interaction and alternate cache methods like WebGL with {{#crossLink "StageGL"}}{{/crossLink}}.
+	 * For more information on the options object, see the BitmapCache {{#crossLink "BitmapCache/define"}}{{/crossLink}}.
 	 *
 	 * @method cache
 	 * @param {Number} x The x coordinate origin for the cache region.
@@ -1210,6 +1248,19 @@ this.createjs = this.createjs||{};
 
 
 // private methods:
+	/**
+	 * Called before the object gets drawn and is a chance to ensure the display state of the object is correct.
+	 * Mostly used by {{#crossLink "MovieClip"}}{{/crossLink}} and {{#crossLink "BitmapText"}}{{/crossLink}} to
+	 * correct their internal state and children prior to being drawn.
+	 *
+	 * Is manually called via draw in a {{#crossLink "Stage"}}{{/crossLink}} but is automatically called when
+	 * present in a {{#crossLink "StageGL"}}{{/crossLink}} instance.
+	 *
+	 * @method _updateState
+	 * @default null
+	 */
+	p._updateState = null;
+
 	// separated so it can be used more easily in subclasses:
 	/**
 	 * @method _cloneProps

@@ -65,6 +65,10 @@ this.createjs = this.createjs||{};
 	 *          console.log("clicked");
 	 *      }
 	 *
+	 * <strong>Important:</strong> This class needs to be notified it is about to be drawn, this will happen automatically
+	 * if you call stage.update, calling stage.draw or disabling tickEnabled will miss important steps and it will render
+	 * stale information.
+	 *
 	 * @class DOMElement
 	 * @extends DisplayObject
 	 * @constructor

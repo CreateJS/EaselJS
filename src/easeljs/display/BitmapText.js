@@ -34,13 +34,14 @@ this.createjs = this.createjs || {};
 
 // constructor:
 	/**
-	 * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
-	 * using new line characters, but automatic wrapping is not supported. See the 
-	 * {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
+	 * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported using new line characters,
+	 * but automatic wrapping is not supported. See the {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
 	 * property for more information on defining glyphs.
-	 * 
-	 * <strong>Important:</strong> BitmapText extends Container, but is not designed to be used as one.
+	 *
+	 * <strong>Important:</strong> While BitmapText extends Container, it is not designed to be used as one.
 	 * As such, methods like addChild and removeChild are disabled.
+	 *
+	 *
 	 * @class BitmapText
 	 * @extends DisplayObject
 	 * @param {String} [text=""] The text to display.
@@ -179,7 +180,7 @@ this.createjs = this.createjs || {};
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return; }
-		//this._updateText();
+		this._updateState();
 		this.Container_draw(ctx, ignoreCache);
 	};
 	
@@ -231,6 +232,13 @@ this.createjs = this.createjs || {};
 
 
 // private methods:
+	/**
+	 * Docced in superclass.
+	 **/
+	p._updateState = function() {
+		this._updateText();
+	};
+
  	/**
 	 * @method _cloneProps
 	 * @param {BitmapText} o
@@ -295,18 +303,8 @@ this.createjs = this.createjs || {};
 		return frame ? frame.rect.width : 1;
 	};
 
-	p._tick = function(evtObj) {
-		var stage = this.stage;
-		if(stage && stage !== this._oldStage) {
-			this._drawAction && stage.off("drawstart", this._drawAction);
-			this._drawAction = stage.on("drawstart", this._updateText, this);
-			this._oldStage = stage;
-		}
-		this.DisplayObject__tick(evtObj);
-	};
-
 	/**
-	 * @method _drawText
+	 * @method _updateText
 	 * @protected
 	 **/
 	p._updateText = function() {
