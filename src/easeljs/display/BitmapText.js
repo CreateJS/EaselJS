@@ -180,15 +180,8 @@ this.createjs = this.createjs || {};
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return; }
-		this.updateState();
+		this._updateState();
 		this.Container_draw(ctx, ignoreCache);
-	};
-
-	/**
-	 * Docced in superclass.
-	 **/
-	p.updateState = function() {
-		this._updateText();
 	};
 	
 	/**
@@ -239,6 +232,13 @@ this.createjs = this.createjs || {};
 
 
 // private methods:
+	/**
+	 * Docced in superclass.
+	 **/
+	p._updateState = function() {
+		this._updateText();
+	};
+
  	/**
 	 * @method _cloneProps
 	 * @param {BitmapText} o
@@ -304,7 +304,7 @@ this.createjs = this.createjs || {};
 	};
 
 	/**
-	 * @method _drawText
+	 * @method _updateText
 	 * @protected
 	 **/
 	p._updateText = function() {

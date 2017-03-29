@@ -795,19 +795,6 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Called before the object gets drawn and is a chance to ensure the display state of the object is correct.
-	 * Mostly used by {{#crossLink "MovieClip"}}{{/crossLink}} and {{#crossLink "BitmapText"}}{{/crossLink}} to
-	 * correct their internal state and children prior to being drawn.
-	 *
-	 * Is manually called via draw in a {{#crossLink "Stage"}}{{/crossLink}} but is automatically called when
-	 * present in a {{#crossLink "StageGL"}}{{/crossLink}} instance.
-	 *
-	 * @method updateState
-	 * @default null
-	 */
-	p.updateState = null;
-	
-	/**
 	 * Applies this display object's transformation, alpha, globalCompositeOperation, clipping path (mask), and shadow
 	 * to the specified context. This is typically called prior to {{#crossLink "DisplayObject/draw"}}{{/crossLink}}.
 	 * @method updateContext
@@ -1261,6 +1248,19 @@ this.createjs = this.createjs||{};
 
 
 // private methods:
+	/**
+	 * Called before the object gets drawn and is a chance to ensure the display state of the object is correct.
+	 * Mostly used by {{#crossLink "MovieClip"}}{{/crossLink}} and {{#crossLink "BitmapText"}}{{/crossLink}} to
+	 * correct their internal state and children prior to being drawn.
+	 *
+	 * Is manually called via draw in a {{#crossLink "Stage"}}{{/crossLink}} but is automatically called when
+	 * present in a {{#crossLink "StageGL"}}{{/crossLink}} instance.
+	 *
+	 * @method _updateState
+	 * @default null
+	 */
+	p._updateState = null;
+
 	// separated so it can be used more easily in subclasses:
 	/**
 	 * @method _cloneProps
