@@ -190,10 +190,12 @@ this.createjs = this.createjs||{};
 			for (var i=0; i<l; i++) { this.addChild(arguments[i]); }
 			return arguments[l-1];
 		}
-		if (child.parent) { child.parent.removeChild(child); }
+		// Note: a lot of duplication with addChildAt, but push is WAY faster than splice.
+		var par=child.parent, silent = par === this;
+		par&&par._removeChildAt(createjs.indexOf(par.children, child), silent);
 		child.parent = this;
 		this.children.push(child);
-		child.dispatchEvent("added");
+		if (!silent) { child.dispatchEvent("added"); }
 		return child;
 	};
 
@@ -229,10 +231,11 @@ this.createjs = this.createjs||{};
 			for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i], indx+i); }
 			return arguments[l-2];
 		}
-		if (child.parent) { child.parent.removeChild(child); }
+		var par=child.parent, silent = par === this;
+		par&&par._removeChildAt(createjs.indexOf(par.children, child), silent);
 		child.parent = this;
 		this.children.splice(index, 0, child);
-		child.dispatchEvent("added");
+		if (!silent) { child.dispatchEvent("added"); }
 		return child;
 	};
 
@@ -260,7 +263,7 @@ this.createjs = this.createjs||{};
 			for (var i=0; i<l; i++) { good = good && this.removeChild(arguments[i]); }
 			return good;
 		}
-		return this.removeChildAt(createjs.indexOf(this.children, child));
+		return this._removeChildAt(createjs.indexOf(this.children, child));
 	};
 
 	/**
@@ -286,15 +289,10 @@ this.createjs = this.createjs||{};
 			for (var i=0; i<l; i++) { a[i] = arguments[i]; }
 			a.sort(function(a, b) { return b-a; });
 			var good = true;
-			for (var i=0; i<l; i++) { good = good && this.removeChildAt(a[i]); }
+			for (var i=0; i<l; i++) { good = good && this._removeChildAt(a[i]); }
 			return good;
 		}
-		if (index < 0 || index > this.children.length-1) { return false; }
-		var child = this.children[index];
-		if (child) { child.parent = null; }
-		this.children.splice(index, 1);
-		child.dispatchEvent("removed");
-		return true;
+		return this._removeChildAt(index);
 	};
 
 	/**
@@ -308,7 +306,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.removeAllChildren = function() {
 		var kids = this.children;
-		while (kids.length) { this.removeChildAt(0); }
+		while (kids.length) { this._removeChildAt(0); }
 	};
 
 	/**
@@ -574,6 +572,24 @@ this.createjs = this.createjs||{};
 			arr.push(clone);
 		}
 	};
+	
+	/**
+	 * Removes the child at the specified index from the display list, and sets its parent to null.
+	 * Used by `removeChildAt`, `addChild`, and `addChildAt`.
+	 * @method removeChildAt
+	 * @protected
+	 * @param {Number} index The index of the child to remove.
+	 * @param {Boolean} [silent] Prevents dispatch of `removed` event if true.
+	 * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
+	 **/
+	p._removeChildAt = function(index, silent) {
+		if (index < 0 || index > this.children.length-1) { return false; }
+		var child = this.children[index];
+		if (child) { child.parent = null; }
+		this.children.splice(index, 1);
+		if (!silent) { child.dispatchEvent("removed"); }
+		return true;
+	};
 
 	/**
 	 * @method _getObjectsUnderPoint
@@ -600,7 +616,7 @@ this.createjs = this.createjs||{};
 			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
 			if (!hitArea && !this._testMask(child, x, y)) { continue; }
 			
-			// if a child container has a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
+			// if a child container has a hitArea then we only need to check its hitAre2a, so we can treat it as a normal DO:
 			if (!hitArea && child instanceof Container) {
 				var result = child._getObjectsUnderPoint(x, y, arr, mouse, activeListener, currentDepth+1);
 				if (!arr && result) { return (mouse && !this.mouseChildren) ? this : result; }

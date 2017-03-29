@@ -28,7 +28,7 @@
 
 /**
  * A collection of Classes that are shared across all the CreateJS libraries.  The classes are included in the minified
- * files of each library and are available on the createsjs namespace directly.
+ * files of each library and are available on the createjs namespace directly.
  *
  * <h4>Example</h4>
  *

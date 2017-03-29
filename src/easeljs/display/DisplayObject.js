@@ -328,8 +328,9 @@ this.createjs = this.createjs||{};
 		/**
 		 * The composite operation indicates how the pixels of this display object will be composited with the elements
 		 * behind it. If `null`, this property is inherited from the parent container. For more information, read the
-		 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
-		 * whatwg spec on compositing</a>.
+		 * <a href="https://html.spec.whatwg.org/multipage/scripting.html#dom-context-2d-globalcompositeoperation">
+		 * whatwg spec on compositing</a>. For a list of supported compositeOperation value, visit
+		 * <a href="https://drafts.fxtf.org/compositing/">the W3C draft on Compositing and Blending</a>.
 		 * @property compositeOperation
 		 * @type {String}
 		 * @default null
@@ -673,6 +674,13 @@ this.createjs = this.createjs||{};
 	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressmove
 	 * event will be generated on that object whenever the mouse moves until the mouse press is released. This can be
 	 * useful for dragging and similar operations.
+	 *
+	 * **Please note** that if the initial mouse target from a `mousedown` event is removed from the stage after being pressed
+	 * (e.g. during a `pressmove` event), a `pressmove` event is still generated. However since it is no longer in the
+	 * display list, the event can not bubble. This means that previous ancestors (parent containers) will not receive
+	 * the event, and therefore can not re-dispatch it. If you intend to listen for `{{#crossLink "DisplayObject/pressup:event"}}{{/crossLink}}`
+	 * or `pressmove` on a dynamic object (such as a {{#crossLink "MovieClip"}}{{/crossLink}} or {{#crossLink "Container"}}{{/crossLink}}),
+	 * then ensure you set {{#crossLink "Container/mouseChildren:property"}}{{/crossLink}} to `false`.
 	 * @event pressmove
 	 * @since 0.7.0
 	 */
@@ -681,6 +689,13 @@ this.createjs = this.createjs||{};
 	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressup event
 	 * will be generated on that object when that mouse press is released. This can be useful for dragging and similar
 	 * operations.
+	 *
+	 * **Please note** that if the initial mouse target from a `mousedown` event is removed from the stage after being pressed
+	 * (e.g. during a `pressmove` event), a `pressup` event is still generated. However since it is no longer in the
+	 * display list, the event can not bubble. This means that previous ancestors (parent containers) will not receive
+	 * the event, and therefore can not re-dispatch it. If you intend to listen for `{{#crossLink "DisplayObject/pressmove:event"}}{{/crossLink}}`
+	 * or `pressup` on a dynamic object (such as a {{#crossLink "MovieClip"}}{{/crossLink}} or {{#crossLink "Container"}}{{/crossLink}}),
+	 * then ensure you set {{#crossLink "Container/mouseChildren:property"}}{{/crossLink}} to `false`.
 	 * @event pressup
 	 * @since 0.7.0
 	 */
@@ -839,7 +854,7 @@ this.createjs = this.createjs||{};
 	 *
 	 *      var shape = new createjs.Shape();
 	 *      shape.graphics.beginFill("#ff0000").drawCircle(0, 0, 25);
-	 *      myShape.cache(-25, -25, 50, 50);
+	 *      shape.cache(-25, -25, 50, 50);
 	 *
 	 * Note that filters need to be defined <em>before</em> the cache is applied or you will have to call updateCache after
 	 * application. Check out the {{#crossLink "Filter"}}{{/crossLink}} class for more information. Some filters
@@ -888,7 +903,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * @method updateCache
 	 * @param {String} compositeOperation The compositeOperation to use, or null to clear the cache and redraw it.
-	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
+	 * <a href="https://html.spec.whatwg.org/multipage/scripting.html#dom-context-2d-globalcompositeoperation">
 	 * whatwg spec on compositing</a>.
 	 **/
 	p.updateCache = function(compositeOperation) {
@@ -1222,7 +1237,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} height The height of the bounds.
 	 **/
 	p.setBounds = function(x, y, width, height) {
-		if (x == null) { this._bounds = x; }
+		if (x == null) { this._bounds = x; return; }
 		this._bounds = (this._bounds || new createjs.Rectangle()).setValues(x, y, width, height);
 	};
 
