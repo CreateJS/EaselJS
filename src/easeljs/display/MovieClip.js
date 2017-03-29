@@ -40,9 +40,8 @@ this.createjs = this.createjs||{};
 // constructor:
 	/**
 	 * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
-	 * you to create objects which encapsulate timeline animations, state changes, and synched actions. Due to the
-	 * complexities inherent in correctly setting up a MovieClip, it is largely intended for tool output and is not included
-	 * in the main EaselJS library.
+	 * you to create objects which encapsulate timeline animations, state changes, and synched actions. The MovieClip
+	 * class has been included in the EaselJS minified file since 0.7.0.
 	 *
 	 * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
 	 * been made to support time-based timelines in the future.

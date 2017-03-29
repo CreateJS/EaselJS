@@ -1799,11 +1799,13 @@ this.createjs = this.createjs||{};
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		} catch(e) {
 			var errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
-			if (console.error) {
+			if(console.error) {
 				//TODO: LM: I recommend putting this into a log function internally, since you do it so often, and each is implemented differently.
-				console.error(e, errString);
-			} else {
-				console && console.log(e, errString);
+				console.error(errString);
+				console.error(e);
+			} else if (console) {
+				console.log(errString);
+				console.log(e);
 			}
 		}
 
