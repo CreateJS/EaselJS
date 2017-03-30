@@ -371,7 +371,7 @@ this.createjs = this.createjs||{};
 			this._webGLCache = false;
 		} else {
 			var stage = this.target.stage;
-			if (stage instanceof StageGL){
+			if (stage instanceof createjs.StageGL){
 				stage.releaseTexture(this.target.cacheCanvas);
 				this.target.cacheCanvas.remove();
 			}

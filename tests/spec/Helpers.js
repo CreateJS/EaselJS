@@ -56,8 +56,8 @@ beforeAll(function(done) {
 			dest[n] = src[n];
 		}
 		return dest;
-	}
-	
+	};
+
 	var img = this.img = new Image();
 
 	img.onload = function () {
@@ -68,9 +68,9 @@ beforeAll(function(done) {
 		fail(img.src + ' failed to load');
 		done();
 	};
-	
+
 	img.src = "_assets/art/" + "daisy.png";
-}, 5000)
+}, 5000);
 
 beforeEach(function () {
 
