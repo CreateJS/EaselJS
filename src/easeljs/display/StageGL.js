@@ -228,13 +228,13 @@ this.createjs = this.createjs||{};
 		this._webGLContext = null;
 
 		/**
-		 * The color to use when the WebGL canvas has been cleared.
+		 * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
 		 * @property _clearColor
 		 * @protected
 		 * @type {Object}
-		 * @default {r: 0.00, g: 0.00, b: 0.00, a: 0.00} (black)
+		 * @default {r: 0.50, g: 0.50, b: 0.50, a: 0.00}
 		 */
-		this._clearColor = {r: 0.00, g: 0.00, b: 0.00, a: 0.00};
+		this._clearColor = {r: 0.50, g: 0.50, b: 0.50, a: 0.00};
 
 		/**
 		 * The maximum number of cards (aka a single sprite) that can be drawn in one draw call. Use getter/setters to
@@ -914,7 +914,7 @@ this.createjs = this.createjs||{};
 				gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._premultiply);
 				//gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
 
-				this.setClearColor();
+				this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 				this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
 			}
 		} else {
