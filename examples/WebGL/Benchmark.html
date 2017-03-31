@@ -55,7 +55,7 @@
 	var CANVAS_WIDTH = 960;
 	var CANVAS_HEIGHT = 400;
 	var MaxPerTick = 100;
-	var MaxEver = 100000;
+	var MaxEver = 50000;
 
 	var guiProps = null;
 	var guiPropsRef = function() {
@@ -184,6 +184,7 @@
 		canvas.height = CANVAS_HEIGHT;
 		if(guiProps.allowWebGL) {
 			stage = new createjs.StageGL(canvas, {transparent: false, autoPurge: -1});
+			stage.setClearColor(0x000000);
 		} else {
 			stage = new createjs.Stage(canvas);
 		}
