@@ -542,7 +542,7 @@ this.createjs = this.createjs||{};
 					ctx.putImageData(data, 0,0);
 					data = null;
 				}
-				filter.applyFilter(ctx, this.x, this.y);
+				filter.applyFilter(ctx, 0,0, w,h);
 			} else {
 				if(!data) {
 					data = ctx.getImageData(0,0, w,h);
