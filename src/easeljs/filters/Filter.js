@@ -69,6 +69,14 @@ this.createjs = this.createjs||{};
 	 **/
 	function Filter() {
 		/**
+		 * A flag stating that this filter uses a context draw mode and cannot be batched into imageData processing.
+		 * @property usesContext
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.usesContext = false;
+
+		/**
 		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
 		 * This should be based upon StageGL.SHADER_VERTEX_BODY_REGULAR
 		 * @property VTX_SHADER
