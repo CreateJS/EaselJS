@@ -77,6 +77,9 @@ this.createjs = this.createjs || {};
 		 **/
 		this.mask = mask;
 
+		/** docced in super class **/
+		this.usesContext = true;
+
 		this.FRAG_SHADER_BODY = (
 			"uniform sampler2D uAlphaSampler;"+
 

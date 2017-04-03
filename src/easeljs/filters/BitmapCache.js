@@ -514,7 +514,7 @@ this.createjs = this.createjs||{};
 			ctx.restore();
 
 			if (target.filters && target.filters.length) {
-				this._applyFilters(target);
+				this._applyFilters(ctx);
 			}
 		}
 		surface._invalid = true;
@@ -525,24 +525,36 @@ this.createjs = this.createjs||{};
 	 * @method _applyFilters
 	 * @protected
 	 **/
-	p._applyFilters = function() {
+	p._applyFilters = function(ctx) {
 		var surface = this.target.cacheCanvas;
 		var filters = this.target.filters;
 
 		var w = surface.width;
 		var h = surface.height;
 
-		// setup
-		var data = surface.getContext("2d").getImageData(0,0, w,h);
+		var data;
 
-		// apply
 		var l = filters.length;
 		for (var i=0; i<l; i++) {
-			filters[i]._applyFilter(data);
+			var filter = filters[i];
+			if(filter.usesContext){
+				if(data) {
+					ctx.putImageData(data, 0,0);
+					data = null;
+				}
+				filter.applyFilter(ctx, this.x, this.y);
+			} else {
+				if(!data) {
+					data = ctx.getImageData(0,0, w,h);
+				}
+				filter._applyFilter(data);
+			}
 		}
 
 		//done
-		surface.getContext("2d").putImageData(data, 0,0);
+		if(data) {
+			ctx.putImageData(data, 0,0);
+		}
 	};
 
 	createjs.BitmapCache = BitmapCache;
