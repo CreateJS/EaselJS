@@ -324,6 +324,8 @@ this.createjs = this.createjs||{};
 		ctx.font = this.font||"10px sans-serif";
 		ctx.textAlign = this.textAlign||"left";
 		ctx.textBaseline = this.textBaseline||"top";
+		ctx.lineJoin = "miter";
+		ctx.miterLimit = 2.5;
 		return ctx;
 	};
 
