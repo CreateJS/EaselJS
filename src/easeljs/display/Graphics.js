@@ -1586,11 +1586,9 @@ this.createjs = this.createjs||{};
 			if (this._stroke) {
 				// doesn't need to be re-applied if it hasn't changed.
 				if (this._strokeDash !== this._oldStrokeDash) {
-					this._oldStrokeDash = this._strokeDash;
 					instr.push(this._strokeDash);
 				}
 				if (this._strokeStyle !== this._oldStrokeStyle) {
-					this._oldStrokeStyle = this._strokeStyle;
 					instr.push(this._strokeStyle);
 				}
 				instr.push(this._stroke);
@@ -1602,6 +1600,8 @@ this.createjs = this.createjs||{};
 		if (commit) {
 			active.length = 0;
 			this._commitIndex = instr.length;
+			this._oldStrokeDash = this._strokeDash;
+			this._oldStrokeStyle = this._strokeStyle;
 		}
 	};
 
