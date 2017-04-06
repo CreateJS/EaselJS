@@ -35,7 +35,6 @@
 	var drawingCanvas;
 	var oldPt;
 	var oldMidPt;
-	var displayCanvas;
 	var image;
 	var bitmap;
 	var maskFilter;
@@ -65,7 +64,12 @@
 		stage.addEventListener("stagemouseup", handleMouseUp);
 		stage.addEventListener("stagemousemove", handleMouseMove);
 		drawingCanvas = new createjs.Shape();
+		drawingCanvas.cache(0, 0, image.width, image.height);
+
 		bitmap = new createjs.Bitmap(image);
+		maskFilter = new createjs.AlphaMaskFilter(drawingCanvas.cacheCanvas);
+		bitmap.filters = [maskFilter];
+		bitmap.cache(0, 0, image.width, image.height);
 
 		blur = new createjs.Bitmap(image);
 		blur.filters = [new createjs.BlurFilter(24, 24, 2), new createjs.ColorMatrixFilter(new createjs.ColorMatrix(60))];
@@ -74,7 +78,6 @@
 		text.text = "Click and Drag to Reveal the Image.";
 
 		stage.addChild(blur, text, bitmap);
-		updateCacheImage(false);
 
 		cursor = new createjs.Shape(new createjs.Graphics().beginFill("#FFFFFF").drawCircle(0, 0, 25));
 		cursor.cursor = "pointer";
@@ -99,7 +102,8 @@
 
 		var midPoint = new createjs.Point(oldPt.x + stage.mouseX >> 1, oldPt.y + stage.mouseY >> 1);
 
-		drawingCanvas.graphics.setStrokeStyle(40, "round", "round")
+		drawingCanvas.graphics.clear()
+				.setStrokeStyle(40, "round", "round")
 				.beginStroke("rgba(0,0,0,0.2)")
 				.moveTo(midPoint.x, midPoint.y)
 				.curveTo(oldPt.x, oldPt.y, oldMidPt.x, oldMidPt.y);
@@ -110,32 +114,16 @@
 		oldMidPt.x = midPoint.x;
 		oldMidPt.y = midPoint.y;
 
-		updateCacheImage(true);
-	}
-
-	function handleMouseUp(event) {
-		updateCacheImage(true);
-		isDrawing = false;
-	}
-
-	function updateCacheImage(update) {
-		if (update) {
-			drawingCanvas.updateCache();
-		} else {
-			drawingCanvas.cache(0, 0, image.width, image.height);
-		}
-
-		maskFilter = new createjs.AlphaMaskFilter(drawingCanvas.cacheCanvas);
-
-		bitmap.filters = [maskFilter];
-		if (update) {
-			bitmap.updateCache(0, 0, image.width, image.height);
-		} else {
-			bitmap.cache(0, 0, image.width, image.height);
-		}
+		drawingCanvas.updateCache("source-over");
+		bitmap.updateCache();
 
 		stage.update();
 	}
+
+	function handleMouseUp(event) {
+		isDrawing = false;
+	}
+
 </script>
 
 </body>
