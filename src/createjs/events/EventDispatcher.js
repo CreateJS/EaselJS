@@ -398,12 +398,10 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._dispatchEvent = function(eventObj, eventPhase) {
-		var l, listeners = (eventPhase==1) ? this._captureListeners : this._listeners;
-		if (eventObj && listeners) {
-			var arr = listeners[eventObj.type];
-			if (!arr||!(l=arr.length)) { return; }
+		var l, arr, listeners = (eventPhase <= 2) ? this._captureListeners : this._listeners;
+		if (eventObj && listeners && (arr = listeners[eventObj.type]) && (l=arr.length)) {
 			try { eventObj.currentTarget = this; } catch (e) {}
-			try { eventObj.eventPhase = eventPhase; } catch (e) {}
+			try { eventObj.eventPhase = eventPhase|0; } catch (e) {}
 			eventObj.removed = false;
 			
 			arr = arr.slice(); // to avoid issues with items being removed or added during the dispatch
@@ -417,6 +415,7 @@ this.createjs = this.createjs||{};
 				}
 			}
 		}
+		if (eventPhase === 2) { this._dispatchEvent(eventObj, 2.1); }
 	};
 
 
