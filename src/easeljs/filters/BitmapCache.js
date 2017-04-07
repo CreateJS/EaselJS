@@ -424,9 +424,9 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._updateSurface = function() {
-		var surface = this.target.cacheCanvas;
-
 		if (!this._options || !this._options.useGL) {
+			var surface = this.target.cacheCanvas;
+
 			// create it if it's missing
 			if(!surface) {
 				surface = this.target.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
@@ -446,7 +446,7 @@ this.createjs = this.createjs||{};
 
 			} else if(this._options.useGL === "new" || this._options.useGL === "stage") {
 				this.target.cacheCanvas = document.createElement("canvas");
-				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, undefined, undefined, true);
+				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true});
 				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
 
 			} else if(this._options.useGL instanceof createjs.StageGL) {
@@ -460,6 +460,7 @@ this.createjs = this.createjs||{};
 		}
 
 		// now size render surfaces
+		var surface = this.target.cacheCanvas;
 		var stageGL = this._webGLCache;
 
 		// if we have a dedicated stage we've gotta size it

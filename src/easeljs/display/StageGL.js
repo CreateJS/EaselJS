@@ -957,8 +957,12 @@ this.createjs = this.createjs||{};
 		if (!this.canvas) { return; }
 		if (StageGL.isWebGLActive(this._webGLContext)) {
 			var gl = this._webGLContext;
-			// Use WebGL.
+			var cc = this._clearColor;
+			var adjust = this._transparent ? cc.a : 1.0;
+			// Use WebGL settings; adjust for pre multiplied alpha appropriate to scenario
+			this._webGLContext.clearColor(cc.r * adjust, cc.g * adjust, cc.b * adjust, adjust);
 			gl.clear(gl.COLOR_BUFFER_BIT);
+			this._webGLContext.clearColor(cc.r, cc.g, cc.b, cc.a);
 		} else {
 			// Use 2D.
 			var ctx = this.canvas.getContext("2d");
@@ -1868,7 +1872,7 @@ this.createjs = this.createjs||{};
 			this._lastTextureInsert = found;
 		} else {
 			var image = texture._imageData;
-			if (texture._storeID != undefined && image._invalid) {
+			if (texture._storeID != undefined && image && image._invalid) {
 				this._updateTextureImageData(gl, image);
 			}
 		}
@@ -2215,8 +2219,9 @@ this.createjs = this.createjs||{};
 			}
 
 			var uvRect, texIndex, image, frame, texture, src;
+			var useCache = item.cacheCanvas && !ignoreCache;
 
-			if (item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
+			if (item._webGLRenderStyle === 2 || useCache) {			// BITMAP / Cached Canvas
 				image = (ignoreCache?false:item.cacheCanvas) || item.image;
 			} else if (item._webGLRenderStyle === 1) {											// SPRITE
 				frame = item.spriteSheet.getFrame(item.currentFrame);	//TODO: Faster way?
@@ -2251,7 +2256,7 @@ this.createjs = this.createjs||{};
 			}
 			texIndex = texture._activeIndex;
 
-			if (item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
+			if (item._webGLRenderStyle === 2 || useCache) {			// BITMAP / Cached Canvas
 				if (item.sourceRect) {
 					// calculate uvs
 					if (!item._uvRect) { item._uvRect = {}; }
@@ -2268,7 +2273,7 @@ this.createjs = this.createjs||{};
 				} else {
 					// calculate uvs
 					// calculate vertices
-					if (item.cacheCanvas) {
+					if (useCache) {
 						src = item.bitmapCache;
 						uvRect = StageGL.UV_RECT;
 						subL = src.x;					subT = src.y;
