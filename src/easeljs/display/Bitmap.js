@@ -41,27 +41,29 @@ this.createjs = this.createjs||{};
 	 *
 	 * <h4>Example</h4>
 	 *
-	 *      var bitmap = new createjs.Bitmap("imagePath.jpg");
+	 * 	var bitmap = new createjs.Bitmap("imagePath.jpg");
 	 *
 	 * <strong>Notes:</strong>
 	 * <ol>
-	 *     <li>When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
-	 *      will be displayed.</li>
-	 *     <li>Bitmaps with an SVG source currently will not respect an alpha value other than 0 or 1. To get around this,
-	 *     the Bitmap can be cached.</li>
-	 *     <li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
-	 *     happens in all browsers except recent Firefox builds.</li>
-	 *     <li>Images loaded cross-origin will throw cross-origin security errors when interacted with using a mouse, using
-	 *     methods such as `getObjectUnderPoint`, or using filters, or caching. You can get around this by setting
-	 *     `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`</li>
+	 * 	<li>When using a video source that may loop or seek, use a {{#crossLink "VideoBuffer"}}{{/crossLink}} object to
+	 * 	 blinking / flashing.
+	 * 	<li>When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
+	 * 	 will be displayed.</li>
+	 * 	<li>Bitmaps with an SVG source currently will not respect an alpha value other than 0 or 1. To get around this,
+	 * 	the Bitmap can be cached.</li>
+	 * 	<li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
+	 * 	happens in all browsers except recent Firefox builds.</li>
+	 * 	<li>Images loaded cross-origin will throw cross-origin security errors when interacted with using a mouse, using
+	 * 	methods such as `getObjectUnderPoint`, or using filters, or caching. You can get around this by setting
+	 * 	`crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`</li>
 	 * </ol>
 	 *
 	 * @class Bitmap
 	 * @extends DisplayObject
 	 * @constructor
-	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to
-	 * display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use.
-	 * If it is a URI, a new Image object will be constructed and assigned to the .image property.
+	 * @param {CanvasImageSource | String | Object} imageOrUri The source image to display. This can be a CanvasImageSource
+	 * (image, video, canvas), an object with a `getImage` method that returns a CanvasImageSource, or a string URL to an image.
+	 * If the latter, a new Image instance with the URL as its src will be used.
 	 **/
 	function Bitmap(imageOrUri) {
 		this.DisplayObject_constructor();
@@ -69,10 +71,11 @@ this.createjs = this.createjs||{};
 		
 	// public properties:
 		/**
-		 * The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially
-		 * mobile browsers) support drawing video to a canvas.
+		 * The source image to display. This can be a CanvasImageSource
+		 * (image, video, canvas), an object with a `getImage` method that returns a CanvasImageSource, or a string URL to an image.
+		 * If the latter, a new Image instance with the URL as its src will be used.
 		 * @property image
-		 * @type HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
+		 * @type CanvasImageSource | Object
 		 **/
 		if (typeof imageOrUri == "string") {
 			this.image = document.createElement("img");
@@ -129,8 +132,10 @@ this.createjs = this.createjs||{};
 	 * @return {Boolean}
 	 **/
 	p.draw = function(ctx, ignoreCache) {
-		if (this.DisplayObject_draw(ctx, ignoreCache) || !this.image) { return true; }
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 		var img = this.image, rect = this.sourceRect;
+		if (img.getImage) { img = img.getImage(); }
+		if (!img) { return true; }
 		if (rect) {
 			// some browsers choke on out of bound values, so we'll fix them:
 			var x1 = rect.x, y1 = rect.y, x2 = x1 + rect.width, y2 = y1 + rect.height, x = 0, y = 0, w = img.width, h = img.height;
