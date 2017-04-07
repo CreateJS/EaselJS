@@ -97,6 +97,7 @@ this.createjs = this.createjs||{};
 		 * @protected
 		 */
 		this._oldProps = null;
+		this._devicePixelRatio = this._getDevicePixelRatio();
 	}
 	var p = createjs.extend(DOMElement, createjs.DisplayObject);
 
@@ -255,9 +256,9 @@ this.createjs = this.createjs||{};
 		var n = 10000; // precision
 		
 		if (!oldMtx || !oldMtx.equals(mtx)) {
-			var str = "matrix(" + (mtx.a*n|0)/n +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n +","+ (mtx.tx+0.5|0);
-			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty+0.5|0) +")";
-			style.MozTransform = str +"px,"+ (mtx.ty+0.5|0) +"px)";
+			var str = "matrix(" + (mtx.a*n|0)/n/this._devicePixelRatio +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n/this._devicePixelRatio +","+ (mtx.tx+0.5|0)/this._devicePixelRatio;
+			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty+0.5|0)/this._devicePixelRatio +")";
+			style.MozTransform = str +"px,"+ (mtx.ty+0.5|0)/this._devicePixelRatio +"px)";
 			if (!oldProps) { oldProps = this._oldProps = new createjs.DisplayProps(true, NaN); }
 			oldProps.matrix.copy(mtx);
 		}
@@ -268,6 +269,21 @@ this.createjs = this.createjs||{};
 		}
 	};
 
+    /**
+     * @method _getDevicePixelRatio     
+     * @protected
+     */
+	p._getDevicePixelRatio = function() {
+		var ratio = 1;
+        	// To account for zoom, change to use deviceXDPI instead of systemXDPI
+        	if (window.screen.systemXDPI != null && window.screen.logicalXDPI != null && window.screen.systemXDPI > window.screen.logicalXDPI) {
+            		// Only allow for values > 1
+    	    		ratio = window.screen.systemXDPI / window.screen.logicalXDPI;
+        	} else if (window.devicePixelRatio != null) {
+            		ratio = window.devicePixelRatio;
+        	}
+        	return ratio;
+	};
 
 	createjs.DOMElement = createjs.promote(DOMElement, "DisplayObject");
 }());
