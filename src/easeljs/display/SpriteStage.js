@@ -829,7 +829,17 @@ this.createjs = this.createjs||{};
 			mtx = kid._props.matrix;
 
 			// Get the kid's global matrix (relative to the stage):
-			mtx = (parentMVMatrix ? mtx.copy(parentMVMatrix) : mtx.identity()).appendTransform(kid.x, kid.y, kid.scaleX, kid.scaleY, kid.rotation, kid.skewX, kid.skewY, kid.regX, kid.regY);
+
+			if (parentMVMatrix) {
+				// Use the parent's global matrix:
+				mtx.copy(parentMVMatrix);
+			} else {
+				// Use the stage's global matrix:
+				mtx.identity().appendTransform(this.x, this.y, this.scaleX, this.scaleY, this.rotation, this.skewX, this.skewY, this.regX, this.regY);
+			}
+
+			// Append the kid's matrix:
+			mtx.appendTransform(kid.x, kid.y, kid.scaleX, kid.scaleY, kid.rotation, kid.skewX, kid.skewY, kid.regX, kid.regY);
 
 			// Set default texture coordinates:
 			var uStart = 0, uEnd = 1,
