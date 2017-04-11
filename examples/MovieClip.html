@@ -33,9 +33,11 @@
 	function init() {
 		var stage = new createjs.Stage("testCanvas");
 		createjs.Ticker.addEventListener("tick", stage);
+		createjs.Ticker.timingMode = createjs.Ticker.RAF;
 
 		// Create the MovieClip
 		var mc = new createjs.MovieClip({loop:-1, labels: {start: 0, middle: 20}});
+		mc.framerate = 20;
 		stage.addChild(mc);
 
 		// Create the States. Each state is just a circle shape.
