@@ -97,7 +97,7 @@ this.createjs = this.createjs||{};
 		
 		var mode, startPosition, loop, labels;
 		
-		// handle old params (tweens, labels, props):
+		// handle old params (mode, startPosition, loop, labels):
 		// TODO: deprecated param handling:
 		if (props instanceof String || arguments.length > 1) {
 			mode = props;

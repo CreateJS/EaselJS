@@ -46,7 +46,7 @@ this.createjs = this.createjs||{};
 	 * <strong>Notes:</strong>
 	 * <ol>
 	 * 	<li>When using a video source that may loop or seek, use a {{#crossLink "VideoBuffer"}}{{/crossLink}} object to
-	 * 	 blinking / flashing.
+	 * 	 prevent blinking / flashing.
 	 * 	<li>When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
 	 * 	 will be displayed.</li>
 	 * 	<li>Bitmaps with an SVG source currently will not respect an alpha value other than 0 or 1. To get around this,
