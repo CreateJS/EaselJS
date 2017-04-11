@@ -36,6 +36,7 @@
 		// create a new stage and point it at our canvas:
 		canvas = document.getElementById("testCanvas");
 		stage = new createjs.Stage(canvas);
+		createjs.Touch.enable(stage);
 
 		// attach mouse handlers directly to the source canvas
 		// better than calling from canvas tag for cross browser
