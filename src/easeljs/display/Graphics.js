@@ -1591,6 +1591,10 @@ this.createjs = this.createjs||{};
 				if (this._strokeStyle !== this._oldStrokeStyle) {
 					instr.push(this._strokeStyle);
 				}
+				if (commit) {
+					this._oldStrokeStyle = this._strokeStyle;
+					this._oldStrokeDash = this._strokeDash;
+				}
 				instr.push(this._stroke);
 			}
 
@@ -1600,8 +1604,6 @@ this.createjs = this.createjs||{};
 		if (commit) {
 			active.length = 0;
 			this._commitIndex = instr.length;
-			this._oldStrokeDash = this._strokeDash;
-			this._oldStrokeStyle = this._strokeStyle;
 		}
 	};
 
