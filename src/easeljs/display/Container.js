@@ -616,7 +616,7 @@ this.createjs = this.createjs||{};
 			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
 			if (!hitArea && !this._testMask(child, x, y)) { continue; }
 			
-			// if a child container has a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
+			// if a child container has a hitArea then we only need to check its hitAre2a, so we can treat it as a normal DO:
 			if (!hitArea && child instanceof Container) {
 				var result = child._getObjectsUnderPoint(x, y, arr, mouse, activeListener, currentDepth+1);
 				if (!arr && result) { return (mouse && !this.mouseChildren) ? this : result; }

@@ -1,5 +1,6 @@
 Version NEXT [Not Released]
 ****************************************************************************************************
+OTHER
 - Add Ticker._pausedTime in Ticker.reset() (thanks @abouthiroppy)
 - Updated and new tests
 - Updated README
@@ -11,8 +12,10 @@ Version NEXT [Not Released]
 	* Fixed inheritance example to show proper parameter usage
 - Added a few missing APIs on FauxCanvas helper
 
-Please see the StageGL-beta branch for a new, more flexible and performant WebGL implementation, which
-will be merged into master in the near future.
+WEBGL UPDATES
+Added StageGL, a drop-in replacement for the EaselJS Stage class that fully supports a WebGL pipeline. StageGL is much
+more performant than the (removed) SpriteStage, and way less strict. Any content can be added the a StageGL display
+list, and it will intelligently batch WebGL draw calls, removing the requirement for a single SpriteSheet.
 
 
 Version 0.8.2 [November 26, 2015]

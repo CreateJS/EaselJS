@@ -67,7 +67,35 @@ this.createjs = this.createjs||{};
 	 * @class Filter
 	 * @constructor
 	 **/
-	function Filter() {}
+	function Filter() {
+		/**
+		 * A flag stating that this filter uses a context draw mode and cannot be batched into imageData processing.
+		 * @property usesContext
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.usesContext = false;
+
+		/**
+		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
+		 * This should be based upon StageGL.SHADER_VERTEX_BODY_REGULAR
+		 * @property VTX_SHADER
+		 * @virtual
+		 * @type {String}
+		 * @readonly
+		 */
+		this.VTX_SHADER_BODY = null;
+
+		/**
+		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
+		 * This should be based upon StageGL.SHADER_FRAGMENT_BODY_REGULAR
+		 * @property FRAG_SHADER
+		 * @virtual
+		 * @type {String}
+		 * @readonly
+		 */
+		this.FRAG_SHADER_BODY = null;
+	}
 	var p = Filter.prototype;
 
 	/**
@@ -94,6 +122,16 @@ this.createjs = this.createjs||{};
 	p.getBounds = function(rect) {
 		return rect;
 	};
+
+	/**
+	 * Assign any unique uniforms or other setup functionality here.
+	 * @method shaderParamSetup
+	 * @virtual
+	 * @param {WebGLContext} gl The context associated with the stage performing the render.
+	 * @param {StageGL} stage The stage instance that will be rendering.
+	 * @param {ShaderProgram} shaderProgram The compiled shader that is going to be used to perform the render.
+	 */
+	p.shaderParamSetup = function(gl, stage, shaderProgram) {};
 
 	/**
 	 * Applies the filter to the specified context.

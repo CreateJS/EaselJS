@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EaselJS Example: Bitmap</title>
+
+	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../../_assets/js/examples.js"></script>
+
+	<script src="../../lib/easeljs-NEXT.combined.js"></script>
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+	<script id="editable">
+		function init() {
+			// create a stage object to work with the canvas. This is the top level node in the display list:
+			var stage = new createjs.StageGL("testCanvas");
+
+			// Create a new Text object:
+			var bitmap = new createjs.Bitmap("../../_assets/art/robot.png");
+
+			// add the text as a child of the stage. This means it will be drawn any time the stage is updated
+			// and that its transformations will be relative to the stage coordinates:
+			stage.addChild(bitmap);
+
+			// make it so the image will center around where it's told to move to:
+			bitmap.regX = 142;
+			bitmap.regY = 168;
+
+			// position the image on screen, relative to the stage coordinates:
+			bitmap.x = stage.canvas.width / 2;
+			bitmap.y = stage.canvas.height / 2;
+
+			// set up a ticker to update the stage, calling stage.update now would display a black screen as the image hasn't loaded
+			// we can avoid this and only call stage.update once, if we pre-load the image before running this code.
+			createjs.Ticker.on("tick", stage);
+		}
+	</script>
+</head>
+
+<body onload="init();">
+
+<header class="EaselJS">
+	<h1>Hello World!</h1>
+
+	<p>A simple example using <code>Bitmap</code> and <code>StageGL</code>.</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"></canvas>
+</div>
+
+</body>
+</html>

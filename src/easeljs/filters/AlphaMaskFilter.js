@@ -67,7 +67,7 @@ this.createjs = this.createjs || {};
 	 * @param {HTMLImageElement|HTMLCanvasElement} mask
 	 **/
 	function AlphaMaskFilter(mask) {
-	
+		this.Filter_constructor();
 	
 	// public properties:
 		/**
@@ -76,12 +76,40 @@ this.createjs = this.createjs || {};
 		 * @type HTMLImageElement|HTMLCanvasElement
 		 **/
 		this.mask = mask;
+
+		/** docced in super class **/
+		this.usesContext = true;
+
+		this.FRAG_SHADER_BODY = (
+			"uniform sampler2D uAlphaSampler;"+
+
+			"void main(void) {" +
+				"vec4 color = texture2D(uSampler, vRenderCoord);" +
+				"vec4 alphaMap = texture2D(uAlphaSampler, vTextureCoord);" +
+
+				"gl_FragColor = vec4(color.rgb, color.a * alphaMap.a);" +
+			"}"
+		);
 	}
 	var p = createjs.extend(AlphaMaskFilter, createjs.Filter);
 
 	// TODO: deprecated
 	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
-	
+
+	/** docced in super class **/
+	p.shaderParamSetup = function(gl, stage, shaderProgram) {
+		if(!this._mapTexture) { this._mapTexture = gl.createTexture(); }
+
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, this._mapTexture);
+		stage.setTextureParams(gl);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.mask);
+
+		gl.uniform1i(
+			gl.getUniformLocation(shaderProgram, "uAlphaSampler"),
+			1
+		);
+	};
 
 // public methods:
 	/**

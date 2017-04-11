@@ -2,12 +2,10 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<base href="../"/>
-	<title>EaselJS Example: Passing interactions between a Context2D and WebGL
-		stage.</title>
+	<title>EaselJS Example: Passing interactions between a Context2D and WebGL stage.</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 
 	<style>
 		.canvasDiv {
@@ -41,7 +39,7 @@
 	<h1>Two Stages passing mouse events</h1>
 
 	<p>This example shows a Context2D <code>Stage</code> (green) passing
-		unhandled mouse events through to a WebGL <code>SpriteStage</code>
+		unhandled mouse events through to a WebGL <code>StageGL</code>
 		(blue) layered below it via <code>Stage.nextStage</code>.
 		Notice that the <code>rollover</code> on the bottom stage works even
 		while over the top (green) canvas.</p>
@@ -55,19 +53,15 @@
 	<canvas id="c2dCanvas" width="958" height="160"></canvas>
 </div>
 
-<script src="../_assets/js/examples.js"></script>
-<!-- Note: All core EaselJS classes are listed here: -->
-<script src="../lib/easeljs-NEXT.combined.js"></script>
+<script src="../../_assets/js/examples.js"></script>
+
+<script src="../../lib/easeljs-NEXT.combined.js"></script>
 <!-- We also provide hosted minified versions of all CreateJS libraries.
   http://code.createjs.com -->
 
-<!-- WebGL specific classes -->
-<script src="../src/easeljs/display/SpriteContainer.js"></script>
-<script src="../src/easeljs/display/SpriteStage.js"></script>
+<script src="../../_assets/libs/tweenjs-NEXT.min.js"></script>
 
-<script src="../_assets/libs/tweenjs-NEXT.min.js"></script>
-
-<script src="../_assets/art/VectorButton.js"></script>
+<script src="../../_assets/art/VectorButton.js"></script>
 
 <!-- We also provide hosted minified versions of all CreateJS libraries.
   http://code.createjs.com -->
@@ -76,12 +70,12 @@
 	function init() {
 		// load the source image:
 		var image = new Image();
-		image.src = "../_assets/art/spritesheet_button.png";
+		image.src = "../../_assets/art/spritesheet_button.png";
 		image.onload = handleImageLoad;
 	}
 
 	function handleImageLoad(evt) {
-		webGLStage = new createjs.SpriteStage("webGLCanvas");
+		webGLStage = new createjs.StageGL("webGLCanvas");
 		webGLStage.enableMouseOver();
 
 		c2dStage = new createjs.Stage("c2dCanvas");
@@ -90,10 +84,10 @@
 
 		// spritesheet "bitmap" button:
 		var spriteSheet = new createjs.SpriteSheet({
-													   images: [evt.target],
-													   frames: {width: 300, height: 100},
-													   animations: { out: 0, over: 1, down: 2 }
-												   });
+			images: [evt.target],
+			frames: {width: 300, height: 100},
+			animations: { out: 0, over: 1, down: 2 }
+		});
 		var bitmapButton = new createjs.Sprite(spriteSheet, "up");
 		webGLStage.addChild(bitmapButton).set({x: 250, y: 150});
 		new createjs.ButtonHelper(bitmapButton);

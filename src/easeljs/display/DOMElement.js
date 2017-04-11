@@ -65,6 +65,10 @@ this.createjs = this.createjs||{};
 	 *          console.log("clicked");
 	 *      }
 	 *
+	 * <strong>Important:</strong> This class needs to be notified it is about to be drawn, this will happen automatically
+	 * if you call stage.update, calling stage.draw or disabling tickEnabled will miss important steps and it will render
+	 * stale information.
+	 *
 	 * @class DOMElement
 	 * @extends DisplayObject
 	 * @constructor
@@ -97,6 +101,21 @@ this.createjs = this.createjs||{};
 		 * @protected
 		 */
 		this._oldProps = null;
+
+		/**
+		 * Used to track the object which this class attached listeners to, helps optimize listener attachment.
+		 * @property _oldStage
+		 * @type Stage
+		 * @protected
+		 */
+		this._oldStage = null;
+		/**
+		 * The event listener proxy triggered drawing draw for special circumstances.
+		 * @property _drawAction
+		 * @type function
+		 * @protected
+		 */
+		this._drawAction = null;
 	}
 	var p = createjs.extend(DOMElement, createjs.DisplayObject);
 
@@ -230,8 +249,12 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._tick = function(evtObj) {
-		var stage = this.getStage();
-		stage&&stage.on("drawend", this._handleDrawEnd, this, true);
+		var stage = this.stage;
+		if(stage && stage !== this._oldStage) {
+			this._drawAction && stage.off("drawend", this._drawAction);
+			this._drawAction = stage.on("drawend", this._handleDrawEnd, this);
+			this._oldStage = stage;
+		}
 		this.DisplayObject__tick(evtObj);
 	};
 	

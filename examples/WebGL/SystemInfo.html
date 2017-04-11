@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EaselJS: WebGL Context Info</title>
+
+	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../../_assets/js/examples.js"></script>
+
+	<script src="../../lib/easeljs-NEXT.combined.js"></script>
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+	<script src="../../src/easeljs/utils/WebGLInspector.js"></script>
+
+	<script id="editable">
+		var outputDiv;
+		var canvasDiv;
+		var stageGL;
+		var inspector;
+
+		function init() {
+			outputDiv = document.getElementById("output");
+			canvasDiv = document.getElementById("testCanvas");
+
+			stageGL = new createjs.StageGL(canvasDiv);
+			inspector = new createjs.WebGLInspector(stageGL);
+
+			// see if WebGL is enabled
+			if(stageGL.isWebGL) {
+				// use the alternateOutput feature to allow us to log to the screen
+				inspector.alternateOutput = boxFill;
+				inspector.logContextInfo();
+			} else {
+				outputDiv.innerHTML = "<p><strong> WebGL failed to load </strong></p>";
+			}
+		}
+
+		var boxFill = {log:function(text) {
+			var content = text.split("\n").slice(1,-1);
+			var htmlOut = "";
+
+			// wrap the output with DOM tags to improve display quality
+			for(var i=0; i<content.length; i++) {
+				if(content[i]) {
+					htmlOut += "<p>"+ content[i].replace(": ", ": <strong>") +"</strong></p>";
+				} else {
+					htmlOut += "</br>";
+				}
+			}
+
+			// duplicate it to console and screen
+			console.log(text);
+			outputDiv.innerHTML = htmlOut;
+		}};
+	</script>
+
+	<style>
+		#output {
+			padding-left: 60px;
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			line-height: 1rem;
+		}
+
+		.content {
+			position: relative;
+		}
+	</style>
+</head>
+<body onload="init();">
+
+<header class="EaselJS">
+	<h1>WebGL Context Info</h1>
+
+	<p>Output of common <code>WebGL</code> context variables using the <code>WebGLInspector</code>, useful for investigation or debugging. For in-depth and related statistics visit <a href="http://www.webglstats.com">WebGL Stats</a></p>
+</header>
+
+<div class="content" id="wrap">
+	<canvas id="testCanvas" width="960" height="1" style="display: none;"></canvas>
+	<div id="output">
+		<!-- this will get filled dynamically -->
+	</div>
+</div>
+
+</body>
+</html>

@@ -214,7 +214,7 @@ describe("DisplayList", function () {
 				expect(clone[n]).toBe(props[n]);
 			}
 		});
-	})
+	});
 	it("getTransformedBounds() should work", function () {
 		var bmp = new createjs.Bitmap(this.img);
 		this.stage.addChild(bmp);

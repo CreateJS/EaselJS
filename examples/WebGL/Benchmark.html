@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EaselJS Example: Benchmark</title>
+
+	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script type="text/javascript" src="../../_assets/js/examples.js"></script>
+
+	<!-- support libs -->
+	<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
+	<script type="text/javascript" src="../../_assets/libs/dat.gui.min.js"></script>
+	<script type="text/javascript" src="../../_assets/libs/stats.min.js"></script>
+	<script type="text/javascript" src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
+
+	<!-- easeljs libs -->
+	<script type="text/javascript" src="../../lib/easeljs-NEXT.combined.js"></script>
+
+	<style>
+		#content {
+			position: relative;
+		}
+		#content canvas {
+			position: absolute;
+			background-color: #000000;
+			color: #ffffff;
+			width: 960px;
+			height: 400px;
+			text-align: center;
+		}
+
+		.dg.main {
+			position: relative;
+			padding-bottom: 20px;
+		}
+		.cr.number.has-slider .property-name {
+			width: 25%;
+		}
+		.cr.number.has-slider .c {
+			width: 75%;
+		}
+		.number input, .string input {
+			text-align: right;
+		}
+	</style>
+
+<script id="editable">
+	var canvas, stage, stats, container;
+	var isReady = false;
+	var manifest = [];
+	var queue = null;
+
+	var MIN_STEP = 5;
+	var CANVAS_WIDTH = 960;
+	var CANVAS_HEIGHT = 400;
+	var MaxPerTick = 100;
+	var MaxEver = 50000;
+
+	var guiProps = null;
+	var guiPropsRef = function() {
+		this.objects = MaxPerTick;
+		this.triangles = "";
+
+		this.texture = "Individual";
+		this.particleRender = false;
+		this.allowWebGL = true;
+
+		this.more = handleRelease;	// add event listener for down
+		this.less = handleRelease;	// add event listener for down
+		this.reset = reset;
+	};
+	var adjustFolder, propsFolder;
+	var propParticle;
+
+	var cjsSprites = null;
+
+	var adding = 0;
+	var objects = [];
+	var bounds = {};
+
+	function ready() {
+		examples.showDistractor("content");
+		outDOM = document.getElementById("output");
+		canvas = document.getElementById("loading");
+
+		// stats reporter
+		stats = new Stats();
+		outDOM.appendChild(stats.domElement);
+		stats.domElement.style.position = "absolute";
+		stats.domElement.style.top = "0px";
+
+		// controls setup
+		guiProps = new guiPropsRef();
+		var gui = new dat.GUI({ autoPlace: true });
+		outDOM.appendChild(gui.domElement);
+
+		var temp;
+		gui.add(guiProps, "objects", 0, MaxEver).step(5).listen();
+		temp = gui.add(guiProps, "triangles").listen().domElement.children[0];
+		temp.disabled = true;
+
+		adjustFolder = gui.addFolder('Sprites (click and hold)');
+		temp = adjustFolder.add(guiProps, "more").domElement.parentNode.parentNode;
+		temp.addEventListener("mousedown", startAdd);
+		temp.addEventListener("touchstart", startAdd);
+		temp = adjustFolder.add(guiProps, "less").domElement.parentNode.parentNode;
+		temp.addEventListener("mousedown", startRemove);
+		temp.addEventListener("touchstart", startRemove);
+
+		propsFolder = gui.addFolder('Properties');
+		propsFolder.open();
+		propsFolder.add(guiProps, "texture", ["Individual", "Sprite Sheet"]).onChange(toggleEffect);
+		propsFolder.add(guiProps, "allowWebGL").onChange(toggleEffect);
+		//propParticle = propsFolder.add(guiProps, "particleRender").onChange(toggleEffect);
+
+		gui.add(guiProps, "reset");
+
+		// image assets, load separately and build into a single sheet for toggling
+		manifest = [
+			{id: "robot0",	src: "../../_assets/art/robojs/robojs.png"},
+			{id: "robot1",	src: "../../_assets/art/robojs/robojs1.png"},
+			{id: "robot2",	src: "../../_assets/art/robojs/robojs2.png"},
+			{id: "robot3",	src: "../../_assets/art/robojs/robojs3.png"},
+			{id: "robot4",	src: "../../_assets/art/robojs/robojs4.png"},
+			{id: "robot5",	src: "../../_assets/art/robojs/robojs5.png"},
+			{id: "robot6",	src: "../../_assets/art/robojs/robojs6.png"},
+			{id: "robot7",	src: "../../_assets/art/robojs/robojs7.png"},
+			{id: "robot8",	src: "../../_assets/art/robojs/robojs8.png"},
+			{id: "robot9",	src: "../../_assets/art/robojs/robojs9.png"},
+			{id: "robot10",	src: "../../_assets/art/robojs/robojs10.png"}
+		];
+
+		// begin actual load
+		queue = new createjs.LoadQueue();
+		queue.on("complete", handleLoad, this);
+		queue.loadManifest(manifest, true);
+	}
+
+	function handleLoad() {
+		var bmp, i, l, id, src;
+		isReady = true;
+
+		// create individual entries
+		cjsSprites = new createjs.SpriteSheetBuilder();
+		for(i=0, l=manifest.length; i<l; i++) {
+			id = manifest[i].id;
+			src = manifest[i].src;
+			bmp = new createjs.Bitmap(queue._loadedResults[id]);
+			cjsSprites.addFrame(bmp);
+			cjsSprites.addAnimation(id, i);
+		}
+		bounds = bmp.getBounds();
+
+		// build into shared sheet
+		cjsSprites.build();
+
+		// start up display (designed to be able to restart easily)
+		init();
+
+		// begin ticks and UI response fall-backs
+		window.addEventListener("blur", handleRelease);
+		document.addEventListener("mouseup", handleRelease);
+		document.addEventListener("touchend", handleRelease);
+		requestAnimationFrame(tick);
+
+		examples.hideDistractor();
+	}
+
+	function init() {
+		if(!isReady) { return; }
+
+		// cleanup
+		if(canvas) {
+			canvas.parentNode.removeChild(canvas);
+		}
+		if(stage && stage.releaseTexture) {
+			stage.releaseTexture(cjsSprites.spriteSheet._images[0]); // CJS cleanup for multi stage-use
+		}
+
+		// make new stages and canvases
+		canvas = document.createElement("canvas");
+		canvas.width = CANVAS_WIDTH;
+		canvas.height = CANVAS_HEIGHT;
+		if(guiProps.allowWebGL) {
+			stage = new createjs.StageGL(canvas, {transparent: false, autoPurge: -1});
+			stage.setClearColor(0x000000);
+		} else {
+			stage = new createjs.Stage(canvas);
+		}
+		container = new createjs.Container();
+		stage.addChild(container);
+
+
+		// insert to DOM
+		outDOM.insertBefore(canvas, document.getElementById("stats"));
+	}
+
+	function addObject() {
+		var item;
+		var target = ((objects.length/100) % manifest.length)|0;
+		var id = manifest[target].id;
+
+		if(guiProps.texture == "Individual") {
+			item = new createjs.Bitmap(manifest[target].src);
+		} else {
+			item = new createjs.Sprite(cjsSprites.spriteSheet, id);
+			item.stop();
+		}
+		item.x = CANVAS_WIDTH/2;
+		item.regX = bounds.width/2;
+		item.regY = bounds.height;
+		item.scaleX = item.scaleY = 0.5 + Math.random()*0.5;
+		item.rotation = (Math.random()-0.5) * 57.2958;	// radians to degrees
+
+		// shared behaviour
+		container.addChild(item);
+
+		// custom code for demo
+		item.vX = (Math.random() * 20) - 10;
+		item.vY = (Math.random() * 10) - 5;
+		objects.push(item);
+	}
+
+	function removeObject() {
+		// shared behaviour
+		container.removeChild(objects.shift());
+	}
+
+	function toggleEffect() {
+		// by resetting the object array to [] we let the GC clean up the old entries and the system then "add" content till we meet the old count
+		objects = [];
+		init();
+	}
+
+	function togglePlatform() {
+		propParticle && propsFolder.remove(propParticle);
+		propParticle = undefined;
+		toggleEffect();
+	}
+
+	function reset() {
+		guiProps.particleRender = false;
+		guiProps.objects = MaxPerTick;
+		toggleEffect();
+	}
+
+	function startRemove(e) {
+		adding = -MIN_STEP;
+	}
+
+	function startAdd(e) {
+		adding = MIN_STEP;
+	}
+
+	function handleRelease(e) {
+		adding = 0;
+	}
+
+	function tick() {
+		if(!stage) {
+			requestAnimationFrame(tick);
+			return;
+		}
+
+		if(adding) {
+			adding *= 1.1;
+			if(adding > MaxPerTick) { adding = MaxPerTick; }
+			if(adding < -MaxPerTick) { adding = -MaxPerTick; }
+			guiProps.objects = (guiProps.objects + adding)|0;
+			if(guiProps.objects < 0) { guiProps.objects = 0; }
+			if(guiProps.objects > MaxEver) { guiProps.objects = MaxEver; }
+		}
+
+		var modify = 0;
+		while(objects.length < guiProps.objects && modify < (2.5*MaxPerTick)) {
+			modify++;
+			addObject();
+		}
+
+		while(objects.length > guiProps.objects && modify < (7.5*MaxPerTick)) {
+			modify++;
+			removeObject();
+		}
+
+		var gravity = 0.5;
+		var size = bounds.width/2;
+		var maxX = CANVAS_WIDTH - size;
+		var maxY = CANVAS_HEIGHT;
+		var minX = size;
+		var minY = 0;
+
+		stats.begin();
+
+		for(var i=0, l=objects.length; i<l; i++) {
+			var item = objects[i];
+			var xPos = item.x += item.vX;
+			var yPos = item.y += item.vY;
+
+			if(xPos > maxX || xPos < minX) {
+				// flip with tiny accel to stop border looping
+				item.vX *= -1.0001;
+			}
+			if(yPos > maxY) {
+				// bounce but sometimes reinvigorate
+				item.vY *= -0.85;
+				item.y = maxY;
+				if(Math.random() < 0.45) {
+					item.vY -= (Math.random()*3)+3;
+				}
+			} else if(yPos < minY && item.vY < 0) {
+				// dampen out of bounds
+				item.vY *= 0.50;
+			}
+
+			item.vY += gravity;
+		}
+
+		stage.update();
+
+		stats.end();
+
+		guiProps.triangles = objects.length*2;
+		if(modify) {
+			stats.domElement.style.visibility = "hidden";
+		} else {
+			stats.domElement.style.visibility = "visible";
+		}
+
+		requestAnimationFrame(tick);
+	}
+</script>
+</head>
+
+<body onload="ready();">
+
+<header class="EaselJS">
+	<h1>Benchmark</h1>
+	<p>
+		Benchmarking page for <code>StageGL</code>. Give the Garbage Collector time to stabilize after switching properties.
+	</p>
+</header>
+
+
+<div id="content" class="content">
+<div id="output"></div>
+</div>
+
+</body>
+</html>

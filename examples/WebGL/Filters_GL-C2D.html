@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EaselJS Example: Filters StageGL, C2D Filter.</title>
+
+	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../../_assets/js/examples.js"></script>
+
+	<script src="../../lib/easeljs-NEXT.combined.js"></script>
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+
+<script id="editable">
+	var img;
+
+	function init() {
+		//wait for the image to load
+		img = new Image();
+		img.onload = handleImageLoad;
+		img.src = "../../_assets/art/flowers.jpg";
+	}
+
+	function handleImageLoad() {
+		//find canvas and load images, wait for last image to load
+		var canvas = document.getElementById("testCanvas");
+
+		// create a new stage and point it at our canvas:
+		stage = new createjs.StageGL(canvas);
+		stage.updateViewport && stage.updateViewport(960, 400);
+
+		var bmp = new createjs.Bitmap(img).set({scaleX: 0.5, scaleY: 0.5});
+		stage.addChild(bmp);
+
+		var colorMatrix = new createjs.ColorMatrix();
+		colorMatrix.adjustSaturation(-100);
+		colorMatrix.adjustContrast(50);
+		var removeFilter = new createjs.ColorFilter(0.25, 0.75, 1, 1); // red, green, blue, alpha
+		var blackAndWhiteFilter = new createjs.ColorMatrixFilter(colorMatrix);
+		bmp = bmp.clone();
+		// filters are only displayed when the display object is cached
+		// later, you can call updateCache() to update changes to your filters
+		bmp.filters = [blackAndWhiteFilter, removeFilter];
+		bmp.cache(0, 0, img.width, img.height);
+		bmp.x = 480;
+		stage.addChild(bmp);
+
+		var fadeFilter = new createjs.ColorMatrixFilter(colorMatrix);
+		var blurFilter = new createjs.BlurFilter(64, 0, 1);
+		bmp = bmp.clone();
+		bmp.filters = [blurFilter,fadeFilter];
+		bmp.cache(0, 0, img.width, img.height);
+		bmp.y = 200;
+		stage.addChild(bmp);
+
+		var removeRedFilter = new createjs.ColorFilter(0.25, 0.75, 1, 1); // red, green, blue, alpha
+		bmp = bmp.clone();
+		bmp.filters = [removeRedFilter];
+		bmp.cache(0, 0, img.width, img.height);
+		bmp.x = 0;
+		stage.addChild(bmp);
+
+		// draw to the canvas:
+		stage.update();
+	}
+
+</script>
+</head>
+
+<body onload="init();">
+<header class="EaselJS">
+	<h1>Filters StageGL, C2D Filter</h1>
+
+	<p>Demonstrates using context 2D filters on a StageGL. Top-left: original. Top-right: <code>ColorMatrixFilter</code>.
+		Bottom-left: <code>ColorFilter</code>. Bottom-right: <code>BlurFilter</code> & <code>ColorMatrixFilter</code>.</p>
+</header>
+
+<div>
+	<canvas id="testCanvas" width="960" height="400"
+			style="background:none;"></canvas>
+</div>
+</body>
+</html>

@@ -20,11 +20,14 @@ beforeAll(function(done) {
 	this.assetsBasePath = "_assets/art/";
 	this.sColor = "#000";
 	this.fColor = "#ff0000";
-	
+
+	this.stageWidth = 200;
+	this.stageHeight = 200;
+
 	/**
 	 * Compare each drawing to a pre-saved base line image.
-	 * Need to has a small tolerance (100),
-	 * to account for antialiasing differnces between the saved images also browser to browser to browser differnces.
+	 * Need to have a small tolerance (100) to account for antialiasing differences between the saved images
+	 * as well as browser to browser differences.
 	 *
 	 * @param path
 	 * @param done
@@ -53,8 +56,8 @@ beforeAll(function(done) {
 			dest[n] = src[n];
 		}
 		return dest;
-	}
-	
+	};
+
 	var img = this.img = new Image();
 
 	img.onload = function () {
@@ -65,9 +68,9 @@ beforeAll(function(done) {
 		fail(img.src + ' failed to load');
 		done();
 	};
-	
+
 	img.src = "_assets/art/" + "daisy.png";
-}, 5000)
+}, 5000);
 
 beforeEach(function () {
 

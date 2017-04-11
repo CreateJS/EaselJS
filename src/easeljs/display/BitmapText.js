@@ -34,13 +34,14 @@ this.createjs = this.createjs || {};
 
 // constructor:
 	/**
-	 * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
-	 * using new line characters, but automatic wrapping is not supported. See the 
-	 * {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
+	 * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported using new line characters,
+	 * but automatic wrapping is not supported. See the {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
 	 * property for more information on defining glyphs.
-	 * 
-	 * <strong>Important:</strong> BitmapText extends Container, but is not designed to be used as one.
+	 *
+	 * <strong>Important:</strong> While BitmapText extends Container, it is not designed to be used as one.
 	 * As such, methods like addChild and removeChild are disabled.
+	 *
+	 *
 	 * @class BitmapText
 	 * @extends DisplayObject
 	 * @param {String} [text=""] The text to display.
@@ -121,6 +122,21 @@ this.createjs = this.createjs || {};
 		 * @protected
 		 **/
 		this._oldProps = {text:0,spriteSheet:0,lineHeight:0,letterSpacing:0,spaceWidth:0};
+
+		/**
+		 * Used to track the object which this class attached listeners to, helps optimize listener attachment.
+		 * @property _oldStage
+		 * @type Stage
+		 * @protected
+		 */
+		this._oldStage = null;
+		/**
+		 * The event listener proxy triggered drawing draw for special circumstances.
+		 * @property _drawAction
+		 * @type function
+		 * @protected
+		 */
+		this._drawAction = null;
 	}
 	var p = createjs.extend(BitmapText, createjs.Container);
 
@@ -164,7 +180,7 @@ this.createjs = this.createjs || {};
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return; }
-		this._updateText();
+		this._updateState();
 		this.Container_draw(ctx, ignoreCache);
 	};
 	
@@ -216,6 +232,13 @@ this.createjs = this.createjs || {};
 
 
 // private methods:
+	/**
+	 * Docced in superclass.
+	 **/
+	p._updateState = function() {
+		this._updateText();
+	};
+
  	/**
 	 * @method _cloneProps
 	 * @param {BitmapText} o
@@ -257,7 +280,7 @@ this.createjs = this.createjs || {};
 		var index = this._getFrameIndex(character, spriteSheet);
 		return index == null ? index : spriteSheet.getFrame(index);
 	};
-	
+
 	/**
 	 * @method _getLineHeight
 	 * @param {SpriteSheet} ss
@@ -268,6 +291,7 @@ this.createjs = this.createjs || {};
 		var frame = this._getFrame("1",ss) || this._getFrame("T",ss) || this._getFrame("L",ss) || ss.getFrame(0);
 		return frame ? frame.rect.height : 1;
 	};
+
 	/**
 	 * @method _getSpaceWidth
 	 * @param {SpriteSheet} ss
@@ -278,9 +302,9 @@ this.createjs = this.createjs || {};
 		var frame = this._getFrame("1",ss) || this._getFrame("l",ss) || this._getFrame("e",ss) || this._getFrame("a",ss) || ss.getFrame(0);
 		return frame ? frame.rect.width : 1;
 	};
-	
+
 	/**
-	 * @method _drawText
+	 * @method _updateText
 	 * @protected
 	 **/
 	p._updateText = function() {

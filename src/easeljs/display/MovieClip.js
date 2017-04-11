@@ -426,11 +426,11 @@ this.createjs = this.createjs||{};
 	p.draw = function(ctx, ignoreCache) {
 		// draw to cache first:
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-		if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) { this._updateTimeline(-1); }
+		this._updateState();
 		this.Container_draw(ctx, ignoreCache);
 		return true;
 	};
-	
+
 	/**
 	 * Sets paused to false.
 	 * @method play
@@ -511,6 +511,13 @@ this.createjs = this.createjs||{};
 
 
 // private methods:
+	/**
+	 * Docced in superclass.
+	 **/
+	p._updateState = function() {
+		if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) { this._updateTimeline(-1); }
+	};
+
 	/**
 	 * @method _tick
 	 * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
