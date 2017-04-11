@@ -1,7 +1,22 @@
 Version NEXT [Not Released]
 ****************************************************************************************************
+CRITICAL (may break existing content):
+- Removed SpriteContainer and SpriteStage, in favour of the new StageGL implementation
+
 OTHER
 - Add Ticker._pausedTime in Ticker.reset() (thanks @abouthiroppy)
+- Fixed Rectangle.pad parameter docs. (thanks @ruslan-simonenko)
+- Fixed error when drawing DOMElement with SpriteStage (thanks @thammin)
+- Added a few missing APIs on FauxCanvas helper
+- Added VideoBuffer helper class that preserves the previous frame until the next one is drawn
+- Fixed an issue where accessing performance throws an error in node webkit
+- Updated EventDispatcher to dispatch to capture listeners in target event phase
+- Fixed issue with miter limits on outlined text
+- Fix for stroke styles getting dropped
+- Fixed synched mode in MovieClip
+- Fix for Timeline._tweens being renamed .tweens
+- Fixed issue with clearing DisplayObject bounds
+- Updates to MovieClip and Container to support the TweenJS overhaul
 - Updated and new tests
 - Updated README
 - Updated documentation and examples
@@ -10,7 +25,6 @@ OTHER
 	  of the document (thanks @MannyC)
 	* Changed Flash references to Adobe Animate
 	* Fixed inheritance example to show proper parameter usage
-- Added a few missing APIs on FauxCanvas helper
 
 WEBGL UPDATES
 Added StageGL, a drop-in replacement for the EaselJS Stage class that fully supports a WebGL pipeline. StageGL is much
