@@ -221,7 +221,7 @@ this.createjs = this.createjs||{};
 		if(!output){ output = new createjs.Rectangle(); }
 		var filters = target.filters;
 		var filterCount = filters && filters.length;
-		if (filterCount > 0) { return output; }
+		if (!!filterCount <= 0) { return output; }
 
 		for(var i=0; i<filterCount; i++) {
 			var f = filters[i];
