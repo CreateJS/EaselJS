@@ -1253,8 +1253,9 @@ this.createjs = this.createjs||{};
 
 		if (filter._builtShader) {
 			targetShader = filter._builtShader;
-			if (targetShader.shaderParamSetup) {
-				targetShader.shaderParamSetup(gl, this, targetShader);
+			if (filter.shaderParamSetup) {
+				gl.useProgram(targetShader);
+				filter.shaderParamSetup(gl, this, targetShader);
 			}
 		} else {
 			try {
@@ -1998,7 +1999,6 @@ this.createjs = this.createjs||{};
 		The internal complexity comes from reducing over-draw, shared code, and issues like textures needing to be flipped
 		sometimes when written to render textures.
 		*/
-		var gl = this._webGLContext;
 		var renderTexture;
 		var shaderBackup = this._activeShader;
 		var blackListBackup = this._slotBlacklist;
@@ -2022,9 +2022,7 @@ this.createjs = this.createjs||{};
 
 		var filterCount = filters && filters.length;
 		if (filterCount) {
-			//this._backupBatchTextures(false);
 			this._drawFilters(target, filters, manager);
-			//this._backupBatchTextures(true);
 		} else {
 			// is this for another stage or mine?
 			if (this.isCacheControlled) {
@@ -2032,7 +2030,6 @@ this.createjs = this.createjs||{};
 				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
 			} else {
-				//this._backupBatchTextures(false);
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
 				target.cacheCanvas = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
 				renderTexture = target.cacheCanvas;
@@ -2046,7 +2043,6 @@ this.createjs = this.createjs||{};
 
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 				this.updateViewport(wBackup, hBackup);
-				//this._backupBatchTextures(true);
 			}
 		}
 
