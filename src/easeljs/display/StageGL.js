@@ -965,9 +965,7 @@ this.createjs = this.createjs||{};
 			this._webGLContext.clearColor(cc.r, cc.g, cc.b, cc.a);
 		} else {
 			// Use 2D.
-			var ctx = this.canvas.getContext("2d");
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
+			this.Stage_clear();
 		}
 	};
 
@@ -1368,6 +1366,7 @@ this.createjs = this.createjs||{};
 	 */
 	p.setTextureParams = function (gl, isPOT) {
 		if (isPOT && this._antialias) {
+			//non POT linear works in some devices, but performance is NOT good, investigate
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		} else {

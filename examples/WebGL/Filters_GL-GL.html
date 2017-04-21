@@ -42,24 +42,27 @@
 		// filters are only displayed when the display object is cached
 		// later, you can call updateCache() to update changes to your filters
 		bmp.filters = [blackAndWhiteFilter, removeFilter];
-		bmp.cache(0, 0, img.width, img.height, 1, "stage");
-		bmp.x = 480;
 		stage.addChild(bmp);
+
+		bmp.cache(0, 0, img.width, img.height, 1, {useGL: "stage"});
+		bmp.x = 480;
 
 		var fadeFilter = new createjs.ColorMatrixFilter(colorMatrix);
 		var blurFilter = new createjs.BlurFilter(64, 0, 1);
 		bmp = bmp.clone();
 		bmp.filters = [blurFilter,fadeFilter];
-		bmp.cache(0, 0, img.width, img.height, 1, "stage");
-		bmp.y = 200;
 		stage.addChild(bmp);
+
+		bmp.cache(0, 0, img.width, img.height, 1, {useGL: "stage"});
+		bmp.y = 200;
 
 		var removeRedFilter = new createjs.ColorFilter(0.25, 0.75, 1, 1); // red, green, blue, alpha
 		bmp = bmp.clone();
 		bmp.filters = [removeRedFilter];
-		bmp.cache(0, 0, img.width, img.height, 1, "stage");
-		bmp.x = 0;
 		stage.addChild(bmp);
+
+		bmp.cache(0, 0, img.width, img.height, 1, {useGL: "stage"});
+		bmp.x = 0;
 
 		// draw to the canvas:
 		stage.update();
