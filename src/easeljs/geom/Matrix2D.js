@@ -403,8 +403,8 @@ this.createjs = this.createjs||{};
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.translate = function(x, y) {
-		this.tx += this.a*x + this.c*y;
-		this.ty += this.b*x + this.d*y;
+		this.tx += x;
+		this.ty += y;
 		return this;
 	};
 
