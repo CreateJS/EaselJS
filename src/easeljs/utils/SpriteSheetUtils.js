@@ -187,6 +187,7 @@ this.createjs = this.createjs||{};
 		}
 
 		var frames = spriteSheet._frames;
+		if (frames == null) { throw "Spritesheet frames are not defined, are all images loaded?"; }
 		var fl = frames.length/count;
 		for (i=0;i<fl;i++) {
 			src = frames[i];
