@@ -2262,10 +2262,10 @@ this.createjs = this.createjs||{};
 					if (!item._uvRect) { item._uvRect = {}; }
 					src = item.sourceRect;
 					uvRect = item._uvRect;
-					uvRect.t = (src.x)/image.width;
-					uvRect.l = (src.y)/image.height;
-					uvRect.b = (src.x + src.width)/image.width;
-					uvRect.r = (src.y + src.height)/image.height;
+					uvRect.t = (src.y)/image.height;
+					uvRect.l = (src.x)/image.width;
+					uvRect.b = (src.y + src.height)/image.height;
+					uvRect.r = (src.x + src.width)/image.width;
 
 					// calculate vertices
 					subL = 0;							subT = 0;
