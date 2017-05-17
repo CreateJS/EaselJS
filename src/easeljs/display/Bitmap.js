@@ -86,7 +86,11 @@ this.createjs = this.createjs||{};
 	
 		/**
 		 * Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
-		 * Note that video sources must have a width / height set to work correctly with `sourceRect`.
+		 * Notes:
+		 * <ul>
+		 *     <li>that video sources must have a width / height set to work correctly with `sourceRect`</li>
+		 *     <li>Cached objects will ignore the `sourceRect` property</li>
+		 * </ul>
 		 * @property sourceRect
 		 * @type Rectangle
 		 * @default null

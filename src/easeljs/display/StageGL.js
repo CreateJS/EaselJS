@@ -2257,7 +2257,7 @@ this.createjs = this.createjs||{};
 			texIndex = texture._activeIndex;
 
 			if (item._webGLRenderStyle === 2 || useCache) {			// BITMAP / Cached Canvas
-				if (item.sourceRect) {
+				if (!useCache && item.sourceRect) {
 					// calculate uvs
 					if (!item._uvRect) { item._uvRect = {}; }
 					src = item.sourceRect;
