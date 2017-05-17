@@ -134,8 +134,8 @@ this.createjs = this.createjs||{};
 	p.getBlurY = function() { return this._blurY; };
 	p.setBlurX = function(value) {
 		if(isNaN(value) || value < 0){ value = 0; }
-		this._blurY = value;
-		this._blurYTable = this._getTable(value * this._quality);
+		this._blurX = value;
+		this._blurXTable = this._getTable(value * this._quality);
 		this._updateShader();
 	};
 	p.setBlurY = function(value) {
