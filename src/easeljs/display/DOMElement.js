@@ -278,13 +278,20 @@ this.createjs = this.createjs||{};
 		var n = 10000; // precision
 		
 		if (!oldMtx || !oldMtx.equals(mtx)) {
-			var str = "matrix(" + (mtx.a*n|0)/n +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n +","+ (mtx.tx+0.5|0);
-			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty+0.5|0) +")";
-			style.MozTransform = str +"px,"+ (mtx.ty+0.5|0) +"px)";
+			 var ratio = this.getStage().canvas.width / this.getStage().canvas.offsetWidth; // if canvas size is not aliged with canvas actual dimentions
+ 			var str = "matrix(" + (mtx.a*n|0)/n +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n +","+ (mtx.tx/ ratio + this.getStage().canvas.offsetLeft +0.5|0);
+			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty/ ratio + this.getStage().canvas.offsetTop+0.5|0) +")";
+			style.MozTransform = str +"px,"+ (mtx.ty/ ratio + this.getStage().canvas.offsetTop+0.5|0) +"px)";
 			if (!oldProps) { oldProps = this._oldProps = new createjs.DisplayProps(true, NaN); }
 			oldProps.matrix.copy(mtx);
 		}
-		
+		// add support for following width and height
+		if(this.width!=undefined && b.width!=this.width / ratio + "px"){ 
+			b.width = this.width / ratio + "px";
+		}
+               if (this.height != undefined  && b.height!=this.height / ratio + "px"){ 
+               		b.height = this.height / ratio + "px";
+               }
 		if (oldProps.alpha != props.alpha) {
 			style.opacity = ""+(props.alpha*n|0)/n;
 			oldProps.alpha = props.alpha;
