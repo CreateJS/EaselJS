@@ -221,7 +221,7 @@ this.createjs = this.createjs||{};
 		if(!output){ output = new createjs.Rectangle(); }
 		var filters = target.filters;
 		var filterCount = filters && filters.length;
-		if (filterCount > 0) { return output; }
+		if (!!filterCount <= 0) { return output; }
 
 		for(var i=0; i<filterCount; i++) {
 			var f = filters[i];
@@ -440,11 +440,16 @@ this.createjs = this.createjs||{};
 
 		// create it if it's missing
 		if (!this._webGLCache) {
-			if (this._options.useGL === "stage" && this.target.stage.isWebGL) {
+			if (this._options.useGL === "stage") {
+				if(!(this.target.stage && this.target.stage.isWebGL)){
+					var error = "Cannot use 'stage' for cache because the object's parent stage is ";
+					error += this.target.stage ? "non WebGL." : "not set, please addChild to the correct stage.";
+					throw error;
+				}
 				this.target.cacheCanvas = true; // will be replaced with RenderTexture, temporary positive value for old "isCached" checks
 				this._webGLCache = this.target.stage;
 
-			} else if(this._options.useGL === "new" || this._options.useGL === "stage") {
+			} else if(this._options.useGL === "new") {
 				this.target.cacheCanvas = document.createElement("canvas");
 				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true});
 				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
@@ -455,7 +460,7 @@ this.createjs = this.createjs||{};
 				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
 
 			} else {
-				throw "Invalid cache selection or invalid StageGL object used for cache param";
+				throw "Invalid option provided to useGL, expected ['stage', 'new', StageGL, undefined], got "+ this._options.useGL;
 			}
 		}
 

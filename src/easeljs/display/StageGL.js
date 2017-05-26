@@ -965,9 +965,7 @@ this.createjs = this.createjs||{};
 			this._webGLContext.clearColor(cc.r, cc.g, cc.b, cc.a);
 		} else {
 			// Use 2D.
-			var ctx = this.canvas.getContext("2d");
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
+			this.Stage_clear();
 		}
 	};
 
@@ -1253,8 +1251,9 @@ this.createjs = this.createjs||{};
 
 		if (filter._builtShader) {
 			targetShader = filter._builtShader;
-			if (targetShader.shaderParamSetup) {
-				targetShader.shaderParamSetup(gl, this, targetShader);
+			if (filter.shaderParamSetup) {
+				gl.useProgram(targetShader);
+				filter.shaderParamSetup(gl, this, targetShader);
 			}
 		} else {
 			try {
@@ -1367,6 +1366,7 @@ this.createjs = this.createjs||{};
 	 */
 	p.setTextureParams = function (gl, isPOT) {
 		if (isPOT && this._antialias) {
+			//non POT linear works in some devices, but performance is NOT good, investigate
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		} else {
@@ -1998,7 +1998,6 @@ this.createjs = this.createjs||{};
 		The internal complexity comes from reducing over-draw, shared code, and issues like textures needing to be flipped
 		sometimes when written to render textures.
 		*/
-		var gl = this._webGLContext;
 		var renderTexture;
 		var shaderBackup = this._activeShader;
 		var blackListBackup = this._slotBlacklist;
@@ -2022,9 +2021,7 @@ this.createjs = this.createjs||{};
 
 		var filterCount = filters && filters.length;
 		if (filterCount) {
-			//this._backupBatchTextures(false);
 			this._drawFilters(target, filters, manager);
-			//this._backupBatchTextures(true);
 		} else {
 			// is this for another stage or mine?
 			if (this.isCacheControlled) {
@@ -2032,7 +2029,6 @@ this.createjs = this.createjs||{};
 				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
 			} else {
-				//this._backupBatchTextures(false);
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
 				target.cacheCanvas = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
 				renderTexture = target.cacheCanvas;
@@ -2046,7 +2042,6 @@ this.createjs = this.createjs||{};
 
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 				this.updateViewport(wBackup, hBackup);
-				//this._backupBatchTextures(true);
 			}
 		}
 
