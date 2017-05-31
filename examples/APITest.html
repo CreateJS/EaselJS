@@ -6,8 +6,10 @@
 
 <link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 <link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+<link href="../_assets/css/prism.css" rel="stylesheet" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.4.min.js"></script>
+<script src="../_assets/js/prism.js"></script>
 
 <script src="../lib/easeljs-NEXT.combined.js"></script>
 <!-- We also provide hosted minified versions of all CreateJS libraries.
@@ -31,52 +33,71 @@
 		var Graphics = createjs.Graphics;
 		demos = [
 			{label: 'lineTo();', graphics: function () {
-				return new Graphics().beginStroke(STROKE_COLOR).moveTo(5, 35).lineTo(110, 75).endStroke();
+				return new Graphics().beginStroke(STROKE_COLOR)
+						.moveTo(5, 35).lineTo(110, 75);
 			}},
 			{label: 'arcTo();', graphics: function () {
-				return new Graphics().beginStroke(STROKE_COLOR).moveTo(50, 20).arcTo(150, 20, 150, 70, 50).endStroke();
+				return new Graphics().beginStroke(STROKE_COLOR)
+						.moveTo(50, 20).arcTo(150, 20, 150, 70, 50);
 			}},
 			{label: 'quadraticCurveTo();', graphics: function () {
-				return new Graphics().beginStroke(STROKE_COLOR).moveTo(0, 25).quadraticCurveTo(45, 50, 35, 25).endStroke();
+				return new Graphics().beginStroke(STROKE_COLOR).moveTo(0, 25)
+						.quadraticCurveTo(45, 50, 35, 25);
 			}},
 			{label: 'bezierCurveTo();', graphics: function () {
-				return new Graphics().beginStroke(STROKE_COLOR).moveTo(5, 75).bezierCurveTo(45, 90, 75, 75, -25, -25).endStroke();
+				return new Graphics().beginStroke(STROKE_COLOR)
+						.moveTo(5, 75).bezierCurveTo(45, 90, 75, 75, -25, -25);
 			}},
 			{label: 'beginLinearGradientStroke();', graphics: function () {
-				return new Graphics().beginLinearGradientStroke([STROKE_COLOR, FILL_COLOR], [0, 1], 5, 0, 110, 0).moveTo(5, 25).lineTo(110, 25);
+				return new Graphics().beginLinearGradientStroke([STROKE_COLOR, FILL_COLOR], [0, 1], 5, 0, 110, 0)
+						.moveTo(5, 25).lineTo(110, 25);
+			}},
+			{label: 'setStrokeStyle();', graphics: function() {
+				return new Graphics().beginStroke("#000").setStrokeStyle(4, "round", "bevel", "round")
+						.setStrokeDash([5,5,10,10])
+						.moveTo(25, 25).quadraticCurveTo(25, 75, 125, 125).endStroke();
 			}},
 			{label: 'drawRect();', graphics: function () {
 				return new Graphics().beginFill(FILL_COLOR).rect(5, 5, 80, 80);
 			}},
 			{label: 'drawRoundRect();', graphics: function () {
-				return new Graphics().beginFill(FILL_COLOR).drawRoundRect(0, 0, 120, 120, 5);
+				return new Graphics().beginFill(FILL_COLOR)
+						.drawRoundRect(0, 0, 120, 120, 5);
 			}},
 			{label: 'beginLinearGradientFill() with drawRoundRect();', graphics: function () {
-				return new Graphics().beginLinearGradientFill([FILL_COLOR, STROKE_COLOR], [0, 1], 0, 0, 0, 130).drawRoundRect(0, 0, 120, 120, 5);
+				return new Graphics().beginLinearGradientFill([FILL_COLOR, STROKE_COLOR], [0, 1], 0, 0, 0, 130)
+						.drawRoundRect(0, 0, 120, 120, 5);
 			}},
 			{label: 'drawCircle();', graphics: function () {
 				return new Graphics().beginFill(FILL_COLOR).drawCircle(40, 40, 40);
 			}},
 			{label: 'beginRadialGradientFill() with drawCircle();', graphics: function () {
-				return new Graphics().beginRadialGradientFill([FILL_COLOR, STROKE_COLOR], [0, 1], 40, 40, 0, 40, 40, 40).drawCircle(40, 40, 40);
+				return new Graphics().beginRadialGradientFill([FILL_COLOR, STROKE_COLOR], [0, 1], 40, 40, 0, 40, 40, 40)
+						.drawCircle(40, 40, 40);
 			}},
 			{label: 'drawEllipse();', graphics: function () {
-				return new Graphics().beginFill(FILL_COLOR).drawEllipse(5, 5, 60, 120);
+				return new Graphics().beginFill(FILL_COLOR)
+						.drawEllipse(5, 5, 60, 120);
 			}},
 			{label: 'Draw Hexagon using drawPolyStar();', graphics: function () {
-				return new Graphics().beginFill(FILL_COLOR).drawPolyStar(60, 60, 60, 6, 0, 45);
+				return new Graphics().beginFill(FILL_COLOR)
+						.drawPolyStar(60, 60, 60, 6, 0, 45);
 			}},
 			{label: 'Draw a star using drawPolyStar();', graphics: function () {
-				return new Graphics().beginFill(FILL_COLOR).drawPolyStar(80, 80, 70, 5, 0.6, -90);
+				return new Graphics().beginFill(FILL_COLOR)
+						.drawPolyStar(80, 80, 70, 5, 0.6, -90);
 			}},
 			{label: 'beginBitmapStroke() with drawRect();', graphics: function () {
-				return new Graphics().setStrokeStyle(25).beginBitmapStroke(img).rect(5, 5, 100, 100);
+				return new Graphics().setStrokeStyle(25)
+						.beginBitmapStroke(img).rect(5, 5, 100, 100);
 			}},
 			{label: 'drawRoundRectComplex();', graphics: function () {
-				return new Graphics().beginFill(FILL_COLOR).drawRoundRectComplex(5, 5, 70, 70, 5, 10, 15, 25);
+				return new Graphics().beginFill(FILL_COLOR)
+						.drawRoundRectComplex(5, 5, 70, 70, 5, 10, 15, 25);
 			}},
 			{label: 'drawCircle(); with beginBitmapFill();', graphics: function () {
-				return new Graphics().beginStroke(STROKE_COLOR).beginBitmapFill(img).drawCircle(30, 30, 30).endStroke();
+				return new Graphics().beginStroke(STROKE_COLOR)
+						.beginBitmapFill(img).drawCircle(30, 30, 30);
 			}},
 			{label: 'Text', code: textDemo },
 			{label: 'Sprite', code: spriteDemo },
@@ -101,7 +122,9 @@
 
 	function maskDemo(stage) {
 		var shape = new createjs.Shape();
-		shape.graphics = new createjs.Graphics().beginStroke(STROKE_COLOR).beginBitmapFill(img).drawCircle(35, 25, 20).endStroke();
+		shape.graphics = new createjs.Graphics().beginStroke(STROKE_COLOR)
+				.beginBitmapFill(img)
+				.drawCircle(35, 25, 20);
 		var image = new createjs.Bitmap(img);
 		image.mask = shape;
 
@@ -185,15 +208,17 @@
 				codeString = codeString.substring(codeString.indexOf('return ') + 7, codeString.lastIndexOf('}'));
 			} else {
 				codeString = demo.code.toString();
-				codeString = codeString.substring(codeString.indexOf('{') + 1, codeString.lastIndexOf('}'));
+				codeString = codeString.substring(codeString.indexOf('{') + 1, codeString.lastIndexOf('}'))
+						.replace(/^\n/, ""); // Remove first line break
 			}
 
 			codeString = codeString.split('STROKE_COLOR').join('"' + STROKE_COLOR + '"').split('FILL_COLOR').join('"' + FILL_COLOR + '"');
-			codeString = '//' + demo.label + '\n' + codeString;
+			codeString = '//' + demo.label
+					+ '\n' + codeString.replace(/\t{1,100}/g, "\t"); // Remove excessive tabs
 
 			var code = $('<div style="width:750px">' +
 								 '<pre>' +
-								 '<code data-language="javascript">' + codeString + '</code>' +
+								 '<code class="language-javascript" data-language="javascript">' + codeString + '</code>' +
 								 '</pre>' +
 								 '</div>');
 
@@ -204,6 +229,9 @@
 
 			drawToCanvas(canvas, demo);
 		}
+
+
+		Prism.highlightAll();
 
 		$('#toc').toc();
 	}
