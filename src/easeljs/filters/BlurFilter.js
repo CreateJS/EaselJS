@@ -41,8 +41,8 @@ this.createjs = this.createjs||{};
 
 // constructor:
 	/**
-	 * Applies a box blur to DisplayObjects. Note that this filter is fairly CPU intensive, particularly if the quality is
-	 * set higher than 1.
+	 * Applies a box blur to DisplayObjects in context 2D and a Gaussian blur in webgl. Note that this filter is fairly
+	 * intensive, particularly if the quality is set higher than 1.
 	 *
 	 * <h4>Example</h4>
 	 * This example creates a red circle, and then applies a 5 pixel blur to it. It uses the {{#crossLink "Filter/getBounds"}}{{/crossLink}}
@@ -77,6 +77,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this._blurX = blurX;
 		this._blurXTable = [];
+		this._lastBlurX = null;
 
 		/**
 		 * Vertical blur radius in pixels
@@ -86,6 +87,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this._blurY = blurY;
 		this._blurYTable = [];
+		this._lastBlurY = null;
 
 		/**
 		 * Number of blur iterations. For example, a value of 1 will produce a rough blur. A value of 2 will produce a
@@ -95,6 +97,7 @@ this.createjs = this.createjs||{};
 		 * @type Number
 		 **/
 		this._quality;
+		this._lastQuality = null;
 
 		/**
 		 * This is a template to generate the shader for {{#crossLink FRAG_SHADER_BODY}}{{/crossLink}}
@@ -135,28 +138,39 @@ this.createjs = this.createjs||{};
 	p.setBlurX = function(value) {
 		if(isNaN(value) || value < 0){ value = 0; }
 		this._blurX = value;
-		this._blurXTable = this._getTable(value * this._quality);
-		this._updateShader();
 	};
 	p.setBlurY = function(value) {
 		if(isNaN(value) || value < 0){ value = 0; }
 		this._blurY = value;
-		this._blurYTable = this._getTable(value * this._quality);
-		this._updateShader();
 	};
 	p.getQuality = function() { return this._quality; };
 	p.setQuality = function(value) {
-		this._quality = value;
-		this._blurXTable = this._getTable(this._blurX * this._quality);
-		this._blurYTable = this._getTable(this._blurY * this._quality);
-		this._updateShader();
+		if(isNaN(value) || value < 0){ value = 0; }
+		this._quality = value | 0;
 	};
+	p._getShader = function() {
+		var xChange = this._lastBlurX !== this._blurX;
+		var yChange = this._lastBlurY !== this._blurY;
+		var qChange = this._lastQuality !== this._quality;
+		if(xChange || yChange || qChange) {
+			if(xChange || qChange) { this._blurXTable = this._getTable(this._blurX * this._quality); }
+			if(yChange || qChange) { this._blurYTable = this._getTable(this._blurY * this._quality); }
+			this._updateShader();
+			this._lastBlurX = this._blurX;
+			this._lastBlurY = this._blurY;
+			this._lastQuality = this._quality;
+			return undefined; // force a rebuild
+		}
+		return this._compiledShader;
+	};
+	p._setShader = function() { this._compiledShader; };
 
 	try {
 		Object.defineProperties(p, {
 			blurX: { get: p.getBlurX, set: p.setBlurX },
 			blurY: { get: p.getBlurY, set: p.setBlurY },
-			quality: { get: p.getQuality, set: p.setQuality }
+			quality: { get: p.getQuality, set: p.setQuality },
+			_builtShader: { get: p._getShader, set: p._setShader}
 		});
 	} catch (e) { console.log(e); }
 
@@ -238,7 +252,7 @@ this.createjs = this.createjs||{};
 		var x = this.blurX|0, y = this.blurY| 0;
 		if(x <= 0 && y <= 0) { return rect; }
 		var q = Math.pow(this.quality, 0.2);
-		return (rect || new createjs.Rectangle()).pad(x*q+1,y*q+1,x*q+1,y*q+1);
+		return (rect || new createjs.Rectangle()).pad(y*q+1,x*q+1,y*q+1,x*q+1);
 	};
 
 	/** docced in super class **/

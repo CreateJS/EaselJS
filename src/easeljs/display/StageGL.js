@@ -2267,14 +2267,13 @@ this.createjs = this.createjs||{};
 					subR = src.width+subL;				subB = src.height+subT;
 				} else {
 					// calculate uvs
+					uvRect = StageGL.UV_RECT;
 					// calculate vertices
 					if (useCache) {
 						src = item.bitmapCache;
-						uvRect = StageGL.UV_RECT;
-						subL = src.x;					subT = src.y;
-						subR = src.width+subL;			subB = src.height+subT;
+						subL = src.x+(src._filterOffX/src.scale);	subT = src.y+(src._filterOffY/src.scale);
+						subR = (src._drawWidth/src.scale)+subL;		subB = (src._drawHeight/src.scale)+subT;
 					} else {
-						uvRect = StageGL.UV_RECT;
 						subL = 0;						subT = 0;
 						subR = image.width+subL;		subB = image.height+subT;
 					}

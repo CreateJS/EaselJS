@@ -226,6 +226,7 @@ this.createjs = this.createjs||{};
 		/**
 		 * The left offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate
 		 * around its center, you would set regX and {{#crossLink "DisplayObject/regY:property"}}{{/crossLink}} to 50.
+		 * Cached object's registration points should be set based on pre-cache conditions, not cached size.
 		 * @property regX
 		 * @type {Number}
 		 * @default 0
@@ -235,6 +236,7 @@ this.createjs = this.createjs||{};
 		/**
 		 * The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
 		 * its center, you would set {{#crossLink "DisplayObject/regX:property"}}{{/crossLink}} and regY to 50.
+		 * Cached object's registration points should be set based on pre-cache conditions, not cached size.
 		 * @property regY
 		 * @type {Number}
 		 * @default 0
@@ -405,42 +407,6 @@ this.createjs = this.createjs||{};
 
 
 	// private properties:
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _cacheOffsetX
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 **/
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _cacheOffsetY
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 **/
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _filterOffsetX
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 **/
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _filterOffsetY
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 **/
-
 		/**
 		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
 		 * @property _cacheScale
@@ -752,26 +718,6 @@ this.createjs = this.createjs||{};
 			cacheID: {
 				get: function(){ return this.bitmapCache && this.bitmapCache.cacheID },
 				set: function(a){ this.bitmapCache && (this.bitmapCache.cacheID = a) }
-			},
-			_cacheOffsetX: {
-				get: function(){ return this.bitmapCache && this.bitmapCache.x },
-				set: function(a){ this.bitmapCache && (this.bitmapCache.x = a) }
-			},
-			_cacheOffsetY: {
-				get: function(){ return this.bitmapCache && this.bitmapCache.y },
-				set: function(a){ this.bitmapCache && (this.bitmapCache.y = a) }
-			},
-			_filterOffsetX: {
-				get: function(){ return this.bitmapCache && this.bitmapCache.offX },
-				set: function(a){ this.bitmapCache && (this.bitmapCache.offX = a) }
-			},
-			_filterOffsetY: {
-				get: function(){ return this.bitmapCache && this.bitmapCache.offY },
-				set: function(a){ this.bitmapCache && (this.bitmapCache.offY = a) }
-			},
-			_cacheScale: {
-				get: function(){ return this.bitmapCache && this.bitmapCache.scale },
-				set: function(a){ this.bitmapCache && (this.bitmapCache.scale = a) }
 			}
 		});
 	} catch (e) {}
