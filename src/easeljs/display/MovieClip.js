@@ -252,6 +252,13 @@ this.createjs = this.createjs||{};
 		 * @private
 		 */
 		this._rawPosition = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
+		
+		/**
+		 * @property _bound_resolveState
+		 * @type Function
+		 * @private
+		 */
+		this._bound_resolveState = this._resolveState.bind(this);
 	
 	
 		/**
@@ -565,7 +572,26 @@ this.createjs = this.createjs||{};
 		
 		// update timeline position, ignoring actions if this is a graphic.
 		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline?
-		tl.setPosition(rawPosition, synced || !this.actionsEnabled, jump, this._resolveState.bind(this));
+		tl.setPosition(rawPosition, synced || !this.actionsEnabled, jump, this._bound_resolveState);
+	};
+	
+	/**
+	 * Renders position 0 without running actions or updating _rawPosition.
+	 * Primarily used by Animate CC to build out the first frame in the constructor of MC symbols.
+	 * @method _renderFirstFrame
+	 * @protected
+	 **/
+	p._renderFirstFrame = function() {
+		// there are two ways we can deal with this. Both involve bending the rules a little:
+		
+		// the first is to go through timeline.setPosition, then reset the "read-only" rawPosition value to ensure the real first frame render happens:
+		this.timeline.setPosition(0, true, true, this._bound_resolveState);
+		this.timeline.rawPosition = -1;
+		/*
+		// the second option is to use the private timeline._updatePosition method:
+		this.timeline._updatePosition();
+		this._resolveState();
+		*/
 	};
 	
 	/**
@@ -582,7 +608,7 @@ this.createjs = this.createjs||{};
 		var tweens = tl.tweens;
 		for (var i=0, l=tweens.length; i<l; i++) {
 			var tween = tweens[i],  target = tween.target;
-			if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. Likely a better approach.
+			if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. There's likely a better approach.
 			var offset = tween._stepPosition;
 
 			if (target instanceof createjs.DisplayObject) {
