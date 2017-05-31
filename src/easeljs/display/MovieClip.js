@@ -578,20 +578,14 @@ this.createjs = this.createjs||{};
 	/**
 	 * Renders position 0 without running actions or updating _rawPosition.
 	 * Primarily used by Animate CC to build out the first frame in the constructor of MC symbols.
+	 * NOTE: not tested when run after the MC advances past the first frame.
 	 * @method _renderFirstFrame
 	 * @protected
 	 **/
 	p._renderFirstFrame = function() {
-		// there are two ways we can deal with this. Both involve bending the rules a little:
-		
-		// the first is to go through timeline.setPosition, then reset the "read-only" rawPosition value to ensure the real first frame render happens:
-		this.timeline.setPosition(0, true, true, this._bound_resolveState);
-		this.timeline.rawPosition = -1;
-		/*
-		// the second option is to use the private timeline._updatePosition method:
-		this.timeline._updatePosition();
-		this._resolveState();
-		*/
+		var tl = this.timeline, pos = tl.rawPosition;
+		tl.setPosition(0, true, true, this._bound_resolveState);
+		tl.rawPosition = pos;
 	};
 	
 	/**
