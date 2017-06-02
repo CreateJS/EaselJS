@@ -64,7 +64,7 @@
 	function tick(event) {
 		var w = canvas.width;
 		var h = canvas.height;
-		var l = container.getNumChildren();
+		var l = container.numChildren;
 
 		captureIndex = (captureIndex + 1) % captureContainers.length;
 		stage.removeChildAt(0);

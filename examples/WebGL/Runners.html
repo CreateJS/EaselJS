@@ -58,7 +58,7 @@
 		function tick(evt) {
 			// runners:
 			var i;
-			var l = runnerContainer.getNumChildren();
+			var l = runnerContainer.numChildren;
 			if (l < maxRunners && Math.random() < 0.3) {
 				addRunner();
 				l++;
@@ -72,7 +72,7 @@
 				}
 			}
 
-			l = sparkleContainer.getNumChildren();
+			l = sparkleContainer.numChildren;
 			for (i=0; i<l; i++) {
 				var sparkle = sparkleContainer.getChildAt(i);
 				sparkle.x += sparkle.velX;
@@ -107,7 +107,7 @@
 			runner.y = Math.random() * 90 + 300 | 0;
 
 			runnerContainer.removeChild(runner);
-			var l = runnerContainer.getNumChildren();
+			var l = runnerContainer.numChildren;
 
 			// very simple depth sorting. Not exact, but good enough for this example.
 			for (var i = 0; i < l; i++) {

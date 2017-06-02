@@ -113,7 +113,7 @@
 
 	// log functions that update text object on related stages with mouse event info
 	function handleEvt(evt) {
-		var target = evt.target, stage = target.getStage(), log = stage.log;
+		var target = evt.target, stage = target.stage, log = stage.log;
 
 		log.push(evt.type + " on " + target.name + " x:" + evt.stageX.toFixed(0) + " y:" + evt.stageY.toFixed(0));
 		while (log.length > 12) {

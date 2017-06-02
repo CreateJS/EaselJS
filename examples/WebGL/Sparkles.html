@@ -73,7 +73,7 @@
 
 	function tick(event) {
 		// loop through all of the active sparkles on stage:
-		var l = spkls.getNumChildren();
+		var l = spkls.numChildren;
 		var m = event.delta / 16;
 		for (var i = 0; i < l; i++) {
 			var sparkle = spkls.getChildAt(i);

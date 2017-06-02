@@ -59,7 +59,7 @@
 	function tick(event) {
 		var w = canvas.width + radius * 2;
 		var h = canvas.height + radius * 2;
-		var l = stage.getNumChildren() - 1;
+		var l = stage.numChildren - 1;
 
 		// iterate through all the children and move them according to their velocity:
 		for (var i = 1; i < l; i++) {
