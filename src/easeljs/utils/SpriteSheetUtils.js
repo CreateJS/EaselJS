@@ -74,36 +74,6 @@ this.createjs = this.createjs||{};
 
 // public static methods:
 	/**
-	 * <b>This is an experimental method, and may be buggy. Please report issues.</b><br/><br/>
-	 * Extends the existing sprite sheet by flipping the original frames horizontally, vertically, or both,
-	 * and adding appropriate animation & frame data. The flipped animations will have a suffix added to their names
-	 * (_h, _v, _hv as appropriate). Make sure the sprite sheet images are fully loaded before using this method.
-	 * <br/><br/>
-	 * For example:<br/>
-	 * SpriteSheetUtils.addFlippedFrames(mySpriteSheet, true, true);
-	 * The above would add frames that are flipped horizontally AND frames that are flipped vertically.
-	 * <br/><br/>
-	 * Note that you can also flip any display object by setting its scaleX or scaleY to a negative value. On some
-	 * browsers (especially those without hardware accelerated canvas) this can result in slightly degraded performance,
-	 * which is why addFlippedFrames is available.
-	 * @method addFlippedFrames
-	 * @static
-	 * @param {SpriteSheet} spriteSheet
-	 * @param {Boolean} horizontal If true, horizontally flipped frames will be added.
-	 * @param {Boolean} vertical If true, vertically flipped frames will be added.
-	 * @param {Boolean} both If true, frames that are flipped both horizontally and vertically will be added.
-	 * @deprecated Modern browsers perform better when flipping via a transform (ex. scaleX=-1) rendering this obsolete.
-	 **/
-	SpriteSheetUtils.addFlippedFrames = function(spriteSheet, horizontal, vertical, both) {
-		if (!horizontal && !vertical && !both) { return; }
-
-		var count = 0;
-		if (horizontal) { SpriteSheetUtils._flip(spriteSheet,++count,true,false); }
-		if (vertical) { SpriteSheetUtils._flip(spriteSheet,++count,false,true); }
-		if (both) { SpriteSheetUtils._flip(spriteSheet,++count,true,true); }
-	};
-
-	/**
 	 * Returns a single frame of the specified sprite sheet as a new PNG image. An example of when this may be useful is
 	 * to use a spritesheet frame as the source for a bitmap fill.
 	 *
@@ -135,34 +105,7 @@ this.createjs = this.createjs||{};
 		img.src = canvas.toDataURL("image/png");
 		return img;
 	};
-
-	/**
-	 * Merges the rgb channels of one image with the alpha channel of another. This can be used to combine a compressed
-	 * JPEG image containing color data with a PNG32 monochromatic image containing alpha data. With certain types of
-	 * images (those with detail that lend itself to JPEG compression) this can provide significant file size savings
-	 * versus a single RGBA PNG32. This method is very fast (generally on the order of 1-2 ms to run).
-	 * @method mergeAlpha
-	 * @static
-	 * @param {HTMLImageElement} rbgImage The image (or canvas) containing the RGB channels to use.
-	 * @param {HTMLImageElement} alphaImage The image (or canvas) containing the alpha channel to use.
-	 * @param {HTMLCanvasElement} canvas Optional. If specified, this canvas will be used and returned. If not, a new canvas will be created.
-	 * @return {HTMLCanvasElement} A canvas with the combined image data. This can be used as a source for Bitmap or SpriteSheet.
-	 * @deprecated Tools such as ImageAlpha generally provide better results. This will be moved to sandbox in the future.
-	*/
-	SpriteSheetUtils.mergeAlpha = function(rgbImage, alphaImage, canvas) {
-		if (!canvas) { canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
-		canvas.width = Math.max(alphaImage.width, rgbImage.width);
-		canvas.height = Math.max(alphaImage.height, rgbImage.height);
-		var ctx = canvas.getContext("2d");
-		ctx.save();
-		ctx.drawImage(rgbImage,0,0);
-		ctx.globalCompositeOperation = "destination-in";
-		ctx.drawImage(alphaImage,0,0);
-		ctx.restore();
-		return canvas;
-	};
-
-
+	
 // private static methods:
 	SpriteSheetUtils._flip = function(spriteSheet, count, h, v) {
 		var imgs = spriteSheet._images;
