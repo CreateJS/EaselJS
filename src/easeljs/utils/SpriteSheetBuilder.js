@@ -188,20 +188,6 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(SpriteSheetBuilder, createjs.EventDispatcher);
 
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
-
 // constants:
 	SpriteSheetBuilder.ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
 	SpriteSheetBuilder.ERR_RUNNING = "a build is already running";

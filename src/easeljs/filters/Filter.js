@@ -98,20 +98,6 @@ this.createjs = this.createjs||{};
 	}
 	var p = Filter.prototype;
 
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
-
 // public methods:
 	/**
 	 * Provides padding values for this filter. That is, how much the filter will extend the visual bounds of an object it is applied to.
