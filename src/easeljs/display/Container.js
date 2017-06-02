@@ -97,8 +97,8 @@ this.createjs = this.createjs||{};
 	/**
 	 * Use the {{#crossLink "Container/numChildren:property"}}{{/crossLink}} property instead.
 	 * @method getNumChildren
+	 * @protected
 	 * @return {Number}
-	 * @deprecated
 	 **/
 	p.getNumChildren = function() {
 		return this.children.length;

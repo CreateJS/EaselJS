@@ -681,11 +681,11 @@ this.createjs = this.createjs||{};
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "DisplayObject/stage:property"}}{{/crossLink}} property instead.
-	 * @method getStage
+	 * @method _getStage
+	 * @protected
 	 * @return {Stage}
-	 * @deprecated
 	 **/
-	p.getStage = function() {
+	p._getStage = function() {
 		// uses dynamic access to avoid circular dependencies;
 		var o = this, _Stage = createjs["Stage"];
 		while (o.parent) { o = o.parent; }
@@ -701,7 +701,7 @@ this.createjs = this.createjs||{};
 	 **/
 	try {
 		Object.defineProperties(p, {
-			stage: { get: p.getStage },
+			stage: { get: p._getStage },
 			cacheID: {
 				get: function(){ return this.bitmapCache && this.bitmapCache.cacheID },
 				set: function(a){ this.bitmapCache && (this.bitmapCache.cacheID = a) }

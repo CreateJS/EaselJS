@@ -362,11 +362,11 @@ this.createjs = this.createjs||{};
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "SpriteSheet/animations:property"}}{{/crossLink}} property instead.
-	 * @method getAnimations
+	 * @method _getAnimations
+	 * @protected
 	 * @return {Array}
-	 * @deprecated
 	 **/
-	p.getAnimations = function() {
+	p._getAnimations = function() {
 		return this._animations.slice();
 	};
 
@@ -378,7 +378,7 @@ this.createjs = this.createjs||{};
 	 **/
 	try {
 		Object.defineProperties(p, {
-			animations: { get: p.getAnimations }
+			animations: { get: p._getAnimations }
 		});
 	} catch (e) {}
 

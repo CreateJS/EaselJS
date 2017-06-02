@@ -330,53 +330,50 @@ this.createjs = this.createjs||{};
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
-	 * @method getLabels
+	 * @method _getLabels
+	 * @protected
 	 * @return {Array}
-	 * @deprecated
 	 **/
-	p.getLabels = function() {
-		return this.timeline.getLabels();
+	p._getLabels = function() {
+		return this.timeline._getLabels();
 	};
 	
 	/**
 	 * Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
-	 * @method getCurrentLabel
+	 * @method _getCurrentLabel
+	 * @protected
 	 * @return {String}
-	 * @deprecated
 	 **/
-	p.getCurrentLabel = function() {
+	p._getCurrentLabel = function() {
 		return this.timeline.currentLabel;
 	};
 	
 	/**
 	 * Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
-	 * @method getDuration
-	 * @return {Number}
+	 * @method _getDuration
 	 * @protected
+	 * @return {Number}
 	 **/
-	p.getDuration = function() {
+	p._getDuration = function() {
 		return this.timeline.duration;
 	};
 
 	/**
 	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
-	 * Shortcut to TweenJS: Timeline.getLabels();
 	 * @property labels
 	 * @type {Array}
 	 * @readonly
 	 **/
 	
 	/**
-	 * Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
-	 * for more information.
+	 * Returns the name of the label on or immediately before the current frame.
 	 * @property currentLabel
 	 * @type {String}
 	 * @readonly
 	 **/
 	
 	/**
-	 * Returns the duration of this MovieClip in seconds or ticks. Identical to {{#crossLink "MovieClip/duration:property"}}{{/crossLink}}
-	 * and provided for Adobe Flash/Animate API compatibility.
+	 * Returns the duration of this MovieClip in seconds or ticks.
 	 * @property totalFrames
 	 * @type {Number}
 	 * @readonly
@@ -390,10 +387,10 @@ this.createjs = this.createjs||{};
 	 **/
 	try {
 		Object.defineProperties(p, {
-			labels: { get: p.getLabels },
-			currentLabel: { get: p.getCurrentLabel },
-			totalFrames: { get: p.getDuration },
-			duration: { get: p.getDuration }
+			labels: { get: p._getLabels },
+			currentLabel: { get: p._getCurrentLabel },
+			totalFrames: { get: p._getDuration },
+			duration: { get: p._getDuration }
 			// TODO: can we just proxy .currentFrame to tl.position as well? Ditto for .loop (or just remove entirely).
 		});
 	} catch (e) {}

@@ -378,11 +378,11 @@ this.createjs = this.createjs||{};
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
-	 * @method getInstructions
-	 * @return {Array}
-	 * @deprecated
+	 * @method _getInstructions
+	 * @protected
+	 * @return {Array} The instructions array, useful for chaining
 	 **/
-	p.getInstructions = function() {
+	p._getInstructions = function() {
 		this._updateInstructions();
 		return this._instructions;
 	};
@@ -398,7 +398,7 @@ this.createjs = this.createjs||{};
 	 **/
 	try {
 		Object.defineProperties(p, {
-			instructions: { get: p.getInstructions }
+			instructions: { get: p._getInstructions }
 		});
 	} catch (e) {}
 
@@ -965,13 +965,6 @@ this.createjs = this.createjs||{};
 	p.drawPolyStar = function(x, y, radius, sides, pointSize, angle) {
 		return this.append(new G.PolyStar(x, y, radius, sides, pointSize, angle));
 	};
-
-	// TODO: deprecated.
-	/**
-	 * Removed in favour of using custom command objects with {{#crossLink "Graphics/append"}}{{/crossLink}}.
-	 * @method inject
-	 * @deprecated
-	 **/
 
 	/**
 	 * Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
