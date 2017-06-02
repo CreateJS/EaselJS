@@ -119,7 +119,7 @@ this.createjs = this.createjs||{};
 // static events:
 	/**
 	 * Dispatched each tick. The event will be dispatched to each listener even when the Ticker has been paused using
-	 * {{#crossLink "Ticker/_setPaused"}}{{/crossLink}}.
+	 * {{#crossLink "Ticker/paused:property"}}{{/crossLink}}.
 	 *
 	 * <h4>Example</h4>
 	 *
