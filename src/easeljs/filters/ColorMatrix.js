@@ -48,6 +48,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters, or {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}
 	 * for an example of how to use ColorMatrix to change a DisplayObject's color.
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @class ColorMatrix
 	 * @param {Number} brightness
 	 * @param {Number} contrast
@@ -98,6 +99,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Identity matrix values.
+	 * Please note the matrix is filled top to bottom then left to right.
 	 * @property IDENTITY_MATRIX
 	 * @type Array
 	 * @protected
@@ -124,6 +126,7 @@ this.createjs = this.createjs||{};
 // public methods:
 	/**
 	 * Resets the instance with the specified values.
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @method setColor
 	 * @param {Number} brightness
 	 * @param {Number} contrast
@@ -150,6 +153,7 @@ this.createjs = this.createjs||{};
 	 * Shortcut method to adjust brightness, contrast, saturation and hue.
 	 * Equivalent to calling adjustHue(hue), adjustContrast(contrast),
 	 * adjustBrightness(brightness), adjustSaturation(saturation), in that order.
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @method adjustColor
 	 * @param {Number} brightness
 	 * @param {Number} contrast
@@ -168,6 +172,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Adjusts the brightness of pixel color by adding the specified value to the red, green and blue channels.
 	 * Positive values will make the image brighter, negative values will make it darker.
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @method adjustBrightness
 	 * @param {Number} value A value between -255 & 255 that will be added to the RGB channels.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
@@ -189,6 +194,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Adjusts the contrast of pixel color.
 	 * Positive values will increase contrast, negative values will decrease contrast.
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @method adjustContrast
 	 * @param {Number} value A value between -100 & 100.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
@@ -222,6 +228,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Adjusts the color saturation of the pixel.
 	 * Positive values will increase saturation, negative values will decrease saturation (trend towards greyscale).
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @method adjustSaturation
 	 * @param {Number} value A value between -100 & 100.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
@@ -247,6 +254,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Adjusts the hue of the pixel color.
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @method adjustHue
 	 * @param {Number} value A value between -180 & 180.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
@@ -272,6 +280,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Concatenates (multiplies) the specified matrix with this one.
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @method concat
 	 * @param {Array} matrix An array or ColorMatrix instance.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
@@ -295,6 +304,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Return a length 25 (5x5) array instance containing this matrix's values.
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @method toArray
 	 * @return {Array} An array holding this matrix's values.
 	 **/
@@ -308,6 +318,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Copy the specified matrix's values to this matrix.
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @method copy
 	 * @param {Array} matrix An array or ColorMatrix instance.
 	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
@@ -323,11 +334,22 @@ this.createjs = this.createjs||{};
 	
 	/**
 	 * Returns a string representation of this object.
+	 * Please note the string representation of this matrix is top to bottom then left to right.
 	 * @method toString
 	 * @return {String} a string representation of the instance.
 	 **/
 	p.toString = function() {
-		return "[ColorMatrix]";
+    		var str = '';
+    		for (var value in this) {
+        		if (this.hasOwnProperty(value)) {
+          			if (value < 24) {
+            				str += this[value] + ', ';
+          			} else {
+            				str += this[value]
+          			}
+			}
+    		}
+    		return str;
 	};
 
 
@@ -367,6 +389,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Makes sure matrixes are 5x5 (25 long).
+	 * Please note the matrix this generates is filled top to bottom then left to right.
 	 * @method _fixMatrix
 	 * @param {Array} matrix
 	 * @protected
