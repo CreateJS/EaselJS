@@ -75,7 +75,7 @@
 		stage.addChild(arm1);
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
-		createjs.Ticker.setInterval(20);		// in ms, so 50 fps
+		createjs.Ticker.interval = 20;		// in ms, so 50 fps
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 

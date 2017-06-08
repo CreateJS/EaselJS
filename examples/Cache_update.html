@@ -44,7 +44,7 @@
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
 		createjs.Ticker.addEventListener("tick", tick);
-		createjs.Ticker.setFPS(30);
+		createjs.Ticker.framerate = 30;
 	}
 
 	function stop() {

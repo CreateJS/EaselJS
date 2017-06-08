@@ -79,7 +79,7 @@
 		stage.addChild(text);
 
 		//start ticking
-		createjs.Ticker.setInterval(20);		// 20ms = 50fps
+		createjs.Ticker.interval = 20;		// 20ms = 50fps
 		createjs.Ticker.addEventListener("tick", tick);
 
 		stage.update(); // Draw the stage once

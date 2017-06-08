@@ -42,7 +42,7 @@
 
 		// we want to do some work before we update the canvas,
 		// otherwise we could use Ticker.addEventListener("tick", stage);
-		createjs.Ticker.setFPS(100);
+		createjs.Ticker.framerate = 100;
 		createjs.Ticker.addEventListener("tick", tick);
 	}
 

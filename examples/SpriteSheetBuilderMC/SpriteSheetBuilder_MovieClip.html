@@ -49,7 +49,7 @@
 		// append the generated spritesheet image for demo purposes:
 		document.body.appendChild(builder._data.images[0]);
 
-		createjs.Ticker.setFPS(30);
+		createjs.Ticker.framerate = 30;
 		createjs.Ticker.addEventListener("tick", stage);
 	}
 

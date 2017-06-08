@@ -34,7 +34,7 @@
 		stage.enableDOMEvents(true);
 
 		createjs.Touch.enable(stage);
-		createjs.Ticker.setFPS(24);
+		createjs.Ticker.framerate = 24;
 
 		drawingCanvas = new createjs.Shape();
 

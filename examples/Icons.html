@@ -86,7 +86,7 @@
 		icon6.gotoAndPlay(0);
 		stage.addChild(icon6);
 
-		createjs.Ticker.setFPS(3); // slow, so we can see the icons
+		createjs.Ticker.framerate = 3; // slow, so we can see the icons
 		createjs.Ticker.addEventListener("tick", stage);
 	}
 </script>
