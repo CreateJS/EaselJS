@@ -2,6 +2,8 @@ Version NEXT [Not Released]
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - Removed SpriteContainer and SpriteStage, in favour of the new StageGL implementation
+- Removed deprecated properties, including changing public getValue/setValue methods to protected
+	_getValue/_setValue methods used by getter/setters.
 
 OTHER
 - Add Ticker._pausedTime in Ticker.reset() (thanks @abouthiroppy)
