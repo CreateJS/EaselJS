@@ -1,11 +1,14 @@
 Version NEXT [Not Released]
 ****************************************************************************************************
 CRITICAL (may break existing content):
-- Removed SpriteContainer and SpriteStage, in favour of the new StageGL implementation
-- Removed deprecated properties, including changing public getValue/setValue methods to protected
-	_getValue/_setValue methods used by getter/setters.
+- significant WebGL updates:
+	* SpriteStage replaced with StageGL
+	* Removed SpriteContainer (not needed for StageGL)
+	* better performance, less content restrictions, more features, easier to use
+- Removed deprecated members, incl. making getter/setter methods to protected and prefixing w/underscore
 
-OTHER
+*****
+OTHER:
 - Add Ticker._pausedTime in Ticker.reset() (thanks @abouthiroppy)
 - Fixed Rectangle.pad parameter docs. (thanks @ruslan-simonenko)
 - Fixed error when drawing DOMElement with SpriteStage (thanks @thammin)
@@ -27,11 +30,6 @@ OTHER
 	  of the document (thanks @MannyC)
 	* Changed Flash references to Adobe Animate
 	* Fixed inheritance example to show proper parameter usage
-
-WEBGL UPDATES
-Added StageGL, a drop-in replacement for the EaselJS Stage class that fully supports a WebGL pipeline. StageGL is much
-more performant than the (removed) SpriteStage, and way less strict. Any content can be added the a StageGL display
-list, and it will intelligently batch WebGL draw calls, removing the requirement for a single SpriteSheet.
 
 
 Version 0.8.2 [November 26, 2015]
