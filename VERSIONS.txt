@@ -2,34 +2,36 @@ Version NEXT [Not Released]
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - significant WebGL updates:
-	* SpriteStage replaced with StageGL
-	* Removed SpriteContainer (not needed for StageGL)
-	* better performance, less content restrictions, more features, easier to use
-- Removed deprecated members, incl. making getter/setter methods to protected and prefixing w/underscore
+    * SpriteStage replaced with StageGL
+    * removed SpriteContainer (not needed for StageGL)
+    * better performance, less content restrictions, more features, easier to use
+- removed deprecated members, incl. making getter/setter methods to protected and prefixing w/underscore
 
 *****
 OTHER:
-- Add Ticker._pausedTime in Ticker.reset() (thanks @abouthiroppy)
-- Fixed Rectangle.pad parameter docs. (thanks @ruslan-simonenko)
-- Fixed error when drawing DOMElement with SpriteStage (thanks @thammin)
-- Added a few missing APIs on FauxCanvas helper
-- Added VideoBuffer helper class that preserves the previous frame until the next one is drawn
-- Fixed an issue where accessing performance throws an error in node webkit
-- Updated EventDispatcher to dispatch to capture listeners in target event phase
-- Fixed issue with miter limits on outlined text
-- Fix for stroke styles getting dropped
-- Fixed synched mode in MovieClip
-- Fix for Timeline._tweens being renamed .tweens
-- Fixed issue with clearing DisplayObject bounds
-- Updates to MovieClip and Container to support the TweenJS overhaul
-- Updated and new tests
-- Updated README
-- Updated documentation and examples
-	* Fixed broken links
-	* Change the YUI docs so that when they're displaying source files they can use the whole width
-	  of the document (thanks @MannyC)
-	* Changed Flash references to Adobe Animate
-	* Fixed inheritance example to show proper parameter usage
+- add Ticker._pausedTime in Ticker.reset() (thanks @abouthiroppy)
+- fixed Rectangle.pad parameter docs. (thanks @ruslan-simonenko)
+- fixed error when drawing DOMElement with SpriteStage (thanks @thammin)
+- added a few missing APIs on FauxCanvas helper
+- added VideoBuffer helper class that preserves the previous frame until the next one is drawn
+- fixed an issue where accessing performance throws an error in node webkit
+- updated EventDispatcher to dispatch to capture listeners in target event phase
+- fixed issue with miter limits on outlined text
+- fix for stroke styles getting dropped
+- fixed synched mode in MovieClip
+- fix for Timeline._tweens being renamed .tweens
+- fixed issue with clearing DisplayObject bounds
+- updated mechanism DOMElement and BitmapText used for pre-draw updates
+- updates to MovieClip and Container to support the TweenJS overhaul
+- updated and new unit tests
+- caching logic moved to new BitmapCache class to support StageGL
+- added `options` param to DisplayObject.cache()
+- updated README
+- updated documentation and examples
+    * fixed broken links
+    * change the YUI docs code examples to use whole width of the document (thanks @MannyC)
+    * changed Flash references to Adobe Animate
+    * fixed inheritance example to show proper parameter usage
 
 
 Version 0.8.2 [November 26, 2015]
