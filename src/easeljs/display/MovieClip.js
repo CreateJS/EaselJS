@@ -335,7 +335,7 @@ this.createjs = this.createjs||{};
 	 * @return {Array}
 	 **/
 	p._getLabels = function() {
-		return this.timeline._getLabels();
+		return this.timeline.getLabels();
 	};
 	
 	/**
