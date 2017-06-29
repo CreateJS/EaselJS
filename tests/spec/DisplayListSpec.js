@@ -713,7 +713,7 @@ describe("DisplayList", function () {
 		this.compareBaseLine("assets/mask.png", done, expect, 0.01);
 	});
 
-	describe("PrelaodJS can be used to load image assets", function () {
+	describe("PreloadJS can be used to load image assets", function () {
 		beforeEach(function (done) {
 			this.loader = new createjs.LoadQueue(true);
 			this.loader.on("complete", function () {
@@ -740,4 +740,5 @@ describe("DisplayList", function () {
 			this.compareBaseLine("assets/PrelaodJSLoadedBitmap.png", done, expect);
 		});
 	});
+
 });
