@@ -89,14 +89,13 @@ describe("DisplayList", function () {
 		expect(this.stage.getConcatenatedMatrix()).not.toBe(null);
 	});
 
-	it("stage.getNumChildren() should be 2", function () {
-		this.stage.addChild(new createjs.Sprite());
-		this.stage.addChild(new createjs.Sprite());
-		expect(this.stage.getNumChildren()).toBe(2);
+	it("stage.numChildren should be 2", function () {
+		this.stage.addChild(new createjs.Sprite(), new createjs.Sprite());
+		expect(this.stage.numChildren).toBe(2);
 	});
 
-	it("stage.getStage() should eq stage.", function () {
-		expect(this.stage.getStage()).toBe(this.stage);
+	it("stage.stage should eq stage.", function () {
+		expect(this.stage.stage).toBe(this.stage);
 	});
 
 	describe("*.clone() should work", function () {

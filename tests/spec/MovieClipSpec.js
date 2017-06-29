@@ -17,15 +17,19 @@ describe("MovieClip", function () {
 		this.mc.timeline.setLabels({start: "startLbl", end: "endLbl"});
 	});
 
-	it("getCurrentLabel", function () {
+	it("currentLabel", function () {
 		this.mc.gotoAndStop("end");
-		var lbl = this.mc.timeline.getCurrentLabel();
+		var lbl = this.mc.currentLabel;
 		expect(lbl).toBe("end");
 	});
 
-	it("getLabels", function () {
-		var lbls = this.mc.timeline.getLabels();
+	it("labels", function () {
+		var lbls = this.mc.labels;
 		expect(lbls[0].position).toBe("startLbl");
+	});
+
+	it("duration", function () {
+		expect(this.mc.duration).toBe(100);
 	});
 
 	it("gotoAndPlay", function (done) {
