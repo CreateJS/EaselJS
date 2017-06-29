@@ -2,7 +2,7 @@ describe("StageGL", function () {
 	var DEBUG = true;
 
 	// To account for AntiAlias and rendering fluctuations
-	var stageWidth, stageHeight, tolerance, bitmapTextSpriteData;
+	var stageWidth, stageHeight, tolerance, bitmapTextSpriteData, daisyImg;
 	beforeAll(function (done) {
 		stageWidth = this.stageWidth;
 		stageHeight = this.stageHeight;
@@ -76,9 +76,18 @@ describe("StageGL", function () {
 			]
 		};
 
+		var path = this.assetsBasePath;
 		var img = bitmapTextSpriteData._imageLoad = new Image();
 		img.onload = function () {
-			done();
+			daisyImg = new Image();
+			daisyImg.onload = function() {
+				done();
+			};
+			daisyImg.onerror = function() {
+				fail(window.daisyImg.src + ' failed to load');
+				done();
+			};
+			daisyImg.src = path + "daisy.png";
 		};
 		img.onerror = function () {
 			fail(img.src + ' failed to load');
@@ -89,7 +98,7 @@ describe("StageGL", function () {
 
 	beforeEach(function (done) {
 		this.stageGL = makeStage();
-		this.bmp = new createjs.Bitmap(this.img);
+		this.bmp = new createjs.Bitmap(daisyImg);
 		this.shape = new createjs.Shape();
 		this.shape.graphics.ss(2).s("#222222").f("#44DD44").dr(2,2, 60,60).ef();
 		this.shape.width = 64;
@@ -136,7 +145,7 @@ describe("StageGL", function () {
 			dispWrapper.style.display = "inline-block";
 
 			label = document.createElement("div");
-			label.innerHTML = "Actual:";
+			label.innerHTML = "StageGL:";
 
 			dispWrapper.appendChild(label);
 			dispWrapper.appendChild(canvas);
@@ -146,7 +155,7 @@ describe("StageGL", function () {
 			dispWrapper.style.display = "inline-block";
 
 			label = document.createElement("div");
-			label.innerHTML = "Expected:";
+			label.innerHTML = "Context2D:";
 
 			dispWrapper.appendChild(label);
 			dispWrapper.appendChild(canvasStick);
@@ -208,7 +217,7 @@ describe("StageGL", function () {
 
 		it("Draws Bitmap Text", function(done) {
 			var ss = new createjs.SpriteSheet(bitmapTextSpriteData);
-			var text = new createjs.BitmapText("TEST", ss);
+			var text = new createjs.BitmapText("Test", ss);
 			compareStageRendering(this.stage, this.stageGL, text);
 			done();
 		});
@@ -232,7 +241,7 @@ describe("StageGL", function () {
 			var shapeTest = this.shape.clone();
 			container.addChild(shapeTest);
 
-			var txt = new createjs.Text("TEST", "20px Arial", "#ff7700");
+			var txt = new createjs.Text("No Match", "20px Arial", "#ff7700");
 			container.addChild(txt);
 
 			compareStageRendering(this.stage, this.stageGL, container, true);
