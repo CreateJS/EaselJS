@@ -4,6 +4,7 @@
 	"../src/createjs/utils/promote.js",
 	"../src/createjs/utils/indexOf.js",
 	"../src/easeljs/utils/UID.js",
+	"../src/createjs/utils/deprecate.js",
 	"../src/createjs/events/Event.js",
 	"../src/createjs/events/EventDispatcher.js",
 	"../src/createjs/utils/Ticker.js",

@@ -337,7 +337,9 @@ this.createjs = this.createjs||{};
 	p._getLabels = function() {
 		return this.timeline.getLabels();
 	};
-	
+	// MovieClip.getLabels is @deprecated. Remove for 1.1+
+	p.getLabels = createjs.deprecate(p._getLabels, "MovieClip.getLabels");
+
 	/**
 	 * Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
 	 * @method _getCurrentLabel
@@ -347,7 +349,9 @@ this.createjs = this.createjs||{};
 	p._getCurrentLabel = function() {
 		return this.timeline.currentLabel;
 	};
-	
+	// MovieClip.getCurrentLabel is @deprecated. Remove for 1.1+
+	p.getCurrentLabel = createjs.deprecate(p._getCurrentLabel, "MovieClip.getCurrentLabel");
+
 	/**
 	 * Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
 	 * @method _getDuration
@@ -357,6 +361,8 @@ this.createjs = this.createjs||{};
 	p._getDuration = function() {
 		return this.timeline.duration;
 	};
+	// MovieClip.getDuration is @deprecated. Remove for 1.1+
+	p.getDuration = createjs.deprecate(p._getDuration, "MovieClip.getDuration");
 
 	/**
 	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.

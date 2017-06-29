@@ -369,6 +369,8 @@ this.createjs = this.createjs||{};
 	p._getAnimations = function() {
 		return this._animations.slice();
 	};
+	// SpriteSheet.getAnimations is @deprecated. Remove for 1.1+
+	p.getAnimations = createjs.deprecate(p._getAnimations, "SpriteSheet.getAnimations");
 
 	/**
 	 * Returns an array of all available animation names available on this sprite sheet as strings.
