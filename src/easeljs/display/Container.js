@@ -96,13 +96,15 @@ this.createjs = this.createjs||{};
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "Container/numChildren:property"}}{{/crossLink}} property instead.
-	 * @method getNumChildren
+	 * @method _getNumChildren
 	 * @protected
 	 * @return {Number}
 	 **/
-	p.getNumChildren = function() {
+	p._getNumChildren = function() {
 		return this.children.length;
 	};
+	// Container.getNumChildren is @deprecated. Remove for 1.1+
+	p.getNumChildren = createjs.deprecate(p._getNumChildren, "Container.getNumChildren");
 
 	/**
 	 * Returns the number of children in the container.
@@ -112,7 +114,7 @@ this.createjs = this.createjs||{};
 	 **/
 	try {
 		Object.defineProperties(p, {
-			numChildren: { get: p.getNumChildren }
+			numChildren: { get: p._getNumChildren }
 		});
 	} catch (e) {}
 	

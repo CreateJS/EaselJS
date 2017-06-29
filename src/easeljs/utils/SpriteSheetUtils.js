@@ -105,6 +105,13 @@ this.createjs = this.createjs||{};
 		img.src = canvas.toDataURL("image/png");
 		return img;
 	};
+
+	// SpriteSheetUtils.addFlippedFrames is @deprecated. Remove for 1.1+
+	SpriteSheetUtils.addFlippedFrames = createjs.deprecate(null, "SpriteSheetUtils.addFlippedFrames");
+
+	// SpriteSheetUtils.addFlippedFrames is @deprecated. Remove for 1.1+
+	SpriteSheetUtils.mergeAlpha = createjs.deprecate(null, "SpriteSheetUtils.mergeAlpha");
+
 	
 // private static methods:
 	SpriteSheetUtils._flip = function(spriteSheet, count, h, v) {

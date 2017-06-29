@@ -692,6 +692,8 @@ this.createjs = this.createjs||{};
 		if (o instanceof _Stage) { return o; }
 		return null;
 	};
+	// DisplayObject.getStage is @deprecated. Remove for 1.1+
+	p.getStage = createjs.deprecate(p._getStage, "DisplayObject.getStage");
 
 	/**
 	 * Returns the Stage instance that this display object will be rendered on, or null if it has not been added to one.

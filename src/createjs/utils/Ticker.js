@@ -143,8 +143,8 @@ this.createjs = this.createjs||{};
 // public static properties:
 	/**
 	 * Specifies the timing api (setTimeout or requestAnimationFrame) and mode to use. See
-	 * {{#crossLink "Ticker/TIMEOUT"}}{{/crossLink}}, {{#crossLink "Ticker/RAF"}}{{/crossLink}}, and
-	 * {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} for mode details.
+	 * {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}}, {{#crossLink "Ticker/RAF:property"}}{{/crossLink}}, and
+	 * {{#crossLink "Ticker/RAF_SYNCHED:property"}}{{/crossLink}} for mode details.
 	 * @property timingMode
 	 * @static
 	 * @type {String}
@@ -316,6 +316,8 @@ this.createjs = this.createjs||{};
 		if (!Ticker._inited) { return; }
 		Ticker._setupTick();
 	};
+	// Ticker.setInterval is @deprecated. Remove for 1.1+
+	Ticker.setInterval = createjs.deprecate(Ticker._setInterval, "Ticker.setInterval");
 
 	/**
 	 * Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
@@ -327,6 +329,8 @@ this.createjs = this.createjs||{};
 	Ticker._getInterval = function() {
 		return Ticker._interval;
 	};
+	// Ticker.getInterval is @deprecated. Remove for 1.1+
+	Ticker.getInterval = createjs.deprecate(Ticker._getInterval, "Ticker.getInterval");
 
 	/**
 	 * Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
@@ -338,6 +342,8 @@ this.createjs = this.createjs||{};
 	Ticker._setFPS = function(value) {
 		Ticker._setInterval(1000/value);
 	};
+	// Ticker.setFPS is @deprecated. Remove for 1.1+
+	Ticker.setFPS = createjs.deprecate(Ticker._setFPS, "Ticker.setFPS");
 
 	/**
 	 * Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
@@ -349,6 +355,8 @@ this.createjs = this.createjs||{};
 	Ticker._getFPS = function() {
 		return 1000/Ticker._interval;
 	};
+	// Ticker.getFPS is @deprecated. Remove for 1.1+
+	Ticker.getFPS = createjs.deprecate(Ticker._getFPS, "Ticker.getFPS");
 
 	/**
 	 * Indicates the target time (in milliseconds) between ticks. Default is 50 (20 FPS).

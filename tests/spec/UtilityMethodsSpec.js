@@ -47,11 +47,10 @@ describe("Utlity Methods", function () {
 			}, 1000);
 		});
 
-		it("setPaused", function (done) {
-			createjs.Ticker.setPaused(true);
-
+		it("paused", function (done) {
+			createjs.Ticker.paused = true;
 			// Should be paused
-			expect(createjs.Ticker.getPaused()).toBe(true);
+			expect(createjs.Ticker.paused).toBe(true);
 
 			// tick event should also also be paused.
 			var func = function (evt) {
@@ -62,15 +61,13 @@ describe("Utlity Methods", function () {
 			createjs.Ticker.addEventListener("tick", func);
 		});
 
-		it("getFPS", function () {
-			createjs.Ticker.setInterval(40);
-
-			expect(createjs.Ticker.getFPS()).toBe(25);
-			expect(createjs.Ticker.getInterval()).toBe(40);
+		it("interval", function () {
+			createjs.Ticker.interval = 40;
+			expect(createjs.Ticker.interval).toBe(40);
 		});
 
-		it("setFPS", function (done) {
-			createjs.Ticker.setFPS(40);
+		it("framerate", function (done) {
+			createjs.Ticker.framerate = 40;
 			setTimeout(function () {
 				expect(createjs.Ticker.getTime() | 0).toBeInRange(40 * 2, 3);
 				done();

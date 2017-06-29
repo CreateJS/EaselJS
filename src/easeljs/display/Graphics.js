@@ -386,6 +386,8 @@ this.createjs = this.createjs||{};
 		this._updateInstructions();
 		return this._instructions;
 	};
+	// Graphics.getInstructions is @deprecated. Remove for 1.1+
+	p.getInstructions = createjs.deprecate(p._getInstructions, "Graphics.getInstructions");
 
 	/**
 	 * Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect)
