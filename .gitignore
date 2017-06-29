@@ -16,5 +16,5 @@ npm-debug.log
 build/.sass-cache
 main.css
 spikes
-
-yarn\.lock
+yarn.lock
+package-lock.json
