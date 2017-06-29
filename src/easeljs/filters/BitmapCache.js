@@ -360,7 +360,6 @@ this.createjs = this.createjs||{};
 			var stage = this.target.stage;
 			if (stage instanceof createjs.StageGL){
 				stage.releaseTexture(this.target.cacheCanvas);
-				this.target.cacheCanvas.remove();
 			}
 		}
 
