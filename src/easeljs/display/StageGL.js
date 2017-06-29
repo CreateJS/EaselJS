@@ -2220,6 +2220,7 @@ this.createjs = this.createjs||{};
 				image = (ignoreCache?false:item.cacheCanvas) || item.image;
 			} else if (item._webGLRenderStyle === 1) {											// SPRITE
 				frame = item.spriteSheet.getFrame(item.currentFrame);	//TODO: Faster way?
+				if (frame === null) { continue; }
 				image = frame.image;
 			} else {																			// MISC (DOM objects render themselves later)
 				continue;
