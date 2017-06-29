@@ -308,7 +308,7 @@
 				watchRestart();
 
 				//play death sound
-				createjs.Sound.play("death", createjs.Sound.INTERRUPT_ANY);
+				createjs.Sound.play("death", {interrupt: createjs.Sound.INTERRUPT_ANY});
 				continue;
 			}
 
@@ -404,7 +404,7 @@
 		o.graphics.beginStroke("#FFFFFF").moveTo(-1, 0).lineTo(1, 0);
 
 		// play the shot sound
-		createjs.Sound.play("laser", createjs.Sound.INTERUPT_LATE);
+		createjs.Sound.play("laser", {interrupt: createjs.Sound.INTERUPT_LATE});
 	}
 
 	function getSpaceRock(size) {

@@ -7,8 +7,7 @@
 <link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
 <link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 <link href="../_assets/css/prism.css" rel="stylesheet" type="text/css"/>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script src="../_assets/js/prism.js"></script>
 
 <script src="../lib/easeljs-NEXT.combined.js"></script>
@@ -232,8 +231,6 @@
 
 
 		Prism.highlightAll();
-
-		$('#toc').toc();
 	}
 
 	function drawToCanvas(canvas, data) {
@@ -271,10 +268,7 @@
 </header>
 
 <div style="overflow: scroll;" class="content" id="wrap">
-	<div id="toc"></div>
-
-	<div id="canvasDiv" style=" padding-left:25px; float: left; height: 150px">
-	</div>
+	<div id="canvasDiv" style=" padding-left:25px; float: left; height: 150px"></div>
 </div>
 
 </body>
