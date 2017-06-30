@@ -131,8 +131,8 @@ this.createjs = this.createjs||{};
 			var img = document.createElement("img");
 			img.src = canvas.toDataURL("image/png");
 			// work around a strange bug in Safari:
-			img.width = src.width;
-			img.height = src.height;
+			img.width = (src.width||src.naturalWidth);
+			img.height = (src.height||src.naturalHeight);
 			imgs.push(img);
 		}
 
@@ -145,11 +145,11 @@ this.createjs = this.createjs||{};
 
 			var frame = {image:img,rect:rect,regX:src.regX,regY:src.regY};
 			if (h) {
-				rect.x = img.width-rect.x-rect.width; // update rect
+				rect.x = (img.width||img.naturalWidth)-rect.x-rect.width; // update rect
 				frame.regX = rect.width-src.regX; // update registration point
 			}
 			if (v) {
-				rect.y = img.height-rect.y-rect.height;  // update rect
+				rect.y = (img.height||img.naturalHeight)-rect.y-rect.height;  // update rect
 				frame.regY = rect.height-src.regY; // update registration point
 			}
 			frames.push(frame);

@@ -600,7 +600,7 @@ this.createjs = this.createjs||{};
 		
 		imgLoop:
 		for (var i=0, imgs=this._images; i<imgs.length; i++) {
-			var img = imgs[i], imgW = img.width, imgH = img.height;
+			var img = imgs[i], imgW = (img.width||img.naturalWidth), imgH = (img.height||img.naturalHeight);
 
 			var y = margin;
 			while (y <= imgH-margin-frameHeight) {
