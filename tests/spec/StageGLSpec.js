@@ -8,7 +8,7 @@ describe("StageGL", function () {
 		stageHeight = this.stageHeight;
 		tolerance = 0.0025 * stageWidth * stageHeight;
 
-		bitmapTextSpriteData = {
+		this.bitmapTextSpriteData = {
 			"animations": {
 				"V": {"frames": [21]},
 				"A": {"frames": [0]},
@@ -75,26 +75,26 @@ describe("StageGL", function () {
 				[966, 2, 9, 10, 0, -17, -31]
 			]
 		};
+		done();
+	});
 
-		var img = bitmapTextSpriteData._imageLoad = new Image();
+	beforeEach(function (done) {
+		var img = new Image();
+		var _this = this;
 		img.onload = function () {
+			_this.stageGL = makeStage();
+			_this.bmp = new createjs.Bitmap(img);
+			_this.shape = new createjs.Shape();
+			_this.shape.graphics.ss(2).s("#222222").f("#44DD44").dr(2,2, 60,60).ef();
+			_this.shape.width = 64;
+			_this.shape.height = 64;
 			done();
 		};
 		img.onerror = function () {
 			fail(img.src + ' failed to load');
 			done();
 		};
-		img.src = bitmapTextSpriteData.images[0];
-	});
-
-	beforeEach(function (done) {
-		this.stageGL = makeStage();
-		this.bmp = new createjs.Bitmap(this.img);
-		this.shape = new createjs.Shape();
-		this.shape.graphics.ss(2).s("#222222").f("#44DD44").dr(2,2, 60,60).ef();
-		this.shape.width = 64;
-		this.shape.height = 64;
-		done();
+		img.src = this.bitmapTextSpriteData.images[0];
 	});
 
 	var makeStage = function () {
@@ -182,7 +182,7 @@ describe("StageGL", function () {
 		});
 
 		it("Draws SpriteSheets", function(done) {
-			var ss = new createjs.SpriteSheet(bitmapTextSpriteData);
+			var ss = new createjs.SpriteSheet(this.bitmapTextSpriteData);
 			var sprite = new createjs.Sprite(ss);
 			sprite.gotoAndStop("Q");
 			compareStageRendering(this.stage, this.stageGL, sprite);
@@ -207,7 +207,7 @@ describe("StageGL", function () {
 		});
 
 		it("Draws Bitmap Text", function(done) {
-			var ss = new createjs.SpriteSheet(bitmapTextSpriteData);
+			var ss = new createjs.SpriteSheet(this.bitmapTextSpriteData);
 			var text = new createjs.BitmapText("TEST", ss);
 			compareStageRendering(this.stage, this.stageGL, text);
 			done();
