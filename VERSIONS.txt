@@ -5,7 +5,8 @@ CRITICAL (may break existing content):
     * SpriteStage replaced with StageGL
     * removed SpriteContainer (not needed for StageGL)
     * better performance, less content restrictions, more features, easier to use
-- removed deprecated members, incl. making getter/setter methods to protected and prefixing w/underscore
+- Deprecated get/set methods are now protect with an underscore (eg _setEnabled)
+	The deprecated methods and properties will still work, but will display a console warning when used.
 
 *****
 OTHER:
@@ -26,12 +27,15 @@ OTHER:
 - updated and new unit tests
 - caching logic moved to new BitmapCache class to support StageGL
 - added `options` param to DisplayObject.cache()
-- updated README
+- changed SpriteSheets to also use `naturalWidth` on images (mostly to support IE)
 - updated documentation and examples
     * fixed broken links
     * change the YUI docs code examples to use whole width of the document (thanks @MannyC)
     * changed Flash references to Adobe Animate
     * fixed inheritance example to show proper parameter usage
+- added a shared createjs.deprecate() method, which wraps old methods and property getter/setters to display
+	a console warning when used.
+- added a DeprecatedMethods unit test
 
 
 Version 0.8.2 [November 26, 2015]
