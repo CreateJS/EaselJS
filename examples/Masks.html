@@ -62,7 +62,7 @@
 
 	function tick(event) {
 		star.rotation += 5;
-		star.scaleX = star.scaleY = 1.5 + Math.sin(angle) * 3;
+		star.scale = 1.5 + Math.sin(angle) * 3;
 		stage.update(event);
 		angle += 0.025;
 	}

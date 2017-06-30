@@ -27,6 +27,7 @@
 			color: #ffffff;
 			width: 960px;
 			height: 400px;
+			top: 0; left: 0;
 			text-align: center;
 		}
 
@@ -210,7 +211,7 @@
 		item.x = CANVAS_WIDTH/2;
 		item.regX = bounds.width/2;
 		item.regY = bounds.height;
-		item.scaleX = item.scaleY = 0.5 + Math.random()*0.5;
+		item.scale = 0.5 + Math.random()*0.5;
 		item.rotation = (Math.random()-0.5) * 57.2958;	// radians to degrees
 
 		// shared behaviour

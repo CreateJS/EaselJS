@@ -52,8 +52,7 @@
 
 		//draw ship flame
 		var o = this.shipFlame;
-		o.scaleX = 0.5;
-		o.scaleY = 0.5;
+		o.scale = 0.5;
 		o.y = -5;
 
 		g = o.graphics;
@@ -86,11 +85,9 @@
 			if (this.timeout > Ship.TOGGLE) {
 				this.timeout = 0;
 				if (this.shipFlame.scaleX == 1) {
-					this.shipFlame.scaleX = 0.5;
-					this.shipFlame.scaleY = 0.5;
+					this.shipFlame.scale = 0.5;
 				} else {
-					this.shipFlame.scaleX = 1;
-					this.shipFlame.scaleY = 1;
+					this.shipFlame.scale = 1;
 				}
 			}
 			this.thrust -= 0.5;

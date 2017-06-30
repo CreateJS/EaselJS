@@ -65,7 +65,7 @@
 			// update position, scale, and alpha:
 			sparkle.x += sparkle.vX * m;
 			sparkle.y += sparkle.vY * m;
-			sparkle.scaleX = sparkle.scaleY = sparkle.scaleX + sparkle.vS * m;
+			sparkle.scale = sparkle.scaleX + sparkle.vS * m;
 			sparkle.alpha += sparkle.vA * m;
 
 			//remove sparkles that are off screen or not invisble
@@ -101,7 +101,7 @@
 			sparkle.y = y;
 			//sparkle.rotation = Math.random()*360;
 			sparkle.alpha = Math.random() * 0.5 + 0.5;
-			sparkle.scaleX = sparkle.scaleY = Math.random() + 0.3;
+			sparkle.scale = Math.random() + 0.3;
 
 			// set up velocities:
 			var a = Math.PI * 2 * Math.random();

@@ -38,7 +38,7 @@
 		for (var i = 0; i < 141; i++) {
 			// share the Graphics instance between all of the shapes:
 			var shape = new createjs.Shape(g);
-			shape.scaleX = shape.scaleY = i / 400 + 0.4;
+			shape.scale = i / 400 + 0.4;
 			shape.x = Math.cos(i / 4) * i * 3.75 + canvas.width / 2;
 			shape.y = Math.sin(i / 4) * i * 3.75 + canvas.height / 2;
 			shape.rotation = Math.random() * 360;

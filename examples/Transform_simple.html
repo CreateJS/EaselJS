@@ -37,7 +37,7 @@
 		bmp.regY = img.height >> 1;
 		bmp.x = canvas.width >> 1;
 		bmp.y = canvas.height >> 1;
-		bmp.scaleX = bmp.scaleY = 0.1;
+		bmp.scale = 0.1;
 		stage.addChild(bmp);
 		stage.update();
 
@@ -50,7 +50,7 @@
 		var value = Math.sin(angle) * 360;
 
 		bmp.rotation = value;
-		bmp.scaleX = bmp.scaleY = value / 360;
+		bmp.scale = value / 360;
 		stage.update(event);
 	}
 

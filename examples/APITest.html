@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 
+	<meta charset="utf-8">
 <title>EaselJS: API Test</title>
 
 <link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
@@ -185,7 +186,7 @@
 										  });
 
 		var sprite = new createjs.Sprite(ss, "run");
-		sprite.scaleY = sprite.scaleX = 0.4;
+		sprite.scale = 0.4;
 		stage.addChild(sprite);
 
 		createjs.Ticker.addEventListener("tick", stage);
