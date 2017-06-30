@@ -395,16 +395,6 @@ this.createjs = this.createjs||{};
 		 */
 		this.cursor = null;
 
-		/**
-		 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
-		 * determine if the cache has changed since a previous check.
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property cacheID
-		 * @deprecated
-		 * @type {Number}
-		 * @default 0
-		 */
-
 
 	// private properties:
 		/**
@@ -701,12 +691,35 @@ this.createjs = this.createjs||{};
 	 * @type {Stage}
 	 * @readonly
 	 **/
+
+	/**
+	 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
+	 * determine if the cache has changed since a previous check.
+	 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
+	 * @property cacheID
+	 * @deprecated
+	 * @type {Number}
+	 * @default 0
+	 */
+
+	/**
+	 * Set both the {{#crossLink "DisplayObject/scaleX:property"}}{{/crossLink}} and the {{#crossLink "DisplayObject/scaleY"}}{{/crossLink}}
+	 * property to the same value. Note that when you get the value, if the `scaleX` and `scaleY` are different values,
+	 * it will return only the `scaleX`.
+	 * @property scaleX
+	 * @type {Number}
+	 * @default 1
+	 */
 	try {
 		Object.defineProperties(p, {
 			stage: { get: p._getStage },
 			cacheID: {
 				get: function(){ return this.bitmapCache && this.bitmapCache.cacheID },
 				set: function(a){ this.bitmapCache && (this.bitmapCache.cacheID = a) }
+			},
+			scale: {
+				get: function() { return this.scaleX; },
+				set: function(scale) { this.scaleX = this.scaleY = scale; },
 			}
 		});
 	} catch (e) {}
