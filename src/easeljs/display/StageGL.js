@@ -571,56 +571,58 @@ this.createjs = this.createjs||{};
 	 */
 	StageGL.UV_RECT = {t:0, l:0, b:1, r:1};
 
-	/**
-	 * Vertex positions for a card that covers the entire render. Used with render targets primarily.
-	 * @property COVER_VERT
-	 * @static
-	 * @final
-	 * @type {Float32Array}
-	 * @readonly
-	 */
-	StageGL.COVER_VERT = new Float32Array([
-		-1,		 1,		//TL
-		1,		 1,		//TR
-		-1,		-1,		//BL
-		1,		 1,		//TR
-		1,		-1,		//BR
-		-1,		-1		//BL
-	]);
+	try {
+		/**
+		 * Vertex positions for a card that covers the entire render. Used with render targets primarily.
+		 * @property COVER_VERT
+		 * @static
+		 * @final
+		 * @type {Float32Array}
+		 * @readonly
+		 */
+		StageGL.COVER_VERT = new Float32Array([
+			-1,		 1,		//TL
+			1,		 1,		//TR
+			-1,		-1,		//BL
+			1,		 1,		//TR
+			1,		-1,		//BR
+			-1,		-1		//BL
+		]);
 
-	/**
-	 * U/V for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
-	 * @property COVER_UV
-	 * @static
-	 * @final
-	 * @type {Float32Array}
-	 * @readonly
-	 */
-	StageGL.COVER_UV = new Float32Array([
-		 0,		 0,		//TL
-		 1,		 0,		//TR
-		 0,		 1,		//BL
-		 1,		 0,		//TR
-		 1,		 1,		//BR
-		 0,		 1		//BL
-	]);
+		/**
+		 * U/V for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
+		 * @property COVER_UV
+		 * @static
+		 * @final
+		 * @type {Float32Array}
+		 * @readonly
+		 */
+		StageGL.COVER_UV = new Float32Array([
+			 0,		 0,		//TL
+			 1,		 0,		//TR
+			 0,		 1,		//BL
+			 1,		 0,		//TR
+			 1,		 1,		//BR
+			 0,		 1		//BL
+		]);
 
-	/**
-	 * Flipped U/V for {{#crossLink "StageGL:COVER_VERT:property"}}{{/crossLink}}.
-	 * @property COVER_UV_FLIP
-	 * @static
-	 * @final
-	 * @type {Float32Array}
-	 * @readonly
-	 */
-	StageGL.COVER_UV_FLIP = new Float32Array([
-		 0,		 1,		//TL
-		 1,		 1,		//TR
-		 0,		 0,		//BL
-		 1,		 1,		//TR
-		 1,		 0,		//BR
-		 0,		 0		//BL
-	]);
+		/**
+		 * Flipped U/V for {{#crossLink "StageGL:COVER_VERT:property"}}{{/crossLink}}.
+		 * @property COVER_UV_FLIP
+		 * @static
+		 * @final
+		 * @type {Float32Array}
+		 * @readonly
+		 */
+		StageGL.COVER_UV_FLIP = new Float32Array([
+			 0,		 1,		//TL
+			 1,		 1,		//TR
+			 0,		 0,		//BL
+			 1,		 1,		//TR
+			 1,		 0,		//BR
+			 0,		 0		//BL
+		]);
+	} catch(e) { /* Breaking in older browsers, but those browsers wont run StageGL so no recovery or warning needed */ }
 
 	/**
 	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
