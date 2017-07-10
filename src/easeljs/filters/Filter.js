@@ -77,6 +77,15 @@ this.createjs = this.createjs||{};
 		this.usesContext = false;
 
 		/**
+		 * Another filter that is required to act as part of this filter and created and managed under the hood.
+		 * @private
+		 * @property _multiPass
+		 * @type {Filter}
+		 * @default null
+		 */
+		this._multiPass = null;
+
+		/**
 		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
 		 * This should be based upon StageGL.SHADER_VERTEX_BODY_REGULAR
 		 * @property VTX_SHADER

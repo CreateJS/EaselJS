@@ -2014,15 +2014,14 @@ this.createjs = this.createjs||{};
 		mtx = mtx.clone();
 		mtx.scale(1/manager.scale, 1/manager.scale);
 		mtx = mtx.invert();
-		mtx.translate(-manager.offX/manager.scale, -manager.offY/manager.scale);
+		mtx.translate(-manager.offX/manager.scale*target.scaleX, -manager.offY/manager.scale*target.scaleY);
 		var container = this._cacheContainer;
 		container.children = [target];
 		container.transformMatrix = mtx;
 
 		this._backupBatchTextures(false);
 
-		var filterCount = filters && filters.length;
-		if (filterCount) {
+		if (filters && filters.length) {
 			this._drawFilters(target, filters, manager);
 		} else {
 			// is this for another stage or mine?
@@ -2068,7 +2067,7 @@ this.createjs = this.createjs||{};
 		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
 
 		var container = this._cacheContainer;
-		var filterCount = filters && filters.length;
+		var filterCount = filters.length;
 
 		// we don't know which texture slot we're dealing with previously and we need one out of the way
 		// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
@@ -2087,10 +2086,8 @@ this.createjs = this.createjs||{};
 		this.setTextureParams(gl);
 
 		var flipY = false;
-
-		// apply each filter in order, but remember to toggle used texture and render buffer
-		for (var i=0; i<filterCount; i++) {
-			var filter = filters[i];
+		var i = 0, filter = filters[i];
+		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
 
 			// swap to correct shader
 			this._activeShader = this.getFilterShader(filter);
@@ -2112,10 +2109,14 @@ this.createjs = this.createjs||{};
 			this.setTextureParams(gl);
 
 			// use flipping to keep things upright, things already cancel out on a single filter
-			if (filterCount > 1) {
+			// this needs to be here as multiPass is not accurate to _this_ frame until after shader acquisition
+			if (filterCount > 1 || filters[0]._multiPass) {
 				flipY = !flipY;
 			}
-		}
+
+			// work through the multipass if it's there, otherwise move on
+			filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
+		} while (filter);
 
 		// is this for another stage or mine
 		if (this.isCacheControlled) {

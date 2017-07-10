@@ -526,9 +526,8 @@ this.createjs = this.createjs||{};
 
 		var data;
 
-		var l = filters.length;
-		for (var i=0; i<l; i++) {
-			var filter = filters[i];
+		var i = 0, filter = filters[i];
+		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
 			if(filter.usesContext){
 				if(data) {
 					ctx.putImageData(data, 0,0);
@@ -541,7 +540,10 @@ this.createjs = this.createjs||{};
 				}
 				filter._applyFilter(data);
 			}
-		}
+
+			// work through the multipass if it's there, otherwise move on
+			filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
+		} while (filter);
 
 		//done
 		if(data) {
