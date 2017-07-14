@@ -717,7 +717,17 @@ this.createjs = this.createjs||{};
 				"{{alternates}}" +
 			"}" +
 
-			"gl_FragColor = vec4(color.rgb{{premultiply}}, color.a * alphaValue);" +
+			"{{fragColor}}" +
+		"}"
+	);
+	StageGL.REGULAR_FRAG_COLOR_NORMAL = (
+		"gl_FragColor = vec4(color.rgb, color.a * alphaValue);"
+	);
+	StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY = (
+		"if(color.a > 0.0035) {" +		// 1/255 = 0.0039, so ignore any value below 1 because it's probably noise
+			"gl_FragColor = vec4(color.rgb/color.a, color.a * alphaValue);" +
+		"} else {" +
+			"gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);" +
 		"}"
 	);
 
@@ -1605,7 +1615,7 @@ this.createjs = this.createjs||{};
 			insert += "} else if (indexPicker <= "+ i +".5) { color = texture2D(uSampler["+ i +"], vTextureCoord);";
 		}
 		str = str.replace(/{{alternates}}/g, insert);
-		str = str.replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
+		str = str.replace(/{{fragColor}}/g, this._premultiply ? StageGL.REGULAR_FRAG_COLOR_NORMAL : StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY);
 
 		// actually compile the shader
 		var shader = gl.createShader(type);
