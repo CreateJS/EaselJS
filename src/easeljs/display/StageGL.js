@@ -1615,7 +1615,7 @@ this.createjs = this.createjs||{};
 			insert += "} else if (indexPicker <= "+ i +".5) { color = texture2D(uSampler["+ i +"], vTextureCoord);";
 		}
 		str = str.replace(/{{alternates}}/g, insert);
-		str = str.replace(/{{fragColor}}/g, this._premultiply ? StageGL.REGULAR_FRAG_COLOR_NORMAL : StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY);
+		str = str.replace(/{{fragColor}}/g, this._premultiply ? StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY : StageGL.REGULAR_FRAG_COLOR_NORMAL);
 
 		// actually compile the shader
 		var shader = gl.createShader(type);
