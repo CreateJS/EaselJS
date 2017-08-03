@@ -45,16 +45,16 @@ this.createjs = this.createjs||{};
 	 *
 	 * Caching in this context is purely visual, and will render the DisplayObject out into an image to be used instead
 	 * of the object. The actual cache itself is still stored on the target with the {{#crossLink "DisplayObject/cacheCanvas:property"}}{{/crossLink}}.
-	 * Working with a singular image like a {{#crossLink "Bitmap"}}{{/crossLink}} there is little benefit to performing 
-	 * a cache as it is already a single image. Caching is best done on containers containing multiple complex parts that 
-	 * do not move often, so that rendering the image instead will improve overall rendering speed. A cached object will 
-	 * not visually update until explicitly told to do so with a call to update, much like a Stage. If a cache is being 
+	 * Working with a singular image like a {{#crossLink "Bitmap"}}{{/crossLink}} there is little benefit to performing
+	 * a cache as it is already a single image. Caching is best done on containers containing multiple complex parts that
+	 * do not move often, so that rendering the image instead will improve overall rendering speed. A cached object will
+	 * not visually update until explicitly told to do so with a call to update, much like a Stage. If a cache is being
 	 * updated every frame it is likely not improving rendering performance. Cache are best used when updates will be sparse.
 	 *
-	 * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need, 
-	 * and to physically enable some effects. The BitmapCache is also responsible for applying filters to objects and 
-	 * reads each {{#crossLink "Filter"}}{{/crossLink}} due to this relationship. Real-time Filters are not recommended 
-	 * performance wise when dealing with a Context2D canvas. For best performance and to still allow for some visual 
+	 * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need,
+	 * and to physically enable some effects. The BitmapCache is also responsible for applying filters to objects and
+	 * reads each {{#crossLink "Filter"}}{{/crossLink}} due to this relationship. Real-time Filters are not recommended
+	 * performance wise when dealing with a Context2D canvas. For best performance and to still allow for some visual
 	 * effects use a compositeOperation when possible.
 	 * @class BitmapCache
 	 * @constructor
@@ -376,12 +376,12 @@ this.createjs = this.createjs||{};
 	 * @method getCacheDataURL
 	 * @return {String} The image data url for the cache.
 	 **/
-	p.getCacheDataURL = function() {
+	p.getCacheDataURL = function(type, encoderOptions) {
 		var cacheCanvas = this.target && this.target.cacheCanvas;
 		if (!cacheCanvas) { return null; }
 		if (this.cacheID != this._cacheDataURLID) {
 			this._cacheDataURLID = this.cacheID;
-			this._cacheDataURL = cacheCanvas.toDataURL?cacheCanvas.toDataURL():null;	// incase function is
+			this._cacheDataURL = cacheCanvas.toDataURL?cacheCanvas.toDataURL(type, encoderOptions):null;	// incase function is
 		}
 		return this._cacheDataURL;
 	};
