@@ -1,4 +1,4 @@
-Version NEXT [Not Released]
+Version 1.0.0 (September 14, 2017)
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - significant WebGL updates:
