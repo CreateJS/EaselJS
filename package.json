@@ -1,7 +1,7 @@
 {
   "name": "easeljs",
   "npmName": "easeljs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "EaselJS is a library for building high-performance interactive 2D content in HTML5. It provides a feature-rich display  list to allow you to manipulate and animate graphics. It also provides a robust interactive model for mouse and touch  interactions.",
   "main": "easeljs.js",
   "directories": {
@@ -23,7 +23,11 @@
     "url": "git+https://github.com/CreateJS/EaselJS.git"
   },
   "keywords": [
-    "canvas", "webgl", "graphics", "animation", "html5"
+    "canvas",
+    "webgl",
+    "graphics",
+    "animation",
+    "html5"
   ],
   "author": "gskinner.com, inc.",
   "license": "MIT",
