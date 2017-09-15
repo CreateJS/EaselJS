@@ -1,11 +1,11 @@
 _assets
 build
 bower.json
-docs/**-NEXT.zip
+docs
 examples
 extras
 icon.png
-lib/**-NEXT.js
+lib/**-NEXT**.js
 spikes
 src
 tests
