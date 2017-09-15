@@ -10,8 +10,13 @@ and shared caching across sites.
 
 
 # libraries
-**easeljs-VERSION.min.js** contains minified versions of all of the EaselJS classes (comments and white space stripped).
-**easeljs-VERSION.combined.js** contains all the EaselJS classes, including whitespace and comments.
+* **easeljs.js** the most recent _tagged_ version of all the EaselJS classes.
+* **easeljs.min.js** the most recent tagged version, minified and stripped of comments and whitespace.
+* **easeljs-NEXT.js** contains the _latest_ EaselJS classes.
+* **easeljs-NEXT.min.js** is a minified version of the _latest updates_ to the library.
+
+Note that previous versions also had a webgl library, but it has been replaced by `StageGL`, which is included in the
+minified source.
 
 
 # license
