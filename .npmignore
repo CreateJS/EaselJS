@@ -1,10 +1,13 @@
 _assets
 build
 bower.json
+docs/**-NEXT.zip
 examples
 extras
 icon.png
+lib/**-NEXT.js
 spikes
+src
 tests
 tutorials
 VERSIONS.txt
