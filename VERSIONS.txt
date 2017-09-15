@@ -7,6 +7,7 @@ CRITICAL (may break existing content):
     * better performance, less content restrictions, more features, easier to use
 - Deprecated get/set methods are now protect with an underscore (eg _setEnabled)
 	The deprecated methods and properties will still work, but will display a console warning when used.
+- Changed version naming to use easeljs.js, instead of containing the version number
 
 *****
 OTHER:
