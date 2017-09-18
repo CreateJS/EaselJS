@@ -8,10 +8,11 @@ module.exports = function (grunt) {
 
 				// Default values
 				version: 'NEXT',
+				fileVersion: "-<%= version %>",
 				name: 'easeljs',
 
 				// Setup doc names / paths.
-				docsName: '<%= pkg.name %>_docs-<%= version %>',
+				docsName: '<%= pkg.name %>_docs<%= fileVersion %>',
 				docsZip: "<%= docsName %>.zip",
 
 				// Setup watch to watch the source and rebuild when it changes.  Also livereload
@@ -63,7 +64,7 @@ module.exports = function (grunt) {
 					},
 					build: {
 						files: {
-							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.min.js': getConfigValue('easel_source')
+							'output/<%= pkg.name.toLowerCase() %><%= fileVersion %>.min.js': getConfigValue('easel_source')
 						}
 					}
 				},
@@ -102,7 +103,7 @@ module.exports = function (grunt) {
 					},
 					build: {
 						files: {
-							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.js': combineSource(
+							'output/<%= pkg.name.toLowerCase() %><%= fileVersion %>.js': combineSource(
 									[
 										{cwd: '', config:'config.json', source:'easel_source'}
 									]
@@ -175,7 +176,7 @@ module.exports = function (grunt) {
 					},
 					src: {
 						files: [
-							{expand: true, cwd:'./output/', src: '*<%=version %>*.js', dest: '../lib/'}
+							{expand: true, cwd:'./output/', src: '*<%=fileVersion %>*.js', dest: '../lib/'}
 						]
 					}
 				},
@@ -308,6 +309,7 @@ module.exports = function (grunt) {
 	 */
 	grunt.registerTask('setVersion', function () {
 		grunt.config.set('version', grunt.config.get('pkg').version);
+		grunt.config.set("fileVersion", "");
 	});
 
 	/**
