@@ -102,7 +102,7 @@ module.exports = function (grunt) {
 					},
 					build: {
 						files: {
-							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.combined.js': combineSource(
+							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.js': combineSource(
 									[
 										{cwd: '', config:'config.json', source:'easel_source'}
 									]
