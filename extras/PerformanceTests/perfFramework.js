@@ -9,7 +9,7 @@
 		"0.4.2",
 		"0.4.1"
 	];
-	var NEXT_PATH = "../../lib/easeljs-NEXT.combined.js";
+	var NEXT_PATH = "../../lib/easeljs-NEXT.js";
 	var AUTO_ITERATIONS = 3;
 	var DATA_KEY = "workingperfdata";
 	var SHARE_KEY = "perfdata";

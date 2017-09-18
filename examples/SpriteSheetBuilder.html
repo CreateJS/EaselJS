@@ -8,7 +8,7 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 	<script src="../_assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -24,11 +24,14 @@
 		// set up a couple of display objects which will act as source material, and add them to the stage:
 		var circle = new createjs.Shape();
 		circle.graphics.beginFill("#F00").drawCircle(0, 0, 30).beginFill("#C00").drawCircle(0, 0, 10);
+        //By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
+		circle.cache(-30, -30, 60, 60);
 		circle.setTransform(100, 90);
 
 		var square = new createjs.Container();
 		var squareBg = square.addChild(new createjs.Shape());
 		squareBg.graphics.beginFill("#00F").drawRect(0, 0, 80, 80);
+
 		var squareFld = square.addChild(new createjs.Text("1", "bold 72px Arial", "#9BF"));
 		squareFld.textBaseline = "top";
 		squareFld.textAlign = "center";
@@ -36,6 +39,8 @@
 		square.setTransform(150, 50);
 		// we'll define the bounds of this shape here, and it will be used when we addFrame:
 		square.bounds = new createjs.Rectangle(0, 0, 80, 80);
+        //By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
+        square.cache(-0, -0, 80, 80);
 
 		stage.addChild(circle, square);
 
@@ -54,9 +59,12 @@
 			// the setup function will be called right before the draw, and passed the setup params "i":
 			index = builder.addFrame(square, null, 1, function (target, data) {
 				squareFld.text = data;
+                //By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
+                square.updateCache(-0, -0, 80, 80);
 			}, i);
 			// save off the index of each frame in order to use when defining the animation:
 			frames.push(index);
+
 		}
 		// create an animation named square that comprises all of the frames we just added:
 		// we're also telling it to loop the animation and setting a frequency so it updates every 8 ticks:

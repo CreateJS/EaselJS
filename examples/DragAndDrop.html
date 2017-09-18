@@ -8,7 +8,7 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 	<script src="../_assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.js"></script>
 
 <script id="editable">
 	var canvas, stage;
@@ -56,8 +56,8 @@
 			bitmap.rotation = 360 * Math.random() | 0;
 			bitmap.regX = bitmap.image.width / 2 | 0;
 			bitmap.regY = bitmap.image.height / 2 | 0;
-			bitmap.scale = bitmap.originalScale = Math.random() * 0.4 + 0.6;
-			bitmap.name = "bmp_" + i;
+            bitmap.scale = bitmap.originalScale = Math.random() * 0.4 + 0.6;
+            bitmap.name = "bmp_" + i;
 			bitmap.cursor = "pointer";
 
 			// using "on" binds the listener to the scope of the currentTarget by default

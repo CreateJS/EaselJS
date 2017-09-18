@@ -8,11 +8,10 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 	<script src="../_assets/js/examples.js"></script>
 
-	<script src="../_assets/libs/preloadjs-NEXT.min.js"></script>
-
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
+	<script src="../_assets/libs/preloadjs-NEXT.min.js"></script>
 
 <script id="editable">
 	var stage, w, h, loader;
@@ -20,7 +19,7 @@
 
 	function init() {
 		examples.showDistractor();
-		stage = new createjs.Stage("testCanvas");
+		stage = new createjs.StageGL("testCanvas");
 
 		// grab canvas width and height for later calculations:
 		w = stage.canvas.width;
@@ -44,12 +43,16 @@
 
 		sky = new createjs.Shape();
 		sky.graphics.beginBitmapFill(loader.getResult("sky")).drawRect(0, 0, w, h);
+		//By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
+		sky.cache(0, 0, w, h);
 
-		var groundImg = loader.getResult("ground");
-		ground = new createjs.Shape();
-		ground.graphics.beginBitmapFill(groundImg).drawRect(0, 0, w + groundImg.width, groundImg.height);
-		ground.tileW = groundImg.width;
-		ground.y = h - groundImg.height;
+        var groundImg = loader.getResult("ground");
+        ground = new createjs.Shape();
+        ground.graphics.beginBitmapFill(groundImg).drawRect(0, 0, w + groundImg.width, groundImg.height);
+        ground.tileW = groundImg.width;
+        ground.y = h - groundImg.height;
+        //By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
+        ground.cache(0, 0, w + groundImg.width, groundImg.height);
 
 		hill = new createjs.Bitmap(loader.getResult("hill"));
 		hill.setTransform(Math.random() * w, h - hill.image.height * 4 - groundImg.height, 4, 4);
