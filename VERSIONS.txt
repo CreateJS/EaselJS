@@ -13,7 +13,6 @@ CRITICAL (may break existing content):
 OTHER:
 - add Ticker._pausedTime in Ticker.reset() (thanks @abouthiroppy)
 - fixed Rectangle.pad parameter docs. (thanks @ruslan-simonenko)
-- fixed error when drawing DOMElement with SpriteStage (thanks @thammin)
 - added a few missing APIs on FauxCanvas helper
 - added VideoBuffer helper class that preserves the previous frame until the next one is drawn
 - fixed an issue where accessing performance throws an error in node webkit
