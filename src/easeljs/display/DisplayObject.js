@@ -706,7 +706,7 @@ this.createjs = this.createjs||{};
 	 * Set both the {{#crossLink "DisplayObject/scaleX:property"}}{{/crossLink}} and the {{#crossLink "DisplayObject/scaleY"}}{{/crossLink}}
 	 * property to the same value. Note that when you get the value, if the `scaleX` and `scaleY` are different values,
 	 * it will return only the `scaleX`.
-	 * @property scaleX
+	 * @property scale
 	 * @type {Number}
 	 * @default 1
 	 */
