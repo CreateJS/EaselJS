@@ -9,7 +9,7 @@
 		"wdamien"
 	],
 	"description": "The Easel Javascript library provides a full, hierarchical display list, a core interaction model, and helper classes to make working with the HTML5 Canvas element much easier. Part of the CreateJS suite of libraries.",
-	"main": "lib/easeljs-1.0.0.combined.js",
+	"main": "lib/easeljs.js",
 	"keywords": [
 		"easeljs",
 		"html5",
