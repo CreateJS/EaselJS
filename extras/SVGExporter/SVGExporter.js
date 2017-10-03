@@ -229,7 +229,7 @@
 	 **/
 	p.run = function() {
 		var target = this._target;
-		var stage = target.getStage();
+		var stage = target.stage;
 		var canvas = stage&&stage.canvas;
 		this._mtx = target.getMatrix();
 		var svg = this.svg = this.createNode("svg");
@@ -296,7 +296,7 @@
 
 	p.exportContainer = function(o) {
 		var group = this.exportCommon(this.createNode("g"), o, "container");
-		for (var i= 0, l=o.getNumChildren(); i<l; i++) {
+		for (var i= 0, l=o.numChildren; i<l; i++) {
 			this.appendChild(group, this.exportElement(o.getChildAt(i)));
 		}
 		return group;
@@ -362,7 +362,7 @@
 	};
 	
 	p.exportShapeElements = function(o, maskmode) {
-		var q = o.graphics.getInstructions(), G = c.Graphics;
+		var q = o.graphics.instructions, G = c.Graphics;
 		var active = [], fill=null, stroke=null, strokeStyle=null, strokeDash=null, closed = false, els = [];
 		
 		for (var i= 0, l= q.length; i<l; i++) {
