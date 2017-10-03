@@ -730,5 +730,11 @@
 		return p;
 	};
 
-	window.SVGExporter = SVGExporter;
+	var root = window || global;
+	if (typeof module !== 'undefined' && module.exports) {
+		module.exports = SVGExporter;
+		root.SVGExporter = SVGExporter;
+	} else {
+		root.SVGExporter = SVGExporter;
+	}
 })();
