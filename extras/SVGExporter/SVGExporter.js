@@ -33,10 +33,10 @@
 	/**
 	 * <b>Note that this is an experimental feature, has not been thoroughly tested, and may undergo significant change.
 	 * Use at your own risk.</b>
-	 * 
+	 *
 	 * Exports an EaselJS Stage or Container to SVG. This works with most content types, including: Shape, Bitmap,
 	 * Sprite, Container, MovieClip (current frame only) and Text.
-	 * 
+	 *
 	 * There are a number of limitations, including:<ul>
 	 * 	<li> arcTo is not supported yet
 	 * 	<li> roundRect negative corner radii not supported
@@ -48,9 +48,9 @@
 	 * 	<li> vertical text positioning is approximate for textBaseline values other than "alphabetic"
 	 * 	<li> bitmap fill repetition modes not supported
 	 * </ul>
-	 * 
+	 *
 	 * Different tools have different limitations for importing SVG. For example, we have noted the following issues
-	 * in Adobe Illustrator CC: 
+	 * in Adobe Illustrator CC:
 	 * <ul>
 	 * 	<li> circular gradient are rendered improperly
 	 * 	<li> bitmap fills are not imported correctly
@@ -69,10 +69,10 @@
 		this.initialize(target, width, height);
 	};
 	var p = SVGExporter.prototype;
-	
+
 // shortcuts:
 	var c = createjs;
-	
+
 // static:
 	/**
 	 * The SVG namespace.
@@ -83,7 +83,7 @@
 	 * @readonly
 	 **/
 	SVGExporter.SVG_NS = "http://www.w3.org/2000/svg";
-	
+
 	/**
 	 * The xlink namespace.
 	 * @property XLINK_NS
@@ -93,7 +93,7 @@
 	 * @readonly
 	 **/
 	SVGExporter.XLINK_NS = "http://www.w3.org/1999/xlink";
-	
+
 	/**
 	 * A lookup hash for supported blend modes.
 	 * @property BLEND_MODES
@@ -102,7 +102,7 @@
 	 * @readonly
 	 **/
 	SVGExporter.BLEND_MODES = {multiply:1, screen:1, overlay:1, darken:1, lighten:1, "color-dodge":1, "color-burn":1, "hard-light":1, "soft-light":1, difference:1, exclusion:1, hue:1, saturation:1, color:1, luminosity:1};
-	
+
 	/**
 	 * A lookup hash mapping canvas text alignment values to SVG equivalents.
 	 * @property ALIGN_MAP
@@ -111,7 +111,7 @@
 	 * @readonly
 	 **/
 	SVGExporter.ALIGN_MAP = {start:"start", end:"end", left:"start", right:"end", center:"middle"};
-	
+
 	/**
 	 * A lookup hash for getting the hex values of CSS color names.
 	 * @property COLOR_NAMES
@@ -120,7 +120,7 @@
 	 * @readonly
 	 **/
 	SVGExporter.COLOR_NAMES = {aliceblue:"#f0f8ff",antiquewhite:"#faebd7",aqua:"#00ffff",aquamarine:"#7fffd4",azure:"#f0ffff",beige:"#f5f5dc",bisque:"#ffe4c4",black:"#000000",blanchedalmond:"#ffebcd",blue:"#0000ff",blueviolet:"#8a2be2",brown:"#a52a2a",burlywood:"#deb887",cadetblue:"#5f9ea0",chartreuse:"#7fff00",chocolate:"#d2691e",coral:"#ff7f50",cornflowerblue:"#6495ed",cornsilk:"#fff8dc",crimson:"#dc143c",cyan:"#00ffff",darkblue:"#00008b",darkcyan:"#008b8b",darkgoldenrod:"#b8860b",darkgray:"#a9a9a9",darkgreen:"#006400",darkkhaki:"#bdb76b",darkmagenta:"#8b008b",darkolivegreen:"#556b2f",darkorange:"#ff8c00",darkorchid:"#9932cc",darkred:"#8b0000",darksalmon:"#e9967a",darkseagreen:"#8fbc8f",darkslateblue:"#483d8b",darkslategray:"#2f4f4f",darkturquoise:"#00ced1",darkviolet:"#9400d3",deeppink:"#ff1493",deepskyblue:"#00bfff",dimgray:"#696969",dodgerblue:"#1e90ff",firebrick:"#b22222",floralwhite:"#fffaf0",forestgreen:"#228b22",fuchsia:"#ff00ff",gainsboro:"#dcdcdc",ghostwhite:"#f8f8ff",gold:"#ffd700",goldenrod:"#daa520",gray:"#808080",grey:"#808080",green:"#008000",greenyellow:"#adff2f",honeydew:"#f0fff0",hotpink:"#ff69b4",indianred:"#cd5c5c",indigo:"#4b0082",ivory:"#fffff0",khaki:"#f0e68c",lavender:"#e6e6fa",lavenderblush:"#fff0f5",lawngreen:"#7cfc00",lemonchiffon:"#fffacd",lightblue:"#add8e6",lightcoral:"#f08080",lightcyan:"#e0ffff",lightgoldenrodyellow:"#fafad2",lightgreen:"#90ee90",lightgrey:"#d3d3d3",lightpink:"#ffb6c1",lightsalmon:"#ffa07a",lightseagreen:"#20b2aa",lightskyblue:"#87cefa",lightslategray:"#778899",lightsteelblue:"#b0c4de",lightyellow:"#ffffe0",lime:"#00ff00",limegreen:"#32cd32",linen:"#faf0e6",magenta:"#ff00ff",maroon:"#800000",mediumaquamarine:"#66cdaa",mediumblue:"#0000cd",mediumorchid:"#ba55d3",mediumpurple:"#9370db",mediumseagreen:"#3cb371",mediumslateblue:"#7b68ee",mediumspringgreen:"#00fa9a",mediumturquoise:"#48d1cc",mediumvioletred:"#c71585",midnightblue:"#191970",mintcream:"#f5fffa",mistyrose:"#ffe4e1",moccasin:"#ffe4b5",navajowhite:"#ffdead",navy:"#000080",oldlace:"#fdf5e6",olive:"#808000",olivedrab:"#6b8e23",orange:"#ffa500",orangered:"#ff4500",orchid:"#da70d6",palegoldenrod:"#eee8aa",palegreen:"#98fb98",paleturquoise:"#afeeee",palevioletred:"#db7093",papayawhip:"#ffefd5",peachpuff:"#ffdab9",peru:"#cd853f",pink:"#ffc0cb",plum:"#dda0dd",powderblue:"#b0e0e6",purple:"#800080",red:"#ff0000",rosybrown:"#bc8f8f",royalblue:"#4169e1",saddlebrown:"#8b4513",salmon:"#fa8072",sandybrown:"#f4a460",seagreen:"#2e8b57",seashell:"#fff5ee",sienna:"#a0522d",silver:"#c0c0c0",skyblue:"#87ceeb",slateblue:"#6a5acd",slategray:"#708090",snow:"#fffafa",springgreen:"#00ff7f",steelblue:"#4682b4",tan:"#d2b48c",teal:"#008080",thistle:"#d8bfd8",tomato:"#ff6347",turquoise:"#40e0d0",violet:"#ee82ee",wheat:"#f5deb3",white:"#ffffff",whitesmoke:"#f5f5f5",yellow:"#ffff00",yellowgreen:"#9acd32"};
-	
+
 // properties:
 	/**
 	 * The resulting SVG node. This will be null until the exporter runs.
@@ -129,7 +129,7 @@
 	 * @default null
 	 **/
 	p.svg = null; // result
-	
+
 	/**
 	 * If true, display objects with visible=false will be included in the export.
 	 * @property includeHidden
@@ -137,11 +137,11 @@
 	 * @default false
 	 **/
 	p.includeHidden = false;
-	
+
 	/**
 	 * If true, then display objects with an active cache will be included as an embedded image. If false, the exporter
 	 * will ignore the cache and export the display object normally.
-	 * 
+	 *
 	 * Note that embedded images will greatly increase the file size of the resulting SVG, and that support for embedded
 	 * images is scattered in many graphics tools.
 	 * @property useCache
@@ -149,10 +149,10 @@
 	 * @default false
 	 **/
 	p.useCache = false;
-	
+
 	/**
 	 * If true, then all images will be embedded into the SVG using a data url instead of referenced externally.
-	 * 
+	 *
 	 * Note that embedded images will greatly increase the file size of the resulting SVG, and that support for embedded
 	 * images is scattered in many graphics tools.
 	 * @property embedImages
@@ -160,7 +160,7 @@
 	 * @default false
 	 **/
 	p.embedImages = false;
-	
+
 	/**
 	 * If true, all colors will be converted into an RGB hex (ex #FF99CC) color and opacity value. This can improve
 	 * compatibility with tools that don't support HLS, RGBA, or named colors.
@@ -169,19 +169,19 @@
 	 * @default true
 	 **/
 	p.normalizeColors = true;
-	
+
 	/**
 	 * Allows you to specify a path that will be prepended to all image file names. If null, the original value of the
 	 * image src attribute will be used. For example, setting it to "images/" would cause an image with a src of
 	 * "http://mydomain.com/assets/image1.jpg" to be exported using a path of "images/image1.jpg".
-	 * 
+	 *
 	 * Note that this can cause issues if you have multiple images with the same file name loaded from different paths.
 	 * @property imagePath
 	 * @type boolean
 	 * @default true
 	 **/
 	p.imagePath = null;
-	
+
 	/**
 	 * The width of the SVG element to create. If null, the exporter will use the width of the target's canvas. If there
 	 * is no canvas, it will default to 1000px.
@@ -190,7 +190,7 @@
 	 * @default null
 	 **/
 	p.width = null;
-	 
+
 	/**
 	 * The height of the SVG element to create. If null, the exporter will use the height of the target's canvas. If there
 	 * is no canvas, it will default to 1000px.
@@ -199,14 +199,14 @@
 	 * @default null
 	 **/
 	p.height = null;
-	
+
 // private properties:
 	p._target = null;
 	p._defs = null;
 	p._uids = null;
 	p._mtx = null;
 	p._embeddedImageSrcs = null;
-	
+
 // initialization:
 	/**
 	 * Initialization method.
@@ -229,7 +229,7 @@
 	 **/
 	p.run = function() {
 		var target = this._target;
-		var stage = target.getStage();
+		var stage = target.stage;
 		var canvas = stage&&stage.canvas;
 		this._mtx = target.getMatrix();
 		var svg = this.svg = this.createNode("svg");
@@ -250,32 +250,32 @@
 		}
 		return id+"_"+(++this._uids[id]);
 	};
-	
+
 	p.createNode = function(name, attributes, parent) {
 		return this.appendChild(parent, this.setAttributes(document.createElementNS(SVGExporter.SVG_NS, name), attributes));
 	};
-	
+
 	p.setAttribute = function(el, attribute, value) {
 		el&&el.setAttribute(attribute, value);
 		return el;
 	};
-	
+
 	p.setAttributes = function(el, attributes) {
 		if (!el) { return el; }
 		for (var n in attributes) { el.setAttribute(n, attributes[n]); }
 		return el;
 	};
-	
+
 	p.appendChild = function(parent, child) {
 		if (child && parent) { parent.appendChild(child); }
 		return child;
 	};
-	
+
 	p.appendChildren = function(parent, children) {
 		if (parent && children) { for (var i= 0,l=children.length; i<l; i++) { parent.appendChild(children[i]); } }
 		return parent;
 	};
-	
+
 	// makes it easy to override this to add unsupported types:
 	p.exportElement = function(o) {
 		if (!o.visible && !this.includeHidden) { return; }
@@ -286,7 +286,7 @@
 		if (o instanceof c.Text) { return this.exportText(o); }
 		if (o instanceof c.Shape) { return this.exportShape(o); }
 	};
-	
+
 	p.exportCache = function(o) {
 		var img = this._getImage(o.cacheCanvas, "cache");
 		if (!img) { return; }
@@ -296,18 +296,18 @@
 
 	p.exportContainer = function(o) {
 		var group = this.exportCommon(this.createNode("g"), o, "container");
-		for (var i= 0, l=o.getNumChildren(); i<l; i++) {
+		for (var i= 0, l=o.numChildren; i<l; i++) {
 			this.appendChild(group, this.exportElement(o.getChildAt(i)));
 		}
 		return group;
 	};
-	
+
 	p.exportBitmap = function(o) {
 		var img = this._getImage(o.image);
 		if (!img) { return; }
 		return this.exportCommon(img, o, "bitmap");
 	};
-	
+
 	p.exportSprite = function(o) {
 		var ss = o.spriteSheet;
 		var frame = ss.getFrame(o.currentFrame);
@@ -315,7 +315,7 @@
 		var img = this._getImage(frame.image);
 		if (!img) { return; }
 		var sprite = this.exportCommon(img, o, "sprite", -r.x - frame.regX, -r.y - frame.regY);
-		
+
 		var id = this.getUID(sprite.id+"_mask");
 		var mask = this.createNode("clipPath", {id:id});
 		this.appendChild(mask, this.createNode("rect", {x: r.x, y: r.y, width: r.width, height: r.height}));
@@ -323,7 +323,7 @@
 		this.setAttribute(sprite, "clip-path", "url(#"+id+")");
 		return sprite;
 	};
-	
+
 	p.exportText = function(o) {
 		var metrics = o.getMetrics(), lines = metrics.lines;
 		var yOffset = o.textBaseline == "alphabetic" ? 0 : metrics.vOffset+metrics.lineHeight*0.9; // magic number
@@ -348,7 +348,7 @@
 		}
 		return text;
 	};
-	
+
 	p.exportShape = function(o, mask) {
 		var els = this.exportShapeElements(o, !!mask), shape;
 		if (mask) {
@@ -360,14 +360,14 @@
 		}
 		return this.exportCommon(shape, o, mask?false:"shape");
 	};
-	
+
 	p.exportShapeElements = function(o, maskmode) {
-		var q = o.graphics.getInstructions(), G = c.Graphics;
+		var q = o.graphics.instructions, G = c.Graphics;
 		var active = [], fill=null, stroke=null, strokeStyle=null, strokeDash=null, closed = false, els = [];
-		
+
 		for (var i= 0, l= q.length; i<l; i++) {
 			var cmd = q[i], isStrokeOrPath = false;
-			
+
 			if (cmd instanceof G.Fill) {
 				fill = cmd;
 				isStrokeOrPath = closed = true;
@@ -381,7 +381,7 @@
 				strokeDash = cmd;
 				isStrokeOrPath = closed = true;
 			}
-			
+
 			if ((closed && !isStrokeOrPath) || i == l-1) {
 				// end of a fill/stroke collection:
 				var subElements = this.exportPathElements(active), el=null;
@@ -395,21 +395,21 @@
 				this.applyFillAndStroke(el, fill, stroke, strokeStyle, strokeDash);
 				if (el) { els.push(el); }
 				active.length = 0;
-				closed = false; 
+				closed = false;
 			}
-			
+
 			if (cmd instanceof G.BeginPath) { fill = stroke = null; }
 			if (!isStrokeOrPath) { active.push(cmd); }
 		}
-		
+
 		return els;
 	};
-	
+
 	p.exportPathElements = function(arr) {
 		var o, G = c.Graphics, path="", elements=[];
 		for (var i= 0, l=arr.length; i<l; i++) {
 			var cmd = arr[i], subPath = null;
-			
+
 			// shapes:
 			if (cmd instanceof G.Rect) { o = this.createNode("rect", {x: cmd.x, y: cmd.y, width: cmd.w, height: cmd.h}); }
 			else if (cmd instanceof G.Circle) { o = this.createNode("circle", {cx: cmd.x, cy: cmd.y, r: cmd.radius}); }
@@ -418,7 +418,7 @@
 				if (cmd.radiusTL == cmd.radiusTR && cmd.radiusTL == cmd.radiusBR && cmd.radiusTL == cmd.radiusBL && cmd.radiusTL >= 0) { o = this.createNode("rect", {x: cmd.x, y: cmd.y, width: cmd.w, height: cmd.h, rx: cmd.radiusTL}); }
 				else { o = this.exportRoundRect(cmd); }
 			} else if (cmd instanceof G.PolyStar) { o = this.exportPolyStar(cmd); }
-			
+
 			// paths:
 			else if (cmd instanceof G.MoveTo) { subPath = "M "+cmd.x+" "+cmd.y; }
 			else if (cmd instanceof G.LineTo) { subPath = "L "+cmd.x+" "+cmd.y; }
@@ -427,7 +427,7 @@
 			else if (cmd instanceof G.ArcTo) { subPath = this.getArcTo(cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.radius); }
 			else if (cmd instanceof G.Arc) { subPath = this.getArc(cmd.x, cmd.y, cmd.radius, cmd.startAngle, cmd.endAngle, cmd.anticlockwise); }
 			else if (cmd instanceof G.ClosePath && path) { subPath = "Z"; }
-			
+
 			// SVG doesn't like missing moveTos, canvas simply treats it as a move:
 			if (subPath && !path && subPath[0] != "M") {
 				subPath = "M "+(isNaN(cmd.x)?cmd.x2:cmd.x)+" "+(isNaN(cmd.y)?cmd.y2:cmd.y);
@@ -442,7 +442,7 @@
 		}
 		return elements;
 	};
-	
+
 	p.exportRoundRect = function(cmd) {
 		// TODO: negative corner radii:
 		var tl = cmd.radiusTL, tr=cmd.radiusTR, br=cmd.radiusBR, bl=cmd.radiusBL, w=cmd.w, h=cmd.h;
@@ -457,7 +457,7 @@
 			+ " z";
 		return this.createNode("path", {d:path});
 	};
-	
+
 	p.exportPolyStar = function(cmd) {
 		var x = cmd.x, y = cmd.y;
 		var radius = cmd.radius;
@@ -465,7 +465,7 @@
 		var sides = cmd.sides;
 		var ps = 1-(cmd.pointSize||0);
 		var a = Math.PI/sides;
-		
+
 		var path = "M "+(x+Math.cos(angle)*radius)+" "+(y+Math.sin(angle)*radius);
 		for (var i=0; i<sides; i++) {
 			angle += a;
@@ -477,22 +477,22 @@
 		}
 		return this.createNode("path", {d:path+" Z"});
 	};
-	
+
 	p.getArcTo = function(x1, y1, x2, y2, radius) {
 		/// TODO: this is totally wrong. I believe we need to track the previous points for this to work.
 		// "A "+radius+" "+radius+" 0 0 1 "+x2+" "+y2;
 		// for now, we will just ignore arcTo:
 		return "";
 	};
-	
+
 	// this seems to be accurate, but could use more testing:
 	p.getArc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		var str = "", dA = endAngle-startAngle;
-		
+
 		if (Math.abs(dA) > Math.PI*2 && (anticlockwise == (dA < 0))) {
 			return this.getArc(x,y,radius,0,Math.PI)+this.getArc(x,y,radius,Math.PI,0);
 		}
-		
+
 		startAngle = this._normalizeAngle(startAngle);
 		endAngle = this._normalizeAngle(endAngle);
 		var startX = x + radius * Math.cos(startAngle);
@@ -508,12 +508,12 @@
 		str += "A "+radius+" "+radius+" 0 "+(large ? 1 : 0)+" "+(anticlockwise ? 0 : 1)+" "+endX+" "+endY;
 		return str;
 	};
-	
+
 	p.applyFillAndStroke = function(el, fill, stroke, strokeStyle, strokeDash) {
 		if (stroke && stroke.ignoreScale) { this.setAttribute(el, "vector-effect", "non-scaling-stroke"); }
 		return this.setAttribute(el, "style", this.getFillAndStrokeStyle(fill, stroke, strokeStyle, strokeDash));
 	};
-	
+
 	p.getFillAndStrokeStyle = function(fill, stroke, strokeStyle, strokeDash) {
 		var style = "";
 		style += this._getFill(fill); // "fill:"+this._getFill(fill)+";";
@@ -533,31 +533,31 @@
 		}
 		return style;
 	};
-	
+
 	p.setId = function(el, name, type) {
 		this.setAttribute(el, "id", this.getUID(name||type||"element"));
 	};
-	
+
 	p.exportCommon = function(el, o, idType, x, y, scale) {
 		if (idType !== false) { this.setId(el, o.name, idType); }
-		
+
 		if (o.alpha != 1) { this.setAttribute(el, "opacity", o.alpha.toFixed(4)); }
 		if (!o.visible) { this.setAttribute(el, "display", "none"); }
-		
+
 		// TODO: need to append this to style instead of overwriting:
 		var blend = SVGExporter.BLEND_MODES[o.compositeOperation];
 		if (blend) { this.setAttribute(el, "style", "mix-blend-mode:"+ o.compositeOperation); }
-	
+
 		this.addMask(el, o);
-		
+
 		scale = scale||1;
 		var mtx = o.getMatrix(this._mtx);
 		if (x || y || scale != 1) { mtx.append(1/scale,0,0,1/scale,x,y); }
 		if (!mtx.isIdentity()) { this.setAttribute(el, "transform", this.exportMatrix(mtx)); }
-		
+
 		return el;
 	};
-	
+
 	p.addMask = function(el, o) {
 		if (!o.mask) { return el; }
 		var id = this.getUID(el.id+"_mask");
@@ -567,18 +567,18 @@
 		this.setAttribute(el, "clip-path", "url(#"+id+")");
 		return el;
 	};
-	
+
 	p.exportMatrix = function(mtx) {
 		return "matrix("+[mtx.a.toFixed(4), mtx.b.toFixed(4), mtx.c.toFixed(4), mtx.d.toFixed(4), mtx.tx.toFixed(4), mtx.ty.toFixed(2)]+")";
 	};
-	
+
 
 // private methods:
 	p._getFill = function(fill, isStroke) {
 		var label=isStroke?"stroke":"fill";
 		if (!fill || !fill.style) { return label+":none;"; }
 		var style = fill.style, props, id, o, col;
-		
+
 		if (typeof style == "string") {
 			if (!this.normalizeColors) { return label+":"+style+";"; }
 			col = this._normalizeColor(style);
@@ -621,14 +621,14 @@
 				if (!isStroke && fill.matrix) { this.setAttribute(o, "patternTransform", this.exportMatrix(fill.matrix)); }
 				this.appendChild(o, img);
 			}
-			
+
 			if (id) {
 				fill.__svg_id = id;
 				return label+":url(#"+id+");";
 			}
 		}
 	};
-	
+
 	p._getImage = function(image, name) {
 		if (!image) { return; }
 		var canvas, w = image.width, h=image.height, id=image.__svg_id || this._embeddedImageSrcs[image.src];
@@ -647,7 +647,7 @@
 			name = "canvas";
 			canvas = image;
 		}
-		
+
 		if (canvas) {
 			if (id == null) {
 				id = this.getUID(name||"canvas");
@@ -662,18 +662,18 @@
 			return el;
 		}
 	};
-	
+
 	p._getImageURL = function(image) {
 		var src = image.getAttribute("src");
 		if (this.imagePath == null || src.substr(0,5) == "data:") { return src; }
 		return this.imagePath+src.substr(src.lastIndexOf("/")+1);
 	};
-	
+
 	p._normalizeAngle = function(angle) {
 		var pi2 = Math.PI * 2;
 		return (angle%pi2+pi2)%pi2;
 	};
-	
+
 // color normalization:
 	p._normalizeColor = function(str) {
 		var color, opacity = 1, match, str = str.toLowerCase();
@@ -691,22 +691,22 @@
 		} else { color = "#000000"; }
 		return {color:color, opacity:opacity};
 	};
-	
+
 	p._normalizeVal = function(val, max) {
 		return (val < 0) ? 0 : (val > max) ? max : val;
 	};
-	
+
 	p._getHex = function(val) {
 		val = this._normalizeVal(Math.round(val),255);
 		return (val < 10 ? "0" : "")+val.toString(16);
 	};
-	
+
 	p._hslToRgb = function(vals){
 		var h = (vals[0]/360%1+1)%1;
 		var s = this._normalizeVal(vals[1]/100,1);
 		var l = this._normalizeVal(vals[2]/100,1);
 		var r, g, b;
-	
+
 		if(s == 0){
 			r = g = b = l; // achromatic
 		}else{
@@ -720,7 +720,7 @@
 		vals[1] = g * 255;
 		vals[2] = b * 255;
 	};
-	
+
 	p._hue2rgb = function(p, q, t){
 		if(t < 0) t += 1;
 		if(t > 1) t -= 1;
@@ -729,6 +729,4 @@
 		if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
 		return p;
 	};
-
-	window.SVGExporter = SVGExporter;
 })();
