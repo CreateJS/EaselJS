@@ -429,7 +429,7 @@ this.createjs = this.createjs||{};
 		 * @type {Number}
 		 * @default 0
 		 */
-		this._lastTrackedCanvas = 0;
+		this._lastTrackedCanvas = -1;
 
 		/**
 		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} is the canvas or a render
@@ -1100,9 +1100,10 @@ this.createjs = this.createjs||{};
 	 * Textures in use, or to be used again shortly, should not be removed. This is simply for performance reasons.
 	 * Removing a texture in use will cause the texture to have to be re-uploaded slowing rendering.
 	 * @method releaseTexture
-	 * @param  {DisplayObject | Texture | Image | Canvas} item An object that used the texture to be discarded.
+	 * @param {DisplayObject | Texture | Image | Canvas} item An object that used the texture to be discarded.
+	 * @param {Boolean} safe Should the release attempt to be "safe" and only delete this usage.
 	 */
-	p.releaseTexture = function (item) {
+	p.releaseTexture = function (item, safe) {
 		var i, l;
 		if (!item) { return; }
 
@@ -1149,14 +1150,22 @@ this.createjs = this.createjs||{};
 		}
 
 		// remove it
-		this._killTextureObject(this._textureDictionary[foundImage._storeID]);
-		foundImage._storeID = undefined;
+		var texture = this._textureDictionary[foundImage._storeID];
+		if (safe) {
+			var data = texture._imageData;
+			var index = data.indexOf(foundImage);
+			if (index >= 0) { data.splice(index, 1); }
+			foundImage._storeID = undefined;
+			if (data.length === 0) { this._killTextureObject(texture); }
+		} else {
+			this._killTextureObject(texture);
+		}
 	};
 
 	/**
 	 * Similar to {{#crossLink "releaseTexture"}}{{/crossLink}}, but this function differs by searching for textures to
 	 * release. It works by assuming that it can purge any texture which was last used more than "count" draw calls ago.
-	 * Because this process is unaware of the objects and whether they may be used on your stage, false positives can
+	 * Because this process is unaware of the objects and whether they may be used later on your stage, false positives can
 	 * occur. It is recommended to manually manage your memory with {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}},
 	 * however, there are many use cases where this is simpler and error-free. This process is also run by default under
 	 * the hood to prevent leaks. To disable it see the {{#crossLink "StageGL/autoPurge:property"}}{{/crossLink}} property.
@@ -1164,16 +1173,24 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [count=100] How many renders ago the texture was last used
 	 */
 	p.purgeTextures = function (count) {
-		if (count == undefined){ count = 100; }
+		if (!(count >= 0)){ count = 100; }
 
 		var dict = this._textureDictionary;
 		var l = dict.length;
-		for (var i= 0; i<l; i++) {
-			var item = dict[i];
-			if (!item) { continue; }
-			if (item._drawID + count <= this._drawID) {	// use draw not batch as draw is more indicative of time
-				this._killTextureObject(item);
+		for (var i = 0; i<l; i++) {
+			var data, texture = dict[i];
+			if (!texture || !(data = texture._imageData)) { continue; }
+
+			for (var j = 0; j<data.length; j++) {
+				var item = data[j];
+				if (item._drawID + count <= this._drawID) {
+					item._storeID = undefined;
+					data.splice(j, 1);
+					j--;
+				}
 			}
+
+			if (!data.length) { this._killTextureObject(texture); }
 		}
 	};
 
@@ -1451,6 +1468,27 @@ this.createjs = this.createjs||{};
 
 // private methods:
 	/**
+	 * Returns a base texture that has no image or data loaded. Not intended for loading images. In some error cases,
+	 * the texture creation will fail. This function differs from {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}
+	 * in that the failed textures will be replaced with a safe to render "nothing" texture.
+	 * @method _getSafeTexture
+	 * @param  {uint} [w=1] The width of the texture in pixels, defaults to 1
+	 * @param  {uint} [h=1] The height of the texture in pixels, defaults to 1
+	 */
+	p._getSafeTexture = function (w, h) {
+		var texture = this.getBaseTexture(w, h);
+
+		if(!texture) {
+			msg = "Problem creating texture, possible cause: using too much VRAM, please try releasing texture memory";
+			(console.error && console.error(msg)) || console.log(msg);
+
+			texture = this._baseTextures[0];
+		}
+
+		return texture;
+	};
+
+	/**
 	 * Sets up and returns the WebGL context for the canvas. May return undefined in error scenarios. These can include 
 	 * situations where the canvas element already has a context, 2D or GL.
 	 * @param  {Canvas} canvas The DOM canvas element to attach to
@@ -1727,10 +1765,12 @@ this.createjs = this.createjs||{};
 
 		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for safety code
 		for (var i=0; i<this._batchTextureCount;i++) {
-			var tex = this.getBaseTexture();
-			this._baseTextures[i] = this._batchTextures[i] = tex;
-			if (!tex) {
+			var texture = this.getBaseTexture();
+			this._baseTextures[i] = this._batchTextures[i] = texture;
+			if (!texture) {
 				throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
+			} else {
+				texture._storeID = -1;
 			}
 		}
 	};
@@ -1739,55 +1779,48 @@ this.createjs = this.createjs||{};
 	 * Load a specific texture, accounting for potential delay, as it might not be preloaded.
 	 * @method _loadTextureImage
 	 * @param {WebGLRenderingContext} gl
-	 * @param {Image} image Actual image to be loaded
+	 * @param {Image | Canvas} image Actual image to be loaded
 	 * @return {WebGLTexture} The resulting Texture object
 	 * @protected
 	 */
 	p._loadTextureImage = function (gl, image) {
-		var src = image.src;
-
-		if (!src) {
-			// one time canvas property setup
-			image._isCanvas = true;
-			src = image.src = "canvas_" + this._lastTrackedCanvas++;
-		}
-
-		// put the texture into our storage system
-		var storeID = this._textureIDs[src];
-		if (storeID === undefined) {
-			storeID = this._textureIDs[src] = this._textureDictionary.length;
-		}
-		if (this._textureDictionary[storeID] === undefined) {
-			this._textureDictionary[storeID] = this.getBaseTexture();
-		}
-
-		var texture = this._textureDictionary[storeID];
-
-		if (texture) {
-			// get texture params all set up
-			texture._batchID = this._batchID;
-			texture._storeID = storeID;
-			texture._imageData = image;
-			this._insertTextureInBatch(gl, texture);
-
-			// get the data into the texture or wait for it to load
-			image._storeID = storeID;
-			if (image.complete || image.naturalWidth || image._isCanvas) {	// is it already loaded
-				this._updateTextureImageData(gl, image);
-			} else  {
-				image.addEventListener("load", this._updateTextureImageData.bind(this, gl, image));
-			}
+		var srcPath, texture, msg;
+		if (image instanceof Image && image.src) {
+			srcPath = image.src;
+		} else if (image instanceof HTMLCanvasElement) {
+			image._isCanvas = true; //canvases are already loaded and assumed unique so note that
+			srcPath = "canvas_" + (++this._lastTrackedCanvas);
 		} else {
-			// we really really should have a texture, try to recover the error by using a saved empty texture so we don't crash
-			var msg = "Problem creating desired texture, known causes include using too much VRAM by not releasing WebGL texture instances";
-			(console.error && console.error(msg)) || console.log(msg);
-
-			texture = this._baseTextures[0];
-			texture._batchID = this._batchID;
-			texture._storeID = -1;
-			texture._imageData = texture;
-			this._insertTextureInBatch(gl, texture);
+			msg = "Invalid image provided as source. Please ensure source is a correct DOM element.";
+			(console.error && console.error(msg, image)) || console.log(msg, image);
+			return;
 		}
+
+		// create the texture lookup and texture
+		var storeID = this._textureIDs[srcPath];
+		if (storeID === undefined) {
+			this._textureIDs[srcPath] = storeID = this._textureDictionary.length;
+			image._storeID = storeID;
+			image._invalid = !image.isCanvas;
+			texture = this._getSafeTexture();
+			this._textureDictionary[storeID] = texture;
+		} else {
+			image._storeID = storeID;
+			texture = this._textureDictionary[storeID];
+		}
+
+		// allow the texture to track its references for cleanup, if it's not an error ref
+		if (texture._storeID != -1) {
+			texture._storeID = storeID;
+			if (texture._imageData) {
+				texture._imageData.push(image);
+			} else {
+				texture._imageData = [image];
+			}
+		}
+
+		// insert texture into batch
+		this._insertTextureInBatch(gl, texture);
 
 		return texture;
 	};
@@ -1801,6 +1834,11 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._updateTextureImageData = function (gl, image) {
+		// the image isn't loaded and isn't ready to be updated, because we don't set the invalid flag we should try again later
+		if (!(image.complete || image._isCanvas || image.naturalWidth)) {
+			return;
+		}
+
 		// the bitwise & is intentional, cheap exponent 2 check
 		var isNPOT = (image.width & image.width-1) || (image.height & image.height-1);
 		var texture = this._textureDictionary[image._storeID];
@@ -1831,8 +1869,8 @@ this.createjs = this.createjs||{};
 		texture._h = image.height;
 
 		if (this.vocalDebug) {
-			if (isNPOT) {
-				console.warn("NPOT(Non Power of Two) Texture: "+ image.src);
+			if (isNPOT && this._antialias) {
+				console.warn("NPOT(Non Power of Two) Texture w/ antialias on: "+ image.src);
 			}
 			if (image.width > gl.MAX_TEXTURE_SIZE || image.height > gl.MAX_TEXTURE_SIZE){
 				console && console.error("Oversized Texture: "+ image.width+"x"+image.height +" vs "+ gl.MAX_TEXTURE_SIZE +"max");
@@ -1848,8 +1886,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._insertTextureInBatch = function (gl, texture) {
-		// if it wasn't used last batch
-		if (this._batchTextures[texture._activeIndex] !== texture) {
+		if (this._batchTextures[texture._activeIndex] !== texture) {	// if it wasn't used last batch
 			// we've got to find it a a spot.
 			var found = -1;
 			var start = (this._lastTextureInsert+1) % this._batchTextureCount;
@@ -1867,14 +1904,14 @@ this.createjs = this.createjs||{};
 				this.batchReason = "textureOverflow";
 				this._drawBuffers(gl);		// <------------------------------------------------------------------------
 				this.batchCardCount = 0;
-				found = start;
+				found = start; //TODO: how do we optimize this to be smarter?
 			}
 
 			// lets put it into that spot
 			this._batchTextures[found] = texture;
 			texture._activeIndex = found;
-			var image = texture._imageData;
-			if (image && image._invalid && texture._drawID !== undefined) {
+			var image = texture._imageData && texture._imageData[0]; // first come first served, potentially problematic
+			if (image && image._invalid) {
 				this._updateTextureImageData(gl, image);
 			} else {
 				gl.activeTexture(gl.TEXTURE0 + found);
@@ -1882,9 +1919,10 @@ this.createjs = this.createjs||{};
 				this.setTextureParams(gl);
 			}
 			this._lastTextureInsert = found;
-		} else {
-			var image = texture._imageData;
-			if (texture._storeID != undefined && image && image._invalid) {
+
+		} else if(texture._drawID !== this._drawID) {	// hanging around from previous draws means the content might be out of date
+			var image = texture._imageData && texture._imageData[0];
+			if (image && image._invalid) {
 				this._updateTextureImageData(gl, image);
 			}
 		}
@@ -1898,32 +1936,33 @@ this.createjs = this.createjs||{};
 	 * {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead as it will call this with the correct texture object(s).
 	 * Note: Testing shows this may not happen immediately, have to wait frames for WebGL to have actually adjust memory.
 	 * @method _killTextureObject
-	 * @param {Texture} tex The texture to be cleaned out
+	 * @param {Texture} texture The texture to be cleaned out
 	 * @protected
 	 */
-	p._killTextureObject = function (tex) {
-		if (!tex) { return; }
+	p._killTextureObject = function (texture) {
+		if (!texture) { return; }
 		var gl = this._webGLContext;
 
 		// remove linkage
-		if (tex._storeID !== undefined && tex._storeID >= 0) {
-			this._textureDictionary[tex._storeID] = undefined;
+		if (texture._storeID !== undefined && texture._storeID >= 0) {
+			this._textureDictionary[texture._storeID] = undefined;
 			for (var n in this._textureIDs) {
-				if (this._textureIDs[n] == tex._storeID) { delete this._textureIDs[n]; }
+				if (this._textureIDs[n] == texture._storeID) { delete this._textureIDs[n]; }
 			}
-			if(tex._imageData) { tex._imageData._storeID = undefined; }
-			tex._imageData = tex._storeID = undefined;
+			var data = texture._imageData;
+			for (var i=data.length-1; i>=0; i--) { data[i]._storeID = undefined; }
+			texture._imageData = texture._storeID = undefined;
 		}
 
 		// make sure to drop it out of an active slot
-		if (tex._activeIndex !== undefined && this._batchTextures[tex._activeIndex] === tex) {
-			this._batchTextures[tex._activeIndex] = this._baseTextures[tex._activeIndex];
+		if (texture._activeIndex !== undefined && this._batchTextures[texture._activeIndex] === texture) {
+			this._batchTextures[texture._activeIndex] = this._baseTextures[texture._activeIndex];
 		}
 
 		// remove buffers if present
 		try {
-			if (tex._frameBuffer) { gl.deleteFramebuffer(tex._frameBuffer); }
-			tex._frameBuffer = undefined;
+			if (texture._frameBuffer) { gl.deleteFramebuffer(texture._frameBuffer); }
+			texture._frameBuffer = undefined;
 		} catch(e) {
 			/* suppress delete errors because it's already gone or didn't need deleting probably */
 			if (this.vocalDebug) { console.log(e); }
@@ -1931,7 +1970,7 @@ this.createjs = this.createjs||{};
 
 		// remove entry
 		try {
-			gl.deleteTexture(tex);
+			gl.deleteTexture(texture);
 		} catch(e) {
 			/* suppress delete errors because it's already gone or didn't need deleting probably */
 			if (this.vocalDebug) { console.log(e); }
@@ -2229,15 +2268,17 @@ this.createjs = this.createjs||{};
 			var uvRect, texIndex, image, frame, texture, src;
 			var useCache = item.cacheCanvas && !ignoreCache;
 
+			// get the image data, or abort if not present
 			if (item._webGLRenderStyle === 2 || useCache) {			// BITMAP / Cached Canvas
 				image = (ignoreCache?false:item.cacheCanvas) || item.image;
-			} else if (item._webGLRenderStyle === 1) {											// SPRITE
+			} else if (item._webGLRenderStyle === 1) {								// SPRITE
 				frame = item.spriteSheet.getFrame(item.currentFrame);	//TODO: Faster way?
 				if (frame === null) { continue; }
 				image = frame.image;
-			} else {																			// MISC (DOM objects render themselves later)
+			} else {																// MISC (DOM objects render themselves later)
 				continue;
 			}
+			if (!image) { continue; }
 
 			var uvs = this._uvs;
 			var vertices = this._vertices;
@@ -2245,16 +2286,15 @@ this.createjs = this.createjs||{};
 			var alphas = this._alphas;
 
 			// calculate texture
-			if (!image) { continue; }
 			if (image._storeID === undefined) {
 				// this texture is new to us so load it and add it to the batch
 				texture = this._loadTextureImage(gl, image);
-				this._insertTextureInBatch(gl, texture);
 			} else {
 				// fetch the texture (render textures know how to look themselves up to simplify this logic)
 				texture = this._textureDictionary[image._storeID];
-				if (!texture){
-					if (this.vocalDebug){ console.log("Texture should not be looked up while not being stored."); }
+
+				if (!texture){ //TODO: this should really not occur but has due to bugs, hopefully this can be removed eventually
+					if (this.vocalDebug){ console.log("Image source should not be lookup a non existent texture, please report a bug."); }
 					continue;
 				}
 
@@ -2264,6 +2304,7 @@ this.createjs = this.createjs||{};
 				}
 			}
 			texIndex = texture._activeIndex;
+			image._drawID = this._drawID;
 
 			if (item._webGLRenderStyle === 2 || useCache) {			// BITMAP / Cached Canvas
 				if (!useCache && item.sourceRect) {
