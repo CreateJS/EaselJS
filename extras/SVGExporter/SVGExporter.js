@@ -291,7 +291,8 @@
 		var img = this._getImage(o.cacheCanvas, "cache");
 		if (!img) { return; }
 		// don't forget cache offset & scale
-		return this.exportCommon(img, o, "cache", o._cacheOffsetX, o._cacheOffsetY, o._cacheScale);
+		var cache = o.bitmapCache;
+		return this.exportCommon(img, o, "cache", cache._filterOffX, cache._filterOffY, cache.scale);
 	};
 
 	p.exportContainer = function(o) {

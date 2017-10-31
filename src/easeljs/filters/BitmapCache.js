@@ -193,6 +193,15 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 **/
 		this._drawHeight = 0;
+
+		/**
+		 * Internal tracking of the last requested bounds, may happen repeadtedly so stored to avoid object creation
+		 * @property _boundRect
+		 * @protected
+		 * @type {Rectangle}
+		 * @default 0
+		 **/
+		this._boundRect = new createjs.Rectangle();
 	}
 	var p = BitmapCache.prototype;
 
@@ -401,6 +410,19 @@ this.createjs = this.createjs||{};
 		return true;
 	};
 
+	/**
+	 * Determine the bounds of the shape in local space.
+	 * @method getBounds
+	 * @returns {Rectangle}
+	 */
+	p.getBounds = function() {
+		var scale = this.scale;
+		return this._boundRect.setValue(
+			this._filterOffX/scale,		this._filterOffY/scale,
+			this.width/scale,			this.height/scale
+		);
+	};
+
 // private methods:
 	/**
 	 * Create or resize the invisible canvas/surface that is needed for the display object(s) to draw to,
@@ -410,8 +432,10 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._updateSurface = function() {
+		var surface;
+
 		if (!this._options || !this._options.useGL) {
-			var surface = this.target.cacheCanvas;
+			surface = this.target.cacheCanvas;
 
 			// create it if it's missing
 			if(!surface) {
@@ -451,7 +475,7 @@ this.createjs = this.createjs||{};
 		}
 
 		// now size render surfaces
-		var surface = this.target.cacheCanvas;
+		surface = this.target.cacheCanvas;
 		var stageGL = this._webGLCache;
 
 		// if we have a dedicated stage we've gotta size it
@@ -483,7 +507,6 @@ this.createjs = this.createjs||{};
 		var webGL = this._webGLCache;
 
 		if (webGL){
-			//TODO: auto split blur into an x/y pass
 			webGL.cacheDraw(target, target.filters, this);
 
 			// we may of swapped around which element the surface is, so we re-fetch it
