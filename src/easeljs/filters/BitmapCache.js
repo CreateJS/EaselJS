@@ -193,6 +193,15 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 **/
 		this._drawHeight = 0;
+
+		/**
+		 * Internal tracking of the last requested bounds, may happen repeadtedly so stored to avoid object creation
+		 * @property _boundRect
+		 * @protected
+		 * @type {Rectangle}
+		 * @default 0
+		 **/
+		this._boundRect = new createjs.Rectangle();
 	}
 	var p = BitmapCache.prototype;
 
@@ -399,6 +408,19 @@ this.createjs = this.createjs||{};
 			this._drawWidth/this.scale,					this._drawHeight/this.scale
 		);
 		return true;
+	};
+
+	/**
+	 * Determine the bounds of the shape in local space.
+	 * @method getBounds
+	 * @returns {Rectangle}
+	 */
+	p.getBounds = function() {
+		var scale = this.scale;
+		return this._boundRect.setValue(
+			this._filterOffX/scale,		this._filterOffY/scale,
+			this.width/scale,			this.height/scale
+		);
 	};
 
 // private methods:
