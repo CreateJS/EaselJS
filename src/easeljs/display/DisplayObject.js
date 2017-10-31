@@ -719,7 +719,7 @@ this.createjs = this.createjs||{};
 			},
 			scale: {
 				get: function() { return this.scaleX; },
-				set: function(scale) { this.scaleX = this.scaleY = scale; },
+				set: function(scale) { this.scaleX = this.scaleY = scale; }
 			}
 		});
 	} catch (e) {}

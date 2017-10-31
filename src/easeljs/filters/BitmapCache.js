@@ -410,8 +410,10 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._updateSurface = function() {
+		var surface;
+
 		if (!this._options || !this._options.useGL) {
-			var surface = this.target.cacheCanvas;
+			surface = this.target.cacheCanvas;
 
 			// create it if it's missing
 			if(!surface) {
@@ -451,7 +453,7 @@ this.createjs = this.createjs||{};
 		}
 
 		// now size render surfaces
-		var surface = this.target.cacheCanvas;
+		surface = this.target.cacheCanvas;
 		var stageGL = this._webGLCache;
 
 		// if we have a dedicated stage we've gotta size it
@@ -483,7 +485,6 @@ this.createjs = this.createjs||{};
 		var webGL = this._webGLCache;
 
 		if (webGL){
-			//TODO: auto split blur into an x/y pass
 			webGL.cacheDraw(target, target.filters, this);
 
 			// we may of swapped around which element the surface is, so we re-fetch it

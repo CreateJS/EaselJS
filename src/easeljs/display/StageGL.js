@@ -1479,7 +1479,7 @@ this.createjs = this.createjs||{};
 		var texture = this.getBaseTexture(w, h);
 
 		if(!texture) {
-			msg = "Problem creating texture, possible cause: using too much VRAM, please try releasing texture memory";
+			var msg = "Problem creating texture, possible cause: using too much VRAM, please try releasing texture memory";
 			(console.error && console.error(msg)) || console.log(msg);
 
 			texture = this._baseTextures[0];
@@ -1644,7 +1644,7 @@ this.createjs = this.createjs||{};
 	 */
 	p._createShader = function (gl, type, str) {
 		// inject the static number
-		str = str.replace(/{{count}}/g, this._batchTextureCount);
+		str = str.replace(/\{\{count}}/g, this._batchTextureCount);
 
 		// resolve issue with no dynamic samplers by creating correct samplers in if else chain
 		// TODO: WebGL 2.0 does not need this support
@@ -1652,8 +1652,8 @@ this.createjs = this.createjs||{};
 		for (var i = 1; i<this._batchTextureCount; i++) {
 			insert += "} else if (indexPicker <= "+ i +".5) { color = texture2D(uSampler["+ i +"], vTextureCoord);";
 		}
-		str = str.replace(/{{alternates}}/g, insert);
-		str = str.replace(/{{fragColor}}/g, this._premultiply ? StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY : StageGL.REGULAR_FRAG_COLOR_NORMAL);
+		str = str.replace(/\{\{alternates}}/g, insert);
+		str = str.replace(/\{\{fragColor}}/g, this._premultiply ? StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY : StageGL.REGULAR_FRAG_COLOR_NORMAL);
 
 		// actually compile the shader
 		var shader = gl.createShader(type);
