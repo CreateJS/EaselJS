@@ -17,7 +17,7 @@ var customMatchers = {
 };
 
 beforeAll(function(done) {
-	this.assetsBasePath = "_assets/art/";
+	this.assetsBasePath = "assets/art/";
 	this.sColor = "#000";
 	this.fColor = "#ff0000";
 
@@ -66,7 +66,7 @@ beforeAll(function(done) {
 		done();
 	};
 
-	img.src = "_assets/art/" + "daisy.png";
+	img.src = this.assetsBasePath + "daisy.png";
 }, 5000)
 
 beforeEach(function () {

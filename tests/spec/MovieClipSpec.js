@@ -31,13 +31,13 @@ describe("MovieClip", function () {
 	it("gotoAndPlay", function (done) {
 		this.mc.gotoAndPlay("start");
 
-		this.compareBaseLine("assets/gotoAndPlay.png", done, expect, .01);
+		this.compareBaseLine("test_assets/gotoAndPlay.png", done, expect, .01);
 	});
 
 	it("gotoAndStop", function (done) {
 		this.mc.gotoAndStop("end");
 
-		this.compareBaseLine("assets/gotoAndStop.png", done, expect, .01);
+		this.compareBaseLine("test_assets/gotoAndStop.png", done, expect, .01);
 	});
 
 	it("play", function (done) {
@@ -48,7 +48,7 @@ describe("MovieClip", function () {
 			this.stage.update();
 		}
 
-		this.compareBaseLine("assets/play.png", done, expect, .01);
+		this.compareBaseLine("test_assets/play.png", done, expect, .01);
 	});
 
 	it("stop", function (done) {

@@ -20,7 +20,7 @@ describe("Filters", function () {
 		this.stage.addChild(bmp2);
 
 		this.stage.update();
-		this.compareBaseLine("assets/AlphaMaskFilter.png", done, expect, .01);
+		this.compareBaseLine("test_assets/AlphaMaskFilter.png", done, expect, .01);
 
 		expect(amf.clone().mask).toBe(maskShape.cacheCanvas);
 	});
@@ -44,7 +44,7 @@ describe("Filters", function () {
 		bmp2.cache(0, 0, width, height);
 		this.stage.addChild(bmp2);
 
-		this.compareBaseLine("assets/AlphaMapFilter.png", done, expect);
+		this.compareBaseLine("test_assets/AlphaMapFilter.png", done, expect);
 
 		expect(amf.clone().alphaMap).toBe(maskShape.cacheCanvas);
 	});
@@ -61,7 +61,7 @@ describe("Filters", function () {
 
 		shape.cache(0, 0, 100, 100);
 
-		this.compareBaseLine("assets/BlurFilter.png", done, expect, 0.01);
+		this.compareBaseLine("test_assets/BlurFilter.png", done, expect, 0.01);
 
 		var blurClone = blurFilter.clone();
 		expect(blurClone.blurX).toBe(blurFilter.blurX);
@@ -80,7 +80,7 @@ describe("Filters", function () {
 		shape.cache(0, 0, 100, 100);
 		this.stage.addChild(shape);
 
-		this.compareBaseLine("assets/ColorFilter.png", done, expect, 0.01);
+		this.compareBaseLine("test_assets/ColorFilter.png", done, expect, 0.01);
 
 		var colorFilterClone = cf.clone();
 
@@ -105,7 +105,7 @@ describe("Filters", function () {
 
 		this.stage.addChild(bmp);
 
-		this.compareBaseLine("assets/ColorMatrixFilter.png", done, expect);
+		this.compareBaseLine("test_assets/ColorMatrixFilter.png", done, expect);
 
 		var clone = cmf.clone().matrix.toArray();
 		var orig = cmf.matrix.toArray()
@@ -123,7 +123,7 @@ describe("Filters", function () {
 
 		this.stage.addChild(c);
 
-		this.compareBaseLine("assets/Shadow.png", done, expect);
+		this.compareBaseLine("test_assets/Shadow.png", done, expect);
 	});
 
 });

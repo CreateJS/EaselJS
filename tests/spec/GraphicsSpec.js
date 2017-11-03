@@ -12,7 +12,7 @@ describe("Graphics", function () {
 		this.g.beginFill(this.fColor);
 		this.g.moveTo(120, 100).arc(100, 100, 20, 0, Math.PI);
 
-		this.compareBaseLine("assets/arc.png", done, expect, 0.01);
+		this.compareBaseLine("test_assets/arc.png", done, expect, 0.01);
 	});
 
 	it("arcTo()", function (done) {
@@ -20,55 +20,55 @@ describe("Graphics", function () {
 		this.g.beginStroke(this.sColor);
 		this.g.moveTo(25, 25).arcTo(150, 25, 150, 70, 50, Math.PI * 2);
 
-		this.compareBaseLine("assets/arcTo.png", done, expect);
+		this.compareBaseLine("test_assets/arcTo.png", done, expect);
 	});
 
 	it("beginBitmapFill()", function (done) {
 		this.g.beginBitmapFill(this.img).drawRect(5, 5, 100, 100);
 
-		this.compareBaseLine("assets/beginBitmapFill.png", done, expect);
+		this.compareBaseLine("test_assets/beginBitmapFill.png", done, expect);
 	});
 
 	it("beginBitmapStroke()", function (done) {
 		this.g.setStrokeStyle(10).beginBitmapStroke(this.img).drawRect(5, 5, 100, 100);
 
-		this.compareBaseLine("assets/beginBitmapStroke.png", done, expect);
+		this.compareBaseLine("test_assets/beginBitmapStroke.png", done, expect);
 	});
 
 	it("beginLinearGradientFill()", function (done) {
 		this.g.beginLinearGradientFill([this.fColor, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 130).drawRect(0, 0, 120, 120);
 
-		this.compareBaseLine("assets/beginLinearGradientFill.png", done, expect);
+		this.compareBaseLine("test_assets/beginLinearGradientFill.png", done, expect);
 	});
 
 	it("beginLinearGradientStroke()", function (done) {
 		this.g.beginLinearGradientStroke([this.sColor, "rgba(50, 50, 50, 1)"], [0, .4], 0, 0, 70, 140).moveTo(5, 25).lineTo(110, 25).endStroke();
 
-		this.compareBaseLine("assets/beginLinearGradientStroke.png", done, expect);
+		this.compareBaseLine("test_assets/beginLinearGradientStroke.png", done, expect);
 	});
 
 	it("beginRadialGradientFill()", function (done) {
 		this.g.beginRadialGradientFill([this.fColor, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 0, 0, 60).drawRect(40, 40, 40, 40);
 
-		this.compareBaseLine("assets/beginRadialGradientFill.png", done, expect, 300);
+		this.compareBaseLine("test_assets/beginRadialGradientFill.png", done, expect, 300);
 	});
 
 	it("beginRadialGradientStroke()", function (done) {
 		this.g.setStrokeStyle(10).beginRadialGradientStroke(["#F00", "#00F"], [0, 1], 150, 150, 200, 100, 100, 25).drawRect(25, 25, 125, 125);
 
-		this.compareBaseLine("assets/beginRadialGradientStroke.png", done, expect);
+		this.compareBaseLine("test_assets/beginRadialGradientStroke.png", done, expect);
 	});
 
 	it("bezierCurveTo()", function (done) {
 		this.g.beginFill(this.fColor).beginStroke(this.sColor).moveTo(25, 25).bezierCurveTo(45, 175, 125, 75, 25, 25);
 
-		this.compareBaseLine("assets/bezierCurveTo.png", done, expect, 0.008);
+		this.compareBaseLine("test_assets/bezierCurveTo.png", done, expect, 0.008);
 	});
 
 	it("quadraticCurveTo() / curveTo()", function (done) {
 		this.g.beginFill(this.fColor).beginStroke(this.sColor).moveTo(5, 5).quadraticCurveTo(200, 20, 190, 190).endStroke();
 
-		this.compareBaseLine("assets/quadraticCurveTo.png", done, expect, 0.008);
+		this.compareBaseLine("test_assets/quadraticCurveTo.png", done, expect, 0.008);
 	});
 
 	it("decodePath()", function (done) {
@@ -119,7 +119,7 @@ describe("Graphics", function () {
 
 		this.stage.addChild(this.shape_10, this.shape_9, this.shape_8, this.shape_7, this.shape_6, this.shape_5, this.shape_4, this.shape_3, this.shape_2, this.shape_1, this.shape);
 
-		this.compareBaseLine("assets/decodePath.png", done, expect, .01);
+		this.compareBaseLine("test_assets/decodePath.png", done, expect, .01);
 	});
 
 	it("drawCircle()", function (done) {
@@ -129,7 +129,7 @@ describe("Graphics", function () {
 		this.g.drawCircle(100, 100, 50);
 		this.g.endFill();
 
-		this.compareBaseLine("assets/drawCircle.png", done, expect);
+		this.compareBaseLine("test_assets/drawCircle.png", done, expect);
 	});
 
 	it("drawEllipse()", function (done) {
@@ -139,7 +139,7 @@ describe("Graphics", function () {
 		this.g.drawEllipse(25, 25, 75, 150);
 		this.g.endFill();
 
-		this.compareBaseLine("assets/drawEllipse.png", done, expect);
+		this.compareBaseLine("test_assets/drawEllipse.png", done, expect);
 	});
 
 	it("drawPolyStar()", function (done) {
@@ -149,7 +149,7 @@ describe("Graphics", function () {
 		this.g.drawPolyStar(100, 100, 75, 5, 0.6, -90);
 		this.g.endFill();
 
-		this.compareBaseLine("assets/drawPolyStar.png", done, expect);
+		this.compareBaseLine("test_assets/drawPolyStar.png", done, expect);
 	});
 
 	it("drawRect()", function (done) {
@@ -159,7 +159,7 @@ describe("Graphics", function () {
 		this.g.drawRect(5, 5, 100, 100);
 		this.g.endFill();
 
-		this.compareBaseLine("assets/drawRect.png", done, expect);
+		this.compareBaseLine("test_assets/drawRect.png", done, expect);
 	});
 
 	it("drawRoundRect()", function (done) {
@@ -169,7 +169,7 @@ describe("Graphics", function () {
 		this.g.drawRoundRect(5, 5, 100, 100, 7);
 		this.g.endFill();
 
-		this.compareBaseLine("assets/drawRoundRect.png", done, expect);
+		this.compareBaseLine("test_assets/drawRoundRect.png", done, expect);
 	});
 
 	it("drawRoundRectComplex()", function (done) {
@@ -179,7 +179,7 @@ describe("Graphics", function () {
 		this.g.drawRoundRectComplex(5, 5, 100, 100, 5, 10, 15, 20);
 		this.g.endFill();
 
-		this.compareBaseLine("assets/drawRoundRectComplex.png", done, expect);
+		this.compareBaseLine("test_assets/drawRoundRectComplex.png", done, expect);
 	});
 
 	it("getHSL()", function () {
@@ -200,19 +200,19 @@ describe("Graphics", function () {
 	it("lineTo()", function (done) {
 		this.g.beginStroke(this.sColor).moveTo(5, 35).lineTo(110, 75);
 
-		this.compareBaseLine("assets/lineTo.png", done, expect);
+		this.compareBaseLine("test_assets/lineTo.png", done, expect);
 	});
 
 	it("setStrokeStyle()", function (done) {
 		this.g.setStrokeStyle(25, 1, 1, 0, true).beginStroke(this.sColor, 1).moveTo(25, 25).lineTo(150, 150);
 
-		this.compareBaseLine("assets/setStrokeStyle.png", done, expect);
+		this.compareBaseLine("test_assets/setStrokeStyle.png", done, expect);
 	});
 
 	it("setStrokeDash()", function (done) {
 		this.g.setStrokeDash([7, 3]);
 		this.g.setStrokeStyle(5).beginStroke("black").rect(10, 10, 150, 150);
-		this.compareBaseLine("assets/setStrokeDash.png", done, expect, 0.008);
+		this.compareBaseLine("test_assets/setStrokeDash.png", done, expect, 0.008);
 	});
 
 	it("clone()", function (done) {
@@ -224,7 +224,7 @@ describe("Graphics", function () {
 		var g = this.g.clone();
 		this.g = g;
 
-		this.compareBaseLine("assets/arc.png", done, expect, 0.01);
+		this.compareBaseLine("test_assets/arc.png", done, expect, 0.01);
 	});
 
 	describe("tiny api", function () {

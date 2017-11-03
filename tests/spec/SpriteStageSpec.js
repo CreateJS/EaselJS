@@ -497,7 +497,7 @@ describe("StageGL", function () {
 				this.stage.addChild(square3).set({x: 80});
 				this.stageGL.addChild(square3SS).set({x: 80});
 
-				// this.compareBaseLine("assets/SpriteSheetBuilder.png", done, expect, 0.0075);
+				// this.compareBaseLine("test_assets/SpriteSheetBuilder.png", done, expect, 0.0075);
 				this.compareStages(expect, done);
 			}.bind(this));
 

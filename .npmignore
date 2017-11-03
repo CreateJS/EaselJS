@@ -1,13 +1,32 @@
-_assets/
+# Only the `dist` and `src` directories are served to NPM.
+
+# JetBrains
+.idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Atom
+.atom/
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Other
+*.lock
+*.log
+
+# Project
+assets/
 docs/
 examples/
-extras/
 tests/
 tutorials/
-
 icon.png
 bower.json
-yuidoc.json
 CONTRIBUTING.md
-CHANGELOG
-README_SECURITY_ERROR.txt

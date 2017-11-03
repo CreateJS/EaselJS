@@ -1,11 +1,25 @@
-docs/**
-!docs/*.zip
+# Packages
 node_modules/
-*TMP*
+
+# JetBrains
 .idea/
+
+# Sublime Text
 *.sublime-project
 *.sublime-workspace
-*[\<\>\:\"\/\\\|\?\*]*
-npm-debug.log
+
+# Atom
+.atom/
+
+# VSCode
+.vscode/
+
+# OS
 .DS_Store
-*.lock
+Thumbs.db
+
+# Generated
+docs/
+
+# Other
+*.log

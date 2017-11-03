@@ -583,7 +583,7 @@ describe("DisplayList", function () {
 		txt.x = 0;
 		this.stage.addChild(txt);
 
-		this.compareBaseLine("assets/Text.png", done, expect, 0.01);
+		this.compareBaseLine("test_assets/Text.png", done, expect, 0.01);
 	});
 
 	it("Text.getBounds() should allow 0 as a value", function () {
@@ -605,7 +605,7 @@ describe("DisplayList", function () {
 			_this.stage.addChild(text);
 
 			_this.stage.update();
-			_this.compareBaseLine("assets/BitmapText.png", done, expect);
+			_this.compareBaseLine("test_assets/BitmapText.png", done, expect);
 		};
 		img.onerror = function () {
 			fail(img.src + ' failed to load');
@@ -710,7 +710,7 @@ describe("DisplayList", function () {
 		this.stage.addChild(star);
 
 		this.stage.update();
-		this.compareBaseLine("assets/mask.png", done, expect, 0.01);
+		this.compareBaseLine("test_assets/mask.png", done, expect, 0.01);
 	});
 
 	describe("PrelaodJS can be used to load image assets", function () {
@@ -737,7 +737,7 @@ describe("DisplayList", function () {
 			this.stage.addChild(a, b);
 			this.stage.update();
 
-			this.compareBaseLine("assets/PrelaodJSLoadedBitmap.png", done, expect);
+			this.compareBaseLine("test_assets/PrelaodJSLoadedBitmap.png", done, expect);
 		});
 	});
 });

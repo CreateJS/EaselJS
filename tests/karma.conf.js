@@ -5,11 +5,11 @@ module.exports = function (config) {
     basePath: "../",
     files: [
       // assets
-      { pattern: "_assets/art/**/*.png", included: false },
+      { pattern: "assets/art/**/*.png", included: false },
       { pattern: "tests/assets/**/*", included: false },
       // deps
-      "_assets/libs/tweenjs-NEXT.min.js",
-      "_assets/libs/preloadjs-NEXT.min.js",
+      "assets/libs/tweenjs-NEXT.min.js",
+      "assets/libs/preloadjs-NEXT.min.js",
       // lib and sourcemap
       "dist/easeljs-NEXT.js",
       { pattern: "src/**/*.js", included: false },
@@ -24,8 +24,8 @@ module.exports = function (config) {
       "**/*.js": [ "sourcemap" ]
     },
     proxies: {
-      '/_assets/': '/base/_assets/',
-      '/assets/': '/base/tests/assets/'
+      '/assets/': '/base/assets/',
+      '/test_assets/': '/base/tests/assets/'
     }
   });
 };

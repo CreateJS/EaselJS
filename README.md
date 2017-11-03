@@ -1,4 +1,19 @@
-# THIS BRANCH IS CURRENTLY UNDER HEAVY DEVELOPMENT
+When working with loaded images and canvas on your local file system, some browsers
+will throw security errors. This may occur when using SpriteSheetUtils or getObjectsUnderPoint,
+and lead to a number of other repeating errors.
+
+To avoid this, test on a web server (a local web server should work fine), or test with a browser
+that doesn't throw these errors (Safari seems to work).
+
+If you have python installed on your system you can enable a simple web server that's fine for
+local testing by navigating to the directory where your project resides typing the following
+at your command line:
+
+python -m SimpleHTTPServer
+
+Your project is now available at:
+
+http://localhost:8000/
 
 # EaselJS
 
@@ -12,10 +27,10 @@ works well alone, or with the rest of the [CreateJS](http://createjs.com/) suite
 
 ### Installation
 
-1. Global Module
-	- Compiled builds are available on the [CDN](http://code.createjs.com/), or in the [distribution folder](https://github.com/CreateJS/EaselJS/tree/master/dist).
-2. NPM
-	- `npm install easeljs --save` will provide you with a CommonJS bundle to import into your project.
+###### Via Script
+Regular or minified scripts are available on the [CDN](http://code.createjs.com/), or in the [distribution folder](https://github.com/CreateJS/EaselJS/tree/master/dist).
+###### Via NPM
+`npm install easeljs --save`
 
 ## Simple Example
 
@@ -141,4 +156,4 @@ A drop-in replacement for the EaselJS Stage class that fully supports a WebGL pi
 based content, including any cached DisplayObjects.
 
 **WebGLInspector**
-A utility and helper class designed to work with StageGL to help investigate and test performance or display problems. 
+A utility and helper class designed to work with StageGL to help investigate and test performance or display problems.

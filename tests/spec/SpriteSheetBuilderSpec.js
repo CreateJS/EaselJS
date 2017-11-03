@@ -47,7 +47,7 @@ describe("SpriteSheetBuilder", function () {
     var square3 = new createjs.Sprite(spriteSheet, "square2");
     this.stage.addChild(square3).set({x: 80});
 
-    this.compareBaseLine("assets/SpriteSheetBuilder.png", done, expect, 0.0075);
+    this.compareBaseLine("test_assets/SpriteSheetBuilder.png", done, expect, 0.0075);
   });
 
   it("should build async", function (done) {
@@ -66,7 +66,7 @@ describe("SpriteSheetBuilder", function () {
       var square3 = new createjs.Sprite(spriteSheet, "square2");
       _this.stage.addChild(square3).set({x: 80});
 
-      _this.compareBaseLine("assets/SpriteSheetBuilder.png", done, expect, 0.0075);
+      _this.compareBaseLine("test_assets/SpriteSheetBuilder.png", done, expect, 0.0075);
     });
 
     this.builder.buildAsync();

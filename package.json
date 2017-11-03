@@ -13,9 +13,10 @@
     "animate",
     "spritesheet"
   ],
-  "homepage": "http://www.createjs.com/easeljs",
-  "url": "https://www.npmjs.com/package/easeljs",
-  "bugs": "https://github.com:CreateJS/EaselJS/issues",
+	"author": "gskinner.com, inc.",
+  "homepage": "https://createjs.com/easeljs",
+  "url": "https://npmjs.com/package/easeljs",
+  "bugs": "https://github.com/createjs/easeljs/issues",
   "license": "MIT",
   "contributors": [
     "Grant Skinner <grant@gskinner.com> (https://github.com/gskinner)",
@@ -25,12 +26,28 @@
     "Patrick McGuckin <patrick@gskinner.com> (https://github.com/tehvgg)",
     "David Gillen <david@gskinner.com> (https://github.com/davidhgillen)"
   ],
-  "main": "dist/easeljs.cjs.js",
-  "jsnext:main": "dist/easeljs.es6.js",
+  "main": "dist/easel.common.js",
+  "jsnext:main": "dist/easel.es6.js",
+  "jsdelivr": "dist/easel.min.js",
   "logo": "icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com:CreateJS/EaselJS"
+    "url": "git+https://github.com/createjs/easeljs.git"
+  },
+	"npmName": "easeljs",
+  "npmFileMap": [
+    {
+      "basePath": "dist",
+      "files": [
+        "**/*"
+      ]
+    }
+  ],
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "lib": "dist",
+    "test": "tests"
   },
   "scripts": {
     "travis": "cd node_modules/createjs && npm run travis",
@@ -50,8 +67,7 @@
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.8.0",
     "babel-preset-es2015": "^6.14.0",
-    "createjs": "2.0.0",
     "js-imagediff": "tehvgg/js-imagediff"
   },
-  "engine": "node >= 4.2.2"
+  "engine": "node >= 7.0.0"
 }
