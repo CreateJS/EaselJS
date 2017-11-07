@@ -119,21 +119,21 @@
 
 		// image assets, load separately and build into a single sheet for toggling
 		manifest = [
-			{id: "robot0",	src: "../../_assets/art/robojs/robojs.png"},
-			{id: "robot1",	src: "../../_assets/art/robojs/robojs1.png"},
-			{id: "robot2",	src: "../../_assets/art/robojs/robojs2.png"},
-			{id: "robot3",	src: "../../_assets/art/robojs/robojs3.png"},
-			{id: "robot4",	src: "../../_assets/art/robojs/robojs4.png"},
-			{id: "robot5",	src: "../../_assets/art/robojs/robojs5.png"},
-			{id: "robot6",	src: "../../_assets/art/robojs/robojs6.png"},
-			{id: "robot7",	src: "../../_assets/art/robojs/robojs7.png"},
-			{id: "robot8",	src: "../../_assets/art/robojs/robojs8.png"},
-			{id: "robot9",	src: "../../_assets/art/robojs/robojs9.png"},
-			{id: "robot10",	src: "../../_assets/art/robojs/robojs10.png"}
+			{id: "robot0",	src: "robojs.png"},
+			{id: "robot1",	src: "robojs1.png"},
+			{id: "robot2",	src: "robojs2.png"},
+			{id: "robot3",	src: "robojs3.png"},
+			{id: "robot4",	src: "robojs4.png"},
+			{id: "robot5",	src: "robojs5.png"},
+			{id: "robot6",	src: "robojs6.png"},
+			{id: "robot7",	src: "robojs7.png"},
+			{id: "robot8",	src: "robojs8.png"},
+			{id: "robot9",	src: "robojs9.png"},
+			{id: "robot10",	src: "robojs10.png"}
 		];
 
 		// begin actual load
-		queue = new createjs.LoadQueue();
+		queue = new createjs.LoadQueue(true, "../../_assets/art/robojs/");
 		queue.on("complete", handleLoad, this);
 		queue.loadManifest(manifest, true);
 	}
@@ -147,7 +147,7 @@
 		for(i=0, l=manifest.length; i<l; i++) {
 			id = manifest[i].id;
 			src = manifest[i].src;
-			bmp = new createjs.Bitmap(queue._loadedResults[id]);
+			bmp = new createjs.Bitmap(queue.getResult(id));
 			cjsSprites.addFrame(bmp);
 			cjsSprites.addAnimation(id, i);
 		}
@@ -203,7 +203,7 @@
 		var id = manifest[target].id;
 
 		if(guiProps.texture == "Individual") {
-			item = new createjs.Bitmap(manifest[target].src);
+			item = new createjs.Bitmap(queue.getResult(id));
 		} else {
 			item = new createjs.Sprite(cjsSprites.spriteSheet, id);
 			item.stop();
