@@ -36,6 +36,7 @@ OTHER:
 - added a shared createjs.deprecate() method, which wraps old methods and property getter/setters to display
 	a console warning when used.
 - added a DeprecatedMethods unit test
+- fixed minor issues with webgl/benchmark demo
 
 
 Version 0.8.2 [November 26, 2015]
