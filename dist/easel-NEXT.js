@@ -1,34 +1,7 @@
-/**
- * @license EaselJS
- * Visit http://createjs.com for documentation, updates and examples.
- *
- * Copyright (c) 2017 gskinner.com, inc.
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- */
-(function(exports, Tween, Timeline) {
+var createjs = function(exports, Tween, Timeline) {
   "use strict";
-  Tween = "default" in Tween ? Tween["default"] : Tween;
-  Timeline = "default" in Timeline ? Timeline["default"] : Timeline;
+  Tween = Tween && Tween.hasOwnProperty("default") ? Tween["default"] : Tween;
+  Timeline = Timeline && Timeline.hasOwnProperty("default") ? Timeline["default"] : Timeline;
   var classCallCheck = function(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function")
@@ -12103,39 +12076,39 @@
       this.framerate = data.framerate || 0;
       // parse images:
       if (data.images) {
-        var _loop = function _loop() {
-          if (_isArray) {
-            if (_i >= _iterator.length) return "break";
-            _ref = _iterator[_i++]
-          } else {
-            _i = _iterator.next();
-            if (_i.done) return "break";
-            _ref = _i.value
-          }
-          var img = _ref;
+        var _loop = function _loop(_img) {
           var a = _this2._images = [];
           var src = void 0;
-          if (typeof img === "string") {
-            src = img;
-            img = document.createElement("img");
-            img.src = src
+          if (typeof _img === "string") {
+            src = _img;
+            _img = document.createElement("img");
+            _img.src = src
           }
-          a.push(img);
-          if (!img.getContext && !img.naturalWidth) {
+          a.push(_img);
+          if (!_img.getContext && !_img.naturalWidth) {
             _this2._loadCount++;
             _this2.complete = false;
-            img.onload = function() {
+            _img.onload = function() {
               return _this2._handleImageLoad(src)
             };
-            img.onerror = function() {
+            _img.onerror = function() {
               return _this2._handleImageError(src)
             }
           }
+          img = _img
         };
         for (var _iterator = data.images, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
           var _ref;
-          var _ret = _loop();
-          if (_ret === "break") break
+          if (_isArray) {
+            if (_i >= _iterator.length) break;
+            _ref = _iterator[_i++]
+          } else {
+            _i = _iterator.next();
+            if (_i.done) break;
+            _ref = _i.value
+          }
+          var img = _ref;
+          _loop(img)
         }
       }
       // parse frames:
@@ -12261,9 +12234,9 @@
       var spacing = this._spacing,
         margin = this._margin;
       imgLoop: for (var i = 0, imgs = this._images, l = imgs.length; i < l; i++) {
-        var _img = imgs[i],
-          imgW = _img.width,
-          imgH = _img.height;
+        var _img2 = imgs[i],
+          imgW = _img2.width,
+          imgH = _img2.height;
         var y = margin;
         while (y <= imgH - margin - frameHeight) {
           var x = margin;
@@ -12273,7 +12246,7 @@
             }
             frameCount++;
             this._frames.push({
-              image: _img,
+              image: _img2,
               rect: new Rectangle(x, y, frameWidth, frameHeight),
               regX: this._regX,
               regY: this._regY
@@ -14205,7 +14178,6 @@
       }
       var touches = e.changedTouches;
       var type = e.type;
-      var l = touches.length;
       for (var _iterator = touches, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
         var _ref;
         if (_isArray) {
@@ -15258,7 +15230,7 @@
     return WebGLInspector
   }(EventDispatcher);
   /**
-   * The EaselJS Javascript library provides a retained graphics mode for canvas including a full hierarchical display
+   * The Easel Javascript library provides a retained graphics mode for canvas including a full hierarchical display
    * list, a core interaction model, and helper classes to make working with 2D graphics in Canvas much easier.
    * EaselJS provides straight forward solutions for working with rich graphics and interactivity with HTML5 Canvas...
    *
@@ -15357,8 +15329,7 @@
   // re-export shared classes
   // TODO: Review this version export.
   // version (templated in gulpfile, pulled from package).
-  var version = "2.0.0";
-  exports.version = version;
+  // export const version = "2.0.0";
   exports.EventDispatcher = EventDispatcher;
   exports.Event = Event;
   exports.Ticker = Ticker;
@@ -15411,6 +15382,7 @@
   exports.SpriteSheetBuilder = SpriteSheetBuilder;
   exports.SpriteSheetUtils = SpriteSheetUtils;
   exports.UID = UID;
-  exports.WebGLInspector = WebGLInspector
-})(this.createjs = this.createjs || {}, this.createjs.Tween, this.createjs.Timeline);
-//# sourceMappingURL=easeljs-NEXT.js.map
+  exports.WebGLInspector = WebGLInspector;
+  return exports
+}({}, this.createjs.Tween, this.createjs.Timeline);
+//# sourceMappingURL=easel-NEXT.js.map
