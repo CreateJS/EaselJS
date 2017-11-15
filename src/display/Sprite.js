@@ -165,7 +165,7 @@ export default class Sprite extends DisplayObject {
 		 * @type {Number}
 		 * @default 1
 		 */
-		this._webGLRenderStyle = 1;
+		this._webGLRenderStyle = DisplayObject._StageGL_SPRITE;
 
 		if (frameOrAnimation != null) { this.gotoAndPlay(frameOrAnimation); }
 	}

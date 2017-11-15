@@ -621,6 +621,7 @@ export default class StageGL extends Stage {
 			let ctx = this.canvas.getContext("2d");
 			ctx.setTransform(1, 0, 0, 1, 0, 0);
 			ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
+			super.clear();
 		}
 	}
 
@@ -902,8 +903,9 @@ export default class StageGL extends Stage {
 
 		if (filter._builtShader) {
 			targetShader = filter._builtShader;
-			if (targetShader.shaderParamSetup) {
-				targetShader.shaderParamSetup(gl, this, targetShader);
+			if (filter.shaderParamSetup) {
+				gl.useProgram(targetShader);
+				filter.shaderParamSetup(gl, this, targetShader);
 			}
 		} else {
 			try {
@@ -1536,7 +1538,8 @@ export default class StageGL extends Stage {
 			for (let n in this._textureIDs) {
 				if (this._textureIDs[n] === tex._storeID) { delete this._textureIDs[n]; }
 			}
-			tex._imageData._storeID = tex._storeID = undefined;
+			if (tex._imageData) { tex._imageData._storeID = undefined; }
+			tex._imageData = tex._storeID = undefined;
 		}
 
 		// make sure to drop it out of an active slot
@@ -1659,9 +1662,7 @@ export default class StageGL extends Stage {
 
 		let filterCount = filters && filters.length;
 		if (filterCount) {
-			//this._backupBatchTextures(false);
 			this._drawFilters(target, filters, manager);
-			//this._backupBatchTextures(true);
 		} else {
 			// is this for another stage or mine?
 			if (this.isCacheControlled) {
@@ -1669,7 +1670,6 @@ export default class StageGL extends Stage {
 				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
 			} else {
-				//this._backupBatchTextures(false);
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
 				target.cacheCanvas = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
 				renderTexture = target.cacheCanvas;
@@ -1683,7 +1683,6 @@ export default class StageGL extends Stage {
 
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 				this.updateViewport(wBackup, hBackup);
-				//this._backupBatchTextures(true);
 			}
 		}
 
@@ -1891,15 +1890,15 @@ export default class StageGL extends Stage {
 			texIndex = texture._activeIndex;
 
 			if (item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
-				if (item.sourceRect) {
+				if (!useCache && item.sourceRect) {
 					// calculate uvs
 					if (!item._uvRect) { item._uvRect = {}; }
 					src = item.sourceRect;
 					uvRect = item._uvRect;
-					uvRect.t = (src.x)/image.width;
-					uvRect.l = (src.y)/image.height;
-					uvRect.b = (src.x + src.width)/image.width;
-					uvRect.r = (src.y + src.height)/image.height;
+					uvRect.t = (src.y)/image.height;
+					uvRect.l = (src.x)/image.width;
+					uvRect.b = (src.y + src.height)/image.height;
+					uvRect.r = (src.x + src.width)/image.width;
 
 					// calculate vertices
 					subL = 0;							subT = 0;

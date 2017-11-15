@@ -305,18 +305,20 @@ export default class Text extends DisplayObject {
  		ctx.font = this.font||"10px sans-serif";
  		ctx.textAlign = this.textAlign||"left";
  		ctx.textBaseline = this.textBaseline||"top";
- 		return ctx;
- 	}
+		ctx.lineJoin = "miter";
+		ctx.miterLimit = 2.5;
+		return ctx;
+	}
 
- 	/**
- 	 * Draws multiline text.
- 	 * @method _drawText
- 	 * @param {CanvasRenderingContext2D} ctx
- 	 * @param {Object} o
- 	 * @param {Array} lines
- 	 * @return {Object}
- 	 * @protected
- 	 */
+	/**
+	 * Draws multiline text.
+	 * @method _drawText
+	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {Object} o
+	 * @param {Array} lines
+	 * @return {Object}
+	 * @protected
+	 */
  	_drawText (ctx, o, lines) {
  		const paint = !!ctx;
  		if (!paint) {

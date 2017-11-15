@@ -66,6 +66,14 @@ export default class Filter {
 	 */
 	constructor () {
 		/**
+		 * A flag stating that this filter uses a context draw mode and cannot be batched into imageData processing.
+		 * @property usesContext
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.usesContext = false;
+
+		/**
 		 * Pre-processing shader code, will be parsed before being fed in.
 		 * This should be based upon StageGL.SHADER_VERTEX_BODY_REGULAR
 		 * @property VTX_SHADER

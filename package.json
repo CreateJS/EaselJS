@@ -1,5 +1,5 @@
 {
-  "name": "easeljs",
+  "name": "@createjs/easeljs",
   "version": "2.0.0",
   "description": "The Easel JavaScript library provides a full, hierarchical display list, a core interaction model, and helper classes to make working with the HTML5 Canvas element much easier. Part of the CreateJS suite of libraries.",
   "keywords": [

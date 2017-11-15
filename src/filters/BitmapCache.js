@@ -217,7 +217,7 @@ export default class BitmapCache extends Filter {
 	static getFilterBounds (target, output = new Rectangle()) {
 		let filters = target.filters;
 		let filterCount = filters && filters.length;
-		if (filterCount > 0) { return output; }
+		if (!!filterCount <= 0) { return output; }
 
 		for (let i=0; i<filterCount; i++) {
 			let f = filters[i];
@@ -377,19 +377,18 @@ export default class BitmapCache extends Filter {
 
 		// create it if it's missing
 		if (!this._webGLCache) {
-			if (this._options === true || this.target.stage !== this._options) {
-				// a StageGL dedicated to this cache
-				this.target.cacheCanvas = document.createElement("canvas");
-				this._webGLCache = new StageGL(this.target.cacheCanvas, {});
-				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
-			} else {
-				// a StageGL re-used by this cache
-				try {
-					this.target.cacheCanvas = true;	// we'll replace this with a render texture during the draw as it changes per draw
-					this._webGLCache = this._options;
-				} catch (e) {
-					throw "Invalid StageGL object used for cache parameter.";
+			if (this._options.useGL === "stage") {
+				if(!(this.target.stage != null && this.target.stage.isWebGL)) {
+					throw `Cannot use 'stage' for cache because the object's parent stage is ${this.target.stage != null ? "non WebGL." : "not set, please addChild to the correct stage."}`;
 				}
+				this.target.cacheCanvas = true; // will be replaced with RenderTexture, temporary positive value for old "isCached" checks
+				this._webGLCache = this.target.stage;
+			} else if (this._options.useGL === "new") {
+				this.target.cacheCanvas = document.createElement("canvas");
+				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true});
+				this._webGLCache.isCacheControlled = true;    // use this flag to control stage sizing and final output
+			} else {
+				throw "Invalid option provided to useGL, expected ['stage', 'new', StageGL, undefined], got "+ this._options.useGL;
 			}
 		}
 

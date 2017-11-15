@@ -63,8 +63,8 @@ export default class DisplayObject extends EventDispatcher {
 		this.alpha = 1;
 
 		/**
-		 * If a cache is active, this returns the canvas that holds the cached version of this display object. See {{#crossLink "DisplayObject/cache:method"}}{{/crossLink}}
-		 * for more information.
+		* If a cache is active, this returns the canvas that holds the image of this display object. See {{#crossLink "DisplayObject/cache:method"}}{{/crossLink}}
+		* for more information. Use this to display the result of a cache. This will be a HTMLCanvasElement unless special cache rules have been deliberately enabled for this cache.
 		 * @property cacheCanvas
 		 * @type {HTMLCanvasElement | Object}
 		 * @default null
@@ -306,81 +306,8 @@ export default class DisplayObject extends EventDispatcher {
 		 */
 		this.cursor = null;
 
-		/**
-		 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
-		 * determine if the cache has changed since a previous check.
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property cacheID
-		 * @deprecated
-		 * @type {Number}
-		 * @default 0
-		 */
-
 
 // private properties:
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _cacheOffsetX
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 */
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _cacheOffsetY
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 */
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _filterOffsetX
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 */
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _filterOffsetY
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 */
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _cacheScale
-		 * @protected
-		 * @type {Number}
-		 * @default 1
-		 * @deprecated
-		 */
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _cacheDataURLID
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 */
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _cacheDataURL
-		 * @protected
-		 * @type {String}
-		 * @default null
-		 * @deprecated
-		 */
-
 		/**
 		 * @property _props
 		 * @protected
@@ -404,6 +331,16 @@ export default class DisplayObject extends EventDispatcher {
 		 * @default null
 		 */
 		this._bounds = null;
+
+		/**
+		 * Where StageGL should look for required display properties, matters only for leaf display objects. Containers
+		 * or cached objects won't use this property, it's for native display of terminal elements.
+		 * @property _webGLRenderStyle
+		 * @protected
+		 * @type {number}
+		 * @default 0
+		 */
+		this._webGLRenderStyle = DisplayObject._StageGL_NONE;
 	}
 
 // accessor properties:
@@ -506,7 +443,7 @@ export default class DisplayObject extends EventDispatcher {
 	 * this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
 	 * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must manually
 	 * update the cache by calling <code>updateCache()</code> again. You must specify the cached area via the x, y, w,
-	 * and h parameters. This defines the rectangle that will be rendered and cached  using this display object's coordinates.
+	 * and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates.
 	 *
 	 * <h4>Example</h4>
 	 * For example if you defined a Shape that drew a circle at 0, 0 with a radius of 25:
@@ -1111,6 +1048,33 @@ export default class DisplayObject extends EventDispatcher {
 	DisplayObject._MOUSE_EVENTS = ["click","dblclick","mousedown","mouseout","mouseover","pressmove","pressup","rollout","rollover"];
 	DisplayObject.suppressCrossDomainErrors = false;
 	DisplayObject.snapToPixelEnabled = false;
+	/**
+	 * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+	 * @property _StageGL_NONE
+	 * @protected
+	 * @static
+	 * @type {number}
+	 */
+	DisplayObject._StageGL_NONE = 0;
+
+	/**
+	 * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+	 * @property _StageGL_SPRITE
+	 * @protected
+	 * @static
+	 * @type {number}
+	 */
+	DisplayObject._StageGL_SPRITE = 1;
+
+	/**
+	 * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+	 * @property _StageGL_BITMAP
+	 * @protected
+	 * @static
+	 * @type {number}
+	 */
+	DisplayObject._StageGL_BITMAP = 2;
+
 }
 
 // events:

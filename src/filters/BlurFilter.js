@@ -97,7 +97,8 @@ export default class BlurFilter extends Filter {
 		 * @default 1
 		 * @type Number
 		 */
-		this._quality;
+		this._quality = isNaN(quality) || quality < 1 ? 1 : quality;
+		this.setQuality(this._quality | 0);
 
 		/**
 		 * This is a template to generate the shader for {{#crossLink FRAG_SHADER_BODY}}{{/crossLink}}
@@ -123,8 +124,6 @@ export default class BlurFilter extends Filter {
 				gl_FragColor = color.rgba;
 			}
 		`;
-
-		this.quality = isNaN(quality) || quality < 1 ? 1 : quality;
 	}
 
 // constants:
@@ -156,7 +155,7 @@ export default class BlurFilter extends Filter {
 		if (isNaN(blurX) || blurX < 0) { blurX = 0; }
 		this._blurX = blurX;
 		this._blurXTable = this._getTable(blurX * this._quality);
-		this.updateShader();
+		this._updateShader();
 	}
 
 	get blurY () {
@@ -167,7 +166,7 @@ export default class BlurFilter extends Filter {
 		if (isNaN(blurY) || blurY < 0){ blurY = 0; }
 		this._blurY = blurY;
 		this._blurYTable = this._getTable(blurY * this._quality);
-		this.updateShader();
+		this._updateShader();
 	}
 
 	get quality () {
@@ -178,20 +177,10 @@ export default class BlurFilter extends Filter {
 		this._quality = quality;
 		this._blurXTable = this._getTable(this._blurX * this._quality);
 		this._blurYTable = this._getTable(this._blurY * this._quality);
-		this.updateShader();
+		this._updateShader();
 	}
 
 // public methods:
-	/**
-	 *
-	 */
-	updateShader () {
-		let result = this.FRAG_SHADER_TEMPLATE;
-		result = result.replace(/{{blurX}}/g, this._blurXTable.length.toFixed(0));
-		result = result.replace(/{{blurY}}/g, this._blurYTable.length.toFixed(0));
-		this.FRAG_SHADER_BODY = result;
-	}
-
 	/**
 	 * Docced in superclass
 	 */
@@ -218,7 +207,7 @@ export default class BlurFilter extends Filter {
 	 */
 	getBounds (rect) {
 		let x = this.blurX|0, y = this.blurY| 0;
-		if(x <= 0 && y <= 0) { return rect; }
+		if (x <= 0 && y <= 0) { return rect; }
 		let q = Math.pow(this.quality, 0.2);
 		return (rect || new Rectangle()).pad(x*q+1,y*q+1,x*q+1,y*q+1);
 	}
@@ -233,7 +222,16 @@ export default class BlurFilter extends Filter {
 
 // private methods:
 	/**
-	 *
+	 * Docced in superclass
+	 */
+	_updateShader () {
+		let result = this.FRAG_SHADER_TEMPLATE;
+		result = result.replace(/{{blurX}}/g, this._blurXTable.length.toFixed(0));
+		result = result.replace(/{{blurY}}/g, this._blurYTable.length.toFixed(0));
+		this.FRAG_SHADER_BODY = result;
+	}
+	/**
+	 * Docced in superclass
 	 */
 	_getTable (spread) {
 		const EDGE = 4.2;

@@ -324,7 +324,7 @@ export default class MovieClip extends Container {
 	draw (ctx, ignoreCache) {
 		// draw to cache first:
 		if (this.drawCache(ctx, ignoreCache)) { return true; }
-    if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) { this._updateTimeline(-1); }
+    this._updateState();
 		super.draw(ctx, ignoreCache);
 		return true;
 	}
@@ -401,6 +401,13 @@ export default class MovieClip extends Container {
 	}
 
 // private methods:
+	/**
+	 * Docced in superclass.
+	 **/
+	_updateState () {
+		if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) { this._updateTimeline(-1); }
+	}
+
 	/**
 	 * @method _tick
 	 * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.

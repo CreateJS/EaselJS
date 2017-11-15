@@ -27,6 +27,7 @@
 */
 
 import DisplayObject from "./DisplayObject";
+import VideoBuffer from "../utils/VideoBuffer";
 
 /**
  * A Bitmap represents an Image, Canvas, or Video in the display list. A Bitmap can be instantiated using an existing
@@ -38,6 +39,8 @@ import DisplayObject from "./DisplayObject";
  *
  * <strong>Notes:</strong>
  * <ol>
+ *     <li>When using a video source that may loop or seek, use a {{#crossLink "VideoBuffer"}}{{/crossLink}} object to
+ *      blinking / flashing.
  *     <li>When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
  *      will be displayed.</li>
  *     <li>Bitmaps with an SVG source currently will not respect an alpha value other than 0 or 1. To get around this,
@@ -57,19 +60,20 @@ export default class Bitmap extends DisplayObject {
 
 // constructor:
 	/**
-	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | String} imageOrUri The source object or URI to an image to
-	 * display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use.
-	 * If it is a URI, a new Image object will be constructed and assigned to the .image property.
+	 * @param {CanvasImageSource | String | Object} imageOrUri The source image to display. This can be a CanvasImageSource
+	 * (image, video, canvas), an object with a `getImage` method that returns a CanvasImageSource, or a string URL to an image.
+	 * If the latter, a new Image instance with the URL as its src will be used.
 	 * @constructor
 	 */
 	constructor (imageOrUri) {
 		super();
 // public properties:
 		/**
-		 * The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially
-		 * mobile browsers) support drawing video to a canvas.
+		 * The source image to display. This can be a CanvasImageSource
+		 * (image, video, canvas), an object with a `getImage` method that returns a CanvasImageSource, or a string URL to an image.
+		 * If the latter, a new Image instance with the URL as its src will be used.
 		 * @property image
-		 * @type HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
+		 * @type CanvasImageSource | Object
 		 */
 		if (typeof imageOrUri === "string") {
 			this.image = document.createElement("img");
@@ -92,9 +96,8 @@ export default class Bitmap extends DisplayObject {
 		 * @property _webGLRenderStyle
 		 * @protected
 		 * @type {Number}
-		 * @default 2
 		 */
-		this._webGLRenderStyle = 2;
+		this._webGLRenderStyle = DisplayObject._StageGL_BITMAP;
 	}
 
 // public methods:
@@ -125,8 +128,10 @@ export default class Bitmap extends DisplayObject {
 	 * @return {Boolean}
 	 */
 	draw (ctx, ignoreCache = false) {
-		if (super.draw(ctx, ignoreCache) || !this.image) { return true; }
+		if (super.draw(ctx, ignoreCache)) { return true; }
 		let img = this.image, rect = this.sourceRect;
+		if (img instanceof VideoBuffer) { img = img.getImage(); }
+		if (img == null) { return true; }
 		if (rect) {
 			// some browsers choke on out of bound values, so we'll fix them:
 			let x1 = rect.x, y1 = rect.y, x2 = x1 + rect.width, y2 = y1 + rect.height, x = 0, y = 0, w = img.width, h = img.height;
@@ -188,13 +193,16 @@ export default class Bitmap extends DisplayObject {
 	/**
 	 * Returns a clone of the Bitmap instance.
 	 * @method clone
+	 * @param {Boolean} [node] Whether the underlying DOM element should be cloned as well.
 	 * @return {Bitmap} a clone of the Bitmap instance.
 	 */
-	clone () {
-		let o = new Bitmap(this.image);
-		if (this.sourceRect) { o.sourceRect = this.sourceRect.clone(); }
-		this._cloneProps(o);
-		return o;
+	clone (node) {
+		let img = this.image;
+		if (img != null && node != null) { img = img.cloneNode(); }
+		let bmp = new Bitmap(img);
+		if (this.sourceRect) { bmp.sourceRect = this.sourceRect.clone(); }
+		this._cloneProps(bmp);
+		return bmp;
 	}
 
 }

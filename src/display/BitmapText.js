@@ -34,13 +34,13 @@ let _maxPoolSize = 100;
 let _spritePool = [];
 
 /**
- * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
- * using new line characters, but automatic wrapping is not supported. See the
- * {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
+ * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported using new line characters,
+ * but automatic wrapping is not supported. See the {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
  * property for more information on defining glyphs.
  *
- * <strong>Important:</strong> BitmapText extends Container, but is not designed to be used as one.
+ * <strong>Important:</strong> While BitmapText extends Container, it is not designed to be used as one.
  * As such, methods like addChild and removeChild are disabled.
+ *
  * @class BitmapText
  * @extends Container
  * @module EaselJS
@@ -125,6 +125,23 @@ export default class BitmapText extends Container {
 		 * @protected
 		 */
 		this._oldProps = {text:0,spriteSheet:0,lineHeight:0,letterSpacing:0,spaceWidth:0};
+
+		/**
+		 * Used to track the object which this class attached listeners to, helps optimize listener attachment.
+		 * @property _oldStage
+		 * @type Stage
+		 * @protected
+		 */
+		this._oldStage = null;
+
+		/**
+		 * The event listener proxy triggered drawing draw for special circumstances.
+		 * @property _drawAction
+		 * @type function
+		 * @protected
+		 */
+		this._drawAction = null;
+
 	}
 
 // static properties:
@@ -154,6 +171,8 @@ export default class BitmapText extends Container {
 	 * Docced in superclass.
 	 */
 	draw (ctx, ignoreCache) {
+		if (this.drawCache(ctx, ignoreCache)) { return; }
+		this._updateState();
 		super.draw(ctx, ignoreCache);
 	}
 
@@ -212,6 +231,13 @@ export default class BitmapText extends Container {
 	removeAllChildren () {}
 
 // private methods:
+	/**
+	 * Docced in superclass.
+	 **/
+	_updateState () {
+		this._updateText();
+	}
+
  	/**
 	 * @method _cloneProps
 	 * @param {BitmapText} o
