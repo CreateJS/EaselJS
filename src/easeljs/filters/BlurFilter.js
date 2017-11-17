@@ -163,7 +163,7 @@ this.createjs = this.createjs||{};
 		}
 		return this._compiledShader;
 	};
-	p._setShader = function() { this._compiledShader; };
+	p._setShader = function(value) { this._compiledShader = value; };
 
 	try {
 		Object.defineProperties(p, {

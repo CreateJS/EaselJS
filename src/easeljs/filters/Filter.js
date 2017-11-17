@@ -57,11 +57,12 @@ this.createjs = this.createjs||{};
 	 *
 	 * <h4>EaselJS Filters</h4>
 	 * EaselJS comes with a number of pre-built filters:
-	 * <ul><li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
-	 *      <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
-	 *      <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
-	 *      <li>{{#crossLink "ColorFilter"}}{{/crossLink}}: Color transform a display object</li>
-	 *      <li>{{#crossLink "ColorMatrixFilter"}}{{/crossLink}}: Transform an image using a {{#crossLink "ColorMatrix"}}{{/crossLink}}</li>
+	 * <ul>
+	 *     <li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
+	 *     <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
+	 *     <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
+	 *     <li>{{#crossLink "ColorFilter"}}{{/crossLink}}: Color transform a display object</li>
+	 *     <li>{{#crossLink "ColorMatrixFilter"}}{{/crossLink}}: Transform an image using a {{#crossLink "ColorMatrix"}}{{/crossLink}}</li>
 	 * </ul>
 	 *
 	 * @class Filter
@@ -89,7 +90,6 @@ this.createjs = this.createjs||{};
 		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
 		 * This should be based upon StageGL.SHADER_VERTEX_BODY_REGULAR
 		 * @property VTX_SHADER
-		 * @virtual
 		 * @type {String}
 		 * @readonly
 		 */
@@ -99,7 +99,6 @@ this.createjs = this.createjs||{};
 		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
 		 * This should be based upon StageGL.SHADER_FRAGMENT_BODY_REGULAR
 		 * @property FRAG_SHADER
-		 * @virtual
 		 * @type {String}
 		 * @readonly
 		 */

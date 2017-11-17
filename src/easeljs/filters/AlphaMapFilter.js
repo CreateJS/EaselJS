@@ -79,7 +79,6 @@ this.createjs = this.createjs || {};
 		 **/
 		this.alphaMap = alphaMap;
 		
-		
 	// private properties:
 		/**
 		 * @property _alphaMap
