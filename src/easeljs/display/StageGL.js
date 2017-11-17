@@ -928,6 +928,8 @@ this.createjs = this.createjs||{};
 
 				this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 				this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
+
+				this.canvas._invalid = true;
 			}
 		} else {
 			this._webGLContext = null;
@@ -1801,7 +1803,7 @@ this.createjs = this.createjs||{};
 		if (storeID === undefined) {
 			this._textureIDs[srcPath] = storeID = this._textureDictionary.length;
 			image._storeID = storeID;
-			image._invalid = !image.isCanvas;
+			image._invalid = true;
 			texture = this._getSafeTexture();
 			this._textureDictionary[storeID] = texture;
 		} else {
@@ -1863,7 +1865,7 @@ this.createjs = this.createjs||{};
 			}
 		}
 
-		image._invalid = false;
+		if (image._invalid !== undefined) { image._invalid = false; } // only adjust what is tracking this data
 
 		texture._w = image.width;
 		texture._h = image.height;
@@ -1886,6 +1888,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._insertTextureInBatch = function (gl, texture) {
+		var image;
 		if (this._batchTextures[texture._activeIndex] !== texture) {	// if it wasn't used last batch
 			// we've got to find it a a spot.
 			var found = -1;
@@ -1910,8 +1913,8 @@ this.createjs = this.createjs||{};
 			// lets put it into that spot
 			this._batchTextures[found] = texture;
 			texture._activeIndex = found;
-			var image = texture._imageData && texture._imageData[0]; // first come first served, potentially problematic
-			if (image && image._invalid) {
+			image = texture._imageData && texture._imageData[0]; // first come first served, potentially problematic
+			if (image && ((image._invalid === undefined && image._isCanvas) || image._invalid)) {
 				this._updateTextureImageData(gl, image);
 			} else {
 				gl.activeTexture(gl.TEXTURE0 + found);
@@ -1920,9 +1923,9 @@ this.createjs = this.createjs||{};
 			}
 			this._lastTextureInsert = found;
 
-		} else if(texture._drawID !== this._drawID) {	// hanging around from previous draws means the content might be out of date
-			var image = texture._imageData && texture._imageData[0];
-			if (image && image._invalid) {
+		} else if(texture._drawID !== this._drawID) {	// being active from previous draws doesn't mean up to date
+			image = texture._imageData && texture._imageData[0];
+			if (image && ((image._invalid === undefined && image._isCanvas) || image._invalid)) {
 				this._updateTextureImageData(gl, image);
 			}
 		}
@@ -2027,7 +2030,9 @@ this.createjs = this.createjs||{};
 
 		this.batchReason = "drawFinish";
 		this._drawBuffers(gl);								// <--------------------------------------------------------
+
 		this._isDrawing--;
+		this.canvas._invalid = true;
 	};
 
 	/**
