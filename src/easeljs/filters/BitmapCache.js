@@ -460,14 +460,13 @@ this.createjs = this.createjs||{};
 				this._webGLCache = this.target.stage;
 
 			} else if(this._options.useGL === "new") {
-				this.target.cacheCanvas = document.createElement("canvas"); // we can turn off autopurge because we wont be making textures here
-				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true, autoPurge: -1});
+				this.target.cacheCanvas = document.createElement("canvas"); // low autopurge in case of filter swapping and low texture count
+				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true, autoPurge: 10});
 				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
 
 			} else if(this._options.useGL instanceof createjs.StageGL) {
 				this.target.cacheCanvas = true; // will be replaced with RenderTexture, temporary positive value for old "isCached" checks
 				this._webGLCache = this._options.useGL;
-				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
 
 			} else {
 				throw "Invalid option provided to useGL, expected ['stage', 'new', StageGL, undefined], got "+ this._options.useGL;
@@ -484,12 +483,14 @@ this.createjs = this.createjs||{};
 			surface.height = this._drawHeight;
 			stageGL.updateViewport(this._drawWidth, this._drawHeight);
 		}
+
+		// make surfaces now, instead of potentially expensive texture operations during a render call
 		if (this.target.filters) {
 			// with filters we can't tell how many we'll need but the most we'll ever need is two, so make them now
 			stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
 			stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
 		} else {
-			// without filters then we only need one RenderTexture, and that's only if its not a dedicated stage
+			// without filters then we only need one RenderTexture
 			if (!stageGL.isCacheControlled) {
 				stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
 			}
@@ -506,7 +507,7 @@ this.createjs = this.createjs||{};
 		var target = this.target;
 		var webGL = this._webGLCache;
 
-		if (webGL){
+		if (webGL) {
 			webGL.cacheDraw(target, target.filters, this);
 
 			// we may of swapped around which element the surface is, so we re-fetch it

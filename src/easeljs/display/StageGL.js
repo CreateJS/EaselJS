@@ -1099,7 +1099,7 @@ this.createjs = this.createjs||{};
 	 * Textures in use, or to be used again shortly, should not be removed. This is simply for performance reasons.
 	 * Removing a texture in use will cause the texture to have to be re-uploaded slowing rendering.
 	 * @method releaseTexture
-	 * @param {DisplayObject | Texture | Image | Canvas} item An object that used the texture to be discarded.
+	 * @param {DisplayObject | WebGLTexture | Image | Canvas} item An object that used the texture to be discarded.
 	 * @param {Boolean} safe Should the release attempt to be "safe" and only delete this usage.
 	 */
 	p.releaseTexture = function (item, safe) {
@@ -1349,7 +1349,7 @@ this.createjs = this.createjs||{};
 	 * @method getRenderBufferTexture
 	 * @param  {Number} w The width of the texture in pixels.
 	 * @param  {Number} h The height of the texture in pixels.
-	 * @return {Texture} the basic texture instance with a render buffer property.
+	 * @return {WebGLTexture} the basic texture instance with a render buffer property.
 	 */
 	p.getRenderBufferTexture = function (w, h) {
 		var gl = this._webGLContext;
@@ -1927,7 +1927,7 @@ this.createjs = this.createjs||{};
 	 * {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead as it will call this with the correct texture object(s).
 	 * Note: Testing shows this may not happen immediately, have to wait frames for WebGL to have actually adjust memory.
 	 * @method _killTextureObject
-	 * @param {Texture} texture The texture to be cleaned out
+	 * @param {WebGLTexture} texture The texture to be cleaned out
 	 * @protected
 	 */
 	p._killTextureObject = function (texture) {
