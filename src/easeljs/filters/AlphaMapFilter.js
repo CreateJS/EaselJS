@@ -99,7 +99,7 @@ this.createjs = this.createjs || {};
 			"uniform sampler2D uAlphaSampler;"+
 
 			"void main(void) {" +
-				"vec4 color = texture2D(uSampler, vRenderCoord);" +
+				"vec4 color = texture2D(uSampler, vTextureCoord);" +
 				"vec4 alphaMap = texture2D(uAlphaSampler, vTextureCoord);" +
 
 				// some image formats can have transparent white rgba(1,1,1, 0) when put on the GPU, this means we need a slight tweak

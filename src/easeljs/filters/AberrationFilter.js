@@ -72,19 +72,19 @@
 			"void main(void) {" +
 				"vec4 sample = texture2D(" +
 					"uSampler, " +
-					"vRenderCoord" +
+					"vTextureCoord" +
 				");" +
 				"vec4 rSample = texture2D(" +
 					"uSampler, " +
-					"vRenderCoord + (uColorDirection * uColorMultiplier.r)" +
+					"vTextureCoord + (uColorDirection * uColorMultiplier.r)" +
 				");" +
 				"vec4 gSample = texture2D(" +
 					"uSampler, " +
-					"vRenderCoord + (uColorDirection * uColorMultiplier.g)" +
+					"vTextureCoord + (uColorDirection * uColorMultiplier.g)" +
 				");" +
 				"vec4 bSample = texture2D(" +
 					"uSampler, " +
-					"vRenderCoord + (uColorDirection * uColorMultiplier.b)" +
+					"vTextureCoord + (uColorDirection * uColorMultiplier.b)" +
 				");" +
 
 				"vec4 result = vec4(" +

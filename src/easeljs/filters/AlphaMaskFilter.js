@@ -84,7 +84,7 @@ this.createjs = this.createjs || {};
 			"uniform sampler2D uAlphaSampler;"+
 
 			"void main(void) {" +
-				"vec4 color = texture2D(uSampler, vRenderCoord);" +
+				"vec4 color = texture2D(uSampler, vTextureCoord);" +
 				"vec4 alphaMap = texture2D(uAlphaSampler, vTextureCoord);" +
 
 				"gl_FragColor = vec4(color.rgb, color.a * alphaMap.a);" +

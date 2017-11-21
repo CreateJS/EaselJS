@@ -91,7 +91,7 @@ this.createjs = this.createjs||{};
 			"uniform vec4 uColorMatrixOffset;" +
 
 			"void main(void) {" +
-				"vec4 color = texture2D(uSampler, vRenderCoord);" +
+				"vec4 color = texture2D(uSampler, vTextureCoord);" +
 
 				"mat4 m = uColorMatrix;" +
 				"vec4 newColor = vec4(" +

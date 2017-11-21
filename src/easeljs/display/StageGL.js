@@ -490,9 +490,9 @@ this.createjs = this.createjs||{};
 
 			var r = f.rect;
 			f.uvRect = {
-				t: r.y / f.image.height,
+				t: 1 - (r.y / f.image.height),
 				l: r.x / f.image.width,
-				b: (r.y + r.height) / f.image.height,
+				b: 1 - ((r.y + r.height) / f.image.height),
 				r: (r.x + r.width) / f.image.width
 			};
 		}
@@ -569,7 +569,7 @@ this.createjs = this.createjs||{};
 	 * @default {t:0, l:0, b:1, r:1}
 	 * @readonly
 	 */
-	StageGL.UV_RECT = {t:0, l:0, b:1, r:1};
+	StageGL.UV_RECT = {t:1, l:0, b:0, r:1};
 
 	try {
 		/**
@@ -582,10 +582,10 @@ this.createjs = this.createjs||{};
 		 */
 		StageGL.COVER_VERT = new Float32Array([
 			-1,		 1,		//TL
-			1,		 1,		//TR
+			 1,		 1,		//TR
 			-1,		-1,		//BL
-			1,		 1,		//TR
-			1,		-1,		//BR
+			 1,		 1,		//TR
+			 1,		-1,		//BR
 			-1,		-1		//BL
 		]);
 
@@ -598,12 +598,12 @@ this.createjs = this.createjs||{};
 		 * @readonly
 		 */
 		StageGL.COVER_UV = new Float32Array([
-			 0,		 0,		//TL
-			 1,		 0,		//TR
-			 0,		 1,		//BL
-			 1,		 0,		//TR
-			 1,		 1,		//BR
-			 0,		 1		//BL
+			 0,		 1,		//TL
+			 1,		 1,		//TR
+			 0,		 0,		//BL
+			 1,		 1,		//TR
+			 1,		 0,		//BR
+			 0,		 0		//BL
 		]);
 
 		/**
@@ -615,12 +615,12 @@ this.createjs = this.createjs||{};
 		 * @readonly
 		 */
 		StageGL.COVER_UV_FLIP = new Float32Array([
-			 0,		 1,		//TL
-			 1,		 1,		//TR
-			 0,		 0,		//BL
-			 1,		 1,		//TR
-			 1,		 0,		//BR
-			 0,		 0		//BL
+			 0,		 0,		//TL
+			 1,		 0,		//TR
+			 0,		 1,		//BL
+			 1,		 0,		//TR
+			 1,		 1,		//BR
+			 0,		 1		//BL
 		]);
 	} catch(e) { /* Breaking in older browsers, but those browsers wont run StageGL so no recovery or warning needed */ }
 
@@ -768,7 +768,6 @@ this.createjs = this.createjs||{};
 	StageGL.COVER_VARYING_HEADER = (
 		"precision mediump float;" +
 
-		"varying highp vec2 vRenderCoord;" +
 		"varying highp vec2 vTextureCoord;"
 	);
 
@@ -785,8 +784,7 @@ this.createjs = this.createjs||{};
 	StageGL.COVER_VERTEX_HEADER = (
 		StageGL.COVER_VARYING_HEADER +
 		"attribute vec2 vertexPosition;" +
-		"attribute vec2 uvPosition;" +
-		"uniform float uUpright;"
+		"attribute vec2 uvPosition;"
 	);
 
 	/**
@@ -816,8 +814,7 @@ this.createjs = this.createjs||{};
 	StageGL.COVER_VERTEX_BODY  = (
 		"void main(void) {" +
 			"gl_Position = vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
-			"vRenderCoord = uvPosition;" +
-			"vTextureCoord = vec2(uvPosition.x, abs(uUpright - uvPosition.y));" +
+			"vTextureCoord = uvPosition;" +
 		"}"
 	);
 
@@ -832,7 +829,7 @@ this.createjs = this.createjs||{};
 	 */
 	StageGL.COVER_FRAGMENT_BODY = (
 		"void main(void) {" +
-			"vec4 color = texture2D(uSampler, vRenderCoord);" +
+			"vec4 color = texture2D(uSampler, vTextureCoord);" +
 			"gl_FragColor = color;" +
 		"}"
 	);
@@ -924,7 +921,7 @@ this.createjs = this.createjs||{};
 				gl.enable(gl.BLEND);
 				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 				gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._premultiply);
-				//gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
 				this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 				this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
@@ -1258,12 +1255,6 @@ this.createjs = this.createjs||{};
 				0,							0,								1,							0,
 				-1,							1,								0.1,						0
 			]);
-			// create the flipped version for use with render texture flipping
-			// DHG: this would be a slice/clone but some platforms don't offer them for Float32Array
-			this._projectionMatrixFlip = new Float32Array([0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0]);
-			this._projectionMatrixFlip.set(this._projectionMatrix);
-			this._projectionMatrixFlip[5] *= -1;
-			this._projectionMatrixFlip[13] *= -1;
 		}
 	};
 
@@ -1591,9 +1582,6 @@ this.createjs = this.createjs||{};
 
 				shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
 				gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-				shaderProgram.uprightUniform = gl.getUniformLocation(shaderProgram, "uUpright");
-				gl.uniform1f(shaderProgram.uprightUniform, 0);
 
 				// if there's some custom attributes be sure to hook them up
 				if (shaderParamSetup) {
@@ -2051,8 +2039,6 @@ this.createjs = this.createjs||{};
 		one drawing directly into the main context and the other drawing into a stored renderTexture respectively.
 		When the draw is a 'filtered' draw, the filters are applied sequentially and will draw into saved textures repeatedly.
 		Once the final filter is done the final output is treated depending upon whether it is a same or unique context.
-		The internal complexity comes from reducing over-draw, shared code, and issues like textures needing to be flipped
-		sometimes when written to render textures.
 		*/
 		var renderTexture;
 		var shaderBackup = this._activeShader;
@@ -2091,7 +2077,6 @@ this.createjs = this.createjs||{};
 				// draw item to render texture		I -> T
 				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
 				this.updateViewport(manager._drawWidth, manager._drawHeight);
-				this._projectionMatrix = this._projectionMatrixFlip;
 				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
 
@@ -2139,7 +2124,6 @@ this.createjs = this.createjs||{};
 		gl.bindTexture(gl.TEXTURE_2D, renderTexture);
 		this.setTextureParams(gl);
 
-		var flipY = false;
 		var i = 0, filter = filters[i];
 		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
 
@@ -2155,18 +2139,12 @@ this.createjs = this.createjs||{};
 			// draw result to render texture	R -> T
 			gl.viewport(0, 0, manager._drawWidth, manager._drawHeight);
 			gl.clear(gl.COLOR_BUFFER_BIT);
-			this._drawCover(gl, flipY);
+			this._drawCover(gl);
 
 			// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, renderTexture);
 			this.setTextureParams(gl);
-
-			// use flipping to keep things upright, things already cancel out on a single filter
-			// this needs to be here as multiPass is not accurate to _this_ frame until after shader acquisition
-			if (filterCount > 1 || filters[0]._multiPass) {
-				flipY = !flipY;
-			}
 
 			// work through the multipass if it's there, otherwise move on
 			filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
@@ -2180,19 +2158,8 @@ this.createjs = this.createjs||{};
 			// draw result to canvas			R -> C
 			this._activeShader = this.getFilterShader(this);
 			gl.clear(gl.COLOR_BUFFER_BIT);
-			this._drawCover(gl, flipY);
+			this._drawCover(gl);
 		} else {
-			//TODO: DHG: this is less than ideal. A flipped initial render for this circumstance might help. Adjust the perspective matrix?
-			if (flipY) {
-				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-				renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
-				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-
-				this._activeShader = this.getFilterShader(this);
-				gl.viewport(0, 0, manager._drawWidth, manager._drawHeight);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._drawCover(gl, !flipY);
-			}
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 			this.updateViewport(wBackup, hBackup);
 
@@ -2317,9 +2284,9 @@ this.createjs = this.createjs||{};
 					if (!item._uvRect) { item._uvRect = {}; }
 					src = item.sourceRect;
 					uvRect = item._uvRect;
-					uvRect.t = (src.y)/image.height;
+					uvRect.t = 1 - ((src.y)/image.height);
 					uvRect.l = (src.x)/image.width;
-					uvRect.b = (src.y + src.height)/image.height;
+					uvRect.b = 1 - ((src.y + src.height)/image.height);
 					uvRect.r = (src.x + src.width)/image.width;
 
 					// calculate vertices
@@ -2436,11 +2403,9 @@ this.createjs = this.createjs||{};
 	 * Draws a card that covers the entire render surface. Mainly used for filters.
 	 * @method _drawBuffers
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-	 * @param {Boolean} flipY Covers are used for things like RenderTextures and because of 3D vs Canvas space this can
-	 * end up meaning the `y` space sometimes requires flipping in the render.
 	 * @protected
 	 */
-	p._drawCover = function (gl, flipY) {
+	p._drawCover = function (gl) {
 		if (this._isDrawing > 0) {
 			this._drawBuffers(gl);
 		}
@@ -2460,10 +2425,9 @@ this.createjs = this.createjs||{};
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_VERT);
 		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bufferSubData(gl.ARRAY_BUFFER, 0, flipY?StageGL.COVER_UV_FLIP:StageGL.COVER_UV);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_UV);
 
 		gl.uniform1i(shaderProgram.samplerUniform, 0);
-		gl.uniform1f(shaderProgram.uprightUniform, flipY?0:1);
 
 		gl.drawArrays(gl.TRIANGLES, 0, StageGL.INDICIES_PER_CARD);
 	};

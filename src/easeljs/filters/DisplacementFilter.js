@@ -98,11 +98,11 @@ this.createjs = this.createjs||{};
 			"void main(void) {" +
 				"vec4 dispSample = texture2D(" +
 					"uDudvSampler, " +
-					"vRenderCoord" +
+					"vTextureCoord" +
 				");" +
 				"gl_FragColor = texture2D(" +
 					"uSampler, " +
-					"vRenderCoord + (dispSample.xy-0.5)*fPower*pixelAdjustment" +
+					"vTextureCoord + (dispSample.xy-0.5)*fPower*pixelAdjustment" +
 				");" +
 			"}"
 		);
