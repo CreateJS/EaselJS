@@ -80,6 +80,7 @@ export default class BlurFilter extends Filter {
 		 */
 		this._blurX = blurX;
 		this._blurXTable = [];
+		this._lastBlurX = null;
 
 		/**
 		 * Vertical blur radius in pixels
@@ -89,6 +90,7 @@ export default class BlurFilter extends Filter {
 		 */
 		this._blurY = blurY;
 		this._blurYTable = [];
+		this._lastBlurY = null;
 
 		/**
 		 * Number of blur iterations. For example, a value of 1 will produce a rough blur. A value of 2 will produce a
@@ -98,7 +100,8 @@ export default class BlurFilter extends Filter {
 		 * @type Number
 		 */
 		this._quality = isNaN(quality) || quality < 1 ? 1 : quality;
-		this.setQuality(this._quality | 0);
+		this._lastQuality = null;
+		this.quality = this._quality | 0;
 
 		/**
 		 * This is a template to generate the shader for {{#crossLink FRAG_SHADER_BODY}}{{/crossLink}}
@@ -154,8 +157,6 @@ export default class BlurFilter extends Filter {
 	set blurX (blurX) {
 		if (isNaN(blurX) || blurX < 0) { blurX = 0; }
 		this._blurX = blurX;
-		this._blurXTable = this._getTable(blurX * this._quality);
-		this._updateShader();
 	}
 
 	get blurY () {
@@ -165,8 +166,6 @@ export default class BlurFilter extends Filter {
 	set blurY (blurY) {
 		if (isNaN(blurY) || blurY < 0){ blurY = 0; }
 		this._blurY = blurY;
-		this._blurYTable = this._getTable(blurY * this._quality);
-		this._updateShader();
 	}
 
 	get quality () {
@@ -174,10 +173,28 @@ export default class BlurFilter extends Filter {
 	}
 
 	set quality (quality) {
-		this._quality = quality;
-		this._blurXTable = this._getTable(this._blurX * this._quality);
-		this._blurYTable = this._getTable(this._blurY * this._quality);
-		this._updateShader();
+		if (isNaN(value) || value < 0) { value = 0; }
+		this._quality = value | 0;
+	}
+
+	get _buildShader () {
+		const xChange = this._lastBlurX !== this._blurX;
+		const yChange = this._lastBlurY !== this._blurY;
+		const qChange = this._lastQuality !== this._quality;
+		if (xChange || yChange || qChange) {
+				if (xChange || qChange) { this._blurXTable = this._getTable(this._blurX * this._quality); }
+				if (yChange || qChange) { this._blurYTable = this._getTable(this._blurY * this._quality); }
+				this._updateShader();
+				this._lastBlurX = this._blurX;
+				this._lastBlurY = this._blurY;
+				this._lastQuality = this._quality;
+				return undefined; // force a rebuild
+		}
+		return this._compiledShader;
+	}
+
+	set _builtShader (value) {
+		this._compiledShader;
 	}
 
 // public methods:
@@ -209,7 +226,7 @@ export default class BlurFilter extends Filter {
 		let x = this.blurX|0, y = this.blurY| 0;
 		if (x <= 0 && y <= 0) { return rect; }
 		let q = Math.pow(this.quality, 0.2);
-		return (rect || new Rectangle()).pad(x*q+1,y*q+1,x*q+1,y*q+1);
+		return (rect || new Rectangle()).pad(y*q+1,x*q+1,y*q+1,x*q+1);
 	}
 
 	/**

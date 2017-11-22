@@ -201,6 +201,16 @@ export default class BitmapCache extends Filter {
 		 * @default 0
 		 */
 		this._drawHeight = 0;
+
+		/**
+		 * Internal tracking of the last requested bounds, may happen repeadtedly so stored to avoid object creation
+		 * @property _boundRect
+		 * @protected
+		 * @type {Rectangle}
+		 * @default Rectangle
+		 */
+		this._boundRect = new Rectangle();
+
 	}
 
 	/**
@@ -314,7 +324,6 @@ export default class BitmapCache extends Filter {
 			this._webGLCache = false;
 		} else if (stage instanceof StageGL) {
 			stage.releaseTexture(this.target.cacheCanvas);
-			this.target.cacheCanvas.remove();
 		}
 		this.target = this.target.cacheCanvas = null;
 		this.cacheID = this._cacheDataURLID = this._cacheDataURL = undefined;
@@ -348,11 +357,29 @@ export default class BitmapCache extends Filter {
 	draw (ctx) {
 		if (!this.target) { return false; }
 		ctx.drawImage(this.target.cacheCanvas,
-			this.x + this._filterOffX,		this.y + this._filterOffY,
-			this.width,						this.height
+			this.x + (this._filterOffX/this.scale),
+			this.y + (this._filterOffY/this.scale),
+			this._drawWidth/this.scale,
+			this._drawHeight/this.scale
 		);
 		return true;
 	}
+
+	/**
+	 * Determine the bounds of the shape in local space.
+	 * @method getBounds
+	 * @returns {Rectangle}
+	 */
+	getBounds () {
+		const scale = this.scale;
+		return this._boundRect.setValue(
+			this._filterOffX/scale,
+			this._filterOffY/scale,
+			this.width/scale,
+			this.height/scale
+		);
+	}
+
 
 // private methods:
 	/**
@@ -362,8 +389,9 @@ export default class BitmapCache extends Filter {
 	 * @protected
 	 */
 	_updateSurface () {
+		let surface;
 		if (!this._useWebGL) {
-			let surface = this.target.cacheCanvas;
+			surface = this.target.cacheCanvas;
 			// create it if it's missing
 			if (!surface) {
 				surface = this.target.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
@@ -384,8 +412,8 @@ export default class BitmapCache extends Filter {
 				this.target.cacheCanvas = true; // will be replaced with RenderTexture, temporary positive value for old "isCached" checks
 				this._webGLCache = this.target.stage;
 			} else if (this._options.useGL === "new") {
-				this.target.cacheCanvas = document.createElement("canvas");
-				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true});
+				this.target.cacheCanvas = document.createElement("canvas"); // we can turn off autopurge because we wont be making textures here
+				this._webGLCache = new StageGL(this.target.cacheCanvas, {antialias: true, transparent: true, autoPurge: -1});
 				this._webGLCache.isCacheControlled = true;    // use this flag to control stage sizing and final output
 			} else {
 				throw "Invalid option provided to useGL, expected ['stage', 'new', StageGL, undefined], got "+ this._options.useGL;
@@ -394,7 +422,7 @@ export default class BitmapCache extends Filter {
 
 		// now size render surfaces
 		let stageGL = this._webGLCache;
-		let surface = this.target.cacheCanvas;
+		surface = this.target.cacheCanvas;
 
 		// if we have a dedicated stage we've gotta size it
 		if (stageGL.isCacheControlled) {
@@ -431,7 +459,8 @@ export default class BitmapCache extends Filter {
 
 			ctx.save();
 			ctx.globalCompositeOperation = compositeOperation;
-			ctx.setTransform(this.scale, 0, 0, this.scale, -this.offX, -this.offY);
+			ctx.setTransform(this.scale,0,0,this.scale, -this._filterOffX,-this._filterOffY);
+			ctx.translate(-this.x, -this.y);
 			target.draw(ctx, true);
 			ctx.restore();
 
@@ -442,7 +471,6 @@ export default class BitmapCache extends Filter {
 			return;
 		}
 
-		// TODO: auto split blur into an x/y pass
 		this._webGLCache.cacheDraw(target, target.filters, this);
 		// NOTE: we may of swapped around which element the surface is, so we re-fetch it
 		surface = this.target.cacheCanvas;
@@ -460,8 +488,8 @@ export default class BitmapCache extends Filter {
 		let surface = this.target.cacheCanvas;
 		let filters = this.target.filters;
 
-		let w = surface.width;
-		let h = surface.height;
+		let w = this._drawWidth;
+		let h = this._drawHeight;
 
 		// setup
 		let data = surface.getContext("2d").getImageData(0,0, w,h);

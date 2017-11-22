@@ -539,7 +539,9 @@ export default class SpriteSheet extends EventDispatcher {
 
 		imgLoop:
 		for (let i=0, imgs=this._images, l=imgs.length; i<l; i++) {
-			let img = imgs[i], imgW = img.width, imgH = img.height;
+			let img = imgs[i],
+				imgW = (img.width||img.naturalWidth),
+				imgH = (img.height||img.naturalHeight);
 
 			let y = margin;
 			while (y <= imgH-margin-frameHeight) {

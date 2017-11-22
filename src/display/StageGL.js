@@ -420,9 +420,9 @@ export default class StageGL extends Stage {
 		 * @property _lastTrackedCanvas
 		 * @protected
 		 * @type {Number}
-		 * @default 0
+		 * @default -1
 		 */
-		this._lastTrackedCanvas = 0;
+		this._lastTrackedCanvas = -1;
 
 		/**
 		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} is the canvas or a render
@@ -742,9 +742,10 @@ export default class StageGL extends Stage {
 	 * Textures in use, or to be used again shortly, should not be removed. This is simply for performance reasons.
 	 * Removing a texture in use will cause the texture to have to be re-uploaded slowing rendering.
 	 * @method releaseTexture
-	 * @param  {DisplayObject | Texture | Image | Canvas} item An object that used the texture to be discarded.
+	 * @param {DisplayObject | Texture | Image | Canvas} item An object that used the texture to be discarded.
+	 * @param {Boolean} safe Should the release attempt to be "safe" and only delete this usage.
 	 */
-	releaseTexture (item) {
+	releaseTexture (item, safe) {
 		if (!item) { return; }
 
 		// this is a container object
@@ -790,8 +791,16 @@ export default class StageGL extends Stage {
 		}
 
 		// remove it
-		this._killTextureObject(this._textureDictionary[foundImage._storeID]);
-		foundImage._storeID = undefined;
+		const texture = this._textureDictionary[foundImage._storeID];
+		if (safe) {
+			const data = texture._imageData;
+			const index = data.indexOf(foundImage);
+			if (index >= 0) { data.splice(index, 1); }
+			foundImage._storeID = undefined;
+			if (data.length === 0) { this._killTextureObject(texture); }
+		} else {
+			this._killTextureObject(texture);
+		}
 	}
 
 	/**
@@ -805,14 +814,23 @@ export default class StageGL extends Stage {
 	 * @param {Number} [count=100] How many renders ago the texture was last used
 	 */
 	purgeTextures (count = 100) {
+		if (count < 0) { count = 100; }
 		const dict = this._textureDictionary;
 		const l = dict.length;
-		for (let i = 0; i < l; i++) {
-			let item = dict[i];
-			if (!item) { continue; }
-			if (item._drawID + count <= this._drawID) {	// use draw not batch as draw is more indicative of time
-				this._killTextureObject(item);
+		let i, j, k;
+		for (i = 0; i < l; i++) {
+			let data, texture = dict[i];
+			if (!texture || !(data = texture._imageData)) { continue; }
+
+			for (j = 0; j < data.length; j++) {
+				let item = data[j];
+				if (item._drawID + count <= this._drawID) {
+					item._storeID = undefined;
+					data.splice(j--, 1);
+				}
 			}
+
+			if (!data.length) { this._killTextureObject(texture); }
 		}
 	}
 
@@ -1080,6 +1098,26 @@ export default class StageGL extends Stage {
 
 // private methods:
 	/**
+	 * Returns a base texture that has no image or data loaded. Not intended for loading images. In some error cases,
+	 * the texture creation will fail. This function differs from {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}
+	 * in that the failed textures will be replaced with a safe to render "nothing" texture.
+	 * @method _getSafeTexture
+	 * @param  {uint} [w=1] The width of the texture in pixels, defaults to 1
+	 * @param  {uint} [h=1] The height of the texture in pixels, defaults to 1
+	 */
+	_getSafeTexture (w, h) {
+			let texture = this.getBaseTexture(w, h);
+
+			if (!texture) {
+				let msg = "Problem creating texture, possible cause: using too much VRAM, please try releasing texture memory";
+				(console.error && console.error(msg)) || console.log(msg);
+				texture = this._baseTextures[0];
+			}
+
+			return texture;
+	}
+
+	/**
 	 * Sets up and returns the WebGL context for the canvas. May return undefined in error scenarios. These can include
 	 * situations wher the canvas element already has a context.
 	 * @param  {Canvas} canvas The DOM canvas element to attach to
@@ -1235,15 +1273,15 @@ export default class StageGL extends Stage {
 	 */
 	_createShader (gl, type, str) {
 		// inject the static number
-		str = str.replace(/{{count}}/g, this._batchTextureCount);
+		str = str.replace(/\{\{count}}/g, this._batchTextureCount);
 
 		// resolve issue with no dynamic samplers by creating correct samplers in if else chain
 		let insert = "";
 		for (let i = 1; i<this._batchTextureCount; i++) {
 			insert += `} else if (src === ${i}) { color = texture2D(uSampler[${i}], vTextureCoord);`;
 		}
-		str = str.replace(/{{alternates}}/g, insert)
-						 .replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
+		str = str.replace(/\{\{alternates}}/g, insert)
+						 .replace(/\{\{fragColor}}/g, this._premultiply ? StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY : StageGL.REGULAR_FRAG_COLOR_NORMAL);
 
 		// actually compile the shader
 		let shader = gl.createShader(type);
@@ -1354,12 +1392,15 @@ export default class StageGL extends Stage {
 		this._batchTextures = [];
 
 		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for safety code
-		for (let i=0; i<this._batchTextureCount;i++) {
-			let t = this.getBaseTexture();
-			this._baseTextures[i] = this._batchTextures[i] = t;
-			if (!t) {
+		for (let i = 0; i < this._batchTextureCount; i++) {
+			const texture = this.getBaseTexture();
+			this._baseTextures[i] = this._batchTextures[i] = texture;
+			if (!texture) {
 				throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
+			} else {
+				texture._storeID = -1;
 			}
+
 		}
 	}
 
@@ -1367,55 +1408,50 @@ export default class StageGL extends Stage {
 	 * Load a specific texture, accounting for potential delay, as it might not be preloaded
 	 * @method _loadTextureImage
 	 * @param {WebGLRenderingContext} gl
-	 * @param {Image} image Actual image to be loaded
+	 * @param {Image | Canvas} image Actual image to be loaded
 	 * @return {WebGLTexture} The resulting Texture object
 	 * @protected
 	 */
 	_loadTextureImage (gl, image) {
-		let src = image.src;
+		let srcPath, texture, msg;
 
-		if (!src) {
-			// one time canvas property setup
-			image._isCanvas = true;
-			src = image.src = `canvas_${this._lastTrackedCanvas++}`;
-		}
-
-		// put the texture into our storage system
-		let storeID = this._textureIDs[src];
-		if (storeID === undefined) {
-			storeID = this._textureIDs[src] = this._textureDictionary.length;
-		}
-		if (this._textureDictionary[storeID] === undefined) {
-			this._textureDictionary[storeID] = this.getBaseTexture();
-		}
-
-		let texture = this._textureDictionary[storeID];
-
-		if (texture) {
-			// get texture params all set up
-			texture._batchID = this._batchID;
-			texture._storeID = storeID;
-			texture._imageData = image;
-			this._insertTextureInBatch(gl, texture);
-
-			// get the data into the texture or wait for it to load
-			image._storeID = storeID;
-			if (image.complete || image.naturalWidth || image._isCanvas) {	// is it already loaded
-				this._updateTextureImageData(gl, image);
-			} else  {
-				image.addEventListener("load", this._updateTextureImageData.bind(this, gl, image));
-			}
+		if (image instanceof Image && image.src) {
+			srcPath = image.src;
+		} else if (image instanceof HTMLCanvasElement) {
+			image._isCanvas = true; // canvases are already loaded and assumed unique so note that
+			srcPath = `canvas_${++this._lastTrackedCanvas}`;
 		} else {
-			// we really really should have a texture, try to recover the error by using a saved empty texture so we don't crash
-			let msg = "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
-			(console.error && console.error(msg)) || console.log(msg);
-
-			texture = this._baseTextures[0];
-			texture._batchID = this._batchID;
-			texture._storeID = -1;
-			texture._imageData = texture;
-			this._insertTextureInBatch(gl, texture);
+			msg = "Invalid image provided as source. Please ensure source is a correct DOM element.";
+			(console.error && console.error(msg, image)) || console.log(msg, image);
+			return;
 		}
+
+		// create the texture lookup and texture
+		let storeID = this._textureIDs[srcPath];
+		if (storeID === undefined) {
+			this._textureIDs[srcPath] = storeID = this._textureDictionary.length;
+			image._storeID = storeID;
+			image._invalid = !image.isCanvas;
+			texture = this._getSafeTexture();
+			this._textureDictionary[storeID] = texture;
+		} else {
+			image._storeID = storeID;
+			texture = this._textureDictionary[storeID];
+		}
+
+
+		// allow the texture to track its references for cleanup, if it's not an error ref
+		if (texture._storeID != -1) {
+			texture._storeID = storeID;
+			if (texture._imageData) {
+				texture._imageData.push(image);
+			} else {
+				texture._imageData = [image];
+			}
+		}
+
+		// insert texture into batch
+		this._insertTextureInBatch(gl, texture);
 
 		return texture;
 	}
@@ -1430,6 +1466,11 @@ export default class StageGL extends Stage {
 	 * @protected
 	 */
 	_updateTextureImageData (gl, image) {
+		// the image isn't loaded and isn't ready to be updated, because we don't set the invalid flag we should try again later
+		if (!(image.complete || image._isCanvas || image.naturalWidth)) {
+			return;
+		}
+
 		// the bitwise & is intentional, cheap exponent 2 check
 		let isNPOT = (image.width & image.width-1) || (image.height & image.height-1);
 		let texture = this._textureDictionary[image._storeID];
@@ -1458,8 +1499,8 @@ export default class StageGL extends Stage {
 		texture._h = image.height;
 
 		if (this.vocalDebug) {
-			if (isNPOT) {
-				console.warn("NPOT(Non Power of Two) Texture: "+ image.src);
+			if (isNPOT && this._antialias) {
+				console.warn("NPOT(Non Power of Two) Texture w/ antialias on: "+ image.src);
 			}
 			if (image.width > gl.MAX_TEXTURE_SIZE || image.height > gl.MAX_TEXTURE_SIZE){
 				console && console.error("Oversized Texture: "+ image.width+"x"+image.height +" vs "+ gl.MAX_TEXTURE_SIZE +"max");
@@ -1494,14 +1535,14 @@ export default class StageGL extends Stage {
 				this.batchReason = "textureOverflow";
 				this._drawBuffers(gl);		// <------------------------------------------------------------------------
 				this.batchCardCount = 0;
-				found = start;
+				found = start; // TODO: how do we optimize this to be smarter?
 			}
 
 			// lets put it into that spot
 			this._batchTextures[found] = texture;
 			texture._activeIndex = found;
-			let image = texture._imageData;
-			if (image && image._invalid && texture._drawID !== undefined) {
+			let image = texture._imageData && texture._imageData[0]; // first come first served, potentially problematic
+			if (image && image._invalid) {
 				this._updateTextureImageData(gl, image);
 			} else {
 				gl.activeTexture(gl.TEXTURE0 + found);
@@ -1509,9 +1550,9 @@ export default class StageGL extends Stage {
 				this.setTextureParams(gl);
 			}
 			this._lastTextureInsert = found;
-		} else {
-			let image = texture._imageData;
-			if (texture._storeID != undefined && image._invalid) {
+		} else if(texture._drawID !== this._drawID) {    // hanging around from previous draws means the content might be out of date
+			let image = texture._imageData && texture._imageData[0];
+			if (image && image._invalid) {
 				this._updateTextureImageData(gl, image);
 			}
 		}
@@ -1525,32 +1566,33 @@ export default class StageGL extends Stage {
 	 * {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead as it will call this with the correct texture object(s).
 	 * Note: Testing shows this may not happen immediately, have to wait for WebGL to have actually adjust memory.
 	 * @method _killTextureObject
-	 * @param {Texture} tex The texture to be cleaned out
+	 * @param {Texture} texture The texture to be cleaned out
 	 * @protected
 	 */
-	_killTextureObject (tex) {
-		if (!tex) { return; }
+	_killTextureObject (texture) {
+		if (!texture) { return; }
 		let gl = this._webGLContext;
 
 		// remove linkage
-		if (tex._storeID !== undefined && tex._storeID >= 0) {
-			this._textureDictionary[tex._storeID] = undefined;
+		if (texture._storeID !== undefined && texture._storeID >= 0) {
+			this._textureDictionary[texture._storeID] = undefined;
 			for (let n in this._textureIDs) {
-				if (this._textureIDs[n] === tex._storeID) { delete this._textureIDs[n]; }
+				if (this._textureIDs[n] === texture._storeID) { delete this._textureIDs[n]; }
 			}
-			if (tex._imageData) { tex._imageData._storeID = undefined; }
-			tex._imageData = tex._storeID = undefined;
+			let data = texture._imageData;
+			for (let i = data.length - 1; i >= 0; i--) { data[i]._storeID = undefined; }
+			texture._imageData = texture._storeID = undefined;
 		}
 
 		// make sure to drop it out of an active slot
-		if (tex._activeIndex !== undefined && this._batchTextures[tex._activeIndex] === tex) {
-			this._batchTextures[tex._activeIndex] = this._baseTextures[tex._activeIndex];
+		if (texture._activeIndex !== undefined && this._batchTextures[texture._activeIndex] === texture) {
+			this._batchTextures[texture._activeIndex] = this._baseTextures[texture._activeIndex];
 		}
 
 		// remove buffers if present
 		try {
-			if (tex._frameBuffer) { gl.deleteFramebuffer(tex._frameBuffer); }
-			tex._frameBuffer = undefined;
+			if (texture._frameBuffer) { gl.deleteFramebuffer(texture._frameBuffer); }
+			texture._frameBuffer = undefined;
 		} catch(e) {
 			/* suppress delete errors because it's already gone or didn't need deleting probably */
 			if (this.vocalDebug) { console.log(e); }
@@ -1558,7 +1600,7 @@ export default class StageGL extends Stage {
 
 		// remove entry
 		try {
-			gl.deleteTexture(tex);
+			gl.deleteTexture(texture);
 		} catch(e) {
 			/* suppress delete errors because it's already gone or didn't need deleting probably */
 			if (this.vocalDebug) { console.log(e); }
@@ -1653,15 +1695,14 @@ export default class StageGL extends Stage {
 		mtx = mtx.clone();
 		mtx.scale(1/manager.scale, 1/manager.scale);
 		mtx = mtx.invert();
-		mtx.translate(-manager.offX/manager.scale, -manager.offY/manager.scale);
+		mtx.translate(-manager.offX/manager.scale*target.scaleX, -manager.offY/manager.scale*target.scaleY);
 		let container = this._cacheContainer;
 		container.children = [target];
 		container.transformMatrix = mtx;
 
 		this._backupBatchTextures(false);
 
-		let filterCount = filters && filters.length;
-		if (filterCount) {
+		if (filters && filters.length) {
 			this._drawFilters(target, filters, manager);
 		} else {
 			// is this for another stage or mine?
@@ -1709,7 +1750,7 @@ export default class StageGL extends Stage {
 		let wBackup = this._viewportWidth, hBackup = this._viewportHeight;
 
 		let container = this._cacheContainer;
-		let filterCount = filters && filters.length;
+		let filterCount = filters.length;
 
 		// we don't know which texture slot we're dealing with previously and we need one out of the way
 		// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
@@ -1729,9 +1770,8 @@ export default class StageGL extends Stage {
 
 		let flipY = false;
 
-		// apply each filter in order, but remember to toggle used texture and render buffer
-		for (let i=0; i<filterCount; i++) {
-			let filter = filters[i];
+		let i = 0, filter = filters[i];
+		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
 
 			// swap to correct shader
 			this._activeShader = this.getFilterShader(filter);
@@ -1753,10 +1793,14 @@ export default class StageGL extends Stage {
 			this.setTextureParams(gl);
 
 			// use flipping to keep things upright, things already cancel out on a single filter
-			if (filterCount > 1) {
+			// this needs to be here as multiPass is not accurate to _this_ frame until after shader acquisition
+			if (filterCount > 1 || filters[0]._multiPass) {
 				flipY = !flipY;
 			}
-		}
+
+			// work through the multipass if it's there, otherwise move on
+			filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
+		} while (filter);
 
 		// is this for another stage or mine
 		if (this.isCacheControlled) {
@@ -1853,15 +1897,19 @@ export default class StageGL extends Stage {
 			}
 
 			let uvRect, texIndex, image, frame, texture, src;
+			let useCache = item.cacheCanvas && !ignoreCache;
 
-			if (item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
+			// get the image data, or abort if not present
+			if (item._webGLRenderStyle === 2 || useCache) { // BITMAP / Cached Canvas
 				image = (ignoreCache?false:item.cacheCanvas) || item.image;
-			} else if (item._webGLRenderStyle === 1) {											// SPRITE
-				frame = item.spriteSheet.getFrame(item.currentFrame);	//TODO: Faster way?
+			} else if (item._webGLRenderStyle === 1) { // SPRITE
+				frame = item.spriteSheet.getFrame(item.currentFrame);	// TODO: Faster way?
+				if (frame === null) { continue; }
 				image = frame.image;
-			} else {																			// MISC (DOM objects render themselves later)
+			} else { // MISC (DOM objects render themselves later)
 				continue;
 			}
+			if (!image) { continue; }
 
 			let uvs = this._uvs;
 			let vertices = this._vertices;
@@ -1869,16 +1917,14 @@ export default class StageGL extends Stage {
 			let alphas = this._alphas;
 
 			// calculate texture
-			if (!image) { continue; }
 			if (image._storeID === undefined) {
 				// this texture is new to us so load it and add it to the batch
 				texture = this._loadTextureImage(gl, image);
-				this._insertTextureInBatch(gl, texture);
 			} else {
 				// fetch the texture (render textures know how to look themselves up to simplify this logic)
 				texture = this._textureDictionary[image._storeID];
-				if (!texture){
-					if (this.vocalDebug){ console.log("Texture should not be looked up while not being stored."); }
+				if (!texture){ //TODO: this should really not occur but has due to bugs, hopefully this can be removed eventually
+					if (this.vocalDebug) { console.log("Image source should not be lookup a non existent texture, please report a bug."); }
 					continue;
 				}
 
@@ -1888,8 +1934,9 @@ export default class StageGL extends Stage {
 				}
 			}
 			texIndex = texture._activeIndex;
+			image._drawID = this._drawID;
 
-			if (item._webGLRenderStyle === 2 || (item.cacheCanvas && !ignoreCache)) {			// BITMAP / Cached Canvas
+			if (item._webGLRenderStyle === 2 || useCache) {			// BITMAP / Cached Canvas
 				if (!useCache && item.sourceRect) {
 					// calculate uvs
 					if (!item._uvRect) { item._uvRect = {}; }
@@ -1905,16 +1952,18 @@ export default class StageGL extends Stage {
 					subR = src.width+subL;				subB = src.height+subT;
 				} else {
 					// calculate uvs
+					uvRect = StageGL.UV_RECT;
 					// calculate vertices
 					if (item.cacheCanvas) {
 						src = item.bitmapCache;
-						uvRect = StageGL.UV_RECT;
-						subL = src.x;					subT = src.y;
-						subR = src.width+subL;			subB = src.height+subT;
+						subL = src.x+(src._filterOffX/src.scale);
+						subT = src.y+(src._filterOffY/src.scale);
+						subR = (src._drawWidth/src.scale)+subL;
+						subB = (src._drawHeight/src.scale)+subT;
 					} else {
-						uvRect = StageGL.UV_RECT;
-						subL = 0;						subT = 0;
-						subR = image.width+subL;		subB = image.height+subT;
+						subL = subT = 0;
+						subR = image.width+subL;
+						subB = image.height+subT;
 					}
 				}
 			} else if (item._webGLRenderStyle === 1) {											// SPRITE
@@ -2238,31 +2287,34 @@ export default class StageGL extends Stage {
 	StageGL.DEFAULT_MAX_BATCH_SIZE = 10000;
 	StageGL.WEBGL_MAX_INDEX_NUM = Math.pow(2, 16);
 	StageGL.UV_RECT = {t:0, l:0, b:1, r:1};
-
-	StageGL.COVER_VERT = new Float32Array([
-		-1,		 1,		// TL
-		1,		 1,		// TR
-		-1,		-1,		// BL
-		1,		 1,		// TR
-		1,		-1,		// BR
-		-1,		-1		// BL
-	]);
-	StageGL.COVER_UV = new Float32Array([
-		 0,		 0,		// TL
-		 1,		 0,		// TR
-		 0,		 1,		// BL
-		 1,		 0,		// TR
-		 1,		 1,		// BR
-		 0,		 1		// BL
-	]);
-	StageGL.COVER_UV_FLIP = new Float32Array([
-		 0,		 1,		// TL
-		 1,		 1,		// TR
-		 0,		 0,		// BL
-		 1,		 1,		// TR
-		 1,		 0,		// BR
-		 0,		 0		// BL
-	]);
+	try {
+		StageGL.COVER_VERT = new Float32Array([
+			-1,		 1,		// TL
+			1,		 1,		// TR
+			-1,		-1,		// BL
+			1,		 1,		// TR
+			1,		-1,		// BR
+			-1,		-1		// BL
+		]);
+		StageGL.COVER_UV = new Float32Array([
+			 0,		 0,		// TL
+			 1,		 0,		// TR
+			 0,		 1,		// BL
+			 1,		 0,		// TR
+			 1,		 1,		// BR
+			 0,		 1		// BL
+		]);
+		StageGL.COVER_UV_FLIP = new Float32Array([
+			 0,		 1,		// TL
+			 1,		 1,		// TR
+			 0,		 0,		// BL
+			 1,		 1,		// TR
+			 1,		 0,		// BR
+			 0,		 0		// BL
+		]);
+	} catch (e) {
+		// Breaking in older browsers, but those browsers wont run StageGL so no recovery or warning needed
+	}
 	StageGL.REGULAR_VARYING_HEADER = `
 		precision mediump float;
 		varying vec2 vTextureCoord;
@@ -2307,7 +2359,17 @@ export default class StageGL extends Stage {
 				{{alternates}}
 			}
 
-			gl_FragColor = vec4(color.rgb{{premultiply}}, color.a * alphaValue);
+			{{fragColor}};
+		}
+	`;
+	StageGL.REGULAR_FRAG_COLOR_NORMAL = `
+		gl_FragColor = vec4(color.rgb, color.a * alphaValue);
+	`;
+	StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY = `
+		if (color.a > 0.0035) {
+			gl_FragColor = vec4(color.rgb / color.a, color.a * alphaValue);
+		} else {
+			gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
 		}
 	`;
 	StageGL.PARTICLE_VERTEX_BODY = `

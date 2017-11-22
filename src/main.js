@@ -129,7 +129,7 @@ export {
   StrokeDash,
   StrokeStyle
 } from "./display/Graphics";
-export { default as MovieClip } from "./display/MovieClip";
+// export { default as MovieClip } from "./display/MovieClip";
 export { default as Shadow } from "./display/Shadow";
 export { default as Shape } from "./display/Shape";
 export { default as Sprite } from "./display/Sprite";
