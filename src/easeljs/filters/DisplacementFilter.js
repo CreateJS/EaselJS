@@ -142,7 +142,7 @@ this.createjs = this.createjs||{};
 
 		gl.uniform2f( //this is correct as the color maps to -0.5,0.5. This compounds the pixel delta, thus 2/size
 			gl.getUniformLocation(shaderProgram, "pixelAdjustment"),
-			2/stage._viewportWidth, 2/stage._viewportHeight
+			2/stage._viewportWidth, -2/stage._viewportHeight
 		);
 	};
 
