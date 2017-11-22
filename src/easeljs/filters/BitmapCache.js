@@ -139,6 +139,13 @@ this.createjs = this.createjs||{};
 
 		// protected:
 		/**
+		 * The number of filters found to process this update, used to optimize some decisions and surfaces
+		 * @type {number}
+		 * @private
+		 */
+		this._filterCount = 0;
+
+		/**
 		 * The relative offset of the filter's x position, used for drawing the cache onto its container.
 		 * Re-calculated every update call before drawing.
 		 * @property _filterOffY
@@ -335,6 +342,9 @@ this.createjs = this.createjs||{};
 
 		this._drawWidth = Math.ceil(this.width*this.scale) + filterBounds.width;
 		this._drawHeight = Math.ceil(this.height*this.scale) + filterBounds.height;
+		this._filterCount = this.target.filters.reduce( function (acc, o) {
+			var out = 1; while (o._multiPass) { o = o._multiPass; out++; } return acc + out;
+		}, 0);
 
 		if(!surface || this._drawWidth != surface.width || this._drawHeight != surface.height) {
 			this._updateSurface();
@@ -358,9 +368,8 @@ this.createjs = this.createjs||{};
 		if (this._webGLCache) {
 			// if it isn't cache controlled clean up after yourself
 			if (!this._webGLCache.isCacheControlled) {
-				if (this.__lastRT){ this.__lastRT = undefined; }
-				if (this.__rtA){ this._webGLCache._killTextureObject(this.__rtA); }
-				if (this.__rtB){ this._webGLCache._killTextureObject(this.__rtB); }
+				if (this._renderTextureOut){ this._webGLCache._killTextureObject(this._renderTextureOut); }
+				if (this._renderTextureTemp){ this._webGLCache._killTextureObject(this._renderTextureTemp); }
 				if (this.target && this.target.cacheCanvas){ this._webGLCache._killTextureObject(this.target.cacheCanvas); }
 			}
 			// set the context to none and let the garbage collector get the rest when the canvas itself gets removed
@@ -451,49 +460,38 @@ this.createjs = this.createjs||{};
 		// create it if it's missing
 		if (!this._webGLCache) {
 			if (this._options.useGL === "stage") {
+				// use the stage that this object belongs on as the WebGL context
 				if(!(this.target.stage && this.target.stage.isWebGL)){
 					var error = "Cannot use 'stage' for cache because the object's parent stage is ";
 					error += this.target.stage ? "non WebGL." : "not set, please addChild to the correct stage.";
 					throw error;
 				}
-				this.target.cacheCanvas = true; // will be replaced with RenderTexture, temporary positive value for old "isCached" checks
 				this._webGLCache = this.target.stage;
+				this.target.cacheCanvas = this._webGLCache.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight, true);
 
 			} else if(this._options.useGL === "new") {
+				// create a new WebGL context to run this cache
 				this.target.cacheCanvas = document.createElement("canvas"); // low autopurge in case of filter swapping and low texture count
 				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true, autoPurge: 10});
 				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
 
 			} else if(this._options.useGL instanceof createjs.StageGL) {
-				this.target.cacheCanvas = true; // will be replaced with RenderTexture, temporary positive value for old "isCached" checks
+				// use the provided WebGL context to run this cache, trust the user it works and is configured.
 				this._webGLCache = this._options.useGL;
+				this.target.cacheCanvas = this._webGLCache.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight, true);
 
 			} else {
 				throw "Invalid option provided to useGL, expected ['stage', 'new', StageGL, undefined], got "+ this._options.useGL;
 			}
 		}
 
-		// now size render surfaces
-		surface = this.target.cacheCanvas;
+		// if we have a dedicated stage we've got to size it
 		var stageGL = this._webGLCache;
-
-		// if we have a dedicated stage we've gotta size it
 		if (stageGL.isCacheControlled) {
+			surface = this.target.cacheCanvas;
 			surface.width = this._drawWidth;
 			surface.height = this._drawHeight;
 			stageGL.updateViewport(this._drawWidth, this._drawHeight);
-		}
-
-		// make surfaces now, instead of potentially expensive texture operations during a render call
-		if (this.target.filters) {
-			// with filters we can't tell how many we'll need but the most we'll ever need is two, so make them now
-			stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
-			stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
-		} else {
-			// without filters then we only need one RenderTexture
-			if (!stageGL.isCacheControlled) {
-				stageGL.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight);
-			}
 		}
 	};
 
@@ -509,12 +507,6 @@ this.createjs = this.createjs||{};
 
 		if (webGL) {
 			webGL.cacheDraw(target, target.filters, this);
-
-			// we may of swapped around which element the surface is, so we re-fetch it
-			surface = this.target.cacheCanvas;
-
-			surface.width = this._drawWidth;
-			surface.height = this._drawHeight;
 		} else {
 			var ctx = surface.getContext("2d");
 
@@ -528,7 +520,6 @@ this.createjs = this.createjs||{};
 			ctx.translate(-this.x, -this.y);
 			target.draw(ctx, true);
 			ctx.restore();
-
 
 			if (target.filters && target.filters.length) {
 				this._applyFilters(ctx);

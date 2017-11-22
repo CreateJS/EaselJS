@@ -1044,45 +1044,42 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Render textures can't draw into themselves so any item being used for renderTextures needs two to alternate between.
-	 * This function creates, gets, and toggles the render surface between the two.
+	 * This function creates, gets, and adjusts the specified render surface.
 	 *
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method getTargetRenderTexture
 	 * @param  {DisplayObject} target The object associated with the render textures, usually a cached object.
 	 * @param  {Number} w The width to create the texture at.
 	 * @param  {Number} h The height to create the texture at.
-	 * @return {Objet}
-	 * @todo fill in return type
+	 * @param  {Boolean} [primary=false] Whether this is the primary render surface
+	 * @return {WebGLTexture}
 	 */
-	p.getTargetRenderTexture = function (target, w, h) {
-		var result, toggle = false;
-		var gl = this._webGLContext;
-		if (target.__lastRT !== undefined && target.__lastRT === target.__rtA) { toggle = true; }
-		if (!toggle) {
-			if (target.__rtA === undefined) {
-				target.__rtA = this.getRenderBufferTexture(w, h);
+	p.getTargetRenderTexture = function (target, w, h, primary) {
+		var result, gl = this._webGLContext;
+		if (primary) {
+			result = target._renderTextureOut;
+			if (!result) {
+				result = target._renderTextureOut = this.getRenderBufferTexture(w, h);
 			} else {
-				if (w != target.__rtA._width || h != target.__rtA._height) {
-					this.resizeTexture(target.__rtA, w, h);
+				if (w != result._width || h != result._height) {
+					this.resizeTexture(result, w, h);
 				}
 				this.setTextureParams(gl);
 			}
-			result = target.__rtA;
 		} else {
-			if (target.__rtB === undefined) {
-				target.__rtB = this.getRenderBufferTexture(w, h);
+			result = target._renderTextureTemp;
+			if (!result) {
+				result = target._renderTextureTemp = this.getRenderBufferTexture(w, h);
 			} else {
-				if (w != target.__rtB._width || h != target.__rtB._height) {
-					this.resizeTexture(target.__rtB, w, h);
+				if (w != result._width || h != result._height) {
+					this.resizeTexture(result, w, h);
 				}
 				this.setTextureParams(gl);
 			}
-			result = target.__rtB;
 		}
-		if (!result) {
+
+		if (result == null) {
 			throw "Problems creating render textures, known causes include using too much VRAM by not releasing WebGL texture instances";
 		}
-		target.__lastRT = result;
 		return result;
 	};
 
@@ -2071,7 +2068,7 @@ this.createjs = this.createjs||{};
 				this._batchDraw(container, gl, true);
 			} else {
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-				target.cacheCanvas = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
+				target.cacheCanvas = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight, true);
 				renderTexture = target.cacheCanvas;
 
 				// draw item to render texture		I -> T
@@ -2105,13 +2102,14 @@ this.createjs = this.createjs||{};
 		var lastTextureSlot = this._maxTextureSlots-1;
 		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
 
+		var filtersLeft = manager._filterCount;
 		var container = this._cacheContainer;
-		var filterCount = filters.length;
+		var useOut = !(filtersLeft%2); // we have to swap render surface, so start with the one that will make 'out' the last
 
 		// we don't know which texture slot we're dealing with previously and we need one out of the way
 		// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
 		gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-		renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
+		renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight, useOut);
 
 		// draw item to render texture		I -> T
 		gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
@@ -2126,46 +2124,46 @@ this.createjs = this.createjs||{};
 
 		var i = 0, filter = filters[i];
 		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
+			filtersLeft--;
+			useOut = !useOut;
 
 			// swap to correct shader
 			this._activeShader = this.getFilterShader(filter);
 			if (!this._activeShader) { continue; }
 
-			// now the old result is stored in slot 0, make a new render texture
 			gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-			renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
-			gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+			renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight, useOut);
 
-			// draw result to render texture	R -> T
-			gl.viewport(0, 0, manager._drawWidth, manager._drawHeight);
-			gl.clear(gl.COLOR_BUFFER_BIT);
-			this._drawCover(gl);
+			if (filtersLeft == 0 && this.isCacheControlled) {
+				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-			// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-			this.setTextureParams(gl);
+				// draw result to canvas			R -> C
+				this.updateViewport(wBackup, hBackup);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+				this._drawCover(gl);
+
+				return;
+
+			} else {
+				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
+
+				// draw result to render texture	R -> T
+				gl.viewport(0, 0, manager._drawWidth, manager._drawHeight);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+				this._drawCover(gl);
+
+				// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, renderTexture);
+				this.setTextureParams(gl);
+			}
 
 			// work through the multipass if it's there, otherwise move on
 			filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
 		} while (filter);
 
-		// is this for another stage or mine
-		if (this.isCacheControlled) {
-			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-			this.updateViewport(wBackup, hBackup);
-
-			// draw result to canvas			R -> C
-			this._activeShader = this.getFilterShader(this);
-			gl.clear(gl.COLOR_BUFFER_BIT);
-			this._drawCover(gl);
-		} else {
-			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-			this.updateViewport(wBackup, hBackup);
-
-			// make sure the last texture is the active thing to draw
-			target.cacheCanvas = renderTexture;
-		}
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		this.updateViewport(wBackup, hBackup);
 	};
 
 	/**
