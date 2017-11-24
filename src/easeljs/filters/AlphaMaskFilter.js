@@ -64,11 +64,15 @@ this.createjs = this.createjs || {};
 	 * @class AlphaMaskFilter
 	 * @extends Filter
 	 * @constructor
-	 * @param {HTMLImageElement|HTMLCanvasElement} mask
+	 * @param {HTMLImageElement|HTMLCanvasElement|WebGLTexture} mask
 	 **/
 	function AlphaMaskFilter(mask) {
 		this.Filter_constructor();
-	
+
+		if (!Filter.isValidImageSource(mask)) {
+			throw "Must provide valid image source for alpha mask, see Filter.isValidImageSource";
+		}
+
 	// public properties:
 		/**
 		 * The image (or canvas) to use as the mask.
@@ -103,7 +107,9 @@ this.createjs = this.createjs || {};
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, this._mapTexture);
 		stage.setTextureParams(gl);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.mask);
+		if (this.mask !== this._mapTexture) {
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.mask);
+		}
 
 		gl.uniform1i(
 			gl.getUniformLocation(shaderProgram, "uAlphaSampler"),

@@ -60,14 +60,14 @@ this.createjs = this.createjs||{};
 	 * @class DisplacementFilter
 	 * @extends Filter
 	 * @constructor
-	 * @param {Image|HTMLCanvasElement} dudvMap The horizontal blur radius in pixels.
+	 * @param {HTMLImageElement|HTMLCanvasElement|WebGLTexture} dudvMap The horizontal blur radius in pixels.
 	 * @param {Number} [distance=0] The absolute value of the maximum possible displacement from the original pixel.
 	 **/
 	function DisplacementFilter(dudvMap, distance) {
 		this.Filter_constructor();
 
-		if (!dudvMap || !(dudvMap instanceof HTMLCanvasElement || dudvMap instanceof Image)) {
-			throw "Must provide valid image source for displacement map (this can be a canvas)";
+		if (!Filter.isValidImageSource(dudvMap)) {
+			throw "Must provide valid image source for displacement map, see Filter.isValidImageSource";
 		}
 
 		// public properties:
@@ -107,11 +107,13 @@ this.createjs = this.createjs||{};
 			"}"
 		);
 
-		if (dudvMap instanceof HTMLCanvasElement) {
+		if(dudvMap instanceof WebGLTexture) {
+			this._mapTexture = dudvMap;
+		} else if (dudvMap instanceof HTMLCanvasElement) {
 			this._dudvCanvas = dudvMap;
 			this._dudvCtx = dudvMap.getContext("2d");
 		} else {
-			var canvas = this._dudvCanvas = document.createElement("canvas");
+			var canvas = this._dudvCanvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
 			canvas.width = dudvMap.width;
 			canvas.height = dudvMap.height;
 			(this._dudvCtx = canvas.getContext("2d")).drawImage(dudvMap);
@@ -128,7 +130,9 @@ this.createjs = this.createjs||{};
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, this._mapTexture);
 		stage.setTextureParams(gl);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.dudvMap);
+		if (this.dudvMap !== this._mapTexture) {
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.dudvMap);
+		}
 
 		gl.uniform1i(
 			gl.getUniformLocation(shaderProgram, "uDudvSampler"),

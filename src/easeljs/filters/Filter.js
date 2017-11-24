@@ -55,14 +55,19 @@ this.createjs = this.createjs||{};
 	 * margins that need to be applied in order to fully display the filter. For example, the {{#crossLink "BlurFilter"}}{{/crossLink}}
 	 * will cause an object to feather outwards, resulting in a margin around the shape.
 	 *
+	 * Any filter that consumes an external image stretches the image to cover the cached bounds. If this is an undesired
+	 * visual result, then use an intermediary cache to properly size and layout your data before passing it to a filter.
+	 *
 	 * <h4>EaselJS Filters</h4>
 	 * EaselJS comes with a number of pre-built filters:
 	 * <ul>
+	 *     <li>{{#crossLink "AberrationFilter"}}{{/crossLink}} : Shift the RGB components separately along a given vector</li>
 	 *     <li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
 	 *     <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
 	 *     <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
 	 *     <li>{{#crossLink "ColorFilter"}}{{/crossLink}}: Color transform a display object</li>
 	 *     <li>{{#crossLink "ColorMatrixFilter"}}{{/crossLink}}: Transform an image using a {{#crossLink "ColorMatrix"}}{{/crossLink}}</li>
+	 *     <li>{{#crossLink "DisplacementFilter"}}{{/crossLink}}: Create localized distortions in supplied display object</li>
 	 * </ul>
 	 *
 	 * @class Filter
@@ -105,6 +110,30 @@ this.createjs = this.createjs||{};
 		this.FRAG_SHADER_BODY = null;
 	}
 	var p = Filter.prototype;
+
+// static methods:
+	/**
+	 * Check to see if an image source being provided is one that is valid.
+	 * <h4>Valid Sources:</h4>
+	 * <ul>
+	 *     <li>Image Object</li>
+	 *     <li>HTML Canvas Element</li>
+	 *     <li>`.cacheCanvas` on an object with the same stage</li>
+	 * </ul>
+	 * WebGLTextures CANNOT be shared between multiple WebGL contexts. This means the only safe source for a WebGLTexture
+	 * is an object cached using the same StageGL as the object trying to use it in a filter. This function does not
+	 * enforce that restriction, as it is difficult or expensive to detect. The render will crash or fail to load the
+	 * image data if the rule isn't followed.
+	 * @param {HTMLImageElement|HTMLCanvasElement|WebGLTexture} src The element to check for validity
+	 * @return Boolean Whether the source is valid
+	 */
+	Filter.isValidImageSource = function(src) {
+		return Boolean(src) && (
+			src instanceof Image ||
+			src instanceof WebGLTexture ||
+			src instanceof HTMLCanvasElement
+		);
+	};
 
 // public methods:
 	/**

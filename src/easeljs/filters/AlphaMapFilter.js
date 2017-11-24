@@ -64,12 +64,16 @@ this.createjs = this.createjs || {};
 	 * @class AlphaMapFilter
 	 * @extends Filter
 	 * @constructor
-	 * @param {HTMLImageElement|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
+	 * @param {HTMLImageElement|HTMLCanvasElement|WebGLTexture} alphaMap The greyscale image (or canvas) to use as the alpha value for the
 	 * result. This should be exactly the same dimensions as the target.
 	 **/
 	function AlphaMapFilter(alphaMap) {
 		this.Filter_constructor();
-	
+
+		if (!Filter.isValidImageSource(alphaMap)) {
+			throw "Must provide valid image source for alpha map, see Filter.isValidImageSource";
+		}
+
 	// public properties:
 		/**
 		 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
@@ -107,6 +111,10 @@ this.createjs = this.createjs || {};
 				"gl_FragColor = vec4(color.rgb, color.a * (alphaMap.r * ceil(alphaMap.a)));" +
 			"}"
 		);
+
+		if(alphaMap instanceof WebGLTexture) {
+			this._mapTexture = alphaMap;
+		}
 	}
 	var p = createjs.extend(AlphaMapFilter, createjs.Filter);
 
@@ -120,7 +128,9 @@ this.createjs = this.createjs || {};
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, this._mapTexture);
 		stage.setTextureParams(gl);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.alphaMap);
+		if (this.alphaMap !== this._mapTexture) {
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.alphaMap);
+		}
 
 		gl.uniform1i(
 			gl.getUniformLocation(shaderProgram, "uAlphaSampler"),
@@ -148,11 +158,14 @@ this.createjs = this.createjs || {};
 	p._applyFilter = function (imageData) {
 		if (!this.alphaMap) { return true; }
 		if (!this._prepAlphaMap()) { return false; }
-		
-		// TODO: update to support scenarios where the target has different dimensions.
+
 		var data = imageData.data;
 		var map = this._mapData;
-		for(var i=0, l=data.length; i<l; i += 4) { data[i + 3] = map[i] || 0; }
+
+
+		for(var i=0, l=data.length; i<l; i += 4) {
+			data[i + 3] = map[i] || 0;
+		}
 		
 		return true;
 	};
