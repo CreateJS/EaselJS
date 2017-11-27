@@ -59,13 +59,10 @@
     "docs": "cd node_modules/createjs && npm run docs"
   },
   "dependencies": {
-    "createjs": "2.0.0",
-    "tweenjs": "2.0.0"
+    "createjs": "2.0.0"
   },
   "devDependencies": {
-    "js-imagediff": "tehvgg/js-imagediff",
-    "preloadjs": "2.0.0",
-    "soundjs": "2.0.0"
+    "js-imagediff": "tehvgg/js-imagediff"
   },
   "engine": "node >= 7.10.1"
 }
