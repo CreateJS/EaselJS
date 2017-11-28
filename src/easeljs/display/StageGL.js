@@ -48,6 +48,14 @@ this.createjs = this.createjs||{};
  * 		combined and paired these are a shader "program"
  * Texture: WebGL representation of image data and associated extra information
  * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
+ *
+ * Notes:
+ *
+ * - WebGL treats 0,0 as the bottom left, as such there's a lot of co-ordinate space flipping to make regular canvas
+ * 		numbers make sense to users and WebGL simultaneously. This extends to textures stored in memory too.
+ * - Older versions had distinct internal paths for filters and regular draws, these have been merged.
+ * - Draws are slowly assembled out of found content. Overflowing things like shaders, object/texture count will cause
+ * 		an early draw before continuing. Lookout for the things that force a draw (marked with <------------------------
  */
 
 (function () {
@@ -605,23 +613,6 @@ this.createjs = this.createjs||{};
 			 1,		 0,		//BR
 			 0,		 0		//BL
 		]);
-
-		/**
-		 * Flipped U/V for {{#crossLink "StageGL:COVER_VERT:property"}}{{/crossLink}}.
-		 * @property COVER_UV_FLIP
-		 * @static
-		 * @final
-		 * @type {Float32Array}
-		 * @readonly
-		 */
-		StageGL.COVER_UV_FLIP = new Float32Array([
-			 0,		 0,		//TL
-			 1,		 0,		//TR
-			 0,		 1,		//BL
-			 1,		 0,		//TR
-			 1,		 1,		//BR
-			 0,		 1		//BL
-		]);
 	} catch(e) { /* Breaking in older browsers, but those browsers wont run StageGL so no recovery or warning needed */ }
 
 	/**
@@ -684,15 +675,7 @@ this.createjs = this.createjs||{};
 	 */
 	StageGL.REGULAR_VERTEX_BODY  = (
 		"void main(void) {" +
-			//DHG TODO: This doesn't work. Must be something wrong with the hand built matrix see js... bypass for now
-			//vertexPosition, round if flag
-			//"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
-			"gl_Position = vec4("+
-				"(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
-				"(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1]," +
-				"pMatrix[3][2]," +
-				"1.0" +
-			");" +
+			"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
 			"alphaValue = objectAlpha;" +
 			"indexPicker = textureIndex;" +
 			"vTextureCoord = uvPosition;" +
@@ -729,30 +712,6 @@ this.createjs = this.createjs||{};
 		"} else {" +
 			"gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);" +
 		"}"
-	);
-
-	//TODO: DHG: a real particle shader
-	/**
-	 * @property PARTICLE_VERTEX_BODY
-	 * @todo
-	 * @final
-	 * @static
-	 * @type {String}
-	 * @readonly
-	 */
-	StageGL.PARTICLE_VERTEX_BODY = (
-		StageGL.REGULAR_VERTEX_BODY
-	);
-	/**
-	 * @property PARTICLE_FRAGMENT_BODY
-	 * @todo
-	 * @final
-	 * @static
-	 * @type {String}
-	 * @readonly
-	 */
-	StageGL.PARTICLE_FRAGMENT_BODY = (
-		StageGL.REGULAR_FRAGMENT_BODY
 	);
 
 	/**
@@ -903,7 +862,7 @@ this.createjs = this.createjs||{};
 				var options = {
 					depth: false, // Disable the depth buffer as it isn't used.
 					alpha: this._transparent, // Make the canvas background transparent.
-					stencil: true,
+					stencil: false, // while there's uses for this, we're not using any yet
 					antialias: this._antialias,
 					premultipliedAlpha: this._premultiply, // Assume the drawing buffer contains colors with premultiplied alpha.
 					preserveDrawingBuffer: this._preserveBuffer
@@ -920,10 +879,11 @@ this.createjs = this.createjs||{};
 				gl.disable(gl.DEPTH_TEST);
 				gl.enable(gl.BLEND);
 				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+				gl.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 				gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._premultiply);
 				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
-				this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
+
 				this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
 
 				this.canvas._invalid = true;
@@ -1248,9 +1208,9 @@ this.createjs = this.createjs||{};
 			// additionally we offset into they Y so the polygons are inside the camera's "clipping" plane
 			this._projectionMatrix = new Float32Array([
 				2 / this._viewportWidth,	0,								0,							0,
-				0,							-2 / this._viewportHeight,		1,							0,
+				0,							-2 / this._viewportHeight,		0,							0,
 				0,							0,								1,							0,
-				-1,							1,								0.1,						0
+				-1,							1,								0,							1
 			]);
 		}
 	};
@@ -1533,14 +1493,6 @@ this.createjs = this.createjs||{};
 				targetVtx = StageGL.COVER_VERTEX_HEADER + (customVTX || StageGL.COVER_VERTEX_BODY);
 				targetFrag = StageGL.COVER_FRAGMENT_HEADER + (customFRAG || StageGL.COVER_FRAGMENT_BODY);
 				break;
-			case "particle": //TODO
-				targetVtx = StageGL.REGULAR_VERTEX_HEADER + StageGL.PARTICLE_VERTEX_BODY;
-				targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + StageGL.PARTICLE_FRAGMENT_BODY;
-				break;
-			case "override":
-				targetVtx = StageGL.REGULAR_VERTEX_HEADER + (customVTX || StageGL.REGULAR_VERTEX_BODY);
-				targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + (customFRAG || StageGL.REGULAR_FRAGMENT_BODY);
-				break;
 			case "regular":
 			default:
 				targetVtx = StageGL.REGULAR_VERTEX_HEADER + StageGL.REGULAR_VERTEX_BODY;
@@ -1557,7 +1509,6 @@ this.createjs = this.createjs||{};
 		gl.attachShader(shaderProgram, vertexShader);
 		gl.attachShader(shaderProgram, fragmentShader);
 		gl.linkProgram(shaderProgram);
-		shaderProgram._type = shaderName;
 
 		// check compile status
 		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
@@ -1604,7 +1555,7 @@ this.createjs = this.createjs||{};
 				gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
 
 				var samplers = [];
-				for (var i = 0; i < this._batchTextureCount; i++) {
+					for (var i = 0; i < this._batchTextureCount; i++) {
 					samplers[i] = i;
 				}
 
@@ -1658,10 +1609,10 @@ this.createjs = this.createjs||{};
 	/**
 	 * Sets up the necessary vertex property buffers, including position and U/V.
 	 * @method _createBuffers
-	 * @param {WebGLRenderingContext} gl
 	 * @protected
 	 */
-	p._createBuffers = function (gl) {
+	p._createBuffers = function () {
+		var gl = this._webGLContext;
 		var groupCount = this._maxCardsPerBatch * StageGL.INDICIES_PER_CARD;
 		var groupSize, i, l;
 
@@ -1753,7 +1704,7 @@ this.createjs = this.createjs||{};
 		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for safety code
 		for (var i=0; i<this._batchTextureCount;i++) {
 			var texture = this.getBaseTexture();
-			this._baseTextures[i] = this._batchTextures[i] = texture;
+				this._baseTextures[i] = this._batchTextures[i] = texture;
 			if (!texture) {
 				throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
 			} else {
@@ -1852,8 +1803,8 @@ this.createjs = this.createjs||{};
 
 		if (image._invalid !== undefined) { image._invalid = false; } // only adjust what is tracking this data
 
-		texture._w = image.width;
-		texture._h = image.height;
+		texture.width = image.width;
+		texture.height = image.height;
 
 		if (this.vocalDebug) {
 			if (isNPOT && this._antialias) {
