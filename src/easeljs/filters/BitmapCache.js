@@ -506,7 +506,7 @@ this.createjs = this.createjs||{};
 		var webGL = this._webGLCache;
 
 		if (webGL) {
-			webGL.cacheDraw(target, target.filters, this);
+			webGL.cacheDraw(target, this);
 		} else {
 			var ctx = surface.getContext("2d");
 

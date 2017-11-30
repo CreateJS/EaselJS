@@ -34,8 +34,8 @@ this.createjs = this.createjs||{};
 
 /*
  * README IF EDITING:
- * Terminology for developers:
  *
+ * - Terminology for developers:
  * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
  * Vertex Property: a piece of information attached to the vertex like a vector3 containing x,y,z
  * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render
@@ -43,18 +43,20 @@ this.createjs = this.createjs||{};
  * Card: a group of 2 triangles used to display a rectangular image
  * U/V: common names for the [0-1] texture co-ordinates on an image
  * Batch: a single call to the renderer, best done as little as possible so multiple cards are put into a single batch
- * Buffer: WebGL array data
  * Program/Shader: For every vertex we run the Vertex shader. The results are used per pixel by the Fragment shader. When
  * 		combined and paired these are a shader "program"
  * Texture: WebGL representation of image data and associated extra information
  * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
+ * Render___: actual WebGL draw call
+ * Buffer: WebGL array data
+ * Cover: A card that covers the entire viewport
  *
- * Notes:
- *
- * - WebGL treats 0,0 as the bottom left, as such there's a lot of co-ordinate space flipping to make regular canvas
- * 		numbers make sense to users and WebGL simultaneously. This extends to textures stored in memory too.
- * - Older versions had distinct internal paths for filters and regular draws, these have been merged.
- * - Draws are slowly assembled out of found content. Overflowing things like shaders, object/texture count will cause
+ * - Notes:
+ * WebGL treats 0,0 as the bottom left, as such there's a lot of co-ordinate space flipping to make regular canvas
+ * 		numbers make sense to users and WebGL simultaneously. This extends to textures stored in memory too. If writing
+ * 		code that deals with x/y, be aware your y may be flipped.
+ * Older versions had distinct internal paths for filters and regular draws, these have been merged.
+ * Draws are slowly assembled out of found content. Overflowing things like shaders, object/texture count will cause
  * 		an early draw before continuing. Lookout for the things that force a draw (marked with <------------------------
  */
 
@@ -120,9 +122,6 @@ this.createjs = this.createjs||{};
 	 *  to perform anti-aliasing. This will also enable linear pixel sampling on power-of-two textures (smoother images).
 	 * @param {Boolean} [options.transparent=false] If `true`, the canvas is transparent. This is <strong>very</strong>
 	 * expensive, and should be used with caution.
-	 * @param {Boolean} [options.premultiply=false] Alters color handling. If `true`, this assumes the shader must
-	 * account for pre-multiplied alpha. This can help avoid visual halo effects with some assets, but may also cause
-	 * problems with other assets.
 	 * @param {Integer} [options.autoPurge=1200] How often the system should automatically dump unused textures with
 	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}} for more
 	 * information.
@@ -132,7 +131,6 @@ this.createjs = this.createjs||{};
 
 		if (options !== undefined) {
 			if (typeof options !== "object"){ throw("Invalid options object"); }
-			var premultiply = options.premultiply;
 			var transparent = options.transparent;
 			var antialias = options.antialias;
 			var preserveBuffer = options.preserveBuffer;
@@ -178,15 +176,6 @@ this.createjs = this.createjs||{};
 		 * @default false
 		 */
 		this._transparent = transparent||false;
-
-		/**
-		 * Specifies whether or not StageGL is handling colours as premultiplied alpha.
-		 * @property _premultiply
-		 * @protected
-		 * @type {Boolean}
-		 * @default false
-		 */
-		this._premultiply = premultiply||false;
 
 		/**
 		 * Internal value of {{#crossLink "StageGL/autoPurge"}}{{/crossLink}}
@@ -262,6 +251,7 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 */
 		this._activeShader = null;
+		this._activeBuffer = null;
 
 		this._mainShader = null;
 
@@ -337,7 +327,11 @@ this.createjs = this.createjs||{};
 		 */
 		this._alphaBuffer = null;
 
-		this._outTexture = null;
+		this._bufferTextureOutput = null;		// what you're drawing to, occasionally swaps with concat
+		this._bufferTextureConcat = null;		// what you've draw before now, occasionally swaps with output
+		this._bufferTextureTemp = null;			// temporary surface for mixing in other objects
+
+		this._builtShaders = {};
 
 		/**
 		 * An index based lookup of every WebGL Texture currently in use.
@@ -407,6 +401,15 @@ this.createjs = this.createjs||{};
 		 */
 		this._lastTextureInsert = -1;
 
+		this._renderMode = "";
+		this._immediateRender = false;
+
+		/**
+		 * Cards drawn into the batch so far.
+		 * @type {number}
+		 * @private
+		 */
+		this._batchCardCount = 0;
 
 		/**
 		 * The current batch being drawn, A batch consists of a call to `drawElements` on the GPU. Many of these calls
@@ -641,7 +644,8 @@ this.createjs = this.createjs||{};
 	 * @readonly
 	 */
 	StageGL.REGULAR_VARYING_HEADER = (
-		"precision mediump float;" +
+		"precision highp float;" +
+
 		"varying vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
 		"varying lowp float alphaValue;"
@@ -715,17 +719,7 @@ this.createjs = this.createjs||{};
 				"{{alternates}}" +
 			"}" +
 
-			"{{fragColor}}" +
-		"}"
-	);
-	StageGL.REGULAR_FRAG_COLOR_NORMAL = (
-		"gl_FragColor = vec4(color.rgb, color.a * alphaValue);"
-	);
-	StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY = (
-		"if(color.a > 0.0035) {" +		// 1/255 = 0.0039, so ignore any value below 1 because it's probably noise
-			"gl_FragColor = vec4(color.rgb/color.a, color.a * alphaValue);" +
-		"} else {" +
-			"gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);" +
+			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
 		"}"
 	);
 
@@ -740,9 +734,9 @@ this.createjs = this.createjs||{};
 	 * @readonly
 	 */
 	StageGL.COVER_VARYING_HEADER = (
-		"precision mediump float;" +
+		"precision highp float;" +	//this is usually essential for filter math
 
-		"varying highp vec2 vTextureCoord;"
+		"varying vec2 vTextureCoord;"
 	);
 
 	/**
@@ -803,10 +797,300 @@ this.createjs = this.createjs||{};
 	 */
 	StageGL.COVER_FRAGMENT_BODY = (
 		"void main(void) {" +
-			"vec4 color = texture2D(uSampler, vTextureCoord);" +
-			"gl_FragColor = color;" +
+			"gl_FragColor = texture2D(uSampler, vTextureCoord);" +
 		"}"
 	);
+
+	StageGL.BLEND_FRAGMENT_SIMPLE = (
+		"uniform sampler2D uMixSampler;"+
+		"void main(void) {" +
+			"vec4 src = texture2D(uMixSampler, vTextureCoord);" +
+			"vec4 dst = texture2D(uSampler, vTextureCoord);"
+		// note this is an open bracket on main!
+	);
+
+	StageGL.BLEND_FRAGMENT_COMPLEX = (
+		StageGL.BLEND_FRAGMENT_SIMPLE +
+			"vec3 srcClr = min(src.rgb/src.a, 1.0);" +
+			"vec3 dstClr = min(dst.rgb/dst.a, 1.0);" +
+
+			"float totalAlpha = min(1.0 - (1.0-dst.a) * (1.0-src.a), 1.0);" +
+			"float srcFactor = min(max(src.a - dst.a, 0.0) / totalAlpha, 1.0);" +
+			"float dstFactor = min(max(dst.a - src.a, 0.0) / totalAlpha, 1.0);" +
+			"float mixFactor = max(max(1.0 - srcFactor, 0.0) - dstFactor, 0.0);" +
+
+			"gl_FragColor = vec4(" +
+				"(" +
+					"srcFactor * srcClr +" +
+					"dstFactor * dstClr +" +
+					"mixFactor * ("
+		// this should be closed with the cap!
+	);
+	StageGL.BLEND_FRAGMENT_COMPLEX_CAP = (
+					")" +
+				") * totalAlpha, totalAlpha" +
+			");" +
+		"}"
+	);
+
+	StageGL.BLEND_FRAGMENT_OVERLAY_UTIL = (
+		"float overlay(float a, float b) {" +
+			"if(a < 0.5) { return 2.0 * a * b; }" +
+			"return 1.0 - 2.0 * (1.0-a) * (1.0-b);" +
+		"}"
+	);
+
+	StageGL.BLEND_FRAGMENT_HSL_UTIL = (
+		"float lum(vec3 c) { return 0.299*c.r + 0.589*c.g + 0.109*c.b; }" +
+		"float sat(vec3 c) { return max(max(c.r, c.g), c.b) - min(min(c.r, c.g), c.b); }" +
+		"vec3 clipHSL(vec3 c) {" +
+			"float l = lum(c);" +
+			"float n = min(min(c.r, c.g), c.b);" +
+			"float x = max(max(c.r, c.g), c.b);" +
+			"if(n < 0.0){ c = l + (((c - l) * l) / (l - n)); }" +
+			"if(x < 1.0){ c = l + (((c - l) * (1.0 - l)) / (x - l)); }" +
+			"return c;" +
+		"}" +
+		"vec3 setLum(vec3 c, float val) {" +
+			"return clipHSL(c + (val - lum(c)));" +
+		"}" +
+		"vec3 setSat(vec3 c, float val) {" +
+			"bool rxg = c.r > c.g; bool rxb = c.r > c.b; bool gxb = c.g > c.b;" +
+			"vec3 midMask = vec3(0.0); vec3 maxMask = vec3(0.0); vec3 result = vec3(0.0);" +
+			"if(rxg){" +
+				"if(rxb) {" +
+					"maxMask.r = 1.0;" +
+					"if(gxb) {midMask.g = 1.0;} else {midMask.b = 1.0;}" +
+				"} else {" +
+					"maxMask.b = 1.0;" +
+					"midMask.r = 1.0;" +
+				"}" +
+			"} else {" +
+				"if(gxb) {" +
+					"maxMask.g = 1.0;" +
+					"if(rxb) {midMask.r = 1.0;} else {midMask.b = 1.0;}" +
+				"} else {" +
+					"maxMask.b = 1.0;" +
+					"midMask.g = 1.0;" +
+				"}" +
+			"}" +
+			"vec3 minMask = 1.0 - (midMask+maxMask);" +
+			"if(any(greaterThan(c*maxMask, c*minMask))) {" +
+				"result = midMask*( ((c*midMask - c*minMask) * val) / (c*maxMask - c*minMask) );" +
+				"result += maxMask*( val );" +
+			"}" +
+
+			"return result;" +
+		"}"
+	);
+
+	StageGL.BLEND_SOURCES = {
+		"source-over": {																								//YAY
+			non_immediate: true
+			//srcRGB: "ONE",							srcA: "ONE"
+			//dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE_MINUS_SRC_ALPHA"
+		},
+		"source-in": {
+			non_immediate: true,
+			srcRGB: "DST_ALPHA",					srcA: "ZERO",
+			dstRGB: "ZERO",							dstA: "SRC_ALPHA"
+		},
+		"source-out": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb*(1-dst.a), src.a-dst.a); }"
+			)
+		},
+		"source-atop": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb*src.a + dst.rgb*(1.0-src.a), dst.a); }"
+			)
+		},
+		"destination-over": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb*(1.0-dst.a) + dst.rgb*dst.a, src.a+dst.a); }"
+			)
+		},
+		"destination-in": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(dst.rgb, src.a*dst.a); }"
+			)
+		},
+		"destination-out": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(dst.rgb, dst.a*(1.0-src.a)); }"
+			)
+		},
+		"destination-atop": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb*(1.0-dst.a) + dst.rgb*dst.a, src.a); }"
+			)
+		},
+		"copy": {																										//YAY
+			non_immediate: true,
+			dstRGB: "ZERO",							dstA: "ZERO"
+		},
+
+		"multiply": {																									//YAY
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"srcClr * dstClr"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"multiply-cheap": {																								//YAY
+			non_immediate: true,
+			srcRGB: "ZERO",							srcA: "ONE",
+			dstRGB: "SRC_COLOR",					dstA: "ONE"
+		},
+		"screen": {																										//YAY
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"1.0 - (1.0 - srcClr) * (1.0 - dstClr)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"screen-cheap": {																								//
+			non_immediate: true,
+			srcRGB: "ZERO",							srcA: "ONE",
+			dstRGB: "SRC_COLOR",					dstA: "ONE"
+		},
+		"lighter": {																									//YAY
+			non_immediate: true,
+			dstRGB: "ONE",							dstA:"ONE"
+		},
+		"lighten": {
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"max(src.rgb, dst.rgb) * shared," +
+				"dst.a+src.a); }"
+			)
+		},
+		"darken": {
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"min(src.rgb, dst.rgb) * shared," +
+				"dst.a+src.a); }"
+			)
+		},
+
+		"overlay": {
+			shader: (
+				StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(overlay(dst.r,src.r), overlay(dst.g,src.g), overlay(dst.b,src.b), dst.a+src.a); }"
+			)
+		},
+		"hard-light": {
+			shader: (
+				StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(overlay(src.r,dst.r), overlay(src.g,dst.g), overlay(src.b,dst.b), dst.a+src.a); }"
+			)
+		},
+		"soft-light": {
+			shader: (
+				"float softcurve(float a) {" +
+				"if(a > 0.25) { return sqrt(a); }" +
+				"return ((16.0 * a - 12.0) * a + 4.0) * a;" +
+				"}" +
+				"float softmix(float a, float b) {" +
+				"if(b <= 0.5) { return a - (1.0 - 2.0*b) * a * (1.0 - a); }" +
+				"return a + (2.0 * b - 1.0) * (softcurve(a) - a);" +
+				"}" + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"vec3(softmix(src.r,dst.r), softmix(src.g,dst.g), softmix(src.b,dst.b)) * shared," +
+				"dst.a+src.a); }"
+			)
+		},
+		"color-dodge": {
+			//shader: (
+			//	"float blendColorDodge(float base, float blend) {" +
+			//		"return (blend==1.0)?blend:min(base/(1.0-blend),1.0);" +
+			//	"}" +
+			//	"vec3 blendColorDodge(vec3 base, vec3 blend) {" +
+			//		"return vec3(blendColorDodge(base.r,blend.r),blendColorDodge(base.g,blend.g),blendColorDodge(base.b,blend.b));" +
+			//	"}" +
+			//	"vec3 blendColorDodge(vec3 base, vec3 blend, float opacity) {" +
+			//		"return (blendColorDodge(base, blend) * opacity + base * (1.0 - opacity));" +
+			//	"}" + StageGL.BLEND_FRAGMENT_SIMPLE +
+			//	"gl_FragColor = vec4(blendColorDodge(dst.rgb, src.rgb, src.a), 1.0); }"
+
+			//shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+			//	"vec4 color = vec4(0.0, 0.0, 0.0, dst.a+src.a);" +
+
+			//	"if(src.r*src.a >= 0.96) {" +
+			//		"if(dst.r*dst.a >= 0.0035) { color.r = 1.0; } else { color.r = 0.0; }" +
+			//	"} else {" +
+			//		"color.r = clamp(dst.r*dst.a / (1.0-src.r*src.a), 0.0, 1.0);" +
+			//	"}" +
+
+			//	"if(src.g*src.a >= 0.96) {" +
+			//		"if(dst.g*dst.a >= 0.0035) { color.g = 1.0; } else { color.g = 0.0; }" +
+			//	"} else {" +
+			//		"color.g = clamp(dst.g*dst.a / (1.0-src.g*src.a), 0.0, 1.0);" +
+			//	"}" +
+
+			//	"if(src.b*src.a >= 0.96) {" +
+			//		"if(dst.b*dst.a >= 0.0035) { color.b = 1.0; } else { color.b = 0.0; }" +
+			//	"} else {" +
+			//		"color.b = clamp(dst.b*dst.a / (1.0-src.b*src.a), 0.0, 1.0);" +
+			//	"}" +
+
+			//	"gl_FragColor = color; }"
+			//shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+			//		"((dst.rgb*dst.a) / (1.0-src.rgb*src.a) * shared," +
+			//	"dst.a+src.a); }"
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				//"gl_FragColor = vec4(1.0/1.0, 1.0/0.0, 0.0/1.0, 1.0); }"		//1.0, 1.0, 0.0
+				//"gl_FragColor = vec4(0.5/1.0, 0.5/0.0, 0.0/0.5, 1.0); }"		//0.5, 1.0, 0.0
+				//"gl_FragColor = vec4(0.0/1.0, 0.0/0.0, 0.0/0.0, 1.0); }"		//0.0, 0.0, 0.0
+				"gl_FragColor = vec4(0.1/0.0, 1.0/1.0, 0.0/0.0, 1.0); }"		//0.0, 0.0, 0.0
+			)
+		},
+		"color-burn": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); }"
+			)
+		},
+
+		"xor": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb*src.a + dst.rgb*dst.a, abs(src.a-dst.a)); }"
+			)
+		},
+		"difference": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(abs(src.rgb-dst.rgb), src.a+dst.a); }"
+			)
+		},
+		"exclusion": {
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"(src.rgb + dst.rgb - 2.0 * src.rgb * dst.rgb) * shared," +
+				"dst.a+src.a); }"
+			)
+		},
+
+		"hue": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				" * shared," +
+				"dst.a+src.a); }"
+			)
+		},
+		"saturation": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				" * shared," +
+				"dst.a+src.a); }"
+			)
+		},
+		"color": {
+			//shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+			//		"setLum(src.rgb*src.a, lum(dst.rgb*dst.a)) * shared," +
+			//	"dst.a+src.a); }"
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_SIMPLE +
+				//"gl_FragColor = vec4(  setLum(vec3(1.0), lum(dst.rgb*dst.a)),  1.0); }"
+				//"gl_FragColor = vec4(  vec3(setLum(vec3(1.0), 0.5)),  1.0); }"
+				//"gl_FragColor = vec4(  (dst.rgb - 0.8) + 0.8,  1.0); }"
+				"gl_FragColor = vec4(  dst.rgb,  1.0); }"
+			)
+		},
+		"luminosity": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(dst.rgb, lum(src.rgb)) * shared," +
+				"dst.a+src.a); }"
+			)
+		}
+	};
 
 // events:
 	/**
@@ -875,11 +1159,12 @@ this.createjs = this.createjs||{};
 
 				// defaults and options
 				var options = {
-					depth: false, // Disable the depth buffer as it isn't used.
-					alpha: this._transparent, // Make the canvas background transparent.
+					depth: false, // nothing has depth
 					stencil: false, // while there's uses for this, we're not using any yet
+					premultipliedAlpha: this._transparent, // this is complicated, trust it
+
+					alpha: this._transparent,
 					antialias: this._antialias,
-					premultipliedAlpha: this._premultiply, // Assume the drawing buffer contains colors with premultiplied alpha.
 					preserveDrawingBuffer: this._preserveBuffer
 				};
 
@@ -888,16 +1173,17 @@ this.createjs = this.createjs||{};
 
 				gl.disable(gl.DEPTH_TEST);
 				gl.enable(gl.BLEND);
-				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-				gl.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
-				gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._premultiply);
+				gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
 				this._createBuffers();
 				this._initMaterials();
+				this._updateRenderMode("source-over");
 
 				this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
-				this._outTexture = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+				this._bufferTextureOutput = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+				this._bufferTextureConcat = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+				this._bufferTextureTemp = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
 
 				this.canvas._invalid = true;
 			}
@@ -917,11 +1203,7 @@ this.createjs = this.createjs||{};
 		this.dispatchEvent("drawstart");
 
 		if (this._webGLContext) {
-			// Use WebGL.
-			this._batchDraw(this, this._webGLContext);
-			if (this._autoPurge != -1 && !(this._drawID%((this._autoPurge/2)|0))) {
-				this.purgeTextures(this._autoPurge);
-			}
+			this.draw(this._webGLContext, false);
 		} else {
 			// Use 2D.
 			if (this.autoClear) { this.clear(); }
@@ -939,18 +1221,15 @@ this.createjs = this.createjs||{};
 	 */
 	p.clear = function () {
 		if (!this.canvas) { return; }
-		if (StageGL.isWebGLActive(this._webGLContext)) {
-			var gl = this._webGLContext;
-			var cc = this._clearColor;
-			var adjust = this._transparent ? cc.a : 1.0;
-			// Use WebGL settings; adjust for pre multiplied alpha appropriate to scenario
-			this._webGLContext.clearColor(cc.r * adjust, cc.g * adjust, cc.b * adjust, adjust);
-			gl.clear(gl.COLOR_BUFFER_BIT);
-			this._webGLContext.clearColor(cc.r, cc.g, cc.b, cc.a);
-		} else {
+
+		var gl = this._webGLContext;
+		if (!StageGL.isWebGLActive(gl)) {
 			// Use 2D.
 			this.Stage_clear();
 		}
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		this._clearFrameBuffer(this._transparent ? this._clearColor.a : 1);
 	};
 
 	/**
@@ -966,13 +1245,30 @@ this.createjs = this.createjs||{};
 	 * @return {Boolean} If the draw was handled by this function
 	 */
 	p.draw = function (context, ignoreCache) {
-		if (context === this._webGLContext && StageGL.isWebGLActive(this._webGLContext)) {
-			var gl = this._webGLContext;
-			this._batchDraw(this, gl, ignoreCache);
-			return true;
-		} else {
+		var gl = this._webGLContext;
+		// 2D context fallback
+		if (!(context === this._webGLContext && StageGL.isWebGLActive(gl))) {
 			return this.Stage_draw(context, ignoreCache);
 		}
+
+		// Use WebGL
+		this._batchCardCount = 0;
+		this._drawID++;
+
+		if (this.autoClear) { this.clear(); }
+
+		this._updateRenderMode("source-over");
+		this._drawContent(this, ignoreCache);
+
+		this._updateRenderMode("source-over");
+		this.batchReason = "finalOutput";
+		this._drawCover(null, this._bufferTextureOutput);
+
+		if (this._autoPurge != -1 && !(this._drawID%((this._autoPurge/2)|0))) {
+			this.purgeTextures(this._autoPurge);
+		}
+
+		return true;
 	};
 
 	/**
@@ -986,33 +1282,14 @@ this.createjs = this.createjs||{};
 	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
 	 * @return {Boolean} If the draw was handled by this function
 	 */
-	p.cacheDraw = function (target, filters, manager) {
-		if (StageGL.isWebGLActive(this._webGLContext)) {
-			var gl = this._webGLContext;
-			this._cacheDraw(gl, target, filters, manager);
-			return true;
-		} else {
+	p.cacheDraw = function (target, manager) {
+		// 2D context fallback
+		if (!StageGL.isWebGLActive(this._webGLContext)) {
 			return false;
 		}
-	};
 
-	/**
-	 * Blocks, or frees a texture "slot" on the GPU. Can be useful if you are overflowing textures. When overflowing
-	 * textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large textures.
-	 * By blocking the slot you reduce available slots, potentially increasing draw calls, but mostly you prevent a
-	 * texture being re-uploaded if it would have moved slots due to overflow.
-	 *
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * For example, block the slot a background image is stored in so there is less re-loading of that image.
-	 * @method protectTextureSlot
-	 * @param  {Number} id The slot to be affected
-	 * @param  {Boolean} [lock=false] Whether this slot is the one being locked.
-	 */
-	p.protectTextureSlot = function (id, lock) {
-		if (id > this._freeTextureCount || id < 0) {
-			throw "Slot outside of acceptable range";
-		}
-		this._slotBlacklist[id] = !!lock;
+		this._cacheDraw(target, target.filters, manager);
+		return true;
 	};
 
 	/**
@@ -1070,7 +1347,7 @@ this.createjs = this.createjs||{};
 	 * Removing a texture in use will cause the texture to have to be re-uploaded slowing rendering.
 	 * @method releaseTexture
 	 * @param {DisplayObject | WebGLTexture | Image | Canvas} item An object that used the texture to be discarded.
-	 * @param {Boolean} safe Should the release attempt to be "safe" and only delete this usage.
+	 * @param {Boolean} [safe=false] Should the release attempt to be "safe" and only delete this usage.
 	 */
 	p.releaseTexture = function (item, safe) {
 		var i, l;
@@ -1079,7 +1356,7 @@ this.createjs = this.createjs||{};
 		// this is a container object
 		if (item.children) {
 			for (i = 0, l = item.children.length; i < l; i++) {
-				this.releaseTexture(item.children[i]);
+				this.releaseTexture(item.children[i], safe);
 			}
 		}
 
@@ -1105,7 +1382,7 @@ this.createjs = this.createjs||{};
 		} else if (item._webGLRenderStyle === 1) {
 			// this is a SpriteSheet, we can't tell which image we used from the list easily so remove them all!
 			for (i = 0, l = item.spriteSheet._images.length; i < l; i++) {
-				this.releaseTexture(item.spriteSheet._images[i]);
+				this.releaseTexture(item.spriteSheet._images[i], safe);
 			}
 			return;
 		}
@@ -1189,8 +1466,14 @@ this.createjs = this.createjs||{};
 				-1,							1,								0,							1
 			]);
 
-			if (this._outTexture !== null) {
-				this.resizeTexture(this._outTexture, this._viewportWidth, this._viewportHeight);
+			if (this._bufferTextureConcat !== null) {
+				this.resizeTexture(this._bufferTextureConcat, this._viewportWidth, this._viewportHeight);
+			}
+			if (this._bufferTextureOutput !== null) {
+				this.resizeTexture(this._bufferTextureOutput, this._viewportWidth, this._viewportHeight);
+			}
+			if (this._bufferTextureTemp !== null) {
+				this.resizeTexture(this._bufferTextureTemp, this._viewportWidth, this._viewportHeight);
 			}
 		}
 	};
@@ -1217,8 +1500,7 @@ this.createjs = this.createjs||{};
 		} else {
 			try {
 				targetShader = this._fetchShaderProgram(
-					"cover",
-					filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY,
+					"cover", filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY,
 					filter.shaderParamSetup && filter.shaderParamSetup.bind(filter)
 				);
 				filter._builtShader = targetShader;
@@ -1384,9 +1666,6 @@ this.createjs = this.createjs||{};
 		this._clearColor.g = g || 0;
 		this._clearColor.b = b || 0;
 		this._clearColor.a = a || 0;
-
-		if (!this._webGLContext) { return; }
-		this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 	};
 
 	/**
@@ -1416,6 +1695,19 @@ this.createjs = this.createjs||{};
 		}
 
 		return texture;
+	};
+
+	p._clearFrameBuffer = function (alpha) {
+		var gl = this._webGLContext;
+		var cc = this._clearColor;
+
+		if(alpha > 0) { alpha = 1; }
+		if(alpha < 0) { alpha = 0; }
+
+		// Use WebGL settings; adjust for pre multiplied alpha appropriate to scenario
+		gl.clearColor(cc.r * alpha, cc.g * alpha, cc.b * alpha, alpha);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 0);
 	};
 
 	/**
@@ -1557,7 +1849,8 @@ this.createjs = this.createjs||{};
 			insert += "} else if (indexPicker <= "+ i +".5) { color = texture2D(uSampler["+ i +"], vTextureCoord);";
 		}
 		str = str.replace(/\{\{alternates}}/g, insert);
-		str = str.replace(/\{\{fragColor}}/g, this._premultiply ? StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY : StageGL.REGULAR_FRAG_COLOR_NORMAL);
+
+		console.log(str);
 
 		// actually compile the shader
 		var shader = gl.createShader(type);
@@ -1607,7 +1900,7 @@ this.createjs = this.createjs||{};
 		// }
 		// vertexBuffer.itemSize = groupSize;
 		// vertexBuffer.numItems = groupCount;
-		// TODO bechmark and test using unified buffer
+		// TODO benchmark and test using unified buffer
 
 		// the actual position information
 		var vertexPositionBuffer = this._vertexPositionBuffer = gl.createBuffer();
@@ -1781,6 +2074,7 @@ this.createjs = this.createjs||{};
 		this.setTextureParams(gl, texture.isPOT);
 
 		try {
+			gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		} catch(e) {
 			var errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
@@ -1793,6 +2087,7 @@ this.createjs = this.createjs||{};
 				console.log(e);
 			}
 		}
+		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 
 		if (image._invalid !== undefined) { image._invalid = false; } // only adjust what is tracking this data
 
@@ -1834,8 +2129,7 @@ this.createjs = this.createjs||{};
 			// we couldn't find anywhere for it go, meaning we're maxed out
 			if (found === -1) {
 				this.batchReason = "textureOverflow";
-				this._drawBuffers(gl);		// <------------------------------------------------------------------------
-				this.batchCardCount = 0;
+				this._renderBuffers();		// <------------------------------------------------------------------------
 				found = start; //TODO: how do we optimize this to be smarter?
 			}
 
@@ -1909,68 +2203,114 @@ this.createjs = this.createjs||{};
 		}
 	};
 
-	/**
-	 * Store or restore current batch textures into a backup array
-	 * @method _backupBatchTextures
-	 * @param {Boolean} restore Perform a restore instead of a store.
-	 * @param {Array} [target=this._backupTextures] Where to perform the backup, defaults to internal backup.
-	 * @protected
-	 */
-	p._backupBatchTextures = function (restore, target) {
-		var gl = this._webGLContext;
+	p._setCoverMixShaderParams = function (gl, stage, shaderProgram) {
+		gl.uniform1i(
+			gl.getUniformLocation(shaderProgram, "uMixSampler"),
+			1
+		);
+	};
 
-		if (!this._backupTextures) { this._backupTextures = []; }
-		if (target === undefined) { target = this._backupTextures; }
+	p._updateRenderMode = function (newMode) {
+		if ( newMode === null || newMode === undefined){ newMode = "source-over"; }
 
-		for (var i=0; i<this._batchTextureCount; i++) {
-			gl.activeTexture(gl.TEXTURE0 + i);
-			if (restore) {
-				this._batchTextures[i] = target[i];
-			} else {
-				target[i] = this._batchTextures[i];
-				this._batchTextures[i] = this._baseTextures[i];
-			}
-			gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[i]);
-			this.setTextureParams(gl, this._batchTextures[i].isPOT);
+		var blendSrc = StageGL.BLEND_SOURCES[newMode];
+		if (blendSrc === undefined) {
+			if(this.vocalDebug){ console.log("Unknown shader ["+ newMode +"], reverting to default"); }
+			blendSrc = StageGL.BLEND_SOURCES[newMode = "source-over"];
 		}
 
-		if (restore && target === this._backupTextures) { this._backupTextures = []; }
+		if (this._renderMode === newMode) { return; }
+
+		var gl = this._webGLContext;
+		var shaderData = this._builtShaders[newMode];
+		if (shaderData === undefined) {
+			try {
+				shaderData = this._builtShaders[newMode] = {
+					immediate: !blendSrc.non_immediate,
+					srcRGB: gl[blendSrc.srcRGB || "ONE"],
+					dstRGB: gl[blendSrc.dstRGB || "ONE_MINUS_SRC_ALPHA"],
+					srcA: gl[blendSrc.srcA || "ONE"],
+					dstA: gl[blendSrc.dstA || "ONE_MINUS_SRC_ALPHA"],
+					shader: this._fetchShaderProgram(
+						"cover", undefined, blendSrc.shader,
+						this._setCoverMixShaderParams
+					)
+				};
+			} catch (e) {
+				this._builtShaders[newMode] = undefined;
+				console && console.log("SHADER SWITCH FAILURE", e);
+				return;
+			}
+		}
+
+		this.batchReason = "shaderSwap";
+		this._renderBuffers();		// <--------------------------------------------------------------------------------
+
+		this._renderMode = newMode;
+		this._immediateRender = shaderData.immediate;
+		gl.blendFuncSeparate(shaderData.srcRGB, shaderData.dstRGB, shaderData.srcA, shaderData.dstA);
 	};
 
 	/**
-	 * Begin the drawing process for a regular render.
-	 * @method _batchDraw
-	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"}}{{/crossLink}} object with all that needs to rendered, preferably a Stage.
+	 *
+	 * @param {Stage | Container} content
 	 * @param {Boolean} ignoreCache
-	 * @protected
+	 * @private
 	 */
-	p._batchDraw = function (sceneGraph, gl, ignoreCache) {
-		if (this._isDrawing > 0) {
-			this._drawBuffers(gl);
-		}
+	p._drawContent = function (content, ignoreCache) {
+		var gl = this._webGLContext;
+
 		this._isDrawing++;
-		this._drawID++;
 
-		this.batchCardCount = 0;
-		this.depth = 0;
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, this._outTexture._frameBuffer);
-		if (this.autoClear) { this.clear(); }
-		this._appendToBatchGroup(sceneGraph, gl, new createjs.Matrix2D(), this.alpha, ignoreCache);
-
-		this.batchReason = "drawFinish";
-		this._drawBuffers(gl);								// <--------------------------------------------------------
-		this._isDrawing--;
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, this._outTexture);
-		this._activeShader = this.getFilterShader(this);
-		this._drawCover(gl);
 		this._activeShader = this._mainShader;
 
-		this.canvas._invalid = true;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._bufferTextureOutput._frameBuffer);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+
+		this._appendToBatchGroup(content, new createjs.Matrix2D(), this.alpha, ignoreCache);
+
+		this.batchReason = "contentEnd";
+		this._renderBuffers();
+
+		this._isDrawing--;
+	};
+
+	/**
+	 *
+	 * @param {WebGLFramebuffer} out Buffer to draw the results into
+	 * @param {WebGLTexture} dst Base texture layer "destination"
+	 * @param {WebGLTexture} [src = undefined] Applied texture layer "source"
+	 * @param {Filter} [filter = undefined] Filter to use instead of blend mode
+	 * @private
+	 */
+	p._drawCover = function (out, dst, src, filter) {
+		var gl = this._webGLContext;
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, out);
+
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, dst);
+		this.setTextureParams(gl);
+
+		if (src !== undefined) {
+			gl.activeTexture(gl.TEXTURE1);
+			gl.bindTexture(gl.TEXTURE_2D, src);
+			this.setTextureParams(gl);
+		}
+
+		if (filter === undefined) {
+			this._activeShader = this._builtShaders[this._renderMode].shader;
+		} else {
+			this.getFilterShader(filter);
+		}
+
+		this._renderCover();
+	};
+
+	p._batchDraw = function(content, ignoreCache) {
+		this._appendToBatchGroup(content, new createjs.Matrix2D(), this.alpha, ignoreCache);
+		this.batchReason = "contentEnd";
+		this._renderBuffers();
 	};
 
 	/**
@@ -1982,7 +2322,9 @@ this.createjs = this.createjs||{};
 	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
 	 * @protected
 	 */
-	p._cacheDraw = function (gl, target, filters, manager) {
+	p._cacheDraw = function(target, filters, manager) {
+		var gl = this._webGLContext;
+
 		/*
 		Implicitly there are 4 modes to this function: filtered-sameContext, filtered-uniqueContext, sameContext, uniqueContext.
 		Each situation must be handled slightly differently as 'sameContext' or 'uniqueContext' define how the output works,
@@ -2006,8 +2348,6 @@ this.createjs = this.createjs||{};
 		container.children = [target];
 		container.transformMatrix = mtx;
 
-		this._backupBatchTextures(false);
-
 		if (filters && filters.length) {
 			this._drawFilters(target, filters, manager);
 		} else {
@@ -2015,7 +2355,7 @@ this.createjs = this.createjs||{};
 			if (this.isCacheControlled) {
 				// draw item to canvas				I -> C
 				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._batchDraw(container, gl, true);
+				this._batchDraw(container, true);
 			} else {
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
 				target.cacheCanvas = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight, true);
@@ -2025,16 +2365,14 @@ this.createjs = this.createjs||{};
 				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
 				this.updateViewport(manager._drawWidth, manager._drawHeight);
 				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._batchDraw(container, gl, true);
+				this._batchDraw(container, true);
 
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 				this.updateViewport(wBackup, hBackup);
 			}
 		}
 
-		this._backupBatchTextures(true);
-
-		this.protectTextureSlot(lastTextureSlot, false);
+		//this.protectTextureSlot(lastTextureSlot, false);
 		this._activeShader = shaderBackup;
 		this._slotBlacklist = blackListBackup;
 	};
@@ -2046,7 +2384,7 @@ this.createjs = this.createjs||{};
 	 * @param {Array} filters The filters we're drawing into cache.
 	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
 	 */
-	p._drawFilters = function (target, filters, manager) {
+	p._drawFilters = function(target, filters, manager) {
 		var gl = this._webGLContext;
 		var renderTexture;
 		var lastTextureSlot = this._freeTextureCount;
@@ -2065,7 +2403,9 @@ this.createjs = this.createjs||{};
 		gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
 		this.updateViewport(manager._drawWidth, manager._drawHeight);
 		gl.clear(gl.COLOR_BUFFER_BIT);
-		this._batchDraw(container, gl, true);
+		this._batchDraw(container, true);
+
+		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 		// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
 		gl.activeTexture(gl.TEXTURE0);
@@ -2090,7 +2430,7 @@ this.createjs = this.createjs||{};
 				// draw result to canvas			R -> C
 				this.updateViewport(wBackup, hBackup);
 				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._drawCover(gl);
+				this._renderCover();
 
 				return;
 
@@ -2100,7 +2440,7 @@ this.createjs = this.createjs||{};
 				// draw result to render texture	R -> T
 				gl.viewport(0, 0, manager._drawWidth, manager._drawHeight);
 				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._drawCover(gl);
+				this._renderCover();
 
 				// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
 				gl.activeTexture(gl.TEXTURE0);
@@ -2121,18 +2461,19 @@ this.createjs = this.createjs||{};
 	 * trigger a draw if a buffer runs out of space. This is the main workforce of the render loop.
 	 * @method _appendToBatchGroup
 	 * @param {Container} container The {{#crossLink "Container"}}{{/crossLink}} that contains everything to be drawn.
-	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param {Matrix2D} concatMtx The effective (concatenated) transformation matrix when beginning this container
 	 * @param {Number} concatAlpha The effective (concatenated) alpha when beginning this container
 	 * @param {Boolean} ignoreCache Don't use an element's cache during this draw
 	 * @protected
 	 */
-	p._appendToBatchGroup = function (container, gl, concatMtx, concatAlpha, ignoreCache) {
+	p._appendToBatchGroup = function (container, concatMtx, concatAlpha, ignoreCache) {
+		var gl = this._webGLContext;
+
 		// sort out shared properties
-		if (!container._glMtx) { container._glMtx = new createjs.Matrix2D(); }
+		if (container._glMtx === undefined) { container._glMtx = new createjs.Matrix2D(); }
 		var cMtx = container._glMtx;
 		cMtx.copy(concatMtx);
-		if (container.transformMatrix) {
+		if (container.transformMatrix !== null) {
 			cMtx.appendMatrix(container.transformMatrix);
 		} else {
 			cMtx.appendTransform(
@@ -2143,6 +2484,12 @@ this.createjs = this.createjs||{};
 			);
 		}
 
+		var backupMode = null;
+		if (container.compositeOperation) {
+			backupMode = this._renderMode;
+			this._updateRenderMode(container.compositeOperation);
+		}
+
 		// sub components of figuring out the position an object holds
 		var subL, subT, subR, subB;
 
@@ -2151,23 +2498,26 @@ this.createjs = this.createjs||{};
 		for (var i = 0; i < l; i++) {
 			var item = container.children[i];
 
-			if (!(item.visible && concatAlpha)) { continue; }
-			if (!item.cacheCanvas || ignoreCache) {
+			if (item.compositeOperation !== null) {
+				this._updateRenderMode(item.compositeOperation);
+			}
+
+			if (!(item.visible && concatAlpha > 0.0035)) { continue; }
+			if (item.cacheCanvas === null || ignoreCache) {
 				if (item._updateState){
 					item._updateState();
 				}
 				if (item.children) {
-					this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
+					this._appendToBatchGroup(item, cMtx, item.alpha * concatAlpha, ignoreCache);
 					continue;
 				}
 			}
 
 			// check for overflowing batch, if yes then force a render
 			// TODO: DHG: consider making this polygon count dependant for things like vector draws
-			if (this.batchCardCount+1 > this._maxCardsPerBatch) {
+			if (this._batchCardCount+1 > this._maxCardsPerBatch) {
 				this.batchReason = "vertexOverflow";
-				this._drawBuffers(gl);					// <------------------------------------------------------------
-				this.batchCardCount = 0;
+				this._renderBuffers();					// <------------------------------------------------------------
 			}
 
 			// keep track of concatenated position
@@ -2268,7 +2618,7 @@ this.createjs = this.createjs||{};
 			}
 
 			// These must be calculated here else a forced draw might happen after they're set
-			var offV1 = this.batchCardCount*StageGL.INDICIES_PER_CARD;		// offset for 1 component vectors
+			var offV1 = this._batchCardCount*StageGL.INDICIES_PER_CARD;		// offset for 1 component vectors
 			var offV2 = offV1*2;											// offset for 2 component vectors
 
 			//DHG: See Matrix2D.transformPoint for why this math specifically
@@ -2294,18 +2644,42 @@ this.createjs = this.createjs||{};
 			// apply alpha
 			alphas[offV1] = alphas[offV1+1] = alphas[offV1+2] = alphas[offV1+3] = alphas[offV1+4] = alphas[offV1+5] = item.alpha * concatAlpha;
 
-			this.batchCardCount++;
+			this._batchCardCount++;
+
+			if (this._immediateRender) {
+				gl.bindFramebuffer(gl.FRAMEBUFFER, this._bufferTextureConcat._frameBuffer);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+
+				var swap = this._bufferTextureOutput;
+				this._bufferTextureOutput = this._bufferTextureConcat;
+				this._bufferTextureConcat = swap;
+
+				this._activeShader = this._mainShader;
+				gl.bindFramebuffer(gl.FRAMEBUFFER, this._bufferTextureTemp._frameBuffer);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+				this.batchReason = "immediateBuffer";
+				this._renderBuffers();//<-------------------------------------------------------------------------------
+
+				this.batchReason = "immediateDraw";
+				this._drawCover(this._bufferTextureOutput._frameBuffer, this._bufferTextureConcat, this._bufferTextureTemp);
+
+				gl.bindFramebuffer(gl.FRAMEBUFFER, this._bufferTextureOutput._frameBuffer);
+			}
+		}
+
+		if (backupMode !== null) {
+			this._updateRenderMode(backupMode);
 		}
 	};
 
 	/**
 	 * Draws all the currently defined cards in the buffer to the render surface.
-	 * @method _drawBuffers
-	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
+	 * @method _renderBuffers
 	 * @protected
 	 */
-	p._drawBuffers = function (gl) {
-		if (this.batchCardCount <= 0) { return; }	// prevents error logs on stages filled with un-renederable content.
+	p._renderBuffers = function () {
+		if (this._batchCardCount <= 0) { return; }	// prevents error logs on stages filled with un-renederable content.
+		var gl = this._webGLContext;
 
 		if (this.vocalDebug) {
 			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
@@ -2343,29 +2717,28 @@ this.createjs = this.createjs||{};
 			this.setTextureParams(gl, texture.isPOT);
 		}
 
-		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*StageGL.INDICIES_PER_CARD);
+		gl.drawArrays(gl.TRIANGLES, 0, this._batchCardCount*StageGL.INDICIES_PER_CARD);
+
+		this._batchCardCount = 0;
 		this._batchID++;
 	};
 
 	/**
 	 * Draws a card that covers the entire render surface. Mainly used for filters.
-	 * @method _drawBuffers
+	 * @method _renderCover
 	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @protected
 	 */
-	p._drawCover = function (gl) {
-		if (this._isDrawing > 0) {
-			this._drawBuffers(gl);
-		}
+	p._renderCover = function () {
+		var gl = this._webGLContext;
 
 		if (this.vocalDebug) {
-			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ "Cover");
+			console.log("Cover["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
 		}
 		var shaderProgram = this._activeShader;
 		var vertexPositionBuffer = this._vertexPositionBuffer;
 		var uvPositionBuffer = this._uvPositionBuffer;
 
-		gl.clear(gl.COLOR_BUFFER_BIT);
 		gl.useProgram(shaderProgram);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
@@ -2378,6 +2751,7 @@ this.createjs = this.createjs||{};
 		gl.uniform1i(shaderProgram.samplerUniform, 0);
 
 		gl.drawArrays(gl.TRIANGLES, 0, StageGL.INDICIES_PER_CARD);
+		this._batchID++;
 	};
 
 	createjs.StageGL = createjs.promote(StageGL, "Stage");

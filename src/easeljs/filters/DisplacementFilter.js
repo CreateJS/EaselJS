@@ -66,7 +66,7 @@ this.createjs = this.createjs||{};
 	function DisplacementFilter(dudvMap, distance) {
 		this.Filter_constructor();
 
-		if (!Filter.isValidImageSource(dudvMap)) {
+		if (!createjs.Filter.isValidImageSource(dudvMap)) {
 			throw "Must provide valid image source for displacement map, see Filter.isValidImageSource";
 		}
 

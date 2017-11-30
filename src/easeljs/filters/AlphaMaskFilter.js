@@ -69,7 +69,7 @@ this.createjs = this.createjs || {};
 	function AlphaMaskFilter(mask) {
 		this.Filter_constructor();
 
-		if (!Filter.isValidImageSource(mask)) {
+		if (!createjs.Filter.isValidImageSource(mask)) {
 			throw "Must provide valid image source for alpha mask, see Filter.isValidImageSource";
 		}
 
