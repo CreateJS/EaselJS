@@ -699,7 +699,7 @@
 	
 	p._getHex = function(val) {
 		val = this._normalizeVal(Math.round(val),255);
-		return (val < 10 ? "0" : "")+val.toString(16);
+		return (val < 16 ? "0" : "")+val.toString(16);
 	};
 	
 	p._hslToRgb = function(vals){
