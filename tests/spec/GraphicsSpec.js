@@ -323,5 +323,9 @@ describe("Graphics", function () {
 		it('decodePath should equal p', function () {
 			expect(this.g['decodePath']).toBe(this.g['p']);
 		});
+
+		it ('ellipticalArc should equal ea', function () {
+			expect(this.g['ellipticalArc']).toBe(this.g['ea']);
+		});
 	});
 });

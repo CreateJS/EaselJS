@@ -1853,114 +1853,95 @@ this.createjs = this.createjs||{};
 	 * @type String
 	 */
 	(G.EllipticalArc = function(x, y, rx, ry, startAngle, endAngle, anticlockwise, closure) {
-		this.x = x; this.y = y;
-		this.rx = rx; this.ry = ry;
+		this.x = x;
+		this.y = y;
+		this.rx = rx;
+		this.ry = ry;
 		this.anticlockwise = !!anticlockwise;
 		this.closure = closure;
-		
+
 		// Map negative angles into positive range
-		if (startAngle < 0 || endAngle < 0)
-		{
-			if (startAngle < -2 * Math.PI)
-			{
+		if (startAngle < 0 || endAngle < 0) {
+			if (startAngle < -2 * Math.PI) {
 				var s = startAngle / (2 * Math.PI);
 				startAngle = (s + Math.floor(Math.abs(s))) * 2 * Math.PI + 2 * Math.PI;
 			}
-			else if (startAngle < 0)
-			{
+			else if (startAngle < 0) {
 				startAngle += 2 * Math.PI;
 			}
-			
-			if (endAngle < -2 * Math.PI)
-			{
+
+			if (endAngle < -2 * Math.PI) {
 				var e = endAngle / (2 * Math.PI);
 				endAngle = (e + Math.floor(Math.abs(e))) * 2 * Math.PI + 2 * Math.PI;
 			}
-			else if (endAngle < 0)
-			{
+			else if (endAngle < 0) {
 				endAngle += 2 * Math.PI;
 			}
 		}
-		
-		
+
 		// Normalize the angles
-		if (startAngle <= endAngle)
-		{
-			if (this.anticlockwise === true)
-			{
-				this.start = -startAngle;
-				this.end = -endAngle;
-			}
-			else
-			{
+		if (startAngle < endAngle || equalEnough(startAngle, endAngle)) {
+			if (this.anticlockwise === false || equalEnough(startAngle, endAngle)) {
 				this.start = -endAngle;
 				this.end = -startAngle - 2 * Math.PI;
 			}
+			else {
+				this.start = -startAngle;
+				this.end = -endAngle;
+			}
 		}
-		else
-		{
-			if (this.anticlockwise === true)
-			{
+		else {
+			if (this.anticlockwise === true) {
 				this.start = -startAngle;
 				this.end = -endAngle - 2 * Math.PI;
 			}
-			else
-			{
+			else {
 				this.start = -endAngle;
 				this.end = -startAngle;
 			}
 		}
-		
 	}).prototype.exec = function(ctx) {
 		// x, y - top left
 		// xe, ye - bottom right
 		// xm, ym - center
-		var x = this.x - this.rx;
-		var y = this.y - this.ry;
 		var rx = this.rx;
 		var ry = this.ry;
 		var start = this.start;
 		var end = this.end;
-		var xe = this.x + rx;
-		var ye = this.y - ry;
 		var xm = this.x;
 		var ym = this.y;
 		var closure = this.closure;
 
-		var quadrantIncrement = Math.PI / 2;
 		var quadrantStart = Math.floor(2 * Math.abs(start) / Math.PI);
 
 		// How long is the arc
 		var span = Math.abs(end);
 
-		// Array of intermediate angles for 
+		// Array of intermediate angles for
 		// breaking up the arc into segments <= PI/2
 		var ia = [0];
 
-		for (var i = 1; i <= 4; i++)
-		{
+		for (var i = 1; i <= 4; i++) {
 			ia[i - 1] = (quadrantStart + i) * Math.PI / 2;
 		}
-		
+
 		var startPoint;
 		var chordMidX;
 		var chordMidY;
-				
-		if (closure === 'radii')
-		{
+
+		if (closure === 'radii') {
 			ctx.moveTo(xm, ym);
 		}
-		else if (closure === 'chord')
-		{
+		else if (closure === 'chord') {
 			var startEA = eccentricAnomalyFromPolarAngle(start, rx, ry);
 			var endEA = eccentricAnomalyFromPolarAngle(end, rx, ry);
-			
+
 			chordMidX = xm + rx * (Math.cos(startEA) + Math.cos(endEA)) / 2;
 			chordMidY = ym + ry * (Math.sin(startEA) + Math.sin(endEA)) / 2;
-			
+
 			ctx.moveTo(chordMidX, chordMidY);
 		}
-		
+
 		if (span <= ia[0])              // 1 segment
 		{
 			startPoint = elarcseg(ctx, xm, ym, rx, ry, start, end, closure);
@@ -1991,38 +1972,40 @@ this.createjs = this.createjs||{};
 			elarcseg(ctx, xm, ym, rx, ry, -ia[2], -ia[3], closure);
 			elarcseg(ctx, xm, ym, rx, ry, -ia[3], end, closure);
 		}
-		
-		if (closure === 'radii')
-		{
+
+		if (closure === 'radii') {
 			ctx.lineTo(xm, ym);
 			ctx.closePath();
 		}
-		else if (closure === 'chord')
-		{
+		else if (closure === 'chord') {
 			ctx.lineTo(chordMidX, chordMidY);
-			
+
 			ctx.closePath();
 		}
 	};
+
+	/**
+	 *  Begin support functions for elliptical arc
+	 **/
 
 	// Elliptical arc segment
 	function elarcseg(ctx, xm, ym, rx, ry, start, end, closure) {
 		var startEA = eccentricAnomalyFromPolarAngle(start, rx, ry);
 		var endEA = eccentricAnomalyFromPolarAngle(end, rx, ry);
-		
+
 		// From parametric equation by L. Maisonobe
 		var k = -Math.sin(endEA - startEA) * (Math.sqrt(4 + 3 * Math.pow(Math.tan((endEA - startEA) / 2), 2)) - 1) / 3;
-		
+
 		// Starting point of the curve
 		var r1 = rx * ry / Math.sqrt(Math.pow(ry * Math.cos(start), 2) + Math.pow(rx * Math.sin(start), 2));
 		var x1 = xm + r1 * Math.cos(start);
 		var y1 = ym + r1 * Math.sin(start);
-		
+
 		// End point of the curve
 		var r2 = rx * ry / Math.sqrt(Math.pow(ry * Math.cos(end), 2) + Math.pow(rx * Math.sin(end), 2));
 		var x2 = xm + r2 * Math.cos(end);
 		var y2 = ym + r2 * Math.sin(end);
-		
+
 		// Control point 1
 		var x3 = x1 - k * Math.sin(-startEA) * rx;
 		var y3 = y1 - k * Math.cos(-startEA) * ry;
@@ -2030,66 +2013,94 @@ this.createjs = this.createjs||{};
 		// Control point 2
 		var x4 = x2 + k * Math.sin(-endEA) * rx;
 		var y4 = y2 + k * Math.cos(-endEA) * ry;
-		
-		if (closure === 'radii' || closure === 'chord')
-		{
+
+		if (closure === 'radii' || closure === 'chord') {
 			ctx.lineTo(x1, y1);
 		}
-		else
-		{
+		else {
 			ctx.moveTo(x1, y1);
 		}
-		
+
 		ctx.bezierCurveTo(x3, y3, x4, y4, x2, y2);
-		
+
 		var startPoint = { x: x1, y: y1 };
-				
+
 		return startPoint;
 	}
-	
+
 	// Maps from polar angle into the angle used in ellipse
 	// parametric equations (this angle is called "eccentricAnomaly")
 	// it is the same as polar angle when the ellipse is a circle
 	// E = atan((rx/ry)*tan(A))
 	// where A is the polar angle and E is the eccentricAnomaly angle
-	function eccentricAnomalyFromPolarAngle(angle, rx, ry)
-	{
-		var sign = 1;
+	function eccentricAnomalyFromPolarAngle(angle, rx, ry) {
 		var retval;
-		var e = 0.00001;
-		
+
 		var cosa = Math.cos(angle);
 		var sina = Math.sin(angle);
-		
-		// circle or near extremeties -- polar angle and 
+
+		// circle or near extremeties -- polar angle and
 		// eccentricAnomaly are the same
-		if (rx == ry || Math.abs(cosa) < e || Math.abs(sina) < e)
-		{
+		if (equalEnough(rx, ry) || equalEnough(Math.abs(cosa), 0) || equalEnough(Math.abs(sina), 0)) {
 			return angle;
 		}
-		
+
 		var tana = rx * Math.tan(angle) / ry;
-		
+
 		// branches of arctan function
-		if (cosa > 0 && sina > 0)
-		{
+		if (cosa > 0 && sina > 0) {
 			retval = Math.atan(tana);
 		}
-		else if (cosa < 0 && sina > 0)
-		{
+		else if (cosa < 0 && sina > 0) {
 			retval = Math.PI + Math.atan(tana);
 		}
-		else if (cosa < 0 && sina < 0)
-		{
+		else if (cosa < 0 && sina < 0) {
 			retval = Math.PI + Math.atan(tana);
 		}
-		else if (cosa > 0 && sina < 0)
-		{
+		else if (cosa > 0 && sina < 0) {
 			retval = 2 * Math.PI + Math.atan(tana);
 		}
-		
+
 		return retval;
 	}
+
+	// This is just a copy of mathjs.equal, or rather mathjs.nearlyEqual
+	// For some reason can't use mathjs here
+	// But, perhaps this is better as it is self-contained and won't introduce a dependency in EaselJS on mathjs
+	// and also, the mathjs version is too stingy on its epsilon
+	function equalEnough(x, y) {
+		var relEpsilon = 0.001;
+		var absEpsilon = 2.2204460492503130808472633361816E-16;
+
+		if (x === y) {
+			return true;
+		}
+
+		// NaN
+		if (isNaN(x) || isNaN(y)) {
+			return false;
+		}
+
+		// at this point x and y should be finite
+		if (isFinite(x) && isFinite(y)) {
+			// check numbers are very close, needed when comparing numbers near zero
+			var diff = Math.abs(x - y);
+			if (diff < absEpsilon) {
+				return true;
+			}
+			else {
+				// use relative error
+				return diff <= Math.max(Math.abs(x), Math.abs(y)) * relEpsilon;
+			}
+		}
+
+		// Infinite and Number or negative Infinite and positive Infinite cases
+		return false;
+	}
+
+	/**
+	 * End support functions for elliptical arc
+	 **/
 
 	/**
 	 * Graphics command object. See {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.

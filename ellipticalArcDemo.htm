@@ -1,0 +1,99 @@
+<script src="EaselJS/build/output/easeljs-0.8.1.min.js"></script>
+<script>
+
+  function radFromDeg(degree)
+  {
+    return degree * Math.PI / 180;
+  }
+  
+  function testEllipticalArcs() {
+  
+    let testAngles = [ 
+    [ [10, 50], [15, 105], [30, 250], [45, 300], [50, 20] ],
+    [ [100, 170], [110, 220], [99, 299], [120, 15], [150, 120] ],
+    [ [200, 260], [210, 295], [230, 10], [220, 100], [260, 190] ],
+    [ [275, 350], [280, 15], [300, 100], [330, 200], [310, 290] ],
+    [ [10, 370], [15, 390], [0, 330], [-1, 50], [80, -290] ] ]; // last three are degenerated cases
+    
+    
+    let closures = [ null, 'radii', 'chord' ];
+    let directions = [ true, false ];
+    
+    let rx = 50;
+    let ry = 30;
+    let pad = 15;
+    var x = pad + rx;
+    var y = pad + ry;
+
+    var stage = new createjs.Stage("demoCanvas");
+
+    for (closure of closures)
+    {
+      for (direction of directions)
+      {
+        for (row of testAngles)
+        {
+          for (pair of row)
+          {
+            var b = new createjs.Shape();
+            
+            var elps = b.graphics;
+            elps.beginFill("#C0C0C0");
+            
+            var s = new createjs.Shape();
+            
+            var arc = s.graphics;
+            arc.setStrokeStyle(3);
+            arc.beginStroke("#000000");
+            
+            // First check for 3 special case
+            if (pair[0] == 0)     // circular arc
+            {
+              arc.ellipticalArc(x, y, ry, ry, radFromDeg(pair[0]), radFromDeg(pair[1]), direction, closure);
+              elps.drawEllipse(x - ry, y - ry, 2 * ry, 2 * ry);
+            }
+            else if (pair[0] < 0) // degenerate into horizontal line
+            {
+              arc.ellipticalArc(x, y, rx, 0.000, radFromDeg(-pair[0]), radFromDeg(pair[1]), direction, closure);
+              elps.drawEllipse(x - rx, y - ry, 2 * rx, 0);
+            }
+            else if (pair[1] < 0) // degenerate into vertical line
+            {
+              arc.ellipticalArc(x, y, 0, ry, radFromDeg(pair[0]), radFromDeg(-pair[1]), direction, closure);
+              elps.drawEllipse(x - rx, y - ry, 0, 2 * ry);
+            }
+            else                  // regular elliptical arc 
+            {
+              arc.ellipticalArc(x, y, rx, ry, radFromDeg(pair[0]), radFromDeg(pair[1]), direction, closure);
+              elps.drawEllipse(x - rx, y - ry, 2 * rx, 2 * ry);
+            }
+            
+            x += 2 * rx + pad;
+    
+            stage.addChild(b);
+            stage.addChild(s);
+          }
+          
+          stage.update();
+          
+          x = pad + rx;       // CR
+          y += 2 * ry + pad;  // LF
+        }
+        
+        x = pad + rx;  // CR
+        y += pad;      // LF
+      }
+      
+      x = pad + rx;  // CR
+      y += pad;      // LF
+    }
+    
+    stage.update();
+    
+  }
+
+</script>
+
+<body onload="testEllipticalArcs();">
+  <canvas id="demoCanvas" width="600" height="2370" style="border:1px solid #000000;background-color: #00C0C0 "></canvas>
+</body>
