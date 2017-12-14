@@ -809,7 +809,7 @@ this.createjs = this.createjs||{};
 		// note this is an open bracket on main!
 	);
 
-	StageGL.BLEND_FRAGMENT_COMPLEX = (
+	StageGL.BLEND_FRAGMENT_COMPLEX = (																					// CLOSE
 		StageGL.BLEND_FRAGMENT_SIMPLE +
 			"vec3 srcClr = min(src.rgb/src.a, 1.0);" +
 			"vec3 dstClr = min(dst.rgb/dst.a, 1.0);" +
@@ -823,7 +823,7 @@ this.createjs = this.createjs||{};
 				"(" +
 					"srcFactor * srcClr +" +
 					"dstFactor * dstClr +" +
-					"mixFactor * ("
+					"mixFactor * vec3("
 		// this should be closed with the cap!
 	);
 	StageGL.BLEND_FRAGMENT_COMPLEX_CAP = (
@@ -841,18 +841,19 @@ this.createjs = this.createjs||{};
 	);
 
 	StageGL.BLEND_FRAGMENT_HSL_UTIL = (
-		"float lum(vec3 c) { return 0.299*c.r + 0.589*c.g + 0.109*c.b; }" +
-		"float sat(vec3 c) { return max(max(c.r, c.g), c.b) - min(min(c.r, c.g), c.b); }" +
+		/*"float getLum(vec3 c) { return 0.299*c.r + 0.589*c.g + 0.109*c.b; }" +
+		//"float getSat(vec3 c) { return max(max(c.r, c.g), c.b) - min(min(c.r, c.g), c.b); }" +
 		"vec3 clipHSL(vec3 c) {" +
-			"float l = lum(c);" +
-			"float n = min(min(c.r, c.g), c.b);" +
-			"float x = max(max(c.r, c.g), c.b);" +
-			"if(n < 0.0){ c = l + (((c - l) * l) / (l - n)); }" +
-			"if(x < 1.0){ c = l + (((c - l) * (1.0 - l)) / (x - l)); }" +
-			"return c;" +
+			"float lum = getLum(c);" +
+			//"float n = min(min(c.r, c.g), c.b);" +
+			//"float x = max(max(c.r, c.g), c.b);" +
+			//"if(n < 0.0){ c = lum + (((c - lum) * lum) / (lum - n)); }" +
+			//"if(x < 1.0){ c = lum + (((c - lum) * (1.0 - lum)) / (x - lum)); }" +
+			"return clamp(c, 0.0, 1.0);" +
 		"}" +
-		"vec3 setLum(vec3 c, float val) {" +
-			"return clipHSL(c + (val - lum(c)));" +
+		"vec3 setLum(vec3 c, float lum) {" +
+			//"return clipHSL(c + (lum - getLum(c)));" +
+			"return vec3(getLum(c) + (lum - getLum(c)));" +
 		"}" +
 		"vec3 setSat(vec3 c, float val) {" +
 			"bool rxg = c.r > c.g; bool rxb = c.r > c.b; bool gxb = c.g > c.b;" +
@@ -881,214 +882,154 @@ this.createjs = this.createjs||{};
 			"}" +
 
 			"return result;" +
-		"}"
+		"}"/**/
 	);
 
 	StageGL.BLEND_SOURCES = {
-		"source-over": {																								//YAY
-			non_immediate: true
+		"source-over": { // empty object verifies it as a blend mode, but default values handle actual settings
+			//eqRGB: "FUNC_ADD",						eqA: "FUNC_ADD"
 			//srcRGB: "ONE",							srcA: "ONE"
 			//dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE_MINUS_SRC_ALPHA"
 		},
-		"source-in": {
-			non_immediate: true,
+		"source-in": {																									// CLOSE
 			srcRGB: "DST_ALPHA",					srcA: "ZERO",
 			dstRGB: "ZERO",							dstA: "SRC_ALPHA"
 		},
-		"source-out": {
-			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(src.rgb*(1-dst.a), src.a-dst.a); }"
-			)
+		"source-out": {																									// CLOSE
+			eqA: "FUNC_SUBTRACT",
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
+			dstRGB: "ZERO",							dstA: "SRC_ALPHA"
 		},
 		"source-atop": {
-			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(src.rgb*src.a + dst.rgb*(1.0-src.a), dst.a); }"
-			)
+			srcRGB: "DST_ALPHA",					srcA: "ZERO",
+			dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE"
 		},
 		"destination-over": {
-			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(src.rgb*(1.0-dst.a) + dst.rgb*dst.a, src.a+dst.a); }"
-			)
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE_MINUS_DST_ALPHA",
+			dstRGB: "ONE",							dstA: "ONE"
 		},
-		"destination-in": {
-			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(dst.rgb, src.a*dst.a); }"
-			)
+		"destination-in": {																								// CLOSE
+			srcRGB: "ZERO",							srcA: "DST_ALPHA",
+			dstRGB: "SRC_ALPHA",					dstA: "ZERO"
 		},
 		"destination-out": {
-			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(dst.rgb, dst.a*(1.0-src.a)); }"
-			)
+			eqA: "FUNC_REVERSE_SUBTRACT",
+			srcRGB: "ZERO",							srcA: "DST_ALPHA",
+			dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE"
 		},
-		"destination-atop": {
-			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(src.rgb*(1.0-dst.a) + dst.rgb*dst.a, src.a); }"
-			)
+		"destination-atop": {																							// CLOSE
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
+			dstRGB: "SRC_ALPHA",					dstA: "ZERO"
 		},
-		"copy": {																										//YAY
-			non_immediate: true,
+		"copy": {
 			dstRGB: "ZERO",							dstA: "ZERO"
 		},
+		"xor": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"float omSRC = (1.0 - src.a);" +
+				"float omDST = (1.0 - dst.a);" +
+				"gl_FragColor = vec4(src.rgb * omDST + dst.rgb * omSRC, src.a * omDST + dst.a * omSRC);" +
+			"}"
+			)
+		},
 
-		"multiply": {																									//YAY
+		"multiply": { // this has to be complex to handle retention of both dst and src in non mixed scenarios
 			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
 				"srcClr * dstClr"
 			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
-		"multiply-cheap": {																								//YAY
-			non_immediate: true,
-			srcRGB: "ZERO",							srcA: "ONE",
+		"multiply_cheap": { // NEW, handles retention of src data incorrectly when no dst data present
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
 			dstRGB: "SRC_COLOR",					dstA: "ONE"
 		},
-		"screen": {																										//YAY
-			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-				"1.0 - (1.0 - srcClr) * (1.0 - dstClr)"
-			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		"screen": {
+			srcRGB: "ONE",							srcA: "ONE",
+			dstRGB: "ONE_MINUS_SRC_COLOR",			dstA: "ONE_MINUS_SRC_ALPHA"
 		},
-		"screen-cheap": {																								//
-			non_immediate: true,
-			srcRGB: "ZERO",							srcA: "ONE",
-			dstRGB: "SRC_COLOR",					dstA: "ONE"
-		},
-		"lighter": {																									//YAY
-			non_immediate: true,
+		"lighter": {
 			dstRGB: "ONE",							dstA:"ONE"
 		},
-		"lighten": {
+		"lighten": { //WebGL 2.0 can optimize this
 			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-				"max(src.rgb, dst.rgb) * shared," +
-				"dst.a+src.a); }"
-			)
+				"max(srcClr, dstClr)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
-		"darken": {
+		"darken": { //WebGL 2.0 can optimize this
 			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-				"min(src.rgb, dst.rgb) * shared," +
-				"dst.a+src.a); }"
-			)
+				"min(srcClr, dstClr)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
 
 		"overlay": {
-			shader: (
-				StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(overlay(dst.r,src.r), overlay(dst.g,src.g), overlay(dst.b,src.b), dst.a+src.a); }"
-			)
+			shader: (StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"overlay(dstClr.r,srcClr.r), overlay(dstClr.g,srcClr.g), overlay(dstClr.b,srcClr.b)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
 		"hard-light": {
-			shader: (
-				StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(overlay(src.r,dst.r), overlay(src.g,dst.g), overlay(src.b,dst.b), dst.a+src.a); }"
-			)
+			shader: (StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"overlay(srcClr.r,dstClr.r), overlay(srcClr.g,dstClr.g), overlay(srcClr.b,dstClr.b)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
 		"soft-light": {
 			shader: (
 				"float softcurve(float a) {" +
-				"if(a > 0.25) { return sqrt(a); }" +
-				"return ((16.0 * a - 12.0) * a + 4.0) * a;" +
+					"if(a > 0.25) { return sqrt(a); }" +
+					"return ((16.0 * a - 12.0) * a + 4.0) * a;" +
 				"}" +
 				"float softmix(float a, float b) {" +
-				"if(b <= 0.5) { return a - (1.0 - 2.0*b) * a * (1.0 - a); }" +
-				"return a + (2.0 * b - 1.0) * (softcurve(a) - a);" +
+					"if(b <= 0.5) { return a - (1.0 - 2.0*b) * a * (1.0 - a); }" +
+					"return a + (2.0 * b - 1.0) * (softcurve(a) - a);" +
 				"}" + StageGL.BLEND_FRAGMENT_COMPLEX +
-				"vec3(softmix(src.r,dst.r), softmix(src.g,dst.g), softmix(src.b,dst.b)) * shared," +
-				"dst.a+src.a); }"
-			)
+				"softmix(dstClr.r,srcClr.r), softmix(dstClr.g,srcClr.g), softmix(dstClr.b,srcClr.b)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
 		"color-dodge": {
-			//shader: (
-			//	"float blendColorDodge(float base, float blend) {" +
-			//		"return (blend==1.0)?blend:min(base/(1.0-blend),1.0);" +
-			//	"}" +
-			//	"vec3 blendColorDodge(vec3 base, vec3 blend) {" +
-			//		"return vec3(blendColorDodge(base.r,blend.r),blendColorDodge(base.g,blend.g),blendColorDodge(base.b,blend.b));" +
-			//	"}" +
-			//	"vec3 blendColorDodge(vec3 base, vec3 blend, float opacity) {" +
-			//		"return (blendColorDodge(base, blend) * opacity + base * (1.0 - opacity));" +
-			//	"}" + StageGL.BLEND_FRAGMENT_SIMPLE +
-			//	"gl_FragColor = vec4(blendColorDodge(dst.rgb, src.rgb, src.a), 1.0); }"
-
-			//shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-			//	"vec4 color = vec4(0.0, 0.0, 0.0, dst.a+src.a);" +
-
-			//	"if(src.r*src.a >= 0.96) {" +
-			//		"if(dst.r*dst.a >= 0.0035) { color.r = 1.0; } else { color.r = 0.0; }" +
-			//	"} else {" +
-			//		"color.r = clamp(dst.r*dst.a / (1.0-src.r*src.a), 0.0, 1.0);" +
-			//	"}" +
-
-			//	"if(src.g*src.a >= 0.96) {" +
-			//		"if(dst.g*dst.a >= 0.0035) { color.g = 1.0; } else { color.g = 0.0; }" +
-			//	"} else {" +
-			//		"color.g = clamp(dst.g*dst.a / (1.0-src.g*src.a), 0.0, 1.0);" +
-			//	"}" +
-
-			//	"if(src.b*src.a >= 0.96) {" +
-			//		"if(dst.b*dst.a >= 0.0035) { color.b = 1.0; } else { color.b = 0.0; }" +
-			//	"} else {" +
-			//		"color.b = clamp(dst.b*dst.a / (1.0-src.b*src.a), 0.0, 1.0);" +
-			//	"}" +
-
-			//	"gl_FragColor = color; }"
-			//shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-			//		"((dst.rgb*dst.a) / (1.0-src.rgb*src.a) * shared," +
-			//	"dst.a+src.a); }"
-			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-				//"gl_FragColor = vec4(1.0/1.0, 1.0/0.0, 0.0/1.0, 1.0); }"		//1.0, 1.0, 0.0
-				//"gl_FragColor = vec4(0.5/1.0, 0.5/0.0, 0.0/0.5, 1.0); }"		//0.5, 1.0, 0.0
-				//"gl_FragColor = vec4(0.0/1.0, 0.0/0.0, 0.0/0.0, 1.0); }"		//0.0, 0.0, 0.0
-				"gl_FragColor = vec4(0.1/0.0, 1.0/1.0, 0.0/0.0, 1.0); }"		//0.0, 0.0, 0.0
-			)
-		},
-		"color-burn": {
-			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); }"
-			)
-		},
-
-		"xor": {
-			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(src.rgb*src.a + dst.rgb*dst.a, abs(src.a-dst.a)); }"
-			)
-		},
-		"difference": {
-			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-				"gl_FragColor = vec4(abs(src.rgb-dst.rgb), src.a+dst.a); }"
-			)
-		},
-		"exclusion": {
 			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-				"(src.rgb + dst.rgb - 2.0 * src.rgb * dst.rgb) * shared," +
-				"dst.a+src.a); }"
-			)
+				"clamp(dstClr / (1.0 - srcClr), 0.0, 1.0)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"color-burn": {																									// CLOSE
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"1.0 - (clamp((1.0 - dstClr) / srcClr, 0.0, 1.0))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"difference": { // do this to match visible results in browsers
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"abs(src.rgb - dstClr)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"exclusion": { // do this to match visible results in browsers
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"dstClr + src.rgb - 2.0 * src.rgb * dstClr"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
 
-		"hue": {
+		"hue": {																										// NEWP
 			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
 				" * shared," +
 				"dst.a+src.a); }"
 			)
 		},
-		"saturation": {
+		"saturation": {																									// NEWP
 			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
 				" * shared," +
 				"dst.a+src.a); }"
 			)
 		},
-		"color": {
+		"color": {																										// NEWP
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				//"setLum(srcClr, getLum(dstClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"luminosity": {																									// NEWP
 			//shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-			//		"setLum(src.rgb*src.a, lum(dst.rgb*dst.a)) * shared," +
-			//	"dst.a+src.a); }"
+			//	"setLum(dstClr, getLum(srcClr))"
+			//+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_SIMPLE +
-				//"gl_FragColor = vec4(  setLum(vec3(1.0), lum(dst.rgb*dst.a)),  1.0); }"
-				//"gl_FragColor = vec4(  vec3(setLum(vec3(1.0), 0.5)),  1.0); }"
-				//"gl_FragColor = vec4(  (dst.rgb - 0.8) + 0.8,  1.0); }"
-				"gl_FragColor = vec4(  dst.rgb,  1.0); }"
-			)
-		},
-		"luminosity": {
-			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-				"setLum(dst.rgb, lum(src.rgb)) * shared," +
-				"dst.a+src.a); }"
-			)
+				"vec3 srcClr = min(src.rgb/src.a, 1.0);" +
+				"vec3 dstClr = min(dst.rgb/dst.a, 1.0);" +
+				"gl_FragColor = vec4(setLum(vec3(1.0,0.0,0.0), getLum(src.rgb)), 1.0);" +
+			"}")
 		}
 	};
 
@@ -1173,8 +1114,8 @@ this.createjs = this.createjs||{};
 
 				gl.disable(gl.DEPTH_TEST);
 				gl.enable(gl.BLEND);
-				gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+				gl.clearColor(0.0, 0.0, 0.0, 0);
 
 				this._createBuffers();
 				this._initMaterials();
@@ -1223,9 +1164,9 @@ this.createjs = this.createjs||{};
 		if (!this.canvas) { return; }
 
 		var gl = this._webGLContext;
-		if (!StageGL.isWebGLActive(gl)) {
-			// Use 2D.
+		if (!StageGL.isWebGLActive(gl)) { // Use 2D.
 			this.Stage_clear();
+			return;
 		}
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -1850,8 +1791,6 @@ this.createjs = this.createjs||{};
 		}
 		str = str.replace(/\{\{alternates}}/g, insert);
 
-		console.log(str);
-
 		// actually compile the shader
 		var shader = gl.createShader(type);
 		gl.shaderSource(shader, str);
@@ -2226,15 +2165,18 @@ this.createjs = this.createjs||{};
 		if (shaderData === undefined) {
 			try {
 				shaderData = this._builtShaders[newMode] = {
-					immediate: !blendSrc.non_immediate,
+					eqRGB: gl[blendSrc.eqRGB || "FUNC_ADD"],
 					srcRGB: gl[blendSrc.srcRGB || "ONE"],
 					dstRGB: gl[blendSrc.dstRGB || "ONE_MINUS_SRC_ALPHA"],
+					eqA: gl[blendSrc.eqA || "FUNC_ADD"],
 					srcA: gl[blendSrc.srcA || "ONE"],
 					dstA: gl[blendSrc.dstA || "ONE_MINUS_SRC_ALPHA"],
-					shader: this._fetchShaderProgram(
-						"cover", undefined, blendSrc.shader,
-						this._setCoverMixShaderParams
-					)
+					immediate: Boolean(blendSrc.shader),
+					shader: (blendSrc.shader || this._builtShaders["source-over"] === undefined) ?
+						this._fetchShaderProgram(
+							"cover", undefined, blendSrc.shader,
+							this._setCoverMixShaderParams
+						) : this._builtShaders["source-over"].shader // re-use source-over when we don't need a new shader
 				};
 			} catch (e) {
 				this._builtShaders[newMode] = undefined;
@@ -2248,6 +2190,7 @@ this.createjs = this.createjs||{};
 
 		this._renderMode = newMode;
 		this._immediateRender = shaderData.immediate;
+		gl.blendEquationSeparate(shaderData.eqRGB, shaderData.eqA);
 		gl.blendFuncSeparate(shaderData.srcRGB, shaderData.dstRGB, shaderData.srcA, shaderData.dstA);
 	};
 
@@ -2405,6 +2348,7 @@ this.createjs = this.createjs||{};
 		gl.clear(gl.COLOR_BUFFER_BIT);
 		this._batchDraw(container, true);
 
+		gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 		// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0

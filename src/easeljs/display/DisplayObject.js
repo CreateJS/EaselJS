@@ -1254,6 +1254,7 @@ this.createjs = this.createjs||{};
 		o.hitArea = this.hitArea;
 		o.cursor = this.cursor;
 		o._bounds = this._bounds;
+		o._webGLRenderStyle = this._webGLRenderStyle;
 		return o;
 	};
 
