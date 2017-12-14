@@ -841,48 +841,33 @@ this.createjs = this.createjs||{};
 	);
 
 	StageGL.BLEND_FRAGMENT_HSL_UTIL = (
-		/*"float getLum(vec3 c) { return 0.299*c.r + 0.589*c.g + 0.109*c.b; }" +
-		//"float getSat(vec3 c) { return max(max(c.r, c.g), c.b) - min(min(c.r, c.g), c.b); }" +
+		"float getLum(vec3 c) { return 0.299*c.r + 0.589*c.g + 0.109*c.b; }" +
+		"float getSat(vec3 c) { return max(max(c.r, c.g), c.b) - min(min(c.r, c.g), c.b); }" +
 		"vec3 clipHSL(vec3 c) {" +
 			"float lum = getLum(c);" +
-			//"float n = min(min(c.r, c.g), c.b);" +
-			//"float x = max(max(c.r, c.g), c.b);" +
-			//"if(n < 0.0){ c = lum + (((c - lum) * lum) / (lum - n)); }" +
-			//"if(x < 1.0){ c = lum + (((c - lum) * (1.0 - lum)) / (x - lum)); }" +
+			"float n = min(min(c.r, c.g), c.b);" +
+			"float x = max(max(c.r, c.g), c.b);" +
+			"if(n < 0.0){ c = lum + (((c - lum) * lum) / (lum - n)); }" +
+			"if(x > 1.0){ c = lum + (((c - lum) * (1.0 - lum)) / (x - lum)); }" +
 			"return clamp(c, 0.0, 1.0);" +
 		"}" +
 		"vec3 setLum(vec3 c, float lum) {" +
-			//"return clipHSL(c + (lum - getLum(c)));" +
-			"return vec3(getLum(c) + (lum - getLum(c)));" +
+			"return clipHSL(c + (lum - getLum(c)));" +
 		"}" +
 		"vec3 setSat(vec3 c, float val) {" +
-			"bool rxg = c.r > c.g; bool rxb = c.r > c.b; bool gxb = c.g > c.b;" +
-			"vec3 midMask = vec3(0.0); vec3 maxMask = vec3(0.0); vec3 result = vec3(0.0);" +
-			"if(rxg){" +
-				"if(rxb) {" +
-					"maxMask.r = 1.0;" +
-					"if(gxb) {midMask.g = 1.0;} else {midMask.b = 1.0;}" +
-				"} else {" +
-					"maxMask.b = 1.0;" +
-					"midMask.r = 1.0;" +
-				"}" +
-			"} else {" +
-				"if(gxb) {" +
-					"maxMask.g = 1.0;" +
-					"if(rxb) {midMask.r = 1.0;} else {midMask.b = 1.0;}" +
-				"} else {" +
-					"maxMask.b = 1.0;" +
-					"midMask.g = 1.0;" +
-				"}" +
+			"vec3 result = vec3(0.0);" +
+			"float minVal = min(min(c.r, c.g), c.b);" +
+			"float maxVal = max(max(c.r, c.g), c.b);" +
+			"vec3 minMask = vec3(c.r == minVal, c.g == minVal, c.b == minVal);" +
+			"vec3 maxMask = vec3(c.r == maxVal, c.g == maxVal, c.b == maxVal);" +
+			"vec3 midMask = 1.0 - min(minMask+maxMask, 1.0);" +
+			"float midVal = (c*midMask).r + (c*midMask).g + (c*midMask).b;" +
+			"if(maxVal > minVal) {" +
+				"result = midMask * min( ((midVal - minVal) * val) / (maxVal - minVal), 1.0);" +
+				"result += maxMask * val;" +
 			"}" +
-			"vec3 minMask = 1.0 - (midMask+maxMask);" +
-			"if(any(greaterThan(c*maxMask, c*minMask))) {" +
-				"result = midMask*( ((c*midMask - c*minMask) * val) / (c*maxMask - c*minMask) );" +
-				"result += maxMask*( val );" +
-			"}" +
-
 			"return result;" +
-		"}"/**/
+		"}"
 	);
 
 	StageGL.BLEND_SOURCES = {
@@ -1004,32 +989,25 @@ this.createjs = this.createjs||{};
 			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
 
-		"hue": {																										// NEWP
+		"hue": {
 			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-				" * shared," +
-				"dst.a+src.a); }"
-			)
-		},
-		"saturation": {																									// NEWP
-			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-				" * shared," +
-				"dst.a+src.a); }"
-			)
-		},
-		"color": {																										// NEWP
-			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-				//"setLum(srcClr, getLum(dstClr))"
+			"setLum(setSat(srcClr, getSat(dstClr)), getLum(dstClr))"
 			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
-		"luminosity": {																									// NEWP
-			//shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-			//	"setLum(dstClr, getLum(srcClr))"
-			//+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_SIMPLE +
-				"vec3 srcClr = min(src.rgb/src.a, 1.0);" +
-				"vec3 dstClr = min(dst.rgb/dst.a, 1.0);" +
-				"gl_FragColor = vec4(setLum(vec3(1.0,0.0,0.0), getLum(src.rgb)), 1.0);" +
-			"}")
+		"saturation": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(setSat(dstClr, getSat(srcClr)), getLum(dstClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"color": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(srcClr, getLum(dstClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"luminosity": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(dstClr, getLum(srcClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		}
 	};
 
