@@ -973,9 +973,9 @@ this.createjs = this.createjs||{};
 				"clamp(dstClr / (1.0 - srcClr), 0.0, 1.0)"
 			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
-		"color-burn": {																									// CLOSE
+		"color-burn": {
 			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-				"1.0 - (clamp((1.0 - dstClr) / srcClr, 0.0, 1.0))"
+				"1.0 - clamp((1.0 - smoothstep(0.0035, 0.9955, dstClr)) / smoothstep(0.0035, 0.9955, srcClr), 0.0, 1.0)"
 			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
 		"difference": { // do this to match visible results in browsers
