@@ -809,7 +809,7 @@ this.createjs = this.createjs||{};
 		// note this is an open bracket on main!
 	);
 
-	StageGL.BLEND_FRAGMENT_COMPLEX = (																					// CLOSE
+	StageGL.BLEND_FRAGMENT_COMPLEX = (
 		StageGL.BLEND_FRAGMENT_SIMPLE +
 			"vec3 srcClr = min(src.rgb/src.a, 1.0);" +
 			"vec3 dstClr = min(dst.rgb/dst.a, 1.0);" +
@@ -876,11 +876,21 @@ this.createjs = this.createjs||{};
 			//srcRGB: "ONE",							srcA: "ONE"
 			//dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE_MINUS_SRC_ALPHA"
 		},
-		"source-in": {																									// CLOSE
+		"source-in": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb * dst.a, src.a * dst.a);" +
+			"}")
+		},
+		"source-in_cheap": {
 			srcRGB: "DST_ALPHA",					srcA: "ZERO",
 			dstRGB: "ZERO",							dstA: "SRC_ALPHA"
 		},
-		"source-out": {																									// CLOSE
+		"source-out": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb * (1.0 - dst.a), src.a - dst.a);" +
+			"}")
+		},
+		"source-out_cheap": {
 			eqA: "FUNC_SUBTRACT",
 			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
 			dstRGB: "ZERO",							dstA: "SRC_ALPHA"
@@ -893,7 +903,12 @@ this.createjs = this.createjs||{};
 			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE_MINUS_DST_ALPHA",
 			dstRGB: "ONE",							dstA: "ONE"
 		},
-		"destination-in": {																								// CLOSE
+		"destination-in": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(dst.rgb * src.a, src.a * dst.a);" +
+			"}")
+		},
+		"destination-in_cheap": {
 			srcRGB: "ZERO",							srcA: "DST_ALPHA",
 			dstRGB: "SRC_ALPHA",					dstA: "ZERO"
 		},
@@ -902,7 +917,12 @@ this.createjs = this.createjs||{};
 			srcRGB: "ZERO",							srcA: "DST_ALPHA",
 			dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE"
 		},
-		"destination-atop": {																							// CLOSE
+		"destination-atop": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+			"gl_FragColor = vec4(dst.rgb * src.a + src.rgb * (1.0 - dst.a), src.a);" +
+			"}")
+		},
+		"destination-atop_cheap": {
 			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
 			dstRGB: "SRC_ALPHA",					dstA: "ZERO"
 		},
@@ -913,9 +933,8 @@ this.createjs = this.createjs||{};
 			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
 				"float omSRC = (1.0 - src.a);" +
 				"float omDST = (1.0 - dst.a);" +
-				"gl_FragColor = vec4(src.rgb * omDST + dst.rgb * omSRC, src.a * omDST + dst.a * omSRC);" +
-			"}"
-			)
+				"gl_FragColor = vec4(src.rgb * omDST + dst.rgb * omSRC, src.a * omDST + dst.a * omSRC);"
+			+ "}")
 		},
 
 		"multiply": { // this has to be complex to handle retention of both dst and src in non mixed scenarios
@@ -2149,7 +2168,7 @@ this.createjs = this.createjs||{};
 					eqA: gl[blendSrc.eqA || "FUNC_ADD"],
 					srcA: gl[blendSrc.srcA || "ONE"],
 					dstA: gl[blendSrc.dstA || "ONE_MINUS_SRC_ALPHA"],
-					immediate: Boolean(blendSrc.shader),
+					immediate: blendSrc.shader !== undefined,
 					shader: (blendSrc.shader || this._builtShaders["source-over"] === undefined) ?
 						this._fetchShaderProgram(
 							"cover", undefined, blendSrc.shader,
