@@ -13,9 +13,8 @@
     "animate",
     "spritesheet"
   ],
-  "author": "gskinner.com, inc.",
   "homepage": "https://createjs.com/easeljs",
-  "url": "https://npmjs.com/package/easeljs",
+  "url": "https://npmjs.com/package/@createjs/easeljs",
   "bugs": "https://github.com/createjs/easeljs/issues",
   "license": "MIT",
   "contributors": [
@@ -26,13 +25,13 @@
     "Patrick McGuckin <patrick@gskinner.com> (https://github.com/tehvgg)",
     "David Gillen <david@gskinner.com> (https://github.com/davidhgillen)"
   ],
-  "main": "dist/easel.common.js",
-  "jsnext:main": "dist/easel.es6.js",
-  "jsdelivr": "dist/easel.min.js",
+  "main": "dist/easeljs.common.js",
+  "jsnext:main": "dist/easeljs.es.js",
+  "jsdelivr": "dist/easeljs.min.js",
   "logo": "icon.png",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/createjs/easeljs.git"
+    "url": "https://github.com/createjs/easeljs.git"
   },
   "npmName": "easeljs",
   "npmFileMap": [
@@ -50,16 +49,16 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "cd node_modules/createjs && npm run test",
-    "test:headless": "cd node_modules/createjs && npm run test:headless",
-    "dev": "cd node_modules/createjs && npm run dev",
-    "build": "cd node_modules/createjs && npm run build",
-    "build:next": "cd node_modules/createjs && npm run build:next",
-    "plugins": "cd node_modules/createjs && npm run plugins",
-    "docs": "cd node_modules/createjs && npm run docs"
+    "lint": "cd node_modules/@createjs/build && npm run lint",
+    "test": "cd node_modules/@createjs/build && npm test",
+    "dev": "cd node_modules/@createjs/build && npm run dev",
+    "build:next": "cd node_modules/@createjs/build && npm run build:next",
+    "build:plugins": "cd node_modules/@createjs/build && npm run build:plugins",
+    "build:dist": "cd node_modules/@createjs/build && npm run build:dist",
+    "docs": "cd node_modules/@createjs/docs && npm run gen"
   },
   "dependencies": {
-    "createjs": "2.0.0"
+
   },
   "devDependencies": {
     "js-imagediff": "tehvgg/js-imagediff"
