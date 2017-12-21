@@ -221,9 +221,12 @@ stage.on("stagemousemove", function(evt) {
 				which point a <code>pressup</code> event will be dispatched.
 			</p>
 			<textarea class="brush: js;" readonly>
+circle.on("mousedown"), function(evt) {
+	evt.target.offset = {x: this.x - evt.stageX, y: this.y - evt.stageY};
+}
 circle.on("pressmove", function(evt) {
-	evt.target.x = evt.stageX;
-	evt.target.y = evt.stageY;
+	evt.target.x = evt.stageX + evt.target.offset.x;
+	evt.target.y = evt.stageY + evt.target.offset.y;
 });
 circle.on("pressup", function(evt) { console.log("up"); })
 			</textarea>

@@ -28,11 +28,17 @@
 			dragger.x = dragger.y = 100;
 			dragger.addChild(circle, label);
 			stage.addChild(dragger);
+
+			dragger.on("mousedown", function (evt) {
+				// keep a record on the offset between the mouse position and the container
+				// position. currentTarget will be the container that the event listener was added to:
+				evt.currentTarget.offset = {x: this.x - evt.stageX, y: this.y - evt.stageY};
+			});
 			
 			dragger.on("pressmove",function(evt) {
-				// currentTarget will be the container that the event listener was added to:
-				evt.currentTarget.x = evt.stageX;
-				evt.currentTarget.y = evt.stageY;
+				// Calculate the new X and Y based on the mouse new position plus the offset.
+				evt.currentTarget.x = evt.stageX + evt.currentTarget.offset.x;
+				evt.currentTarget.y = evt.stageY + evt.currentTarget.offset.y;
 				// make sure to redraw the stage to show the change:
 				stage.update();   
 			});
