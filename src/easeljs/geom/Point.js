@@ -60,12 +60,14 @@ this.createjs = this.createjs||{};
 		 * X position.
 		 * @property x
 		 * @type Number
+		 * @default 0
 		 **/
 	
 		/**
 		 * Y position.
 		 * @property y
 		 * @type Number
+		 * @default 0
 		 **/
 	}
 	var p = Point.prototype;
@@ -86,10 +88,14 @@ this.createjs = this.createjs||{};
 	};
 	
 	/** 
-	 * Offsets the Point object by the specified amount. The value of dx is added to the original value of x to create the new x value. The value of dy is added to the original value of y to create the new y value.
+	 * Offsets the Point object by the specified amount.
+	 * <ul>
+	 *     <li>The value of `dx` is added to the original value of `x` to create the new `x` value</li>
+	 *     <li>The value of `dy` is added to the original value of `y` to create the new `y` value</li>
+	 * </ul>
 	 * @method offset
-	 * @param {Number} dx The amount by which to offset the horizontal coordinate, x.
-	 * @param {Number} dy The amount by which to offset the vertical coordinate, y.
+	 * @param {Number} dx The amount by which to offset the horizontal coordinate, `x`.
+	 * @param {Number} dy The amount by which to offset the vertical coordinate, `y`.
 	 * @return {Point} This instance. Useful for chaining method calls.
 	 * @chainable
 	*/
@@ -104,31 +110,41 @@ this.createjs = this.createjs||{};
 	 * @method polar
 	 * @param {Number} len The length coordinate of the polar pair.
 	 * @param {Number} angle The angle, in radians, of the polar pair.
-	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a new {{#crossLink "Point"}}{{/crossLink}}
+	 * will be returned.
 	 * @return {Point} The new, interpolated point.
-	 * @chainable
 	*/
 	Point.polar = function(len, angle, pt) {
-		pt = pt||{};
-		pt.x = len * (Math.cos(angle));
-		pt.y = len * (Math.sin(angle));
+		pt = pt||new Point();
+		pt.x = len * Math.cos(angle);
+		pt.y = len * Math.sin(angle);
 		return pt;
 	};
 
-	/** 
-	 * Determines a point between two specified points. The parameter `f` determines where the new interpolated point is located relative to the two end points specified by parameters `pt1` and `pt2`. The closer the value of the parameter `f` is to 1.0, the closer the interpolated point is to the first point (parameter `pt1`). The closer the value of the parameter `f` is to 0, the closer the interpolated point is to the second point (parameter `pt2`).
+	/**
+	 * Determine a point between two specified points.
+	 *
+	 * The parameter `f` determines where the new interpolated point is located relative to the two end points specified
+	 * by parameters `pt1` and `pt2`:
+	 * <ul>
+	 *     <li>The closer the value of the parameter `f` is to 1.0, the closer the interpolated point is to the first
+	 *     point (parameter `pt1`).</li>
+	 *     <li>The closer the value of the parameter `f` is to 0, the closer the interpolated point is to the second
+	 *     point (parameter `pt2`).</li>
+	 * </ul>
 	 * @method interpolate
 	 * @param {Point | Object} pt1 The first point as a Point or generic object.
 	 * @param {Point | Object} pt2 The second point as a Point or generic object.
-	 * @param {Number} f The level of interpolation between the two points. Indicates where the new point will be, along the line between `pt1` and `pt2`. If `f=1`, `pt1` is returned; if `f=0`, `pt2` is returned.
-	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
-	 * @return {Point} The new, interpolated point.
-	 * @chainable
+	 * @param {Number} f The level of interpolation between the two points. Indicates where the new point will be, along
+	 * the line between `pt1` and `pt2`. If `f=1`, `pt1` is returned; if `f=0`, `pt2` is returned.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted, a new {{#crossLink "Point"}}{{/crossLink}}
+	 * will be returned.
+	 * @return {Point} A new interpolated Point, or the `pt` passed in the 4th parameter with the interpolated values.
 	*/
 	Point.interpolate = function(pt1, pt2, f, pt) {
-		pt = pt||{};
-		pt.x = pt2.x + (f * (pt1.x - pt2.x));
-		pt.y = pt2.y + (f * (pt1.y - pt2.y));
+		pt = pt || new Point();
+		pt.x = pt2.x + f * (pt1.x - pt2.x);
+		pt.y = pt2.y + f * (pt1.y - pt2.y);
 		return pt;
 	};
 	
