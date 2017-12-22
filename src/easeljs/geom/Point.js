@@ -113,6 +113,7 @@ this.createjs = this.createjs||{};
 	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a new {{#crossLink "Point"}}{{/crossLink}}
 	 * will be returned.
 	 * @return {Point} The new, interpolated point.
+	 * @static
 	*/
 	Point.polar = function(len, angle, pt) {
 		pt = pt||new Point();
@@ -140,6 +141,7 @@ this.createjs = this.createjs||{};
 	 * @param {Point | Object} [pt] An object to copy the result into. If omitted, a new {{#crossLink "Point"}}{{/crossLink}}
 	 * will be returned.
 	 * @return {Point} A new interpolated Point, or the `pt` passed in the 4th parameter with the interpolated values.
+	 * @static
 	*/
 	Point.interpolate = function(pt1, pt2, f, pt) {
 		pt = pt || new Point();
