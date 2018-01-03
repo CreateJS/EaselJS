@@ -1,22 +1,7 @@
-var customMatchers = {
-	toBeInRange: function(util, customEqualityTesters) {
-		return {
-			compare: function(actual, excpected, range) {
-				var result = {};
-				range = range || 0;
+// run the master setup file first
+require('@createjs/build/tests/setup');
 
-				if (actual <= (excpected + range) && actual >= (excpected - range)) {
-					result.pass = true;
-				} else {
-					result.pass = false;
-				}
-				return result;
-			}
-		};
-	}
-};
-
-beforeAll(function(done) {
+beforeAll(cb => {
 	this.assetsBasePath = "assets/art/";
 	this.sColor = "#000";
 	this.fColor = "#ff0000";
@@ -58,21 +43,19 @@ beforeAll(function(done) {
 	var img = this.img = new Image();
 
 	img.onload = function () {
-		done();
+		cb();
 	};
 
 	img.onerror = function () {
 		fail(img.src + ' failed to load');
-		done();
+		cb();
 	};
 
 	img.src = this.assetsBasePath + "daisy.png";
-}, 5000)
+}, 5000);
 
 beforeEach(function () {
-
 	this.stage = new createjs.Stage(imagediff.createCanvas(200, 200));
-
 	jasmine.addMatchers(imagediff.jasmine);
 	jasmine.addMatchers(customMatchers);
 });
