@@ -57,10 +57,10 @@
     "build:dist": "cd node_modules/@createjs/build && npm run build:dist",
     "docs": "cd node_modules/@createjs/docs && npm run gen"
   },
-  "dependencies": {
-
-  },
+  "dependencies": {},
   "devDependencies": {
+    "babel-jest": "^22.0.4",
+    "jest": "^22.0.4",
     "js-imagediff": "tehvgg/js-imagediff"
   },
   "engine": "node >= 7.10.1"

@@ -28,7 +28,7 @@
 
 import Container from "./Container";
 import DisplayObject from "./DisplayObject";
-import Event from "createjs/src/events/Event";
+import Event from "@createjs/build/src/events/Event";
 import MouseEvent from "../events/MouseEvent";
 
 /**

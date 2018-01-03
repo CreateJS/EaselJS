@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import EventDispatcher from "createjs/src/events/EventDispatcher";
+import EventDispatcher from "@createjs/build/src/events/EventDispatcher";
 import UID from "../utils/UID";
 import DisplayProps from "../geom/DisplayProps";
 import Rectangle from "../geom/Rectangle";

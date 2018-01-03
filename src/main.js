@@ -98,9 +98,9 @@
  */
 
 // re-export shared classes
-export { default as EventDispatcher } from "createjs/src/events/EventDispatcher";
-export { default as Event } from "createjs/src/events/Event";
-export { default as Ticker } from "createjs/src/utils/Ticker";
+export { default as EventDispatcher } from "@createjs/core/src/events/EventDispatcher";
+export { default as Event } from "@createjs/core/src/events/Event";
+export { default as Ticker } from "@createjs/core/src/utils/Ticker";
 // display
 export { default as StageGL } from "./display/StageGL";
 export { default as Stage } from "./display/Stage";
@@ -129,7 +129,7 @@ export {
   StrokeDash,
   StrokeStyle
 } from "./display/Graphics";
-// export { default as MovieClip } from "./display/MovieClip";
+export { default as MovieClip } from "./display/MovieClip";
 export { default as Shadow } from "./display/Shadow";
 export { default as Shape } from "./display/Shape";
 export { default as Sprite } from "./display/Sprite";
@@ -159,5 +159,6 @@ export { default as SpriteSheetBuilder } from "./utils/SpriteSheetBuilder";
 export { default as SpriteSheetUtils } from "./utils/SpriteSheetUtils";
 export { default as UID } from "./utils/UID";
 export { default as WebGLInspector } from "./utils/WebGLInspector";
-// version (templated in gulpfile, pulled from package).
-export const version = "<%= version %>";
+// inject version into window
+const v = (window.createjs = window.createjs || { v: {} });
+v.e = "<%= version %>";

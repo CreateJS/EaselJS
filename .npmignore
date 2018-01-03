@@ -1,5 +1,3 @@
-# Only the `dist` and `src` directories are served to NPM.
-
 # JetBrains
 .idea/
 
