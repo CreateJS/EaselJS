@@ -26,9 +26,9 @@
  * OTHER DEAliNGS IN THE SOFTWARE.
  */
 
-import EventDispatcher from "@createjs/build/src/events/EventDispatcher";
-import Event from "@createjs/build/src/events/Event";
-import Rectangle from "../geom/Rectangle";
+import { EventDispatcher } from "@createjs/core/src/events/EventDispatcher";
+import { Event } from "@createjs/core/src/events/Event";
+import { Rectangle } from "../geom/Rectangle";
 
 /**
  * Encapsulates the properties and methods associated with a sprite sheet. A sprite sheet is a series of images (usually
@@ -197,7 +197,7 @@ import Rectangle from "../geom/Rectangle";
  * @extends EventDispatcher
  * @module EaselJS
  */
-export default class SpriteSheet extends EventDispatcher {
+class SpriteSheet extends EventDispatcher {
 
 // constructor:
 	/**
@@ -599,3 +599,5 @@ export default class SpriteSheet extends EventDispatcher {
  * @param {String} src The source of the image that failed to load.
  * @since 0.8.2
  */
+
+export { SpriteSheet };

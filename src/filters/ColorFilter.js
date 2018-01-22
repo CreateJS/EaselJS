@@ -30,7 +30,7 @@
  * @module EaselJS
  */
 
-import Filter from "./Filter";
+import { Filter } from "./Filter";
 
 /**
  * Applies a color transform to DisplayObjects.
@@ -51,7 +51,7 @@ import Filter from "./Filter";
  * @class ColorFilter
  * @extends Filter
  */
-export default class ColorFilter extends Filter {
+class ColorFilter extends Filter {
 
 // constructor:
 	/**
@@ -182,3 +182,5 @@ export default class ColorFilter extends Filter {
 	}
 
 }
+
+export { ColorFilter };

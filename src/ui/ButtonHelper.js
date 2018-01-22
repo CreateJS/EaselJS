@@ -48,7 +48,7 @@
  * @class ButtonHelper
  * @module EaselJS
  */
-export default class ButtonHelper {
+class ButtonHelper {
 
 // constructor:
 	/**
@@ -225,3 +225,5 @@ export default class ButtonHelper {
 	}
 
 }
+
+export { ButtonHelper };

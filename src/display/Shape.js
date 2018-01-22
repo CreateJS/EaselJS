@@ -26,8 +26,8 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import DisplayObject from "./DisplayObject";
-import Graphics from "./Graphics";
+import { DisplayObject } from "./DisplayObject";
+import { Graphics } from "./Graphics";
 
 /**
  * A Shape allows you to display vector art in the display list. It composites a {{#crossLink "Graphics"}}{{/crossLink}}
@@ -51,7 +51,7 @@ import Graphics from "./Graphics";
  * @extends DisplayObject
  * @module EaselJS
  */
-export default class Shape extends DisplayObject {
+class Shape extends DisplayObject {
 
 // constructor:
 	/**
@@ -113,3 +113,5 @@ export default class Shape extends DisplayObject {
 	}
 
 }
+
+export { Shape };

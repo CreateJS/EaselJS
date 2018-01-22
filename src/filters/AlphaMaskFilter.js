@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Filter from "./Filter";
+import { Filter } from "./Filter";
 
 /**
  * Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
@@ -55,7 +55,7 @@ import Filter from "./Filter";
  * @extends Filter
  * @module EaselJS
  */
-export default class AlphaMaskFilter extends Filter {
+class AlphaMaskFilter extends Filter {
 
 // constructor:
 	/**
@@ -149,3 +149,5 @@ export default class AlphaMaskFilter extends Filter {
 	}
 
 }
+
+export { AlphaMaskFilter };

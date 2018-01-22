@@ -64,7 +64,7 @@ const _LENGTH = 25;
  * for an example of how to use ColorMatrix to change a DisplayObject's color.
  * @class ColorMatrix
  */
-export default class ColorMatrix {
+class ColorMatrix {
 
 // constructor:
 	/**
@@ -368,3 +368,5 @@ export default class ColorMatrix {
 	}
 
 }
+
+export { ColorMatrix };

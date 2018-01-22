@@ -26,8 +26,8 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import DisplayObject from "./DisplayObject";
-import VideoBuffer from "../utils/VideoBuffer";
+import { DisplayObject } from "./DisplayObject";
+import { VideoBuffer } from "../utils/VideoBuffer";
 
 /**
  * A Bitmap represents an Image, Canvas, or Video in the display list. A Bitmap can be instantiated using an existing
@@ -56,7 +56,7 @@ import VideoBuffer from "../utils/VideoBuffer";
  * @extends DisplayObject
  * @module EaselJS
  */
-export default class Bitmap extends DisplayObject {
+class Bitmap extends DisplayObject {
 
 // constructor:
 	/**
@@ -206,3 +206,5 @@ export default class Bitmap extends DisplayObject {
 	}
 
 }
+
+export { Bitmap };

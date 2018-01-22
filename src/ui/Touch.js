@@ -46,7 +46,7 @@
  * @static
  * @module EaselJS
  */
-export default class Touch {
+class Touch {
 
 // constructor:
 	/**
@@ -304,3 +304,5 @@ export default class Touch {
 	}
 
 }
+
+export { Touch };

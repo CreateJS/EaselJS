@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Filter from "./Filter";
+import { Filter } from "./Filter";
 
 /**
  * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
@@ -55,7 +55,7 @@ import Filter from "./Filter";
  * @extends Filter
  * @module EaselJS
  */
-export default class AlphaMapFilter extends Filter {
+class AlphaMapFilter extends Filter {
 
 // constructor:
 	/**
@@ -183,3 +183,5 @@ export default class AlphaMapFilter extends Filter {
 	}
 
 }
+
+export { AlphaMapFilter };

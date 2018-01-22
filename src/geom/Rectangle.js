@@ -36,7 +36,7 @@
  * @class Rectangle
  * @module EaselJS
  */
-export default class Rectangle {
+class Rectangle {
 
 // constructor:
 	/**
@@ -220,3 +220,5 @@ export default class Rectangle {
 	}
 
 }
+
+export { Rectangle };

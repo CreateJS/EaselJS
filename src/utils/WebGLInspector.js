@@ -28,7 +28,7 @@
 
 let _alternateOutput = null;
 
-import EventDispatcher from "@createjs/build/src/events/EventDispatcher";
+import { EventDispatcher } from "@createjs/core/src/events/EventDispatcher";
 
  /**
   * A utility and helper class designed to work with {{#crossLink "StageGL"}}{{/crossLink}} to help investigate and
@@ -38,7 +38,7 @@ import EventDispatcher from "@createjs/build/src/events/EventDispatcher";
   * @extends EventDispatcher
   * @module EaselJS
   */
-export default class WebGLInspector extends EventDispatcher {
+class WebGLInspector extends EventDispatcher {
 
 // constructor:
 	/**
@@ -220,3 +220,5 @@ export default class WebGLInspector extends EventDispatcher {
 	}
 
 }
+
+export { WebGLInspector };

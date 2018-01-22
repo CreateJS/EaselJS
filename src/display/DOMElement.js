@@ -26,8 +26,8 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import DisplayObject from "./DisplayObject";
-import DisplayProps from "../geom/DisplayProps";
+import { DisplayObject } from "./DisplayObject";
+import { DisplayProps } from "../geom/DisplayProps";
 
 /**
  * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>
@@ -64,7 +64,7 @@ import DisplayProps from "../geom/DisplayProps";
  * @extends DisplayObject
  * @module EaselJS
  */
-export default class DOMElement extends DisplayObject {
+class DOMElement extends DisplayObject {
 
 // constructor:
 	/**
@@ -272,3 +272,5 @@ export default class DOMElement extends DisplayObject {
  * Not applicable to DOMElement.
  * @event tick
  */
+
+export { DOMElement };

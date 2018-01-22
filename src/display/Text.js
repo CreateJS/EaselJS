@@ -29,7 +29,7 @@
 const _H_OFFSETS = {start: 0, left: 0, center: -0.5, end: -1, right: -1};
 const _V_OFFSETS = {top: 0, hanging: -0.01, middle: -0.4, alphabetic: -0.8, ideographic: -0.85, bottom: -1};
 
-import DisplayObject from "./DisplayObject";
+import { DisplayObject } from "./DisplayObject";
 
 /**
  * Display one or more lines of dynamic text (not user editable) in the display list. Line wrapping support (using the
@@ -55,7 +55,7 @@ import DisplayObject from "./DisplayObject";
  * @extends DisplayObject
  * @module EaselJS
  */
-export default class Text extends DisplayObject {
+class Text extends DisplayObject {
 
 // constructor:
 	/**
@@ -413,3 +413,5 @@ export default class Text extends DisplayObject {
 		canvas.width = canvas.height = 1;
 	}
 }
+
+export { Text };
