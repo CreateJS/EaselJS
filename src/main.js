@@ -159,6 +159,3 @@ export { default as SpriteSheetBuilder } from "./utils/SpriteSheetBuilder";
 export { default as SpriteSheetUtils } from "./utils/SpriteSheetUtils";
 export { default as UID } from "./utils/UID";
 export { default as WebGLInspector } from "./utils/WebGLInspector";
-// inject version into window
-const v = (window.createjs = window.createjs || { v: {} });
-v.e = "<%= version %>";
