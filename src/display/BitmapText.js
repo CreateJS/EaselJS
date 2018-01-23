@@ -26,8 +26,8 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Container } from "./Container";
-import { Sprite } from "./Sprite";
+import Container from "./Container";
+import Sprite from "./Sprite";
 
 // ES6 does not support static properties, this is a work around.
 let _maxPoolSize = 100;
@@ -45,7 +45,7 @@ let _spritePool = [];
  * @extends Container
  * @module EaselJS
  */
-class BitmapText extends Container {
+export default class BitmapText extends Container {
 
 // constructor:
 	/**
@@ -369,5 +369,3 @@ class BitmapText extends Container {
 	}
 
 }
-
-export { BitmapText };

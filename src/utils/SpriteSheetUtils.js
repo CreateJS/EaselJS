@@ -35,7 +35,7 @@
  * @static
  * @module EaselJS
  */
-class SpriteSheetUtils {
+export default class SpriteSheetUtils {
 
 // constructor:
 	/**
@@ -189,5 +189,3 @@ class SpriteSheetUtils {
 		canvas.width = canvas.height = 1;
 	}
 }
-
-export { SpriteSheetUtils };

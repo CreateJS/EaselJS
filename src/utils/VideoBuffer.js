@@ -38,7 +38,7 @@
  * @param {HTMLVideoElement} video The HTML video element to buffer.
  * @constructor
  **/
-class VideoBuffer {
+export default class VideoBuffer {
 
   constructor (video) {
 // private properties:
@@ -113,4 +113,3 @@ class VideoBuffer {
   }
 
 }
-export { VideoBuffer };

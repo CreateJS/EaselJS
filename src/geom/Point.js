@@ -39,7 +39,7 @@
  *
  * @class Point
  */
-class Point {
+export default class Point {
 
 // constructor:
 	/**
@@ -113,5 +113,3 @@ class Point {
 	}
 
 }
-
-export { Point };

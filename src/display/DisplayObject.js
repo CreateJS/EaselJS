@@ -26,13 +26,13 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { EventDispatcher } from "@createjs/core/src/events/EventDispatcher";
-import { UID } from "../utils/UID";
-import { DisplayProps } from "../geom/DisplayProps";
-import { Rectangle } from "../geom/Rectangle";
-import { Point } from "../geom/Point";
-import { Matrix2D } from "../geom/Matrix2D";
-import { BitmapCache } from "../filters/BitmapCache";
+import EventDispatcher from "@createjs/build/src/events/EventDispatcher";
+import UID from "../utils/UID";
+import DisplayProps from "../geom/DisplayProps";
+import Rectangle from "../geom/Rectangle";
+import Point from "../geom/Point";
+import Matrix2D from "../geom/Matrix2D";
+import BitmapCache from "../filters/BitmapCache";
 
 /**
  * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
@@ -44,7 +44,7 @@ import { BitmapCache } from "../filters/BitmapCache";
  * @extends EventDispatcher
  * @module EaselJS
  */
-class DisplayObject extends EventDispatcher {
+export default class DisplayObject extends EventDispatcher {
 
 // constructor:
 	/**
@@ -1210,5 +1210,3 @@ class DisplayObject extends EventDispatcher {
 	 *      example if you called stage.update("hello"), then the params would be ["hello"].
 	 * @since 0.6.0
 	 */
-
-export { DisplayObject };

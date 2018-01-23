@@ -29,10 +29,10 @@
 const _ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
 const _ERR_RUNNING = "a build is already running";
 
-import { EventDispatcher } from "@createjs/core/src/events/EventDispatcher";
-import { Rectangle } from "../geom/Rectangle";
-import { SpriteSheet } from "../display/SpriteSheet";
-import { Event } from "@createjs/core/src/events/Event";
+import EventDispatcher from "@createjs/build/src/events/EventDispatcher";
+import Rectangle from "../geom/Rectangle";
+import SpriteSheet from "../display/SpriteSheet";
+import Event from "@createjs/build/src/events/Event";
 
 /**
  * The SpriteSheetBuilder allows you to generate {{#crossLink "SpriteSheet"}}{{/crossLink}} instances at run time
@@ -51,7 +51,7 @@ import { Event } from "@createjs/core/src/events/Event";
  * @extends EventDispatcher
  * @module EaselJS
  */
-class SpriteSheetBuilder extends EventDispatcher {
+export default class SpriteSheetBuilder extends EventDispatcher {
 
 // constructor:
 	/**
@@ -532,5 +532,3 @@ class SpriteSheetBuilder extends EventDispatcher {
  * @param {Number} progress The current progress value (0-1).
  * @since 0.6.0
  */
-
-export { SpriteSheetBuilder };

@@ -26,10 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import Stage from "./Stage";
+import Container from "./Container";
+import Matrix2D from "../geom/Matrix2D";
 
-import { Stage } from "./Stage";
-import { Container } from "./Container";
-import { Matrix2D } from "../geom/Matrix2D";
 /*
  * README IF EDITING:
  * Terminology for developers:
@@ -101,7 +101,7 @@ import { Matrix2D } from "../geom/Matrix2D";
  * @extends Stage
  * @module EaselJS
  */
-class StageGL extends Stage {
+export default class StageGL extends Stage {
 
 // constructor:
 	/**
@@ -2420,5 +2420,3 @@ class StageGL extends Stage {
  * restored.
  * @event drawend
  */
-
-export { StageGL };

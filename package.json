@@ -49,11 +49,12 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "jest -c ./tests/jest.config.js",
-    "lint": "cd node_modules/@createjs/build && gulp lint",
-    "dev": "cd node_modules/@createjs/build && gulp dev",
-    "build": "cd node_modules/@createjs/build && gulp build",
-    "plugins": "cd node_modules/@createjs/build && gulp plugins",
+    "lint": "cd node_modules/@createjs/build && npm run lint",
+    "test": "cd node_modules/@createjs/build && npm test",
+    "dev": "cd node_modules/@createjs/build && npm run dev",
+    "build:next": "cd node_modules/@createjs/build && npm run build:next",
+    "build:plugins": "cd node_modules/@createjs/build && npm run build:plugins",
+    "build:dist": "cd node_modules/@createjs/build && npm run build:dist",
     "docs": "cd node_modules/@createjs/docs && npm run gen"
   },
   "dependencies": {},

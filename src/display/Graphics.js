@@ -121,7 +121,7 @@
  * @class Graphics
  * @module EaselJS
  */
-class Graphics {
+export default class Graphics {
 
 // constructor:
 	/**
@@ -1533,7 +1533,7 @@ class Graphics {
  * Graphics command object. See {{#crossLink "Graphics/lineTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class LineTo
  */
-class LineTo {
+export class LineTo {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -1565,7 +1565,7 @@ class LineTo {
  * Graphics command object. See {{#crossLink "Graphics/moveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class MoveTo
  */
-class MoveTo {
+export class MoveTo {
 	/**
 	 * @constructor
    * @param {Number} x
@@ -1597,7 +1597,7 @@ class MoveTo {
  * Graphics command object. See {{#crossLink "Graphics/arcTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class ArcTo
  */
-class ArcTo {
+export class ArcTo {
 	/**
 	 * @constructor
 	 * @param {Number} x1
@@ -1647,7 +1647,7 @@ class ArcTo {
  * Graphics command object. See {{#crossLink "Graphics/arc"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Arc
  */
-class Arc {
+export class Arc {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -1703,7 +1703,7 @@ class Arc {
  * Graphics command object. See {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class QuadraticCurveTo
  */
-class QuadraticCurveTo {
+export class QuadraticCurveTo {
 	/**
 	 * @constructor
 	 * @param {Number} cpx
@@ -1747,7 +1747,7 @@ class QuadraticCurveTo {
  * Graphics command object. See {{#crossLink "Graphics/bezierCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class BezierCurveTo
  */
-class BezierCurveTo {
+export class BezierCurveTo {
 	/**
 	 * @constructor
 	 * @param {Number} cp1x
@@ -1803,7 +1803,7 @@ class BezierCurveTo {
  * Graphics command object. See {{#crossLink "Graphics/rect"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Rect
  */
-class Rect {
+export class Rect {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -1847,7 +1847,7 @@ class Rect {
  * Graphics command object. See {{#crossLink "Graphics/closePath"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class ClosePath
  */
-class ClosePath {
+export class ClosePath {
 	/**
 	 * @constructor
 	 */
@@ -1866,7 +1866,7 @@ class ClosePath {
  * Graphics command object to begin a new path. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class BeginPath
  */
-class BeginPath {
+export class BeginPath {
 	/**
 	 * @constructor
 	 */
@@ -1885,7 +1885,7 @@ class BeginPath {
  * Graphics command object. See {{#crossLink "Graphics/beginFill"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Fill
  */
-class Fill {
+export class Fill {
 	/**
 	 * @constructor
 	 * @param {Object} style A valid Context2D fillStyle.
@@ -1984,7 +1984,7 @@ class Fill {
  * Graphics command object. See {{#crossLink "Graphics/beginStroke"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Stroke
  */
-class Stroke {
+export class Stroke {
 	/**
 	 * @constructor
 	 * @param {Object} style A valid Context2D fillStyle.
@@ -2070,7 +2070,7 @@ class Stroke {
  * Graphics command object. See {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class StrokeStyle
  */
-class StrokeStyle {
+export class StrokeStyle {
 	/**
 	 * @constructor
 	 * @param {Number} [width=1]
@@ -2132,7 +2132,7 @@ class StrokeStyle {
  * Graphics command object. See {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class StrokeDash
  */
-class StrokeDash {
+export class StrokeDash {
 	/**
 	 * @constructor
 	 * @param {Array} [segments=[]]
@@ -2179,7 +2179,7 @@ class StrokeDash {
  * Graphics command object. See {{#crossLink "Graphics/drawRoundRectComplex"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class RoundRect
  */
-class RoundRect {
+export class RoundRect {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -2269,7 +2269,7 @@ class RoundRect {
  * Graphics command object. See {{#crossLink "Graphics/drawCircle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Circle
  */
-class Circle {
+export class Circle {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -2307,7 +2307,7 @@ class Circle {
  * Graphics command object. See {{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Ellipse
  */
-class Ellipse {
+export class Ellipse {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -2366,7 +2366,7 @@ class Ellipse {
  * Graphics command object. See {{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class PolyStar
  */
-class PolyStar {
+export class PolyStar {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -2497,24 +2497,3 @@ class PolyStar {
 	Graphics.STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
 	Graphics.EMPTY_SEGMENTS = [];
 }
-
-export {
-	Graphics,
-	LineTo,
-	MoveTo,
-	ArcTo,
-	Arc,
-	QuadraticCurveTo,
-	BezierCurveTo,
-	Rect,
-	ClosePath,
-	BeginPath,
-	Fill,
-	Stroke,
-	StrokeStyle,
-	StrokeDash,
-	RoundRect,
-	Circle,
-	Ellipse,
-	PolyStar
-};

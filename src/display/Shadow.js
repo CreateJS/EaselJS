@@ -37,7 +37,7 @@
  * @class Shadow
  * @module EaselJS
  */
-class Shadow {
+export default class Shadow {
 
 // constructor:
 	/**
@@ -115,5 +115,3 @@ class Shadow {
 {
 	Shadow.identity = new Shadow("transparent");
 }
-
-export { Shadow };

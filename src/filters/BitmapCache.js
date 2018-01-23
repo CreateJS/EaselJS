@@ -26,9 +26,9 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Filter } from "./Filter";
-import { Rectangle } from "../geom/Rectangle";
-import { StageGL } from "../display/StageGL";
+import Filter from "./Filter";
+import Rectangle from "../geom/Rectangle";
+import StageGL from "../display/StageGL";
 
 /**
  * The BitmapCache is an internal representation of all the cache properties and logic required in order to "cache"
@@ -54,7 +54,7 @@ import { StageGL } from "../display/StageGL";
  * @class BitmapCache
  * @module EaselJS
  */
-class BitmapCache extends Filter {
+export default class BitmapCache extends Filter {
 
 // constructor:
 	/**
@@ -550,5 +550,3 @@ class BitmapCache extends Filter {
  * 	cached elements with greater fidelity. Default is 1.
  * @param {Boolean|StageGL} [options] Select whether to use context 2D, or WebGL rendering, and whether to make a new stage instance or use an existing one.
  */
-
-export { BitmapCache };

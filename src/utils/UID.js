@@ -35,7 +35,7 @@ let _nextID = 0;
  * @static
  * @module EaselJS
  */
-class UID {
+export default class UID {
 
 // constructor:
 	/**
@@ -66,5 +66,3 @@ class UID {
 	}
 
 }
-
-export { UID };

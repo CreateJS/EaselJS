@@ -98,19 +98,19 @@
  */
 
 // re-export shared classes
-export { EventDispatcher } from "@createjs/core/src/events/EventDispatcher";
-export { Event } from "@createjs/core/src/events/Event";
-export { Ticker } from "@createjs/core/src/utils/Ticker";
+export { default as EventDispatcher } from "@createjs/core/src/events/EventDispatcher";
+export { default as Event } from "@createjs/core/src/events/Event";
+export { default as Ticker } from "@createjs/core/src/utils/Ticker";
 // display
-export { StageGL } from "./display/StageGL";
-export { Stage } from "./display/Stage";
-export { Container } from "./display/Container";
-export { DisplayObject } from "./display/DisplayObject";
-export { Bitmap } from "./display/Bitmap";
-export { BitmapText } from "./display/BitmapText";
-export { DOMElement } from "./display/DOMElement";
+export { default as StageGL } from "./display/StageGL";
+export { default as Stage } from "./display/Stage";
+export { default as Container } from "./display/Container";
+export { default as DisplayObject } from "./display/DisplayObject";
+export { default as Bitmap } from "./display/Bitmap";
+export { default as BitmapText } from "./display/BitmapText";
+export { default as DOMElement } from "./display/DOMElement";
 export {
-  Graphics,
+  default as Graphics,
   Arc,
   ArcTo,
   BeginPath,
@@ -129,33 +129,36 @@ export {
   StrokeDash,
   StrokeStyle
 } from "./display/Graphics";
-export { MovieClip } from "./display/MovieClip";
-export { Shadow } from "./display/Shadow";
-export { Shape } from "./display/Shape";
-export { Sprite } from "./display/Sprite";
-export { SpriteSheet } from "./display/SpriteSheet";
-export { Text } from "./display/Text";
+export { default as MovieClip } from "./display/MovieClip";
+export { default as Shadow } from "./display/Shadow";
+export { default as Shape } from "./display/Shape";
+export { default as Sprite } from "./display/Sprite";
+export { default as SpriteSheet } from "./display/SpriteSheet";
+export { default as Text } from "./display/Text";
 // events
-export { MouseEvent } from "./events/MouseEvent";
+export { default as MouseEvent } from "./events/MouseEvent";
 // filters
-export { AlphaMapFilter } from "./filters/AlphaMapFilter";
-export { AlphaMaskFilter } from "./filters/AlphaMaskFilter";
-export { BitmapCache } from "./filters/BitmapCache";
-export { BlurFilter } from "./filters/BlurFilter";
-export { ColorFilter } from "./filters/ColorFilter";
-export { ColorMatrix } from "./filters/ColorMatrix";
-export { ColorMatrixFilter } from "./filters/ColorMatrixFilter";
-export { Filter } from "./filters/Filter";
+export { default as AlphaMapFilter } from "./filters/AlphaMapFilter";
+export { default as AlphaMaskFilter } from "./filters/AlphaMaskFilter";
+export { default as BitmapCache } from "./filters/BitmapCache";
+export { default as BlurFilter } from "./filters/BlurFilter";
+export { default as ColorFilter } from "./filters/ColorFilter";
+export { default as ColorMatrix } from "./filters/ColorMatrix";
+export { default as ColorMatrixFilter } from "./filters/ColorMatrixFilter";
+export { default as Filter } from "./filters/Filter";
 // geom
-export { DisplayProps } from "./geom/DisplayProps";
-export { Matrix2D } from "./geom/Matrix2D";
-export { Point } from "./geom/Point";
-export { Rectangle } from "./geom/Rectangle";
+export { default as DisplayProps } from "./geom/DisplayProps";
+export { default as Matrix2D } from "./geom/Matrix2D";
+export { default as Point } from "./geom/Point";
+export { default as Rectangle } from "./geom/Rectangle";
 // ui
-export { ButtonHelper } from "./ui/ButtonHelper";
-export { Touch } from "./ui/Touch";
+export { default as ButtonHelper } from "./ui/ButtonHelper";
+export { default as Touch } from "./ui/Touch";
 // utils
-export { SpriteSheetBuilder } from "./utils/SpriteSheetBuilder";
-export { SpriteSheetUtils } from "./utils/SpriteSheetUtils";
-export { UID } from "./utils/UID";
-export { WebGLInspector } from "./utils/WebGLInspector";
+export { default as SpriteSheetBuilder } from "./utils/SpriteSheetBuilder";
+export { default as SpriteSheetUtils } from "./utils/SpriteSheetUtils";
+export { default as UID } from "./utils/UID";
+export { default as WebGLInspector } from "./utils/WebGLInspector";
+// inject version into window
+const v = (window.createjs = window.createjs || { v: {} });
+v.e = "<%= version %>";

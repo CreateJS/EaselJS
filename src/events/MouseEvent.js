@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Event } from "@createjs/core/src/events/Event";
+import Event from "@createjs/build/src/events/Event";
 
 /**
  * Passed as the parameter to all mouse/pointer/touch related events. For a listing of mouse events and their properties,
@@ -35,7 +35,7 @@ import { Event } from "@createjs/core/src/events/Event";
  * @extends Event
  * @module EaselJS
  */
-class MouseEvent extends Event {
+export default class MouseEvent extends Event {
 
 // constructor:
 	/**
@@ -175,5 +175,3 @@ class MouseEvent extends Event {
 	}
 
 }
-
-export { MouseEvent };

@@ -30,7 +30,7 @@
  * @module EaselJS
  */
 
-import { Filter } from "./Filter";
+import Filter from "./Filter";
 
 /**
  * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
@@ -54,7 +54,7 @@ import { Filter } from "./Filter";
  * @class ColorMatrixFilter
  * @extends Filter
  */
-class ColorMatrixFilter extends Filter {
+export default class ColorMatrixFilter extends Filter {
 
 // constructor:
 	/**
@@ -148,5 +148,3 @@ class ColorMatrixFilter extends Filter {
 	}
 
 }
-
-export { ColorMatrixFilter };

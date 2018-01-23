@@ -26,8 +26,8 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { DisplayObject } from "./DisplayObject";
-import { Event } from "@createjs/core/src/events/Event";
+import DisplayObject from "./DisplayObject";
+import Event from "@createjs/build/src/events/Event";
 
 /**
  * Displays a frame or sequence of frames (ie. an animation) from a SpriteSheet instance. A sprite sheet is a series of
@@ -49,7 +49,7 @@ import { Event } from "@createjs/core/src/events/Event";
  * @extends DisplayObject
  * @module EaselJS
  */
-class Sprite extends DisplayObject {
+export default class Sprite extends DisplayObject {
 
 // constructor:
 	/**
@@ -460,5 +460,3 @@ class Sprite extends DisplayObject {
  * @param {Object} target The object that dispatched the event.
  * @param {String} type The event type.
  */
-
-export { Sprite };

@@ -58,7 +58,7 @@
  *
  * @class Filter
  */
-class Filter {
+export default class Filter {
 
 // constructor:
 	/**
@@ -183,5 +183,3 @@ class Filter {
 	}
 
 }
-
-export { Filter };

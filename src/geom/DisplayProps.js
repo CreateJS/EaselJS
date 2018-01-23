@@ -30,13 +30,13 @@
  * @module EaselJS
  */
 
-import { Matrix2D } from "./Matrix2D";
+import Matrix2D from "./Matrix2D";
 
 /**
  * Used for calculating and encapsulating display related properties.
  * @class DisplayProps
  */
-class DisplayProps {
+export default class DisplayProps {
 
 // constructor:
 	/**
@@ -179,5 +179,3 @@ class DisplayProps {
 	}
 
 }
-
-export { DisplayProps };

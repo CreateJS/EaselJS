@@ -26,7 +26,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { DisplayObject } from './DisplayObject';
+import DisplayObject from './DisplayObject';
 
 /**
  * A Container is a nestable display list that allows you to work with compound display elements. For  example you could
@@ -49,7 +49,7 @@ import { DisplayObject } from './DisplayObject';
  * @extends DisplayObject
  * @module EaselJS
  */
-class Container extends DisplayObject {
+export default class Container extends DisplayObject {
 
 // constructor:
 	/**
@@ -677,5 +677,3 @@ class Container extends DisplayObject {
 	}
 
 }
-
-export { Container };

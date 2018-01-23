@@ -26,10 +26,10 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Container } from "./Container";
-import { DisplayObject } from "./DisplayObject";
-import { Event } from "@createjs/core/src/events/Event";
-import { MouseEvent } from "../events/MouseEvent";
+import Container from "./Container";
+import DisplayObject from "./DisplayObject";
+import Event from "@createjs/build/src/events/Event";
+import MouseEvent from "../events/MouseEvent";
 
 /**
  * A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
@@ -52,7 +52,7 @@ import { MouseEvent } from "../events/MouseEvent";
  * @extends Container
  * @module EaselJS
  */
-class Stage extends Container {
+export default class Stage extends Container {
 
 // constructor:
 	/**
@@ -832,5 +832,3 @@ class Stage extends Container {
  * @event drawend
  * @since 0.7.0
  */
-
-export { Stage };
