@@ -51,7 +51,7 @@
   "scripts": {
     "test": "jest -c ./tests/jest.config.js",
     "lint": "cd node_modules/@createjs/build && gulp lint",
-    "dev": "cd node_modules/@createjs/build && gulp dev",
+    "dev": "cd node_modules/@createjs/build && gulp dev --format=global",
     "build": "cd node_modules/@createjs/build && gulp build",
     "plugins": "cd node_modules/@createjs/build && gulp plugins",
     "docs": "cd node_modules/@createjs/docs && npm run gen"

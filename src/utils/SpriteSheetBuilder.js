@@ -29,10 +29,10 @@
 const _ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
 const _ERR_RUNNING = "a build is already running";
 
-import EventDispatcher from "@createjs/build/src/events/EventDispatcher";
+import EventDispatcher from "@createjs/core/src/events/EventDispatcher";
 import Rectangle from "../geom/Rectangle";
 import SpriteSheet from "../display/SpriteSheet";
-import Event from "@createjs/build/src/events/Event";
+import Event from "@createjs/core/src/events/Event";
 
 /**
  * The SpriteSheetBuilder allows you to generate {{#crossLink "SpriteSheet"}}{{/crossLink}} instances at run time

@@ -173,8 +173,8 @@ export default class BlurFilter extends Filter {
 	}
 
 	set quality (quality) {
-		if (isNaN(value) || value < 0) { value = 0; }
-		this._quality = value | 0;
+		if (isNaN(quality) || quality < 0) { quality = 0; }
+		this._quality = quality | 0;
 	}
 
 	get _buildShader () {

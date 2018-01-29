@@ -28,7 +28,7 @@
 
 let _alternateOutput = null;
 
-import EventDispatcher from "@createjs/build/src/events/EventDispatcher";
+import EventDispatcher from "@createjs/core/src/events/EventDispatcher";
 
  /**
   * A utility and helper class designed to work with {{#crossLink "StageGL"}}{{/crossLink}} to help investigate and

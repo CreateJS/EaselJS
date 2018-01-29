@@ -4,11 +4,11 @@
 	<meta charset="utf-8">
 	<title>EaselJS: AlphaMaskFilter Reveal Demo</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="/assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../dist/easeljs-NEXT.js"></script>
 </head>
 
 <body onload="init();">
@@ -48,7 +48,7 @@
 
 		image = new Image();
 		image.onload = handleComplete;
-		image.src = "../_assets/art/flowers.jpg";
+		image.src = "/assets/art/flowers.jpg";
 
 		stage = new createjs.Stage("testCanvas");
 		text = new createjs.Text("Loading...", "20px Arial", "#FFF");

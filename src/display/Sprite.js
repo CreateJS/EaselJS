@@ -27,7 +27,7 @@
 */
 
 import DisplayObject from "./DisplayObject";
-import Event from "@createjs/build/src/events/Event";
+import Event from "@createjs/core/src/events/Event";
 
 /**
  * Displays a frame or sequence of frames (ie. an animation) from a SpriteSheet instance. A sprite sheet is a series of
