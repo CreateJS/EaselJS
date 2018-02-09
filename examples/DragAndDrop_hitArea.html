@@ -4,11 +4,11 @@
 	<meta charset="utf-8">
 	<title>EaselJS Example: Rollovers and Drag & Drop</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+		<script src="../dist/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -37,7 +37,7 @@
 
 		// load the source image:
 		var image = new Image();
-		image.src = "../_assets/art/daisy.png";
+		image.src = "../assets/art/daisy.png";
 		image.onload = handleImageLoad;
 	}
 
@@ -67,7 +67,8 @@
 			bitmap.rotation = 360 * Math.random() | 0;
 			bitmap.regX = bitmap.image.width / 2 | 0;
 			bitmap.regY = bitmap.image.height / 2 | 0;
-			bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.random() * 0.4 + 0.6;
+			bitmap.s = Math.random() * 0.4 + 0.6;
+			bitmap.scale = bitmap.s;
 			bitmap.name = "bmp_" + i;
 			bitmap.cursor = "pointer";
 
@@ -92,13 +93,13 @@
 
 			bitmap.addEventListener("rollover", function (evt) {
 				var o = evt.target;
-				o.scaleX = o.scaleY = o.scale * 1.2;
+				o.scale *= 1.2;
 				update = true;
 			});
 
 			bitmap.addEventListener("rollout", function (evt) {
 				var o = evt.target;
-				o.scaleX = o.scaleY = o.scale;
+				o.scale = o.s;
 				update = true;
 			});
 

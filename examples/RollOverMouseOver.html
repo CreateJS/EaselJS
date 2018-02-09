@@ -4,11 +4,11 @@
 	<meta charset="utf-8">
 	<title>EaselJS Example: rollover and mouseover</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../dist/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -29,10 +29,10 @@
 		var red = container.addChild(new createjs.Shape()).set({name: "red", x: 100, y: 150});
 		red.graphics.beginFill("#F00").drawRect(0, 0, 100, 100);
 
-		container.addEventListener("mouseover", handleEvt);
-		container.addEventListener("mouseout", handleEvt);
-		container.addEventListener("rollover", handleEvt);
-		container.addEventListener("rollout", handleEvt);
+		container.on("mouseover", handleEvt);
+		container.on("mouseout", handleEvt);
+		container.on("rollover", handleEvt);
+		container.on("rollout", handleEvt);
 
 		container.cursor = "pointer";
 		red.cursor = "";
@@ -41,7 +41,7 @@
 		text = stage.addChild(new createjs.Text("", "14px monospace", "#111")).set({x: 280, y: 100, lineHeight: 20});
 
 		// call update on the stage to make it render the current display list to the canvas:
-		createjs.Ticker.addEventListener("tick", stage);
+		createjs.Ticker.on("tick", stage);
 	}
 
 	var log = [];

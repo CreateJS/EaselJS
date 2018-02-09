@@ -4,11 +4,11 @@
 	<meta charset="utf-8">
 	<title>EaselJS Example: Text Link</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../dist/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -73,12 +73,12 @@
 			var link = new TextLink(links[i] + " link!", "36px Arial", links[i], "#FFF");
 			link.x = 100;
 			link.y = 50 + i * 50;
-			link.addEventListener("click", handleClick);
+			link.on("click", handleClick);
 			link.cursor = "pointer";
 			stage.addChild(link);
 		}
 
-		createjs.Ticker.addEventListener("tick", stage);
+		createjs.Ticker.on("tick", stage);
 	}
 
 	function handleClick(evt) {

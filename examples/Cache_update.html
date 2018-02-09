@@ -4,11 +4,10 @@
 	<meta charset="utf-8">
 	<title>EaselJS Example: Using Stage.autoClear</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
-
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
+	<script src="../dist/easeljs-NEXT.js"></script>
 
 <script id="editable">
 	var canvas;
@@ -43,8 +42,8 @@
 		stage.addChild(moon);
 
 		// start the tick and point it at the window so we can do some work before updating the stage:
-		createjs.Ticker.addEventListener("tick", tick);
-		createjs.Ticker.setFPS(30);
+		createjs.Ticker.on("tick", tick);
+		createjs.Ticker.framerate = 30;
 	}
 
 	function stop() {

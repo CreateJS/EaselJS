@@ -4,14 +4,14 @@
 	<meta charset="utf-8">
 	<title>EaselJS Example: Bitmap</title>
 
-	<link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../../_assets/js/examples.js"></script>
+	<link href="../../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../../node_modules/@createjs/build/assets/js/examples.js"></script>
 
-	<script src="../../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../../dist/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
-	<script src="../../src/easeljs/display/StageGL.js"></script>
+	<script src="../../src/display/StageGL.js"></script>
 
 <script id="editable">
 	function init() {
@@ -22,7 +22,7 @@
 		var stage = new createjs.StageGL(canvas);
 
 		// Create a new Text object:
-		var bitmap = new createjs.Bitmap("../../_assets/art/robot.png");
+		var bitmap = new createjs.Bitmap("../../assets/art/robot.png");
 
 		// add the text as a child of the stage. This means it will be drawn any time the stage is updated
 		// and that its transformations will be relative to the stage coordinates:
@@ -38,7 +38,7 @@
 
 		// set up a ticker to update the stage, calling stage.update now would display a black screen as the image hasn't loaded
 		// we can avoid this and only call stage.update once, if we pre-load the image before running this code
-		createjs.Ticker.addEventListener("tick", stage.update.bind(stage));
+		createjs.Ticker.on("tick", stage.update.bind(stage));
 	}
 </script>
 </head>

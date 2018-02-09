@@ -4,11 +4,11 @@
 	<meta charset="utf-8">
 	<title>EaselJS: Filters Example</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../../build/assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+		<script src="../dist/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -27,7 +27,7 @@
 		speed = 0.02;
 		img = new Image();
 		img.onload = handleImageLoad;
-		img.src = "../_assets/art/flowers.jpg";
+		img.src = "../assets/art/flowers.jpg";
 	}
 
 	function handleImageLoad() {

@@ -3,10 +3,11 @@
 <head>
 	<title>EaselJS: Tileset SpriteSheet Example</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../dist/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -15,13 +16,13 @@
 		function init() {
 			// create a new stage and point it at our canvas:
 			stage = new createjs.Stage("testCanvas");
-			
+
 			// load the spritesheet image:
 			var image = new Image();
 			image.onload = handleLoad;
-			image.src = "../_assets/art/tmw_desert_spacing.png";
+			image.src = "../assets/art/tmw_desert_spacing.png";
 		}
-		
+
 		function handleLoad(evt) {
 			// define the spritesheet:
 			var ss = new createjs.SpriteSheet({
@@ -42,7 +43,7 @@
 				[30, 30, 30, 30, 14, 16, 30, 48, 32, 30],
 				[30, 30, 40, 30, 14, 16, 30, 30, 30, 30]
 			]
-			
+
 			// draw the map:
 			for (var row=0; row<map.length; row++) {
 				for (var col=0; col<map[0].length; col++) {
@@ -55,7 +56,7 @@
 					stage.addChild(tile);
 				}
 			}
-			
+
 			// update the stage to draw to screen:
 			stage.update();
 		}

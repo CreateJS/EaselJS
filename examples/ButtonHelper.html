@@ -4,15 +4,15 @@
 	<meta charset="utf-8">
 	<title>EaselJS Example: Rollovers and Drag & Drop</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../dist/easeljs-NEXT.js"></script>
 
-	<script src="../_assets/libs/tweenjs-NEXT.min.js"></script>
+	<script src="../../tweenjs/tweenjs-NEXT.min.js"></script>
 
-	<script src="../_assets/art/VectorButton.js"></script>
+	<script src="../assets/art/VectorButton.js"></script>
 
 <script id="editable">
 
@@ -37,7 +37,7 @@
 
 		// load the source image:
 		var image = new Image();
-		image.src = "../_assets/art/spritesheet_button.png";
+		image.src = "../assets/art/spritesheet_button.png";
 		image.onload = handleImageLoad;
 	}
 
@@ -64,7 +64,7 @@
 			vectorButton.alpha = 0.5 + vectorHelper.enabled * 0.5;
 		});
 
-		createjs.Ticker.addEventListener("tick", stage);
+		createjs.Ticker.on("tick", stage);
 	}
 </script>
 

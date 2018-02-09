@@ -4,13 +4,13 @@
 	<meta charset="utf-8">
 	<title>EaselJS Example: Transform</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../dist/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries. http://code.createjs.com -->
-	<script src="../_assets/js/Slider.js"></script>
+	<script src="../assets/js/Slider.js"></script>
 
 <script id="editable">
 	var stage, sliceContainer, sliceWidth, degToRad = Math.PI / 180;
@@ -25,7 +25,7 @@
 
 		var img = new Image();
 		img.onload = handleImageLoad;
-		img.src = "../_assets/art/flowers.jpg";
+		img.src = "../assets/art/flowers.jpg";
 	}
 
 	function handleImageLoad(evt) {

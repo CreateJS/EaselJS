@@ -4,15 +4,14 @@
 	<meta charset="utf-8">
 	<title>EaselJS: Sprite Sheet Example</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
 
-	<script src="../_assets/libs/preloadjs-NEXT.min.js"></script>
+	<script src="libs/"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
-	<script src="../lib/main.es5.js"></script>
-	<script src="../lib/main.es6.js"></script>
+	<script src="../dist/easeljs-NEXT.js"></script>
+
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -41,7 +40,7 @@
 
 		loader = new createjs.LoadQueue(false);
 		loader.addEventListener("complete", handleComplete);
-		loader.loadManifest(manifest, true, "../_assets/art/");
+		loader.loadManifest(manifest, true, "../assets/art/");
 	}
 
 	function handleComplete() {

@@ -4,9 +4,13 @@
 	<meta charset="utf-8">
 	<title>EaselJS Example: Two Stages passing mouse events</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
+
+	<script src="../dist/easeljs-NEXT.js"></script>
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
 
 	<style>
 		.canvasDiv {
@@ -51,10 +55,6 @@
 	<canvas id="canvasTwo" width="540" height="260"></canvas>
 </div>
 
-<script src="../lib/easeljs-NEXT.combined.js"></script>
-<!-- We also provide hosted minified versions of all CreateJS libraries.
-  http://code.createjs.com -->
-
 <script id="editable">
 	var bottomStage, topStage;
 
@@ -83,13 +83,13 @@
 	 */
 	function stageSetup(canvasName, handler) {
 		stage = new createjs.Stage(canvasName);
-		//stage.addEventListener("stagemousemove", handler);	// too noisy
-		stage.addEventListener("stagemousedown", handler);
-		stage.addEventListener("stagemouseup", handler);
-		stage.addEventListener("mouseleave", handler);
-		stage.addEventListener("mouseenter", handler);
+		//stage.on("stagemousemove", handler);	// too noisy
+		stage.on("stagemousedown", handler);
+		stage.on("stagemouseup", handler);
+		stage.on("mouseleave", handler);
+		stage.on("mouseenter", handler);
 
-		createjs.Ticker.addEventListener("tick", stage);
+		createjs.Ticker.on("tick", stage);
 		stage.log = [];
 
 		return stage;
@@ -102,10 +102,10 @@
 		var shape = container.addChild(new createjs.Shape()).set({name: "square", x: x, y: y});
 		shape.graphics.beginFill(color).drawRect(0, 0, 135, 135);
 
-		container.addEventListener("mouseover", handler);
-		container.addEventListener("mouseout", handler);
-		container.addEventListener("dblclick", handler);
-		container.addEventListener("click", handler);
+		container.on("mouseover", handler);
+		container.on("mouseout", handler);
+		container.on("dblclick", handler);
+		container.on("click", handler);
 
 		container.cursor = "pointer";
 		return container;

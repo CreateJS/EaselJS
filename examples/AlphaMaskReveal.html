@@ -4,9 +4,9 @@
 	<meta charset="utf-8">
 	<title>EaselJS: AlphaMaskFilter Reveal Demo</title>
 
-	<link href="/assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="/assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="/assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
 
 	<script src="../dist/easeljs-NEXT.js"></script>
 </head>
@@ -61,9 +61,9 @@
 		createjs.Touch.enable(stage);
 		stage.enableMouseOver();
 
-		stage.addEventListener("stagemousedown", handleMouseDown);
-		stage.addEventListener("stagemouseup", handleMouseUp);
-		stage.addEventListener("stagemousemove", handleMouseMove);
+		stage.on("stagemousedown", handleMouseDown);
+		stage.on("stagemouseup", handleMouseUp);
+		stage.on("stagemousemove", handleMouseMove);
 		drawingCanvas = new createjs.Shape();
 		bitmap = new createjs.Bitmap(image);
 
@@ -100,7 +100,7 @@
 		var midPoint = new createjs.Point(oldPt.x + stage.mouseX >> 1, oldPt.y + stage.mouseY >> 1);
 
 		drawingCanvas.graphics.setStrokeStyle(40, "round", "round")
-				.beginStroke("rgba(0,0,0,0.2)")
+				.beginStroke("#FF0099")
 				.moveTo(midPoint.x, midPoint.y)
 				.curveTo(oldPt.x, oldPt.y, oldMidPt.x, oldMidPt.y);
 

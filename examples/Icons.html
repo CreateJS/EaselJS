@@ -5,11 +5,11 @@
 	<title>EaselJS Example: Displaying icons using Sprite and
 		SpriteSheet</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../dist/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -21,7 +21,7 @@
 	function init() {
 		//find canvas and load images, wait for last image to load
 		iconSheet.onload = handleImageLoad;
-		iconSheet.src = "../_assets/art/spritesheet_icons.png";
+		iconSheet.src = "../assets/art/spritesheet_icons.png";
 	}
 
 	function handleImageLoad() {
@@ -86,8 +86,8 @@
 		icon6.gotoAndPlay(0);
 		stage.addChild(icon6);
 
-		createjs.Ticker.setFPS(3); // slow, so we can see the icons
-		createjs.Ticker.addEventListener("tick", stage);
+		createjs.Ticker.framerate = 3; // slow, so we can see the icons
+		createjs.Ticker.on("tick", stage);
 	}
 </script>
 
@@ -114,7 +114,7 @@
 <div id="content">
 	The original icons.png file, images from <a
 		href="http://thenounproject.com/">the Noun project</a>:<br/>
-	<img src="../_assets/art/spritesheet_icons.png"/>
+	<img src="../assets/art/spritesheet_icons.png"/>
 </div>
 </body>
 </html>

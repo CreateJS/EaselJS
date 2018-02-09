@@ -4,9 +4,10 @@
 	<meta charset="utf-8">
 	<title>EaselJS Example: MovieClips</title>
 
-	<link href="../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
-	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
-	<script src="../_assets/js/examples.js"></script>
+	<link href="../node_modules/@createjs/build/assets/css/shared.css" rel="stylesheet" type="text/css"/>
+	<link href="../node_modules/@createjs/build/assets/css/examples.css" rel="stylesheet" type="text/css"/>
+	<script src="../node_modules/@createjs/build/assets/js/examples.js"></script>
+
 </head>
 <body onload="init()">
 
@@ -23,12 +24,14 @@
 	<canvas id="testCanvas" width="960" height="400"></canvas>
 </div>
 
-<script src="../lib/easeljs-NEXT.combined.js"></script>
+
 <!-- We also provide hosted minified versions of all CreateJS libraries.
   http://code.createjs.com -->
 
 <!-- MovieClip is not included in the core library, and is dependent on TweenJS -->
-<script src="../_assets/libs/tweenjs-NEXT.min.js"></script>
+<script src="/libs/tweenjs/dist/tweenjs-NEXT.js"></script>
+
+<script src="../dist/easeljs-NEXT.js"></script>
 
 <script id="editable">
 	function init() {
@@ -36,7 +39,7 @@
 		createjs.Ticker.addEventListener("tick", stage);
 
 		// Create the MovieClip
-		var mc = new createjs.MovieClip(null, 0, true, {start: 0, middle: 40});
+		var mc = new createjs.MovieClip({mode:0,startPosition:0, labels:{start: 0, middle: 40}});
 		stage.addChild(mc);
 
 		// Create the States. Each state is just a circle shape.
