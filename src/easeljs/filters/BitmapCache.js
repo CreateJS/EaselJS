@@ -427,7 +427,10 @@ this.createjs = this.createjs||{};
 		var surfaceCount = this._filterCount + (this._stageGL.isCacheControlled ? 0 : 1);
 		if(surfaceCount >= 1) {
 			var out = this._stageGL.getTargetRenderTexture(this, this._drawWidth,this._drawHeight, true);
-			if(this._cacheCanvas === null){ this._cacheCanvas = out; }
+			if(this._cacheCanvas === null){
+				this._cacheCanvas = out;
+				this.disabled = this._disabled;
+			}
 		}
 		if(surfaceCount >= 2) {
 			this._stageGL.getTargetRenderTexture(this, this._drawWidth,this._drawHeight, false);
@@ -513,11 +516,14 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Determines and returns the correct draw target for the content (pre filters) to be output to.
+	 * Determines and returns the correct draw target for the content to be output to.
 	 * Intended for internal use.
+	 * @method _getGLContentTarget
+	 * @param {Number} filterCount Whole number, the number of filters still to be drawn
 	 * @returns {WebGLTexture}
 	 */
-	p._getGLContentTarget = function() {
+	p._getGLContentTarget = function(filterCount) {
+		if(!(filterCount >= 0)){ filterCount = 0; }
 		// draws ping pong between out/temp as each filter pass occurs, starting on the right foot avoids pointless draws
 		// to canvas, no filter			= canvas
 		// to canvas, odd filters		= out
@@ -525,8 +531,21 @@ this.createjs = this.createjs||{};
 		// to texture, no filter		= out
 		// to texture, odd filters		= temp
 		// to texture, even filters		= out
-		if(this._filterCount === 0 && this._stageGL.isCacheControlled) { return this._cacheCanvas }
-		return ((this._filterCount % 2) ^ this._stageGL.isCacheControlled) ? this._renderTextureTemp : this._renderTextureOut;
+		if(filterCount === 0 && this._stageGL.isCacheControlled) { return this._cacheCanvas }
+		return ((filterCount % 2) ^ this._stageGL.isCacheControlled) ? this._renderTextureTemp : this._renderTextureOut;
+	};
+
+	/**
+	 * Fetch the correct filter in order, complicated by multipass filtering.
+	 * @param {Number} lookup The filter in the list to return
+	 */
+	p._getGLFilter = function(lookup) {
+		var i = 0;
+		var result = this.target.filters[i];
+		while(result && --lookup >= 0) {
+			result = result._multiPass ? result._multiPass : this.target.filters[++i];
+		}
+		return result
 	};
 
 // private methods:

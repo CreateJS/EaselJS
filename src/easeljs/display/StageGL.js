@@ -252,6 +252,24 @@ this.createjs = this.createjs||{};
 		 */
 		this._webGLContext = null;
 
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+		this._frameBuffer = null;
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
 		/**
 		 * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
 		 * @property _clearColor
@@ -1299,20 +1317,27 @@ this.createjs = this.createjs||{};
 		this._directDraw = true;
 
 		var filterCount = manager._filterCount;
+		var filtersLeft = filterCount;
 		var backupWidth = this._viewportWidth, backupHeight = this._viewportHeight;
 		this.updateViewport(manager._drawWidth, manager._drawHeight);
 
-		var contentStamp = manager._getGLContentTarget();
+		var contentStamp = manager._getGLContentTarget(filtersLeft);
 		var container = this._cacheContainer;
 		container.children = [target];
 		container.transformMatrix = this._alignTargetToCache(target, manager);
 
 		this._updateRenderMode("source-over");
 		this._drawContent(contentStamp._frameBuffer, container, true);
+		console.log("-----------------");
 
-		if(filterCount) {
-			this._drawFilters(contentStamp, target, manager);
+		while(filtersLeft) { //warning: pay attention to where filtersLeft is modified, this is a micro-optimization
+			var filter = manager._getGLFilter(filterCount - filtersLeft);
+			var drawTarget = manager._getGLContentTarget(--filtersLeft);
+			this._drawCover(drawTarget._frameBuffer, contentStamp, filter);
+			console.log(filter);
+			contentStamp = drawTarget;
 		}
+		console.log("==================");
 
 		this.updateViewport(backupWidth, backupHeight);
 		this._directDraw = temp;
@@ -2331,14 +2356,14 @@ this.createjs = this.createjs||{};
 	/**
 	 * Used to draw one or more textures potentially using a filter into the supplied buffer.
 	 * Mostly used for caches, filters, and outputting final render frames.
-	 * Draws `dst` into `out` after applying `src` (if specified) using `filter` or the current `_renderMode`.
+	 * Draws `dst` into `out` after applying `srcFilter` depending on its current value.
 	 * @param {WebGLFramebuffer} out Buffer to draw the results into (null is the canvas element)
 	 * @param {WebGLTexture} dst Base texture layer aka "destination" in image blending terminology
-	 * @param {WebGLTexture} [src = undefined] Modification texture layer aka "source" in image blending terminology
-	 * @param {Filter} [filter = undefined] Filter to use instead of blend mode, must supply a src to work.
+	 * @param {WebGLTexture | Filter} [srcFilter = undefined] Modification parameter for the draw. If a texture, the
+	 * current _renderMode applies it as a "source" image. If a Filter, the filter is applied to the dst with its params.
 	 * @protected
 	 */
-	p._drawCover = function (out, dst, src, filter) {
+	p._drawCover = function (out, dst, srcFilter) {
 		var gl = this._webGLContext;
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, out);
@@ -2347,16 +2372,17 @@ this.createjs = this.createjs||{};
 		gl.bindTexture(gl.TEXTURE_2D, dst);
 		this.setTextureParams(gl);
 
-		if (src !== undefined) {
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, src);
-			this.setTextureParams(gl);
-		}
-
-		if (filter === undefined) {
-			this._activeShader = this._builtShaders[this._renderMode].shader;
+		if (srcFilter instanceof createjs.Filter) {
+			this._activeShader = this.getFilterShader(srcFilter);
 		} else {
-			this.getFilterShader(filter);
+			if (srcFilter instanceof WebGLTexture) {
+				gl.activeTexture(gl.TEXTURE1);
+				gl.bindTexture(gl.TEXTURE_2D, srcFilter);
+				this.setTextureParams(gl);
+			} else if(srcFilter !== undefined && this.vocalDebug) {
+				console.log("Unknown data handed to function: ", srcFilter);
+			}
+			this._activeShader = this._builtShaders[this._renderMode].shader;
 		}
 
 		this._renderCover();
@@ -2383,101 +2409,6 @@ this.createjs = this.createjs||{};
 		mtx.translate(-manager.offX/manager.scale*target.scaleX, -manager.offY/manager.scale*target.scaleY);
 
 		return mtx;
-	};
-
-	/**
-	 * Sub portion of cacheDraw, split off for readability. Do not call independently. Swap surfaces are texture drawn
-	 * into back and forth due to limitations drawing a texture a into itself. This will draw into the managers out.
-	 * @method _drawFilters
-	 * @param {WebGLTexture} content A render texture which should contain original content
-	 * @param {DisplayObject} target The object we're drawing with a filter.
-	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
-	 */
-	p._drawFilters = function(content, target, manager) {
-		// we can use one of the swap buffers as the out, but we need to notice that and start off on the right foot
-
-
-
-
-
-
-
-
-
-
-	};
-
-	p._drawFilters_OLD = function(target, filters, manager) {
-		var gl = this._webGLContext;
-		var renderTexture;
-		var lastTextureSlot = this._freeTextureCount;
-		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
-
-		var filtersLeft = manager._filterCount;
-		var container = this._cacheContainer;
-		var useOut = !(filtersLeft%2); // we have to swap render surface, so start with the one that will make 'out' the last
-
-		// we don't know which texture slot we're dealing with previously and we need one out of the way
-		// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
-		gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-		renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight, useOut);
-
-		// draw item to render texture		I -> T
-		gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-		this.updateViewport(manager._drawWidth, manager._drawHeight);
-		gl.clear(gl.COLOR_BUFFER_BIT);
-		this._batchDraw(container, true);
-
-		gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-		// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-		this.setTextureParams(gl);
-
-		var i = 0, filter = filters[i];
-		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
-			filtersLeft--;
-			useOut = !useOut;
-
-			// swap to correct shader
-			this._activeShader = this.getFilterShader(filter);
-			if (!this._activeShader) { continue; }
-
-			gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-			renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight, useOut);
-
-			if (filtersLeft === 0 && this.isCacheControlled) {
-				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-				// draw result to canvas			R -> C
-				this.updateViewport(wBackup, hBackup);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._renderCover();
-
-				return;
-
-			} else {
-				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-
-				// draw result to render texture	R -> T
-				gl.viewport(0, 0, manager._drawWidth, manager._drawHeight);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._renderCover();
-
-				// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
-				gl.activeTexture(gl.TEXTURE0);
-				gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-				this.setTextureParams(gl);
-			}
-
-			// work through the multipass if it's there, otherwise move on
-			filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
-		} while (filter);
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		this.updateViewport(wBackup, hBackup);
 	};
 
 	/**
@@ -2755,7 +2686,6 @@ this.createjs = this.createjs||{};
 	/**
 	 * Draws a card that covers the entire render surface. Mainly used for filters.
 	 * @method _renderCover
-	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @protected
 	 */
 	p._renderCover = function () {
