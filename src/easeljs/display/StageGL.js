@@ -1328,16 +1328,13 @@ this.createjs = this.createjs||{};
 
 		this._updateRenderMode("source-over");
 		this._drawContent(contentStamp._frameBuffer, container, true);
-		console.log("-----------------");
 
 		while(filtersLeft) { //warning: pay attention to where filtersLeft is modified, this is a micro-optimization
 			var filter = manager._getGLFilter(filterCount - filtersLeft);
 			var drawTarget = manager._getGLContentTarget(--filtersLeft);
 			this._drawCover(drawTarget._frameBuffer, contentStamp, filter);
-			console.log(filter);
 			contentStamp = drawTarget;
 		}
-		console.log("==================");
 
 		this.updateViewport(backupWidth, backupHeight);
 		this._directDraw = temp;

@@ -424,16 +424,18 @@ this.createjs = this.createjs||{};
 			this._updateSurface();
 		}
 
-		var surfaceCount = this._filterCount + (this._stageGL.isCacheControlled ? 0 : 1);
-		if(surfaceCount >= 1) {
-			var out = this._stageGL.getTargetRenderTexture(this, this._drawWidth,this._drawHeight, true);
-			if(this._cacheCanvas === null){
-				this._cacheCanvas = out;
-				this.disabled = this._disabled;
+		if (this._stageGL) {
+			var surfaceCount = this._filterCount + (this._stageGL.isCacheControlled ? 0 : 1);
+			if(surfaceCount >= 1) {
+				var out = this._stageGL.getTargetRenderTexture(this, this._drawWidth,this._drawHeight, true);
+				if(this._cacheCanvas === null){
+					this._cacheCanvas = out;
+					this.disabled = this._disabled;
+				}
 			}
-		}
-		if(surfaceCount >= 2) {
-			this._stageGL.getTargetRenderTexture(this, this._drawWidth,this._drawHeight, false);
+			if(surfaceCount >= 2) {
+				this._stageGL.getTargetRenderTexture(this, this._drawWidth,this._drawHeight, false);
+			}
 		}
 
 		this._filterOffX = filterBounds.x;
@@ -565,6 +567,7 @@ this.createjs = this.createjs||{};
 			// create it if it's missing
 			if(!surface) {
 				surface = this._cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+				this.target.cacheCanvas = this._disabled ? null : this._cacheCanvas;
 			}
 
 			// now size it
