@@ -36,7 +36,6 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-
 // constructor:
 	/**
 	 * The BitmapCache is an internal representation of all the cache properties and logic required in order to "cache"
@@ -166,6 +165,30 @@ this.createjs = this.createjs||{};
 		this._filterOffY = 0;
 
 		/**
+		 * Internal tracking of the disabled state, use the getter/setters.
+		 * @property _disabled
+		 * @type {boolean}
+		 * @protected
+		 */
+		this._disabled = false;
+
+		/**
+		 * Internal tracking of intended cacheCanvas, may or may not be assigned based on disabled state.
+		 * @property _cacheCanvas
+		 * @type {HTMLCanvasElement | WebGLTexture | Object}
+		 * @protected
+		 */
+		this._cacheCanvas = null;
+
+		/**
+		 * Output StageGL target for GL drawing
+		 * @property _stageGL
+		 * @type {StageGL}
+		 * @protected
+		 */
+		this._stageGL = null;
+
+		/**
 		 * The cacheID when a DataURL was requested.
 		 * @property _cacheDataURLID
 		 * @protected
@@ -209,8 +232,59 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 **/
 		this._boundRect = new createjs.Rectangle();
+
+		// semi protected: not public API but modified by other classes
+		/**
+		 * Storage for the StageGL counter positioning matrix used on the object being cached
+		 * @property _counterMatrix
+		 * @type {Matrix2D}
+		 */
+		this._counterMatrix = null;
+
+		/**
+		 * Render texture temporary surface, used for swapping render calls in complex effects.
+		 * The difference between out and Temp is that Out is assigned to the cacheCanvas property of the display object
+		 * being managed by this class. That needs to be the same element consistently to allow for chaining filters & effects.
+		 * @property _renderTextureOut
+		 * @type {WebGLTexture}
+		 * @default 0
+		 */
+		this._renderTextureOut = null;
+
+		/**
+		 * Render texture temporary surface, used for swapping render calls in complex effects.
+		 * The difference between out and Temp is that Out is assigned to the cacheCanvas property of the display object
+		 * being managed by this class. That needs to be the same element consistently to allow for chaining filters & effects.
+		 * @property _renderTextureTemp
+		 * @type {WebGLTexture}
+		 * @default 0
+		 */
+		this._renderTextureTemp = null;
 	}
 	var p = BitmapCache.prototype;
+
+	p._get_disabled = function () {
+		return this._disabled;
+	};
+	p._set_disabled = function (value) {
+		this._disabled = !!value;
+		if(this.target) {
+			this.target.cacheCanvas = this._disabled ? null : this._cacheCanvas;
+		}
+	};
+
+	try {
+		Object.defineProperties(p, {
+			/**
+			 * Disable or enable the BitmapCache from displaying. Does not cause or block cache or cache updates when toggled.
+			 * Best used if the cached state is always identical, but the object will need temporary uncaching.
+			 * @property autoPurge
+			 * @type {Boolean}
+			 * @default false
+			 */
+			disabled: { get: p._get_disabled, set: p._set_disabled }
+		});
+	} catch (e) {} // TODO: use Log
 
 	/**
 	 * Returns the bounds that surround all applied filters, relies on each filter to describe how it changes bounds.
@@ -231,7 +305,7 @@ this.createjs = this.createjs||{};
 			if(!f || !f.getBounds){ continue; }
 			var test = f.getBounds();
 			if(!test){ continue; }
-			if(i==0) {
+			if(i === 0) {
 				output.setValues(test.x, test.y, test.width, test.height);
 			} else {
 				output.extend(test.x, test.y, test.width, test.height);
@@ -338,7 +412,7 @@ this.createjs = this.createjs||{};
 		if(!this.target) { throw "define() must be called before update()"; }
 
 		var filterBounds = BitmapCache.getFilterBounds(this.target);
-		var surface = this.target.cacheCanvas;
+		var surface = this._cacheCanvas;
 
 		this._drawWidth = Math.ceil(this.width*this.scale) + filterBounds.width;
 		this._drawHeight = Math.ceil(this.height*this.scale) + filterBounds.height;
@@ -346,8 +420,17 @@ this.createjs = this.createjs||{};
 			var out = 1; while (o._multiPass) { o = o._multiPass; out++; } return acc + out;
 		}, 0);
 
-		if(!surface || this._drawWidth != surface.width || this._drawHeight != surface.height) {
+		if(!surface || this._drawWidth !== surface.width || this._drawHeight !== surface.height) {
 			this._updateSurface();
+		}
+
+		var surfaceCount = this._filterCount + (this._stageGL.isCacheControlled ? 0 : 1);
+		if(surfaceCount >= 1) {
+			var out = this._stageGL.getTargetRenderTexture(this, this._drawWidth,this._drawHeight, true);
+			if(this._cacheCanvas === null){ this._cacheCanvas = out; }
+		}
+		if(surfaceCount >= 2) {
+			this._stageGL.getTargetRenderTexture(this, this._drawWidth,this._drawHeight, false);
 		}
 
 		this._filterOffX = filterBounds.x;
@@ -365,23 +448,20 @@ this.createjs = this.createjs||{};
 	 * @method release
 	 **/
 	p.release = function() {
-		if (this._webGLCache) {
-			// if it isn't cache controlled clean up after yourself
-			if (!this._webGLCache.isCacheControlled) {
-				if (this._renderTextureOut){ this._webGLCache._killTextureObject(this._renderTextureOut); }
-				if (this._renderTextureTemp){ this._webGLCache._killTextureObject(this._renderTextureTemp); }
-				if (this.target && this.target.cacheCanvas){ this._webGLCache._killTextureObject(this.target.cacheCanvas); }
-			}
+		if (this._stageGL) {
+			if (this._renderTextureOut){ this._stageGL._killTextureObject(this._renderTextureOut); }
+			if (this._renderTextureTemp){ this._stageGL._killTextureObject(this._renderTextureTemp); }
 			// set the context to none and let the garbage collector get the rest when the canvas itself gets removed
-			this._webGLCache = false;
+			this._stageGL = false;
 		} else {
 			var stage = this.target.stage;
-			if (stage instanceof createjs.StageGL){
-				stage.releaseTexture(this.target.cacheCanvas);
+			if (stage instanceof createjs.StageGL) {
+				stage.releaseTexture(this._cacheCanvas);
 			}
 		}
 
-		this.target = this.target.cacheCanvas = null;
+		this.disabled = true;
+		this.target = this._cacheCanvas = null;
 		this.cacheID = this._cacheDataURLID = this._cacheDataURL = undefined;
 		this.width = this.height = this.x = this.y = this.offX = this.offY = 0;
 		this.scale = 1;
@@ -395,11 +475,11 @@ this.createjs = this.createjs||{};
 	 * @return {String} The image data url for the cache.
 	 **/
 	p.getCacheDataURL = function() {
-		var cacheCanvas = this.target && this.target.cacheCanvas;
+		var cacheCanvas = this.target && this._cacheCanvas;
 		if (!cacheCanvas) { return null; }
-		if (this.cacheID != this._cacheDataURLID) {
+		if (this.cacheID !== this._cacheDataURLID) {
 			this._cacheDataURLID = this.cacheID;
-			this._cacheDataURL = cacheCanvas.toDataURL?cacheCanvas.toDataURL():null;	// incase function is
+			this._cacheDataURL = cacheCanvas.toDataURL ? cacheCanvas.toDataURL() : null;
 		}
 		return this._cacheDataURL;
 	};
@@ -412,7 +492,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.draw = function(ctx) {
 		if(!this.target) { return false; }
-		ctx.drawImage(this.target.cacheCanvas,
+		ctx.drawImage(this._cacheCanvas,
 			this.x + (this._filterOffX/this.scale),		this.y + (this._filterOffY/this.scale),
 			this._drawWidth/this.scale,					this._drawHeight/this.scale
 		);
@@ -432,6 +512,23 @@ this.createjs = this.createjs||{};
 		);
 	};
 
+	/**
+	 * Determines and returns the correct draw target for the content (pre filters) to be output to.
+	 * Intended for internal use.
+	 * @returns {WebGLTexture}
+	 */
+	p._getGLContentTarget = function() {
+		// draws ping pong between out/temp as each filter pass occurs, starting on the right foot avoids pointless draws
+		// to canvas, no filter			= canvas
+		// to canvas, odd filters		= out
+		// to canvas, even filters		= temp
+		// to texture, no filter		= out
+		// to texture, odd filters		= temp
+		// to texture, even filters		= out
+		if(this._filterCount === 0 && this._stageGL.isCacheControlled) { return this._cacheCanvas }
+		return ((this._filterCount % 2) ^ this._stageGL.isCacheControlled) ? this._renderTextureTemp : this._renderTextureOut;
+	};
+
 // private methods:
 	/**
 	 * Create or resize the invisible canvas/surface that is needed for the display object(s) to draw to,
@@ -444,11 +541,11 @@ this.createjs = this.createjs||{};
 		var surface;
 
 		if (!this._options || !this._options.useGL) {
-			surface = this.target.cacheCanvas;
+			surface = this._cacheCanvas;
 
 			// create it if it's missing
 			if(!surface) {
-				surface = this.target.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+				surface = this._cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 			}
 
 			// now size it
@@ -458,37 +555,38 @@ this.createjs = this.createjs||{};
 		}
 
 		// create it if it's missing
-		if (!this._webGLCache) {
+		if (!this._stageGL) {
 			if (this._options.useGL === "stage") {
+				var targetStage = this.target.stage;
 				// use the stage that this object belongs on as the WebGL context
-				if(!(this.target.stage && this.target.stage.isWebGL)){
+				if(!(targetStage && targetStage.isWebGL)){
 					var error = "Cannot use 'stage' for cache because the object's parent stage is ";
-					error += this.target.stage ? "non WebGL." : "not set, please addChild to the correct stage.";
+					error += targetStage ? "non WebGL." : "not set, please addChild to the correct stage.";
 					throw error;
 				}
-				this._webGLCache = this.target.stage;
-				this.target.cacheCanvas = this._webGLCache.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight, true);
+				this._stageGL = targetStage;
 
 			} else if(this._options.useGL === "new") {
 				// create a new WebGL context to run this cache
-				this.target.cacheCanvas = document.createElement("canvas"); // low autopurge in case of filter swapping and low texture count
-				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true, autoPurge: 10});
-				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
+				this._cacheCanvas = document.createElement("canvas"); // low autopurge in case of filter swapping and low texture count
+				this._stageGL = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true, autoPurge: 10});
+				this._stageGL.isCacheControlled = true;	// use this flag to control stage sizing and final output
 
 			} else if(this._options.useGL instanceof createjs.StageGL) {
 				// use the provided WebGL context to run this cache, trust the user it works and is configured.
-				this._webGLCache = this._options.useGL;
-				this.target.cacheCanvas = this._webGLCache.getTargetRenderTexture(this.target, this._drawWidth,this._drawHeight, true);
+				this._stageGL = this._options.useGL;
 
 			} else {
 				throw "Invalid option provided to useGL, expected ['stage', 'new', StageGL, undefined], got "+ this._options.useGL;
 			}
 		}
 
+		this.target.cacheCanvas = this._disabled ? null : this._cacheCanvas;
+
 		// if we have a dedicated stage we've got to size it
-		var stageGL = this._webGLCache;
+		var stageGL = this._stageGL;
 		if (stageGL.isCacheControlled) {
-			surface = this.target.cacheCanvas;
+			surface = this._cacheCanvas;
 			surface.width = this._drawWidth;
 			surface.height = this._drawHeight;
 			stageGL.updateViewport(this._drawWidth, this._drawHeight);
@@ -501,9 +599,9 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._drawToCache = function(compositeOperation) {
-		var surface = this.target.cacheCanvas;
+		var surface = this._cacheCanvas;
 		var target = this.target;
-		var webGL = this._webGLCache;
+		var webGL = this._stageGL;
 
 		if (webGL) {
 			webGL.cacheDraw(target, this);

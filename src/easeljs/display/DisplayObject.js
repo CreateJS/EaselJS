@@ -153,7 +153,7 @@ this.createjs = this.createjs||{};
 		 * If a cache is active, this returns the canvas that holds the image of this display object. See {{#crossLink "DisplayObject/cache:method"}}{{/crossLink}}
 		 * for more information. Use this to display the result of a cache. This will be a HTMLCanvasElement unless special cache rules have been deliberately enabled for this cache.
 		 * @property cacheCanvas
-		 * @type {HTMLCanvasElement | Object}
+		 * @type {HTMLCanvasElement | WebGLTexture | Object}
 		 * @default null
 		 * @readonly
 		 **/
@@ -457,6 +457,15 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 */
 		this._webGLRenderStyle = DisplayObject._StageGL_NONE;
+
+		/**
+		 * Storage for the calculated position of an object in StageGL
+		 * @property _glMtx
+		 * @protected
+		 * @type {Rectangle}
+		 * @default null
+		 */
+		this._glMtx = null;
 	}
 	var p = createjs.extend(DisplayObject, createjs.EventDispatcher);
 
@@ -996,8 +1005,9 @@ this.createjs = this.createjs||{};
 	 * @return {Matrix2D} A matrix representing this display object's transform.
 	 **/
 	p.getMatrix = function(matrix) {
-		var o = this, mtx = matrix&&matrix.identity() || new createjs.Matrix2D();
-		return o.transformMatrix ?  mtx.copy(o.transformMatrix) : mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+		var o = this, mtx = matrix || new createjs.Matrix2D();
+		return o.transformMatrix ?  mtx.copy(o.transformMatrix) :
+			(matrix.identity() && mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY));
 	};
 
 	/**
