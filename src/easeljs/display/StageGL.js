@@ -203,11 +203,7 @@ this.createjs = this.createjs||{};
 		this.autoPurge = autoPurge;	//getter/setter handles setting the real value and validating and documentation
 
 		/**
-		 * aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-		 * aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-		 * aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-		 * aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-		 * aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+		 * See directDraw
 		 * @property _directDraw
 		 * @protected
 		 * @type {Boolean}
@@ -252,23 +248,12 @@ this.createjs = this.createjs||{};
 		 */
 		this._webGLContext = null;
 
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
+		/**
+		 * Reduce API logic by allowing stage to behave as a renderTexture target, should always be null as null is canvas.
+		 * @type {null}
+		 * @protected
+		 */
 		this._frameBuffer = null;
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
 
 		/**
 		 * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
@@ -1207,8 +1192,6 @@ this.createjs = this.createjs||{};
 				this.updateViewport(this.canvas.width, this.canvas.height);
 				if(!this._directDraw) {
 					this._bufferTextureOutput = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
-					this._bufferTextureConcat = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
-					this._bufferTextureTemp = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
 				}
 
 				this.canvas._invalid = true;
@@ -1312,9 +1295,19 @@ this.createjs = this.createjs||{};
 			return false;
 		}
 
-		// TODO: fix it so we don't have to do this
-		var temp = this._directDraw;
-		this._directDraw = true;
+		// TODO: fix it so we don't have to assume `_directDraw = false`
+		// TODO: fix it so we don't have to assume `_directDraw = false`
+		// TODO: fix it so we don't have to assume `_directDraw = false`
+		// TODO: fix it so we don't have to assume `_directDraw = false`
+		// TODO: fix it so we don't have to assume `_directDraw = false`
+		// TODO: fix it so we don't have to assume `_directDraw = false`
+		// TODO: fix it so we don't have to assume `_directDraw = false`
+		// TODO: fix it so we don't have to assume `_directDraw = false`
+		// Two distinct issues
+		// #) Swap textures for content draws are hard coded to screen canvases, switch to using BitmapCache temps when cache drawing
+		// #) CacheControlled + no filters put the output as the canvas, but we can't assume that till the entire tree is walked
+
+
 
 		var filterCount = manager._filterCount;
 		var filtersLeft = filterCount;
@@ -1337,7 +1330,6 @@ this.createjs = this.createjs||{};
 		}
 
 		this.updateViewport(backupWidth, backupHeight);
-		this._directDraw = temp;
 		return true;
 	};
 
@@ -2457,6 +2449,7 @@ this.createjs = this.createjs||{};
 
 			if (!(item.visible && concatAlpha > 0.0035)) { continue; }
 			if (!useCache) {
+				// TODO: DHG: cacheless filters
 				if (item._updateState){
 					item._updateState();
 				}
@@ -2604,29 +2597,44 @@ this.createjs = this.createjs||{};
 			this._batchCardCount++;
 
 			if (this._immediateRender) {
-				gl.bindFramebuffer(gl.FRAMEBUFFER, this._bufferTextureConcat._frameBuffer);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-
-				var swap = this._bufferTextureOutput;
-				this._bufferTextureOutput = this._bufferTextureConcat;
-				this._bufferTextureConcat = swap;
-
-				this._activeShader = this._mainShader;
-				gl.bindFramebuffer(gl.FRAMEBUFFER, this._bufferTextureTemp._frameBuffer);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				this.batchReason = "immediateBuffer";
-				this._renderBatch();//<-------------------------------------------------------------------------------
-
-				this.batchReason = "immediateDraw";
-				this._drawCover(this._bufferTextureOutput._frameBuffer, this._bufferTextureConcat, this._bufferTextureTemp);
-
-				gl.bindFramebuffer(gl.FRAMEBUFFER, this._bufferTextureOutput._frameBuffer);
+				this._immediateBatchRender(gl);
 			}
 		}
 
 		if (backupMode !== null) {
 			this._updateRenderMode(backupMode);
 		}
+	};
+
+	/**
+	 * The shader or effect needs to be drawn immediately, sub function of `_appendToBatch`
+	 * @protected
+	 */
+	p._immediateBatchRender = function(gl) {
+		if(this._bufferTextureConcat === null){
+			this._bufferTextureConcat = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+		}
+		if(this._bufferTextureTemp === null){
+			this._bufferTextureTemp = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+		}
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._bufferTextureConcat._frameBuffer);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+
+		var swap = this._bufferTextureOutput;
+		this._bufferTextureOutput = this._bufferTextureConcat;
+		this._bufferTextureConcat = swap;
+
+		this._activeShader = this._mainShader;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._bufferTextureTemp._frameBuffer);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		this.batchReason = "immediateBuffer";
+		this._renderBatch();//<-----------------------------------------------------------------------------------------
+
+		this.batchReason = "immediateDraw";
+		this._drawCover(this._bufferTextureOutput._frameBuffer, this._bufferTextureConcat, this._bufferTextureTemp);
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._bufferTextureOutput._frameBuffer);
 	};
 
 	/**

@@ -315,6 +315,16 @@ this.createjs = this.createjs||{};
 		return output;
 	};
 
+	/**
+	 * Utility function, use with `displayObject.filters.reduce(BitmapCache.filterCounter, 0);`
+	 * @param acc Accumulator
+	 * @param o Object
+	 * @returns {*}
+	 */
+	BitmapCache.filterCounter =  function (acc, o) {
+		var out = 1; while (o._multiPass) { o = o._multiPass; out++; } return acc + out;
+	};
+
 // public methods:
 	/**
 	 * Returns a string representation of this object.
@@ -416,9 +426,7 @@ this.createjs = this.createjs||{};
 
 		this._drawWidth = Math.ceil(this.width*this.scale) + filterBounds.width;
 		this._drawHeight = Math.ceil(this.height*this.scale) + filterBounds.height;
-		this._filterCount = this.target.filters.reduce( function (acc, o) {
-			var out = 1; while (o._multiPass) { o = o._multiPass; out++; } return acc + out;
-		}, 0);
+		this._filterCount = this.target.filters.reduce(BitmapCache.filterCounter, 0);
 
 		if(!surface || this._drawWidth !== surface.width || this._drawHeight !== surface.height) {
 			this._updateSurface();
@@ -591,7 +599,8 @@ this.createjs = this.createjs||{};
 			} else if(this._options.useGL === "new") {
 				// create a new WebGL context to run this cache
 				this._cacheCanvas = document.createElement("canvas"); // low autopurge in case of filter swapping and low texture count
-				this._stageGL = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true, autoPurge: 10});
+				this._stageGL = new createjs.StageGL(this._cacheCanvas, {antialias: true, transparent: true, autoPurge: 10});
+				if(!this._stageGL._webGLContext){ throw "GL Cache asked for but unavailable"; }
 				this._stageGL.isCacheControlled = true;	// use this flag to control stage sizing and final output
 
 			} else if(this._options.useGL instanceof createjs.StageGL) {
