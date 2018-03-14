@@ -1,9 +1,44 @@
-describe("DisplayList", function () {
-	beforeEach(function () {
-		this.shadow = new createjs.Shadow();
+import {
+	Shadow,
+	Stage,
+	Shape,
+	Container,
+	Sprite,
+	Bitmap,
+	DisplayObject,
+	SpriteSheet,
+	BitmapText,
+	Text,
+	Rectangle,
+	BlurFilter,
+	ColorMatrixFilter,
+	ColorMatrix
+} from "../../../dist/easeljs.module";
+import globals from "../../setup";
+import imagediff from "imagediff";
+import Canvas from "canvas-prebuilt";
+
+function createShapeRect (x, y, w, h, fColor) {
+	const shape = new Shape();
+	const g = shape.graphics;
+	g.ss(1).s(globals.sColor).f(fColor).dr(x, y, w, h).ef();
+	return shape;
+}
+
+describe("DisplayList", () => {
+
+	let stage, image, displayObjectProps, bitmapProps;
+
+	beforeEach(async (done) => {
+		stage = new Stage(imagediff.createCanvas(200, 200));
+
+		image = new Canvas.Image();
+		image.onload = () => { done(); }
+		image.onerror = () => { done(`${image.src} failed to load`); }
+		image.src = `${globals.rootPath}assets/art/daisy.png`;
 
 		// Used to test clone() and set() operations
-		this.displayObjectProps = {
+		displayObjectProps = {
 			alpha: .5,
 			name: "foo",
 			regX: 1,
@@ -11,7 +46,7 @@ describe("DisplayList", function () {
 			rotation: 90,
 			scaleX: 1.5,
 			scaleY: 1.6,
-			shadow: this.shadow,
+			shadow: new Shadow(),
 			skewX: 3,
 			skewY: 4,
 			visible: false,
@@ -21,122 +56,117 @@ describe("DisplayList", function () {
 			compositeOperation: "copy"
 		};
 
-		this.bitmapProps = {sourceRect: new createjs.Rectangle(1, 2, 3, 4)};
-		for (var n in this.displayObjectProps) {
-			this.bitmapProps[n] = this.displayObjectProps[n];
-		}
-
-		this.createShapeRect = function (x, y, w, h, fColor) {
-			var shape = new createjs.Shape();
-			var g = shape.graphics;
-			g.ss(1).s(this.sColor).f(fColor).dr(x, y, w, h).ef();
-			return shape;
+		bitmapProps = { sourceRect: new Rectangle(1, 2, 3, 4) };
+		for (let n in displayObjectProps) {
+			bitmapProps[n] = displayObjectProps[n];
 		}
 	});
 
-	it("stage.addChild() should work", function () {
-		var child = new createjs.Container();
-		this.stage.addChild(child);
+	afterEach(() => {
+		stage, image, displayObjectProps, bitmapProps = null;
+	})
 
-		expect(this.stage.contains(child)).toBe(true);
+	describe("Stage", () => {
+
+		test("addChild() should work", () => {
+			const child = new Container();
+			stage.addChild(child);
+			expect(stage.contains(child)).toBeTruthy();
+		});
+
+		test("stage.contains() and stage.removeChild() should work", () => {
+			const child = new Container();
+			stage.addChild(child);
+			stage.removeChild(child);
+			expect(stage.contains(child)).toBeFalsy();
+		});
+
+		test("stage.removeChildAt(0) should work", () => {
+			const child = new Container();
+			stage.addChild(child);
+			stage.removeChildAt(0);
+			expect(stage.contains(child)).toBeFalsy();
+		});
+
+		test("stage.getChildIndex() should work", () => {
+			const child = new Container();
+			stage.addChild(new Container());
+			stage.addChildAt(child, 0);
+			expect(stage.getChildIndex(child)).toBe(0);
+		});
+
+		test("stage.addChildAt() should work.", () => {
+			const child = new Container();
+			stage.addChild(new Container());
+			stage.addChildAt(child, 1);
+			expect(stage.getChildIndex(child)).toBe(1);
+		});
+
+		test("stage.getChildByName('foo') should work", () => {
+			const child = new Container();
+			child.name = "foo";
+			stage.addChild(child);
+			expect(stage.getChildByName("foo")).not.toBeNull();
+		});
+
+		test("stage.getMatrix() should work", () => {
+			expect(stage.getMatrix()).not.toBe(null);
+		});
+
+		test("stage.getConcatenatedMatrix() should work", () => {
+			expect(stage.getConcatenatedMatrix()).not.toBe(null);
+		});
+
+		test("stage.numChildren should be 2", () => {
+			stage.addChild(new Sprite());
+			stage.addChild(new Sprite());
+			expect(stage.numChildren).toBe(2);
+		});
+
+		test("stage.stage should eq stage.", () => {
+			expect(stage.stage).toBe(stage);
+		});
+
 	});
 
-	it("stage.contains() and stage.removeChild() should work", function () {
-		var child = new createjs.Container();
-		this.stage.addChild(child);
-		this.stage.removeChild(child);
+	describe("*.clone() should work", () => {
 
-		expect(this.stage.contains(child)).toBe(false);
-	});
-
-	it("stage.removeChildAt(0) should work", function () {
-		var child = new createjs.Container();
-		this.stage.addChild(child);
-		this.stage.removeChildAt(0);
-
-		expect(this.stage.contains(child)).toBe(false);
-	});
-
-	it("stage.getChildIndex() should work", function () {
-		var child = new createjs.Container();
-		this.stage.addChild(new createjs.Container());
-		this.stage.addChildAt(child, 0);
-
-		expect(this.stage.getChildIndex(child)).toBe(0);
-	});
-
-	it("stage.addChildAt() should work.", function () {
-		var child = new createjs.Container();
-		this.stage.addChild(new createjs.Container());
-		this.stage.addChildAt(child, 1);
-
-		expect(this.stage.getChildIndex(child)).toBe(1);
-	});
-
-	it("stage.getChildByName('foo') should work", function () {
-		var child = new createjs.Container();
-		child.name = "foo";
-		this.stage.addChild(child);
-
-		expect(this.stage.getChildByName("foo")).not.toBe(null);
-	});
-
-	it("stage.getMatrix() should work", function () {
-		expect(this.stage.getMatrix()).not.toBe(null);
-	});
-
-	it("stage.getConcatenatedMatrix() should work", function () {
-		expect(this.stage.getConcatenatedMatrix()).not.toBe(null);
-	});
-
-	it("stage.numChildren should be 2", function () {
-		this.stage.addChild(new createjs.Sprite());
-		this.stage.addChild(new createjs.Sprite());
-		expect(this.stage.numChildren).toBe(2);
-	});
-
-	it("stage.stage should eq stage.", function () {
-		expect(this.stage.stage).toBe(this.stage);
-	});
-
-	describe("*.clone() should work", function () {
-
-		it("Bitmap.clone();", function () {
-			var bmp = new createjs.Bitmap(this.img).set(this.bitmapProps);
+		test("Bitmap.clone();", () => {
+			var bmp = new Bitmap(image).set(bitmapProps);
 			var clone = bmp.clone();
 
-			for (var n in this.bitmapProps) {
-				if (clone[n] instanceof createjs.Rectangle) {
-					var a = this.bitmapProps[n];
+			for (var n in bitmapProps) {
+				if (clone[n] instanceof Rectangle) {
+					var a = bitmapProps[n];
 					var b = clone[n];
 					expect(a.x).toBe(b.x);
 					expect(a.y).toBe(b.y);
 					expect(a.width).toBe(b.width);
 					expect(a.height).toBe(b.height);
 				} else {
-					expect(clone[n]).toBe(this.bitmapProps[n]);
+					expect(clone[n]).toBe(bitmapProps[n]);
 				}
 			}
 		});
 
-		it("DisplayObject.clone();", function () {
-			var obj = new createjs.DisplayObject().set(this.displayObjectProps);
+		test("DisplayObject.clone();", () => {
+			var obj = new DisplayObject().set(displayObjectProps);
 			var clone = obj.clone();
 
-			for (var n in this.displayObjectProps) {
-				expect(clone[n]).toBe(this.displayObjectProps[n]);
+			for (var n in displayObjectProps) {
+				expect(clone[n]).toBe(displayObjectProps[n]);
 			}
 		});
 
-		it("Sprite.clone();", function () {
-			var props = this.merge({
+		test("Sprite.clone();", () => {
+			var props = globals.merge({
 									   currentFrame: 1,
 									   currentAnimation: "foo",
 									   paused: true,
 									   currentAnimationFrame: 2,
 									   framerate: 3
-								   }, this.displayObjectProps);
-			var obj = new createjs.Sprite().set(props);
+								   }, displayObjectProps);
+			var obj = new Sprite().set(props);
 			var clone = obj.clone();
 
 			for (var n in props) {
@@ -144,17 +174,17 @@ describe("DisplayList", function () {
 			}
 		});
 
-		it("Container.clone();", function () {
-			var obj = new createjs.Container().set(this.displayObjectProps);
+		test("Container.clone();", () => {
+			var obj = new Container().set(displayObjectProps);
 			var clone = obj.clone();
 
-			for (var n in this.displayObjectProps) {
-				expect(clone[n]).toBe(this.displayObjectProps[n]);
+			for (var n in displayObjectProps) {
+				expect(clone[n]).toBe(displayObjectProps[n]);
 			}
 		});
 
-		it("Stage.clone() should fail", function () {
-			var obj = new createjs.Stage();
+		test("Stage.clone() should fail", () => {
+			var obj = new Stage();
 
 			// Can't use toThrow() since a string is thrown and jasmine doesn't catch it.
 			try {
@@ -167,8 +197,8 @@ describe("DisplayList", function () {
 			expect(true).toBe(false);
 		});
 
-		it("SpriteSheet.clone() should fail", function () {
-			var obj = new createjs.SpriteSheet();
+		test("SpriteSheet.clone() should fail", () => {
+			var obj = new SpriteSheet();
 
 			// Can't use toThrow() since a string is thrown and jasmine doesn't catch it.
 			try {
@@ -181,13 +211,13 @@ describe("DisplayList", function () {
 			expect(true).toBe(false);
 		});
 
-		it("BitmapText.clone();", function () {
-			var props = this.merge({
+		test("BitmapText.clone();", () => {
+			var props = globals.merge({
 									   lineHeight: 4,
 									   letterSpacing: 5,
 									   spaceWidth: 6
-								   }, this.displayObjectProps);
-			var obj = new createjs.BitmapText().set(props);
+								   }, displayObjectProps);
+			var obj = new BitmapText().set(props);
 			var clone = obj.clone();
 
 			for (var n in props) {
@@ -195,8 +225,8 @@ describe("DisplayList", function () {
 			}
 		});
 
-		it("Text.clone();", function () {
-			var props = this.merge({
+		test("Text.clone();", () => {
+			var props = globals.merge({
 									   text: "foo bar",
 									   font: "Arial",
 									   color: "rgba(255,0,255, 5)",
@@ -206,217 +236,221 @@ describe("DisplayList", function () {
 									   outline: 1,
 									   lineHeight: 6,
 									   lineWidth: 7
-								   }, this.displayObjectProps);
-			var obj = new createjs.Text().set(props);
+								   }, displayObjectProps);
+			var obj = new Text().set(props);
 			var clone = obj.clone();
 
 			for (var n in props) {
 				expect(clone[n]).toBe(props[n]);
 			}
 		});
-	})
-	it("getTransformedBounds() should work", function () {
-		var bmp = new createjs.Bitmap(this.img);
-		this.stage.addChild(bmp);
+	});
+
+	describe("getObjectsUnderPoint()", () => {
+		let rect1, rect2, rect3, rect4, rect5;
+		beforeEach(() => {
+			rect1 = createShapeRect(0, 0, 150, 150, globals.fColor);
+			rect2 = createShapeRect(151, 151, 20, 20, globals.fColor);
+			rect3 = createShapeRect(160, 160, 20, 20, globals.fColor);
+			rect4 = createShapeRect(151, 151, 20, 20, globals.fColor);
+			rect5 = createShapeRect(25, 25, 130, 130, globals.fColor);
+
+			stage.addChild(rect1, rect2, rect3, rect4, rect5);
+			stage.update();
+
+			// document.body.appendChild(stage.canvas);
+		});
+
+		test("should return 1 object.", () => {
+			var objects = stage.getObjectsUnderPoint(1, 1);
+			expect(objects.length).toBe(1);
+		});
+
+		test("should return 3 objects.", () => {
+			var objects = stage.getObjectsUnderPoint(152, 152);
+			expect(objects.length).toBe(3);
+		});
+
+		describe("should respect masks.", () => {
+			let mask;
+			beforeEach(() => {
+				mask = new Shape();
+				var g = mask.graphics;
+				g.setStrokeStyle(1);
+				g.beginStroke(globals.sColor);
+				g.beginFill(globals.fColor);
+				g.drawRect(0, 0, 50, 50);
+				g.endFill();
+
+				rect1.mask = mask;
+
+				stage.update();
+			});
+
+			test("should find the masked object on stage", () => {
+				var objects = stage.getObjectsUnderPoint(51, 51);
+				expect(objects.length).toBe(1);
+			});
+
+			test("should not find the object on stage", () => {
+				var objects = stage.getObjectsUnderPoint(51, 51);
+				expect(objects.length).toBe(1);
+			});
+
+			describe("container masks", () => {
+				let container, mask;
+				beforeEach(() => {
+					stage.removeAllChildren();
+
+					container = new Container();
+					var wh = 100;
+					var o = 0;
+					var oi = 20;
+					rect1 = createShapeRect(o, o, wh, wh, "#ffcc88");
+					rect2 = createShapeRect(o += oi, o, wh, wh, "#ccccee");
+					rect3 = createShapeRect(o += oi, o, wh, wh, "#ccccee");
+					rect4 = createShapeRect(o += oi, o, wh, wh, globals.fColor);
+					rect5 = createShapeRect(o += oi, o, wh, wh, globals.fColor);
+					mask = createShapeRect(0, 0, 15, 15, globals.fColor);
+				});
+
+				test(".getObjectsUnderPoint should return 4", () => {
+					container.addChild(rect1, rect2, rect3, rect4);
+					stage.addChild(container);
+					stage.update();
+
+					var dot = new Shape();
+					dot.graphics.f("#ffffff").de(50, 50, 2, 2);
+
+					expect(container.getObjectsUnderPoint(48, 48).length).toBe(3);
+
+					container.addChild(dot);
+					stage.update();
+				});
+
+				test("should respect container masks from stage.getObjectsUnderPoint", () => {
+					container.addChild(rect1, rect2, rect3, rect4);
+					container.mask = mask;
+					stage.addChild(container);
+					stage.update();
+
+					expect(container.getObjectsUnderPoint(50, 50).length).toBe(0);
+				});
+
+				test("should respect containers masks", () => {
+					container.addChild(rect1, rect2, rect3, rect4);
+					container.mask = mask;
+					stage.addChild(container);
+					stage.update();
+
+					expect(stage.getObjectsUnderPoint(50, 50).length).toBe(0);
+				});
+			});
+		});
+
+		describe("hitareas", () => {
+			beforeEach(() => {
+				var hitarea = createShapeRect(0, 0, 10, 10, "#ff00aa");
+
+				rect1.mouseEnabled = true;
+				rect1.hitArea = hitarea;
+
+				stage.update();
+			});
+
+			test("should find one object", () => {
+				var objects = stage.getObjectsUnderPoint(9, 9);
+				expect(objects.length).toBe(1);
+			});
+
+			test("should not return any objects", () => {
+				var objects = stage.getObjectsUnderPoint(11, 11);
+				expect(objects.length).toBe(0);
+			});
+		});
+
+		describe("mode", () => {
+			test("mode=0 should return mouseEnabled=false objects.", () => {
+				rect2.mouseEnabled = false;
+				rect3.mouseEnabled = false;
+
+				var objects = stage.getObjectsUnderPoint(152, 152, 0);
+				expect(objects.length).toBe(3);
+			});
+
+			test("mode=1 should ignore mouseEnabled=false objects.", () => {
+				rect2.mouseEnabled = false;
+				rect3.mouseEnabled = false;
+
+				var objects = stage.getObjectsUnderPoint(152, 152, 1);
+				expect(objects.length).toBe(2);
+			});
+
+			test("mode=2 should return objects with mouseEvents and mouseEnabled==true.", () => {
+				rect2.addEventListener("click", () => {
+				});
+				rect2.mouseEnabled = false;
+				rect3.mouseEnabled = false;
+				rect4.mouseEnabled = false;
+
+				var objects = stage.getObjectsUnderPoint(152, 152, 2);
+				expect(objects.length).toBe(0);
+			});
+		});
+	});
+
+	test("getTransformedBounds() should work", () => {
+		var bmp = new Bitmap(image);
+		stage.addChild(bmp);
 		var bounds = bmp.getTransformedBounds();
 		expect(bounds.width).toBe(80);
 		expect(bounds.height).toBe(67);
 	});
 
-	describe("getObjectsUnderPoint()", function () {
-		beforeEach(function () {
-			this.rect = this.createShapeRect(0, 0, 150, 150, this.fColor);
-			this.rect2 = this.createShapeRect(151, 151, 20, 20, this.fColor);
-			this.rect3 = this.createShapeRect(160, 160, 20, 20, this.fColor);
-			this.rect4 = this.createShapeRect(151, 151, 20, 20, this.fColor);
-			this.rect5 = this.createShapeRect(25, 25, 130, 130, this.fColor);
-
-			this.stage.addChild(this.rect, this.rect2, this.rect3, this.rect4, this.rect5);
-			this.stage.update();
-
-			// document.body.appendChild(this.stage.canvas);
-		});
-
-		it("should return 1 object.", function () {
-			var objects = this.stage.getObjectsUnderPoint(1, 1);
-			expect(objects.length).toBe(1);
-		});
-
-		it("should return 3 objects.", function () {
-			var objects = this.stage.getObjectsUnderPoint(152, 152);
-			expect(objects.length).toBe(3);
-		});
-
-		describe("should respect masks.", function () {
-			beforeEach(function () {
-				this.mask = new createjs.Shape();
-				var g = this.mask.graphics;
-				g.setStrokeStyle(1);
-				g.beginStroke(this.sColor);
-				g.beginFill(this.fColor);
-				g.drawRect(0, 0, 50, 50);
-				g.endFill();
-
-				this.rect.mask = this.mask;
-
-				this.stage.update();
-			});
-
-			it("should find the masked object on stage", function () {
-				var objects = this.stage.getObjectsUnderPoint(51, 51);
-				expect(objects.length).toBe(1);
-			});
-
-			it("should not find the object on stage", function () {
-				var objects = this.stage.getObjectsUnderPoint(51, 51);
-				expect(objects.length).toBe(1);
-			});
-
-			describe("container masks", function () {
-				beforeEach(function () {
-					this.stage.removeAllChildren();
-
-					this.container = new createjs.Container();
-					var wh = 100;
-					var o = 0;
-					var oi = 20;
-					this.rect1 = this.createShapeRect(o, o, wh, wh, "#ffcc88");
-					this.rect2 = this.createShapeRect(o += oi, o, wh, wh, "#ccccee");
-					this.rect3 = this.createShapeRect(o += oi, o, wh, wh, "#ccccee");
-					this.rect4 = this.createShapeRect(o += oi, o, wh, wh, this.fColor);
-					this.rect5 = this.createShapeRect(o += oi, o, wh, wh, this.fColor);
-					this.mask = this.createShapeRect(0, 0, 15, 15, this.fColor);
-				});
-
-				it(".getObjectsUnderPoint should return 4", function () {
-					this.container.addChild(this.rect1, this.rect2, this.rect3, this.rect4);
-					this.stage.addChild(this.container);
-					this.stage.update();
-
-					var dot = new createjs.Shape();
-					dot.graphics.f("#ffffff").de(50, 50, 2, 2);
-
-					expect(this.container.getObjectsUnderPoint(48, 48).length).toBe(3);
-
-					this.container.addChild(dot);
-					this.stage.update();
-				});
-
-				it("should respect container masks from stage.getObjectsUnderPoint", function () {
-					this.container.addChild(this.rect1, this.rect2, this.rect3, this.rect4);
-					this.container.mask = this.mask;
-					this.stage.addChild(this.container);
-					this.stage.update();
-
-					expect(this.container.getObjectsUnderPoint(50, 50).length).toBe(0);
-				});
-
-				it("should respect containers masks", function () {
-					this.container.addChild(this.rect1, this.rect2, this.rect3, this.rect4);
-					this.container.mask = this.mask;
-					this.stage.addChild(this.container);
-					this.stage.update();
-
-					expect(this.stage.getObjectsUnderPoint(50, 50).length).toBe(0);
-				});
-			});
-		});
-
-		describe("hitareas", function () {
-			beforeEach(function () {
-				var hitarea = this.createShapeRect(0, 0, 10, 10, "#ff00aa");
-
-				this.rect.mouseEnabled = true;
-				this.rect.hitArea = hitarea;
-
-				this.stage.update();
-			});
-
-			it("should find one object", function () {
-				var objects = this.stage.getObjectsUnderPoint(9, 9);
-				expect(objects.length).toBe(1);
-			});
-
-			it("should not return any objects", function () {
-				var objects = this.stage.getObjectsUnderPoint(11, 11);
-				expect(objects.length).toBe(0);
-			});
-		});
-
-		describe("mode", function () {
-			it("mode=0 should return mouseEnabled=false objects.", function () {
-				this.rect2.mouseEnabled = false;
-				this.rect3.mouseEnabled = false;
-
-				var objects = this.stage.getObjectsUnderPoint(152, 152, 0);
-				expect(objects.length).toBe(3);
-			});
-
-			it("mode=1 should ignore mouseEnabled=false objects.", function () {
-				this.rect2.mouseEnabled = false;
-				this.rect3.mouseEnabled = false;
-
-				var objects = this.stage.getObjectsUnderPoint(152, 152, 1);
-				expect(objects.length).toBe(2);
-			});
-
-			it("mode=2 should return objects with mouseEvents and mouseEnabled==true.", function () {
-				this.rect2.addEventListener("click", function () {
-				});
-				this.rect2.mouseEnabled = false;
-				this.rect3.mouseEnabled = false;
-				this.rect4.mouseEnabled = false;
-
-				var objects = this.stage.getObjectsUnderPoint(152, 152, 2);
-				expect(objects.length).toBe(0);
-			});
-		});
-	});
-
-	it("hitTest() should be true.", function () {
-		var dot = new createjs.Shape();
+	test("hitTest() should be true.", () => {
+		var dot = new Shape();
 
 		var g = dot.graphics;
 		g.setStrokeStyle(1);
-		g.beginStroke(this.sColor);
-		g.beginFill(this.fColor);
+		g.beginStroke(globals.sColor);
+		g.beginFill(globals.fColor);
 		g.drawRect(0, 0, 5, 5);
 		g.endFill();
 
-		this.stage.addChild(dot);
-		this.stage.update();
+		stage.addChild(dot);
+		stage.update();
 
-		expect(this.stage.hitTest(1, 1)).toBe(true);
+		expect(stage.hitTest(1, 1)).toBe(true);
 	});
 
-	it("isVisible() should be true.", function () {
-		var dot = new createjs.Shape();
+	test("isVisible() should be true.", () => {
+		var dot = new Shape();
 
 		var g = dot.graphics;
 		g.setStrokeStyle(1);
-		g.beginStroke(this.sColor);
-		g.beginFill(this.fColor);
+		g.beginStroke(globals.sColor);
+		g.beginFill(globals.fColor);
 		g.drawRect(0, 0, 5, 5);
 		g.endFill();
 
 		expect(dot.isVisible()).toBe(true);
 	});
 
-	it("localToGlobal() should work on stage.", function () {
-		var pt = this.stage.localToGlobal(0, 0);
+	test("localToGlobal() should work on stage.", () => {
+		var pt = stage.localToGlobal(0, 0);
 
 		expect(pt.x).toBe(0);
 		expect(pt.y).toBe(0);
 	});
 
-	it("localToGlobal() should work on nested containers.", function () {
-		var c = new createjs.Container();
+	test("localToGlobal() should work on nested containers.", () => {
+		var c = new Container();
 		c.set({x:50, y:50});
 
-		var c2 = new createjs.Container();
+		var c2 = new Container();
 		c2.set({x:25, y:25});
 
-		var c3 = new createjs.Container();
+		var c3 = new Container();
 		c3.set({x:-5, y:-5});
 
 		c.addChild(c2);
@@ -431,25 +465,25 @@ describe("DisplayList", function () {
 		expect(c3.localToGlobal(0, 0).y).toBe(70);
 	});
 
-	it("localToLocal() should work.", function () {
-		var s = new createjs.Shape();
-		this.stage.addChild(s);
+	test("localToLocal() should work.", () => {
+		var s = new Shape();
+		stage.addChild(s);
 
-		var pt = this.stage.localToLocal(0, 0, s);
+		var pt = stage.localToLocal(0, 0, s);
 		expect(pt.x).toBe(0);
 	});
 
-	it("set() should work", function () {
-		var shape = this.stage.addChild(new createjs.Shape()).set(this.displayObjectProps);
+	test("set() should work", () => {
+		var shape = stage.addChild(new Shape()).set(displayObjectProps);
 
-		for (var n in this.displayObjectProps) {
-			expect(shape[n]).toBe(this.displayObjectProps[n]);
+		for (var n in displayObjectProps) {
+			expect(shape[n]).toBe(displayObjectProps[n]);
 		}
 	});
 
-	it("setBounds() should work.", function () {
-		var s = new createjs.Shape();
-		this.stage.addChild(s);
+	test("setBounds() should work.", () => {
+		var s = new Shape();
+		stage.addChild(s);
 
 		s.setBounds(1, 2, 3, 4);
 
@@ -460,17 +494,17 @@ describe("DisplayList", function () {
 		expect(b.height).toBe(4);
 	});
 
-	it("setChildIndex() should work.", function () {
-		var foo = new createjs.Shape();
-		var bar = new createjs.Shape();
-		this.stage.addChild(bar);
-		this.stage.addChild(foo);
-		this.stage.setChildIndex(foo, 0);
-		expect(this.stage.getChildIndex(foo)).toBe(0);
+	test("setChildIndex() should work.", () => {
+		var foo = new Shape();
+		var bar = new Shape();
+		stage.addChild(bar);
+		stage.addChild(foo);
+		stage.setChildIndex(foo, 0);
+		expect(stage.getChildIndex(foo)).toBe(0);
 	});
 
-	it("setTransform() should work.", function () {
-		var foo = new createjs.Shape();
+	test("setTransform() should work.", () => {
+		var foo = new Shape();
 		foo.setTransform(5, 6, 2, 3, 90, 10, 11, 50, 55);
 
 		expect(foo.x).toBe(5);
@@ -484,7 +518,7 @@ describe("DisplayList", function () {
 		expect(foo.regY).toBe(55);
 	});
 
-	it("sortChildren() higher y should be on-top", function () {
+	test("sortChildren() higher y should be on-top", () => {
 		var sortFunction = function (obj1, obj2, options) {
 			if (obj1.y < obj2.y) {
 				return -1;
@@ -495,11 +529,11 @@ describe("DisplayList", function () {
 			return 0;
 		}
 
-		var container = new createjs.Container();
+		var container = new Container();
 
-		var foo = new createjs.Shape().set({y: 80});
-		var bar = new createjs.Shape().set({y: 45});
-		var ja = new createjs.Shape().set({y: 150});
+		var foo = new Shape().set({y: 80});
+		var bar = new Shape().set({y: 45});
+		var ja = new Shape().set({y: 150});
 
 		container.addChild(ja, bar, foo);
 		expect(container.getChildIndex(ja)).toBe(0);
@@ -507,11 +541,11 @@ describe("DisplayList", function () {
 		expect(container.getChildIndex(ja)).toBe(2);
 	});
 
-	it("swapChildren() should work.", function () {
-		var container = new createjs.Container();
+	test("swapChildren() should work.", () => {
+		var container = new Container();
 
-		var foo = new createjs.Shape();
-		var bar = new createjs.Shape();
+		var foo = new Shape();
+		var bar = new Shape();
 
 		container.addChild(bar, foo);
 		expect(container.getChildIndex(bar)).toBe(0);
@@ -523,12 +557,12 @@ describe("DisplayList", function () {
 		expect(container.getChildIndex(bar)).toBe(1);
 	});
 
-	it("swapChildrenAt() should work.", function () {
-		var container = new createjs.Container();
+	test("swapChildrenAt() should work.", () => {
+		var container = new Container();
 
-		var foo = new createjs.Shape();
-		var bar = new createjs.Shape();
-		var bars = new createjs.Shape();
+		var foo = new Shape();
+		var bar = new Shape();
+		var bars = new Shape();
 
 		container.addChild(bar, foo, bars);
 		expect(container.getChildIndex(bar)).toBe(0);
@@ -540,82 +574,57 @@ describe("DisplayList", function () {
 		expect(container.getChildIndex(bars)).toBe(0);
 	});
 
-	it("toDataURL() should return a valid image.", function (done) {
-		var url = this.stage.toDataURL("#ffffff");
+	test("toDataURL() should return a valid image.", function (done) {
+		var url = stage.toDataURL("#ffffff");
 
-		var image = new Image();
-		image.onload = function () {
-			done();
-		};
-		image.onerror = function () {
-			fail(url + ' failed to load');
-			done();
-		};
-		image.src = url;
-		expect(image.src).not.toBe(null);
+		var img = new Canvas.Image();
+		img.onload = () => { expect(url).not.toBe(null); done(); }
+		img.onerror = () => { done(`${url} failed to load`); }
+		img.src = url;
 	});
 
-	it("stage.toString() should work.", function () {
-		expect(this.stage.toString()).not.toBe(null);
+	test("stage.toString() should work.", () => {
+		expect(stage.toString()).not.toBe(null);
 	});
 
-	it("cache(), updateCache() and uncache() should work.", function () {
-		this.stage.cache(0, 0, 25, 25);
-		expect(this.stage.cacheCanvas).not.toBe(null);
-		this.stage.updateCache();
-		this.stage.uncache();
+	test("cache(), updateCache() and uncache() should work.", () => {
+		stage.cache(0, 0, 25, 25);
+		expect(stage.cacheCanvas).not.toBe(null);
+		stage.updateCache();
+		stage.uncache();
 
 		var err = false;
 		try {
-			this.stage.updateCache();
+			stage.updateCache();
 		} catch (e) {
 			err = true;
 		}
 		expect(err).toBe(true);
 	});
 
-	it("Text", function (done) {
-		var txt = new createjs.Text("", "12px Arial", "#dd0000");
+	test("Text", function (done) {
+		var txt = new Text("", "12px Arial", "#dd0000");
 		txt.text = "This text is rendered in canvas.\n\nusing the Text Object.!\n\nTEST!\n\nmore text";
 		txt.textBaseline = "top";
 		txt.textAlign = "left";
 		txt.y = 0;
 		txt.x = 0;
-		this.stage.addChild(txt);
-
-		this.compareBaseLine("test_assets/Text.png", done, expect, 0.01);
+		stage.addChild(txt);
+		stage.update();
+		globals.compareBaseLine(globals.rootPath + "tests/assets/Text.png", done, expect, stage.canvas, 0.01);
 	});
 
-	it("Text.getBounds() should allow 0 as a value", function () {
-		var txt = new createjs.Text("", "12px Arial", "#dd0000");
+	test("Text.getBounds() should allow 0 as a value", () => {
+		var txt = new Text("", "12px Arial", "#dd0000");
 		txt.text = 0;
-		this.stage.addChild(txt);
+		stage.addChild(txt);
 
 		expect(txt.getBounds()).not.toBe(null);
 	});
 
-	it("BitmapText", function (done) {
-		var _this = this;
-
-		var img = new Image();
-		img.onload = function () {
-			data.images = [img];
-			var ss = new createjs.SpriteSheet(data);
-			var text = new createjs.BitmapText("abcdef\nghijklm\nnopqr\nstuvw\nxyz!,.?", ss);
-			_this.stage.addChild(text);
-
-			_this.stage.update();
-			_this.compareBaseLine("test_assets/BitmapText.png", done, expect);
-		};
-		img.onerror = function () {
-			fail(img.src + ' failed to load');
-			done();
-		};
-
-		img.src = this.assetsBasePath + "spritesheet_font.png";
-
+	test("BitmapText", function (done) {
 		// Embedded SpriteSheet data.
-		var data = {
+		const data = {
 			"animations": {
 				"V": {"frames": [21]},
 				"A": {"frames": [0]},
@@ -648,7 +657,6 @@ describe("DisplayList", function () {
 				"?": {"frames": [28]},
 				"U": {"frames": [20]}
 			},
-			"images": [this.assetsBasePath + "spritesheet_font.png"],
 			"frames": [
 				[155, 2, 25, 41, 0, -10, -3],
 				[72, 2, 28, 43, 0, -8, -1],
@@ -682,62 +690,46 @@ describe("DisplayList", function () {
 				[966, 2, 9, 10, 0, -17, -31]
 			]
 		};
+		var img = new Canvas.Image();
+		img.onload = () => {
+			data.images = [img];
+			var ss = new SpriteSheet(data);
+			var text = new BitmapText("abcdef\nghijklm\nnopqr\nstuvw\nxyz!,.?", ss);
+			stage.addChild(text);
+			stage.update();
+			globals.compareBaseLine(globals.rootPath + "tests/assets/BitmapText.png", done, expect, stage.canvas);
+		};
+		img.onerror = () => done(`${img.src} failed to load`);
+		img.src = globals.rootPath + "assets/art/spritesheet_font.png";
 	});
 
-	it("masks should work", function (done) {
+	test.only("masks should work", function (done) {
 		// masks can only be shapes.
-		var star = new createjs.Shape();
+		var star = new Shape();
 
 		// the mask's position will be relative to the parent of its target:
-		star.x = this.img.width / 2;
-		star.y = this.img.height / 2;
+		star.x = image.width / 2;
+		star.y = image.height / 2;
 
 		// only the drawPolyStar call is needed for the mask to work:
-		star.graphics.beginStroke("#FF0").setStrokeStyle(3).drawPolyStar(0, 0, this.img.height / 2, 5, 0.6);
+		star.graphics.beginStroke("#FF0").setStrokeStyle(3).drawPolyStar(0, 0, image.height / 2, 5, 0.6);
 
-		var bg = new createjs.Bitmap(this.img);
+		var bg = new Bitmap(image);
 		// blur and desaturate the background image:
-		bg.filters = [new createjs.BlurFilter(2, 2, 2), new createjs.ColorMatrixFilter(new createjs.ColorMatrix(0, 0, -100, 0))];
-		bg.cache(0, 0, this.img.width, this.img.height);
-		this.stage.addChild(bg);
+		bg.filters = [new BlurFilter(2, 2, 2), new ColorMatrixFilter(new ColorMatrix(0, 0, -100, 0))];
+		bg.cache(0, 0, image.width, image.height);
+		stage.addChild(bg);
 
-		var bmp = new createjs.Bitmap(this.img);
-		this.stage.addChild(bmp);
+		var bmp = new Bitmap(image);
+		stage.addChild(bmp);
 		bmp.mask = star;
 
 		// note that the shape can be used in the display list as well if you'd like, or
 		// we can reuse the Graphics instance in another shape if we'd like to transform it differently.
-		this.stage.addChild(star);
+		stage.addChild(star);
+		stage.update();
 
-		this.stage.update();
-		this.compareBaseLine("test_assets/mask.png", done, expect, 0.01);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/mask.png", done, expect, stage.canvas, 0.01);
 	});
 
-	describe("PrelaodJS can be used to load image assets", function () {
-		beforeEach(function (done) {
-			this.loader = new createjs.LoadQueue(true);
-			this.loader.on("complete", function () {
-				done();
-			});
-			this.loader.on("error", function (e) {
-				fail('error loading asset ' + e.message);
-				done();
-			});
-			this.loader.loadFile({
-									 id: "image",
-									 src: this.assetsBasePath + "daisy.png"
-								 });
-		});
-
-		it("loaded pngs should work", function (done) {
-			var a = new createjs.Bitmap(this.loader.getResult('image'));
-			var b = new createjs.Bitmap(this.loader.getResult('image'));
-			b.x = 80;
-
-			this.stage.addChild(a, b);
-			this.stage.update();
-
-			this.compareBaseLine("test_assets/PrelaodJSLoadedBitmap.png", done, expect);
-		});
-	});
 });

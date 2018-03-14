@@ -461,7 +461,7 @@ export default class Stage extends Container {
 			};
 			for (let n in ls) {
 				let o = ls[n];
-				o.t.addEventListener(n, o.f, false);
+				o.t.addEventListener && o.t.addEventListener(n, o.f, false);
 			}
 		}
 	}

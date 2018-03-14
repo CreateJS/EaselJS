@@ -35,9 +35,9 @@ function _interopDefault(ex) {
   return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
 }
 
-var EventDispatcher = _interopDefault(require("@createjs/build/src/events/EventDispatcher"));
+var Tween = _interopDefault(require("@createjs/tweenjs/src/Tween"));
 
-var Event = _interopDefault(require("@createjs/build/src/events/Event"));
+var Timeline = _interopDefault(require("@createjs/tweenjs/src/Timeline"));
 
 var classCallCheck = function(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -85,10 +85,10 @@ var possibleConstructorReturn = function(self, call) {
 };
 
 var Event = function() {
-  function Event$$1(type) {
+  function Event(type) {
     var bubbles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     var cancelable = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    classCallCheck(this, Event$$1);
+    classCallCheck(this, Event);
     this.type = type;
     this.target = null;
     this.currentTarget = null;
@@ -101,24 +101,24 @@ var Event = function() {
     this.immediatePropagationStopped = false;
     this.removed = false;
   }
-  Event$$1.prototype.preventDefault = function preventDefault() {
+  Event.prototype.preventDefault = function preventDefault() {
     this.defaultPrevented = this.cancelable;
     return this;
   };
-  Event$$1.prototype.stopPropagation = function stopPropagation() {
+  Event.prototype.stopPropagation = function stopPropagation() {
     this.propagationStopped = true;
     return this;
   };
-  Event$$1.prototype.stopImmediatePropagation = function stopImmediatePropagation() {
+  Event.prototype.stopImmediatePropagation = function stopImmediatePropagation() {
     this.immediatePropagationStopped = this.propagationStopped = true;
     return this;
   };
-  Event$$1.prototype.remove = function remove() {
+  Event.prototype.remove = function remove() {
     this.removed = true;
     return this;
   };
-  Event$$1.prototype.clone = function clone() {
-    var event = new Event$$1(this.type, this.bubbles, this.cancelable);
+  Event.prototype.clone = function clone() {
+    var event = new Event(this.type, this.bubbles, this.cancelable);
     for (var n in this) {
       if (this.hasOwnProperty(n)) {
         event[n] = this[n];
@@ -126,21 +126,21 @@ var Event = function() {
     }
     return event;
   };
-  Event$$1.prototype.set = function set(props) {
+  Event.prototype.set = function set(props) {
     for (var n in props) {
       this[n] = props[n];
     }
     return this;
   };
-  Event$$1.prototype.toString = function toString() {
+  Event.prototype.toString = function toString() {
     return "[" + this.constructor.name + " (type=" + this.type + ")]";
   };
-  return Event$$1;
+  return Event;
 }();
 
 var EventDispatcher = function() {
-  EventDispatcher$$1.initialize = function initialize(target) {
-    var p = EventDispatcher$$1.prototype;
+  EventDispatcher.initialize = function initialize(target) {
+    var p = EventDispatcher.prototype;
     target.addEventListener = p.addEventListener;
     target.on = p.on;
     target.removeEventListener = target.off = p.removeEventListener;
@@ -150,12 +150,12 @@ var EventDispatcher = function() {
     target._dispatchEvent = p._dispatchEvent;
     target.willTrigger = p.willTrigger;
   };
-  function EventDispatcher$$1() {
-    classCallCheck(this, EventDispatcher$$1);
+  function EventDispatcher() {
+    classCallCheck(this, EventDispatcher);
     this._listeners = null;
     this._captureListeners = null;
   }
-  EventDispatcher$$1.prototype.addEventListener = function addEventListener(type, listener) {
+  EventDispatcher.prototype.addEventListener = function addEventListener(type, listener) {
     var useCapture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     var listeners = void 0;
     if (useCapture) {
@@ -175,7 +175,7 @@ var EventDispatcher = function() {
     }
     return listener;
   };
-  EventDispatcher$$1.prototype.on = function on(type, listener) {
+  EventDispatcher.prototype.on = function on(type, listener) {
     var scope = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
     var once = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
     var data = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
@@ -185,12 +185,12 @@ var EventDispatcher = function() {
       listener = listener.handleEvent;
     }
     scope = scope || this;
-    return this.addEventListener(type, function(event) {
+    return this.addEventListener(type, function(evt) {
       listener.call(scope, evt, data);
       once && evt.remove();
     }, useCapture);
   };
-  EventDispatcher$$1.prototype.removeEventListener = function removeEventListener(type, listener) {
+  EventDispatcher.prototype.removeEventListener = function removeEventListener(type, listener) {
     var useCapture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     var listeners = useCapture ? this._captureListeners : this._listeners;
     if (!listeners) {
@@ -212,11 +212,11 @@ var EventDispatcher = function() {
       }
     }
   };
-  EventDispatcher$$1.prototype.off = function off(type, listener) {
+  EventDispatcher.prototype.off = function off(type, listener) {
     var useCapture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     this.removeEventListener(type, listener, useCapture);
   };
-  EventDispatcher$$1.prototype.removeAllEventListeners = function removeAllEventListeners() {
+  EventDispatcher.prototype.removeAllEventListeners = function removeAllEventListeners() {
     var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
     if (type) {
       if (this._listeners) {
@@ -229,7 +229,7 @@ var EventDispatcher = function() {
       this._listeners = this._captureListeners = null;
     }
   };
-  EventDispatcher$$1.prototype.dispatchEvent = function dispatchEvent(eventObj) {
+  EventDispatcher.prototype.dispatchEvent = function dispatchEvent(eventObj) {
     var bubbles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     var cancelable = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     if (typeof eventObj === "string") {
@@ -263,11 +263,11 @@ var EventDispatcher = function() {
     }
     return !eventObj.defaultPrevented;
   };
-  EventDispatcher$$1.prototype.hasEventListener = function hasEventListener(type) {
+  EventDispatcher.prototype.hasEventListener = function hasEventListener(type) {
     var listeners = this._listeners, captureListeners = this._captureListeners;
     return !!(listeners && listeners[type] || captureListeners && captureListeners[type]);
   };
-  EventDispatcher$$1.prototype.willTrigger = function willTrigger(type) {
+  EventDispatcher.prototype.willTrigger = function willTrigger(type) {
     var o = this;
     while (o) {
       if (o.hasEventListener(type)) {
@@ -277,10 +277,10 @@ var EventDispatcher = function() {
     }
     return false;
   };
-  EventDispatcher$$1.prototype.toString = function toString() {
-    return "[EventDispatcher]";
+  EventDispatcher.prototype.toString = function toString() {
+    return "[" + (this.constructor.name + this.name ? " " + this.name : "") + "]";
   };
-  EventDispatcher$$1.prototype._dispatchEvent = function _dispatchEvent(eventObj, eventPhase) {
+  EventDispatcher.prototype._dispatchEvent = function _dispatchEvent(eventObj, eventPhase) {
     var listeners = eventPhase === 1 ? this._captureListeners : this._listeners;
     if (eventObj && listeners) {
       var arr = listeners[eventObj.type];
@@ -310,7 +310,7 @@ var EventDispatcher = function() {
       }
     }
   };
-  return EventDispatcher$$1;
+  return EventDispatcher;
 }();
 
 var Ticker = function(_EventDispatcher) {
@@ -473,6 +473,31 @@ var Ticker = function(_EventDispatcher) {
     var now = window.performance && window.performance.now;
     return (now && now.call(performance) || new Date().getTime()) - this._startTime;
   };
+  Ticker.on = function on(type, listener, scope, once, data, useCapture) {
+    return _instance.on(type, listener, scope, once, data, useCapture);
+  };
+  Ticker.removeEventListener = function removeEventListener(type, listener, useCapture) {
+    _instance.removeEventListener(type, listener, useCapture);
+  };
+  Ticker.off = function off(type, listener, useCapture) {
+    _instance.off(type, listener, useCapture);
+  };
+  Ticker.removeAllEventListeners = function removeAllEventListeners(type) {
+    _instance.removeAllEventListeners(type);
+  };
+  Ticker.dispatchEvent = function dispatchEvent(eventObj, bubbles, cancelable) {
+    return _instance.dispatchEvent(eventObj, bubbles, cancelable);
+  };
+  Ticker.hasEventListener = function hasEventListener(type) {
+    return _instance.hasEventListener(type);
+  };
+  Ticker.willTrigger = function willTrigger(type) {
+    return _instance.willTrigger(type);
+  };
+  Ticker.toString = function toString() {
+    return _instance.toString();
+  };
+  Ticker._dispatchEvent = function _dispatchEvent(eventObj, eventPhase) {};
   Ticker.init = function init() {
     _instance.init();
   };
@@ -4805,16 +4830,16 @@ var PolyStar = function() {
     x: 49,
     y: 50,
     z: 51,
-    "0": 52,
-    "1": 53,
-    "2": 54,
-    "3": 55,
-    "4": 56,
-    "5": 57,
-    "6": 58,
-    "7": 59,
-    "8": 60,
-    "9": 61,
+    0: 52,
+    1: 53,
+    2: 54,
+    3: 55,
+    4: 56,
+    5: 57,
+    6: 58,
+    7: 59,
+    8: 60,
+    9: 61,
     "+": 62,
     "/": 63
   };
@@ -4822,780 +4847,6 @@ var PolyStar = function() {
   Graphics.STROKE_JOINTS_MAP = [ "miter", "round", "bevel" ];
   Graphics.EMPTY_SEGMENTS = [];
 }
-
-var AbstractTween = function(_EventDispatcher) {
-  inherits(AbstractTween, _EventDispatcher);
-  function AbstractTween(props) {
-    classCallCheck(this, AbstractTween);
-    var _this = possibleConstructorReturn(this, _EventDispatcher.call(this));
-    _this.ignoreGlobalPause = false;
-    _this.loop = 0;
-    _this.useTicks = false;
-    _this.reversed = false;
-    _this.bounce = false;
-    _this.timeScale = 1;
-    _this.duration = 0;
-    _this.position = 0;
-    _this.rawPosition = -1;
-    _this._paused = true;
-    _this._next = null;
-    _this._prev = null;
-    _this._parent = null;
-    _this._labels = null;
-    _this._labelList = null;
-    if (props) {
-      _this.useTicks = !!props.useTicks;
-      _this.ignoreGlobalPause = !!props.ignoreGlobalPause;
-      _this.loop = props.loop === true ? -1 : props.loop || 0;
-      _this.reversed = !!props.reversed;
-      _this.bounce = !!props.bounce;
-      _this.timeScale = props.timeScale || 1;
-      props.onChange && _this.addEventListener("change", props.onChange);
-      props.onComplete && _this.addEventListener("complete", props.onComplete);
-    }
-    return _this;
-  }
-  AbstractTween.prototype.advance = function advance(delta) {
-    var ignoreActions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    this.setPosition(this.rawPosition + delta * this.timeScale, ignoreActions);
-  };
-  AbstractTween.prototype.setPosition = function setPosition(rawPosition) {
-    var ignoreActions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    var jump = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    var callback = arguments[3];
-    var d = this.duration, loopCount = this.loop, prevRawPos = this.rawPosition;
-    var loop = 0, t = 0, end = false;
-    if (rawPosition < 0) {
-      rawPosition = 0;
-    }
-    if (d === 0) {
-      end = true;
-      if (prevRawPos !== -1) {
-        return end;
-      }
-    } else {
-      loop = rawPosition / d | 0;
-      t = rawPosition - loop * d;
-      end = loopCount !== -1 && rawPosition >= loopCount * d + d;
-      if (end) {
-        rawPosition = (t = d) * (loop = loopCount) + d;
-      }
-      if (rawPosition === prevRawPos) {
-        return end;
-      }
-      if (!this.reversed !== !(this.bounce && loop % 2)) {
-        t = d - t;
-      }
-    }
-    this.position = t;
-    this.rawPosition = rawPosition;
-    this._updatePosition(jump, end);
-    if (end) {
-      this.paused = true;
-    }
-    callback && callback(this);
-    if (!ignoreActions) {
-      this._runActions(prevRawPos, rawPosition, jump, !jump && prevRawPos === -1);
-    }
-    this.dispatchEvent("change");
-    if (end) {
-      this.dispatchEvent("complete");
-    }
-  };
-  AbstractTween.prototype.calculatePosition = function calculatePosition(rawPosition) {
-    var d = this.duration, loopCount = this.loop;
-    var loop = 0, t = 0;
-    if (d === 0) {
-      return 0;
-    }
-    if (loopCount !== -1 && rawPosition >= loopCount * d + d) {
-      t = d;
-      loop = loopCount;
-    } else if (rawPosition < 0) {
-      t = 0;
-    } else {
-      loop = rawPosition / d | 0;
-      t = rawPosition - loop * d;
-    }
-    return !this.reversed !== !(this.bounce && loop % 2) ? d - t : t;
-  };
-  AbstractTween.prototype.addLabel = function addLabel(label, position) {
-    if (!this._labels) {
-      this._labels = {};
-    }
-    this._labels[label] = position;
-    var list = this._labelList;
-    if (list) {
-      for (var _i = 0, l = list.length; _i < l; _i++) {
-        if (position < list[_i].position) {
-          break;
-        }
-      }
-      list.splice(i, 0, {
-        label: label,
-        position: position
-      });
-    }
-  };
-  AbstractTween.prototype.gotoAndPlay = function gotoAndPlay(positionOrLabel) {
-    this.paused = false;
-    this._goto(positionOrLabel);
-  };
-  AbstractTween.prototype.gotoAndStop = function gotoAndStop(positionOrLabel) {
-    this.paused = true;
-    this._goto(positionOrLabel);
-  };
-  AbstractTween.prototype.resolve = function resolve(positionOrLabel) {
-    var pos = Number(positionOrLabel);
-    return isNaN(pos) ? this._labels && this._labels[positionOrLabel] : pos;
-  };
-  AbstractTween.prototype.toString = function toString() {
-    return "[" + this.constructor.name + (this.name ? " (name=" + this.name + ")" : "") + "]";
-  };
-  AbstractTween.prototype.clone = function clone() {
-    throw "AbstractTween cannot be cloned.";
-  };
-  AbstractTween.prototype._init = function _init(props) {
-    if (!props || !props.paused) {
-      this.paused = false;
-    }
-    if (props && props.position != null) {
-      this.setPosition(props.position);
-    }
-  };
-  AbstractTween.prototype._goto = function _goto(positionOrLabel) {
-    var pos = this.resolve(positionOrLabel);
-    if (pos != null) {
-      this.setPosition(pos, false, true);
-    }
-  };
-  AbstractTween.prototype._runActions = function _runActions(startRawPos, endRawPos, jump, includeStart) {
-    if (!this._actionHead && !this.tweens) {
-      return;
-    }
-    var d = this.duration, loopCount = this.loop;
-    var reversed = this.reversed, bounce = this.bounce;
-    var loop0 = void 0, loop1 = void 0, t0 = void 0, t1 = void 0;
-    if (d === 0) {
-      loop0 = loop1 = t0 = t1 = 0;
-      reversed = bounce = false;
-    } else {
-      loop0 = startRawPos / d | 0;
-      loop1 = endRawPos / d | 0;
-      t0 = startRawPos - loop0 * d;
-      t1 = endRawPos - loop1 * d;
-    }
-    if (loopCount !== -1) {
-      if (loop1 > loopCount) {
-        t1 = d;
-        loop1 = loopCount;
-      }
-      if (loop0 > loopCount) {
-        t0 = d;
-        loop0 = loopCount;
-      }
-    }
-    if (jump) {
-      return this._runActionsRange(t1, t1, jump, includeStart);
-    } else if (loop0 === loop1 && t0 === t1 && !jump && !includeStart) {
-      return;
-    } else if (loop0 === -1) {
-      loop0 = t0 = 0;
-    }
-    var dir = startRawPos <= endRawPos;
-    var loop = loop0;
-    do {
-      var rev = !reversed !== !(bounce && loop % 2);
-      var start = loop === loop0 ? t0 : dir ? 0 : d;
-      var end = loop === loop1 ? t1 : dir ? d : 0;
-      if (rev) {
-        start = d - start;
-        end = d - end;
-      }
-      if (bounce && loop !== loop0 && start === end) {} else if (this._runActionsRange(start, end, jump, includeStart || loop !== loop0 && !bounce)) {
-        return true;
-      }
-      includeStart = false;
-    } while (dir && ++loop <= loop1 || !dir && --loop >= loop1);
-  };
-  AbstractTween.prototype._runActionsRange = function _runActionsRange(startPos, endPos, jump, includeStart) {
-    throw "_runActionsRange is abstract and must be overridden by a subclass.";
-  };
-  AbstractTween.prototype._updatePosition = function _updatePosition(jump, end) {
-    throw "_updatePosition is abstract and must be overridden by a subclass.";
-  };
-  createClass(AbstractTween, [ {
-    key: "labels",
-    get: function get() {
-      var list = this._labelList;
-      if (!list) {
-        list = this._labelList = [];
-        var labels = this._labels;
-        for (var label in labels) {
-          list.push({
-            label: label,
-            position: labels[label]
-          });
-        }
-        list.sort(function(a, b) {
-          return a.position - b.position;
-        });
-      }
-      return list;
-    },
-    set: function set(labels) {
-      this._labels = labels;
-      this._labelList = null;
-    }
-  }, {
-    key: "currentLabel",
-    get: function get() {
-      var labels = this.labels;
-      var pos = this.position;
-      for (var _i2 = 0, l = labels.length; _i2 < l; _i2++) {
-        if (pos < labels[_i2].position) {
-          break;
-        }
-      }
-      return i === 0 ? null : labels[i - 1].label;
-    }
-  }, {
-    key: "paused",
-    get: function get() {
-      return this._paused;
-    },
-    set: function set(paused) {
-      Tween._register(this, paused);
-      this._paused = paused;
-    }
-  } ]);
-  return AbstractTween;
-}(EventDispatcher);
-
-function linear(t) {
-  return t;
-}
-
-function getElasticIn(amplitude, period) {
-  var pi2 = Math.PI * 2;
-  return function(t) {
-    if (t === 0 || t === 1) return t;
-    var s = period / pi2 * Math.asin(1 / amplitude);
-    return -(amplitude * Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * pi2 / period));
-  };
-}
-
-function getElasticOut(amplitude, period) {
-  var pi2 = Math.PI * 2;
-  return function(t) {
-    if (t === 0 || t === 1) return t;
-    var s = period / pi2 * Math.asin(1 / amplitude);
-    return amplitude * Math.pow(2, -10 * t) * Math.sin((t - s) * pi2 / period) + 1;
-  };
-}
-
-function getElasticInOut(amplitude, period) {
-  var pi2 = Math.PI * 2;
-  return function(t) {
-    var s = period / pi2 * Math.asin(1 / amplitude);
-    if ((t *= 2) < 1) return -.5 * (amplitude * Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * pi2 / period));
-    return amplitude * Math.pow(2, -10 * (t -= 1)) * Math.sin((t - s) * pi2 / period) * .5 + 1;
-  };
-}
-
-var elasticIn = getElasticIn(1, .3);
-
-var elasticOut = getElasticOut(1, .3);
-
-var elasticInOut = getElasticInOut(1, .3 * 1.5);
-
-var Tween = function(_AbstractTween) {
-  inherits(Tween, _AbstractTween);
-  function Tween(target, props) {
-    classCallCheck(this, Tween);
-    var _this = possibleConstructorReturn(this, _AbstractTween.call(this, props));
-    _this.pluginData = null;
-    _this.target = target;
-    _this.passive = false;
-    _this._stepHead = new TweenStep(null, 0, 0, {}, null, true);
-    _this._stepTail = _this._stepHead;
-    _this._stepPosition = 0;
-    _this._actionHead = null;
-    _this._actionTail = null;
-    _this._plugins = null;
-    _this._pluginIds = null;
-    _this._injected = null;
-    if (props) {
-      _this.pluginData = props.pluginData;
-      if (props.override) {
-        Tween.removeTweens(target);
-      }
-    }
-    if (!_this.pluginData) {
-      _this.pluginData = {};
-    }
-    _this._init(props);
-    return _this;
-  }
-  Tween.get = function get$$1(target, props) {
-    return new Tween(target, props);
-  };
-  Tween.tick = function tick(delta, paused) {
-    var tween = Tween._tweenHead;
-    while (tween) {
-      var next = tween._next;
-      if (paused && !tween.ignoreGlobalPause || tween._paused) {} else {
-        tween.advance(tween.useTicks ? 1 : delta);
-      }
-      tween = next;
-    }
-  };
-  Tween.handleEvent = function handleEvent(event) {
-    if (event.type === "tick") {
-      this.tick(event.delta, event.paused);
-    }
-  };
-  Tween.removeTweens = function removeTweens(target) {
-    if (!target.tweenjs_count) {
-      return;
-    }
-    var tween = Tween._tweenHead;
-    while (tween) {
-      var next = tween._next;
-      if (tween.target === target) {
-        tween.paused = true;
-      }
-      tween = next;
-    }
-    target.tweenjs_count = 0;
-  };
-  Tween.removeAllTweens = function removeAllTweens() {
-    var tween = Tween._tweenHead;
-    while (tween) {
-      var next = tween._next;
-      tween._paused = true;
-      tween.target && (tween.target.tweenjs_count = 0);
-      tween._next = tween._prev = null;
-      tween = next;
-    }
-    Tween._tweenHead = Tween._tweenTail = null;
-  };
-  Tween.hasActiveTweens = function hasActiveTweens(target) {
-    if (target) {
-      return !!target.tweenjs_count;
-    }
-    return !!Tween._tweenHead;
-  };
-  Tween.installPlugin = function installPlugin(plugin, props) {
-    plugin.install(props);
-    var priority = plugin.priority = plugin.priority || 0, arr = Tween._plugins = Tween._plugins || [];
-    for (var _i = 0, l = arr.length; _i < l; _i++) {
-      if (priority < arr[_i].priority) {
-        break;
-      }
-    }
-    arr.splice(i, 0, plugin);
-  };
-  Tween._register = function _register(tween, paused) {
-    var target = tween.target;
-    if (!paused && tween._paused) {
-      if (target) {
-        target.tweenjs_count = target.tweenjs_count ? target.tweenjs_count + 1 : 1;
-      }
-      var tail = Tween._tweenTail;
-      if (!tail) {
-        Tween._tweenHead = Tween._tweenTail = tween;
-      } else {
-        Tween._tweenTail = tail._next = tween;
-        tween._prev = tail;
-      }
-      if (!Tween._inited) {
-        Ticker.addEventListener("tick", Tween);
-        Tween._inited = true;
-      }
-    } else if (paused && !tween._paused) {
-      if (target) {
-        target.tweenjs_count--;
-      }
-      var next = tween._next, prev = tween._prev;
-      if (next) {
-        next._prev = prev;
-      } else {
-        Tween._tweenTail = prev;
-      }
-      if (prev) {
-        prev._next = next;
-      } else {
-        Tween._tweenHead = next;
-      }
-      tween._next = tween._prev = null;
-    }
-  };
-  Tween.prototype.wait = function wait(duration) {
-    var passive = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    if (duration > 0) {
-      this._addStep(+duration, this._stepTail.props, null, passive);
-    }
-    return this;
-  };
-  Tween.prototype.to = function to(props) {
-    var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var ease = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : linear;
-    if (duration < 0) {
-      duration = 0;
-    }
-    var step = this._addStep(+duration, null, ease);
-    this._appendProps(props, step);
-    return this;
-  };
-  Tween.prototype.label = function label(name) {
-    this.addLabel(name, this.duration);
-    return this;
-  };
-  Tween.prototype.call = function call(callback, params, scope) {
-    return this._addAction(scope || this.target, callback, params || [ this ]);
-  };
-  Tween.prototype.set = function set(props, target) {
-    return this._addAction(target || this.target, this._set, [ props ]);
-  };
-  Tween.prototype.play = function play(tween) {
-    return this._addAction(tween || this, this._set, [ {
-      paused: false
-    } ]);
-  };
-  Tween.prototype.pause = function pause(tween) {
-    return this._addAction(tween || this, this._set, [ {
-      paused: false
-    } ]);
-  };
-  Tween.prototype.clone = function clone() {
-    throw "Tween can not be cloned.";
-  };
-  Tween.prototype._addPlugin = function _addPlugin(plugin) {
-    var ids = this._pluginIds || (this._pluginIds = {}), id = plugin.id;
-    if (!id || ids[id]) {
-      return;
-    }
-    ids[id] = true;
-    var plugins = this._plugins || (this._plugins = []), priority = plugin.priority || 0;
-    for (var _i2 = 0, l = plugins.length; _i2 < l; _i2++) {
-      if (priority < plugins[_i2].priority) {
-        plugins.splice(_i2, 0, plugin);
-        return;
-      }
-    }
-    plugins.push(plugin);
-  };
-  Tween.prototype._updatePosition = function _updatePosition(jump, end) {
-    var step = this._stepHead.next, t = this.position, d = this.duration;
-    if (this.target && step) {
-      var stepNext = step.next;
-      while (stepNext && stepNext.t <= t) {
-        step = step.next;
-        stepNext = step.next;
-      }
-      var ratio = end ? d === 0 ? 1 : t / d : (t - step.t) / step.d;
-      this._updateTargetProps(step, ratio, end);
-    }
-    this._stepPosition = step ? t - step.t : 0;
-  };
-  Tween.prototype._updateTargetProps = function _updateTargetProps(step, ratio, end) {
-    if (this.passive = !!step.passive) {
-      return;
-    }
-    var v = void 0, v0 = void 0, v1 = void 0, ease = void 0;
-    var p0 = step.prev.props;
-    var p1 = step.props;
-    if (ease = step.ease) {
-      ratio = ease(ratio, 0, 1, 1);
-    }
-    var plugins = this._plugins;
-    proploop: for (var n in p0) {
-      v0 = p0[n];
-      v1 = p1[n];
-      if (v0 !== v1 && typeof v0 === "number") {
-        v = v0 + (v1 - v0) * ratio;
-      } else {
-        v = ratio >= 1 ? v1 : v0;
-      }
-      if (plugins) {
-        for (var _i3 = 0, l = plugins.length; _i3 < l; _i3++) {
-          var value = plugins[_i3].change(this, step, n, v, ratio, end);
-          if (value === Tween.IGNORE) {
-            continue proploop;
-          }
-          if (value !== undefined) {
-            v = value;
-          }
-        }
-      }
-      this.target[n] = v;
-    }
-  };
-  Tween.prototype._runActionsRange = function _runActionsRange(startPos, endPos, jump, includeStart) {
-    var rev = startPos > endPos;
-    var action = rev ? this._actionTail : this._actionHead;
-    var ePos = endPos, sPos = startPos;
-    if (rev) {
-      ePos = startPos;
-      sPos = endPos;
-    }
-    var t = this.position;
-    while (action) {
-      var pos = action.t;
-      if (pos === endPos || pos > sPos && pos < ePos || includeStart && pos === startPos) {
-        action.funct.apply(action.scope, action.params);
-        if (t !== this.position) {
-          return true;
-        }
-      }
-      action = rev ? action.prev : action.next;
-    }
-  };
-  Tween.prototype._appendProps = function _appendProps(props, step, stepPlugins) {
-    var initProps = this._stepHead.props, target = this.target, plugins = Tween._plugins;
-    var n = void 0, i = void 0, l = void 0, value = void 0, initValue = void 0, inject = void 0;
-    var oldStep = step.prev, oldProps = oldStep.props;
-    var stepProps = step.props || (step.props = this._cloneProps(oldProps));
-    var cleanProps = {};
-    for (n in props) {
-      if (!props.hasOwnProperty(n)) {
-        continue;
-      }
-      cleanProps[n] = stepProps[n] = props[n];
-      if (initProps[n] !== undefined) {
-        continue;
-      }
-      initValue = undefined;
-      if (plugins) {
-        for (i = plugins.length - 1; i >= 0; i--) {
-          value = plugins[i].init(this, n, initValue);
-          if (value !== undefined) {
-            initValue = value;
-          }
-          if (initValue === Tween.IGNORE) {
-            (ignored = ignored || {})[n] = true;
-            delete stepProps[n];
-            delete cleanProps[n];
-            break;
-          }
-        }
-      }
-      if (initValue !== Tween.IGNORE) {
-        if (initValue === undefined) {
-          initValue = target[n];
-        }
-        oldProps[n] = initValue === undefined ? null : initValue;
-      }
-    }
-    for (n in cleanProps) {
-      value = props[n];
-      var o = void 0, prev = oldStep;
-      while ((o = prev) && (prev = o.prev)) {
-        if (prev.props === o.props) {
-          continue;
-        }
-        if (prev.props[n] !== undefined) {
-          break;
-        }
-        prev.props[n] = oldProps[n];
-      }
-    }
-    if (stepPlugins && (plugins = this._plugins)) {
-      for (i = plugins.length - 1; i >= 0; i--) {
-        plugins[i].step(this, step, cleanProps);
-      }
-    }
-    if (inject = this._injected) {
-      this._injected = null;
-      this._appendProps(inject, step, false);
-    }
-  };
-  Tween.prototype._injectProp = function _injectProp(name, value) {
-    var o = this._injected || (this._injected = {});
-    o[name] = value;
-  };
-  Tween.prototype._addStep = function _addStep(duration, props, ease) {
-    var passive = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    var step = new TweenStep(this._stepTail, this.duration, duration, props, ease, passive);
-    this.duration += duration;
-    return this._stepTail = this._stepTail.next = step;
-  };
-  Tween.prototype._addAction = function _addAction(scope, funct, params) {
-    var action = new TweenAction(this._actionTail, this.duration, scope, funct, params);
-    if (this._actionTail) {
-      this._actionTail.next = action;
-    } else {
-      this._actionHead = action;
-    }
-    this._actionTail = action;
-    return this;
-  };
-  Tween.prototype._set = function _set(props) {
-    for (var n in props) {
-      this[n] = props[n];
-    }
-  };
-  Tween.prototype._cloneProps = function _cloneProps(props) {
-    var o = {};
-    for (var n in props) {
-      o[n] = props[n];
-    }
-    return o;
-  };
-  return Tween;
-}(AbstractTween);
-
-{
-  var p = Tween.prototype;
-  p.w = p.wait;
-  p.t = p.to;
-  p.c = p.call;
-  p.s = p.set;
-}
-
-Tween.IGNORE = {};
-
-Tween._tweens = [];
-
-Tween._plugins = null;
-
-Tween._tweenHead = null;
-
-Tween._tweenTail = null;
-
-var TweenStep = function TweenStep(prev, t, d, props, ease, passive) {
-  classCallCheck(this, TweenStep);
-  this.next = null;
-  this.prev = prev;
-  this.t = t;
-  this.d = d;
-  this.props = props;
-  this.ease = ease;
-  this.passive = passive;
-  this.index = prev ? prev.index + 1 : 0;
-};
-
-var TweenAction = function TweenAction(prev, t, scope, funct, params) {
-  classCallCheck(this, TweenAction);
-  this.next = null;
-  this.d = 0;
-  this.prev = prev;
-  this.t = t;
-  this.scope = scope;
-  this.funct = funct;
-  this.params = params;
-};
-
-var Timeline = function(_AbstractTween) {
-  inherits(Timeline, _AbstractTween);
-  function Timeline() {
-    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    classCallCheck(this, Timeline);
-    var _this = possibleConstructorReturn(this, _AbstractTween.call(this, props));
-    _this.tweens = [];
-    if (props.tweens) {
-      _this.addTween.apply(_this, props.tweens);
-    }
-    if (props.labels) {
-      _this.labels = props.labels;
-    }
-    _this._init(props);
-    return _this;
-  }
-  Timeline.prototype.addTween = function addTween() {
-    for (var _len = arguments.length, tweens = Array(_len), _key = 0; _key < _len; _key++) {
-      tweens[_key] = arguments[_key];
-    }
-    var l = tweens.length;
-    if (l === 1) {
-      var tween = tweens[0];
-      this.tweens.push(tween);
-      tween._parent = this;
-      tween.paused = true;
-      var d = tween.duration;
-      if (tween.loop > 0) {
-        d *= tween.loop + 1;
-      }
-      if (d > this.duration) {
-        this.duration = d;
-      }
-      if (this.rawPosition >= 0) {
-        tween.setPosition(this.rawPosition);
-      }
-      return tween;
-    }
-    if (l > 1) {
-      for (var i = 0; i < l; i++) {
-        this.addTween(tweens[i]);
-      }
-      return tweens[l - 1];
-    }
-    return null;
-  };
-  Timeline.prototype.removeTween = function removeTween() {
-    for (var _len2 = arguments.length, tweens = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      tweens[_key2] = arguments[_key2];
-    }
-    var l = tweens.length;
-    if (l === 1) {
-      var tw = this.tweens;
-      var tween = tweens[0];
-      var i = tw.length;
-      while (i--) {
-        if (tw[i] === tween) {
-          tw.splice(i, 1);
-          tween._parent = null;
-          if (tween.duration >= this.duration) {
-            this.updateDuration();
-          }
-          return true;
-        }
-      }
-      return false;
-    }
-    if (l > 1) {
-      var good = true;
-      for (var _i = 0; _i < l; _i++) {
-        good = good && this.removeTween(tweens[_i]);
-      }
-      return good;
-    }
-    return true;
-  };
-  Timeline.prototype.updateDuration = function updateDuration() {
-    this.duration = 0;
-    for (var i = 0, l = this.tweens.length; i < l; i++) {
-      var tween = this.tweens[i];
-      var d = tween.duration;
-      if (tween.loop > 0) {
-        d *= tween.loop + 1;
-      }
-      if (d > this.duration) {
-        this.duration = d;
-      }
-    }
-  };
-  Timeline.prototype.clone = function clone() {
-    throw "Timeline can not be cloned.";
-  };
-  Timeline.prototype._updatePosition = function _updatePosition(jump, end) {
-    var t = this.position;
-    for (var i = 0, l = this.tweens.length; i < l; i++) {
-      this.tweens[i].setPosition(t, true, jump);
-    }
-  };
-  Timeline.prototype._runActionsRange = function _runActionsRange(startPos, endPos, jump, includeStart) {
-    var t = this.position;
-    for (var i = 0, l = this.tweens.length; i < l; i++) {
-      this.tweens[i]._runActions(startPos, endPos, jump, includeStart);
-      if (t !== this.position) {
-        return true;
-      }
-    }
-  };
-  return Timeline;
-}(AbstractTween);
 
 var MovieClip = function(_Container) {
   inherits(MovieClip, _Container);
@@ -6741,10 +5992,10 @@ var BlurFilter = function(_Filter) {
       return this._quality;
     },
     set: function set(quality) {
-      if (isNaN(value) || value < 0) {
-        value = 0;
+      if (isNaN(quality) || quality < 0) {
+        quality = 0;
       }
-      this._quality = value | 0;
+      this._quality = quality | 0;
     }
   }, {
     key: "_buildShader",

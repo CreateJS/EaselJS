@@ -407,7 +407,7 @@ export default class Text extends DisplayObject {
 	 * @private
 	 * @static
 	 */
-	let canvas = createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+	let canvas = window.createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 	if (canvas.getContext) {
 		Text._workingContext = canvas.getContext("2d");
 		canvas.width = canvas.height = 1;

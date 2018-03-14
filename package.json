@@ -49,18 +49,21 @@
     "test": "tests"
   },
   "scripts": {
+    "pretest": "npm run build -- --format=module",
     "test": "jest -c ./tests/jest.config.js",
     "lint": "cd node_modules/@createjs/build && gulp lint",
     "dev": "cd node_modules/@createjs/build && gulp dev --format=global",
     "build": "cd node_modules/@createjs/build && gulp build",
     "plugins": "cd node_modules/@createjs/build && gulp plugins",
+		"assets": "cd node_modules/@createjs/build && gulp assets",
     "docs": "cd node_modules/@createjs/docs && npm run gen"
   },
   "dependencies": {},
   "devDependencies": {
     "babel-jest": "^22.0.4",
-    "jest": "^22.0.4",
-    "js-imagediff": "tehvgg/js-imagediff"
+    "canvas-prebuilt": "^1.6.0",
+    "imagediff": "github:tehvgg/js-imagediff",
+    "jest": "^22.0.4"
   },
   "engine": "node >= 7.10.1"
 }

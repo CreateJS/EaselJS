@@ -260,7 +260,7 @@ export default class BitmapCache extends Filter {
 	 * @param {Object} [options] When using things like {{#crossLink "StageGL"}}{{/crossLink}} there may be
 	 * extra caching opportunities or requirements.
 	 */
-	 define (target, x = 0, y = 0, width = 1, height = 1, scale = 1, options) {
+	define (target, x = 0, y = 0, width = 1, height = 1, scale = 1, options) {
 		if (!target) { throw "No symbol to cache"; }
 		this._options = options;
 		this._useWebGL = options !== undefined;
@@ -356,7 +356,8 @@ export default class BitmapCache extends Filter {
 	 */
 	draw (ctx) {
 		if (!this.target) { return false; }
-		ctx.drawImage(this.target.cacheCanvas,
+		ctx.drawImage(
+			this.target.cacheCanvas,
 			this.x + (this._filterOffX/this.scale),
 			this.y + (this._filterOffY/this.scale),
 			this._drawWidth/this.scale,

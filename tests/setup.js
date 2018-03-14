@@ -1,61 +1,55 @@
 // run the master setup file first
-require('@createjs/build/tests/setup');
+require("@createjs/build/tests/setup");
 
-beforeAll(cb => {
-	this.assetsBasePath = "assets/art/";
-	this.sColor = "#000";
-	this.fColor = "#ff0000";
+const imagediff = require("imagediff");
+const Canvas = require("canvas-prebuilt");
+const { resolve } = require("path");
+const { Stage } = require("../dist/easeljs.module");
 
+expect.extend(imagediff.jasmine);
+
+module.exports = {
+	rootPath: resolve(__dirname, "../") + "\\",
+	sColor: "#000",
+	fColor: "#ff0000",
 	/**
 	 * Compare each drawing to a pre-saved base line image.
-	 * Need to has a small tolerance (100),
-	 * to account for antialiasing differnces between the saved images also browser to browser to browser differnces.
+	 * Needs to have a small tolerance (100),
+	 * to account for antialiasing differnces between the saved images also browser to browser differences.
 	 *
-	 * @param path
-	 * @param done
-	 * @param expect
+	 * @param {string} path
+	 * @param {Function} done
+	 * @param {Function} expect
+	 * @param {HTMLCanvasElement|Canvas} canvas
+	 * @param {number} [pixelTolerance=0.005]
 	 */
-	this.compareBaseLine = function (path, done, expect, pixelTolerance) {
-		var stage = this.stage;
-		stage.update();
-
-		var img = new Image();
+	compareBaseLine (path, done, expect, canvas, pixelTolerance = 0.005) {
+		const img = new Canvas.Image();
+		img.onload = () => {
+			/*console.log(canvas.toBuffer());
+			require('fs').writeFile(this.rootPath + "tests/_output/canvas.png", canvas.toBuffer(), done);
+			return;*/
+			const canvasData = imagediff.toImageData(canvas);
+			const imageData = imagediff.toImageData(img);
+			const isEqual = imagediff.equal(canvasData, imageData, (img.height * img.width) * pixelTolerance);
+			if (!isEqual) {
+				imagediff.imageDataToPNG(canvasData, this.rootPath + "tests/_output/canvas.png", () => {
+					imagediff.imageDataToPNG(imageData, this.rootPath + "tests/_output/image.png", () => {
+						done('Images not equal.');
+					});
+				});
+			} else {
+				expect(isEqual).toBeTruthy();
+				done();
+			}
+		};
+		img.onerror = () => done(`${img.src} failed to load`);
 		img.src = path;
-		img.onload = function () {
-			var pixels = this.width * this.height;
-			var tolerance = pixels * (typeof pixelTolerance === 'undefined' ? 0.005 : pixelTolerance);
-			expect(stage.canvas).toImageDiffEqual(this, tolerance);
-			done();
-		};
-		img.onerror = function(){
-			fail(img.src + ' failed to load');
-			done();
-		};
-	};
-
-	this.merge = function(dest, src) {
-		for (var n in src) {
+	},
+	merge (dest, src) {
+		for (let n in src) {
 			dest[n] = src[n];
 		}
 		return dest;
 	}
-
-	var img = this.img = new Image();
-
-	img.onload = function () {
-		cb();
-	};
-
-	img.onerror = function () {
-		fail(img.src + ' failed to load');
-		cb();
-	};
-
-	img.src = this.assetsBasePath + "daisy.png";
-}, 5000);
-
-beforeEach(function () {
-	this.stage = new createjs.Stage(imagediff.createCanvas(200, 200));
-	jasmine.addMatchers(imagediff.jasmine);
-	jasmine.addMatchers(customMatchers);
-});
+};

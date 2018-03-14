@@ -25,9 +25,9 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-import EventDispatcher from "@createjs/build/src/events/EventDispatcher";
+import Tween from "@createjs/tweenjs/src/Tween";
 
-import Event from "@createjs/build/src/events/Event";
+import Timeline from "@createjs/tweenjs/src/Timeline";
 
 class Event {
   constructor(type, bubbles = false, cancelable = false) {
@@ -120,7 +120,7 @@ class EventDispatcher {
       listener = listener.handleEvent;
     }
     scope = scope || this;
-    return this.addEventListener(type, event => {
+    return this.addEventListener(type, evt => {
       listener.call(scope, evt, data);
       once && evt.remove();
     }, useCapture);
@@ -208,7 +208,7 @@ class EventDispatcher {
     return false;
   }
   toString() {
-    return "[EventDispatcher]";
+    return `[${this.constructor.name + this.name ? ` ${this.name}` : ""}]`;
   }
   _dispatchEvent(eventObj, eventPhase) {
     const listeners = eventPhase === 1 ? this._captureListeners : this._listeners;
@@ -401,6 +401,31 @@ class Ticker extends EventDispatcher {
     const now = window.performance && window.performance.now;
     return (now && now.call(performance) || new Date().getTime()) - this._startTime;
   }
+  static on(type, listener, scope, once, data, useCapture) {
+    return _instance.on(type, listener, scope, once, data, useCapture);
+  }
+  static removeEventListener(type, listener, useCapture) {
+    _instance.removeEventListener(type, listener, useCapture);
+  }
+  static off(type, listener, useCapture) {
+    _instance.off(type, listener, useCapture);
+  }
+  static removeAllEventListeners(type) {
+    _instance.removeAllEventListeners(type);
+  }
+  static dispatchEvent(eventObj, bubbles, cancelable) {
+    return _instance.dispatchEvent(eventObj, bubbles, cancelable);
+  }
+  static hasEventListener(type) {
+    return _instance.hasEventListener(type);
+  }
+  static willTrigger(type) {
+    return _instance.willTrigger(type);
+  }
+  static toString() {
+    return _instance.toString();
+  }
+  static _dispatchEvent(eventObj, eventPhase) {}
   static get interval() {
     return _instance.interval;
   }
@@ -1357,7 +1382,7 @@ class DisplayObject extends EventDispatcher {
 }
 
 {
-  let canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+  let canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
   if (canvas.getContext) {
     DisplayObject._hitTestCanvas = canvas;
     DisplayObject._hitTestContext = canvas.getContext("2d");
@@ -1898,7 +1923,7 @@ class Stage extends Container {
       };
       for (let n in ls) {
         let o = ls[n];
-        o.t.addEventListener(n, o.f, false);
+        o.t.addEventListener && o.t.addEventListener(n, o.f, false);
       }
     }
   }
@@ -4375,7 +4400,7 @@ class PolyStar {
 }
 
 {
-  let canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+  let canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
   if (canvas.getContext) {
     Graphics._ctx = canvas.getContext("2d");
     canvas.width = canvas.height = 1;
@@ -4434,762 +4459,22 @@ class PolyStar {
     x: 49,
     y: 50,
     z: 51,
-    "0": 52,
-    "1": 53,
-    "2": 54,
-    "3": 55,
-    "4": 56,
-    "5": 57,
-    "6": 58,
-    "7": 59,
-    "8": 60,
-    "9": 61,
+    0: 52,
+    1: 53,
+    2: 54,
+    3: 55,
+    4: 56,
+    5: 57,
+    6: 58,
+    7: 59,
+    8: 60,
+    9: 61,
     "+": 62,
     "/": 63
   };
   Graphics.STROKE_CAPS_MAP = [ "butt", "round", "square" ];
   Graphics.STROKE_JOINTS_MAP = [ "miter", "round", "bevel" ];
   Graphics.EMPTY_SEGMENTS = [];
-}
-
-class AbstractTween extends EventDispatcher {
-  constructor(props) {
-    super();
-    this.ignoreGlobalPause = false;
-    this.loop = 0;
-    this.useTicks = false;
-    this.reversed = false;
-    this.bounce = false;
-    this.timeScale = 1;
-    this.duration = 0;
-    this.position = 0;
-    this.rawPosition = -1;
-    this._paused = true;
-    this._next = null;
-    this._prev = null;
-    this._parent = null;
-    this._labels = null;
-    this._labelList = null;
-    if (props) {
-      this.useTicks = !!props.useTicks;
-      this.ignoreGlobalPause = !!props.ignoreGlobalPause;
-      this.loop = props.loop === true ? -1 : props.loop || 0;
-      this.reversed = !!props.reversed;
-      this.bounce = !!props.bounce;
-      this.timeScale = props.timeScale || 1;
-      props.onChange && this.addEventListener("change", props.onChange);
-      props.onComplete && this.addEventListener("complete", props.onComplete);
-    }
-  }
-  get labels() {
-    let list = this._labelList;
-    if (!list) {
-      list = this._labelList = [];
-      let labels = this._labels;
-      for (let label in labels) {
-        list.push({
-          label: label,
-          position: labels[label]
-        });
-      }
-      list.sort((a, b) => a.position - b.position);
-    }
-    return list;
-  }
-  set labels(labels) {
-    this._labels = labels;
-    this._labelList = null;
-  }
-  get currentLabel() {
-    let labels = this.labels;
-    let pos = this.position;
-    for (let i = 0, l = labels.length; i < l; i++) {
-      if (pos < labels[i].position) {
-        break;
-      }
-    }
-    return i === 0 ? null : labels[i - 1].label;
-  }
-  get paused() {
-    return this._paused;
-  }
-  set paused(paused) {
-    Tween._register(this, paused);
-    this._paused = paused;
-  }
-  advance(delta, ignoreActions = false) {
-    this.setPosition(this.rawPosition + delta * this.timeScale, ignoreActions);
-  }
-  setPosition(rawPosition, ignoreActions = false, jump = false, callback) {
-    const d = this.duration, loopCount = this.loop, prevRawPos = this.rawPosition;
-    let loop = 0, t = 0, end = false;
-    if (rawPosition < 0) {
-      rawPosition = 0;
-    }
-    if (d === 0) {
-      end = true;
-      if (prevRawPos !== -1) {
-        return end;
-      }
-    } else {
-      loop = rawPosition / d | 0;
-      t = rawPosition - loop * d;
-      end = loopCount !== -1 && rawPosition >= loopCount * d + d;
-      if (end) {
-        rawPosition = (t = d) * (loop = loopCount) + d;
-      }
-      if (rawPosition === prevRawPos) {
-        return end;
-      }
-      if (!this.reversed !== !(this.bounce && loop % 2)) {
-        t = d - t;
-      }
-    }
-    this.position = t;
-    this.rawPosition = rawPosition;
-    this._updatePosition(jump, end);
-    if (end) {
-      this.paused = true;
-    }
-    callback && callback(this);
-    if (!ignoreActions) {
-      this._runActions(prevRawPos, rawPosition, jump, !jump && prevRawPos === -1);
-    }
-    this.dispatchEvent("change");
-    if (end) {
-      this.dispatchEvent("complete");
-    }
-  }
-  calculatePosition(rawPosition) {
-    const d = this.duration, loopCount = this.loop;
-    let loop = 0, t = 0;
-    if (d === 0) {
-      return 0;
-    }
-    if (loopCount !== -1 && rawPosition >= loopCount * d + d) {
-      t = d;
-      loop = loopCount;
-    } else if (rawPosition < 0) {
-      t = 0;
-    } else {
-      loop = rawPosition / d | 0;
-      t = rawPosition - loop * d;
-    }
-    return !this.reversed !== !(this.bounce && loop % 2) ? d - t : t;
-  }
-  addLabel(label, position) {
-    if (!this._labels) {
-      this._labels = {};
-    }
-    this._labels[label] = position;
-    const list = this._labelList;
-    if (list) {
-      for (let i = 0, l = list.length; i < l; i++) {
-        if (position < list[i].position) {
-          break;
-        }
-      }
-      list.splice(i, 0, {
-        label: label,
-        position: position
-      });
-    }
-  }
-  gotoAndPlay(positionOrLabel) {
-    this.paused = false;
-    this._goto(positionOrLabel);
-  }
-  gotoAndStop(positionOrLabel) {
-    this.paused = true;
-    this._goto(positionOrLabel);
-  }
-  resolve(positionOrLabel) {
-    const pos = Number(positionOrLabel);
-    return isNaN(pos) ? this._labels && this._labels[positionOrLabel] : pos;
-  }
-  toString() {
-    return `[${this.constructor.name}${this.name ? ` (name=${this.name})` : ""}]`;
-  }
-  clone() {
-    throw "AbstractTween cannot be cloned.";
-  }
-  _init(props) {
-    if (!props || !props.paused) {
-      this.paused = false;
-    }
-    if (props && props.position != null) {
-      this.setPosition(props.position);
-    }
-  }
-  _goto(positionOrLabel) {
-    const pos = this.resolve(positionOrLabel);
-    if (pos != null) {
-      this.setPosition(pos, false, true);
-    }
-  }
-  _runActions(startRawPos, endRawPos, jump, includeStart) {
-    if (!this._actionHead && !this.tweens) {
-      return;
-    }
-    const d = this.duration, loopCount = this.loop;
-    let reversed = this.reversed, bounce = this.bounce;
-    let loop0, loop1, t0, t1;
-    if (d === 0) {
-      loop0 = loop1 = t0 = t1 = 0;
-      reversed = bounce = false;
-    } else {
-      loop0 = startRawPos / d | 0;
-      loop1 = endRawPos / d | 0;
-      t0 = startRawPos - loop0 * d;
-      t1 = endRawPos - loop1 * d;
-    }
-    if (loopCount !== -1) {
-      if (loop1 > loopCount) {
-        t1 = d;
-        loop1 = loopCount;
-      }
-      if (loop0 > loopCount) {
-        t0 = d;
-        loop0 = loopCount;
-      }
-    }
-    if (jump) {
-      return this._runActionsRange(t1, t1, jump, includeStart);
-    } else if (loop0 === loop1 && t0 === t1 && !jump && !includeStart) {
-      return;
-    } else if (loop0 === -1) {
-      loop0 = t0 = 0;
-    }
-    const dir = startRawPos <= endRawPos;
-    let loop = loop0;
-    do {
-      let rev = !reversed !== !(bounce && loop % 2);
-      let start = loop === loop0 ? t0 : dir ? 0 : d;
-      let end = loop === loop1 ? t1 : dir ? d : 0;
-      if (rev) {
-        start = d - start;
-        end = d - end;
-      }
-      if (bounce && loop !== loop0 && start === end) {} else if (this._runActionsRange(start, end, jump, includeStart || loop !== loop0 && !bounce)) {
-        return true;
-      }
-      includeStart = false;
-    } while (dir && ++loop <= loop1 || !dir && --loop >= loop1);
-  }
-  _runActionsRange(startPos, endPos, jump, includeStart) {
-    throw "_runActionsRange is abstract and must be overridden by a subclass.";
-  }
-  _updatePosition(jump, end) {
-    throw "_updatePosition is abstract and must be overridden by a subclass.";
-  }
-}
-
-function linear(t) {
-  return t;
-}
-
-function getElasticIn(amplitude, period) {
-  let pi2 = Math.PI * 2;
-  return function(t) {
-    if (t === 0 || t === 1) return t;
-    let s = period / pi2 * Math.asin(1 / amplitude);
-    return -(amplitude * Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * pi2 / period));
-  };
-}
-
-function getElasticOut(amplitude, period) {
-  let pi2 = Math.PI * 2;
-  return function(t) {
-    if (t === 0 || t === 1) return t;
-    let s = period / pi2 * Math.asin(1 / amplitude);
-    return amplitude * Math.pow(2, -10 * t) * Math.sin((t - s) * pi2 / period) + 1;
-  };
-}
-
-function getElasticInOut(amplitude, period) {
-  let pi2 = Math.PI * 2;
-  return function(t) {
-    let s = period / pi2 * Math.asin(1 / amplitude);
-    if ((t *= 2) < 1) return -.5 * (amplitude * Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * pi2 / period));
-    return amplitude * Math.pow(2, -10 * (t -= 1)) * Math.sin((t - s) * pi2 / period) * .5 + 1;
-  };
-}
-
-const elasticIn = getElasticIn(1, .3);
-
-const elasticOut = getElasticOut(1, .3);
-
-const elasticInOut = getElasticInOut(1, .3 * 1.5);
-
-class Tween extends AbstractTween {
-  constructor(target, props) {
-    super(props);
-    this.pluginData = null;
-    this.target = target;
-    this.passive = false;
-    this._stepHead = new TweenStep(null, 0, 0, {}, null, true);
-    this._stepTail = this._stepHead;
-    this._stepPosition = 0;
-    this._actionHead = null;
-    this._actionTail = null;
-    this._plugins = null;
-    this._pluginIds = null;
-    this._injected = null;
-    if (props) {
-      this.pluginData = props.pluginData;
-      if (props.override) {
-        Tween.removeTweens(target);
-      }
-    }
-    if (!this.pluginData) {
-      this.pluginData = {};
-    }
-    this._init(props);
-  }
-  static get(target, props) {
-    return new Tween(target, props);
-  }
-  static tick(delta, paused) {
-    let tween = Tween._tweenHead;
-    while (tween) {
-      let next = tween._next;
-      if (paused && !tween.ignoreGlobalPause || tween._paused) {} else {
-        tween.advance(tween.useTicks ? 1 : delta);
-      }
-      tween = next;
-    }
-  }
-  static handleEvent(event) {
-    if (event.type === "tick") {
-      this.tick(event.delta, event.paused);
-    }
-  }
-  static removeTweens(target) {
-    if (!target.tweenjs_count) {
-      return;
-    }
-    let tween = Tween._tweenHead;
-    while (tween) {
-      let next = tween._next;
-      if (tween.target === target) {
-        tween.paused = true;
-      }
-      tween = next;
-    }
-    target.tweenjs_count = 0;
-  }
-  static removeAllTweens() {
-    let tween = Tween._tweenHead;
-    while (tween) {
-      let next = tween._next;
-      tween._paused = true;
-      tween.target && (tween.target.tweenjs_count = 0);
-      tween._next = tween._prev = null;
-      tween = next;
-    }
-    Tween._tweenHead = Tween._tweenTail = null;
-  }
-  static hasActiveTweens(target) {
-    if (target) {
-      return !!target.tweenjs_count;
-    }
-    return !!Tween._tweenHead;
-  }
-  static installPlugin(plugin, props) {
-    plugin.install(props);
-    const priority = plugin.priority = plugin.priority || 0, arr = Tween._plugins = Tween._plugins || [];
-    for (let i = 0, l = arr.length; i < l; i++) {
-      if (priority < arr[i].priority) {
-        break;
-      }
-    }
-    arr.splice(i, 0, plugin);
-  }
-  static _register(tween, paused) {
-    const target = tween.target;
-    if (!paused && tween._paused) {
-      if (target) {
-        target.tweenjs_count = target.tweenjs_count ? target.tweenjs_count + 1 : 1;
-      }
-      let tail = Tween._tweenTail;
-      if (!tail) {
-        Tween._tweenHead = Tween._tweenTail = tween;
-      } else {
-        Tween._tweenTail = tail._next = tween;
-        tween._prev = tail;
-      }
-      if (!Tween._inited) {
-        Ticker.addEventListener("tick", Tween);
-        Tween._inited = true;
-      }
-    } else if (paused && !tween._paused) {
-      if (target) {
-        target.tweenjs_count--;
-      }
-      let next = tween._next, prev = tween._prev;
-      if (next) {
-        next._prev = prev;
-      } else {
-        Tween._tweenTail = prev;
-      }
-      if (prev) {
-        prev._next = next;
-      } else {
-        Tween._tweenHead = next;
-      }
-      tween._next = tween._prev = null;
-    }
-  }
-  wait(duration, passive = false) {
-    if (duration > 0) {
-      this._addStep(+duration, this._stepTail.props, null, passive);
-    }
-    return this;
-  }
-  to(props, duration = 0, ease = linear) {
-    if (duration < 0) {
-      duration = 0;
-    }
-    const step = this._addStep(+duration, null, ease);
-    this._appendProps(props, step);
-    return this;
-  }
-  label(name) {
-    this.addLabel(name, this.duration);
-    return this;
-  }
-  call(callback, params, scope) {
-    return this._addAction(scope || this.target, callback, params || [ this ]);
-  }
-  set(props, target) {
-    return this._addAction(target || this.target, this._set, [ props ]);
-  }
-  play(tween) {
-    return this._addAction(tween || this, this._set, [ {
-      paused: false
-    } ]);
-  }
-  pause(tween) {
-    return this._addAction(tween || this, this._set, [ {
-      paused: false
-    } ]);
-  }
-  clone() {
-    throw "Tween can not be cloned.";
-  }
-  _addPlugin(plugin) {
-    let ids = this._pluginIds || (this._pluginIds = {}), id = plugin.id;
-    if (!id || ids[id]) {
-      return;
-    }
-    ids[id] = true;
-    let plugins = this._plugins || (this._plugins = []), priority = plugin.priority || 0;
-    for (let i = 0, l = plugins.length; i < l; i++) {
-      if (priority < plugins[i].priority) {
-        plugins.splice(i, 0, plugin);
-        return;
-      }
-    }
-    plugins.push(plugin);
-  }
-  _updatePosition(jump, end) {
-    let step = this._stepHead.next, t = this.position, d = this.duration;
-    if (this.target && step) {
-      let stepNext = step.next;
-      while (stepNext && stepNext.t <= t) {
-        step = step.next;
-        stepNext = step.next;
-      }
-      let ratio = end ? d === 0 ? 1 : t / d : (t - step.t) / step.d;
-      this._updateTargetProps(step, ratio, end);
-    }
-    this._stepPosition = step ? t - step.t : 0;
-  }
-  _updateTargetProps(step, ratio, end) {
-    if (this.passive = !!step.passive) {
-      return;
-    }
-    let v, v0, v1, ease;
-    let p0 = step.prev.props;
-    let p1 = step.props;
-    if (ease = step.ease) {
-      ratio = ease(ratio, 0, 1, 1);
-    }
-    let plugins = this._plugins;
-    proploop: for (let n in p0) {
-      v0 = p0[n];
-      v1 = p1[n];
-      if (v0 !== v1 && typeof v0 === "number") {
-        v = v0 + (v1 - v0) * ratio;
-      } else {
-        v = ratio >= 1 ? v1 : v0;
-      }
-      if (plugins) {
-        for (let i = 0, l = plugins.length; i < l; i++) {
-          let value = plugins[i].change(this, step, n, v, ratio, end);
-          if (value === Tween.IGNORE) {
-            continue proploop;
-          }
-          if (value !== undefined) {
-            v = value;
-          }
-        }
-      }
-      this.target[n] = v;
-    }
-  }
-  _runActionsRange(startPos, endPos, jump, includeStart) {
-    let rev = startPos > endPos;
-    let action = rev ? this._actionTail : this._actionHead;
-    let ePos = endPos, sPos = startPos;
-    if (rev) {
-      ePos = startPos;
-      sPos = endPos;
-    }
-    let t = this.position;
-    while (action) {
-      let pos = action.t;
-      if (pos === endPos || pos > sPos && pos < ePos || includeStart && pos === startPos) {
-        action.funct.apply(action.scope, action.params);
-        if (t !== this.position) {
-          return true;
-        }
-      }
-      action = rev ? action.prev : action.next;
-    }
-  }
-  _appendProps(props, step, stepPlugins) {
-    let initProps = this._stepHead.props, target = this.target, plugins = Tween._plugins;
-    let n, i, l, value, initValue, inject;
-    let oldStep = step.prev, oldProps = oldStep.props;
-    let stepProps = step.props || (step.props = this._cloneProps(oldProps));
-    let cleanProps = {};
-    for (n in props) {
-      if (!props.hasOwnProperty(n)) {
-        continue;
-      }
-      cleanProps[n] = stepProps[n] = props[n];
-      if (initProps[n] !== undefined) {
-        continue;
-      }
-      initValue = undefined;
-      if (plugins) {
-        for (i = plugins.length - 1; i >= 0; i--) {
-          value = plugins[i].init(this, n, initValue);
-          if (value !== undefined) {
-            initValue = value;
-          }
-          if (initValue === Tween.IGNORE) {
-            (ignored = ignored || {})[n] = true;
-            delete stepProps[n];
-            delete cleanProps[n];
-            break;
-          }
-        }
-      }
-      if (initValue !== Tween.IGNORE) {
-        if (initValue === undefined) {
-          initValue = target[n];
-        }
-        oldProps[n] = initValue === undefined ? null : initValue;
-      }
-    }
-    for (n in cleanProps) {
-      value = props[n];
-      let o, prev = oldStep;
-      while ((o = prev) && (prev = o.prev)) {
-        if (prev.props === o.props) {
-          continue;
-        }
-        if (prev.props[n] !== undefined) {
-          break;
-        }
-        prev.props[n] = oldProps[n];
-      }
-    }
-    if (stepPlugins && (plugins = this._plugins)) {
-      for (i = plugins.length - 1; i >= 0; i--) {
-        plugins[i].step(this, step, cleanProps);
-      }
-    }
-    if (inject = this._injected) {
-      this._injected = null;
-      this._appendProps(inject, step, false);
-    }
-  }
-  _injectProp(name, value) {
-    let o = this._injected || (this._injected = {});
-    o[name] = value;
-  }
-  _addStep(duration, props, ease, passive = false) {
-    let step = new TweenStep(this._stepTail, this.duration, duration, props, ease, passive);
-    this.duration += duration;
-    return this._stepTail = this._stepTail.next = step;
-  }
-  _addAction(scope, funct, params) {
-    let action = new TweenAction(this._actionTail, this.duration, scope, funct, params);
-    if (this._actionTail) {
-      this._actionTail.next = action;
-    } else {
-      this._actionHead = action;
-    }
-    this._actionTail = action;
-    return this;
-  }
-  _set(props) {
-    for (let n in props) {
-      this[n] = props[n];
-    }
-  }
-  _cloneProps(props) {
-    let o = {};
-    for (let n in props) {
-      o[n] = props[n];
-    }
-    return o;
-  }
-}
-
-{
-  let p = Tween.prototype;
-  p.w = p.wait;
-  p.t = p.to;
-  p.c = p.call;
-  p.s = p.set;
-}
-
-Tween.IGNORE = {};
-
-Tween._tweens = [];
-
-Tween._plugins = null;
-
-Tween._tweenHead = null;
-
-Tween._tweenTail = null;
-
-class TweenStep {
-  constructor(prev, t, d, props, ease, passive) {
-    this.next = null;
-    this.prev = prev;
-    this.t = t;
-    this.d = d;
-    this.props = props;
-    this.ease = ease;
-    this.passive = passive;
-    this.index = prev ? prev.index + 1 : 0;
-  }
-}
-
-class TweenAction {
-  constructor(prev, t, scope, funct, params) {
-    this.next = null;
-    this.d = 0;
-    this.prev = prev;
-    this.t = t;
-    this.scope = scope;
-    this.funct = funct;
-    this.params = params;
-  }
-}
-
-class Timeline extends AbstractTween {
-  constructor(props = {}) {
-    super(props);
-    this.tweens = [];
-    if (props.tweens) {
-      this.addTween(...props.tweens);
-    }
-    if (props.labels) {
-      this.labels = props.labels;
-    }
-    this._init(props);
-  }
-  addTween(...tweens) {
-    const l = tweens.length;
-    if (l === 1) {
-      const tween = tweens[0];
-      this.tweens.push(tween);
-      tween._parent = this;
-      tween.paused = true;
-      let d = tween.duration;
-      if (tween.loop > 0) {
-        d *= tween.loop + 1;
-      }
-      if (d > this.duration) {
-        this.duration = d;
-      }
-      if (this.rawPosition >= 0) {
-        tween.setPosition(this.rawPosition);
-      }
-      return tween;
-    }
-    if (l > 1) {
-      for (let i = 0; i < l; i++) {
-        this.addTween(tweens[i]);
-      }
-      return tweens[l - 1];
-    }
-    return null;
-  }
-  removeTween(...tweens) {
-    const l = tweens.length;
-    if (l === 1) {
-      const tw = this.tweens;
-      const tween = tweens[0];
-      let i = tw.length;
-      while (i--) {
-        if (tw[i] === tween) {
-          tw.splice(i, 1);
-          tween._parent = null;
-          if (tween.duration >= this.duration) {
-            this.updateDuration();
-          }
-          return true;
-        }
-      }
-      return false;
-    }
-    if (l > 1) {
-      let good = true;
-      for (let i = 0; i < l; i++) {
-        good = good && this.removeTween(tweens[i]);
-      }
-      return good;
-    }
-    return true;
-  }
-  updateDuration() {
-    this.duration = 0;
-    for (let i = 0, l = this.tweens.length; i < l; i++) {
-      let tween = this.tweens[i];
-      let d = tween.duration;
-      if (tween.loop > 0) {
-        d *= tween.loop + 1;
-      }
-      if (d > this.duration) {
-        this.duration = d;
-      }
-    }
-  }
-  clone() {
-    throw "Timeline can not be cloned.";
-  }
-  _updatePosition(jump, end) {
-    const t = this.position;
-    for (let i = 0, l = this.tweens.length; i < l; i++) {
-      this.tweens[i].setPosition(t, true, jump);
-    }
-  }
-  _runActionsRange(startPos, endPos, jump, includeStart) {
-    const t = this.position;
-    for (let i = 0, l = this.tweens.length; i < l; i++) {
-      this.tweens[i]._runActions(startPos, endPos, jump, includeStart);
-      if (t !== this.position) {
-        return true;
-      }
-    }
-  }
 }
 
 class MovieClip extends Container {
@@ -5849,7 +5134,7 @@ class Text extends DisplayObject {
 }
 
 {
-  let canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+  let canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
   if (canvas.getContext) {
     Text._workingContext = canvas.getContext("2d");
     canvas.width = canvas.height = 1;
@@ -5910,7 +5195,7 @@ class AlphaMapFilter extends Filter {
     if (map instanceof HTMLCanvasElement) {
       ctx = canvas.getContext("2d");
     } else {
-      canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+      canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
       canvas.width = map.width;
       canvas.height = map.height;
       ctx = canvas.getContext("2d");
@@ -6013,10 +5298,10 @@ class BlurFilter extends Filter {
     return this._quality;
   }
   set quality(quality) {
-    if (isNaN(value) || value < 0) {
-      value = 0;
+    if (isNaN(quality) || quality < 0) {
+      quality = 0;
     }
-    this._quality = value | 0;
+    this._quality = quality | 0;
   }
   get _buildShader() {
     const xChange = this._lastBlurX !== this._blurX;
@@ -7016,7 +6301,7 @@ class SpriteSheetUtils {
   }
   static mergeAlpha(rgbImage, alphaImage, canvas) {
     if (!canvas) {
-      canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+      canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
     }
     canvas.width = Math.max(alphaImage.width, rgbImage.width);
     canvas.height = Math.max(alphaImage.height, rgbImage.height);
@@ -7097,7 +6382,7 @@ class SpriteSheetUtils {
 }
 
 {
-  let canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+  let canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
   if (canvas.getContext) {
     SpriteSheetUtils._workingCanvas = canvas;
     SpriteSheetUtils._workingContext = canvas.getContext("2d");
@@ -7215,7 +6500,7 @@ class WebGLInspector extends EventDispatcher {
   }
 }
 
-export { EventDispatcher as EventDispatcher, Event as Event, Ticker, StageGL, Stage, Container, DisplayObject, Bitmap, BitmapText, DOMElement, Graphics, Arc, ArcTo, BeginPath, BezierCurveTo, Circle, ClosePath, Ellipse, Fill, LineTo, MoveTo, PolyStar, QuadraticCurveTo, Rect, RoundRect, Stroke, StrokeDash, StrokeStyle, MovieClip, Shadow as Shadow, Shape, Sprite, SpriteSheet, Text, MouseEvent, AlphaMapFilter, AlphaMaskFilter, BitmapCache, BlurFilter, ColorFilter, ColorMatrix, ColorMatrixFilter, Filter, DisplayProps, Matrix2D, Point, Rectangle, ButtonHelper, Touch, SpriteSheetBuilder, SpriteSheetUtils, UID, WebGLInspector };
+export { EventDispatcher, Event, Ticker, StageGL, Stage, Container, DisplayObject, Bitmap, BitmapText, DOMElement, Graphics, Arc, ArcTo, BeginPath, BezierCurveTo, Circle, ClosePath, Ellipse, Fill, LineTo, MoveTo, PolyStar, QuadraticCurveTo, Rect, RoundRect, Stroke, StrokeDash, StrokeStyle, MovieClip, Shadow as Shadow, Shape, Sprite, SpriteSheet, Text, MouseEvent, AlphaMapFilter, AlphaMaskFilter, BitmapCache, BlurFilter, ColorFilter, ColorMatrix, ColorMatrixFilter, Filter, DisplayProps, Matrix2D, Point, Rectangle, ButtonHelper, Touch, SpriteSheetBuilder, SpriteSheetUtils, UID, WebGLInspector };
 
 var cjs = window.createjs = window.createjs || {};
 

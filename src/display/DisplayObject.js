@@ -1054,7 +1054,7 @@ export default class DisplayObject extends EventDispatcher {
  * @protected
  */
 {
-	let canvas = createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); // prevent errors on load in browsers without canvas.
+	let canvas = window.createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); // prevent errors on load in browsers without canvas.
 	if (canvas.getContext) {
 		DisplayObject._hitTestCanvas = canvas;
 		DisplayObject._hitTestContext = canvas.getContext("2d");

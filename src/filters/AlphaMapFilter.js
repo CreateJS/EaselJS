@@ -166,7 +166,7 @@ export default class AlphaMapFilter extends Filter {
 		if (map instanceof HTMLCanvasElement) {
 			ctx = canvas.getContext("2d");
 		} else {
-			canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+			canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
 			canvas.width = map.width;
 			canvas.height = map.height;
 			ctx = canvas.getContext("2d");
