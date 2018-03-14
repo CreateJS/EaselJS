@@ -395,7 +395,7 @@ export default class BitmapCache extends Filter {
 			surface = this.target.cacheCanvas;
 			// create it if it's missing
 			if (!surface) {
-				surface = this.target.cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+				surface = this.target.cacheCanvas = window.createjs&&createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 			}
 			// now size it
 			surface.width = this._drawWidth;

@@ -1,5 +1,6 @@
 /**
- * @license EaselJS
+ * @license
+ * EaselJS
  * Visit https://createjs.com for documentation, updates and examples.
  *
  * Copyright (c) 2017 gskinner.com, inc.
@@ -481,7 +482,6 @@
     Ticker.toString = function toString() {
       return _instance.toString();
     };
-    Ticker._dispatchEvent = function _dispatchEvent(eventObj, eventPhase) {};
     Ticker.init = function init() {
       _instance.init();
     };
@@ -505,24 +505,6 @@
     };
     Ticker.getTicks = function getTicks(pauseable) {
       return _instance.getTicks(pauseable);
-    };
-    Ticker._handleSynch = function _handleSynch() {
-      _instance._handleSynch();
-    };
-    Ticker._handleRAF = function _handleRAF() {
-      _instance._handleRAF();
-    };
-    Ticker._handleTimeout = function _handleTimeout() {
-      _instance._handleTimeout();
-    };
-    Ticker._setupTick = function _setupTick() {
-      _instance._setupTick();
-    };
-    Ticker._tick = function _tick() {
-      _instance._tick();
-    };
-    Ticker._getTime = function _getTime() {
-      return _instance._getTime();
     };
     createClass(Ticker, [ {
       key: "interval",
@@ -560,10 +542,46 @@
       set: function set(framerate) {
         _instance.framerate = framerate;
       }
+    }, {
+      key: "name",
+      get: function get() {
+        return _instance.name;
+      },
+      set: function set(name) {
+        _instance.name = name;
+      }
+    }, {
+      key: "timingMode",
+      get: function get() {
+        return _instance.timingMode;
+      },
+      set: function set(timingMode) {
+        _instance.timingMode = timingMode;
+      }
+    }, {
+      key: "maxDelta",
+      get: function get() {
+        return _instance.maxDelta;
+      },
+      set: function set(maxDelta) {
+        _instance.maxDelta = maxDelta;
+      }
+    }, {
+      key: "paused",
+      get: function get() {
+        return _instance.paused;
+      },
+      set: function set(paused) {
+        _instance.paused = paused;
+      }
     } ]);
     return Ticker;
   }(EventDispatcher);
   var _instance = new Ticker("createjs.global");
+  var StageGL = function StageGL() {
+    classCallCheck(this, StageGL);
+    throw new Error("\n\t\t\tStageGL is not currently supported on the EaselJS 2.0 branch.\n\t\t\tEnd of Q1 2018 is targetted for StageGL support.\n\t\t\tFollow @CreateJS on Twitter for updates.\n\t\t");
+  };
   var _nextID = 0;
   var UID = function() {
     function UID() {
@@ -1543,7 +1561,7 @@
     return DisplayObject;
   }(EventDispatcher);
   {
-    var canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+    var canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
     if (canvas.getContext) {
       DisplayObject._hitTestCanvas = canvas;
       DisplayObject._hitTestContext = canvas.getContext("2d");
@@ -2125,7 +2143,7 @@
         };
         for (var _n in ls) {
           var _o = ls[_n];
-          _o.t.addEventListener(_n, _o.f, false);
+          _o.t.addEventListener && _o.t.addEventListener(_n, _o.f, false);
         }
       }
     };
@@ -2358,1147 +2376,6 @@
     } ]);
     return Stage;
   }(Container);
-  var StageGL = function(_Stage) {
-    inherits(StageGL, _Stage);
-    function StageGL(canvas, _ref) {
-      var _ref$preserveBuffer = _ref.preserveBuffer, preserveBuffer = _ref$preserveBuffer === undefined ? false : _ref$preserveBuffer, _ref$antialias = _ref.antialias, antialias = _ref$antialias === undefined ? false : _ref$antialias, _ref$transparent = _ref.transparent, transparent = _ref$transparent === undefined ? false : _ref$transparent, _ref$premultiply = _ref.premultiply, premultiply = _ref$premultiply === undefined ? false : _ref$premultiply, _ref$autoPurge = _ref.autoPurge, autoPurge = _ref$autoPurge === undefined ? 1200 : _ref$autoPurge;
-      classCallCheck(this, StageGL);
-      var _this = possibleConstructorReturn(this, _Stage.call(this, canvas));
-      _this.vocalDebug = false;
-      _this._preserveBuffer = preserveBuffer;
-      _this._antialias = antialias;
-      _this._transparent = transparent;
-      _this._premultiply = premultiply;
-      _this._autoPurge = autoPurge;
-      _this._viewportWidth = 0;
-      _this._viewportHeight = 0;
-      _this._projectionMatrix = null;
-      _this._webGLContext = null;
-      _this._clearColor = {
-        r: 0,
-        g: 0,
-        b: 0,
-        a: 0
-      };
-      _this._maxCardsPerBatch = StageGL.DEFAULT_MAX_BATCH_SIZE;
-      _this._activeShader = null;
-      _this._vertices = null;
-      _this._vertexPositionBuffer = null;
-      _this._uvs = null;
-      _this._uvPositionBuffer = null;
-      _this._indices = null;
-      _this._textureIndexBuffer = null;
-      _this._alphas = null;
-      _this._alphaBuffer = null;
-      _this._textureDictionary = [];
-      _this._textureIDs = {};
-      _this._batchTextures = [];
-      _this._baseTextures = [];
-      _this._batchTextureCount = 8;
-      _this._lastTextureInsert = -1;
-      _this._batchID = 0;
-      _this._drawID = 0;
-      _this._slotBlacklist = [];
-      _this._isDrawing = 0;
-      _this._lastTrackedCanvas = -1;
-      _this.isCacheControlled = false;
-      _this._cacheContainer = new Container();
-      _this._initializeWebGL();
-      return _this;
-    }
-    StageGL.buildUVRects = function buildUVRects(spritesheet) {
-      var target = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : -1;
-      var onlyTarget = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      if (!spritesheet || !spritesheet._frames) {
-        return null;
-      }
-      var start = target != -1 && onlyTarget ? target : 0;
-      var end = target != -1 && onlyTarget ? target + 1 : spritesheet._frames.length;
-      for (var i = start; i < end; i++) {
-        var f = spritesheet._frames[i];
-        if (f.uvRect || f.image.width <= 0 || f.image.height <= 0) {
-          continue;
-        }
-        var _r = f.rect;
-        f.uvRect = {
-          t: _r.y / f.image.height,
-          l: _r.x / f.image.width,
-          b: (_r.y + _r.height) / f.image.height,
-          r: (_r.x + _r.width) / f.image.width
-        };
-      }
-      var r = StageGL.UV_RECT;
-      return spritesheet._frames[target != -1 ? target : 0].uvRect || {
-        t: r.t,
-        l: r.l,
-        b: r.b,
-        r: r.r
-      };
-    };
-    StageGL.isWebGLActive = function isWebGLActive(ctx) {
-      return ctx && ctx instanceof WebGLRenderingContext && typeof WebGLRenderingContext !== "undefined";
-    };
-    StageGL.prototype._initializeWebGL = function _initializeWebGL() {
-      if (this.canvas) {
-        if (!this._webGLContext || this._webGLContext.canvas !== this.canvas) {
-          var options = {
-            depth: false,
-            alpha: this._transparent,
-            stencil: true,
-            antialias: this._antialias,
-            premultipliedAlpha: this._premultiply,
-            preserveDrawingBuffer: this._preserveBuffer
-          };
-          var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
-          if (!gl) {
-            return null;
-          }
-          this.updateSimultaneousTextureCount(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
-          this._maxTextureSlots = gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
-          this._createBuffers(gl);
-          this._initTextures(gl);
-          gl.disable(gl.DEPTH_TEST);
-          gl.enable(gl.BLEND);
-          gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-          gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._premultiply);
-          this.setClearColor();
-          this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
-        }
-      } else {
-        this._webGLContext = null;
-      }
-      return this._webGLContext;
-    };
-    StageGL.prototype.update = function update(props) {
-      if (!this.canvas) {
-        return;
-      }
-      if (this.tickOnUpdate) {
-        this.tick(props);
-      }
-      this.dispatchEvent("drawstart");
-      if (this.autoClear) {
-        this.clear();
-      }
-      if (this._webGLContext) {
-        this._batchDraw(this, this._webGLContext);
-        if (this._autoPurge != -1 && !(this._drawID % (this._autoPurge / 2 | 0))) {
-          this.purgeTextures(this._autoPurge);
-        }
-      } else {
-        var ctx = this.canvas.getContext("2d");
-        ctx.save();
-        this.updateContext(ctx);
-        this.draw(ctx, false);
-        ctx.restore();
-      }
-      this.dispatchEvent("drawend");
-    };
-    StageGL.prototype.clear = function clear() {
-      if (!this.canvas) {
-        return;
-      }
-      if (StageGL.isWebGLActive(this._webGLContext)) {
-        var gl = this._webGLContext;
-        gl.clear(gl.COLOR_BUFFER_BIT);
-      } else {
-        var ctx = this.canvas.getContext("2d");
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
-        _Stage.prototype.clear.call(this);
-      }
-    };
-    StageGL.prototype.draw = function draw(context) {
-      var ignoreCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      if (context === this._webGLContext && StageGL.isWebGLActive(this._webGLContext)) {
-        var gl = this._webGLContext;
-        this._batchDraw(this, gl, ignoreCache);
-        return true;
-      } else {
-        return _Stage.prototype.draw.call(this, context, ignoreCache);
-      }
-    };
-    StageGL.prototype.cacheDraw = function cacheDraw(target, filters, manager) {
-      if (StageGL.isWebGLActive(this._webGLContext)) {
-        this._cacheDraw(target, filters, manager);
-        return true;
-      } else {
-        return false;
-      }
-    };
-    StageGL.prototype.protectTextureSlot = function protectTextureSlot(id) {
-      var lock = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      if (id > this._maxTextureSlots || id < 0) {
-        throw "Slot outside of acceptable range";
-      }
-      this._slotBlacklist[id] = !!lock;
-    };
-    StageGL.prototype.getTargetRenderTexture = function getTargetRenderTexture(target, w, h) {
-      var result = void 0, toggle = false;
-      var gl = this._webGLContext;
-      if (target.__lastRT !== undefined && target.__lastRT === target.__rtA) {
-        toggle = true;
-      }
-      if (!toggle) {
-        if (target.__rtA === undefined) {
-          target.__rtA = this.getRenderBufferTexture(w, h);
-        } else {
-          if (w != target.__rtA._width || h != target.__rtA._height) {
-            this.resizeTexture(target.__rtA, w, h);
-          }
-          this.setTextureParams(gl);
-        }
-        result = target.__rtA;
-      } else {
-        if (target.__rtB === undefined) {
-          target.__rtB = this.getRenderBufferTexture(w, h);
-        } else {
-          if (w != target.__rtB._width || h != target.__rtB._height) {
-            this.resizeTexture(target.__rtB, w, h);
-          }
-          this.setTextureParams(gl);
-        }
-        result = target.__rtB;
-      }
-      if (!result) {
-        throw "Problems creating render textures, known causes include using too much VRAM by not releasing WebGL texture instances";
-      }
-      target.__lastRT = result;
-      return result;
-    };
-    StageGL.prototype.releaseTexture = function releaseTexture(item, safe) {
-      if (!item) {
-        return;
-      }
-      if (item.children) {
-        for (var i = 0, l = item.children.length; i < l; i++) {
-          this.releaseTexture(item.children[i]);
-        }
-      }
-      if (item.cacheCanvas) {
-        item.uncache();
-      }
-      var foundImage = void 0;
-      if (item._storeID !== undefined) {
-        if (item === this._textureDictionary[item._storeID]) {
-          this._killTextureObject(item);
-          item._storeID = undefined;
-          return;
-        }
-        foundImage = item;
-      } else if (item._webGLRenderStyle === 2) {
-        foundImage = item.image;
-      } else if (item._webGLRenderStyle === 1) {
-        for (var _i = 0, _l = item.spriteSheet._images.length; _i < _l; _i++) {
-          this.releaseTexture(item.spriteSheet._images[_i]);
-        }
-        return;
-      }
-      if (foundImage === undefined) {
-        if (this.vocalDebug) {
-          console.log("No associated texture found on release");
-        }
-        return;
-      }
-      var texture = this._textureDictionary[foundImage._storeID];
-      if (safe) {
-        var data = texture._imageData;
-        var index = data.indexOf(foundImage);
-        if (index >= 0) {
-          data.splice(index, 1);
-        }
-        foundImage._storeID = undefined;
-        if (data.length === 0) {
-          this._killTextureObject(texture);
-        }
-      } else {
-        this._killTextureObject(texture);
-      }
-    };
-    StageGL.prototype.purgeTextures = function purgeTextures() {
-      var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-      if (count < 0) {
-        count = 100;
-      }
-      var dict = this._textureDictionary;
-      var l = dict.length;
-      var i = void 0, j = void 0;
-      for (i = 0; i < l; i++) {
-        var data = void 0, texture = dict[i];
-        if (!texture || !(data = texture._imageData)) {
-          continue;
-        }
-        for (j = 0; j < data.length; j++) {
-          var item = data[j];
-          if (item._drawID + count <= this._drawID) {
-            item._storeID = undefined;
-            data.splice(j--, 1);
-          }
-        }
-        if (!data.length) {
-          this._killTextureObject(texture);
-        }
-      }
-    };
-    StageGL.prototype.updateSimultaneousTextureCount = function updateSimultaneousTextureCount() {
-      var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      var gl = this._webGLContext;
-      var success = false;
-      if (count < 1) {
-        count = 1;
-      }
-      this._batchTextureCount = count;
-      while (!success) {
-        try {
-          this._activeShader = this._fetchShaderProgram(gl);
-          success = true;
-        } catch (e) {
-          if (this._batchTextureCount === 1) {
-            throw "Cannot compile shader " + e;
-          }
-          this._batchTextureCount -= 4;
-          if (this._batchTextureCount < 1) {
-            this._batchTextureCount = 1;
-          }
-          if (this.vocalDebug) {
-            console.log("Reducing desired texture count due to errors: " + this._batchTextureCount);
-          }
-        }
-      }
-    };
-    StageGL.prototype.updateViewport = function updateViewport(width, height) {
-      this._viewportWidth = width | 0;
-      this._viewportHeight = height | 0;
-      var gl = this._webGLContext;
-      if (gl) {
-        gl.viewport(0, 0, this._viewportWidth, this._viewportHeight);
-        this._projectionMatrix = new Float32Array([ 2 / this._viewportWidth, 0, 0, 0, 0, -2 / this._viewportHeight, 1, 0, 0, 0, 1, 0, -1, 1, .1, 0 ]);
-        this._projectionMatrixFlip = new Float32Array([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]);
-        this._projectionMatrixFlip.set(this._projectionMatrix);
-        this._projectionMatrixFlip[5] *= -1;
-        this._projectionMatrixFlip[13] *= -1;
-      }
-    };
-    StageGL.prototype.getFilterShader = function getFilterShader(filter) {
-      if (!filter) {
-        filter = this;
-      }
-      var gl = this._webGLContext;
-      var targetShader = this._activeShader;
-      if (filter._builtShader) {
-        targetShader = filter._builtShader;
-        if (filter.shaderParamSetup) {
-          gl.useProgram(targetShader);
-          filter.shaderParamSetup(gl, this, targetShader);
-        }
-      } else {
-        try {
-          targetShader = this._fetchShaderProgram(gl, "filter", filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY, filter.shaderParamSetup && filter.shaderParamSetup.bind(filter));
-          filter._builtShader = targetShader;
-          targetShader._name = filter.toString();
-        } catch (e) {
-          console && console.log(e);
-        }
-      }
-      return targetShader;
-    };
-    StageGL.prototype.getBaseTexture = function getBaseTexture() {
-      var w = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      var h = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-      var width = Math.ceil(w > 0 ? w : 1);
-      var height = Math.ceil(h > 0 ? h : 1);
-      var gl = this._webGLContext;
-      var texture = gl.createTexture();
-      this.resizeTexture(texture, width, height);
-      this.setTextureParams(gl, false);
-      return texture;
-    };
-    StageGL.prototype.resizeTexture = function resizeTexture(texture) {
-      var width = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-      var height = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-      var gl = this._webGLContext;
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-      texture.width = width;
-      texture.height = height;
-    };
-    StageGL.prototype.getRenderBufferTexture = function getRenderBufferTexture(w, h) {
-      var gl = this._webGLContext;
-      var renderTexture = this.getBaseTexture(w, h);
-      if (!renderTexture) {
-        return null;
-      }
-      var frameBuffer = gl.createFramebuffer();
-      if (!frameBuffer) {
-        return null;
-      }
-      renderTexture.width = w;
-      renderTexture.height = h;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, renderTexture, 0);
-      frameBuffer._renderTexture = renderTexture;
-      renderTexture._frameBuffer = frameBuffer;
-      renderTexture._storeID = this._textureDictionary.length;
-      this._textureDictionary[renderTexture._storeID] = renderTexture;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      return renderTexture;
-    };
-    StageGL.prototype.setTextureParams = function setTextureParams(gl) {
-      var isPOT = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      if (isPOT && this._antialias) {
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      } else {
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      }
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    };
-    StageGL.prototype.setClearColor = function setClearColor() {
-      var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-      var r = void 0, g = void 0, b = void 0, a = void 0, output = void 0;
-      if (typeof color === "string") {
-        if (color.indexOf("#") === 0) {
-          if (color.length === 4) {
-            color = "#" + (color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2) + color.charAt(3) + color.charAt(3));
-          }
-          r = Number("0x" + color.slice(1, 3)) / 255;
-          g = Number("0x" + color.slice(3, 5)) / 255;
-          b = Number("0x" + color.slice(5, 7)) / 255;
-          a = Number("0x" + color.slice(7, 9)) / 255;
-        } else if (color.indexOf("rgba(") === 0) {
-          output = color.slice(5, -1).split(",");
-          r = Number(output[0]) / 255;
-          g = Number(output[1]) / 255;
-          b = Number(output[2]) / 255;
-          a = Number(output[3]);
-        }
-      } else {
-        r = ((color & 4278190080) >>> 24) / 255;
-        g = ((color & 16711680) >>> 16) / 255;
-        b = ((color & 65280) >>> 8) / 255;
-        a = (color & 255) / 255;
-      }
-      this._clearColor.r = r || 0;
-      this._clearColor.g = g || 0;
-      this._clearColor.b = b || 0;
-      this._clearColor.a = a || 0;
-      if (!this._webGLContext) {
-        return;
-      }
-      this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
-    };
-    StageGL.prototype._getSafeTexture = function _getSafeTexture(w, h) {
-      var texture = this.getBaseTexture(w, h);
-      if (!texture) {
-        var msg = "Problem creating texture, possible cause: using too much VRAM, please try releasing texture memory";
-        console.error && console.error(msg) || console.log(msg);
-        texture = this._baseTextures[0];
-      }
-      return texture;
-    };
-    StageGL.prototype._fetchWebGLContext = function _fetchWebGLContext(canvas, options) {
-      var gl = void 0;
-      try {
-        gl = canvas.getContext("webgl", options) || canvas.getContext("experimental-webgl", options);
-      } catch (e) {}
-      if (!gl) {
-        var msg = "Could not initialize WebGL";
-        console.error ? console.error(msg) : console.log(msg);
-      } else {
-        gl.viewportWidth = canvas.width;
-        gl.viewportHeight = canvas.height;
-      }
-      return gl;
-    };
-    StageGL.prototype._fetchShaderProgram = function _fetchShaderProgram(gl) {
-      var shaderName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "regular";
-      var customVTX = arguments[2];
-      var customFRAG = arguments[3];
-      var shaderParamSetup = arguments[4];
-      gl.useProgram(null);
-      var targetFrag = void 0, targetVtx = void 0;
-      switch (shaderName) {
-       case "filter":
-        targetVtx = StageGL.COVER_VERTEX_HEADER + (customVTX || StageGL.COVER_VERTEX_BODY);
-        targetFrag = StageGL.COVER_FRAGMENT_HEADER + (customFRAG || StageGL.COVER_FRAGMENT_BODY);
-        break;
-
-       case "particle":
-        targetVtx = StageGL.REGULAR_VERTEX_HEADER + StageGL.PARTICLE_VERTEX_BODY;
-        targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + StageGL.PARTICLE_FRAGMENT_BODY;
-        break;
-
-       case "override":
-        targetVtx = StageGL.REGULAR_VERTEX_HEADER + (customVTX || StageGL.REGULAR_VERTEX_BODY);
-        targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + (customFRAG || StageGL.REGULAR_FRAGMENT_BODY);
-        break;
-
-       case "regular":
-       default:
-        targetVtx = StageGL.REGULAR_VERTEX_HEADER + StageGL.REGULAR_VERTEX_BODY;
-        targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + StageGL.REGULAR_FRAGMENT_BODY;
-        break;
-      }
-      var vertexShader = this._createShader(gl, gl.VERTEX_SHADER, targetVtx);
-      var fragmentShader = this._createShader(gl, gl.FRAGMENT_SHADER, targetFrag);
-      var shaderProgram = gl.createProgram();
-      gl.attachShader(shaderProgram, vertexShader);
-      gl.attachShader(shaderProgram, fragmentShader);
-      gl.linkProgram(shaderProgram);
-      shaderProgram._type = shaderName;
-      if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-        gl.useProgram(this._activeShader);
-        throw gl.getProgramInfoLog(shaderProgram);
-      }
-      gl.useProgram(shaderProgram);
-      switch (shaderName) {
-       case "filter":
-        shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-        shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
-        gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
-        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-        gl.uniform1i(shaderProgram.samplerUniform, 0);
-        shaderProgram.uprightUniform = gl.getUniformLocation(shaderProgram, "uUpright");
-        gl.uniform1f(shaderProgram.uprightUniform, 0);
-        if (shaderParamSetup) {
-          shaderParamSetup(gl, this, shaderProgram);
-        }
-        break;
-
-       case "override":
-       case "particle":
-       case "regular":
-       default:
-        shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-        shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
-        gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
-        shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
-        gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
-        shaderProgram.alphaAttribute = gl.getAttribLocation(shaderProgram, "objectAlpha");
-        gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
-        var samplers = [];
-        for (var i = 0; i < this._batchTextureCount; i++) {
-          samplers[i] = i;
-        }
-        shaderProgram.samplerData = samplers;
-        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-        gl.uniform1iv(shaderProgram.samplerUniform, samplers);
-        shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
-        break;
-      }
-      gl.useProgram(this._activeShader);
-      return shaderProgram;
-    };
-    StageGL.prototype._createShader = function _createShader(gl, type, str) {
-      str = str.replace(/\{\{count}}/g, this._batchTextureCount);
-      var insert = "";
-      for (var i = 1; i < this._batchTextureCount; i++) {
-        insert += "} else if (src === " + i + ") { color = texture2D(uSampler[" + i + "], vTextureCoord);";
-      }
-      str = str.replace(/\{\{alternates}}/g, insert).replace(/\{\{fragColor}}/g, this._premultiply ? StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY : StageGL.REGULAR_FRAG_COLOR_NORMAL);
-      var shader = gl.createShader(type);
-      gl.shaderSource(shader, str).compileShader(shader);
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw gl.getShaderInfoLog(shader);
-      }
-      return shader;
-    };
-    StageGL.prototype._createBuffers = function _createBuffers(gl) {
-      var groupCount = this._maxCardsPerBatch * StageGL.INDICIES_PER_CARD;
-      var groupSize = void 0;
-      var vertexPositionBuffer = this._vertexPositionBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-      groupSize = 2;
-      var vertices = this._vertices = new Float32Array(groupCount * groupSize);
-      for (var i = 0, l = vertices.length; i < l; i += groupSize) {
-        vertices[i] = vertices[i + 1] = 0;
-      }
-      gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
-      vertexPositionBuffer.itemSize = groupSize;
-      vertexPositionBuffer.numItems = groupCount;
-      var uvPositionBuffer = this._uvPositionBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
-      groupSize = 2;
-      var uvs = this._uvs = new Float32Array(groupCount * groupSize);
-      for (var _i2 = 0, _l2 = uvs.length; _i2 < _l2; _i2 += groupSize) {
-        uvs[_i2] = uvs[_i2 + 1] = 0;
-      }
-      gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
-      uvPositionBuffer.itemSize = groupSize;
-      uvPositionBuffer.numItems = groupCount;
-      var textureIndexBuffer = this._textureIndexBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
-      groupSize = 1;
-      var indices = this._indices = new Float32Array(groupCount * groupSize);
-      for (var _i3 = 0, _l3 = indices.length; _i3 < _l3; _i3++) {
-        indices[_i3] = 0;
-      }
-      gl.bufferData(gl.ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW);
-      textureIndexBuffer.itemSize = groupSize;
-      textureIndexBuffer.numItems = groupCount;
-      var alphaBuffer = this._alphaBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
-      groupSize = 1;
-      var alphas = this._alphas = new Float32Array(groupCount * groupSize);
-      for (var _i4 = 0, _l4 = alphas.length; _i4 < _l4; _i4++) {
-        alphas[_i4] = 1;
-      }
-      gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
-      alphaBuffer.itemSize = groupSize;
-      alphaBuffer.numItems = groupCount;
-    };
-    StageGL.prototype._initTextures = function _initTextures() {
-      this._lastTextureInsert = -1;
-      this._textureDictionary = [];
-      this._textureIDs = {};
-      this._baseTextures = [];
-      this._batchTextures = [];
-      for (var i = 0; i < this._batchTextureCount; i++) {
-        var texture = this.getBaseTexture();
-        this._baseTextures[i] = this._batchTextures[i] = texture;
-        if (!texture) {
-          throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
-        } else {
-          texture._storeID = -1;
-        }
-      }
-    };
-    StageGL.prototype._loadTextureImage = function _loadTextureImage(gl, image) {
-      var srcPath = void 0, texture = void 0, msg = void 0;
-      if (image instanceof Image && image.src) {
-        srcPath = image.src;
-      } else if (image instanceof HTMLCanvasElement) {
-        image._isCanvas = true;
-        srcPath = "canvas_" + ++this._lastTrackedCanvas;
-      } else {
-        msg = "Invalid image provided as source. Please ensure source is a correct DOM element.";
-        console.error && console.error(msg, image) || console.log(msg, image);
-        return;
-      }
-      var storeID = this._textureIDs[srcPath];
-      if (storeID === undefined) {
-        this._textureIDs[srcPath] = storeID = this._textureDictionary.length;
-        image._storeID = storeID;
-        image._invalid = !image.isCanvas;
-        texture = this._getSafeTexture();
-        this._textureDictionary[storeID] = texture;
-      } else {
-        image._storeID = storeID;
-        texture = this._textureDictionary[storeID];
-      }
-      if (texture._storeID != -1) {
-        texture._storeID = storeID;
-        if (texture._imageData) {
-          texture._imageData.push(image);
-        } else {
-          texture._imageData = [ image ];
-        }
-      }
-      this._insertTextureInBatch(gl, texture);
-      return texture;
-    };
-    StageGL.prototype._updateTextureImageData = function _updateTextureImageData(gl, image) {
-      if (!(image.complete || image._isCanvas || image.naturalWidth)) {
-        return;
-      }
-      var isNPOT = image.width & image.width - 1 || image.height & image.height - 1;
-      var texture = this._textureDictionary[image._storeID];
-      gl.activeTexture(gl.TEXTURE0 + texture._activeIndex);
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      texture.isPOT = !isNPOT;
-      this.setTextureParams(gl, texture.isPOT);
-      try {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-      } catch (e) {
-        var errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
-        if (console.error) {
-          console.error(e, errString);
-        } else {
-          console && console.log(e, errString);
-        }
-      }
-      image._invalid = false;
-      texture._w = image.width;
-      texture._h = image.height;
-      if (this.vocalDebug) {
-        if (isNPOT && this._antialias) {
-          console.warn("NPOT(Non Power of Two) Texture w/ antialias on: " + image.src);
-        }
-        if (image.width > gl.MAX_TEXTURE_SIZE || image.height > gl.MAX_TEXTURE_SIZE) {
-          console && console.error("Oversized Texture: " + image.width + "x" + image.height + " vs " + gl.MAX_TEXTURE_SIZE + "max");
-        }
-      }
-    };
-    StageGL.prototype._insertTextureInBatch = function _insertTextureInBatch(gl, texture) {
-      if (this._batchTextures[texture._activeIndex] !== texture) {
-        var found = -1;
-        var start = (this._lastTextureInsert + 1) % this._batchTextureCount;
-        var look = start;
-        do {
-          if (this._batchTextures[look]._batchID != this._batchID && !this._slotBlacklist[look]) {
-            found = look;
-            break;
-          }
-          look = (look + 1) % this._batchTextureCount;
-        } while (look !== start);
-        if (found === -1) {
-          this.batchReason = "textureOverflow";
-          this._drawBuffers(gl);
-          this.batchCardCount = 0;
-          found = start;
-        }
-        this._batchTextures[found] = texture;
-        texture._activeIndex = found;
-        var image = texture._imageData && texture._imageData[0];
-        if (image && image._invalid) {
-          this._updateTextureImageData(gl, image);
-        } else {
-          gl.activeTexture(gl.TEXTURE0 + found);
-          gl.bindTexture(gl.TEXTURE_2D, texture);
-          this.setTextureParams(gl);
-        }
-        this._lastTextureInsert = found;
-      } else if (texture._drawID !== this._drawID) {
-        var _image = texture._imageData && texture._imageData[0];
-        if (_image && _image._invalid) {
-          this._updateTextureImageData(gl, _image);
-        }
-      }
-      texture._drawID = this._drawID;
-      texture._batchID = this._batchID;
-    };
-    StageGL.prototype._killTextureObject = function _killTextureObject(texture) {
-      if (!texture) {
-        return;
-      }
-      var gl = this._webGLContext;
-      if (texture._storeID !== undefined && texture._storeID >= 0) {
-        this._textureDictionary[texture._storeID] = undefined;
-        for (var n in this._textureIDs) {
-          if (this._textureIDs[n] === texture._storeID) {
-            delete this._textureIDs[n];
-          }
-        }
-        var data = texture._imageData;
-        for (var i = data.length - 1; i >= 0; i--) {
-          data[i]._storeID = undefined;
-        }
-        texture._imageData = texture._storeID = undefined;
-      }
-      if (texture._activeIndex !== undefined && this._batchTextures[texture._activeIndex] === texture) {
-        this._batchTextures[texture._activeIndex] = this._baseTextures[texture._activeIndex];
-      }
-      try {
-        if (texture._frameBuffer) {
-          gl.deleteFramebuffer(texture._frameBuffer);
-        }
-        texture._frameBuffer = undefined;
-      } catch (e) {
-        if (this.vocalDebug) {
-          console.log(e);
-        }
-      }
-      try {
-        gl.deleteTexture(texture);
-      } catch (e) {
-        if (this.vocalDebug) {
-          console.log(e);
-        }
-      }
-    };
-    StageGL.prototype._backupBatchTextures = function _backupBatchTextures(restore, target) {
-      var gl = this._webGLContext;
-      if (!this._backupTextures) {
-        this._backupTextures = [];
-      }
-      if (target === undefined) {
-        target = this._backupTextures;
-      }
-      for (var i = 0; i < this._batchTextureCount; i++) {
-        gl.activeTexture(gl.TEXTURE0 + i);
-        if (restore) {
-          this._batchTextures[i] = target[i];
-        } else {
-          target[i] = this._batchTextures[i];
-          this._batchTextures[i] = this._baseTextures[i];
-        }
-        gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[i]);
-        this.setTextureParams(gl, this._batchTextures[i].isPOT);
-      }
-      if (restore && target === this._backupTextures) {
-        this._backupTextures = [];
-      }
-    };
-    StageGL.prototype._batchDraw = function _batchDraw(sceneGraph, gl, ignoreCache) {
-      if (this._isDrawing > 0) {
-        this._drawBuffers(gl);
-      }
-      this._isDrawing++;
-      this._drawID++;
-      this.batchCardCount = 0;
-      this.depth = 0;
-      this._appendToBatchGroup(sceneGraph, gl, new Matrix2D(), this.alpha, ignoreCache);
-      this.batchReason = "drawFinish";
-      this._drawBuffers(gl);
-      this._isDrawing--;
-    };
-    StageGL.prototype._cacheDraw = function _cacheDraw(target, filters, manager) {
-      var gl = this._webGLContext;
-      var renderTexture = void 0;
-      var shaderBackup = this._activeShader;
-      var blackListBackup = this._slotBlacklist;
-      var lastTextureSlot = this._maxTextureSlots - 1;
-      var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
-      this.protectTextureSlot(lastTextureSlot, true);
-      var mtx = target.getMatrix();
-      mtx = mtx.clone();
-      mtx.scale(1 / manager.scale, 1 / manager.scale);
-      mtx = mtx.invert();
-      mtx.translate(-manager.offX / manager.scale * target.scaleX, -manager.offY / manager.scale * target.scaleY);
-      var container = this._cacheContainer;
-      container.children = [ target ];
-      container.transformMatrix = mtx;
-      this._backupBatchTextures(false);
-      if (filters && filters.length) {
-        this._drawFilters(target, filters, manager);
-      } else {
-        if (this.isCacheControlled) {
-          gl.clear(gl.COLOR_BUFFER_BIT);
-          this._batchDraw(container, gl, true);
-        } else {
-          gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-          target.cacheCanvas = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
-          renderTexture = target.cacheCanvas;
-          gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-          this.updateViewport(manager._drawWidth, manager._drawHeight);
-          this._projectionMatrix = this._projectionMatrixFlip;
-          gl.clear(gl.COLOR_BUFFER_BIT);
-          this._batchDraw(container, gl, true);
-          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-          this.updateViewport(wBackup, hBackup);
-        }
-      }
-      this._backupBatchTextures(true);
-      this.protectTextureSlot(lastTextureSlot, false);
-      this._activeShader = shaderBackup;
-      this._slotBlacklist = blackListBackup;
-    };
-    StageGL.prototype._drawFilters = function _drawFilters(target, filters, manager) {
-      var gl = this._webGLContext;
-      var renderTexture = void 0;
-      var lastTextureSlot = this._maxTextureSlots - 1;
-      var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
-      var container = this._cacheContainer;
-      var filterCount = filters.length;
-      gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-      renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-      this.updateViewport(manager._drawWidth, manager._drawHeight);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      this._batchDraw(container, gl, true);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-      this.setTextureParams(gl);
-      var flipY = false;
-      var i = 0, filter = filters[i];
-      do {
-        this._activeShader = this.getFilterShader(filter);
-        if (!this._activeShader) {
-          continue;
-        }
-        gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-        renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-        gl.viewport(0, 0, manager._drawWidth, manager._drawHeight);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        this._drawCover(gl, flipY);
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-        this.setTextureParams(gl);
-        if (filterCount > 1 || filters[0]._multiPass) {
-          flipY = !flipY;
-        }
-        filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
-      } while (filter);
-      if (this.isCacheControlled) {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        this.updateViewport(wBackup, hBackup);
-        this._activeShader = this.getFilterShader(this);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        this._drawCover(gl, flipY);
-      } else {
-        if (flipY) {
-          gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-          renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
-          gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-          this._activeShader = this.getFilterShader(this);
-          gl.viewport(0, 0, manager._drawWidth, manager._drawHeight);
-          gl.clear(gl.COLOR_BUFFER_BIT);
-          this._drawCover(gl, !flipY);
-        }
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        this.updateViewport(wBackup, hBackup);
-        target.cacheCanvas = renderTexture;
-      }
-    };
-    StageGL.prototype._appendToBatchGroup = function _appendToBatchGroup(container, gl, concatMtx, concatAlpha, ignoreCache) {
-      if (!container._glMtx) {
-        container._glMtx = new Matrix2D();
-      }
-      var cMtx = container._glMtx;
-      cMtx.copy(concatMtx);
-      if (container.transformMatrix) {
-        cMtx.appendMatrix(container.transformMatrix);
-      } else {
-        cMtx.appendTransform(container.x, container.y, container.scaleX, container.scaleY, container.rotation, container.skewX, container.skewY, container.regX, container.regY);
-      }
-      var subL = void 0, subT = void 0, subR = void 0, subB = void 0;
-      var l = container.numChildren;
-      for (var i = 0; i < l; i++) {
-        var item = container.children[i];
-        if (!(item.visible && concatAlpha)) {
-          continue;
-        }
-        if (!item.cacheCanvas || ignoreCache) {
-          if (item.children) {
-            this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
-            continue;
-          }
-        }
-        if (this.batchCardCount + 1 > this._maxCardsPerBatch) {
-          this.batchReason = "vertexOverflow";
-          this._drawBuffers(gl);
-          this.batchCardCount = 0;
-        }
-        if (!item._glMtx) {
-          item._glMtx = new Matrix2D();
-        }
-        var iMtx = item._glMtx;
-        iMtx.copy(cMtx);
-        if (item.transformMatrix) {
-          iMtx.appendMatrix(item.transformMatrix);
-        } else {
-          iMtx.appendTransform(item.x, item.y, item.scaleX, item.scaleY, item.rotation, item.skewX, item.skewY, item.regX, item.regY);
-        }
-        var uvRect = void 0, texIndex = void 0, image = void 0, frame = void 0, texture = void 0, src = void 0;
-        var useCache = item.cacheCanvas && !ignoreCache;
-        if (item._webGLRenderStyle === 2 || useCache) {
-          image = (ignoreCache ? false : item.cacheCanvas) || item.image;
-        } else if (item._webGLRenderStyle === 1) {
-          frame = item.spriteSheet.getFrame(item.currentFrame);
-          if (frame === null) {
-            continue;
-          }
-          image = frame.image;
-        } else {
-          continue;
-        }
-        if (!image) {
-          continue;
-        }
-        var uvs = this._uvs;
-        var vertices = this._vertices;
-        var texI = this._indices;
-        var alphas = this._alphas;
-        if (image._storeID === undefined) {
-          texture = this._loadTextureImage(gl, image);
-        } else {
-          texture = this._textureDictionary[image._storeID];
-          if (!texture) {
-            if (this.vocalDebug) {
-              console.log("Image source should not be lookup a non existent texture, please report a bug.");
-            }
-            continue;
-          }
-          if (texture._batchID !== this._batchID) {
-            this._insertTextureInBatch(gl, texture);
-          }
-        }
-        texIndex = texture._activeIndex;
-        image._drawID = this._drawID;
-        if (item._webGLRenderStyle === 2 || useCache) {
-          if (!useCache && item.sourceRect) {
-            if (!item._uvRect) {
-              item._uvRect = {};
-            }
-            src = item.sourceRect;
-            uvRect = item._uvRect;
-            uvRect.t = src.y / image.height;
-            uvRect.l = src.x / image.width;
-            uvRect.b = (src.y + src.height) / image.height;
-            uvRect.r = (src.x + src.width) / image.width;
-            subL = 0;
-            subT = 0;
-            subR = src.width + subL;
-            subB = src.height + subT;
-          } else {
-            uvRect = StageGL.UV_RECT;
-            if (item.cacheCanvas) {
-              src = item.bitmapCache;
-              subL = src.x + src._filterOffX / src.scale;
-              subT = src.y + src._filterOffY / src.scale;
-              subR = src._drawWidth / src.scale + subL;
-              subB = src._drawHeight / src.scale + subT;
-            } else {
-              subL = subT = 0;
-              subR = image.width + subL;
-              subB = image.height + subT;
-            }
-          }
-        } else if (item._webGLRenderStyle === 1) {
-          var rect = frame.rect;
-          uvRect = frame.uvRect;
-          if (!uvRect) {
-            uvRect = StageGL.buildUVRects(item.spriteSheet, item.currentFrame, false);
-          }
-          subL = -frame.regX;
-          subT = -frame.regY;
-          subR = rect.width - frame.regX;
-          subB = rect.height - frame.regY;
-        }
-        var offV1 = this.batchCardCount * StageGL.INDICIES_PER_CARD;
-        var offV2 = offV1 * 2;
-        vertices[offV2] = subL * iMtx.a + subT * iMtx.c + iMtx.tx;
-        vertices[offV2 + 1] = subL * iMtx.b + subT * iMtx.d + iMtx.ty;
-        vertices[offV2 + 2] = subL * iMtx.a + subB * iMtx.c + iMtx.tx;
-        vertices[offV2 + 3] = subL * iMtx.b + subB * iMtx.d + iMtx.ty;
-        vertices[offV2 + 4] = subR * iMtx.a + subT * iMtx.c + iMtx.tx;
-        vertices[offV2 + 5] = subR * iMtx.b + subT * iMtx.d + iMtx.ty;
-        vertices[offV2 + 6] = vertices[offV2 + 2];
-        vertices[offV2 + 7] = vertices[offV2 + 3];
-        vertices[offV2 + 8] = vertices[offV2 + 4];
-        vertices[offV2 + 9] = vertices[offV2 + 5];
-        vertices[offV2 + 10] = subR * iMtx.a + subB * iMtx.c + iMtx.tx;
-        vertices[offV2 + 11] = subR * iMtx.b + subB * iMtx.d + iMtx.ty;
-        uvs[offV2] = uvRect.l;
-        uvs[offV2 + 1] = uvRect.t;
-        uvs[offV2 + 2] = uvRect.l;
-        uvs[offV2 + 3] = uvRect.b;
-        uvs[offV2 + 4] = uvRect.r;
-        uvs[offV2 + 5] = uvRect.t;
-        uvs[offV2 + 6] = uvRect.l;
-        uvs[offV2 + 7] = uvRect.b;
-        uvs[offV2 + 8] = uvRect.r;
-        uvs[offV2 + 9] = uvRect.t;
-        uvs[offV2 + 10] = uvRect.r;
-        uvs[offV2 + 11] = uvRect.b;
-        texI[offV1] = texI[offV1 + 1] = texI[offV1 + 2] = texI[offV1 + 3] = texI[offV1 + 4] = texI[offV1 + 5] = texIndex;
-        alphas[offV1] = alphas[offV1 + 1] = alphas[offV1 + 2] = alphas[offV1 + 3] = alphas[offV1 + 4] = alphas[offV1 + 5] = item.alpha * concatAlpha;
-        this.batchCardCount++;
-      }
-    };
-    StageGL.prototype._drawBuffers = function _drawBuffers(gl) {
-      if (this.batchCardCount <= 0) {
-        return;
-      }
-      if (this.vocalDebug) {
-        console.log("Draw[" + this._drawID + ":" + this._batchID + "] : " + this.batchReason);
-      }
-      var shaderProgram = this._activeShader;
-      var vertexPositionBuffer = this._vertexPositionBuffer;
-      var textureIndexBuffer = this._textureIndexBuffer;
-      var uvPositionBuffer = this._uvPositionBuffer;
-      var alphaBuffer = this._alphaBuffer;
-      gl.useProgram(shaderProgram);
-      gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-      gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._vertices);
-      gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
-      gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, textureIndexBuffer.itemSize, gl.FLOAT, false, 0, 0);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._indices);
-      gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
-      gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._uvs);
-      gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
-      gl.vertexAttribPointer(shaderProgram.alphaAttribute, alphaBuffer.itemSize, gl.FLOAT, false, 0, 0);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._alphas);
-      gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
-      for (var i = 0; i < this._batchTextureCount; i++) {
-        var texture = this._batchTextures[i];
-        gl.activeTexture(gl.TEXTURE0 + i);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        this.setTextureParams(gl, texture.isPOT);
-      }
-      gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount * StageGL.INDICIES_PER_CARD);
-      this._batchID++;
-    };
-    StageGL.prototype._drawCover = function _drawCover(gl, flipY) {
-      if (this._isDrawing > 0) {
-        this._drawBuffers(gl);
-      }
-      if (this.vocalDebug) {
-        console.log("Draw[" + this._drawID + ":" + this._batchID + "] : Cover");
-      }
-      var shaderProgram = this._activeShader;
-      var vertexPositionBuffer = this._vertexPositionBuffer;
-      var uvPositionBuffer = this._uvPositionBuffer;
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.useProgram(shaderProgram);
-      gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-      gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_VERT);
-      gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
-      gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, flipY ? StageGL.COVER_UV_FLIP : StageGL.COVER_UV);
-      gl.uniform1i(shaderProgram.samplerUniform, 0);
-      gl.uniform1f(shaderProgram.uprightUniform, flipY ? 0 : 1);
-      gl.drawArrays(gl.TRIANGLES, 0, StageGL.INDICIES_PER_CARD);
-    };
-    createClass(StageGL, [ {
-      key: "isWebGL",
-      get: function get() {
-        return !!this._webGLContext;
-      }
-    }, {
-      key: "autoPurge",
-      get: function get() {
-        return Number(this._autoPurge);
-      },
-      set: function set(autoPurge) {
-        autoPurge = isNaN(autoPurge) ? 1200 : autoPurge;
-        if (autoPurge != -1 && autoPurge < 10) {
-          autoPurge = 10;
-        }
-        this._autoPurge = autoPurge;
-      }
-    } ]);
-    return StageGL;
-  }(Stage);
-  {
-    StageGL.VERTEX_PROPERTY_COUNT = 6;
-    StageGL.INDICIES_PER_CARD = 6;
-    StageGL.DEFAULT_MAX_BATCH_SIZE = 1e4;
-    StageGL.WEBGL_MAX_INDEX_NUM = Math.pow(2, 16);
-    StageGL.UV_RECT = {
-      t: 0,
-      l: 0,
-      b: 1,
-      r: 1
-    };
-    try {
-      StageGL.COVER_VERT = new Float32Array([ -1, 1, 1, 1, -1, -1, 1, 1, 1, -1, -1, -1 ]);
-      StageGL.COVER_UV = new Float32Array([ 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1 ]);
-      StageGL.COVER_UV_FLIP = new Float32Array([ 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0 ]);
-    } catch (e) {}
-    StageGL.REGULAR_VARYING_HEADER = "\n\t\tprecision mediump float;\n\t\tvarying vec2 vTextureCoord;\n\t\tvarying lowp float indexPicker;\n\t\tvarying lowp float alphaValue;\n\t";
-    StageGL.REGULAR_VERTEX_HEADER = "\n\t\t" + StageGL.REGULAR_VARYING_HEADER + "\n\t\tattribute vec2 vertexPosition;\n\t\tattribute vec2 uvPosition;\n\t\tattribute lowp float textureIndex;\n\t\tattribute lowp float objectAlpha;\n\t\tuniform mat4 pMatrix;\n\t";
-    StageGL.REGULAR_FRAGMENT_HEADER = "\n\t\t" + StageGL.REGULAR_VARYING_HEADER + "\n\t\tuniform sampler2D uSampler[{{count}}];\n\t";
-    StageGL.REGULAR_VERTEX_BODY = "\n\t\tvoid main (void) {\n\t\t\t// DHG TODO: This doesn't work. Must be something wrong with the hand built matrix see js... bypass for now\n\t\t\t// vertexPosition, round if flag\n\t\t\t// gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);\n\t\t\tgl_Position = vec4(\n\t\t\t\t(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0],\n\t\t\t\t(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1],\n\t\t\t\tpMatrix[3][2],\n\t\t\t\t1.0\n\t\t\t);\n\t\t\talphaValue = objectAlpha;\n\t\t\tindexPicker = textureIndex;\n\t\t\tvTextureCoord = uvPosition;\n\t\t}\n\t";
-    StageGL.REGULAR_FRAGMENT_BODY = "\n\t\tvoid main (void) {\n\t\t\tint src = int(indexPicker);\n\t\t\tvec4 color = vec4(1.0, 0.0, 0.0, 1.0);\n\n\t\t\tif (src === 0) {\n\t\t\t\tcolor = texture2D(uSampler[0], vTextureCoord);\n\t\t\t\t{{alternates}}\n\t\t\t}\n\n\t\t\t{{fragColor}};\n\t\t}\n\t";
-    StageGL.REGULAR_FRAG_COLOR_NORMAL = "\n\t\tgl_FragColor = vec4(color.rgb, color.a * alphaValue);\n\t";
-    StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY = "\n\t\tif (color.a > 0.0035) {\n\t\t\tgl_FragColor = vec4(color.rgb / color.a, color.a * alphaValue);\n\t\t} else {\n\t\t\tgl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n\t\t}\n\t";
-    StageGL.PARTICLE_VERTEX_BODY = "\n\t\t" + StageGL.REGULAR_VERTEX_BODY + "\n\t";
-    StageGL.PARTICLE_FRAGMENT_BODY = "\n\t\t" + StageGL.REGULAR_FRAGMENT_BODY + "\n\t";
-    StageGL.COVER_VARYING_HEADER = "\n\t\tprecision mediump float;\n\t\tvarying highp vec2 vRenderCoord;\n\t\tvarying highp vec2 vTextureCoord;\n\t";
-    StageGL.COVER_VERTEX_HEADER = "\n\t\t" + StageGL.COVER_VARYING_HEADER + "\n\t\tattribute vec2 vertexPosition;\n\t\tattribute vec2 uvPosition;\n\t\tuniform float uUpright;\n\t";
-    StageGL.COVER_FRAGMENT_HEADER = "\n\t\t" + StageGL.COVER_VARYING_HEADER + "\n\t\tuniform sampler2D uSampler;\n\t";
-    StageGL.COVER_VERTEX_BODY = "\n\t\tvoid main (void) {\n\t\t\tgl_Position = vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);\n\t\t\tvRenderCoord = uvPosition;\n\t\t\tvTextureCoord = vec2(uvPosition.x, abs(uUpright - uvPosition.y));\n\t\t}\n\t";
-    StageGL.COVER_FRAGMENT_BODY = "\n\t\tvoid main (void) {\n\t\t\tvec4 color = texture2D(uSampler, vRenderCoord);\n\t\t\tgl_FragColor = color;\n\t\t}\n\t";
-  }
   var VideoBuffer = function() {
     function VideoBuffer(video) {
       classCallCheck(this, VideoBuffer);
@@ -4712,7 +3589,7 @@
     return PolyStar;
   }();
   {
-    var canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+    var canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
     if (canvas.getContext) {
       Graphics._ctx = canvas.getContext("2d");
       canvas.width = canvas.height = 1;
@@ -5529,7 +4406,7 @@
     return Text;
   }(DisplayObject);
   {
-    var canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+    var canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
     if (canvas.getContext) {
       Text._workingContext = canvas.getContext("2d");
       canvas.width = canvas.height = 1;
@@ -5592,7 +4469,7 @@
       if (map instanceof HTMLCanvasElement) {
         ctx = canvas.getContext("2d");
       } else {
-        canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+        canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
         canvas.width = map.width;
         canvas.height = map.height;
         ctx = canvas.getContext("2d");
@@ -6795,7 +5672,7 @@
     };
     SpriteSheetUtils.mergeAlpha = function mergeAlpha(rgbImage, alphaImage, canvas) {
       if (!canvas) {
-        canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+        canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
       }
       canvas.width = Math.max(alphaImage.width, rgbImage.width);
       canvas.height = Math.max(alphaImage.height, rgbImage.height);
@@ -6876,7 +5753,7 @@
     return SpriteSheetUtils;
   }();
   {
-    var canvas = createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+    var canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
     if (canvas.getContext) {
       SpriteSheetUtils._workingCanvas = canvas;
       SpriteSheetUtils._workingContext = canvas.getContext("2d");

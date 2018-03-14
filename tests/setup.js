@@ -4,7 +4,6 @@ require("@createjs/build/tests/setup");
 const imagediff = require("imagediff");
 const Canvas = require("canvas-prebuilt");
 const { resolve } = require("path");
-const { Stage } = require("../dist/easeljs.module");
 
 expect.extend(imagediff.jasmine);
 

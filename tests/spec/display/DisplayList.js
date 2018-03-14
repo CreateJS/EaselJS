@@ -1,19 +1,18 @@
-import {
-	Shadow,
-	Stage,
-	Shape,
-	Container,
-	Sprite,
-	Bitmap,
-	DisplayObject,
-	SpriteSheet,
-	BitmapText,
-	Text,
-	Rectangle,
-	BlurFilter,
-	ColorMatrixFilter,
-	ColorMatrix
-} from "../../../dist/easeljs.module";
+import Bitmap from "../../../src/display/Bitmap";
+import BitmapText from "../../../src/display/BitmapText";
+import Container from "../../../src/display/Container";
+import DisplayObject from "../../../src/display/DisplayObject";
+import Shadow from "../../../src/display/Shadow";
+import Shape from "../../../src/display/Shape";
+import Sprite from "../../../src/display/Sprite";
+import SpriteSheet from "../../../src/display/SpriteSheet";
+import Stage from "../../../src/display/Stage";
+import Text from "../../../src/display/Text";
+import Rectangle from "../../../src/geom/Rectangle";
+import BlurFilter from "../../../src/filters/BlurFilter";
+import ColorMatrix from "../../../src/filters/ColorMatrix";
+import ColorMatrixFilter from "../../../src/filters/ColorMatrixFilter";
+
 import globals from "../../setup";
 import imagediff from "imagediff";
 import Canvas from "canvas-prebuilt";
@@ -132,13 +131,13 @@ describe("DisplayList", () => {
 	describe("*.clone() should work", () => {
 
 		test("Bitmap.clone();", () => {
-			var bmp = new Bitmap(image).set(bitmapProps);
-			var clone = bmp.clone();
+			let bmp = new Bitmap(image).set(bitmapProps);
+			let clone = bmp.clone();
 
-			for (var n in bitmapProps) {
+			for (let n in bitmapProps) {
 				if (clone[n] instanceof Rectangle) {
-					var a = bitmapProps[n];
-					var b = clone[n];
+					let a = bitmapProps[n];
+					let b = clone[n];
 					expect(a.x).toBe(b.x);
 					expect(a.y).toBe(b.y);
 					expect(a.width).toBe(b.width);
@@ -150,41 +149,41 @@ describe("DisplayList", () => {
 		});
 
 		test("DisplayObject.clone();", () => {
-			var obj = new DisplayObject().set(displayObjectProps);
-			var clone = obj.clone();
+			let obj = new DisplayObject().set(displayObjectProps);
+			let clone = obj.clone();
 
-			for (var n in displayObjectProps) {
+			for (let n in displayObjectProps) {
 				expect(clone[n]).toBe(displayObjectProps[n]);
 			}
 		});
 
 		test("Sprite.clone();", () => {
-			var props = globals.merge({
+			let props = globals.merge({
 									   currentFrame: 1,
 									   currentAnimation: "foo",
 									   paused: true,
 									   currentAnimationFrame: 2,
 									   framerate: 3
 								   }, displayObjectProps);
-			var obj = new Sprite().set(props);
-			var clone = obj.clone();
+			let obj = new Sprite().set(props);
+			let clone = obj.clone();
 
-			for (var n in props) {
+			for (let n in props) {
 				expect(clone[n]).toBe(props[n]);
 			}
 		});
 
 		test("Container.clone();", () => {
-			var obj = new Container().set(displayObjectProps);
-			var clone = obj.clone();
+			let obj = new Container().set(displayObjectProps);
+			let clone = obj.clone();
 
-			for (var n in displayObjectProps) {
+			for (let n in displayObjectProps) {
 				expect(clone[n]).toBe(displayObjectProps[n]);
 			}
 		});
 
 		test("Stage.clone() should fail", () => {
-			var obj = new Stage();
+			let obj = new Stage();
 
 			// Can't use toThrow() since a string is thrown and jasmine doesn't catch it.
 			try {
@@ -198,7 +197,7 @@ describe("DisplayList", () => {
 		});
 
 		test("SpriteSheet.clone() should fail", () => {
-			var obj = new SpriteSheet();
+			let obj = new SpriteSheet();
 
 			// Can't use toThrow() since a string is thrown and jasmine doesn't catch it.
 			try {
@@ -212,21 +211,21 @@ describe("DisplayList", () => {
 		});
 
 		test("BitmapText.clone();", () => {
-			var props = globals.merge({
+			let props = globals.merge({
 									   lineHeight: 4,
 									   letterSpacing: 5,
 									   spaceWidth: 6
 								   }, displayObjectProps);
-			var obj = new BitmapText().set(props);
-			var clone = obj.clone();
+			let obj = new BitmapText().set(props);
+			let clone = obj.clone();
 
-			for (var n in props) {
+			for (let n in props) {
 				expect(clone[n]).toBe(props[n]);
 			}
 		});
 
 		test("Text.clone();", () => {
-			var props = globals.merge({
+			let props = globals.merge({
 									   text: "foo bar",
 									   font: "Arial",
 									   color: "rgba(255,0,255, 5)",
@@ -237,10 +236,10 @@ describe("DisplayList", () => {
 									   lineHeight: 6,
 									   lineWidth: 7
 								   }, displayObjectProps);
-			var obj = new Text().set(props);
-			var clone = obj.clone();
+			let obj = new Text().set(props);
+			let clone = obj.clone();
 
-			for (var n in props) {
+			for (let n in props) {
 				expect(clone[n]).toBe(props[n]);
 			}
 		});
@@ -262,12 +261,12 @@ describe("DisplayList", () => {
 		});
 
 		test("should return 1 object.", () => {
-			var objects = stage.getObjectsUnderPoint(1, 1);
+			let objects = stage.getObjectsUnderPoint(1, 1);
 			expect(objects.length).toBe(1);
 		});
 
 		test("should return 3 objects.", () => {
-			var objects = stage.getObjectsUnderPoint(152, 152);
+			let objects = stage.getObjectsUnderPoint(152, 152);
 			expect(objects.length).toBe(3);
 		});
 
@@ -275,7 +274,7 @@ describe("DisplayList", () => {
 			let mask;
 			beforeEach(() => {
 				mask = new Shape();
-				var g = mask.graphics;
+				let g = mask.graphics;
 				g.setStrokeStyle(1);
 				g.beginStroke(globals.sColor);
 				g.beginFill(globals.fColor);
@@ -288,12 +287,12 @@ describe("DisplayList", () => {
 			});
 
 			test("should find the masked object on stage", () => {
-				var objects = stage.getObjectsUnderPoint(51, 51);
+				let objects = stage.getObjectsUnderPoint(51, 51);
 				expect(objects.length).toBe(1);
 			});
 
 			test("should not find the object on stage", () => {
-				var objects = stage.getObjectsUnderPoint(51, 51);
+				let objects = stage.getObjectsUnderPoint(51, 51);
 				expect(objects.length).toBe(1);
 			});
 
@@ -303,9 +302,9 @@ describe("DisplayList", () => {
 					stage.removeAllChildren();
 
 					container = new Container();
-					var wh = 100;
-					var o = 0;
-					var oi = 20;
+					let wh = 100;
+					let o = 0;
+					let oi = 20;
 					rect1 = createShapeRect(o, o, wh, wh, "#ffcc88");
 					rect2 = createShapeRect(o += oi, o, wh, wh, "#ccccee");
 					rect3 = createShapeRect(o += oi, o, wh, wh, "#ccccee");
@@ -319,7 +318,7 @@ describe("DisplayList", () => {
 					stage.addChild(container);
 					stage.update();
 
-					var dot = new Shape();
+					let dot = new Shape();
 					dot.graphics.f("#ffffff").de(50, 50, 2, 2);
 
 					expect(container.getObjectsUnderPoint(48, 48).length).toBe(3);
@@ -350,7 +349,7 @@ describe("DisplayList", () => {
 
 		describe("hitareas", () => {
 			beforeEach(() => {
-				var hitarea = createShapeRect(0, 0, 10, 10, "#ff00aa");
+				let hitarea = createShapeRect(0, 0, 10, 10, "#ff00aa");
 
 				rect1.mouseEnabled = true;
 				rect1.hitArea = hitarea;
@@ -359,12 +358,12 @@ describe("DisplayList", () => {
 			});
 
 			test("should find one object", () => {
-				var objects = stage.getObjectsUnderPoint(9, 9);
+				let objects = stage.getObjectsUnderPoint(9, 9);
 				expect(objects.length).toBe(1);
 			});
 
 			test("should not return any objects", () => {
-				var objects = stage.getObjectsUnderPoint(11, 11);
+				let objects = stage.getObjectsUnderPoint(11, 11);
 				expect(objects.length).toBe(0);
 			});
 		});
@@ -374,7 +373,7 @@ describe("DisplayList", () => {
 				rect2.mouseEnabled = false;
 				rect3.mouseEnabled = false;
 
-				var objects = stage.getObjectsUnderPoint(152, 152, 0);
+				let objects = stage.getObjectsUnderPoint(152, 152, 0);
 				expect(objects.length).toBe(3);
 			});
 
@@ -382,7 +381,7 @@ describe("DisplayList", () => {
 				rect2.mouseEnabled = false;
 				rect3.mouseEnabled = false;
 
-				var objects = stage.getObjectsUnderPoint(152, 152, 1);
+				let objects = stage.getObjectsUnderPoint(152, 152, 1);
 				expect(objects.length).toBe(2);
 			});
 
@@ -393,24 +392,24 @@ describe("DisplayList", () => {
 				rect3.mouseEnabled = false;
 				rect4.mouseEnabled = false;
 
-				var objects = stage.getObjectsUnderPoint(152, 152, 2);
+				let objects = stage.getObjectsUnderPoint(152, 152, 2);
 				expect(objects.length).toBe(0);
 			});
 		});
 	});
 
 	test("getTransformedBounds() should work", () => {
-		var bmp = new Bitmap(image);
+		let bmp = new Bitmap(image);
 		stage.addChild(bmp);
-		var bounds = bmp.getTransformedBounds();
+		let bounds = bmp.getTransformedBounds();
 		expect(bounds.width).toBe(80);
 		expect(bounds.height).toBe(67);
 	});
 
 	test("hitTest() should be true.", () => {
-		var dot = new Shape();
+		let dot = new Shape();
 
-		var g = dot.graphics;
+		let g = dot.graphics;
 		g.setStrokeStyle(1);
 		g.beginStroke(globals.sColor);
 		g.beginFill(globals.fColor);
@@ -424,9 +423,9 @@ describe("DisplayList", () => {
 	});
 
 	test("isVisible() should be true.", () => {
-		var dot = new Shape();
+		let dot = new Shape();
 
-		var g = dot.graphics;
+		let g = dot.graphics;
 		g.setStrokeStyle(1);
 		g.beginStroke(globals.sColor);
 		g.beginFill(globals.fColor);
@@ -437,20 +436,20 @@ describe("DisplayList", () => {
 	});
 
 	test("localToGlobal() should work on stage.", () => {
-		var pt = stage.localToGlobal(0, 0);
+		let pt = stage.localToGlobal(0, 0);
 
 		expect(pt.x).toBe(0);
 		expect(pt.y).toBe(0);
 	});
 
 	test("localToGlobal() should work on nested containers.", () => {
-		var c = new Container();
+		let c = new Container();
 		c.set({x:50, y:50});
 
-		var c2 = new Container();
+		let c2 = new Container();
 		c2.set({x:25, y:25});
 
-		var c3 = new Container();
+		let c3 = new Container();
 		c3.set({x:-5, y:-5});
 
 		c.addChild(c2);
@@ -466,28 +465,28 @@ describe("DisplayList", () => {
 	});
 
 	test("localToLocal() should work.", () => {
-		var s = new Shape();
+		let s = new Shape();
 		stage.addChild(s);
 
-		var pt = stage.localToLocal(0, 0, s);
+		let pt = stage.localToLocal(0, 0, s);
 		expect(pt.x).toBe(0);
 	});
 
 	test("set() should work", () => {
-		var shape = stage.addChild(new Shape()).set(displayObjectProps);
+		let shape = stage.addChild(new Shape()).set(displayObjectProps);
 
-		for (var n in displayObjectProps) {
+		for (let n in displayObjectProps) {
 			expect(shape[n]).toBe(displayObjectProps[n]);
 		}
 	});
 
 	test("setBounds() should work.", () => {
-		var s = new Shape();
+		let s = new Shape();
 		stage.addChild(s);
 
 		s.setBounds(1, 2, 3, 4);
 
-		var b = s.getBounds();
+		let b = s.getBounds();
 		expect(b.x).toBe(1);
 		expect(b.y).toBe(2);
 		expect(b.width).toBe(3);
@@ -495,8 +494,8 @@ describe("DisplayList", () => {
 	});
 
 	test("setChildIndex() should work.", () => {
-		var foo = new Shape();
-		var bar = new Shape();
+		let foo = new Shape();
+		let bar = new Shape();
 		stage.addChild(bar);
 		stage.addChild(foo);
 		stage.setChildIndex(foo, 0);
@@ -504,7 +503,7 @@ describe("DisplayList", () => {
 	});
 
 	test("setTransform() should work.", () => {
-		var foo = new Shape();
+		let foo = new Shape();
 		foo.setTransform(5, 6, 2, 3, 90, 10, 11, 50, 55);
 
 		expect(foo.x).toBe(5);
@@ -519,7 +518,7 @@ describe("DisplayList", () => {
 	});
 
 	test("sortChildren() higher y should be on-top", () => {
-		var sortFunction = function (obj1, obj2, options) {
+		let sortFunction = function (obj1, obj2, options) {
 			if (obj1.y < obj2.y) {
 				return -1;
 			}
@@ -529,11 +528,11 @@ describe("DisplayList", () => {
 			return 0;
 		}
 
-		var container = new Container();
+		let container = new Container();
 
-		var foo = new Shape().set({y: 80});
-		var bar = new Shape().set({y: 45});
-		var ja = new Shape().set({y: 150});
+		let foo = new Shape().set({y: 80});
+		let bar = new Shape().set({y: 45});
+		let ja = new Shape().set({y: 150});
 
 		container.addChild(ja, bar, foo);
 		expect(container.getChildIndex(ja)).toBe(0);
@@ -542,10 +541,10 @@ describe("DisplayList", () => {
 	});
 
 	test("swapChildren() should work.", () => {
-		var container = new Container();
+		let container = new Container();
 
-		var foo = new Shape();
-		var bar = new Shape();
+		let foo = new Shape();
+		let bar = new Shape();
 
 		container.addChild(bar, foo);
 		expect(container.getChildIndex(bar)).toBe(0);
@@ -558,11 +557,11 @@ describe("DisplayList", () => {
 	});
 
 	test("swapChildrenAt() should work.", () => {
-		var container = new Container();
+		let container = new Container();
 
-		var foo = new Shape();
-		var bar = new Shape();
-		var bars = new Shape();
+		let foo = new Shape();
+		let bar = new Shape();
+		let bars = new Shape();
 
 		container.addChild(bar, foo, bars);
 		expect(container.getChildIndex(bar)).toBe(0);
@@ -574,10 +573,10 @@ describe("DisplayList", () => {
 		expect(container.getChildIndex(bars)).toBe(0);
 	});
 
-	test("toDataURL() should return a valid image.", function (done) {
-		var url = stage.toDataURL("#ffffff");
+	test("toDataURL() should return a valid image.", done => {
+		let url = stage.toDataURL("#ffffff");
 
-		var img = new Canvas.Image();
+		let img = new Canvas.Image();
 		img.onload = () => { expect(url).not.toBe(null); done(); }
 		img.onerror = () => { done(`${url} failed to load`); }
 		img.src = url;
@@ -593,7 +592,7 @@ describe("DisplayList", () => {
 		stage.updateCache();
 		stage.uncache();
 
-		var err = false;
+		let err = false;
 		try {
 			stage.updateCache();
 		} catch (e) {
@@ -602,8 +601,8 @@ describe("DisplayList", () => {
 		expect(err).toBe(true);
 	});
 
-	test("Text", function (done) {
-		var txt = new Text("", "12px Arial", "#dd0000");
+	test("Text", done => {
+		let txt = new Text("", "12px Arial", "#dd0000");
 		txt.text = "This text is rendered in canvas.\n\nusing the Text Object.!\n\nTEST!\n\nmore text";
 		txt.textBaseline = "top";
 		txt.textAlign = "left";
@@ -615,14 +614,14 @@ describe("DisplayList", () => {
 	});
 
 	test("Text.getBounds() should allow 0 as a value", () => {
-		var txt = new Text("", "12px Arial", "#dd0000");
+		let txt = new Text("", "12px Arial", "#dd0000");
 		txt.text = 0;
 		stage.addChild(txt);
 
 		expect(txt.getBounds()).not.toBe(null);
 	});
 
-	test("BitmapText", function (done) {
+	test("BitmapText", done => {
 		// Embedded SpriteSheet data.
 		const data = {
 			"animations": {
@@ -690,11 +689,11 @@ describe("DisplayList", () => {
 				[966, 2, 9, 10, 0, -17, -31]
 			]
 		};
-		var img = new Canvas.Image();
+		let img = new Canvas.Image();
 		img.onload = () => {
 			data.images = [img];
-			var ss = new SpriteSheet(data);
-			var text = new BitmapText("abcdef\nghijklm\nnopqr\nstuvw\nxyz!,.?", ss);
+			let ss = new SpriteSheet(data);
+			let text = new BitmapText("abcdef\nghijklm\nnopqr\nstuvw\nxyz!,.?", ss);
 			stage.addChild(text);
 			stage.update();
 			globals.compareBaseLine(globals.rootPath + "tests/assets/BitmapText.png", done, expect, stage.canvas);
@@ -703,9 +702,9 @@ describe("DisplayList", () => {
 		img.src = globals.rootPath + "assets/art/spritesheet_font.png";
 	});
 
-	test.only("masks should work", function (done) {
+	test("masks should work", done => {
 		// masks can only be shapes.
-		var star = new Shape();
+		let star = new Shape();
 
 		// the mask's position will be relative to the parent of its target:
 		star.x = image.width / 2;
@@ -714,13 +713,13 @@ describe("DisplayList", () => {
 		// only the drawPolyStar call is needed for the mask to work:
 		star.graphics.beginStroke("#FF0").setStrokeStyle(3).drawPolyStar(0, 0, image.height / 2, 5, 0.6);
 
-		var bg = new Bitmap(image);
+		let bg = new Bitmap(image);
 		// blur and desaturate the background image:
 		bg.filters = [new BlurFilter(2, 2, 2), new ColorMatrixFilter(new ColorMatrix(0, 0, -100, 0))];
 		bg.cache(0, 0, image.width, image.height);
 		stage.addChild(bg);
 
-		var bmp = new Bitmap(image);
+		let bmp = new Bitmap(image);
 		stage.addChild(bmp);
 		bmp.mask = star;
 

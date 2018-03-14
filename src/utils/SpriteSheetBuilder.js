@@ -380,7 +380,7 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 			if (o.w > x) { x = o.w; }
 			y += o.h;
 			if (!o.h || !frames.length) {
-				let canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+				let canvas = window.createjs&&createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 				canvas.width = this._getSize(x,this.maxWidth);
 				canvas.height = this._getSize(y,this.maxHeight);
 				this._data.images[img] = canvas;

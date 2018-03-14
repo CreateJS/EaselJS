@@ -49,7 +49,6 @@
     "test": "tests"
   },
   "scripts": {
-    "pretest": "npm run build -- --format=module",
     "test": "jest -c ./tests/jest.config.js",
     "lint": "cd node_modules/@createjs/build && gulp lint",
     "dev": "cd node_modules/@createjs/build && gulp dev --format=global",
