@@ -629,6 +629,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * The number of properties defined per vertex (x, y, textureU, textureV, textureIndex, alpha)
 	 * @property VERTEX_PROPERTY_COUNT
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {Number}
@@ -640,6 +641,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * The number of triangle indices it takes to form a Card. 3 per triangle, 2 triangles.
 	 * @property INDICIES_PER_CARD
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {Number}
@@ -675,6 +677,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Default UV rect for dealing with full coverage from an image source.
 	 * @property UV_RECT
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {Object}
@@ -724,6 +727,7 @@ this.createjs = this.createjs||{};
 	 * regular shader is designed to render all expected objects. Shader code may contain templates that are replaced
 	 * pre-compile.
 	 * @property REGULAR_VARYING_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -741,6 +745,7 @@ this.createjs = this.createjs||{};
 	 * Actual full header for the vertex shader. Includes the varying header. The regular shader is designed to render
 	 * all expected objects. Shader code may contain templates that are replaced pre-compile.
 	 * @property REGULAR_VERTEX_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -759,6 +764,7 @@ this.createjs = this.createjs||{};
 	 * Actual full header for the fragment shader. Includes the varying header. The regular shader is designed to render
 	 * all expected objects. Shader code may contain templates that are replaced pre-compile.
 	 * @property REGULAR_FRAGMENT_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -773,6 +779,7 @@ this.createjs = this.createjs||{};
 	 * Body of the vertex shader. The regular shader is designed to render all expected objects. Shader code may contain
 	 * templates that are replaced pre-compile.
 	 * @property REGULAR_VERTEX_BODY
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -791,6 +798,7 @@ this.createjs = this.createjs||{};
 	 * Body of the fragment shader. The regular shader is designed to render all expected objects. Shader code may
 	 * contain templates that are replaced pre-compile.
 	 * @property REGULAR_FRAGMENT_BODY
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -814,6 +822,7 @@ this.createjs = this.createjs||{};
 	 * cover shader is designed to be a simple vertex/uv only texture render that covers the render surface. Shader
 	 * code may contain templates that are replaced pre-compile.
 	 * @property COVER_VARYING_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -830,6 +839,7 @@ this.createjs = this.createjs||{};
 	 * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
 	 * replaced pre-compile.
 	 * @property COVER_VERTEX_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -846,6 +856,7 @@ this.createjs = this.createjs||{};
 	 * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
 	 * replaced pre-compile.
 	 * @property COVER_FRAGMENT_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -860,6 +871,7 @@ this.createjs = this.createjs||{};
 	 * Body of the vertex shader. The cover shader is designed to be a simple vertex/uv only texture render that covers
 	 * the render surface. Shader code may contain templates that are replaced pre-compile.
 	 * @property COVER_VERTEX_BODY
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -876,6 +888,7 @@ this.createjs = this.createjs||{};
 	 * Body of the fragment shader. The cover shader is designed to be a simple vertex/uv only texture render that
 	 * covers the render surface. Shader code may contain templates that are replaced pre-compile.
 	 * @property COVER_FRAGMENT_BODY
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -887,6 +900,15 @@ this.createjs = this.createjs||{};
 		"}"
 	);
 
+	/**
+	 * The starting template of a cover fragment shader with simple blending equations
+	 * @property BLEND_FRAGMENT_SIMPLE
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
 	StageGL.BLEND_FRAGMENT_SIMPLE = (
 		"uniform sampler2D uMixSampler;"+
 		"void main(void) {" +
@@ -895,6 +917,15 @@ this.createjs = this.createjs||{};
 		// note this is an open bracket on main!
 	);
 
+	/**
+	 * The starting template of a cover fragment shader which has complex blending equations
+	 * @property BLEND_FRAGMENT_COMPLEX
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
 	StageGL.BLEND_FRAGMENT_COMPLEX = (
 		StageGL.BLEND_FRAGMENT_SIMPLE +
 			"vec3 srcClr = min(src.rgb/src.a, 1.0);" +
@@ -912,6 +943,16 @@ this.createjs = this.createjs||{};
 					"mixFactor * vec3("
 		// this should be closed with the cap!
 	);
+
+	/**
+	 * The closing portion of a template for a cover fragment shader which has complex blending equations
+	 * @property BLEND_FRAGMENT_COMPLEX_CAP
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
 	StageGL.BLEND_FRAGMENT_COMPLEX_CAP = (
 					")" +
 				") * totalAlpha, totalAlpha" +
@@ -919,6 +960,15 @@ this.createjs = this.createjs||{};
 		"}"
 	);
 
+	/**
+	 * A shader utility function, used to calculate the "overlay" blend of two elements
+	 * @property BLEND_FRAGMENT_OVERLAY_UTIL
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
 	StageGL.BLEND_FRAGMENT_OVERLAY_UTIL = (
 		"float overlay(float a, float b) {" +
 			"if(a < 0.5) { return 2.0 * a * b; }" +
@@ -926,6 +976,16 @@ this.createjs = this.createjs||{};
 		"}"
 	);
 
+	/**
+	 * A collection of shader utility functions, used to calculate HSL math. Taken from W3C spec
+	 * https://www.w3.org/TR/compositing-1/#blendingnonseparable
+	 * @property BLEND_FRAGMENT_HSL_UTIL
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
 	StageGL.BLEND_FRAGMENT_HSL_UTIL = (
 		"float getLum(vec3 c) { return 0.299*c.r + 0.589*c.g + 0.109*c.b; }" +
 		"float getSat(vec3 c) { return max(max(c.r, c.g), c.b) - min(min(c.r, c.g), c.b); }" +
@@ -956,6 +1016,14 @@ this.createjs = this.createjs||{};
 		"}"
 	);
 
+	/**
+	 * The hash of supported blend modes and their properties
+	 * @property BLEND_SOURCES
+	 * @static
+	 * @final
+	 * @type {Object}
+	 * @readonly
+	 */
 	StageGL.BLEND_SOURCES = {
 		"source-over": { // empty object verifies it as a blend mode, but default values handle actual settings
 			//eqRGB: "FUNC_ADD",						eqA: "FUNC_ADD"
@@ -1332,11 +1400,9 @@ this.createjs = this.createjs||{};
 			return false;
 		}
 
-		var swap, filterCount = manager._filterCount, filtersLeft = filterCount;
+		var filterCount = manager._filterCount, filtersLeft = filterCount;
 		var backupWidth = this._viewportWidth, backupHeight = this._viewportHeight;
 		this.updateViewport(manager._drawWidth, manager._drawHeight);
-
-		// TODO: DIRECT CACHE WRITE
 
 		var out = this._batchTextureOutput = (manager._filterCount%2) ? manager._bufferTextureConcat : manager._bufferTextureOutput;
 		this._batchTextureConcat = (manager._filterCount%2) ? manager._bufferTextureOutput : manager._bufferTextureConcat;
@@ -1349,10 +1415,15 @@ this.createjs = this.createjs||{};
 		this._updateRenderMode("source-over");
 		this._drawContent(container, true);
 
-		// despite trying to align the buffers for final output we could have had it mis-aligned due to composite operations
+		// re-align buffers with fake filter passes to solve certain error cases
 		if (out !== this._batchTextureOutput) {
-			// this works because getGLFilter will return undefined on an out of range value
-			// and the only way to of become desynced will of made a concat buffer to draw to
+			// pre filter pass to align output, may of become misaligned due to composite operations
+			filtersLeft++;
+		}
+		if (this.isCacheControlled) {
+			// post filter pass to place content into output buffer
+			//TODO: add in directDraw support for cache controlled StageGLs
+			filterCount++;
 			filtersLeft++;
 		}
 
@@ -1360,7 +1431,7 @@ this.createjs = this.createjs||{};
 			var filter = manager._getGLFilter(filterCount - (filtersLeft--));
 			var swap = this._batchTextureConcat;
 			this._batchTextureConcat = this._batchTextureOutput;
-			this._batchTextureOutput = swap;
+			this._batchTextureOutput = (this.isCacheControlled && filtersLeft === 0) ? this : swap;
 			this._drawCover(this._batchTextureOutput._frameBuffer, this._batchTextureConcat, filter);
 		}
 
@@ -2682,7 +2753,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Draws a card that covers the entire render surface. Mainly used for filters.
+	 * Draws a card that covers the entire render surface. Mainly used for filters and composite operations.
 	 * @method _renderCover
 	 * @protected
 	 */

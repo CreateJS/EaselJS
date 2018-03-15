@@ -430,7 +430,7 @@ this.createjs = this.createjs||{};
 
 		this._drawWidth = Math.ceil(this.width*this.scale) + filterBounds.width;
 		this._drawHeight = Math.ceil(this.height*this.scale) + filterBounds.height;
-		this._filterCount = this.target.filters.reduce(BitmapCache.filterCounter, 0);
+		this._filterCount = this.target.filters && this.target.filters.reduce(BitmapCache.filterCounter, 0);
 
 		if(!surface || this._drawWidth !== surface.width || this._drawHeight !== surface.height) {
 			this._updateSurface();
