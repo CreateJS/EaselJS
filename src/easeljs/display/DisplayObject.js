@@ -459,13 +459,13 @@ this.createjs = this.createjs||{};
 		this._webGLRenderStyle = DisplayObject._StageGL_NONE;
 
 		/**
-		 * Storage for the calculated position of an object in StageGL
+		 * Storage for the calculated position of an object in StageGL. If not using StageGL, you can null it to save memory.
 		 * @property _glMtx
 		 * @protected
-		 * @type {Rectangle}
+		 * @type {Matrix2D}
 		 * @default null
 		 */
-		this._glMtx = null;
+		this._glMtx = new createjs.Matrix2D();
 	}
 	var p = createjs.extend(DisplayObject, createjs.EventDispatcher);
 
@@ -1007,7 +1007,7 @@ this.createjs = this.createjs||{};
 	p.getMatrix = function(matrix) {
 		var o = this, mtx = matrix || new createjs.Matrix2D();
 		return o.transformMatrix ?  mtx.copy(o.transformMatrix) :
-			(matrix.identity() && mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY));
+			(mtx.identity() && mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY));
 	};
 
 	/**

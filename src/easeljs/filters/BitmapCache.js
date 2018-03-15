@@ -242,24 +242,28 @@ this.createjs = this.createjs||{};
 		this._counterMatrix = null;
 
 		/**
-		 * Render texture temporary surface, used for swapping render calls in complex effects.
-		 * The difference between out and Temp is that Out is assigned to the cacheCanvas property of the display object
-		 * being managed by this class. That needs to be the same element consistently to allow for chaining filters & effects.
-		 * @property _renderTextureOut
+		 * One of the major render buffers used in composite blending and filter drawing. Do not expect this to always be the same object.
+		 * "What you're drawing to", object occasionally swaps with concat.
+		 * @property _bufferTextureOutput
 		 * @type {WebGLTexture}
-		 * @default 0
 		 */
-		this._renderTextureOut = null;
+		this._bufferTextureOutput = null;
 
 		/**
-		 * Render texture temporary surface, used for swapping render calls in complex effects.
-		 * The difference between out and Temp is that Out is assigned to the cacheCanvas property of the display object
-		 * being managed by this class. That needs to be the same element consistently to allow for chaining filters & effects.
-		 * @property _renderTextureTemp
+		 * One of the major render buffers used in composite blending and filter drawing. Do not expect this to always be the same object.
+		 * "What you've draw before now", object occasionally swaps with output.
+		 * @property _bufferTextureConcat
 		 * @type {WebGLTexture}
-		 * @default 0
 		 */
-		this._renderTextureTemp = null;
+		this._bufferTextureConcat = null;
+
+		/**
+		 * One of the major render buffers used only for composite blending draws.
+		 * "Temporary mixing surface"
+		 * @property _bufferTextureTemp
+		 * @type {WebGLTexture}
+		 */
+		this._bufferTextureTemp = null;
 	}
 	var p = BitmapCache.prototype;
 
@@ -419,7 +423,7 @@ this.createjs = this.createjs||{};
 	 * @param {String} [compositeOperation=null] The DisplayObject this cache is linked to.
 	 **/
 	p.update = function(compositeOperation) {
-		if(!this.target) { throw "define() must be called before update()"; }
+		if (!this.target) { throw "define() must be called before update()"; }
 
 		var filterBounds = BitmapCache.getFilterBounds(this.target);
 		var surface = this._cacheCanvas;
@@ -433,16 +437,22 @@ this.createjs = this.createjs||{};
 		}
 
 		if (this._stageGL) {
-			var surfaceCount = this._filterCount + (this._stageGL.isCacheControlled ? 0 : 1);
-			if(surfaceCount >= 1) {
-				var out = this._stageGL.getTargetRenderTexture(this, this._drawWidth,this._drawHeight, true);
-				if(this._cacheCanvas === null){
-					this._cacheCanvas = out;
-					this.disabled = this._disabled;
-				}
+			if (this._bufferTextureOutput === null) {
+				this._bufferTextureOutput = this._stageGL.getRenderBufferTexture(this._drawWidth, this._drawHeight);
+			} else {
+				this._stageGL.resizeTexture(this._bufferTextureOutput, this._drawWidth, this._drawHeight);
 			}
-			if(surfaceCount >= 2) {
-				this._stageGL.getTargetRenderTexture(this, this._drawWidth,this._drawHeight, false);
+
+			if(this._cacheCanvas === null){
+				this._cacheCanvas = this._bufferTextureOutput;
+				this.disabled = this._disabled;
+			}
+			if (this._filterCount >= 1) {
+				if (this._bufferTextureConcat === null) {
+					this._bufferTextureConcat = this._stageGL.getRenderBufferTexture(this._drawWidth, this._drawHeight);
+				} else {
+					this._stageGL.resizeTexture(this._bufferTextureConcat, this._drawWidth, this._drawHeight);
+				}
 			}
 		}
 
@@ -462,8 +472,9 @@ this.createjs = this.createjs||{};
 	 **/
 	p.release = function() {
 		if (this._stageGL) {
-			if (this._renderTextureOut){ this._stageGL._killTextureObject(this._renderTextureOut); }
-			if (this._renderTextureTemp){ this._stageGL._killTextureObject(this._renderTextureTemp); }
+			if (this._bufferTextureOutput !== null){ this._stageGL._killTextureObject(this._bufferTextureOutput); }
+			if (this._bufferTextureConcat !== null){ this._stageGL._killTextureObject(this._bufferTextureConcat); }
+			if (this._bufferTextureTemp !== null){ this._stageGL._killTextureObject(this._bufferTextureTemp); }
 			// set the context to none and let the garbage collector get the rest when the canvas itself gets removed
 			this._stageGL = false;
 		} else {
@@ -526,26 +537,6 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Determines and returns the correct draw target for the content to be output to.
-	 * Intended for internal use.
-	 * @method _getGLContentTarget
-	 * @param {Number} filterCount Whole number, the number of filters still to be drawn
-	 * @returns {WebGLTexture}
-	 */
-	p._getGLContentTarget = function(filterCount) {
-		if(!(filterCount >= 0)){ filterCount = 0; }
-		// draws ping pong between out/temp as each filter pass occurs, starting on the right foot avoids pointless draws
-		// to canvas, no filter			= canvas
-		// to canvas, odd filters		= out
-		// to canvas, even filters		= temp
-		// to texture, no filter		= out
-		// to texture, odd filters		= temp
-		// to texture, even filters		= out
-		if(filterCount === 0 && this._stageGL.isCacheControlled) { return this._cacheCanvas }
-		return ((filterCount % 2) ^ this._stageGL.isCacheControlled) ? this._renderTextureTemp : this._renderTextureOut;
-	};
-
-	/**
 	 * Fetch the correct filter in order, complicated by multipass filtering.
 	 * @param {Number} lookup The filter in the list to return
 	 */
@@ -555,7 +546,7 @@ this.createjs = this.createjs||{};
 		while(result && --lookup >= 0) {
 			result = result._multiPass ? result._multiPass : this.target.filters[++i];
 		}
-		return result
+		return result;
 	};
 
 // private methods:
