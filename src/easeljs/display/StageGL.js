@@ -394,9 +394,9 @@ this.createjs = this.createjs||{};
 		 * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
 		 * @property _batchTextureOutput
 		 * @protected
-		 * @type {WebGLTexture}
+		 * @type {WebGLTexture | StageGL}
 		 */
-		this._batchTextureOutput = null;
+		this._batchTextureOutput = this;
 
 		/**
 		 * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
@@ -1354,10 +1354,9 @@ this.createjs = this.createjs||{};
 		this._batchVertexCount = 0;
 		this._drawID++;
 
-		if (this.autoClear) { this.clear(); }
-
 		if (this._directDraw) {
 			this._batchTextureOutput = this;
+			if (this.autoClear) { this.clear(); }
 		} else {
 			this._batchTextureOutput = this._bufferTextureOutput;
 			this._batchTextureConcat = this._bufferTextureConcat;
@@ -1368,6 +1367,7 @@ this.createjs = this.createjs||{};
 		this._drawContent(this, ignoreCache);
 
 		if (!this._directDraw) {
+			if (this.autoClear) { this.clear(); }
 			this.batchReason = "finalOutput";
 			this._drawCover(null, this._batchTextureOutput);
 		}
@@ -1432,6 +1432,7 @@ this.createjs = this.createjs||{};
 			var swap = this._batchTextureConcat;
 			this._batchTextureConcat = this._batchTextureOutput;
 			this._batchTextureOutput = (this.isCacheControlled && filtersLeft === 0) ? this : swap;
+			this.batchReason = "filterPass";
 			this._drawCover(this._batchTextureOutput._frameBuffer, this._batchTextureConcat, filter);
 		}
 
@@ -2289,7 +2290,9 @@ this.createjs = this.createjs||{};
 				if (this._textureIDs[n] === texture._storeID) { delete this._textureIDs[n]; }
 			}
 			var data = texture._imageData;
-			for (var i=data.length-1; i>=0; i--) { data[i]._storeID = undefined; }
+			if (data) {
+				for (var i=data.length-1; i>=0; i--) { data[i]._storeID = undefined; }
+			}
 			texture._imageData = texture._storeID = undefined;
 		}
 
@@ -2378,6 +2381,8 @@ this.createjs = this.createjs||{};
 			return;
 		}
 
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
+
 		this.batchReason = "shaderSwap";
 		this._renderBatch();		// <--------------------------------------------------------------------------------
 
@@ -2423,6 +2428,7 @@ this.createjs = this.createjs||{};
 		var gl = this._webGLContext;
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, out);
+		if (out !== null){ gl.clear(gl.COLOR_BUFFER_BIT); }
 
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, dst);
@@ -2677,21 +2683,25 @@ this.createjs = this.createjs||{};
 	p._immediateBatchRender = function(gl) {
 		if(this._batchTextureConcat === null){
 			this._batchTextureConcat = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+		} else {
+			this.resizeTexture(this._batchTextureConcat, this._viewportWidth, this._viewportHeight);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureConcat._frameBuffer);
+			gl.clear(gl.COLOR_BUFFER_BIT);
 		}
 		if(this._batchTextureTemp === null){
 			this._batchTextureTemp = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureTemp._frameBuffer);
+		} else {
+			this.resizeTexture(this._batchTextureTemp, this._viewportWidth, this._viewportHeight);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureTemp._frameBuffer);
+			gl.clear(gl.COLOR_BUFFER_BIT);
 		}
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureConcat._frameBuffer);
-		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		var swap = this._batchTextureOutput;
 		this._batchTextureOutput = this._batchTextureConcat;
 		this._batchTextureConcat = swap;
 
 		this._activeShader = this._mainShader;
-		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureTemp._frameBuffer);
-		gl.clear(gl.COLOR_BUFFER_BIT);
 		this.batchReason = "immediateBuffer";
 		this._renderBatch();//<-----------------------------------------------------------------------------------------
 
