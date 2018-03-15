@@ -272,7 +272,7 @@ this.createjs = this.createjs||{};
 	};
 	p._set_disabled = function (value) {
 		this._disabled = !!value;
-		if(this.target) {
+		if (this.target) {
 			this.target.cacheCanvas = this._disabled ? null : this._cacheCanvas;
 		}
 	};
@@ -299,17 +299,17 @@ this.createjs = this.createjs||{};
 	 * @static
 	 **/
 	BitmapCache.getFilterBounds = function(target, output) {
-		if(!output){ output = new createjs.Rectangle(); }
+		if (!output){ output = new createjs.Rectangle(); }
 		var filters = target.filters;
 		var filterCount = filters && filters.length;
 		if (!!filterCount <= 0) { return output; }
 
-		for(var i=0; i<filterCount; i++) {
+		for (var i=0; i<filterCount; i++) {
 			var f = filters[i];
-			if(!f || !f.getBounds){ continue; }
+			if (!f || !f.getBounds){ continue; }
 			var test = f.getBounds();
-			if(!test){ continue; }
-			if(i === 0) {
+			if (!test){ continue; }
+			if (i === 0) {
 				output.setValues(test.x, test.y, test.width, test.height);
 			} else {
 				output.extend(test.x, test.y, test.width, test.height);
@@ -401,7 +401,7 @@ this.createjs = this.createjs||{};
 	 * @for BitmapCache
 	 */
 	 p.define = function(target, x, y, width, height, scale, options) {
-		if(!target){ throw "No symbol to cache"; }
+		if (!target){ throw "No symbol to cache"; }
 		this._options = options;
 		this.target = target;
 
@@ -432,7 +432,7 @@ this.createjs = this.createjs||{};
 		this._drawHeight = Math.ceil(this.height*this.scale) + filterBounds.height;
 		this._filterCount = this.target.filters && this.target.filters.reduce(BitmapCache.filterCounter, 0);
 
-		if(!surface || this._drawWidth !== surface.width || this._drawHeight !== surface.height) {
+		if (!surface || this._drawWidth !== surface.width || this._drawHeight !== surface.height) {
 			this._updateSurface();
 		}
 
@@ -443,7 +443,7 @@ this.createjs = this.createjs||{};
 				this._stageGL.resizeTexture(this._bufferTextureOutput, this._drawWidth, this._drawHeight);
 			}
 
-			if(this._cacheCanvas === null){
+			if (this._cacheCanvas === null){
 				this._cacheCanvas = this._bufferTextureOutput;
 				this.disabled = this._disabled;
 			}
@@ -515,7 +515,7 @@ this.createjs = this.createjs||{};
 	 * @return {Boolean} Whether the draw was handled successfully.
 	 **/
 	p.draw = function(ctx) {
-		if(!this.target) { return false; }
+		if (!this.target) { return false; }
 		ctx.drawImage(this._cacheCanvas,
 			this.x + (this._filterOffX/this.scale),		this.y + (this._filterOffY/this.scale),
 			this._drawWidth/this.scale,					this._drawHeight/this.scale
@@ -544,7 +544,7 @@ this.createjs = this.createjs||{};
 		if (this.target.filters === null){ return undefined; }
 		var i = 0;
 		var result = this.target.filters[i];
-		while(result && --lookup >= 0) {
+		while (result && --lookup >= 0) {
 			result = result._multiPass ? result._multiPass : this.target.filters[++i];
 		}
 		return result;
@@ -565,7 +565,7 @@ this.createjs = this.createjs||{};
 			surface = this._cacheCanvas;
 
 			// create it if it's missing
-			if(!surface) {
+			if (!surface) {
 				surface = this._cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 				this.target.cacheCanvas = this._disabled ? null : this._cacheCanvas;
 			}
@@ -581,21 +581,21 @@ this.createjs = this.createjs||{};
 			if (this._options.useGL === "stage") {
 				var targetStage = this.target.stage;
 				// use the stage that this object belongs on as the WebGL context
-				if(!(targetStage && targetStage.isWebGL)){
+				if (!(targetStage && targetStage.isWebGL)){
 					var error = "Cannot use 'stage' for cache because the object's parent stage is ";
 					error += targetStage ? "non WebGL." : "not set, please addChild to the correct stage.";
 					throw error;
 				}
 				this._stageGL = targetStage;
 
-			} else if(this._options.useGL === "new") {
+			} else if (this._options.useGL === "new") {
 				// create a new WebGL context to run this cache
 				this._cacheCanvas = document.createElement("canvas"); // low autopurge in case of filter swapping and low texture count
 				this._stageGL = new createjs.StageGL(this._cacheCanvas, {antialias: true, transparent: true, autoPurge: 10});
-				if(!this._stageGL._webGLContext){ throw "GL Cache asked for but unavailable"; }
+				if (!this._stageGL._webGLContext){ throw "GL Cache asked for but unavailable"; }
 				this._stageGL.isCacheControlled = true;	// use this flag to control stage sizing and final output
 
-			} else if(this._options.useGL instanceof createjs.StageGL) {
+			} else if (this._options.useGL instanceof createjs.StageGL) {
 				// use the provided WebGL context to run this cache, trust the user it works and is configured.
 				this._stageGL = this._options.useGL;
 
@@ -664,14 +664,14 @@ this.createjs = this.createjs||{};
 
 		var i = 0, filter = filters[i];
 		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
-			if(filter.usesContext){
-				if(data) {
+			if (filter.usesContext){
+				if (data) {
 					ctx.putImageData(data, 0,0);
 					data = null;
 				}
 				filter.applyFilter(ctx, 0,0, w,h);
 			} else {
-				if(!data) {
+				if (!data) {
 					data = ctx.getImageData(0,0, w,h);
 				}
 				filter._applyFilter(data);
@@ -682,7 +682,7 @@ this.createjs = this.createjs||{};
 		} while (filter);
 
 		//done
-		if(data) {
+		if (data) {
 			ctx.putImageData(data, 0,0);
 		}
 	};

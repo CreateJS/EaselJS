@@ -760,7 +760,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.draw = function(ctx, ignoreCache) {
 		var cache = this.bitmapCache;
-		if(cache && !ignoreCache) {
+		if (cache && !ignoreCache) {
 			return cache.draw(ctx);
 		}
 		return false;
@@ -835,7 +835,7 @@ this.createjs = this.createjs||{};
 	 * @param {Object} [options=undefined] Specify additional parameters for the cache logic
 	 **/
 	p.cache = function(x, y, width, height, scale, options) {
-		if(!this.bitmapCache){
+		if (!this.bitmapCache){
 			this.bitmapCache = new createjs.BitmapCache();
 		}
 		this.bitmapCache.define(this, x, y, width, height, scale, options);
@@ -864,7 +864,7 @@ this.createjs = this.createjs||{};
 	 * whatwg spec on compositing</a>.
 	 **/
 	p.updateCache = function(compositeOperation) {
-		if(!this.bitmapCache) {
+		if (!this.bitmapCache) {
 			throw "cache() must be called before updateCache()";
 		}
 		this.bitmapCache.update(compositeOperation);
@@ -875,7 +875,7 @@ this.createjs = this.createjs||{};
 	 * @method uncache
 	 **/
 	p.uncache = function() {
-		if(this.bitmapCache) {
+		if (this.bitmapCache) {
 			this.bitmapCache.release();
 			this.bitmapCache = undefined;
 		}
@@ -1044,7 +1044,7 @@ this.createjs = this.createjs||{};
 			
 			// we do this to avoid problems with the matrix being used for both operations when o._props.matrix is passed in as the props param.
 			// this could be simplified (ie. just done as part of the prepend above) if we switched to using a pool.
-			if (o != this) { mtx.prependMatrix(o.getMatrix(o._props.matrix)); }
+			if (o !== this) { mtx.prependMatrix(o.getMatrix(o._props.matrix)); }
 		} while (o = o.parent);
 		return props;
 	};

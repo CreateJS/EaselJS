@@ -1280,7 +1280,7 @@ this.createjs = this.createjs||{};
 				this._updateRenderMode("source-over");
 
 				this.updateViewport(this.canvas.width, this.canvas.height);
-				if(!this._directDraw) {
+				if (!this._directDraw) {
 					this._bufferTextureOutput = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
 				}
 
@@ -1657,7 +1657,7 @@ this.createjs = this.createjs||{};
 	 * @param  {uint} height The height of the texture in pixels
 	 */
 	p.resizeTexture = function (texture, width,height) {
-		if(texture.width === width && texture.height === height){ return; }
+		if (texture.width === width && texture.height === height){ return; }
 
 		var gl = this._webGLContext;
 		gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -1801,7 +1801,7 @@ this.createjs = this.createjs||{};
 	p._getSafeTexture = function (w, h) {
 		var texture = this.getBaseTexture(w, h);
 
-		if(!texture) {
+		if (!texture) {
 			var msg = "Problem creating texture, possible cause: using too much VRAM, please try releasing texture memory";
 			(console.error && console.error(msg)) || console.log(msg);
 
@@ -1821,8 +1821,8 @@ this.createjs = this.createjs||{};
 		var gl = this._webGLContext;
 		var cc = this._clearColor;
 
-		if(alpha > 0) { alpha = 1; }
-		if(alpha < 0) { alpha = 0; }
+		if (alpha > 0) { alpha = 1; }
+		if (alpha < 0) { alpha = 0; }
 
 		// Use WebGL settings; adjust for pre multiplied alpha appropriate to scenario
 		gl.clearColor(cc.r * alpha, cc.g * alpha, cc.b * alpha, alpha);
@@ -1962,7 +1962,7 @@ this.createjs = this.createjs||{};
 		// inject the static number
 		str = str.replace(/\{\{count}}/g, textureCount);
 
-		if(type === gl.FRAGMENT_SHADER) {
+		if (type === gl.FRAGMENT_SHADER) {
 			// resolve issue with no dynamic samplers by creating correct samplers in if else chain
 			// TODO: WebGL 2.0 does not need this support
 			var insert = "";
@@ -2192,7 +2192,7 @@ this.createjs = this.createjs||{};
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		} catch(e) {
 			var errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
-			if(console.error) {
+			if (console.error) {
 				//TODO: LM: I recommend putting this into a log function internally, since you do it so often, and each is implemented differently.
 				console.error(errString);
 				console.error(e);
@@ -2260,7 +2260,7 @@ this.createjs = this.createjs||{};
 			}
 			this._lastTextureInsert = found;
 
-		} else if(texture._drawID !== this._drawID) {	// being active from previous draws doesn't mean up to date
+		} else if (texture._drawID !== this._drawID) {	// being active from previous draws doesn't mean up to date
 			image = texture._imageData && texture._imageData[0];
 			if (image && ((image._invalid === undefined && image._isCanvas) || image._invalid)) {
 				this._updateTextureImageData(gl, image);
@@ -2345,7 +2345,7 @@ this.createjs = this.createjs||{};
 
 		var blendSrc = StageGL.BLEND_SOURCES[newMode];
 		if (blendSrc === undefined) {
-			if(this.vocalDebug){ console.log("Unknown compositeOperation ["+ newMode +"], reverting to default"); }
+			if (this.vocalDebug){ console.log("Unknown compositeOperation ["+ newMode +"], reverting to default"); }
 			blendSrc = StageGL.BLEND_SOURCES[newMode = "source-over"];
 		}
 
@@ -2377,7 +2377,7 @@ this.createjs = this.createjs||{};
 		}
 
 		if (shaderData.immediate && this._directDraw) {
-			if(this.vocalDebug) { console.log("Illegal compositeOperation ["+ newMode +"] due to StageGL.directDraw = true, reverting to default"); }
+			if (this.vocalDebug) { console.log("Illegal compositeOperation ["+ newMode +"] due to StageGL.directDraw = true, reverting to default"); }
 			return;
 		}
 
@@ -2441,7 +2441,7 @@ this.createjs = this.createjs||{};
 				gl.activeTexture(gl.TEXTURE1);
 				gl.bindTexture(gl.TEXTURE_2D, srcFilter);
 				this.setTextureParams(gl);
-			} else if(srcFilter !== undefined && this.vocalDebug) {
+			} else if (srcFilter !== undefined && this.vocalDebug) {
 				console.log("Unknown data handed to function: ", srcFilter);
 			}
 			this._activeShader = this._builtShaders[this._renderMode].shader;
@@ -2459,7 +2459,7 @@ this.createjs = this.createjs||{};
 	 * @private
 	 */
 	p._alignTargetToCache = function(target, manager) {
-		if(manager._counterMatrix === null) {
+		if (manager._counterMatrix === null) {
 			manager._counterMatrix = target.getMatrix();
 		} else {
 			target.getMatrix(manager._counterMatrix)
@@ -2681,14 +2681,14 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._immediateBatchRender = function(gl) {
-		if(this._batchTextureConcat === null){
+		if (this._batchTextureConcat === null){
 			this._batchTextureConcat = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
 		} else {
 			this.resizeTexture(this._batchTextureConcat, this._viewportWidth, this._viewportHeight);
 			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureConcat._frameBuffer);
 			gl.clear(gl.COLOR_BUFFER_BIT);
 		}
-		if(this._batchTextureTemp === null){
+		if (this._batchTextureTemp === null){
 			this._batchTextureTemp = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
 			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureTemp._frameBuffer);
 		} else {
