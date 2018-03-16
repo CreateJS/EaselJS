@@ -4,21 +4,23 @@ import Shadow from "../../../src/display/Shadow";
 import Shape from "../../../src/display/Shape";
 import Stage from "../../../src/display/Stage";
 import AlphaMaskFilter from "../../../src/filters/AlphaMaskFilter";
+import AlphaMapFilter from "../../../src/filters/AlphaMapFilter";
 import BlurFilter from "../../../src/filters/BlurFilter";
 import ColorFilter from "../../../src/filters/ColorFilter";
 import ColorMatrix from "../../../src/filters/ColorMatrix";
 import ColorMatrixFilter from "../../../src/filters/ColorMatrixFilter";
 
 import globals from "../../setup";
-import imagediff from "imagediff";
 import Canvas from "canvas-prebuilt";
 
 describe("Filters", () => {
 
-	let stage, image;
+	let stage, canvas, image;
 
 	beforeEach(async (done) => {
-		stage = new Stage(imagediff.createCanvas(200, 200));
+		canvas = new Canvas();
+		canvas.width = canvas.height = 200;
+		stage = new Stage(canvas);
 
 		image = new Canvas.Image();
 		image.onload = () => { done(); }
@@ -70,7 +72,7 @@ describe("Filters", () => {
 		bmp2.cache(0, 0, width, height);
 		stage.addChild(bmp2);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/AlphaMapFilter.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/AlphaMapFilter.png", done, expect, canvas);
 
 		expect(amf.clone().alphaMap).toBe(maskShape.cacheCanvas);
 	});
@@ -87,7 +89,7 @@ describe("Filters", () => {
 
 		shape.cache(0, 0, 100, 100);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/BlurFilter.png", done, expect, stage.canvas, 0.01);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/BlurFilter.png", done, expect, canvas, 0.01);
 
 		let blurClone = blurFilter.clone();
 		expect(blurClone.blurX).toBe(blurFilter.blurX);
@@ -106,7 +108,7 @@ describe("Filters", () => {
 		shape.cache(0, 0, 100, 100);
 		stage.addChild(shape);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/ColorFilter.png", done, expect, stage.canvas, 0.01);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/ColorFilter.png", done, expect, canvas, 0.01);
 
 		let colorFilterClone = cf.clone();
 
@@ -131,7 +133,7 @@ describe("Filters", () => {
 
 		stage.addChild(bmp);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/ColorMatrixFilter.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/ColorMatrixFilter.png", done, expect, canvas);
 
 		let clone = cmf.clone().matrix.toArray();
 		let orig = cmf.matrix.toArray()
@@ -149,7 +151,7 @@ describe("Filters", () => {
 
 		stage.addChild(c);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/Shadow.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/Shadow.png", done, expect, canvas);
 	});
 
 });

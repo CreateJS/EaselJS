@@ -3,16 +3,16 @@ import Shape from "../../../src/display/Shape";
 import Stage from "../../../src/display/Stage";
 
 import globals from "../../setup";
-
-import imagediff from "imagediff";
 import Canvas from "canvas-prebuilt";
 
 describe("Graphics", () => {
 
-	let stage, shape, g, image;
+	let stage, canvas, shape, g, image;
 
 	beforeEach(async (done) => {
-		stage = new Stage(imagediff.createCanvas(200, 200));
+		canvas = new Canvas();
+		canvas.width = canvas.height = 200;
+		stage = new Stage(canvas);
 		shape = new Shape();
 		g = shape.graphics;
 		stage.addChild(shape);
@@ -28,7 +28,7 @@ describe("Graphics", () => {
 		g.beginFill(globals.fColor);
 		g.moveTo(120, 100).arc(100, 100, 20, 0, Math.PI);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/arc.png", done, expect, stage.canvas, 0.01);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/arc.png", done, expect, canvas, 0.01);
 	});
 
 	it("arcTo()", done => {
@@ -36,55 +36,55 @@ describe("Graphics", () => {
 		g.beginStroke(globals.sColor);
 		g.moveTo(25, 25).arcTo(150, 25, 150, 70, 50, Math.PI * 2);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/arcTo.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/arcTo.png", done, expect, canvas);
 	});
 
 	it("beginBitmapFill()", done => {
 		g.beginBitmapFill(image).drawRect(5, 5, 100, 100);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/beginBitmapFill.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/beginBitmapFill.png", done, expect, canvas);
 	});
 
 	it("beginBitmapStroke()", done => {
 		g.setStrokeStyle(10).beginBitmapStroke(image).drawRect(5, 5, 100, 100);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/beginBitmapStroke.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/beginBitmapStroke.png", done, expect, canvas);
 	});
 
 	it("beginLinearGradientFill()", done => {
 		g.beginLinearGradientFill([globals.fColor, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 130).drawRect(0, 0, 120, 120);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/beginLinearGradientFill.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/beginLinearGradientFill.png", done, expect, canvas);
 	});
 
 	it("beginLinearGradientStroke()", done => {
 		g.beginLinearGradientStroke([globals.sColor, "rgba(50, 50, 50, 1)"], [0, .4], 0, 0, 70, 140).moveTo(5, 25).lineTo(110, 25).endStroke();
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/beginLinearGradientStroke.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/beginLinearGradientStroke.png", done, expect, canvas);
 	});
 
 	it("beginRadialGradientFill()", done => {
 		g.beginRadialGradientFill([globals.fColor, "rgba(0,0,0,1)"], [0, 1], 0, 0, 0, 0, 0, 60).drawRect(40, 40, 40, 40);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/beginRadialGradientFill.png", done, expect, stage.canvas, 300);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/beginRadialGradientFill.png", done, expect, canvas, 300);
 	});
 
 	it("beginRadialGradientStroke()", done => {
 		g.setStrokeStyle(10).beginRadialGradientStroke(["#F00", "#00F"], [0, 1], 150, 150, 200, 100, 100, 25).drawRect(25, 25, 125, 125);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/beginRadialGradientStroke.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/beginRadialGradientStroke.png", done, expect, canvas);
 	});
 
 	it("bezierCurveTo()", done => {
 		g.beginFill(globals.fColor).beginStroke(globals.sColor).moveTo(25, 25).bezierCurveTo(45, 175, 125, 75, 25, 25);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/bezierCurveTo.png", done, expect, stage.canvas, 0.008);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/bezierCurveTo.png", done, expect, canvas, 0.008);
 	});
 
 	it("quadraticCurveTo() / curveTo()", done => {
 		g.beginFill(globals.fColor).beginStroke(globals.sColor).moveTo(5, 5).quadraticCurveTo(200, 20, 190, 190).endStroke();
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/quadraticCurveTo.png", done, expect, stage.canvas, 0.008);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/quadraticCurveTo.png", done, expect, canvas, 0.008);
 	});
 
 	it("decodePath()", done => {
@@ -134,7 +134,7 @@ describe("Graphics", () => {
 
 		stage.addChild(shape_10, shape_9, shape_8, shape_7, shape_6, shape_5, shape_4, shape_3, shape_2, shape_1, shape);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/decodePath.png", done, expect, stage.canvas, .01);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/decodePath.png", done, expect, canvas, .01);
 	});
 
 	it("drawCircle()", done => {
@@ -144,7 +144,7 @@ describe("Graphics", () => {
 		g.drawCircle(100, 100, 50);
 		g.endFill();
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/drawCircle.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/drawCircle.png", done, expect, canvas);
 	});
 
 	it("drawEllipse()", done => {
@@ -154,7 +154,7 @@ describe("Graphics", () => {
 		g.drawEllipse(25, 25, 75, 150);
 		g.endFill();
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/drawEllipse.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/drawEllipse.png", done, expect, canvas);
 	});
 
 	it("drawPolyStar()", done => {
@@ -164,7 +164,7 @@ describe("Graphics", () => {
 		g.drawPolyStar(100, 100, 75, 5, 0.6, -90);
 		g.endFill();
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/drawPolyStar.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/drawPolyStar.png", done, expect, canvas);
 	});
 
 	it("drawRect()", done => {
@@ -174,7 +174,7 @@ describe("Graphics", () => {
 		g.drawRect(5, 5, 100, 100);
 		g.endFill();
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/drawRect.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/drawRect.png", done, expect, canvas);
 	});
 
 	it("drawRoundRect()", done => {
@@ -184,7 +184,7 @@ describe("Graphics", () => {
 		g.drawRoundRect(5, 5, 100, 100, 7);
 		g.endFill();
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/drawRoundRect.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/drawRoundRect.png", done, expect, canvas);
 	});
 
 	it("drawRoundRectComplex()", done => {
@@ -194,7 +194,7 @@ describe("Graphics", () => {
 		g.drawRoundRectComplex(5, 5, 100, 100, 5, 10, 15, 20);
 		g.endFill();
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/drawRoundRectComplex.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/drawRoundRectComplex.png", done, expect, canvas);
 	});
 
 	it("getHSL()", () => {
@@ -215,19 +215,19 @@ describe("Graphics", () => {
 	it("lineTo()", done => {
 		g.beginStroke(globals.sColor).moveTo(5, 35).lineTo(110, 75);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/lineTo.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/lineTo.png", done, expect, canvas);
 	});
 
 	it("setStrokeStyle()", done => {
 		g.setStrokeStyle(25, 1, 1, 0, true).beginStroke(globals.sColor, 1).moveTo(25, 25).lineTo(150, 150);
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/setStrokeStyle.png", done, expect, stage.canvas);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/setStrokeStyle.png", done, expect, canvas);
 	});
 
 	it("setStrokeDash()", done => {
 		g.setStrokeDash([7, 3]);
 		g.setStrokeStyle(5).beginStroke("black").rect(10, 10, 150, 150);
-		globals.compareBaseLine(globals.rootPath + "tests/assets/setStrokeDash.png", done, expect, stage.canvas, 0.008);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/setStrokeDash.png", done, expect, canvas, 0.008);
 	});
 
 	it("clone()", done => {
@@ -237,7 +237,7 @@ describe("Graphics", () => {
 		g.moveTo(120, 100).arc(100, 100, 20, 0, Math.PI);
 		g = g.clone();
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/arc.png", done, expect, stage.canvas, 0.01);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/arc.png", done, expect, canvas, 0.01);
 	});
 
 	describe("tiny api", () => {

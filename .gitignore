@@ -21,6 +21,7 @@ Thumbs.db
 # Generated
 docs/
 tests/coverage/
+tests/debug/
 
 # Other
 *.log

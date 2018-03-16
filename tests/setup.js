@@ -1,11 +1,35 @@
 // run the master setup file first
 require("@createjs/build/tests/setup");
 
-const imagediff = require("imagediff");
 const Canvas = require("canvas-prebuilt");
 const { resolve } = require("path");
+const fs = require("fs");
 
-expect.extend(imagediff.jasmine);
+function toImageDataFromImage (image) {
+	let canvas = new Canvas();
+	let context = canvas.getContext("2d");
+	canvas.height = image.height;
+	canvas.width = image.width;
+	context.drawImage(image, 0, 0);
+	return context.getImageData(0, 0, canvas.height, image.height);
+}
+function toImageDataFromCanvas (canvas) {
+	return canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
+}
+function equal (a, b, tolerance = 0) {
+	if (a.height !== b.height || a.width !== b.width) { return false; }
+	for (let i = a.length - 1; i >= 0; i--) {
+		if (a[i] !== b[i] && Math.abs(a[i] - b[i]) > tolerance) {
+			return false;
+		}
+	}
+	return true;
+}
+function getBuffer (data) {
+	let canvas = new Canvas();
+	canvas.getContext("2d").putImageData(data, 0, 0);
+	return new Buffer(canvas.toDataURL().replace(/^data:image\/\w+;base64,/,""), "base64");
+}
 
 module.exports = {
 	rootPath: resolve(__dirname, "../") + "\\",
@@ -19,22 +43,26 @@ module.exports = {
 	 * @param {string} path
 	 * @param {Function} done
 	 * @param {Function} expect
-	 * @param {HTMLCanvasElement|Canvas} canvas
+	 * @param {Canvas} canvas
 	 * @param {number} [pixelTolerance=0.005]
 	 */
 	compareBaseLine (path, done, expect, canvas, pixelTolerance = 0.005) {
 		const img = new Canvas.Image();
 		img.onload = () => {
-			/*console.log(canvas.toBuffer());
-			require('fs').writeFile(this.rootPath + "tests/_output/canvas.png", canvas.toBuffer(), done);
-			return;*/
-			const canvasData = imagediff.toImageData(canvas);
-			const imageData = imagediff.toImageData(img);
-			const isEqual = imagediff.equal(canvasData, imageData, (img.height * img.width) * pixelTolerance);
+			console.log(canvas, img);
+			const canvasData = toImageDataFromCanvas(canvas);
+			const imageData = toImageDataFromImage(img);
+			const isEqual = equal(canvasData.data, imageData.data, img.height * img.width * pixelTolerance);
 			if (!isEqual) {
-				imagediff.imageDataToPNG(canvasData, this.rootPath + "tests/_output/canvas.png", () => {
-					imagediff.imageDataToPNG(imageData, this.rootPath + "tests/_output/image.png", () => {
-						done('Images not equal.');
+				let folder = `${this.rootPath}tests/debug/`;
+				fs.mkdir(folder, () => {
+					folder = `${folder}/${global[Object.getOwnPropertySymbols(global)[1]].state.currentTestName.replace(/(\s|\.)/, "-").replace("()", "")}/`;
+					fs.mkdir(folder, () => {
+						fs.writeFile(`${folder}/canvas.png`, getBuffer(canvasData), () => {
+							fs.writeFile(`${folder}/image.png`, getBuffer(imageData), () => {
+								done("Images not equal.");
+							});
+						});
 					});
 				});
 			} else {

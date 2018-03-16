@@ -14,7 +14,6 @@ import ColorMatrix from "../../../src/filters/ColorMatrix";
 import ColorMatrixFilter from "../../../src/filters/ColorMatrixFilter";
 
 import globals from "../../setup";
-import imagediff from "imagediff";
 import Canvas from "canvas-prebuilt";
 
 function createShapeRect (x, y, w, h, fColor) {
@@ -26,10 +25,12 @@ function createShapeRect (x, y, w, h, fColor) {
 
 describe("DisplayList", () => {
 
-	let stage, image, displayObjectProps, bitmapProps;
+	let stage, canvas, image, displayObjectProps, bitmapProps;
 
 	beforeEach(async (done) => {
-		stage = new Stage(imagediff.createCanvas(200, 200));
+		canvas = new Canvas();
+		canvas.width = canvas.height = 200;
+		stage = new Stage(canvas);
 
 		image = new Canvas.Image();
 		image.onload = () => { done(); }
@@ -257,7 +258,7 @@ describe("DisplayList", () => {
 			stage.addChild(rect1, rect2, rect3, rect4, rect5);
 			stage.update();
 
-			// document.body.appendChild(stage.canvas);
+			// document.body.appendChild(canvas);
 		});
 
 		test("should return 1 object.", () => {
@@ -610,7 +611,7 @@ describe("DisplayList", () => {
 		txt.x = 0;
 		stage.addChild(txt);
 		stage.update();
-		globals.compareBaseLine(globals.rootPath + "tests/assets/Text.png", done, expect, stage.canvas, 0.01);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/Text.png", done, expect, canvas, 0.01);
 	});
 
 	test("Text.getBounds() should allow 0 as a value", () => {
@@ -696,7 +697,7 @@ describe("DisplayList", () => {
 			let text = new BitmapText("abcdef\nghijklm\nnopqr\nstuvw\nxyz!,.?", ss);
 			stage.addChild(text);
 			stage.update();
-			globals.compareBaseLine(globals.rootPath + "tests/assets/BitmapText.png", done, expect, stage.canvas);
+			globals.compareBaseLine(globals.rootPath + "tests/assets/BitmapText.png", done, expect, canvas);
 		};
 		img.onerror = () => done(`${img.src} failed to load`);
 		img.src = globals.rootPath + "assets/art/spritesheet_font.png";
@@ -728,7 +729,7 @@ describe("DisplayList", () => {
 		stage.addChild(star);
 		stage.update();
 
-		globals.compareBaseLine(globals.rootPath + "tests/assets/mask.png", done, expect, stage.canvas, 0.01);
+		globals.compareBaseLine(globals.rootPath + "tests/assets/mask.png", done, expect, canvas, 0.01);
 	});
 
 });

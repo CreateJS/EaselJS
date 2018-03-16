@@ -6,15 +6,17 @@ import { Tween } from "@createjs/tweenjs/src/Tween";
 import { Ticker } from "@createjs/core/src/utils/Ticker";
 
 import globals from "../../setup";
-import imagediff from "imagediff";
+import Canvas from "canvas-prebuilt";
 
 // skip movieclip tests, MC plugin is incomplete
 describe.skip("MovieClip", () => {
 
-	let stage, mc;
+	let stage, canvas, mc;
 
 	beforeEach(() => {
-		stage = new Stage(imagediff.createCanvas(200, 200));
+		canvas = new Canvas();
+		canvas.width = canvas.height = 200;
+		stage = new Stage(canvas);
 		mc = new MovieClip({
 			labels: {
 				start: 24,

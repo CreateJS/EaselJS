@@ -7,14 +7,16 @@ import Rectangle from "../../../src/geom/Rectangle";
 import SpriteSheetBuilder from "../../../src/utils/SpriteSheetBuilder";
 
 import globals from "../../setup";
-import imagediff from "imagediff";
+import Canvas from "canvas-prebuilt";
 
 describe("SpriteSheetBuilder", () => {
 
-	let stage, builder;
+	let stage, canvas, builder;
 
   beforeEach(() => {
-		stage = new Stage(imagediff.createCanvas(200, 200));
+		canvas = new Canvas();
+		canvas.width = canvas.height = 200;
+		stage = new Stage(canvas);
     let circle = new Shape();
     circle.graphics.beginFill("#F00").drawCircle(0, 0, 30).beginFill("#C00").drawCircle(0, 0, 10);
     circle.setTransform(0, 0);
@@ -62,7 +64,7 @@ describe("SpriteSheetBuilder", () => {
     let square3 = new Sprite(spriteSheet, "square2");
     stage.addChild(square3).set({x: 80});
 
-    globals.compareBaseLine(globals.rootPath + "tests/assets/SpriteSheetBuilder.png", done, expect, stage.canvas, 0.0075);
+    globals.compareBaseLine(globals.rootPath + "tests/assets/SpriteSheetBuilder.png", done, expect, canvas, 0.0075);
   });
 
   it("should build async", done => {
@@ -80,7 +82,7 @@ describe("SpriteSheetBuilder", () => {
       let square3 = new Sprite(spriteSheet, "square2");
       stage.addChild(square3).set({x: 80});
 
-      globals.compareBaseLine(globals.rootPath + "tests/assets/SpriteSheetBuilder.png", done, expect, stage.canvas, 0.0075);
+      globals.compareBaseLine(globals.rootPath + "tests/assets/SpriteSheetBuilder.png", done, expect, canvas, 0.0075);
     });
 
     builder.buildAsync();
