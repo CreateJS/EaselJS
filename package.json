@@ -22,13 +22,13 @@
     "Lanny McNie <lanny@gskinner.com> (https://github.com/lannymcnie)",
     "Wes Gorgichuk <wes@gskinner.com> (https://github.com/wdamien)",
     "Mike Chambers <> (https://github.com/mikechambers)",
-    "Patrick McGuckin <patrick@gskinner.com> (https://github.com/tehvgg)",
+    "Patrick McGuckin <p.mcgooks@gmail.com> (https://github.com/tehvgg)",
     "David Gillen <david@gskinner.com> (https://github.com/davidhgillen)"
   ],
   "main": "dist/easeljs.common.js",
-  "jsnext:main": "dist/easeljs.es.js",
-  "jsdelivr": "dist/easeljs.min.js",
-  "logo": "icon.png",
+  "module": "dist/easeljs.module.js",
+  "browser": "dist/easeljs.min.js",
+  "logo": "assets/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/createjs/easeljs.git"
@@ -53,15 +53,18 @@
     "lint": "cd node_modules/@createjs/build && gulp lint",
     "dev": "cd node_modules/@createjs/build && gulp dev --format=global",
     "build": "cd node_modules/@createjs/build && gulp build",
-    "plugins": "cd node_modules/@createjs/build && gulp plugins",
-		"assets": "cd node_modules/@createjs/build && gulp assets",
-    "docs": "cd node_modules/@createjs/docs && npm run gen"
+    "docs": "cd node_modules/@createjs/docs && npm run gen",
+    "prepublishOnly": "npm test; npm run build -- --production;"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@createjs/core": "github:createjs/core",
+    "@createjs/tweenjs": "github:createjs/tweenjs#2.0"
+	},
   "devDependencies": {
+    "@createjs/build": "github:createjs/build",
     "babel-jest": "^22.0.4",
     "canvas-prebuilt": "^1.6.0",
     "jest": "^22.0.4"
   },
-  "engine": "node >= 7.10.1"
+  "engine": "node >= 8.9.4"
 }
