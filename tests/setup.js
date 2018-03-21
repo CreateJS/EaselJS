@@ -13,9 +13,11 @@ function toImageDataFromImage (image) {
 	context.drawImage(image, 0, 0);
 	return context.getImageData(0, 0, canvas.height, image.height);
 }
+
 function toImageDataFromCanvas (canvas) {
 	return canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
 }
+
 function equal (a, b, tolerance = 0) {
 	if (a.height !== b.height || a.width !== b.width) { return false; }
 	for (let i = a.length - 1; i >= 0; i--) {
@@ -25,6 +27,7 @@ function equal (a, b, tolerance = 0) {
 	}
 	return true;
 }
+
 function getBuffer (data) {
 	let canvas = new Canvas();
 	canvas.getContext("2d").putImageData(data, 0, 0);
