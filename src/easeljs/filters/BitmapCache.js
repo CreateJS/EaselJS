@@ -548,7 +548,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} lookup The filter in the list to return
 	 */
 	p._getGLFilter = function(lookup) {
-		if (this.target.filters === null){ return undefined; }
+		if (this.target.filters === null || lookup < 0){ return undefined; }
 		var i = 0;
 		var result = this.target.filters[i];
 		while (result && --lookup >= 0) {
