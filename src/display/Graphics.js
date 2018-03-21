@@ -121,7 +121,7 @@
  * @class Graphics
  * @module EaselJS
  */
-export default class Graphics {
+class Graphics {
 
 // constructor:
 	/**
@@ -1521,6 +1521,24 @@ export default class Graphics {
 		return this;
 	}
 
+	static get LineTo () { return LineTo; }
+	static get MoveTo () { return MoveTo; }
+	static get ArcTo () { return ArcTo; }
+	static get Arc () { return Arc; }
+	static get QuadraticCurveTo () { return QuadraticCurveTo; }
+	static get BezierCurveTo () { return BezierCurveTo; }
+	static get Rect () { return Rect; }
+	static get ClosePath () { return ClosePath; }
+	static get BeginPath () { return BeginPath; }
+	static get Fill () { return Fill; }
+	static get Stroke () { return Stroke; }
+	static get StrokeStyle () { return StrokeStyle; }
+	static get StrokeDash () { return StrokeDash; }
+	static get RoundRect () { return RoundRect; }
+	static get Circle () { return Circle; }
+	static get Ellipse () { return Ellipse; }
+	static get PolyStar () { return PolyStar; }
+
 }
 
 // Command Objects:
@@ -1533,7 +1551,7 @@ export default class Graphics {
  * Graphics command object. See {{#crossLink "Graphics/lineTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class LineTo
  */
-export class LineTo {
+class LineTo {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -1565,7 +1583,7 @@ export class LineTo {
  * Graphics command object. See {{#crossLink "Graphics/moveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class MoveTo
  */
-export class MoveTo {
+class MoveTo {
 	/**
 	 * @constructor
    * @param {Number} x
@@ -1597,7 +1615,7 @@ export class MoveTo {
  * Graphics command object. See {{#crossLink "Graphics/arcTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class ArcTo
  */
-export class ArcTo {
+class ArcTo {
 	/**
 	 * @constructor
 	 * @param {Number} x1
@@ -1647,7 +1665,7 @@ export class ArcTo {
  * Graphics command object. See {{#crossLink "Graphics/arc"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Arc
  */
-export class Arc {
+class Arc {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -1703,7 +1721,7 @@ export class Arc {
  * Graphics command object. See {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class QuadraticCurveTo
  */
-export class QuadraticCurveTo {
+class QuadraticCurveTo {
 	/**
 	 * @constructor
 	 * @param {Number} cpx
@@ -1747,7 +1765,7 @@ export class QuadraticCurveTo {
  * Graphics command object. See {{#crossLink "Graphics/bezierCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class BezierCurveTo
  */
-export class BezierCurveTo {
+class BezierCurveTo {
 	/**
 	 * @constructor
 	 * @param {Number} cp1x
@@ -1803,7 +1821,7 @@ export class BezierCurveTo {
  * Graphics command object. See {{#crossLink "Graphics/rect"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Rect
  */
-export class Rect {
+class Rect {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -1847,7 +1865,7 @@ export class Rect {
  * Graphics command object. See {{#crossLink "Graphics/closePath"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class ClosePath
  */
-export class ClosePath {
+class ClosePath {
 	/**
 	 * @constructor
 	 */
@@ -1866,7 +1884,7 @@ export class ClosePath {
  * Graphics command object to begin a new path. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class BeginPath
  */
-export class BeginPath {
+class BeginPath {
 	/**
 	 * @constructor
 	 */
@@ -1885,7 +1903,7 @@ export class BeginPath {
  * Graphics command object. See {{#crossLink "Graphics/beginFill"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Fill
  */
-export class Fill {
+class Fill {
 	/**
 	 * @constructor
 	 * @param {Object} style A valid Context2D fillStyle.
@@ -1984,7 +2002,7 @@ export class Fill {
  * Graphics command object. See {{#crossLink "Graphics/beginStroke"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Stroke
  */
-export class Stroke {
+class Stroke {
 	/**
 	 * @constructor
 	 * @param {Object} style A valid Context2D fillStyle.
@@ -2070,7 +2088,7 @@ export class Stroke {
  * Graphics command object. See {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class StrokeStyle
  */
-export class StrokeStyle {
+class StrokeStyle {
 	/**
 	 * @constructor
 	 * @param {Number} [width=1]
@@ -2132,7 +2150,7 @@ export class StrokeStyle {
  * Graphics command object. See {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class StrokeDash
  */
-export class StrokeDash {
+class StrokeDash {
 	/**
 	 * @constructor
 	 * @param {Array} [segments=[]]
@@ -2179,7 +2197,7 @@ export class StrokeDash {
  * Graphics command object. See {{#crossLink "Graphics/drawRoundRectComplex"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class RoundRect
  */
-export class RoundRect {
+class RoundRect {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -2269,7 +2287,7 @@ export class RoundRect {
  * Graphics command object. See {{#crossLink "Graphics/drawCircle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Circle
  */
-export class Circle {
+class Circle {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -2307,7 +2325,7 @@ export class Circle {
  * Graphics command object. See {{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class Ellipse
  */
-export class Ellipse {
+class Ellipse {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -2366,7 +2384,7 @@ export class Ellipse {
  * Graphics command object. See {{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
  * @class PolyStar
  */
-export class PolyStar {
+class PolyStar {
 	/**
 	 * @constructor
 	 * @param {Number} x
@@ -2497,3 +2515,5 @@ export class PolyStar {
 	Graphics.STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
 	Graphics.EMPTY_SEGMENTS = [];
 }
+
+export default Graphics;

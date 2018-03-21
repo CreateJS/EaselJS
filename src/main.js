@@ -18,26 +18,7 @@ export { default as DisplayObject } from "./display/DisplayObject";
 export { default as Bitmap } from "./display/Bitmap";
 export { default as BitmapText } from "./display/BitmapText";
 export { default as DOMElement } from "./display/DOMElement";
-export {
-  default as Graphics,
-  Arc,
-  ArcTo,
-  BeginPath,
-  BezierCurveTo,
-  Circle,
-  ClosePath,
-  Ellipse,
-  Fill,
-  LineTo,
-  MoveTo,
-  PolyStar,
-  QuadraticCurveTo,
-  Rect,
-  RoundRect,
-  Stroke,
-  StrokeDash,
-  StrokeStyle
-} from "./display/Graphics";
+export { default as Graphics } from "./display/Graphics";
 export { default as MovieClip } from "./display/MovieClip";
 export { default as Shadow } from "./display/Shadow";
 export { default as Shape } from "./display/Shape";
