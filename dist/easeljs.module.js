@@ -30,6 +30,12 @@ import Tween from "@createjs/tweenjs/src/Tween";
 
 import Timeline from "@createjs/tweenjs/src/Timeline";
 
+class StageGL {
+  constructor() {
+    throw new Error(`\n\t\t\tStageGL is not currently supported on the EaselJS 2.0 branch.\n\t\t\tEnd of Q1 2018 is targetted for StageGL support.\n\t\t\tFollow @CreateJS on Twitter for updates.\n\t\t`);
+  }
+}
+
 class Event {
   constructor(type, bubbles = false, cancelable = false) {
     this.type = type;
@@ -240,259 +246,6 @@ class EventDispatcher {
         }
       }
     }
-  }
-}
-
-class Ticker extends EventDispatcher {
-  static get RAF_SYNCHED() {
-    return "synched";
-  }
-  static get RAF() {
-    return "raf";
-  }
-  static get TIMEOUT() {
-    return "timeout";
-  }
-  constructor(name) {
-    super();
-    this.name = name;
-    this.timingMode = Ticker.TIMEOUT;
-    this.maxDelta = 0;
-    this.paused = false;
-    this._inited = false;
-    this._startTime = 0;
-    this._pausedTime = 0;
-    this._ticks = 0;
-    this._pausedTicks = 0;
-    this._interval = 50;
-    this._lastTime = 0;
-    this._times = null;
-    this._tickTimes = null;
-    this._timerId = null;
-    this._raf = true;
-  }
-  get interval() {
-    return this._interval;
-  }
-  set interval(interval) {
-    this._interval = interval;
-    if (!this._inited) {
-      return;
-    }
-    this._setupTick();
-  }
-  get framerate() {
-    return 1e3 / this._interval;
-  }
-  set framerate(framerate) {
-    this.interval = 1e3 / framerate;
-  }
-  init() {
-    if (this._inited) {
-      return;
-    }
-    this._inited = true;
-    this._times = [];
-    this._tickTimes = [];
-    this._startTime = this._getTime();
-    this._times.push(this._lastTime = 0);
-    this._setupTick();
-  }
-  reset() {
-    if (this._raf) {
-      let f = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.oCancelAnimationFrame || window.msCancelAnimationFrame;
-      f && f(this._timerId);
-    } else {
-      clearTimeout(this._timerId);
-    }
-    this.removeAllEventListeners("tick");
-    this._timerId = this._times = this._tickTimes = null;
-    this._startTime = this._lastTime = this._ticks = 0;
-    this._inited = false;
-  }
-  addEventListener(type, listener, useCapture) {
-    !this._inited && this.init();
-    return super.addEventListener(type, listener, useCapture);
-  }
-  getMeasuredTickTime(ticks = null) {
-    const times = this._tickTimes;
-    if (!times || times.length < 1) {
-      return -1;
-    }
-    ticks = Math.min(times.length, ticks || this.framerate | 0);
-    return times.reduce((a, b) => a + b, 0) / ticks;
-  }
-  getMeasuredFPS(ticks = null) {
-    const times = this._times;
-    if (!times || times.length < 2) {
-      return -1;
-    }
-    ticks = Math.min(times.length - 1, ticks || this.framerate | 0);
-    return 1e3 / ((times[0] - times[ticks]) / ticks);
-  }
-  getTime(runTime = false) {
-    return this._startTime ? this._getTime() - (runTime ? this._pausedTime : 0) : -1;
-  }
-  getEventTime(runTime = false) {
-    return this._startTime ? (this._lastTime || this._startTime) - (runTime ? this._pausedTime : 0) : -1;
-  }
-  getTicks(pauseable = false) {
-    return this._ticks - (pauseable ? this._pausedTicks : 0);
-  }
-  _handleSynch() {
-    this._timerId = null;
-    this._setupTick();
-    if (this._getTime() - this._lastTime >= (this._interval - 1) * .97) {
-      this._tick();
-    }
-  }
-  _handleRAF() {
-    this._timerId = null;
-    this._setupTick();
-    this._tick();
-  }
-  _handleTimeout() {
-    this._timerId = null;
-    this._setupTick();
-    this._tick();
-  }
-  _setupTick() {
-    if (this._timerId != null) {
-      return;
-    }
-    const mode = this.timingMode || this._raf && Ticker.RAF;
-    if (mode === Ticker.RAF_SYNCHED || mode === Ticker.RAF) {
-      const f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
-      if (f) {
-        this._timerId = f(mode === Ticker.RAF ? this._handleRAF.bind(this) : this._handleSynch.bind(this));
-        this._raf = true;
-        return;
-      }
-    }
-    this._raf = false;
-    this._timerId = setTimeout(this._handleTimeout.bind(this), this._interval);
-  }
-  _tick() {
-    const paused = this.paused, time = this._getTime(), elapsedTime = time - this._lastTime;
-    this._lastTime = time;
-    this._ticks++;
-    if (paused) {
-      this._pausedTicks++;
-      this._pausedTime += elapsedTime;
-    }
-    if (this.hasEventListener("tick")) {
-      const event = new Event("tick");
-      const maxDelta = this.maxDelta;
-      event.delta = maxDelta && elapsedTime > maxDelta ? maxDelta : elapsedTime;
-      event.paused = paused;
-      event.time = time;
-      event.runTime = time - this._pausedTime;
-      this.dispatchEvent(event);
-    }
-    this._tickTimes.unshift(this._getTime() - time);
-    while (this._tickTimes.length > 100) {
-      this._tickTimes.pop();
-    }
-    this._times.unshift(time);
-    while (this._times.length > 100) {
-      this._times.pop();
-    }
-  }
-  _getTime() {
-    const now = window.performance && window.performance.now;
-    return (now && now.call(performance) || new Date().getTime()) - this._startTime;
-  }
-  static on(type, listener, scope, once, data, useCapture) {
-    return _instance.on(type, listener, scope, once, data, useCapture);
-  }
-  static removeEventListener(type, listener, useCapture) {
-    _instance.removeEventListener(type, listener, useCapture);
-  }
-  static off(type, listener, useCapture) {
-    _instance.off(type, listener, useCapture);
-  }
-  static removeAllEventListeners(type) {
-    _instance.removeAllEventListeners(type);
-  }
-  static dispatchEvent(eventObj, bubbles, cancelable) {
-    return _instance.dispatchEvent(eventObj, bubbles, cancelable);
-  }
-  static hasEventListener(type) {
-    return _instance.hasEventListener(type);
-  }
-  static willTrigger(type) {
-    return _instance.willTrigger(type);
-  }
-  static toString() {
-    return _instance.toString();
-  }
-  static init() {
-    _instance.init();
-  }
-  static reset() {
-    _instance.reset();
-  }
-  static addEventListener(type, listener, useCapture) {
-    _instance.addEventListener(type, listener, useCapture);
-  }
-  static getMeasuredTickTime(ticks) {
-    return _instance.getMeasuredTickTime(ticks);
-  }
-  static getMeasuredFPS(ticks) {
-    return _instance.getMeasuredFPS(ticks);
-  }
-  static getTime(runTime) {
-    return _instance.getTime(runTime);
-  }
-  static getEventTime(runTime) {
-    return _instance.getEventTime(runTime);
-  }
-  static getTicks(pauseable) {
-    return _instance.getTicks(pauseable);
-  }
-  static get interval() {
-    return _instance.interval;
-  }
-  static set interval(interval) {
-    _instance.interval = interval;
-  }
-  static get framerate() {
-    return _instance.framerate;
-  }
-  static set framerate(framerate) {
-    _instance.framerate = framerate;
-  }
-  static get name() {
-    return _instance.name;
-  }
-  static set name(name) {
-    _instance.name = name;
-  }
-  static get timingMode() {
-    return _instance.timingMode;
-  }
-  static set timingMode(timingMode) {
-    _instance.timingMode = timingMode;
-  }
-  static get maxDelta() {
-    return _instance.maxDelta;
-  }
-  static set maxDelta(maxDelta) {
-    _instance.maxDelta = maxDelta;
-  }
-  static get paused() {
-    return _instance.paused;
-  }
-  static set paused(paused) {
-    _instance.paused = paused;
-  }
-}
-
-const _instance = new Ticker("createjs.global");
-
-class StageGL {
-  constructor() {
-    throw new Error(`\n\t\t\tStageGL is not currently supported on the EaselJS 2.0 branch.\n\t\t\tEnd of Q1 2018 is targetted for StageGL support.\n\t\t\tFollow @CreateJS on Twitter for updates.\n\t\t`);
   }
 }
 
@@ -1006,7 +759,7 @@ class BitmapCache extends Filter {
     if (!this._useWebGL) {
       surface = this.target.cacheCanvas;
       if (!surface) {
-        surface = this.target.cacheCanvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+        surface = this.target.cacheCanvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
       }
       surface.width = this._drawWidth;
       surface.height = this._drawHeight;
@@ -2941,6 +2694,57 @@ class Graphics {
     }
     return this;
   }
+  static get LineTo() {
+    return LineTo;
+  }
+  static get MoveTo() {
+    return MoveTo;
+  }
+  static get ArcTo() {
+    return ArcTo;
+  }
+  static get Arc() {
+    return Arc;
+  }
+  static get QuadraticCurveTo() {
+    return QuadraticCurveTo;
+  }
+  static get BezierCurveTo() {
+    return BezierCurveTo;
+  }
+  static get Rect() {
+    return Rect;
+  }
+  static get ClosePath() {
+    return ClosePath;
+  }
+  static get BeginPath() {
+    return BeginPath;
+  }
+  static get Fill() {
+    return Fill;
+  }
+  static get Stroke() {
+    return Stroke;
+  }
+  static get StrokeStyle() {
+    return StrokeStyle;
+  }
+  static get StrokeDash() {
+    return StrokeDash;
+  }
+  static get RoundRect() {
+    return RoundRect;
+  }
+  static get Circle() {
+    return Circle;
+  }
+  static get Ellipse() {
+    return Ellipse;
+  }
+  static get PolyStar() {
+    return PolyStar;
+  }
 }
 
 class LineTo {
@@ -3590,7 +3394,7 @@ class MovieClipPlugin {
     throw "MovieClipPlugin cannot be instantiated.";
   }
   static install() {
-    Tween._installPlugin(MovieClipPlugin);
+    Tween.installPlugin(MovieClipPlugin);
   }
   static init(tween, prop, value) {
     return value;
@@ -3607,7 +3411,7 @@ class MovieClipPlugin {
   MovieClipPlugin.priority = 100;
 }
 
-class Shadow {
+class Shadow$1 {
   constructor(color = "black", offsetX = 0, offsetY = 0, blur = 0) {
     this.color = color;
     this.offsetX = offsetX;
@@ -3618,12 +3422,12 @@ class Shadow {
     return `[${this.constructor.name}]`;
   }
   clone() {
-    return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);
+    return new Shadow$1(this.color, this.offsetX, this.offsetY, this.blur);
   }
 }
 
 {
-  Shadow.identity = new Shadow("transparent");
+  Shadow$1.identity = new Shadow$1("transparent");
 }
 
 class Shape extends DisplayObject {
@@ -5068,7 +4872,7 @@ class SpriteSheetBuilder extends EventDispatcher {
       }
       y += o.h;
       if (!o.h || !frames.length) {
-        let canvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+        let canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
         canvas.width = this._getSize(x, this.maxWidth);
         canvas.height = this._getSize(y, this.maxHeight);
         this._data.images[img] = canvas;
@@ -5395,7 +5199,9 @@ class WebGLInspector extends EventDispatcher {
   }
 }
 
-export { EventDispatcher, Event, Ticker, StageGL, Stage, Container, DisplayObject, Bitmap, BitmapText, DOMElement, Graphics, Arc, ArcTo, BeginPath, BezierCurveTo, Circle, ClosePath, Ellipse, Fill, LineTo, MoveTo, PolyStar, QuadraticCurveTo, Rect, RoundRect, Stroke, StrokeDash, StrokeStyle, MovieClip, Shadow as Shadow, Shape, Sprite, SpriteSheet, Text, MouseEvent, AlphaMapFilter, AlphaMaskFilter, BitmapCache, BlurFilter, ColorFilter, ColorMatrix, ColorMatrixFilter, Filter, DisplayProps, Matrix2D, Point, Rectangle, ButtonHelper, Touch, SpriteSheetBuilder, SpriteSheetUtils, UID, WebGLInspector };
+export { StageGL, Stage, Container, DisplayObject, Bitmap, BitmapText, DOMElement, Graphics, MovieClip, Shadow$1 as Shadow, Shape, Sprite, SpriteSheet, Text, MouseEvent, AlphaMapFilter, AlphaMaskFilter, BitmapCache, BlurFilter, ColorFilter, ColorMatrix, ColorMatrixFilter, Filter, DisplayProps, Matrix2D, Point, Rectangle, ButtonHelper, Touch, SpriteSheetBuilder, SpriteSheetUtils, UID, WebGLInspector };
+
+export { Event, EventDispatcher, Ticker };
 
 var cjs = window.createjs = window.createjs || {};
 

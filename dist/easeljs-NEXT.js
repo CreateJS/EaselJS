@@ -71,6 +71,10 @@
     }
     return call && (typeof call === "object" || typeof call === "function") ? call : self;
   };
+  var StageGL = function StageGL() {
+    classCallCheck(this, StageGL);
+    throw new Error("\n\t\t\tStageGL is not currently supported on the EaselJS 2.0 branch.\n\t\t\tEnd of Q1 2018 is targetted for StageGL support.\n\t\t\tFollow @CreateJS on Twitter for updates.\n\t\t");
+  };
   var Event = function() {
     function Event(type) {
       var bubbles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -298,290 +302,6 @@
     };
     return EventDispatcher;
   }();
-  var Ticker = function(_EventDispatcher) {
-    inherits(Ticker, _EventDispatcher);
-    createClass(Ticker, null, [ {
-      key: "RAF_SYNCHED",
-      get: function get() {
-        return "synched";
-      }
-    }, {
-      key: "RAF",
-      get: function get() {
-        return "raf";
-      }
-    }, {
-      key: "TIMEOUT",
-      get: function get() {
-        return "timeout";
-      }
-    } ]);
-    function Ticker(name) {
-      classCallCheck(this, Ticker);
-      var _this = possibleConstructorReturn(this, _EventDispatcher.call(this));
-      _this.name = name;
-      _this.timingMode = Ticker.TIMEOUT;
-      _this.maxDelta = 0;
-      _this.paused = false;
-      _this._inited = false;
-      _this._startTime = 0;
-      _this._pausedTime = 0;
-      _this._ticks = 0;
-      _this._pausedTicks = 0;
-      _this._interval = 50;
-      _this._lastTime = 0;
-      _this._times = null;
-      _this._tickTimes = null;
-      _this._timerId = null;
-      _this._raf = true;
-      return _this;
-    }
-    Ticker.prototype.init = function init() {
-      if (this._inited) {
-        return;
-      }
-      this._inited = true;
-      this._times = [];
-      this._tickTimes = [];
-      this._startTime = this._getTime();
-      this._times.push(this._lastTime = 0);
-      this._setupTick();
-    };
-    Ticker.prototype.reset = function reset() {
-      if (this._raf) {
-        var f = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.oCancelAnimationFrame || window.msCancelAnimationFrame;
-        f && f(this._timerId);
-      } else {
-        clearTimeout(this._timerId);
-      }
-      this.removeAllEventListeners("tick");
-      this._timerId = this._times = this._tickTimes = null;
-      this._startTime = this._lastTime = this._ticks = 0;
-      this._inited = false;
-    };
-    Ticker.prototype.addEventListener = function addEventListener(type, listener, useCapture) {
-      !this._inited && this.init();
-      return _EventDispatcher.prototype.addEventListener.call(this, type, listener, useCapture);
-    };
-    Ticker.prototype.getMeasuredTickTime = function getMeasuredTickTime() {
-      var ticks = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-      var times = this._tickTimes;
-      if (!times || times.length < 1) {
-        return -1;
-      }
-      ticks = Math.min(times.length, ticks || this.framerate | 0);
-      return times.reduce(function(a, b) {
-        return a + b;
-      }, 0) / ticks;
-    };
-    Ticker.prototype.getMeasuredFPS = function getMeasuredFPS() {
-      var ticks = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-      var times = this._times;
-      if (!times || times.length < 2) {
-        return -1;
-      }
-      ticks = Math.min(times.length - 1, ticks || this.framerate | 0);
-      return 1e3 / ((times[0] - times[ticks]) / ticks);
-    };
-    Ticker.prototype.getTime = function getTime() {
-      var runTime = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      return this._startTime ? this._getTime() - (runTime ? this._pausedTime : 0) : -1;
-    };
-    Ticker.prototype.getEventTime = function getEventTime() {
-      var runTime = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      return this._startTime ? (this._lastTime || this._startTime) - (runTime ? this._pausedTime : 0) : -1;
-    };
-    Ticker.prototype.getTicks = function getTicks() {
-      var pauseable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      return this._ticks - (pauseable ? this._pausedTicks : 0);
-    };
-    Ticker.prototype._handleSynch = function _handleSynch() {
-      this._timerId = null;
-      this._setupTick();
-      if (this._getTime() - this._lastTime >= (this._interval - 1) * .97) {
-        this._tick();
-      }
-    };
-    Ticker.prototype._handleRAF = function _handleRAF() {
-      this._timerId = null;
-      this._setupTick();
-      this._tick();
-    };
-    Ticker.prototype._handleTimeout = function _handleTimeout() {
-      this._timerId = null;
-      this._setupTick();
-      this._tick();
-    };
-    Ticker.prototype._setupTick = function _setupTick() {
-      if (this._timerId != null) {
-        return;
-      }
-      var mode = this.timingMode || this._raf && Ticker.RAF;
-      if (mode === Ticker.RAF_SYNCHED || mode === Ticker.RAF) {
-        var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
-        if (f) {
-          this._timerId = f(mode === Ticker.RAF ? this._handleRAF.bind(this) : this._handleSynch.bind(this));
-          this._raf = true;
-          return;
-        }
-      }
-      this._raf = false;
-      this._timerId = setTimeout(this._handleTimeout.bind(this), this._interval);
-    };
-    Ticker.prototype._tick = function _tick() {
-      var paused = this.paused, time = this._getTime(), elapsedTime = time - this._lastTime;
-      this._lastTime = time;
-      this._ticks++;
-      if (paused) {
-        this._pausedTicks++;
-        this._pausedTime += elapsedTime;
-      }
-      if (this.hasEventListener("tick")) {
-        var event = new Event("tick");
-        var maxDelta = this.maxDelta;
-        event.delta = maxDelta && elapsedTime > maxDelta ? maxDelta : elapsedTime;
-        event.paused = paused;
-        event.time = time;
-        event.runTime = time - this._pausedTime;
-        this.dispatchEvent(event);
-      }
-      this._tickTimes.unshift(this._getTime() - time);
-      while (this._tickTimes.length > 100) {
-        this._tickTimes.pop();
-      }
-      this._times.unshift(time);
-      while (this._times.length > 100) {
-        this._times.pop();
-      }
-    };
-    Ticker.prototype._getTime = function _getTime() {
-      var now = window.performance && window.performance.now;
-      return (now && now.call(performance) || new Date().getTime()) - this._startTime;
-    };
-    Ticker.on = function on(type, listener, scope, once, data, useCapture) {
-      return _instance.on(type, listener, scope, once, data, useCapture);
-    };
-    Ticker.removeEventListener = function removeEventListener(type, listener, useCapture) {
-      _instance.removeEventListener(type, listener, useCapture);
-    };
-    Ticker.off = function off(type, listener, useCapture) {
-      _instance.off(type, listener, useCapture);
-    };
-    Ticker.removeAllEventListeners = function removeAllEventListeners(type) {
-      _instance.removeAllEventListeners(type);
-    };
-    Ticker.dispatchEvent = function dispatchEvent(eventObj, bubbles, cancelable) {
-      return _instance.dispatchEvent(eventObj, bubbles, cancelable);
-    };
-    Ticker.hasEventListener = function hasEventListener(type) {
-      return _instance.hasEventListener(type);
-    };
-    Ticker.willTrigger = function willTrigger(type) {
-      return _instance.willTrigger(type);
-    };
-    Ticker.toString = function toString() {
-      return _instance.toString();
-    };
-    Ticker.init = function init() {
-      _instance.init();
-    };
-    Ticker.reset = function reset() {
-      _instance.reset();
-    };
-    Ticker.addEventListener = function addEventListener(type, listener, useCapture) {
-      _instance.addEventListener(type, listener, useCapture);
-    };
-    Ticker.getMeasuredTickTime = function getMeasuredTickTime(ticks) {
-      return _instance.getMeasuredTickTime(ticks);
-    };
-    Ticker.getMeasuredFPS = function getMeasuredFPS(ticks) {
-      return _instance.getMeasuredFPS(ticks);
-    };
-    Ticker.getTime = function getTime(runTime) {
-      return _instance.getTime(runTime);
-    };
-    Ticker.getEventTime = function getEventTime(runTime) {
-      return _instance.getEventTime(runTime);
-    };
-    Ticker.getTicks = function getTicks(pauseable) {
-      return _instance.getTicks(pauseable);
-    };
-    createClass(Ticker, [ {
-      key: "interval",
-      get: function get() {
-        return this._interval;
-      },
-      set: function set(interval) {
-        this._interval = interval;
-        if (!this._inited) {
-          return;
-        }
-        this._setupTick();
-      }
-    }, {
-      key: "framerate",
-      get: function get() {
-        return 1e3 / this._interval;
-      },
-      set: function set(framerate) {
-        this.interval = 1e3 / framerate;
-      }
-    } ], [ {
-      key: "interval",
-      get: function get() {
-        return _instance.interval;
-      },
-      set: function set(interval) {
-        _instance.interval = interval;
-      }
-    }, {
-      key: "framerate",
-      get: function get() {
-        return _instance.framerate;
-      },
-      set: function set(framerate) {
-        _instance.framerate = framerate;
-      }
-    }, {
-      key: "name",
-      get: function get() {
-        return _instance.name;
-      },
-      set: function set(name) {
-        _instance.name = name;
-      }
-    }, {
-      key: "timingMode",
-      get: function get() {
-        return _instance.timingMode;
-      },
-      set: function set(timingMode) {
-        _instance.timingMode = timingMode;
-      }
-    }, {
-      key: "maxDelta",
-      get: function get() {
-        return _instance.maxDelta;
-      },
-      set: function set(maxDelta) {
-        _instance.maxDelta = maxDelta;
-      }
-    }, {
-      key: "paused",
-      get: function get() {
-        return _instance.paused;
-      },
-      set: function set(paused) {
-        _instance.paused = paused;
-      }
-    } ]);
-    return Ticker;
-  }(EventDispatcher);
-  var _instance = new Ticker("createjs.global");
-  var StageGL = function StageGL() {
-    classCallCheck(this, StageGL);
-    throw new Error("\n\t\t\tStageGL is not currently supported on the EaselJS 2.0 branch.\n\t\t\tEnd of Q1 2018 is targetted for StageGL support.\n\t\t\tFollow @CreateJS on Twitter for updates.\n\t\t");
-  };
   var _nextID = 0;
   var UID = function() {
     function UID() {
@@ -1149,7 +869,7 @@
       if (!this._useWebGL) {
         surface = this.target.cacheCanvas;
         if (!surface) {
-          surface = this.target.cacheCanvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+          surface = this.target.cacheCanvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
         }
         surface.width = this._drawWidth;
         surface.height = this._drawHeight;
@@ -3194,6 +2914,91 @@
         this._updateInstructions();
         return this._instructions;
       }
+    } ], [ {
+      key: "LineTo",
+      get: function get() {
+        return LineTo;
+      }
+    }, {
+      key: "MoveTo",
+      get: function get() {
+        return MoveTo;
+      }
+    }, {
+      key: "ArcTo",
+      get: function get() {
+        return ArcTo;
+      }
+    }, {
+      key: "Arc",
+      get: function get() {
+        return Arc;
+      }
+    }, {
+      key: "QuadraticCurveTo",
+      get: function get() {
+        return QuadraticCurveTo;
+      }
+    }, {
+      key: "BezierCurveTo",
+      get: function get() {
+        return BezierCurveTo;
+      }
+    }, {
+      key: "Rect",
+      get: function get() {
+        return Rect;
+      }
+    }, {
+      key: "ClosePath",
+      get: function get() {
+        return ClosePath;
+      }
+    }, {
+      key: "BeginPath",
+      get: function get() {
+        return BeginPath;
+      }
+    }, {
+      key: "Fill",
+      get: function get() {
+        return Fill;
+      }
+    }, {
+      key: "Stroke",
+      get: function get() {
+        return Stroke;
+      }
+    }, {
+      key: "StrokeStyle",
+      get: function get() {
+        return StrokeStyle;
+      }
+    }, {
+      key: "StrokeDash",
+      get: function get() {
+        return StrokeDash;
+      }
+    }, {
+      key: "RoundRect",
+      get: function get() {
+        return RoundRect;
+      }
+    }, {
+      key: "Circle",
+      get: function get() {
+        return Circle;
+      }
+    }, {
+      key: "Ellipse",
+      get: function get() {
+        return Ellipse;
+      }
+    }, {
+      key: "PolyStar",
+      get: function get() {
+        return PolyStar;
+      }
     } ]);
     return Graphics;
   }();
@@ -3589,10 +3394,10 @@
     return PolyStar;
   }();
   {
-    var canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-    if (canvas.getContext) {
-      Graphics._ctx = canvas.getContext("2d");
-      canvas.width = canvas.height = 1;
+    var canvas$1 = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+    if (canvas$1.getContext) {
+      Graphics._ctx = canvas$1.getContext("2d");
+      canvas$1.width = canvas$1.height = 1;
     }
     Graphics.beginCmd = new BeginPath();
     Graphics.BASE_64 = {
@@ -3906,7 +3711,7 @@
       throw "MovieClipPlugin cannot be instantiated.";
     }
     MovieClipPlugin.install = function install() {
-      Tween._installPlugin(MovieClipPlugin);
+      Tween.installPlugin(MovieClipPlugin);
     };
     MovieClipPlugin.init = function init(tween, prop, value) {
       return value;
@@ -3922,7 +3727,7 @@
   {
     MovieClipPlugin.priority = 100;
   }
-  var Shadow = function() {
+  var Shadow$1 = function() {
     function Shadow() {
       var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "black";
       var offsetX = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -3943,7 +3748,7 @@
     return Shadow;
   }();
   {
-    Shadow.identity = new Shadow("transparent");
+    Shadow$1.identity = new Shadow$1("transparent");
   }
   var Shape = function(_DisplayObject) {
     inherits(Shape, _DisplayObject);
@@ -4406,10 +4211,10 @@
     return Text;
   }(DisplayObject);
   {
-    var canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-    if (canvas.getContext) {
-      Text._workingContext = canvas.getContext("2d");
-      canvas.width = canvas.height = 1;
+    var canvas$2 = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+    if (canvas$2.getContext) {
+      Text._workingContext = canvas$2.getContext("2d");
+      canvas$2.width = canvas$2.height = 1;
     }
   }
   var AlphaMapFilter = function(_Filter) {
@@ -5529,7 +5334,7 @@
         }
         y += o.h;
         if (!o.h || !frames.length) {
-          var canvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+          var canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
           canvas.width = this._getSize(x, this.maxWidth);
           canvas.height = this._getSize(y, this.maxHeight);
           this._data.images[img] = canvas;
@@ -5753,11 +5558,11 @@
     return SpriteSheetUtils;
   }();
   {
-    var canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-    if (canvas.getContext) {
-      SpriteSheetUtils._workingCanvas = canvas;
-      SpriteSheetUtils._workingContext = canvas.getContext("2d");
-      canvas.width = canvas.height = 1;
+    var canvas$3 = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
+    if (canvas$3.getContext) {
+      SpriteSheetUtils._workingCanvas = canvas$3;
+      SpriteSheetUtils._workingContext = canvas$3.getContext("2d");
+      canvas$3.width = canvas$3.height = 1;
     }
   }
   var _alternateOutput = null;
@@ -5880,9 +5685,6 @@
     } ]);
     return WebGLInspector;
   }(EventDispatcher);
-  exports.EventDispatcher = EventDispatcher;
-  exports.Event = Event;
-  exports.Ticker = Ticker;
   exports.StageGL = StageGL;
   exports.Stage = Stage;
   exports.Container = Container;
@@ -5891,25 +5693,8 @@
   exports.BitmapText = BitmapText;
   exports.DOMElement = DOMElement;
   exports.Graphics = Graphics;
-  exports.Arc = Arc;
-  exports.ArcTo = ArcTo;
-  exports.BeginPath = BeginPath;
-  exports.BezierCurveTo = BezierCurveTo;
-  exports.Circle = Circle;
-  exports.ClosePath = ClosePath;
-  exports.Ellipse = Ellipse;
-  exports.Fill = Fill;
-  exports.LineTo = LineTo;
-  exports.MoveTo = MoveTo;
-  exports.PolyStar = PolyStar;
-  exports.QuadraticCurveTo = QuadraticCurveTo;
-  exports.Rect = Rect;
-  exports.RoundRect = RoundRect;
-  exports.Stroke = Stroke;
-  exports.StrokeDash = StrokeDash;
-  exports.StrokeStyle = StrokeStyle;
   exports.MovieClip = MovieClip;
-  exports.Shadow = Shadow;
+  exports.Shadow = Shadow$1;
   exports.Shape = Shape;
   exports.Sprite = Sprite;
   exports.SpriteSheet = SpriteSheet;
@@ -5933,6 +5718,9 @@
   exports.SpriteSheetUtils = SpriteSheetUtils;
   exports.UID = UID;
   exports.WebGLInspector = WebGLInspector;
+  exports.Event = Event;
+  exports.EventDispatcher = EventDispatcher;
+  exports.Ticker = Ticker;
   var v = exports.versions = exports.versions || {};
   v.easeljs = "NEXT";
 })(this.createjs = this.createjs || {}, this.createjs && this.createjs.Tween, this.createjs && this.createjs.Timeline);
