@@ -1,4 +1,18 @@
-# @createjs/easeljs
+### 2.0 BETA
+
+This branch is in beta. Reporting issues is appreciated, please mention that it is for 2.0 in the issue body.
+
+EaselJS is currently not on NPM. To use 2.0 in your projects, install with the git commit-ish syntax `npm install github:createjs/easeljs#2.0`
+
+The `StageGL` class went under a heavy rewrite in 1.1 which has not been ported to ES2015 syntax. As such, we have excluded it from this branch for the time being. It will be added back when the class is finalized.
+
+Canvas-based image comparison unit tests are known to be failing, please don't report issues for this.
+
+<p align="center">
+  <a href="https://createjs.com/easeljs">
+    <img alt="easeljs" src="https://raw.githubusercontent.com/createjs/easeljs/2.0/assets/github-header.png" width="546">
+  </a>
+</p>
 
 EaselJS is a library for building high-performance interactive 2D content in HTML5. It provides a feature-rich display
 list to allow you to manipulate and animate graphics. It also provides a robust interactive model for mouse and touch
@@ -46,14 +60,12 @@ Ticker.on("tick", stage);
 
 ## Support and Resources
 - Find examples and more information at the [EaselJS web site](http://createjs.com/easeljs).
-- Read the [documentation](http://createjs.com/docs).
+- Read the [documentation](http://createjs.com/easeljs/docs).
 - Discuss, share projects, and interact with other users on [reddit](http://www.reddit.com/r/createjs/).
 - Ask technical questions on [Stack Overflow](http://stackoverflow.com/questions/tagged/easeljs).
 - File verified bugs or formal feature requests using Issues on [GitHub](https://github.com/createjs/easeljs/issues).
 - There is a [Google Group](http://groups.google.com/group/createjs-discussion) for discussions and support.
 - Have a look at the included [examples](https://github.com/createjs/easeljs/tree/master/examples) for more in-depth instructions.
-
-
 
 It was built by [gskinner.com](http://www.gskinner.com), and is released for free under the MIT license, which means you
 can use it for almost any purpose (including commercial projects). We appreciate credit where possible, but it is not a
