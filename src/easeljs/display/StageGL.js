@@ -1960,6 +1960,8 @@ this.createjs = this.createjs||{};
 			shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
 		}
 
+		shaderProgram._type = coverShader ? "cover" : "batch";
+
 		gl.useProgram(this._activeShader);
 		return shaderProgram;
 	};
@@ -2117,6 +2119,7 @@ this.createjs = this.createjs||{};
 		}
 
 		this._mainShader = this._activeShader;
+		this._mainShader._name = "main";
 
 		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for safety code
 		var texture = this.getBaseTexture();
@@ -2387,6 +2390,7 @@ this.createjs = this.createjs||{};
 							this._setCoverMixShaderParams
 						) : this._builtShaders["source-over"].shader // re-use source-over when we don't need a new shader
 				};
+				if (blendSrc.shader) { shaderData.shader._name = newMode; }
 			} catch (e) {
 				this._builtShaders[newMode] = undefined;
 				console && console.log("SHADER SWITCH FAILURE", e);
