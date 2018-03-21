@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Perlin Noise Demo</title>
+    <link rel="stylesheet" href="../../_assets/css/examples.css" />
+    <link href="../../_assets/css/shared.css" rel="stylesheet" type="text/css"/>
+
+    <style>
+        canvas {
+            background-color: #EEEEEE;
+            border: 1px solid #444444;
+        }
+    </style>
+
+</head>
+<body>
+    <header class="EaselJS">
+        <h1>Perlin Noise Demo</h1>
+        <p>Perlin noise visualized in various ways. All noise is generated randomly, so outputs will change on refresh.
+            <span>Note that PerlinNoiseMachine is ES6, and will only run in browsers that support it, unless transpiled to
+                ES5</span>
+    </header>
+    </p>
+
+    <h3>1D Perlin Noise</h3>
+    <p>Perlin noise output with only one input variable changing, visualized as a graph. Here, the x axis is the changing
+        input variable, and the y axis is the output of the noise function.</p>
+    <canvas id="c1" width="960" height="600"></canvas>
+
+    <h3>2D Perlin Noise</h3>
+    <p>Perlin noise output with two varying inputs. Each pixel's x and y coordinate are fed into the noise machine to
+        generate the value for that pixel. Brighter pixels are higher return values.</p>
+    <canvas id="c2" width="960" height="600"></canvas>
+
+    <h3>2D RGB Perlin Noise</h3>
+    <p>3 separate 2D perlin noise outputs similar to the above, with the three noise channels being fed into the RGB
+        values of each pixel.</p>
+    <canvas id="c3" width="960" height="600"></canvas>
+
+    <h3>2D HSL Perlin Noise</h3>
+    <p>Same as above, but using HSL colour space instead of RGB.</p>
+    <canvas id="c4" width="960" height="600"></canvas>
+    <!--<img id="canvasOutput">-->
+
+    <script type="text/javascript" src="../../lib/easeljs-NEXT.min.js"></script>
+    <script type="text/javascript" src="./PerlinNoiseMachine.js"></script>
+    <script type="text/javascript" src="./testHarness.js"></script>
+
+</body>
+</html>
