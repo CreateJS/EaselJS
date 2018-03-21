@@ -6,10 +6,6 @@
  * This is explained here: https://github.com/rollup/rollup/issues/845#issuecomment-240277194
  */
 
-// re-export shared classes
-export { default as EventDispatcher } from "@createjs/core/src/events/EventDispatcher";
-export { default as Event } from "@createjs/core/src/events/Event";
-export { default as Ticker } from "@createjs/core/src/utils/Ticker";
 // display
 export { default as StageGL } from "./display/StageGL";
 export { default as Stage } from "./display/Stage";
