@@ -34,29 +34,39 @@ this.createjs = this.createjs||{};
 
 /*
  * README IF EDITING:
- * Terminology for developers:
  *
+ * - Terminology for developers:
  * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
  * Vertex Property: a piece of information attached to the vertex like a vector3 containing x,y,z
  * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render
  * 		modes do not use these)
  * Card: a group of 2 triangles used to display a rectangular image
- * U/V: common names for the [0-1] texture co-ordinates on an image
- * Batch: a single call to the renderer, best done as little as possible so multiple cards are put into a single batch
- * Buffer: WebGL array data
+ * UV: common names for the [0-1] texture co-ordinates on an image
+ * Batch: a single call to the renderer, best done as little as possible. Multiple cards are batched for this reason
  * Program/Shader: For every vertex we run the Vertex shader. The results are used per pixel by the Fragment shader. When
- * 		combined and paired these are a shader "program"
- * Texture: WebGL representation of image data and associated extra information
- * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
+ * 		combined and paired these are a "shader program"
+ * Texture: WebGL representation of image data and associated extra information, separate from a DOM Image
+ * Slot: A space on the GPU into which textures can be loaded for use in a batch, i.e. using "ActiveTexture" switches texture slot.
+ * Render___: actual WebGL draw call
+ * Buffer: WebGL array data
+ * Cover: A card that covers the entire viewport
+ *
+ * - Notes:
+ * WebGL treats 0,0 as the bottom left, as such there's a lot of co-ordinate space flipping to make regular canvas
+ * 		numbers make sense to users and WebGL simultaneously. This extends to textures stored in memory too. If writing
+ * 		code that deals with x/y, be aware your y may be flipped.
+ * Older versions had distinct internal paths for filters and regular draws, these have been merged.
+ * Draws are slowly assembled out of found content. Overflowing things like shaders, object/texture count will cause
+ * 		an early draw before continuing. Lookout for the things that force a draw. Marked with <------------------------
  */
 
 (function () {
 	"use strict";
 
 	/**
-	 * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL-optimized display list,
-	 * which is used in place of the usual {{#crossLink "Stage"}}{{/crossLink}}. This class should behave identically to
-	 * a {{#crossLink "Stage"}}{{/crossLink}} except for WebGL-specific functionality.
+	 * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for a WebGL-optimized display list,
+	 * which can be used in place of the usual {{#crossLink "Stage"}}{{/crossLink}}. This class should behave identically
+	 * to a {{#crossLink "Stage"}}{{/crossLink}} except for WebGL-specific functionality.
 	 *
 	 * Each time the {{#crossLink "Stage/tick"}}{{/crossLink}} method is called, the display list is rendered to the
 	 * target &lt;canvas/&gt; instance, ignoring non-WebGL-compatible display objects. On devices and browsers that don't
@@ -94,41 +104,41 @@ this.createjs = this.createjs||{};
 	 *          stage.update();
 	 *      }
 	 *
-	 * <h4>Notes</h4>
-	 * - StageGL is not currently included in the minified version of EaselJS.
-	 * - {{#crossLink "SpriteContainer"}}{{/crossLink}} (the previous approach to WebGL with EaselJS) has been deprecated.
-	 * - Earlier versions of WebGL support in EaselJS (SpriteStage and SpriteContainer) had hard limitations on images
-	 * 	per container, which have been solved.
-	 *
 	 * @class StageGL
 	 * @extends Stage
 	 * @constructor
 	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that StageGL will render to, or the string id
-	 *  of a canvas object in the current DOM.
+	 * of a canvas object in the current DOM.
 	 * @param {Object} options All the option parameters in a reference object, some are not supported by some browsers.
 	 * @param {Boolean} [options.preserveBuffer=false] If `true`, the canvas is NOT auto-cleared by WebGL (the spec
-	 *  discourages setting this to `true`). This is useful if you want persistent draw effects.
+	 * discourages setting this to `true`). This is useful if you want persistent draw effects and has also fixed device
+	 * specific bugs due to mis-timed clear commands.
 	 * @param {Boolean} [options.antialias=false] Specifies whether or not the browser's WebGL implementation should try
-	 *  to perform anti-aliasing. This will also enable linear pixel sampling on power-of-two textures (smoother images).
+	 * to perform anti-aliasing. This will also enable linear pixel sampling on power-of-two textures (smoother images).
 	 * @param {Boolean} [options.transparent=false] If `true`, the canvas is transparent. This is <strong>very</strong>
 	 * expensive, and should be used with caution.
-	 * @param {Boolean} [options.premultiply=false] Alters color handling. If `true`, this assumes the shader must
-	 * account for pre-multiplied alpha. This can help avoid visual halo effects with some assets, but may also cause
-	 * problems with other assets.
-	 * @param {Integer} [options.autoPurge=1200] How often the system should automatically dump unused textures with
-	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}} for more
-	 * information.
+	 * @param {Boolean} [options.directDraw=false] If `true`, this will bypass intermediary render-textures when possible
+	 * resulting in reduced memory and increased performance, this disables some features. Cache-less filters and some
+	 * {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}} values rely on this being false.
+	 * @param (Boolean} [options.premultiply] @deprecated Upgraded colour & transparency handling have fixed the issue
+	 * this flag was trying to solve rendering it unnecessary.
+	 * @param {int} [options.autoPurge=1200] How often the system should automatically dump unused textures. Calls
+	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}}
+	 * for more information on texture purging.
+	 * @param {String|int} [options.clearColor=undefined] Automatically calls {{#crossLink "StageGL/setClearColor"}}{{/crossLink}}
+	 * after init is complete, can be overridden and changed manually later.
 	 */
 	function StageGL(canvas, options) {
 		this.Stage_constructor(canvas);
 
+		var transparent, antialias, preserveBuffer, autoPurge, directDraw;
 		if (options !== undefined) {
 			if (typeof options !== "object"){ throw("Invalid options object"); }
-			var premultiply = options.premultiply;
-			var transparent = options.transparent;
-			var antialias = options.antialias;
-			var preserveBuffer = options.preserveBuffer;
-			var autoPurge = options.autoPurge;
+			transparent = options.transparent;
+			antialias = options.antialias;
+			preserveBuffer = options.preserveBuffer;
+			autoPurge = options.autoPurge;
+			directDraw = options.directDraw;
 		}
 
 // public properties:
@@ -140,6 +150,18 @@ this.createjs = this.createjs||{};
 		 * @default false
 		 */
 		this.vocalDebug = false;
+
+		/**
+		 * Specifies whether this instance is slaved to a {{#crossLink "BitmapCache"}}{{/crossLink}} or is its own master.
+		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} command is to the canvas
+		 * or a render texture. See the {{#crossLink "cache"}}{{/crossLink}} function documentation and read the code for
+		 * full implications and details of necessity. Enabled by default when BitmapCache's `useGL` is true.
+		 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+		 * @property isCacheControlled
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.isCacheControlled = false;
 
 // private properties:
 		/**
@@ -172,23 +194,23 @@ this.createjs = this.createjs||{};
 		this._transparent = transparent||false;
 
 		/**
-		 * Specifies whether or not StageGL is handling colours as premultiplied alpha.
-		 * @property _premultiply
+		 * Internal value of {{#crossLink "StageGL/autoPurge"}}{{/crossLink}}
+		 * @property _autoPurge
+		 * @protected
+		 * @type {int}
+		 * @default null
+		 */
+		this._autoPurge = undefined;
+		this.autoPurge = autoPurge;	//getter/setter handles setting the real value and validating and documentation
+
+		/**
+		 * See directDraw
+		 * @property _directDraw
 		 * @protected
 		 * @type {Boolean}
 		 * @default false
 		 */
-		this._premultiply = premultiply||false;
-
-		/**
-		 * Internal value of {{#crossLink "StageGL/autoPurge"}}{{/crossLink}}
-		 * @property _autoPurge
-		 * @protected
-		 * @type {Integer}
-		 * @default null
-		 */
-		this._autoPurge = undefined;
-		this.autoPurge = autoPurge;	//getter/setter handles setting the real value and validating
+		this._directDraw = directDraw;
 
 		/**
 		 * The width in px of the drawing surface saved in memory.
@@ -228,6 +250,13 @@ this.createjs = this.createjs||{};
 		this._webGLContext = null;
 
 		/**
+		 * Reduce API logic by allowing stage to behave as a renderTexture target, should always be null as null is canvas.
+		 * @type {null}
+		 * @protected
+		 */
+		this._frameBuffer = null;
+
+		/**
 		 * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
 		 * @property _clearColor
 		 * @protected
@@ -239,12 +268,12 @@ this.createjs = this.createjs||{};
 		/**
 		 * The maximum number of cards (aka a single sprite) that can be drawn in one draw call. Use getter/setters to
 		 * modify otherwise internal buffers may be incorrect sizes.
-		 * @property _maxCardsPerBatch
+		 * @property _maxBatchVertexCount
 		 * @protected
 		 * @type {Number}
-		 * @default StageGL.DEFAULT_MAX_BATCH_SIZE (10000)
+		 * @default StageGL.DEFAULT_MAX_BATCH_SIZE * StageGL.INDICIES_PER_CARD
 		 */
-		this._maxCardsPerBatch = StageGL.DEFAULT_MAX_BATCH_SIZE;														//TODO: write getter/setters for this
+		this._maxBatchVertexCount = StageGL.DEFAULT_MAX_BATCH_SIZE * StageGL.INDICIES_PER_CARD;
 
 		/**
 		 * The shader program used to draw the current batch.
@@ -254,6 +283,13 @@ this.createjs = this.createjs||{};
 		 * @default null
 		 */
 		this._activeShader = null;
+
+		/**
+		 * The non cover, per object shader used for most rendering actions.
+		 * @type {WebGLProgram}
+		 * @protected
+		 */
+		this._mainShader = null;
 
 		/**
 		 * The vertex position data for the current draw call.
@@ -274,7 +310,7 @@ this.createjs = this.createjs||{};
 		this._vertexPositionBuffer = null;
 
 		/**
-		 * The vertex U/V data for the current draw call.
+		 * The vertex UV data for the current draw call.
 		 * @property _uvs
 		 * @protected
 		 * @type {Float32Array}
@@ -328,6 +364,67 @@ this.createjs = this.createjs||{};
 		this._alphaBuffer = null;
 
 		/**
+		 * One of the major render buffers used in composite blending drawing. Do not expect this to always be the same object.
+		 * "What you're drawing to", object occasionally swaps with concat.
+		 * @property _bufferTextureOutput
+		 * @protected
+		 * @type {WebGLTexture}
+		 */
+		this._bufferTextureOutput = null;
+
+		/**
+		 * One of the major render buffers used in composite blending drawing. Do not expect this to always be the same object.
+		 * "What you've draw before now", object occasionally swaps with output.
+		 * @property _bufferTextureConcat
+		 * @protected
+		 * @type {WebGLTexture}
+		 */
+		this._bufferTextureConcat = null;
+
+		/**
+		 * One of the major render buffers used in composite blending drawing.
+		 * "Temporary mixing surface"
+		 * @property _bufferTextureTemp
+		 * @protected
+		 * @type {WebGLTexture}
+		 */
+		this._bufferTextureTemp = null;
+
+		/**
+		 * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
+		 * @property _batchTextureOutput
+		 * @protected
+		 * @type {WebGLTexture | StageGL}
+		 */
+		this._batchTextureOutput = this;
+
+		/**
+		 * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
+		 * @property _batchTextureConcat
+		 * @protected
+		 * @type {WebGLTexture}
+		 */
+		this._batchTextureConcat = null;
+
+		/**
+		 * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
+		 * @property _batchTextureTemp
+		 * @protected
+		 * @type {WebGLTexture}
+		 */
+		this._batchTextureTemp = null;
+
+		/**
+		 * Internal library of the shaders that have been compiled and created along with their parameters. Should contain
+		 * compiled `gl.ShaderProgram` and settings for `gl.blendFunc` and `gl.blendEquation`. Populated as requested.
+		 *
+		 * See {{#crossLink "StageGL/_updateRenderMode:method"}}{{/crossLink}} for exact details.
+		 * @type {Object}
+		 * @private
+		 */
+		this._builtShaders = {};
+
+		/**
 		 * An index based lookup of every WebGL Texture currently in use.
 		 * @property _drawTexture
 		 * @protected
@@ -361,29 +458,58 @@ this.createjs = this.createjs||{};
 		this._baseTextures = [];
 
 		/**
-		 * The number of concurrent textures the GPU can handle. This value is dynamically set from WebGL during initialization
-		 * via `gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)`. The WebGL spec states that the lowest guaranteed value is 8,
-		 * but it could be higher. Do not set this value higher than the value returned by the GPU. Setting it lower will
-		 * probably reduce performance, but may be advisable to reserve slots for custom filter work.
-		 * NOTE: Can also act as a length for {{#crossLink "StageGL/_batchTextures:property"}}.
-		 * @property _batchTextureCount
+		 * Texture slots for a draw
+		 * @property _gpuTextureCount
 		 * @protected
-		 * @type {Number}
-		 * @default 8
+		 * @type {uint}
 		 */
-		this._batchTextureCount = 8;
+		this._gpuTextureCount = 8;
 
 		/**
-		 * The location at which the last texture was inserted into a GPU slot in {{#crossLink "StageGL/_batchTextures:property"}}{{/crossLink}}.
-		 * Manual control of this variable can yield improvements in performance by intelligently replacing textures
-		 * inside a batch to reduce texture re-load. It is impossible to write automated general use code, as it requires
-		 * display list look ahead inspection and/or render foreknowledge.
-		 * @property _lastTextureInsert
+		 * Texture slots on the hardware
+		 * @property _gpuTextureMax
 		 * @protected
-		 * @type {Number}
-		 * @default -1
+		 * @type {uint}
+		 */
+		this._gpuTextureMax = 8;
+
+		/**
+		 * Texture slots in a batch for User textures
+		 * @property _batchTextureCount
+		 * @protected
+		 * @type {uint}
+		 */
+		this._batchTextureCount = 0;
+
+		/**
+		 * The location at which the last texture was inserted into a GPU slot
 		 */
 		this._lastTextureInsert = -1;
+
+		/**
+		 * The current string name of the render mode being employed per Context2D spec.
+		 * Must start invalid to trigger default shader into being built during init.
+		 * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
+		 * @type {string}
+		 * @private
+		 */
+		this._renderMode = "";
+
+		/**
+		 * Flag indicating that the content being batched in `appendToBatch` must be drawn now and not follow batch logic.
+		 * Used for effects that are compounding in nature and cannot be applied in a single pass.
+		 * Should be enabled with extreme care due to massive performance implications.
+		 * @type {boolean}
+		 * @private
+		 */
+		this._immediateRender = false;
+
+		/**
+		 * Vertices drawn into the batch so far.
+		 * @type {number}
+		 * @private
+		 */
+		this._batchVertexCount = 0;
 
 		/**
 		 * The current batch being drawn, A batch consists of a call to `drawElements` on the GPU. Many of these calls
@@ -414,15 +540,6 @@ this.createjs = this.createjs||{};
 		this._slotBlacklist = [];
 
 		/**
-		 * Used to prevent nested draw calls from accidentally overwriting drawing information by tracking depth.
-		 * @property _isDrawing
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 */
-		this._isDrawing = 0;
-
-		/**
 		 * Used to ensure every canvas used as a texture source has a unique ID.
 		 * @property _lastTrackedCanvas
 		 * @protected
@@ -430,17 +547,6 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 */
 		this._lastTrackedCanvas = -1;
-
-		/**
-		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} is the canvas or a render
-		 * texture. See the {{#crossLink "cache"}}{{/crossLink}} function modifications for full implications and discussion.
-		 * @property isCacheControlled
-		 * @protected
-		 * @type {Boolean}
-		 * @default false
-		 * @todo LM: is this supposed to be _isCacheControlled since its private?
-		 */
-		this.isCacheControlled = false;
 
 		/**
 		 * Used to counter-position the object being cached so it aligns with the cache surface. Additionally ensures
@@ -454,12 +560,18 @@ this.createjs = this.createjs||{};
 
 		// and begin
 		this._initializeWebGL();
+
+		// these settings require everything to be ready
+		if (options !== undefined) {
+			options.clearColor !== undefined && this.setClearColor(options.clearColor);
+			options.premultiply !== undefined && (createjs.deprecate(null, "options.premultiply")());
+		}
 	}
 	var p = createjs.extend(StageGL, createjs.Stage);
 
 // static methods:
 	/**
-	 * Calculate the U/V co-ordinate based info for sprite frames. Instead of pixel count it uses a 0-1 space. Also includes
+	 * Calculate the UV co-ordinate based info for sprite frames. Instead of pixel count it uses a 0-1 space. Also includes
 	 * the ability to get info back for a specific frame, or only calculate that one frame.
 	 *
 	 *     //generate UV rects for all entries
@@ -482,8 +594,8 @@ this.createjs = this.createjs||{};
 		if (target === undefined) { target = -1; }
 		if (onlyTarget === undefined) { onlyTarget = false; }
 
-		var start = (target != -1 && onlyTarget)?(target):(0);
-		var end = (target != -1 && onlyTarget)?(target+1):(spritesheet._frames.length);
+		var start = (target !== -1 && onlyTarget)?(target):(0);
+		var end = (target !== -1 && onlyTarget)?(target+1):(spritesheet._frames.length);
 		for (var i=start; i<end; i++) {
 			var f = spritesheet._frames[i];
 			if (f.uvRect || f.image.width <= 0 || f.image.height <= 0) { continue; }
@@ -497,13 +609,13 @@ this.createjs = this.createjs||{};
 			};
 		}
 
-		return spritesheet._frames[(target != -1) ? target : 0].uvRect || {t:0, l:0, b:1, r:1};
+		return spritesheet._frames[(target !== -1) ? target : 0].uvRect || {t:0, l:0, b:1, r:1};
 	};
 
 	/**
 	 * Test a context to see if it has WebGL enabled on it.
 	 * @method isWebGLActive
-	 * @param {CanvasContext} ctx The context to test
+	 * @param {CanvasRenderingContext2D | WebGLRenderingContext} ctx The context to test
 	 * @static
 	 * @return {Boolean} Whether WebGL is enabled
 	 */
@@ -517,6 +629,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * The number of properties defined per vertex (x, y, textureU, textureV, textureIndex, alpha)
 	 * @property VERTEX_PROPERTY_COUNT
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {Number}
@@ -528,6 +641,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * The number of triangle indices it takes to form a Card. 3 per triangle, 2 triangles.
 	 * @property INDICIES_PER_CARD
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {Number}
@@ -546,7 +660,7 @@ this.createjs = this.createjs||{};
 	 * @default 10000
 	 * @readonly
 	 */
-	StageGL.DEFAULT_MAX_BATCH_SIZE = 10000;
+	StageGL.DEFAULT_MAX_BATCH_SIZE = 10920;
 
 	/**
 	 * The maximum size WebGL allows for element index numbers. Uses a 16 bit unsigned integer. It takes 6 indices to
@@ -561,8 +675,9 @@ this.createjs = this.createjs||{};
 	StageGL.WEBGL_MAX_INDEX_NUM = Math.pow(2, 16);
 
 	/**
-	 * Default U/V rect for dealing with full coverage from an image source.
+	 * Default UV rect for dealing with full coverage from an image source.
 	 * @property UV_RECT
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {Object}
@@ -590,7 +705,7 @@ this.createjs = this.createjs||{};
 		]);
 
 		/**
-		 * U/V for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
+		 * UV for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
 		 * @property COVER_UV
 		 * @static
 		 * @final
@@ -605,23 +720,6 @@ this.createjs = this.createjs||{};
 			 1,		 0,		//BR
 			 0,		 0		//BL
 		]);
-
-		/**
-		 * Flipped U/V for {{#crossLink "StageGL:COVER_VERT:property"}}{{/crossLink}}.
-		 * @property COVER_UV_FLIP
-		 * @static
-		 * @final
-		 * @type {Float32Array}
-		 * @readonly
-		 */
-		StageGL.COVER_UV_FLIP = new Float32Array([
-			 0,		 0,		//TL
-			 1,		 0,		//TR
-			 0,		 1,		//BL
-			 1,		 0,		//TR
-			 1,		 1,		//BR
-			 0,		 1		//BL
-		]);
 	} catch(e) { /* Breaking in older browsers, but those browsers wont run StageGL so no recovery or warning needed */ }
 
 	/**
@@ -629,13 +727,15 @@ this.createjs = this.createjs||{};
 	 * regular shader is designed to render all expected objects. Shader code may contain templates that are replaced
 	 * pre-compile.
 	 * @property REGULAR_VARYING_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
 	 * @readonly
 	 */
 	StageGL.REGULAR_VARYING_HEADER = (
-		"precision mediump float;" +
+		"precision highp float;" +
+
 		"varying vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
 		"varying lowp float alphaValue;"
@@ -645,6 +745,7 @@ this.createjs = this.createjs||{};
 	 * Actual full header for the vertex shader. Includes the varying header. The regular shader is designed to render
 	 * all expected objects. Shader code may contain templates that are replaced pre-compile.
 	 * @property REGULAR_VERTEX_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -663,6 +764,7 @@ this.createjs = this.createjs||{};
 	 * Actual full header for the fragment shader. Includes the varying header. The regular shader is designed to render
 	 * all expected objects. Shader code may contain templates that are replaced pre-compile.
 	 * @property REGULAR_FRAGMENT_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -677,6 +779,7 @@ this.createjs = this.createjs||{};
 	 * Body of the vertex shader. The regular shader is designed to render all expected objects. Shader code may contain
 	 * templates that are replaced pre-compile.
 	 * @property REGULAR_VERTEX_BODY
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -684,15 +787,7 @@ this.createjs = this.createjs||{};
 	 */
 	StageGL.REGULAR_VERTEX_BODY  = (
 		"void main(void) {" +
-			//DHG TODO: This doesn't work. Must be something wrong with the hand built matrix see js... bypass for now
-			//vertexPosition, round if flag
-			//"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
-			"gl_Position = vec4("+
-				"(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
-				"(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1]," +
-				"pMatrix[3][2]," +
-				"1.0" +
-			");" +
+			"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
 			"alphaValue = objectAlpha;" +
 			"indexPicker = textureIndex;" +
 			"vTextureCoord = uvPosition;" +
@@ -703,6 +798,7 @@ this.createjs = this.createjs||{};
 	 * Body of the fragment shader. The regular shader is designed to render all expected objects. Shader code may
 	 * contain templates that are replaced pre-compile.
 	 * @property REGULAR_FRAGMENT_BODY
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -717,42 +813,8 @@ this.createjs = this.createjs||{};
 				"{{alternates}}" +
 			"}" +
 
-			"{{fragColor}}" +
+			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
 		"}"
-	);
-	StageGL.REGULAR_FRAG_COLOR_NORMAL = (
-		"gl_FragColor = vec4(color.rgb, color.a * alphaValue);"
-	);
-	StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY = (
-		"if(color.a > 0.0035) {" +		// 1/255 = 0.0039, so ignore any value below 1 because it's probably noise
-			"gl_FragColor = vec4(color.rgb/color.a, color.a * alphaValue);" +
-		"} else {" +
-			"gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);" +
-		"}"
-	);
-
-	//TODO: DHG: a real particle shader
-	/**
-	 * @property PARTICLE_VERTEX_BODY
-	 * @todo
-	 * @final
-	 * @static
-	 * @type {String}
-	 * @readonly
-	 */
-	StageGL.PARTICLE_VERTEX_BODY = (
-		StageGL.REGULAR_VERTEX_BODY
-	);
-	/**
-	 * @property PARTICLE_FRAGMENT_BODY
-	 * @todo
-	 * @final
-	 * @static
-	 * @type {String}
-	 * @readonly
-	 */
-	StageGL.PARTICLE_FRAGMENT_BODY = (
-		StageGL.REGULAR_FRAGMENT_BODY
 	);
 
 	/**
@@ -760,15 +822,16 @@ this.createjs = this.createjs||{};
 	 * cover shader is designed to be a simple vertex/uv only texture render that covers the render surface. Shader
 	 * code may contain templates that are replaced pre-compile.
 	 * @property COVER_VARYING_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
 	 * @readonly
 	 */
 	StageGL.COVER_VARYING_HEADER = (
-		"precision mediump float;" +
+		"precision highp float;" +	//this is usually essential for filter math
 
-		"varying highp vec2 vTextureCoord;"
+		"varying vec2 vTextureCoord;"
 	);
 
 	/**
@@ -776,6 +839,7 @@ this.createjs = this.createjs||{};
 	 * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
 	 * replaced pre-compile.
 	 * @property COVER_VERTEX_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -792,6 +856,7 @@ this.createjs = this.createjs||{};
 	 * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
 	 * replaced pre-compile.
 	 * @property COVER_FRAGMENT_HEADER
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -806,6 +871,7 @@ this.createjs = this.createjs||{};
 	 * Body of the vertex shader. The cover shader is designed to be a simple vertex/uv only texture render that covers
 	 * the render surface. Shader code may contain templates that are replaced pre-compile.
 	 * @property COVER_VERTEX_BODY
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -822,6 +888,7 @@ this.createjs = this.createjs||{};
 	 * Body of the fragment shader. The cover shader is designed to be a simple vertex/uv only texture render that
 	 * covers the render surface. Shader code may contain templates that are replaced pre-compile.
 	 * @property COVER_FRAGMENT_BODY
+	 * @protected
 	 * @static
 	 * @final
 	 * @type {String}
@@ -829,10 +896,298 @@ this.createjs = this.createjs||{};
 	 */
 	StageGL.COVER_FRAGMENT_BODY = (
 		"void main(void) {" +
-			"vec4 color = texture2D(uSampler, vTextureCoord);" +
-			"gl_FragColor = color;" +
+			"gl_FragColor = texture2D(uSampler, vTextureCoord);" +
 		"}"
 	);
+
+	/**
+	 * The starting template of a cover fragment shader with simple blending equations
+	 * @property BLEND_FRAGMENT_SIMPLE
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.BLEND_FRAGMENT_SIMPLE = (
+		"uniform sampler2D uMixSampler;"+
+		"void main(void) {" +
+			"vec4 src = texture2D(uMixSampler, vTextureCoord);" +
+			"vec4 dst = texture2D(uSampler, vTextureCoord);"
+		// note this is an open bracket on main!
+	);
+
+	/**
+	 * The starting template of a cover fragment shader which has complex blending equations
+	 * @property BLEND_FRAGMENT_COMPLEX
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.BLEND_FRAGMENT_COMPLEX = (
+		StageGL.BLEND_FRAGMENT_SIMPLE +
+			"vec3 srcClr = min(src.rgb/src.a, 1.0);" +
+			"vec3 dstClr = min(dst.rgb/dst.a, 1.0);" +
+
+			"float totalAlpha = min(1.0 - (1.0-dst.a) * (1.0-src.a), 1.0);" +
+			"float srcFactor = min(max(src.a - dst.a, 0.0) / totalAlpha, 1.0);" +
+			"float dstFactor = min(max(dst.a - src.a, 0.0) / totalAlpha, 1.0);" +
+			"float mixFactor = max(max(1.0 - srcFactor, 0.0) - dstFactor, 0.0);" +
+
+			"gl_FragColor = vec4(" +
+				"(" +
+					"srcFactor * srcClr +" +
+					"dstFactor * dstClr +" +
+					"mixFactor * vec3("
+		// this should be closed with the cap!
+	);
+
+	/**
+	 * The closing portion of a template for a cover fragment shader which has complex blending equations
+	 * @property BLEND_FRAGMENT_COMPLEX_CAP
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.BLEND_FRAGMENT_COMPLEX_CAP = (
+					")" +
+				") * totalAlpha, totalAlpha" +
+			");" +
+		"}"
+	);
+
+	/**
+	 * A shader utility function, used to calculate the "overlay" blend of two elements
+	 * @property BLEND_FRAGMENT_OVERLAY_UTIL
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.BLEND_FRAGMENT_OVERLAY_UTIL = (
+		"float overlay(float a, float b) {" +
+			"if(a < 0.5) { return 2.0 * a * b; }" +
+			"return 1.0 - 2.0 * (1.0-a) * (1.0-b);" +
+		"}"
+	);
+
+	/**
+	 * A collection of shader utility functions, used to calculate HSL math. Taken from W3C spec
+	 * https://www.w3.org/TR/compositing-1/#blendingnonseparable
+	 * @property BLEND_FRAGMENT_HSL_UTIL
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.BLEND_FRAGMENT_HSL_UTIL = (
+		"float getLum(vec3 c) { return 0.299*c.r + 0.589*c.g + 0.109*c.b; }" +
+		"float getSat(vec3 c) { return max(max(c.r, c.g), c.b) - min(min(c.r, c.g), c.b); }" +
+		"vec3 clipHSL(vec3 c) {" +
+			"float lum = getLum(c);" +
+			"float n = min(min(c.r, c.g), c.b);" +
+			"float x = max(max(c.r, c.g), c.b);" +
+			"if(n < 0.0){ c = lum + (((c - lum) * lum) / (lum - n)); }" +
+			"if(x > 1.0){ c = lum + (((c - lum) * (1.0 - lum)) / (x - lum)); }" +
+			"return clamp(c, 0.0, 1.0);" +
+		"}" +
+		"vec3 setLum(vec3 c, float lum) {" +
+			"return clipHSL(c + (lum - getLum(c)));" +
+		"}" +
+		"vec3 setSat(vec3 c, float val) {" +
+			"vec3 result = vec3(0.0);" +
+			"float minVal = min(min(c.r, c.g), c.b);" +
+			"float maxVal = max(max(c.r, c.g), c.b);" +
+			"vec3 minMask = vec3(c.r == minVal, c.g == minVal, c.b == minVal);" +
+			"vec3 maxMask = vec3(c.r == maxVal, c.g == maxVal, c.b == maxVal);" +
+			"vec3 midMask = 1.0 - min(minMask+maxMask, 1.0);" +
+			"float midVal = (c*midMask).r + (c*midMask).g + (c*midMask).b;" +
+			"if(maxVal > minVal) {" +
+				"result = midMask * min( ((midVal - minVal) * val) / (maxVal - minVal), 1.0);" +
+				"result += maxMask * val;" +
+			"}" +
+			"return result;" +
+		"}"
+	);
+
+	/**
+	 * The hash of supported blend modes and their properties
+	 * @property BLEND_SOURCES
+	 * @static
+	 * @final
+	 * @type {Object}
+	 * @readonly
+	 */
+	StageGL.BLEND_SOURCES = {
+		"source-over": { // empty object verifies it as a blend mode, but default values handle actual settings
+			//eqRGB: "FUNC_ADD",						eqA: "FUNC_ADD"
+			//srcRGB: "ONE",							srcA: "ONE"
+			//dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE_MINUS_SRC_ALPHA"
+		},
+		"source-in": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb * dst.a, src.a * dst.a);" +
+			"}")
+		},
+		"source-in_cheap": {
+			srcRGB: "DST_ALPHA",					srcA: "ZERO",
+			dstRGB: "ZERO",							dstA: "SRC_ALPHA"
+		},
+		"source-out": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb * (1.0 - dst.a), src.a - dst.a);" +
+			"}")
+		},
+		"source-out_cheap": {
+			eqA: "FUNC_SUBTRACT",
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
+			dstRGB: "ZERO",							dstA: "SRC_ALPHA"
+		},
+		"source-atop": {
+			srcRGB: "DST_ALPHA",					srcA: "ZERO",
+			dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE"
+		},
+		"destination-over": {
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE_MINUS_DST_ALPHA",
+			dstRGB: "ONE",							dstA: "ONE"
+		},
+		"destination-in": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(dst.rgb * src.a, src.a * dst.a);" +
+			"}")
+		},
+		"destination-in_cheap": {
+			srcRGB: "ZERO",							srcA: "DST_ALPHA",
+			dstRGB: "SRC_ALPHA",					dstA: "ZERO"
+		},
+		"destination-out": {
+			eqA: "FUNC_REVERSE_SUBTRACT",
+			srcRGB: "ZERO",							srcA: "DST_ALPHA",
+			dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE"
+		},
+		"destination-atop": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+			"gl_FragColor = vec4(dst.rgb * src.a + src.rgb * (1.0 - dst.a), src.a);" +
+			"}")
+		},
+		"destination-atop_cheap": {
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
+			dstRGB: "SRC_ALPHA",					dstA: "ZERO"
+		},
+		"copy": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb, src.a);" +
+			"}")
+		},
+		"copy_cheap": {
+			dstRGB: "ZERO",							dstA: "ZERO"
+		},
+		"xor": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"float omSRC = (1.0 - src.a);" +
+				"float omDST = (1.0 - dst.a);" +
+				"gl_FragColor = vec4(src.rgb * omDST + dst.rgb * omSRC, src.a * omDST + dst.a * omSRC);"
+			+ "}")
+		},
+
+		"multiply": { // this has to be complex to handle retention of both dst and src in non mixed scenarios
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"srcClr * dstClr"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"multiply_cheap": { // NEW, handles retention of src data incorrectly when no dst data present
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
+			dstRGB: "SRC_COLOR",					dstA: "ONE"
+		},
+		"screen": {
+			srcRGB: "ONE",							srcA: "ONE",
+			dstRGB: "ONE_MINUS_SRC_COLOR",			dstA: "ONE_MINUS_SRC_ALPHA"
+		},
+		"lighter": {
+			dstRGB: "ONE",							dstA:"ONE"
+		},
+		"lighten": { //WebGL 2.0 can optimize this
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"max(srcClr, dstClr)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"darken": { //WebGL 2.0 can optimize this
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"min(srcClr, dstClr)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+
+		"overlay": {
+			shader: (StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"overlay(dstClr.r,srcClr.r), overlay(dstClr.g,srcClr.g), overlay(dstClr.b,srcClr.b)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"hard-light": {
+			shader: (StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"overlay(srcClr.r,dstClr.r), overlay(srcClr.g,dstClr.g), overlay(srcClr.b,dstClr.b)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"soft-light": {
+			shader: (
+				"float softcurve(float a) {" +
+					"if(a > 0.25) { return sqrt(a); }" +
+					"return ((16.0 * a - 12.0) * a + 4.0) * a;" +
+				"}" +
+				"float softmix(float a, float b) {" +
+					"if(b <= 0.5) { return a - (1.0 - 2.0*b) * a * (1.0 - a); }" +
+					"return a + (2.0 * b - 1.0) * (softcurve(a) - a);" +
+				"}" + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"softmix(dstClr.r,srcClr.r), softmix(dstClr.g,srcClr.g), softmix(dstClr.b,srcClr.b)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"color-dodge": {
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"clamp(dstClr / (1.0 - srcClr), 0.0, 1.0)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"color-burn": {
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"1.0 - clamp((1.0 - smoothstep(0.0035, 0.9955, dstClr)) / smoothstep(0.0035, 0.9955, srcClr), 0.0, 1.0)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"difference": { // do this to match visible results in browsers
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"abs(src.rgb - dstClr)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"exclusion": { // do this to match visible results in browsers
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"dstClr + src.rgb - 2.0 * src.rgb * dstClr"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+
+		"hue": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+			"setLum(setSat(srcClr, getSat(dstClr)), getLum(dstClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"saturation": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(setSat(dstClr, getSat(srcClr)), getLum(dstClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"color": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(srcClr, getLum(dstClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"luminosity": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(dstClr, getLum(srcClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		}
+	};
 
 // events:
 	/**
@@ -853,7 +1208,7 @@ this.createjs = this.createjs||{};
 
 	p._set_autoPurge = function (value) {
 		value = isNaN(value)?1200:value;
-		if (value != -1) {
+		if (value !== -1) {
 			value = value<10?10:value;
 		}
 		this._autoPurge = value;
@@ -875,10 +1230,12 @@ this.createjs = this.createjs||{};
 
 			/**
 			 * Specifies whether or not StageGL is automatically purging unused textures. Higher numbers purge less
-			 * often. Values below 10 are upgraded to 10, and -1 disables this feature.
+			 * often. Values below 10 are upgraded to 10, and -1 disables this feature. If you are not dynamically adding
+			 * and removing new images this can be se9000t to -1, and should be for performance reasons. If you only add images,
+			 * or add and remove the same images for the entire application, it is safe to turn off this feature. Alternately,
+			 * manually manage removing textures yourself with {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}}
 			 * @property autoPurge
-			 * @protected
-			 * @type {Integer}
+			 * @type {int}
 			 * @default 1000
 			 */
 			autoPurge: { get: p._get_autoPurge, set: p._set_autoPurge }
@@ -901,30 +1258,32 @@ this.createjs = this.createjs||{};
 
 				// defaults and options
 				var options = {
-					depth: false, // Disable the depth buffer as it isn't used.
-					alpha: this._transparent, // Make the canvas background transparent.
-					stencil: true,
+					depth: false, // nothing has depth
+					stencil: false, // while there's uses for this, we're not using any yet
+					premultipliedAlpha: this._transparent, // this is complicated, trust it
+
+					alpha: this._transparent,
 					antialias: this._antialias,
-					premultipliedAlpha: this._premultiply, // Assume the drawing buffer contains colors with premultiplied alpha.
 					preserveDrawingBuffer: this._preserveBuffer
 				};
 
 				var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
 				if (!gl) { return null; }
 
-				this.updateSimultaneousTextureCount(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
-				this._maxTextureSlots = gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
-				this._createBuffers(gl);
-				this._initTextures(gl);
-
 				gl.disable(gl.DEPTH_TEST);
+				gl.depthMask(false);
 				gl.enable(gl.BLEND);
-				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-				gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._premultiply);
 				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+				gl.clearColor(0.0, 0.0, 0.0, 0);
 
-				this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
-				this.updateViewport(this._viewportWidth || this.canvas.width, this._viewportHeight || this.canvas.height);
+				this._createBuffers();
+				this._initMaterials();
+				this._updateRenderMode("source-over");
+
+				this.updateViewport(this.canvas.width, this.canvas.height);
+				if (!this._directDraw) {
+					this._bufferTextureOutput = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+				}
 
 				this.canvas._invalid = true;
 			}
@@ -942,16 +1301,12 @@ this.createjs = this.createjs||{};
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
 		this.dispatchEvent("drawstart");
-		if (this.autoClear) { this.clear(); }
 
 		if (this._webGLContext) {
-			// Use WebGL.
-			this._batchDraw(this, this._webGLContext);
-			if (this._autoPurge != -1 && !(this._drawID%((this._autoPurge/2)|0))) {
-				this.purgeTextures(this._autoPurge);
-			}
+			this.draw(this._webGLContext, false);
 		} else {
 			// Use 2D.
+			if (this.autoClear) { this.clear(); }
 			var ctx = this.canvas.getContext("2d");
 			ctx.save();
 			this.updateContext(ctx);
@@ -966,18 +1321,15 @@ this.createjs = this.createjs||{};
 	 */
 	p.clear = function () {
 		if (!this.canvas) { return; }
-		if (StageGL.isWebGLActive(this._webGLContext)) {
-			var gl = this._webGLContext;
-			var cc = this._clearColor;
-			var adjust = this._transparent ? cc.a : 1.0;
-			// Use WebGL settings; adjust for pre multiplied alpha appropriate to scenario
-			this._webGLContext.clearColor(cc.r * adjust, cc.g * adjust, cc.b * adjust, adjust);
-			gl.clear(gl.COLOR_BUFFER_BIT);
-			this._webGLContext.clearColor(cc.r, cc.g, cc.b, cc.a);
-		} else {
-			// Use 2D.
+
+		var gl = this._webGLContext;
+		if (!StageGL.isWebGLActive(gl)) { // Use 2D.
 			this.Stage_clear();
+			return;
 		}
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		this._clearFrameBuffer(this._transparent ? this._clearColor.a : 1);
 	};
 
 	/**
@@ -993,13 +1345,52 @@ this.createjs = this.createjs||{};
 	 * @return {Boolean} If the draw was handled by this function
 	 */
 	p.draw = function (context, ignoreCache) {
-		if (context === this._webGLContext && StageGL.isWebGLActive(this._webGLContext)) {
-			var gl = this._webGLContext;
-			this._batchDraw(this, gl, ignoreCache);
-			return true;
-		} else {
+		var gl = this._webGLContext;
+		// 2D context fallback
+		if (!(context === this._webGLContext && StageGL.isWebGLActive(gl))) {
 			return this.Stage_draw(context, ignoreCache);
 		}
+
+		var storeBatchOutput = this._batchTextureOutput;
+		var storeBatchConcat = this._batchTextureConcat;
+		var storeBatchTemp = this._batchTextureTemp;
+
+		// Use WebGL
+		this._batchVertexCount = 0;
+		this._drawID++;
+
+		if (this._directDraw) {
+			this._batchTextureOutput = this;
+			if (this.autoClear) { this.clear(); }
+		} else {
+			this._batchTextureOutput = this._bufferTextureOutput;
+			this._batchTextureConcat = this._bufferTextureConcat;
+			this._batchTextureTemp = this._bufferTextureTemp;
+		}
+
+		this._updateRenderMode("source-over");
+		this._drawContent(this, ignoreCache);
+
+		if (!this._directDraw) {
+			if (this.autoClear) { this.clear(); }
+			this.batchReason = "finalOutput";
+			this._drawCover(null, this._batchTextureOutput);
+		}
+
+		// batches may generate or swap around textures. To be sure we capture them, store them back into buffer
+		this._bufferTextureOutput = this._batchTextureOutput;
+		this._bufferTextureConcat = this._batchTextureConcat;
+		this._bufferTextureTemp = this._batchTextureTemp;
+
+		this._batchTextureOutput = storeBatchOutput;
+		this._batchTextureConcat = storeBatchConcat;
+		this._batchTextureTemp = storeBatchTemp;
+
+		if (this._autoPurge !== -1 && !(this._drawID%((this._autoPurge/2)|0))) {
+			this.purgeTextures(this._autoPurge);
+		}
+
+		return true;
 	};
 
 	/**
@@ -1009,78 +1400,65 @@ this.createjs = this.createjs||{};
 	 * @method cacheDraw
 	 * @param {DisplayObject} target The object we're drawing into cache.
 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
-	 * @param {Array} filters The filters we're drawing into cache.
 	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
 	 * @return {Boolean} If the draw was handled by this function
 	 */
-	p.cacheDraw = function (target, filters, manager) {
-		if (StageGL.isWebGLActive(this._webGLContext)) {
-			var gl = this._webGLContext;
-			this._cacheDraw(gl, target, filters, manager);
-			return true;
-		} else {
+	p.cacheDraw = function (target, manager) {
+		// 2D context fallback
+		if (!StageGL.isWebGLActive(this._webGLContext)) {
 			return false;
 		}
-	};
 
-	/**
-	 * Blocks, or frees a texture "slot" on the GPU. Can be useful if you are overflowing textures. When overflowing
-	 * textures they are re-uploaded to the GPU every time they're encountered, this can be expensive with large textures.
-	 * By blocking the slot you reduce available slots, potentially increasing draw calls, but mostly you prevent a
-	 * texture being re-uploaded if it would have moved slots due to overflow.
-	 *
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * For example, block the slot a background image is stored in so there is less re-loading of that image.
-	 * @method protectTextureSlot
-	 * @param  {Number} id The slot to be affected
-	 * @param  {Boolean} [lock=false] Whether this slot is the one being locked.
-	 */
-	p.protectTextureSlot = function (id, lock) {
-		if (id > this._maxTextureSlots || id < 0) {
-			throw "Slot outside of acceptable range";
+		var storeBatchOutput = this._batchTextureOutput;
+		var storeBatchConcat = this._batchTextureConcat;
+		var storeBatchTemp = this._batchTextureTemp;
+
+		var filterCount = manager._filterCount, filtersLeft = filterCount;
+		var backupWidth = this._viewportWidth, backupHeight = this._viewportHeight;
+		this.updateViewport(manager._drawWidth, manager._drawHeight);
+
+		this._batchTextureOutput = (manager._filterCount%2) ? manager._bufferTextureConcat : manager._bufferTextureOutput;
+		this._batchTextureConcat = (manager._filterCount%2) ? manager._bufferTextureOutput : manager._bufferTextureConcat;
+		this._batchTextureTemp = manager._bufferTextureTemp;
+
+		var container = this._cacheContainer;
+		container.children = [target];
+		container.transformMatrix = this._alignTargetToCache(target, manager);
+
+		this._updateRenderMode("source-over");
+		this._drawContent(container, true);
+
+		// re-align buffers with fake filter passes to solve certain error cases
+		if (manager._cacheCanvas !== ((manager._filterCount%2) ? this._batchTextureConcat : this._batchTextureOutput)) {
+			// pre filter pass to align output, may of become misaligned due to composite operations
+			filtersLeft++;
 		}
-		this._slotBlacklist[id] = !!lock;
-	};
-
-	/**
-	 * Render textures can't draw into themselves so any item being used for renderTextures needs two to alternate between.
-	 * This function creates, gets, and adjusts the specified render surface.
-	 *
-	 * @method getTargetRenderTexture
-	 * @param  {DisplayObject} target The object associated with the render textures, usually a cached object.
-	 * @param  {Number} w The width to create the texture at.
-	 * @param  {Number} h The height to create the texture at.
-	 * @param  {Boolean} [primary=false] Whether this is the primary render surface
-	 * @return {WebGLTexture}
-	 */
-	p.getTargetRenderTexture = function (target, w, h, primary) {
-		var result, gl = this._webGLContext;
-		if (primary) {
-			result = target._renderTextureOut;
-			if (!result) {
-				result = target._renderTextureOut = this.getRenderBufferTexture(w, h);
-			} else {
-				if (w != result._width || h != result._height) {
-					this.resizeTexture(result, w, h);
-				}
-				this.setTextureParams(gl);
-			}
-		} else {
-			result = target._renderTextureTemp;
-			if (!result) {
-				result = target._renderTextureTemp = this.getRenderBufferTexture(w, h);
-			} else {
-				if (w != result._width || h != result._height) {
-					this.resizeTexture(result, w, h);
-				}
-				this.setTextureParams(gl);
-			}
+		if (this.isCacheControlled) {
+			// post filter pass to place content into output buffer
+			//TODO: add in directDraw support for cache controlled StageGLs
+			filterCount++;
+			filtersLeft++;
 		}
 
-		if (result == null) {
-			throw "Problems creating render textures, known causes include using too much VRAM by not releasing WebGL texture instances";
+		while (filtersLeft) { //warning: pay attention to where filtersLeft is modified, this is a micro-optimization
+			var filter = manager._getGLFilter(filterCount - (filtersLeft--));
+			var swap = this._batchTextureConcat;
+			this._batchTextureConcat = this._batchTextureOutput;
+			this._batchTextureOutput = (this.isCacheControlled && filtersLeft === 0) ? this : swap;
+			this.batchReason = "filterPass";
+			this._drawCover(this._batchTextureOutput._frameBuffer, this._batchTextureConcat, filter);
 		}
-		return result;
+
+		manager._bufferTextureOutput = this._batchTextureOutput;
+		manager._bufferTextureConcat = this._batchTextureConcat;
+		manager._bufferTextureTemp = this._batchTextureTemp;
+
+		this._batchTextureOutput = storeBatchOutput;
+		this._batchTextureConcat = storeBatchConcat;
+		this._batchTextureTemp = storeBatchTemp;
+
+		this.updateViewport(backupWidth, backupHeight);
+		return true;
 	};
 
 	/**
@@ -1094,10 +1472,10 @@ this.createjs = this.createjs||{};
 	 * developer to ensure that a texture in use is not removed.
 	 *
 	 * Textures in use, or to be used again shortly, should not be removed. This is simply for performance reasons.
-	 * Removing a texture in use will cause the texture to have to be re-uploaded slowing rendering.
+	 * Removing a texture in use will cause the texture to end up being re-uploaded slowing rendering.
 	 * @method releaseTexture
 	 * @param {DisplayObject | WebGLTexture | Image | Canvas} item An object that used the texture to be discarded.
-	 * @param {Boolean} safe Should the release attempt to be "safe" and only delete this usage.
+	 * @param {Boolean} [safe=false] Should the release attempt to be "safe" and only delete this usage.
 	 */
 	p.releaseTexture = function (item, safe) {
 		var i, l;
@@ -1106,7 +1484,7 @@ this.createjs = this.createjs||{};
 		// this is a container object
 		if (item.children) {
 			for (i = 0, l = item.children.length; i < l; i++) {
-				this.releaseTexture(item.children[i]);
+				this.releaseTexture(item.children[i], safe);
 			}
 		}
 
@@ -1132,7 +1510,7 @@ this.createjs = this.createjs||{};
 		} else if (item._webGLRenderStyle === 1) {
 			// this is a SpriteSheet, we can't tell which image we used from the list easily so remove them all!
 			for (i = 0, l = item.spriteSheet._images.length; i < l; i++) {
-				this.releaseTexture(item.spriteSheet._images[i]);
+				this.releaseTexture(item.spriteSheet._images[i], safe);
 			}
 			return;
 		}
@@ -1191,49 +1569,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Try to set the max textures the system can handle. It should default to the hardware maximum, and lower values
-	 * may limit performance. Some devices have been known to mis-report their max textures, or you may need a standard
-	 * baseline cross devices for testing. Barring the previous suggestions, there is little need to call this function
-	 * as the library will automatically try to find the best value.
-	 *
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * @method updateSimultaneousTextureCount
-	 * @param {Number} [count=1] The number of textures intended for simultaneous loading.
-	 */
-	p.updateSimultaneousTextureCount = function (count) {
-		// TODO: DHG: make sure API works in all instances, may be some issues with buffers etc I haven't foreseen
-		var gl = this._webGLContext;
-		var success = false;
-
-		if (count < 1 || isNaN(count)) { count = 1; }
-		this._batchTextureCount = count;
-
-		while (!success) {
-			try {
-				this._activeShader = this._fetchShaderProgram(gl);
-				success = true;
-			} catch(e) {
-				if (this._batchTextureCount == 1) {
-					throw "Cannot compile shader " + e;
-				}
-
-				this._batchTextureCount -= 4;
-				if (this._batchTextureCount < 1) { this._batchTextureCount = 1; }
-
-				if (this.vocalDebug) {
-					console.log("Reducing desired texture count due to errors: " + this._batchTextureCount);
-				}
-			}
-		}
-	};
-
-	/**
 	 * Update the WebGL viewport. Note that this does <strong>not</strong> update the canvas element's width/height, but
 	 * the render surface's instead. This is necessary after manually resizing the canvas element on the DOM to avoid a
 	 * up/down scaled render.
 	 * @method updateViewport
-	 * @param {Integer} width The width of the render surface in pixels.
-	 * @param {Integer} height The height of the render surface in pixels.
+	 * @param {int} width The width of the render surface in pixels.
+	 * @param {int} height The height of the render surface in pixels.
 	 */
 	p.updateViewport = function (width, height) {
 		this._viewportWidth = width|0;
@@ -1248,10 +1589,20 @@ this.createjs = this.createjs||{};
 			// additionally we offset into they Y so the polygons are inside the camera's "clipping" plane
 			this._projectionMatrix = new Float32Array([
 				2 / this._viewportWidth,	0,								0,							0,
-				0,							-2 / this._viewportHeight,		1,							0,
+				0,							-2 / this._viewportHeight,		0,							0,
 				0,							0,								1,							0,
-				-1,							1,								0.1,						0
+				-1,							1,								0,							1
 			]);
+
+			if (this._bufferTextureOutput !== null) {
+				this.resizeTexture(this._bufferTextureOutput, this._viewportWidth, this._viewportHeight);
+			}
+			if (this._bufferTextureConcat !== null) {
+				this.resizeTexture(this._bufferTextureConcat, this._viewportWidth, this._viewportHeight);
+			}
+			if (this._bufferTextureTemp !== null) {
+				this.resizeTexture(this._bufferTextureTemp, this._viewportWidth, this._viewportHeight);
+			}
 		}
 	};
 
@@ -1277,8 +1628,7 @@ this.createjs = this.createjs||{};
 		} else {
 			try {
 				targetShader = this._fetchShaderProgram(
-					gl, "filter",
-					filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY,
+					true, filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY,
 					filter.shaderParamSetup && filter.shaderParamSetup.bind(filter)
 				);
 				filter._builtShader = targetShader;
@@ -1320,10 +1670,12 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 * @method resizeTexture
 	 * @param  {WebGLTexture} texture The GL Texture to be modified.
-	 * @param  {uint} [width=1] The width of the texture in pixels, defaults to 1
-	 * @param  {uint} [height=1] The height of the texture in pixels, defaults to 1
+	 * @param  {uint} width The width of the texture in pixels
+	 * @param  {uint} height The height of the texture in pixels
 	 */
 	p.resizeTexture = function (texture, width,height) {
+		if (texture.width === width && texture.height === height){ return; }
+
 		var gl = this._webGLContext;
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texImage2D(
@@ -1335,6 +1687,8 @@ this.createjs = this.createjs||{};
 			gl.UNSIGNED_BYTE,			// type of texture(pixel color depth)
 			null						// image data, we can do null because we're doing array data
 		);
+
+		// set its width and height for spoofing as an image and tracking
 		texture.width = width;
 		texture.height = height;
 	};
@@ -1342,7 +1696,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Returns a base texture (see {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}) for details. Also includes an
 	 * attached and linked render buffer in `texture._frameBuffer`. RenderTextures can be thought of as an internal
-	 * canvas on the GPU that can be drawn to.
+	 * canvas on the GPU that can be drawn to. Being internal to the GPU they are much faster than "offscreen canvases".
 	 * @method getRenderBufferTexture
 	 * @param  {Number} w The width of the texture in pixels.
 	 * @param  {Number} h The height of the texture in pixels.
@@ -1351,15 +1705,13 @@ this.createjs = this.createjs||{};
 	p.getRenderBufferTexture = function (w, h) {
 		var gl = this._webGLContext;
 
-		// get the texture
 		var renderTexture = this.getBaseTexture(w, h);
 		if (!renderTexture) { return null; }
 
-		// get the frame buffer
 		var frameBuffer = gl.createFramebuffer();
 		if (!frameBuffer) { return null; }
 
-		// set its width and height for spoofing as an image
+		// set its width and height for spoofing as an image and tracking
 		renderTexture.width = w;
 		renderTexture.height = h;
 
@@ -1417,16 +1769,16 @@ this.createjs = this.createjs||{};
 	p.setClearColor = function (color) {
 		var r, g, b, a, output;
 
-		if (typeof color == "string") {
-			if (color.indexOf("#") == 0) {
-				if (color.length == 4) {
+		if (typeof color === "string") {
+			if (color.indexOf("#") === 0) {
+				if (color.length === 4) {
 					color = "#" + color.charAt(1)+color.charAt(1) + color.charAt(2)+color.charAt(2) + color.charAt(3)+color.charAt(3)
 				}
 				r = Number("0x"+color.slice(1, 3))/255;
 				g = Number("0x"+color.slice(3, 5))/255;
 				b = Number("0x"+color.slice(5, 7))/255;
 				a = Number("0x"+color.slice(7, 9))/255;
-			} else if (color.indexOf("rgba(") == 0) {
+			} else if (color.indexOf("rgba(") === 0) {
 				output = color.slice(5, -1).split(",");
 				r = Number(output[0])/255;
 				g = Number(output[1])/255;
@@ -1444,9 +1796,6 @@ this.createjs = this.createjs||{};
 		this._clearColor.g = g || 0;
 		this._clearColor.b = b || 0;
 		this._clearColor.a = a || 0;
-
-		if (!this._webGLContext) { return; }
-		this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 	};
 
 	/**
@@ -1464,11 +1813,12 @@ this.createjs = this.createjs||{};
 	 * @method _getSafeTexture
 	 * @param  {uint} [w=1] The width of the texture in pixels, defaults to 1
 	 * @param  {uint} [h=1] The height of the texture in pixels, defaults to 1
+	 * @protected
 	 */
 	p._getSafeTexture = function (w, h) {
 		var texture = this.getBaseTexture(w, h);
 
-		if(!texture) {
+		if (!texture) {
 			var msg = "Problem creating texture, possible cause: using too much VRAM, please try releasing texture memory";
 			(console.error && console.error(msg)) || console.log(msg);
 
@@ -1476,6 +1826,25 @@ this.createjs = this.createjs||{};
 		}
 
 		return texture;
+	};
+
+	/**
+	 * Visually clear out the currently active FrameBuffer, does not rebind or adjust the frameBuffer in use.
+	 * @method _getSafeTexture
+	 * @param alpha
+	 * @protected
+	 */
+	p._clearFrameBuffer = function (alpha) {
+		var gl = this._webGLContext;
+		var cc = this._clearColor;
+
+		if (alpha > 0) { alpha = 1; }
+		if (alpha < 0) { alpha = 0; }
+
+		// Use WebGL settings; adjust for pre multiplied alpha appropriate to scenario
+		gl.clearColor(cc.r * alpha, cc.g * alpha, cc.b * alpha, alpha);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 0);
 	};
 
 	/**
@@ -1512,40 +1881,29 @@ this.createjs = this.createjs||{};
 	 * filters. Once compiled, shaders are saved so. If the Shader code requires dynamic alterations re-run this function
 	 * to generate a new shader.
 	 * @method _fetchShaderProgram
-	 * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-	 * @param  {String} [shaderName="regular"] Working values: "regular", "override", and "filter". Which type of shader to build.
+	 * @param  {Boolean} coverShader Is this a per object shader or a cover shader
 	 * Filter and override both accept the custom params. Regular and override have all features. Filter is a special case reduced feature shader meant to be over-ridden.
-	 * @param  {String} [customVTX] Extra vertex shader information to replace a regular draw, see 
+	 * @param  {String | undefined} [customVTX=undefined] Extra vertex shader information to replace a regular draw, see
 	 * {{#crossLink "StageGL/COVER_VERTEX_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
-	 * @param  {String} [customFRAG] Extra fragment shader information to replace a regular draw, see 
+	 * @param  {String | undefined} [customFRAG=undefined] Extra fragment shader information to replace a regular draw, see
 	 * {{#crossLink "StageGL/COVER_FRAGMENT_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
-	 * @param  {Function} [shaderParamSetup] Function to run so custom shader parameters can get applied for the render.
+	 * @param  {Function | undefined} [shaderParamSetup=undefined] Function to run so custom shader parameters can get applied for the render.
 	 * @protected
 	 * @return {WebGLProgram} The compiled and linked shader
 	 */
-	p._fetchShaderProgram = function (gl, shaderName, customVTX, customFRAG, shaderParamSetup) {
+	p._fetchShaderProgram = function (coverShader, customVTX, customFRAG, shaderParamSetup) {
+		var gl = this._webGLContext;
+
 		gl.useProgram(null);		// safety to avoid collisions
 
 		// build the correct shader string out of the right headers and bodies
 		var targetFrag, targetVtx;
-		switch (shaderName) {
-			case "filter":
-				targetVtx = StageGL.COVER_VERTEX_HEADER + (customVTX || StageGL.COVER_VERTEX_BODY);
-				targetFrag = StageGL.COVER_FRAGMENT_HEADER + (customFRAG || StageGL.COVER_FRAGMENT_BODY);
-				break;
-			case "particle": //TODO
-				targetVtx = StageGL.REGULAR_VERTEX_HEADER + StageGL.PARTICLE_VERTEX_BODY;
-				targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + StageGL.PARTICLE_FRAGMENT_BODY;
-				break;
-			case "override":
-				targetVtx = StageGL.REGULAR_VERTEX_HEADER + (customVTX || StageGL.REGULAR_VERTEX_BODY);
-				targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + (customFRAG || StageGL.REGULAR_FRAGMENT_BODY);
-				break;
-			case "regular":
-			default:
-				targetVtx = StageGL.REGULAR_VERTEX_HEADER + StageGL.REGULAR_VERTEX_BODY;
-				targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + StageGL.REGULAR_FRAGMENT_BODY;
-				break;
+		if (coverShader) {
+			targetVtx = StageGL.COVER_VERTEX_HEADER + (customVTX || StageGL.COVER_VERTEX_BODY);
+			targetFrag = StageGL.COVER_FRAGMENT_HEADER + (customFRAG || StageGL.COVER_FRAGMENT_BODY);
+		} else {
+			targetVtx = StageGL.REGULAR_VERTEX_HEADER + (customVTX || StageGL.REGULAR_VERTEX_BODY);
+			targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + (customFRAG || StageGL.REGULAR_FRAGMENT_BODY);
 		}
 
 		// create the separate vars
@@ -1557,7 +1915,6 @@ this.createjs = this.createjs||{};
 		gl.attachShader(shaderProgram, vertexShader);
 		gl.attachShader(shaderProgram, fragmentShader);
 		gl.linkProgram(shaderProgram);
-		shaderProgram._type = shaderName;
 
 		// check compile status
 		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
@@ -1567,54 +1924,43 @@ this.createjs = this.createjs||{};
 
 		// set up the parameters on the shader
 		gl.useProgram(shaderProgram);
-		switch (shaderName) {
-			case "filter":
-				// get the places in memory the shader is stored so we can feed information into them
-				// then save it off on the shader because it's so tied to the shader itself
-				shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-				gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
-				shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
-				gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
+		// get the places in memory the shader is stored so we can feed information into them
+		// then save it off on the shader because it's so tied to the shader itself
+		shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
+		gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
-				shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-				gl.uniform1i(shaderProgram.samplerUniform, 0);
+		shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
+		gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
 
-				// if there's some custom attributes be sure to hook them up
-				if (shaderParamSetup) {
-					shaderParamSetup(gl, this, shaderProgram);
-				}
-				break;
-			case "override":
-			case "particle":
-			case "regular":
-			default:
-				// get the places in memory the shader is stored so we can feed information into them
-				// then save it off on the shader because it's so tied to the shader itself
-				shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-				gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+		if (coverShader) {
+			shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+			gl.uniform1i(shaderProgram.samplerUniform, 0);
 
-				shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
-				gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
+			// if there's some custom attributes be sure to hook them up
+			if (shaderParamSetup) {
+				shaderParamSetup(gl, this, shaderProgram);
+			}
+		} else {
+			shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
+			gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
 
-				shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
-				gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
+			shaderProgram.alphaAttribute = gl.getAttribLocation(shaderProgram, "objectAlpha");
+			gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
 
-				shaderProgram.alphaAttribute = gl.getAttribLocation(shaderProgram, "objectAlpha");
-				gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
+			var samplers = [];
+			for (var i = 0; i < this._gpuTextureCount; i++) {
+				samplers[i] = i;
+			}
+			shaderProgram.samplerData = samplers;
 
-				var samplers = [];
-				for (var i = 0; i < this._batchTextureCount; i++) {
-					samplers[i] = i;
-				}
+			shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+			gl.uniform1iv(shaderProgram.samplerUniform, shaderProgram.samplerData);
 
-				shaderProgram.samplerData = samplers;
-				shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-				gl.uniform1iv(shaderProgram.samplerUniform, samplers);
-
-				shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
-				break;
+			shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
 		}
+
+		shaderProgram._type = coverShader ? "cover" : "batch";
 
 		gl.useProgram(this._activeShader);
 		return shaderProgram;
@@ -1630,17 +1976,20 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._createShader = function (gl, type, str) {
-		// inject the static number
-		str = str.replace(/\{\{count}}/g, this._batchTextureCount);
+		var textureCount = this._batchTextureCount;
 
-		// resolve issue with no dynamic samplers by creating correct samplers in if else chain
-		// TODO: WebGL 2.0 does not need this support
-		var insert = "";
-		for (var i = 1; i<this._batchTextureCount; i++) {
-			insert += "} else if (indexPicker <= "+ i +".5) { color = texture2D(uSampler["+ i +"], vTextureCoord);";
+		// inject the static number
+		str = str.replace(/\{\{count}}/g, textureCount);
+
+		if (type === gl.FRAGMENT_SHADER) {
+			// resolve issue with no dynamic samplers by creating correct samplers in if else chain
+			// TODO: WebGL 2.0 does not need this support
+			var insert = "";
+			for (var i = 1; i<textureCount; i++) {
+				insert += "} else if (indexPicker <= "+ i +".5) { color = texture2D(uSampler["+ i +"], vTextureCoord);";
+			}
+			str = str.replace(/\{\{alternates}}/g, insert);
 		}
-		str = str.replace(/\{\{alternates}}/g, insert);
-		str = str.replace(/\{\{fragColor}}/g, this._premultiply ? StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY : StageGL.REGULAR_FRAG_COLOR_NORMAL);
 
 		// actually compile the shader
 		var shader = gl.createShader(type);
@@ -1656,13 +2005,13 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Sets up the necessary vertex property buffers, including position and U/V.
+	 * Sets up the necessary vertex property buffers, including position and UV.
 	 * @method _createBuffers
-	 * @param {WebGLRenderingContext} gl
 	 * @protected
 	 */
-	p._createBuffers = function (gl) {
-		var groupCount = this._maxCardsPerBatch * StageGL.INDICIES_PER_CARD;
+	p._createBuffers = function () {
+		var gl = this._webGLContext;
+		var groupCount = this._maxBatchVertexCount;
 		var groupSize, i, l;
 
 		// INFO:
@@ -1680,7 +2029,7 @@ this.createjs = this.createjs||{};
 
 		// var vertexBuffer = this._vertexBuffer = gl.createBuffer();
 		// gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-		// groupSize = 2 + 2 + 1 + 1; //x/y, u/v, index, alpha
+		// groupSize = 2 + 2 + 1 + 1; //{x,y}, {u,v}, index, alpha
 		// var vertexData = this._vertexData = new Float32Array(groupCount * groupSize);
 		// for (i=0; i<vertexData.length; i+=groupSize) {
 		// 	vertexData[i+0] = vertexData[i+1] = 0;
@@ -1690,7 +2039,7 @@ this.createjs = this.createjs||{};
 		// }
 		// vertexBuffer.itemSize = groupSize;
 		// vertexBuffer.numItems = groupCount;
-		// TODO bechmark and test using unified buffer
+		// TODO benchmark and test using unified buffer
 
 		// the actual position information
 		var vertexPositionBuffer = this._vertexPositionBuffer = gl.createBuffer();
@@ -1734,12 +2083,12 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Do all the setup steps for textures in the system.
-	 * @method _initTextures
+	 * Do all the setup steps for standard textures & shaders.
+	 * @method _initMaterials
 	 * @protected
 	 */
-	p._initTextures = function () {
-		//TODO: DHG: add a cleanup routine in here in case this happens mid stream
+	p._initMaterials = function () {
+		var gl = this._webGLContext;
 
 		// reset counters
 		this._lastTextureInsert = -1;
@@ -1750,15 +2099,37 @@ this.createjs = this.createjs||{};
 		this._baseTextures = [];
 		this._batchTextures = [];
 
-		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for safety code
-		for (var i=0; i<this._batchTextureCount;i++) {
-			var texture = this.getBaseTexture();
-			this._baseTextures[i] = this._batchTextures[i] = texture;
-			if (!texture) {
-				throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
-			} else {
-				texture._storeID = -1;
+		this._gpuTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS); // this is what we can draw with
+		this._gpuTextureMax = gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS); // this could be higher
+
+		this._batchTextureCount = this._gpuTextureCount;
+		var success = false;
+		while (!success) {
+			try {
+				this._activeShader = this._fetchShaderProgram(false);
+				success = true;
+			} catch(e) {
+				if (this._batchTextureCount <= 1) { throw "Cannot compile shader " + e; }
+				this._batchTextureCount = (this._batchTextureCount / 2)|0;
+
+				if (this.vocalDebug) {
+					console.log("Reducing possible texture count due to errors: " + this._batchTextureCount);
+				}
 			}
+		}
+
+		this._mainShader = this._activeShader;
+		this._mainShader._name = "main";
+
+		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for safety code
+		var texture = this.getBaseTexture();
+		if (!texture) {
+			throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
+		} else {
+			texture._storeID = -1;
+		}
+		for (var i=0; i<this._batchTextureCount; i++) {
+			this._baseTextures[i] = this._batchTextures[i] = texture;
 		}
 	};
 
@@ -1797,7 +2168,7 @@ this.createjs = this.createjs||{};
 		}
 
 		// allow the texture to track its references for cleanup, if it's not an error ref
-		if (texture._storeID != -1) {
+		if (texture._storeID !== -1) {
 			texture._storeID = storeID;
 			if (texture._imageData) {
 				texture._imageData.push(image);
@@ -1837,10 +2208,11 @@ this.createjs = this.createjs||{};
 		this.setTextureParams(gl, texture.isPOT);
 
 		try {
+			gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		} catch(e) {
 			var errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
-			if(console.error) {
+			if (console.error) {
 				//TODO: LM: I recommend putting this into a log function internally, since you do it so often, and each is implemented differently.
 				console.error(errString);
 				console.error(e);
@@ -1849,11 +2221,12 @@ this.createjs = this.createjs||{};
 				console.log(e);
 			}
 		}
+		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 
 		if (image._invalid !== undefined) { image._invalid = false; } // only adjust what is tracking this data
 
-		texture._w = image.width;
-		texture._h = image.height;
+		texture.width = image.width;
+		texture.height = image.height;
 
 		if (this.vocalDebug) {
 			if (isNPOT && this._antialias) {
@@ -1880,7 +2253,7 @@ this.createjs = this.createjs||{};
 			var start = (this._lastTextureInsert+1) % this._batchTextureCount;
 			var look = start;
 			do {
-				if (this._batchTextures[look]._batchID != this._batchID && !this._slotBlacklist[look]) {
+				if (this._batchTextures[look]._batchID !== this._batchID && !this._slotBlacklist[look]) {
 					found = look;
 					break;
 				}
@@ -1890,8 +2263,7 @@ this.createjs = this.createjs||{};
 			// we couldn't find anywhere for it go, meaning we're maxed out
 			if (found === -1) {
 				this.batchReason = "textureOverflow";
-				this._drawBuffers(gl);		// <------------------------------------------------------------------------
-				this.batchCardCount = 0;
+				this._renderBatch();		// <------------------------------------------------------------------------
 				found = start; //TODO: how do we optimize this to be smarter?
 			}
 
@@ -1902,13 +2274,14 @@ this.createjs = this.createjs||{};
 			if (image && ((image._invalid === undefined && image._isCanvas) || image._invalid)) {
 				this._updateTextureImageData(gl, image);
 			} else {
-				gl.activeTexture(gl.TEXTURE0 + found);
-				gl.bindTexture(gl.TEXTURE_2D, texture);
-				this.setTextureParams(gl);
+				// probably redundant, confirm functionality then remove from codebase
+				//gl.activeTexture(gl.TEXTURE0 + found);
+				//gl.bindTexture(gl.TEXTURE_2D, texture);
+				//this.setTextureParams(gl);
 			}
 			this._lastTextureInsert = found;
 
-		} else if(texture._drawID !== this._drawID) {	// being active from previous draws doesn't mean up to date
+		} else if (texture._drawID !== this._drawID) {	// being active from previous draws doesn't mean up to date
 			image = texture._imageData && texture._imageData[0];
 			if (image && ((image._invalid === undefined && image._isCanvas) || image._invalid)) {
 				this._updateTextureImageData(gl, image);
@@ -1935,10 +2308,12 @@ this.createjs = this.createjs||{};
 		if (texture._storeID !== undefined && texture._storeID >= 0) {
 			this._textureDictionary[texture._storeID] = undefined;
 			for (var n in this._textureIDs) {
-				if (this._textureIDs[n] == texture._storeID) { delete this._textureIDs[n]; }
+				if (this._textureIDs[n] === texture._storeID) { delete this._textureIDs[n]; }
 			}
 			var data = texture._imageData;
-			for (var i=data.length-1; i>=0; i--) { data[i]._storeID = undefined; }
+			if (data) {
+				for (var i=data.length-1; i>=0; i--) { data[i]._storeID = undefined; }
+			}
 			texture._imageData = texture._storeID = undefined;
 		}
 
@@ -1966,223 +2341,177 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Store or restore current batch textures into a backup array
-	 * @method _backupBatchTextures
-	 * @param {Boolean} restore Perform a restore instead of a store.
-	 * @param {Array} [target=this._backupTextures] Where to perform the backup, defaults to internal backup.
+	 * Small utility function to keep internal API consistent and set the uniforms for a dual texture cover render
+	 * @method _setCoverMixShaderParams
+	 * @param {WebGLRenderingContext} gl The context where the drawing takes place
+	 * @param stage unused
+	 * @param shaderProgram unused
 	 * @protected
 	 */
-	p._backupBatchTextures = function (restore, target) {
-		var gl = this._webGLContext;
-
-		if (!this._backupTextures) { this._backupTextures = []; }
-		if (target === undefined) { target = this._backupTextures; }
-
-		for (var i=0; i<this._batchTextureCount; i++) {
-			gl.activeTexture(gl.TEXTURE0 + i);
-			if (restore) {
-				this._batchTextures[i] = target[i];
-			} else {
-				target[i] = this._batchTextures[i];
-				this._batchTextures[i] = this._baseTextures[i];
-			}
-			gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[i]);
-			this.setTextureParams(gl, this._batchTextures[i].isPOT);
-		}
-
-		if (restore && target === this._backupTextures) { this._backupTextures = []; }
+	p._setCoverMixShaderParams = function (gl, stage, shaderProgram) {
+		gl.uniform1i(
+			gl.getUniformLocation(shaderProgram, "uMixSampler"),
+			1
+		);
 	};
 
 	/**
-	 * Begin the drawing process for a regular render.
-	 * @method _batchDraw
-	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-	 * @param {Stage || Container} sceneGraph {{#crossLink "Container"}}{{/crossLink}} object with all that needs to rendered, preferably a Stage.
+	 * Change the respective render settings and filters to the correct settings. Will build the shader on first use.
+	 * @method _updateRenderMode
+	 * @param {String} newMode Composite operation name
+	 * @protected
+	 */
+	p._updateRenderMode = function (newMode) {
+		if ( newMode === null || newMode === undefined){ newMode = "source-over"; }
+
+		var blendSrc = StageGL.BLEND_SOURCES[newMode];
+		if (blendSrc === undefined) {
+			if (this.vocalDebug){ console.log("Unknown compositeOperation ["+ newMode +"], reverting to default"); }
+			blendSrc = StageGL.BLEND_SOURCES[newMode = "source-over"];
+		}
+
+		if (this._renderMode === newMode) { return; }
+
+		var gl = this._webGLContext;
+		var shaderData = this._builtShaders[newMode];
+		if (shaderData === undefined) {
+			try {
+				shaderData = this._builtShaders[newMode] = {
+					eqRGB: gl[blendSrc.eqRGB || "FUNC_ADD"],
+					srcRGB: gl[blendSrc.srcRGB || "ONE"],
+					dstRGB: gl[blendSrc.dstRGB || "ONE_MINUS_SRC_ALPHA"],
+					eqA: gl[blendSrc.eqA || "FUNC_ADD"],
+					srcA: gl[blendSrc.srcA || "ONE"],
+					dstA: gl[blendSrc.dstA || "ONE_MINUS_SRC_ALPHA"],
+					immediate: blendSrc.shader !== undefined,
+					shader: (blendSrc.shader || this._builtShaders["source-over"] === undefined) ?
+						this._fetchShaderProgram(
+							true, undefined, blendSrc.shader,
+							this._setCoverMixShaderParams
+						) : this._builtShaders["source-over"].shader // re-use source-over when we don't need a new shader
+				};
+				if (blendSrc.shader) { shaderData.shader._name = newMode; }
+			} catch (e) {
+				this._builtShaders[newMode] = undefined;
+				console && console.log("SHADER SWITCH FAILURE", e);
+				return;
+			}
+		}
+
+		if (shaderData.immediate && this._directDraw) {
+			if (this.vocalDebug) { console.log("Illegal compositeOperation ["+ newMode +"] due to StageGL.directDraw = true, reverting to default"); }
+			return;
+		}
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
+
+		this.batchReason = "shaderSwap";
+		this._renderBatch();		// <--------------------------------------------------------------------------------
+
+		this._renderMode = newMode;
+		this._immediateRender = shaderData.immediate;
+		gl.blendEquationSeparate(shaderData.eqRGB, shaderData.eqA);
+		gl.blendFuncSeparate(shaderData.srcRGB, shaderData.dstRGB, shaderData.srcA, shaderData.dstA);
+	};
+
+	/**
+	 * Helper function for the standard content draw
+	 * @method _drawContent
+	 * @param {Stage | Container} content
 	 * @param {Boolean} ignoreCache
 	 * @protected
 	 */
-	p._batchDraw = function (sceneGraph, gl, ignoreCache) {
-		if (this._isDrawing > 0) {
-			this._drawBuffers(gl);
-		}
-		this._isDrawing++;
-		this._drawID++;
+	p._drawContent = function (content, ignoreCache) {
+		var gl = this._webGLContext;
 
-		this.batchCardCount = 0;
-		this.depth = 0;
+		this._activeShader = this._mainShader;
 
-		this._appendToBatchGroup(sceneGraph, gl, new createjs.Matrix2D(), this.alpha, ignoreCache);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
+		gl.clear(gl.COLOR_BUFFER_BIT);
 
-		this.batchReason = "drawFinish";
-		this._drawBuffers(gl);								// <--------------------------------------------------------
+		this._appendToBatch(content, new createjs.Matrix2D(), this.alpha, ignoreCache);
 
-		this._isDrawing--;
-		this.canvas._invalid = true;
+		this.batchReason = "contentEnd";
+		this._renderBatch();
 	};
 
 	/**
-	 * Perform the drawing process to fill a specific cache texture, including applying filters.
-	 * @method _cacheDraw
-	 * @param {DisplayObject} target The object we're drawing into the cache. For example, used for drawing the cache
-	 * (to prevent it from simply drawing an existing cache back into itself).
-	 * @param {Array} filters The filters we're drawing into cache.
-	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
+	 * Used to draw one or more textures potentially using a filter into the supplied buffer.
+	 * Mostly used for caches, filters, and outputting final render frames.
+	 * Draws `dst` into `out` after applying `srcFilter` depending on its current value.
+	 * @method _drawCover
+	 * @param {WebGLFramebuffer} out Buffer to draw the results into (null is the canvas element)
+	 * @param {WebGLTexture} dst Base texture layer aka "destination" in image blending terminology
+	 * @param {WebGLTexture | Filter} [srcFilter = undefined] Modification parameter for the draw. If a texture, the
+	 * current _renderMode applies it as a "source" image. If a Filter, the filter is applied to the dst with its params.
 	 * @protected
 	 */
-	p._cacheDraw = function (gl, target, filters, manager) {
-		/*
-		Implicitly there are 4 modes to this function: filtered-sameContext, filtered-uniqueContext, sameContext, uniqueContext.
-		Each situation must be handled slightly differently as 'sameContext' or 'uniqueContext' define how the output works,
-		one drawing directly into the main context and the other drawing into a stored renderTexture respectively.
-		When the draw is a 'filtered' draw, the filters are applied sequentially and will draw into saved textures repeatedly.
-		Once the final filter is done the final output is treated depending upon whether it is a same or unique context.
-		*/
-		var renderTexture;
-		var shaderBackup = this._activeShader;
-		var blackListBackup = this._slotBlacklist;
-		var lastTextureSlot = this._maxTextureSlots-1;
-		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
+	p._drawCover = function (out, dst, srcFilter) {
+		var gl = this._webGLContext;
 
-		// protect the last slot so that we have somewhere to bind the renderTextures so it doesn't get upset
-		this.protectTextureSlot(lastTextureSlot, true);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, out);
+		if (out !== null){ gl.clear(gl.COLOR_BUFFER_BIT); }
 
-		// create offset container for drawing item
-		var mtx = target.getMatrix();
-		mtx = mtx.clone();
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, dst);
+		this.setTextureParams(gl);
+
+		if (srcFilter instanceof createjs.Filter) {
+			this._activeShader = this.getFilterShader(srcFilter);
+		} else {
+			if (srcFilter instanceof WebGLTexture) {
+				gl.activeTexture(gl.TEXTURE1);
+				gl.bindTexture(gl.TEXTURE_2D, srcFilter);
+				this.setTextureParams(gl);
+			} else if (srcFilter !== undefined && this.vocalDebug) {
+				console.log("Unknown data handed to function: ", srcFilter);
+			}
+			this._activeShader = this._builtShaders[this._renderMode].shader;
+		}
+
+		this._renderCover();
+	};
+
+	/**
+	 * Returns a matrix that can be used to counter position the `target` so that it fits and scales to the `manager`
+	 * @param {DisplayObject} target The object to be counter positioned
+	 * @param {BitmapCache} manager The cache manager to be aligned to
+	 * @returns {Matrix2D} The matrix that can be used used to counter position the container
+	 * @method _alignTargetToCache
+	 * @private
+	 */
+	p._alignTargetToCache = function(target, manager) {
+		if (manager._counterMatrix === null) {
+			manager._counterMatrix = target.getMatrix();
+		} else {
+			target.getMatrix(manager._counterMatrix)
+		}
+
+		var mtx = manager._counterMatrix;
 		mtx.scale(1/manager.scale, 1/manager.scale);
 		mtx = mtx.invert();
 		mtx.translate(-manager.offX/manager.scale*target.scaleX, -manager.offY/manager.scale*target.scaleY);
-		var container = this._cacheContainer;
-		container.children = [target];
-		container.transformMatrix = mtx;
 
-		this._backupBatchTextures(false);
-
-		if (filters && filters.length) {
-			this._drawFilters(target, filters, manager);
-		} else {
-			// is this for another stage or mine?
-			if (this.isCacheControlled) {
-				// draw item to canvas				I -> C
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._batchDraw(container, gl, true);
-			} else {
-				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-				target.cacheCanvas = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight, true);
-				renderTexture = target.cacheCanvas;
-
-				// draw item to render texture		I -> T
-				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-				this.updateViewport(manager._drawWidth, manager._drawHeight);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._batchDraw(container, gl, true);
-
-				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-				this.updateViewport(wBackup, hBackup);
-			}
-		}
-
-		this._backupBatchTextures(true);
-
-		this.protectTextureSlot(lastTextureSlot, false);
-		this._activeShader = shaderBackup;
-		this._slotBlacklist = blackListBackup;
-	};
-
-	/**
-	 * Sub portion of _cacheDraw, split off for readability. Do not call independently.
-	 * @method _drawFilters
-	 * @param {DisplayObject} target The object we're drawing with a filter.
-	 * @param {Array} filters The filters we're drawing into cache.
-	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
-	 */
-	p._drawFilters = function (target, filters, manager) {
-		var gl = this._webGLContext;
-		var renderTexture;
-		var lastTextureSlot = this._maxTextureSlots-1;
-		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
-
-		var filtersLeft = manager._filterCount;
-		var container = this._cacheContainer;
-		var useOut = !(filtersLeft%2); // we have to swap render surface, so start with the one that will make 'out' the last
-
-		// we don't know which texture slot we're dealing with previously and we need one out of the way
-		// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
-		gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-		renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight, useOut);
-
-		// draw item to render texture		I -> T
-		gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-		this.updateViewport(manager._drawWidth, manager._drawHeight);
-		gl.clear(gl.COLOR_BUFFER_BIT);
-		this._batchDraw(container, gl, true);
-
-		// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-		this.setTextureParams(gl);
-
-		var i = 0, filter = filters[i];
-		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
-			filtersLeft--;
-			useOut = !useOut;
-
-			// swap to correct shader
-			this._activeShader = this.getFilterShader(filter);
-			if (!this._activeShader) { continue; }
-
-			gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
-			renderTexture = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight, useOut);
-
-			if (filtersLeft == 0 && this.isCacheControlled) {
-				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-				// draw result to canvas			R -> C
-				this.updateViewport(wBackup, hBackup);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._drawCover(gl);
-
-				return;
-
-			} else {
-				gl.bindFramebuffer(gl.FRAMEBUFFER, renderTexture._frameBuffer);
-
-				// draw result to render texture	R -> T
-				gl.viewport(0, 0, manager._drawWidth, manager._drawHeight);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				this._drawCover(gl);
-
-				// bind the result texture to slot 0 as all filters and cover draws assume original content is in slot 0
-				gl.activeTexture(gl.TEXTURE0);
-				gl.bindTexture(gl.TEXTURE_2D, renderTexture);
-				this.setTextureParams(gl);
-			}
-
-			// work through the multipass if it's there, otherwise move on
-			filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
-		} while (filter);
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		this.updateViewport(wBackup, hBackup);
+		return mtx;
 	};
 
 	/**
 	 * Add all the contents of a container to the pending buffers, called recursively on each container. This may
 	 * trigger a draw if a buffer runs out of space. This is the main workforce of the render loop.
-	 * @method _appendToBatchGroup
+	 * @method _appendToBatch
 	 * @param {Container} container The {{#crossLink "Container"}}{{/crossLink}} that contains everything to be drawn.
-	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
 	 * @param {Matrix2D} concatMtx The effective (concatenated) transformation matrix when beginning this container
 	 * @param {Number} concatAlpha The effective (concatenated) alpha when beginning this container
-	 * @param {Boolean} ignoreCache Don't use an element's cache during this draw
+	 * @param {Boolean} [ignoreCache=false] Don't use an element's cache during this draw
 	 * @protected
 	 */
-	p._appendToBatchGroup = function (container, gl, concatMtx, concatAlpha, ignoreCache) {
+	p._appendToBatch = function (container, concatMtx, concatAlpha, ignoreCache) {
+		var gl = this._webGLContext;
+
 		// sort out shared properties
-		if (!container._glMtx) { container._glMtx = new createjs.Matrix2D(); }
 		var cMtx = container._glMtx;
 		cMtx.copy(concatMtx);
-		if (container.transformMatrix) {
+		if (container.transformMatrix !== null) {
 			cMtx.appendMatrix(container.transformMatrix);
 		} else {
 			cMtx.appendTransform(
@@ -2193,6 +2522,11 @@ this.createjs = this.createjs||{};
 			);
 		}
 
+		var previousRenderMode = this._renderMode;
+		if (container.compositeOperation) {
+			this._updateRenderMode(container.compositeOperation);
+		}
+
 		// sub components of figuring out the position an object holds
 		var subL, subT, subR, subB;
 
@@ -2200,28 +2534,53 @@ this.createjs = this.createjs||{};
 		var l = container.children.length;
 		for (var i = 0; i < l; i++) {
 			var item = container.children[i];
+			var useCache = (!ignoreCache && item.cacheCanvas) || false;
 
-			if (!(item.visible && concatAlpha)) { continue; }
-			if (!item.cacheCanvas || ignoreCache) {
+			if (!(item.visible && concatAlpha > 0.0035)) { continue; }
+
+			if (useCache === false) {
 				if (item._updateState){
 					item._updateState();
 				}
-				if (item.children) {
-					this._appendToBatchGroup(item, gl, cMtx, item.alpha * concatAlpha);
-					continue;
+
+				if(!ignoreCache && item.cacheCanvas === null && item.filters !== null && item.filters.length) {
+					var bounds;
+					if (item.bitmapCache === null) {
+						bounds = item.getBounds();
+						item.bitmapCache = new createjs.BitmapCache();
+						item.bitmapCache._autoGenerated = true;
+					}
+					if (item.bitmapCache._autoGenerated) {
+						this.batchReason = "cachelessFilterInterupt";
+						this._renderBatch();					// <----------------------------------------------------
+
+						var shaderBackup = this._activeShader;
+						bounds = bounds || item.getBounds();
+						item.bitmapCache.define(item, bounds.x, bounds.y, bounds.width, bounds.height, 1, {useGL:this});
+						useCache = item.bitmapCache._cacheCanvas;
+
+						this._activeShader = shaderBackup;
+						gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
+					}
 				}
 			}
 
+			if (useCache === false && item.children) {
+				this._appendToBatch(item, cMtx, item.alpha * concatAlpha);
+				continue;
+			}
+
+			if (item.compositeOperation !== null) {
+				this._updateRenderMode(item.compositeOperation);
+			}
+
 			// check for overflowing batch, if yes then force a render
-			// TODO: DHG: consider making this polygon count dependant for things like vector draws
-			if (this.batchCardCount+1 > this._maxCardsPerBatch) {
+			if (this._batchVertexCount + StageGL.INDICIES_PER_CARD > this._maxBatchVertexCount) {
 				this.batchReason = "vertexOverflow";
-				this._drawBuffers(gl);					// <------------------------------------------------------------
-				this.batchCardCount = 0;
+				this._renderBatch();					// <------------------------------------------------------------
 			}
 
 			// keep track of concatenated position
-			if (!item._glMtx) { item._glMtx = new createjs.Matrix2D(); }
 			var iMtx = item._glMtx;
 			iMtx.copy(cMtx);
 			if (item.transformMatrix) {
@@ -2236,16 +2595,20 @@ this.createjs = this.createjs||{};
 			}
 
 			var uvRect, texIndex, image, frame, texture, src;
-			var useCache = item.cacheCanvas && !ignoreCache;
 
 			// get the image data, or abort if not present
-			if (item._webGLRenderStyle === 2 || useCache) {			// BITMAP / Cached Canvas
-				image = (ignoreCache?false:item.cacheCanvas) || item.image;
-			} else if (item._webGLRenderStyle === 1) {								// SPRITE
-				frame = item.spriteSheet.getFrame(item.currentFrame);	//TODO: Faster way?
+			// BITMAP / Cached Canvas
+			if (item._webGLRenderStyle === 2 || useCache !== false) {
+				image = useCache === false ? item.image : useCache;
+
+			// SPRITE
+			} else if (item._webGLRenderStyle === 1) {
+				frame = item.spriteSheet.getFrame(item.currentFrame);
 				if (frame === null) { continue; }
 				image = frame.image;
-			} else {																// MISC (DOM objects render themselves later)
+
+			// MISC (DOM objects render themselves later)
+			} else {
 				continue;
 			}
 			if (!image) { continue; }
@@ -2276,8 +2639,9 @@ this.createjs = this.createjs||{};
 			texIndex = texture._activeIndex;
 			image._drawID = this._drawID;
 
-			if (item._webGLRenderStyle === 2 || useCache) {			// BITMAP / Cached Canvas
-				if (!useCache && item.sourceRect) {
+			// BITMAP / Cached Canvas
+			if (item._webGLRenderStyle === 2 || useCache !== false) {
+				if (useCache === false && item.sourceRect) {
 					// calculate uvs
 					if (!item._uvRect) { item._uvRect = {}; }
 					src = item.sourceRect;
@@ -2294,16 +2658,18 @@ this.createjs = this.createjs||{};
 					// calculate uvs
 					uvRect = StageGL.UV_RECT;
 					// calculate vertices
-					if (useCache) {
+					if (useCache === false) {
+						subL = 0;						subT = 0;
+						subR = image.width+subL;		subB = image.height+subT;
+					} else {
 						src = item.bitmapCache;
 						subL = src.x+(src._filterOffX/src.scale);	subT = src.y+(src._filterOffY/src.scale);
 						subR = (src._drawWidth/src.scale)+subL;		subB = (src._drawHeight/src.scale)+subT;
-					} else {
-						subL = 0;						subT = 0;
-						subR = image.width+subL;		subB = image.height+subT;
 					}
 				}
-			} else if (item._webGLRenderStyle === 1) {											// SPRITE
+
+			// SPRITE
+			} else if (item._webGLRenderStyle === 1) {
 				var rect = frame.rect;
 
 				// calculate uvs
@@ -2318,8 +2684,8 @@ this.createjs = this.createjs||{};
 			}
 
 			// These must be calculated here else a forced draw might happen after they're set
-			var offV1 = this.batchCardCount*StageGL.INDICIES_PER_CARD;		// offset for 1 component vectors
-			var offV2 = offV1*2;											// offset for 2 component vectors
+			var offV1 = this._batchVertexCount;					// offset for 1 component vectors
+			var offV2 = offV1*2;								// offset for 2 component vectors
 
 			//DHG: See Matrix2D.transformPoint for why this math specifically
 			// apply vertices
@@ -2344,21 +2710,67 @@ this.createjs = this.createjs||{};
 			// apply alpha
 			alphas[offV1] = alphas[offV1+1] = alphas[offV1+2] = alphas[offV1+3] = alphas[offV1+4] = alphas[offV1+5] = item.alpha * concatAlpha;
 
-			this.batchCardCount++;
+			this._batchVertexCount += StageGL.INDICIES_PER_CARD;
+
+			if (this._immediateRender) {
+				this._immediateBatchRender();
+			}
+		}
+
+		if (this._renderMode !== previousRenderMode) {
+			this._updateRenderMode(previousRenderMode);
 		}
 	};
 
 	/**
-	 * Draws all the currently defined cards in the buffer to the render surface.
-	 * @method _drawBuffers
-	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
+	 * The shader or effect needs to be drawn immediately, sub function of `_appendToBatch`
+	 * @method _immediateBatchRender
 	 * @protected
 	 */
-	p._drawBuffers = function (gl) {
-		if (this.batchCardCount <= 0) { return; }	// prevents error logs on stages filled with un-renederable content.
+	p._immediateBatchRender = function() {
+		var gl = this._webGLContext;
+
+		if (this._batchTextureConcat === null){
+			this._batchTextureConcat = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+		} else {
+			this.resizeTexture(this._batchTextureConcat, this._viewportWidth, this._viewportHeight);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureConcat._frameBuffer);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+		}
+		if (this._batchTextureTemp === null){
+			this._batchTextureTemp = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureTemp._frameBuffer);
+		} else {
+			this.resizeTexture(this._batchTextureTemp, this._viewportWidth, this._viewportHeight);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureTemp._frameBuffer);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+		}
+
+		var swap = this._batchTextureOutput;
+		this._batchTextureOutput = this._batchTextureConcat;
+		this._batchTextureConcat = swap;
+
+		this._activeShader = this._mainShader;
+		this.batchReason = "immediatePrep";
+		this._renderBatch();//<-----------------------------------------------------------------------------------------
+
+		this.batchReason = "immediateResults";
+		this._drawCover(this._batchTextureOutput._frameBuffer, this._batchTextureConcat, this._batchTextureTemp);
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
+	};
+
+	/**
+	 * Draws all the currently defined cards in the buffer to the render surface.
+	 * @method _renderBatch
+	 * @protected
+	 */
+	p._renderBatch = function () {
+		if (this._batchVertexCount <= 0) { return; }	// prevents error logs on stages filled with un-renederable content.
+		var gl = this._webGLContext;
 
 		if (this.vocalDebug) {
-			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
+			console.log("Batch["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
 		}
 		var shaderProgram = this._activeShader;
 		var vertexPositionBuffer = this._vertexPositionBuffer;
@@ -2393,29 +2805,27 @@ this.createjs = this.createjs||{};
 			this.setTextureParams(gl, texture.isPOT);
 		}
 
-		gl.drawArrays(gl.TRIANGLES, 0, this.batchCardCount*StageGL.INDICIES_PER_CARD);
+		gl.drawArrays(gl.TRIANGLES, 0, this._batchVertexCount);
+
+		this._batchVertexCount = 0;
 		this._batchID++;
 	};
 
 	/**
-	 * Draws a card that covers the entire render surface. Mainly used for filters.
-	 * @method _drawBuffers
-	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
+	 * Draws a card that covers the entire render surface. Mainly used for filters and composite operations.
+	 * @method _renderCover
 	 * @protected
 	 */
-	p._drawCover = function (gl) {
-		if (this._isDrawing > 0) {
-			this._drawBuffers(gl);
-		}
+	p._renderCover = function () {
+		var gl = this._webGLContext;
 
 		if (this.vocalDebug) {
-			console.log("Draw["+ this._drawID +":"+ this._batchID +"] : "+ "Cover");
+			console.log("Cover["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
 		}
 		var shaderProgram = this._activeShader;
 		var vertexPositionBuffer = this._vertexPositionBuffer;
 		var uvPositionBuffer = this._uvPositionBuffer;
 
-		gl.clear(gl.COLOR_BUFFER_BIT);
 		gl.useProgram(shaderProgram);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
@@ -2428,6 +2838,7 @@ this.createjs = this.createjs||{};
 		gl.uniform1i(shaderProgram.samplerUniform, 0);
 
 		gl.drawArrays(gl.TRIANGLES, 0, StageGL.INDICIES_PER_CARD);
+		this._batchID++; // while this isn't a batch, this fixes issues with expected textures in expected places
 	};
 
 	createjs.StageGL = createjs.promote(StageGL, "Stage");

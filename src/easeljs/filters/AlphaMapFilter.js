@@ -70,7 +70,7 @@ this.createjs = this.createjs || {};
 	function AlphaMapFilter(alphaMap) {
 		this.Filter_constructor();
 
-		if (!Filter.isValidImageSource(alphaMap)) {
+		if (!createjs.Filter.isValidImageSource(alphaMap)) {
 			throw "Must provide valid image source for alpha map, see Filter.isValidImageSource";
 		}
 
