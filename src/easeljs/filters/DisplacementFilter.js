@@ -96,14 +96,9 @@ this.createjs = this.createjs||{};
 			"uniform vec2 pixelAdjustment;" +
 
 			"void main(void) {" +
-				"vec4 dispSample = texture2D(" +
-					"uDudvSampler, " +
-					"vTextureCoord" +
-				");" +
-				"gl_FragColor = texture2D(" +
-					"uSampler, " +
-					"vTextureCoord + (dispSample.xy-0.5)*fPower*pixelAdjustment" +
-				");" +
+				"vec4 dudvValue = texture2D(uDudvSampler, vTextureCoord);" +
+				"vec2 sampleOffset = mix(vec2(0.0), dudvValue.rg-0.5, dudvValue.a) * (fPower*pixelAdjustment);" +
+				"gl_FragColor = texture2D(uSampler, vTextureCoord + sampleOffset);" +
 			"}"
 		);
 
@@ -166,14 +161,15 @@ this.createjs = this.createjs||{};
 		var dudvOffset, dudvPixel;
 
 		for (var i=0; i<height; i++) {
-			offset = i*width;
-			dudvOffset = ((i*(width/dudvWidth)) * dudvWidth) |0;
+			offset = i * width;
+			dudvOffset = ((i*(dudvHeight/height))|0) * dudvWidth;
 			for (var j=0; j<width; j++) {
-				pixel = (offset+j)*4;
-				dudvPixel = (dudvOffset + ((j*(height/dudvHeight)) |0) )*4;
+				pixel = (offset + j) *4;
+				dudvPixel = (dudvOffset + ((j*(dudvWidth/width)) |0) ) *4;
 
-				var xDelta = (((dudvPixels[dudvPixel] - 128)/128)*this.distance) |0;
-				var yDelta = (((dudvPixels[dudvPixel+1] - 128)/128)*this.distance) |0;
+				var deltaPower = dudvPixels[dudvPixel+3] / 255;
+				var xDelta = ((((dudvPixels[dudvPixel] - 128)/128) * deltaPower) * this.distance) |0;
+				var yDelta = ((((dudvPixels[dudvPixel+1] - 128)/128) * deltaPower) * this.distance |0);
 
 				if (j+xDelta < 0) { xDelta = -j; }
 				if (j+xDelta > width) { xDelta = width-j; }
