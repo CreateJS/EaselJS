@@ -1429,14 +1429,13 @@ this.createjs = this.createjs||{};
 		this._drawContent(container, true);
 
 		// re-align buffers with fake filter passes to solve certain error cases
-		if (manager._cacheCanvas !== ((manager._filterCount%2) ? this._batchTextureConcat : this._batchTextureOutput)) {
-			// pre filter pass to align output, may of become misaligned due to composite operations
-			filtersLeft++;
-		}
 		if (this.isCacheControlled) {
 			// post filter pass to place content into output buffer
 			//TODO: add in directDraw support for cache controlled StageGLs
 			filterCount++;
+			filtersLeft++;
+		} else if (manager._cacheCanvas !== ((manager._filterCount%2) ? this._batchTextureConcat : this._batchTextureOutput)) {
+			// pre filter pass to align output, may of become misaligned due to composite operations
 			filtersLeft++;
 		}
 
