@@ -116,7 +116,7 @@ this.createjs = this.createjs||{};
 			var canvas = this._dudvCanvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
 			canvas.width = dudvMap.width;
 			canvas.height = dudvMap.height;
-			(this._dudvCtx = canvas.getContext("2d")).drawImage(dudvMap);
+			(this._dudvCtx = canvas.getContext("2d")).drawImage(dudvMap, 0,0);
 		}
 	}
 	var p = createjs.extend(DisplacementFilter, createjs.Filter);

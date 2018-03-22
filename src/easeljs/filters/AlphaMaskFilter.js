@@ -91,7 +91,7 @@ this.createjs = this.createjs || {};
 				"vec4 color = texture2D(uSampler, vTextureCoord);" +
 				"vec4 alphaMap = texture2D(uAlphaSampler, vTextureCoord);" +
 
-				"gl_FragColor = vec4(color.rgb, color.a * alphaMap.a);" +
+				"gl_FragColor = vec4(color.rgb * alphaMap.a, color.a * alphaMap.a);" +
 			"}"
 		);
 	}

@@ -161,17 +161,12 @@
 				var grnPixel = ((grnY*width)+grnX)*4;
 				var bluPixel = ((bluY*width)+bluX)*4;
 
-				if(this._alphaMax) {
-					outPixels[pixel] =		refPixels[redPixel];
-					outPixels[pixel+1] =	refPixels[grnPixel+1];
-					outPixels[pixel+2] =	refPixels[bluPixel+2];
-					outPixels[pixel+3] =	refPixels[pixel+3];
-				} else {
-					outPixels[pixel] =		refPixels[redPixel];
-					outPixels[pixel+1] =	refPixels[grnPixel+1];
-					outPixels[pixel+2] =	refPixels[bluPixel+2];
-					outPixels[pixel+3] =	refPixels[pixel+3];
-				}
+				outPixels[pixel] =		refPixels[redPixel];
+				outPixels[pixel+1] =	refPixels[grnPixel+1];
+				outPixels[pixel+2] =	refPixels[bluPixel+2];
+				outPixels[pixel+3] =	this._alphaMax ?
+					Math.max(refPixels[redPixel+3], refPixels[grnPixel+3], refPixels[bluPixel+3]) :
+					(refPixels[redPixel+3] + refPixels[grnPixel+3] + refPixels[bluPixel+3]) / 3;
 			}
 		}
 

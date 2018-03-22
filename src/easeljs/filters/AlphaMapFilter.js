@@ -108,7 +108,8 @@ this.createjs = this.createjs || {};
 
 				// some image formats can have transparent white rgba(1,1,1, 0) when put on the GPU, this means we need a slight tweak
 				// using ceil ensure that the colour will be used so long as it exists but pure transparency will be treated black
-				"gl_FragColor = vec4(color.rgb, color.a * (alphaMap.r * ceil(alphaMap.a)));" +
+				"float newAlpha = alphaMap.r * ceil(alphaMap.a);" +
+				"gl_FragColor = vec4(clamp(color.rgb/color.a, 0.0, 1.0) * newAlpha, newAlpha);" +
 			"}"
 		);
 
