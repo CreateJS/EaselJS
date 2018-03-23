@@ -148,39 +148,51 @@ this.createjs = this.createjs||{};
 // private methods:
 	/** docced in super class **/
 	p._applyFilter = function(imageData) {
-		var refPixels = imageData.data.slice();
-		var outPixels = imageData.data;
+		var refArray = imageData.data.slice(); // as we're reaching across pixels we need an unmodified clone of the source
+
+		var outArray = imageData.data;
 		var width = imageData.width;
 		var height = imageData.height;
-		var offset, pixel;
+		var rowOffset, pixelStart;
 
-		var dudvData = this._dudvCtx.getImageData(0,0, this.dudvMap.width,this.dudvMap.height);
-		var dudvPixels = dudvData.data;
-		var dudvWidth = dudvData.width;
-		var dudvHeight = dudvData.height;
-		var dudvOffset, dudvPixel;
+		var sampleData = this._dudvCtx.getImageData(0,0, this.dudvMap.width,this.dudvMap.height);
+		var sampleArray = sampleData.data;
+		var sampleWidth = sampleData.width;
+		var sampleHeight = sampleData.height;
+		var sampleRowOffset, samplePixelStart;
 
+		var widthRatio = sampleWidth/width;
+		var heightRatio = sampleHeight/height;
+		var pxRange = 1/255;
+
+		// performance optimizing lookup
+		var distance = this.distance*2;
+
+		// the x and y need to stretch separately, nesting the for loops simplifies this logic even if the array is flat
 		for (var i=0; i<height; i++) {
-			offset = i * width;
-			dudvOffset = ((i*(dudvHeight/height))|0) * dudvWidth;
-			for (var j=0; j<width; j++) {
-				pixel = (offset + j) *4;
-				dudvPixel = (dudvOffset + ((j*(dudvWidth/width)) |0) ) *4;
+			rowOffset = i * width;
+			sampleRowOffset = ((i*heightRatio) |0) * sampleWidth;
 
-				var deltaPower = dudvPixels[dudvPixel+3] / 255;
-				var xDelta = ((((dudvPixels[dudvPixel] - 128)/128) * deltaPower) * this.distance) |0;
-				var yDelta = ((((dudvPixels[dudvPixel+1] - 128)/128) * deltaPower) * this.distance |0);
+			// the arrays are int arrays, so a single pixel is [r,g,b,a, ...],so calculate the start of the pixel
+			for (var j=0; j<width; j++) {
+				pixelStart = (rowOffset + j) *4;
+				samplePixelStart = (sampleRowOffset + ((j*widthRatio) |0)) *4;
+
+				// modify the pixels
+				var deltaPower = sampleArray[samplePixelStart+3] * pxRange * distance;
+				var xDelta = ((sampleArray[samplePixelStart] * pxRange - 0.5) * deltaPower) |0;
+				var yDelta = ((sampleArray[samplePixelStart+1] * pxRange - 0.5) * deltaPower) |0;
 
 				if (j+xDelta < 0) { xDelta = -j; }
 				if (j+xDelta > width) { xDelta = width-j; }
 				if (i+yDelta < 0) { yDelta = -i; }
 				if (i+yDelta > height) { yDelta = height-i; }
 
-				var targetPixel = (pixel + xDelta*4) + yDelta*4*width;
-				outPixels[pixel] =		refPixels[targetPixel];
-				outPixels[pixel+1] =	refPixels[targetPixel+1];
-				outPixels[pixel+2] =	refPixels[targetPixel+2];
-				outPixels[pixel+3] =	refPixels[targetPixel+3];
+				var targetPixelStart = (pixelStart + xDelta*4) + yDelta*4*width;
+				outArray[pixelStart] =   refArray[targetPixelStart];
+				outArray[pixelStart+1] = refArray[targetPixelStart+1];
+				outArray[pixelStart+2] = refArray[targetPixelStart+2];
+				outArray[pixelStart+3] = refArray[targetPixelStart+3];
 			}
 		}
 

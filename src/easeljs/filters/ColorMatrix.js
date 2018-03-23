@@ -138,7 +138,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Create an instance of ColorMatrix using the Greyscale preset.
-	 * This differs from -100 saturation in that it uses a balanced representation per channel instead of luminance.
+	 * Note: -100 saturation accounts for perceived brightness, the greyscale preset treats all channels equally.
 	 * @returns {ColorMatrix}
 	 */
 	ColorMatrix.createGreyscalePreset = function() {

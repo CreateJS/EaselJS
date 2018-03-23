@@ -164,23 +164,19 @@ this.createjs = this.createjs||{};
 	 * @param {Number} y The y position to use for the source rect.
 	 * @param {Number} width The width to use for the source rect.
 	 * @param {Number} height The height to use for the source rect.
-	 * @param {CanvasRenderingContext2D} [targetCtx] The 2D context to draw the result to. Defaults to the context passed to ctx.
-	 * @param {Number} [targetX] The x position to draw the result to. Defaults to the value passed to x.
-	 * @param {Number} [targetY] The y position to draw the result to. Defaults to the value passed to y.
+	 * @param {CanvasRenderingContext2D} [targetCtx=ctx] The 2D context to draw the result to. Defaults to the context passed to ctx.
 	 * @return {Boolean} If the filter was applied successfully.
 	 **/
-	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
+	p.applyFilter = function(ctx, x, y, width, height, targetCtx) {
 		// this is the default behaviour because most filters access pixel data. It is overridden when not needed.
 		targetCtx = targetCtx || ctx;
-		if (targetX == null) { targetX = x; }
-		if (targetY == null) { targetY = y; }
 		try {
 			var imageData = ctx.getImageData(x, y, width, height);
 		} catch (e) {
 			return false;
 		}
 		if (this._applyFilter(imageData)) {
-			targetCtx.putImageData(imageData, targetX, targetY);
+			targetCtx.putImageData(imageData, x, y);
 			return true;
 		}
 		return false;

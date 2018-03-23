@@ -85,18 +85,24 @@ this.createjs = this.createjs || {};
 		
 	// private properties:
 		/**
-		 * @property _alphaMap
+		 * @property _map
 		 * @protected
 		 * @type HTMLImageElement|HTMLCanvasElement
 		 **/
-		this._alphaMap = null;
+		this._map = null;
 		
 		/**
-		 * @property _mapData
+		 * @property _mapCtx
 		 * @protected
-		 * @type Uint8ClampedArray
+		 * @type CanvasRenderingContext2D
 		 **/
-		this._mapData = null;
+		this._mapCtx = null;
+
+		/**
+		 * @property _mapTexture
+		 * @protected
+		 * @type WebGLTexture
+		 */
 		this._mapTexture = null;
 
 		this.FRAG_SHADER_BODY = (
@@ -124,7 +130,7 @@ this.createjs = this.createjs || {};
 
 	/** docced in super class **/
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
-		if(!this._mapTexture) { this._mapTexture = gl.createTexture(); }
+		if(this._mapTexture === null) { this._mapTexture = gl.createTexture(); }
 
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, this._mapTexture);
@@ -143,8 +149,6 @@ this.createjs = this.createjs || {};
 	/** docced in super class **/
 	p.clone = function () {
 		var o = new AlphaMapFilter(this.alphaMap);
-		o._alphaMap = this._alphaMap;
-		o._mapData = this._mapData;
 		return o;
 	};
 
@@ -156,18 +160,43 @@ this.createjs = this.createjs || {};
 
 // private methods:
 	/** docced in super class **/
-	p._applyFilter = function (imageData) {
-		if (!this.alphaMap) { return true; }
+	p._applyFilter = function(imageData) {
 		if (!this._prepAlphaMap()) { return false; }
 
-		var data = imageData.data;
-		var map = this._mapData;
+		var outArray = imageData.data;
+		var width = imageData.width;
+		var height = imageData.height;
+		var rowOffset, pixelStart;
 
+		var sampleData = this._mapCtx.getImageData(0,0, this._map.width,this._map.height);
+		var sampleArray = sampleData.data;
+		var sampleWidth = sampleData.width;
+		var sampleHeight = sampleData.height;
+		var sampleRowOffset, samplePixelStart;
 
-		for(var i=0, l=data.length; i<l; i += 4) {
-			data[i + 3] = map[i] || 0;
+		var widthRatio = sampleWidth/width;
+		var heightRatio = sampleHeight/height;
+
+		// performance optimizing lookup
+
+		// the x and y need to stretch separately, nesting the for loops simplifies this logic even if the array is flat
+		for (var i=0; i<height; i++) {
+			rowOffset = i * width;
+			sampleRowOffset = ((i*heightRatio) |0) * sampleWidth;
+
+			// the arrays are int arrays, so a single pixel is [r,g,b,a, ...],so calculate the start of the pixel
+			for (var j=0; j<width; j++) {
+				pixelStart = (rowOffset + j) *4;
+				samplePixelStart = (sampleRowOffset + ((j*widthRatio) |0)) *4;
+
+				// modify the pixels
+				outArray[pixelStart] =   outArray[pixelStart];
+				outArray[pixelStart+1] = outArray[pixelStart+1];
+				outArray[pixelStart+2] = outArray[pixelStart+2];
+				outArray[pixelStart+3] = sampleArray[samplePixelStart];
+			}
 		}
-		
+
 		return true;
 	};
 
@@ -177,10 +206,9 @@ this.createjs = this.createjs || {};
 	 **/
 	p._prepAlphaMap = function () {
 		if (!this.alphaMap) { return false; }
-		if (this.alphaMap == this._alphaMap && this._mapData) { return true; }
+		if (this.alphaMap === this._map && this._mapCtx) { return true; }
 
-		this._mapData = null;
-		var map = this._alphaMap = this.alphaMap;
+		var map = this._map = this.alphaMap;
 		var canvas = map;
 		var ctx;
 		if (map instanceof HTMLCanvasElement) {
@@ -193,14 +221,8 @@ this.createjs = this.createjs || {};
 			ctx.drawImage(map, 0, 0);
 		}
 
-		try {
-			var imgData = ctx.getImageData(0, 0, map.width, map.height);
-		} catch (e) {
-			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
-			return false;
-		}
-		
-		this._mapData = imgData.data;
+		this._mapCtx = ctx;
+
 		return true;
 	};
 
