@@ -148,7 +148,15 @@ this.createjs = this.createjs||{};
 // private methods:
 	/** docced in super class **/
 	p._applyFilter = function(imageData) {
-		var refArray = imageData.data.slice(); // as we're reaching across pixels we need an unmodified clone of the source
+		// as we're reaching across pixels we need an unmodified clone of the source
+		// slice/from/map/filter don't work correctly in IE11 and subarray creates a ref
+		var refArray, refArraySrc = imageData.data;
+		if (refArraySrc.slice !== undefined) {
+			refArray = refArraySrc.slice();
+		} else {
+			refArray = new Uint8ClampedArray(refArraySrc.length);
+			refArray.set(refArraySrc);
+		}
 
 		var outArray = imageData.data;
 		var width = imageData.width;
