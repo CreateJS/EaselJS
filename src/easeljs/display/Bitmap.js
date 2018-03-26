@@ -212,7 +212,10 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clone = function(node) {
 		var image = this.image;
-		if(image && node){ image = image.cloneNode(); }
+		if(image && node){
+			image = image.cloneNode();
+			image.src = image.src; // IE cloneNode bug fix
+		}
 		var o = new Bitmap(image);
 		if (this.sourceRect) { o.sourceRect = this.sourceRect.clone(); }
 		this._cloneProps(o);
