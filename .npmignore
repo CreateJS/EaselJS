@@ -16,7 +16,6 @@
 Thumbs.db
 
 # Other
-*.lock
 *.log
 
 # Project
