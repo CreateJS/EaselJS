@@ -53,8 +53,11 @@ this.createjs = this.createjs||{};
 	 * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need,
 	 * and to physically enable some effects. The BitmapCache is also responsible for applying filters to objects and
 	 * reads each {{#crossLink "Filter"}}{{/crossLink}} due to this relationship. Real-time Filters are not recommended
-	 * performance wise when dealing with a Context2D canvas. For best performance and to still allow for some visual
-	 * effects use a compositeOperation when possible.
+	 * performance wise when dealing with a Context2D canvas. On a StageGL performance is better so the presence of a
+	 * filter will automatically create a cache if one is not made manually.
+	 *
+	 * Some visual effects can be achieved with a {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}}
+	 * so check out that setting before settling on a filter.
 	 * @class BitmapCache
 	 * @constructor
 	 **/
@@ -352,8 +355,8 @@ this.createjs = this.createjs||{};
 	 * specifics of how to use the options object.
 	 *
 	 * - If options.useGL is set to "new" a StageGL is created and contained on this for use when rendering the cache.
-	 * - If options.useGL is set to "stage" if the current stage is a StageGL it will be used. If not then it will default to "new".
-	 * - If options.useGL is a StageGL instance it will not create one but use the one provided.
+	 * - If options.useGL is set to "stage" if the current stage is a StageGL it will be used. Must be added to a stage first to work.
+	 * - If options.useGL is a StageGL instance then it will use it to cache. Warning, caches made on one StageGL will not render on any other StageGL.
 	 * - If options.useGL is undefined a Context 2D cache will be performed.
 	 *
 	 * This means you can use any combination of StageGL and 2D with either, neither, or both the stage and cache being
@@ -382,16 +385,21 @@ this.createjs = this.createjs||{};
 	 *
 	 *     var stageGL = new createjs.StageGL();
 	 *     var bmp = new createjs.Bitmap(src);
-	 *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: "stage"});       // use our StageGL to cache
+	 *
+	 *     // option 1
+	 *     stageGL.addChild(bmp);
+	 *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: "stage"});       // when added to the display list we can look it up
+	 *     // option 2
+	 *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: stageGL});       // we can specify it explicitly if we add it later
+	 *     stageGL.addChild(bmp);
 	 *
 	 *     var shape = new createjs.Shape();
 	 *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
 	 *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
 	 *
 	 * You may wish to create your own StageGL instance to control factors like clear color, transparency, AA, and
-	 * others. If you do, pass a new instance in instead of "true", the library will automatically set the
-	 * {{#crossLink "StageGL/isCacheControlled"}}{{/crossLink}} to true on your instance. This will trigger it to behave
-	 * correctly, and not assume your main context is WebGL.
+	 * others. If the specified stage is not rendering content and just the cache set{{#crossLink "StageGL/isCacheControlled"}}{{/crossLink}}
+	 * to true on your instance. This will trigger it to behave correctly for rendering your output.
 	 *
 	 * @public
 	 * @method BitmapCache.cache

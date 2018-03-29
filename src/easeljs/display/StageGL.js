@@ -152,11 +152,11 @@ this.createjs = this.createjs||{};
 		this.vocalDebug = false;
 
 		/**
-		 * Specifies whether this instance is slaved to a {{#crossLink "BitmapCache"}}{{/crossLink}} or is its own master.
-		 * Controls whether final rendering output of a {{#crossLink "cacheDraw"}}{{/crossLink}} command is to the canvas
-		 * or a render texture. See the {{#crossLink "cache"}}{{/crossLink}} function documentation and read the code for
-		 * full implications and details of necessity. Enabled by default when BitmapCache's `useGL` is true.
-		 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+		 * Specifies whether this instance is slaved to a {{#crossLink "BitmapCache"}}{{/crossLink}} or draws independantly.
+		 * Necessary to control texture outputs and behaviours when caching. StageGL cache outputs will only render
+		 * properly for the StageGL that made them. See the {{#crossLink "cache"}}{{/crossLink}} function documentation
+		 * for more information. Enabled by default when BitmapCache's `useGL` is true.
+		 * NOTE: This property is mainly for internal use, though it may be useful for advanced uses.
 		 * @property isCacheControlled
 		 * @type {Boolean}
 		 * @default false

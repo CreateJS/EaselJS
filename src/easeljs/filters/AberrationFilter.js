@@ -36,19 +36,21 @@
 
 // constructor:
 	/**
-	 * Seperates and pushes the different colour channels apart.
+	 * Separates and pushes each of the colour channels apart. I.E. shift the red channel slightly left.
+	 * Allows specifying the direction and the ammount it affects each channel. Great for computer glitches and VCR like
+	 * effects.
 	 *
 	 * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
 	 * @class AberrationFilter
 	 * @extends Filter
 	 * @constructor
-	 * @param {Number} [xDir=0] Movement in x, specified in pixels.
-	 * @param {Number} [yDir=0] Movement in y, specified in pixels.
-	 * @param {Number} [redMultiplier=0] Multiplier for movement of the Red channel. Negative values allowed.
-	 * @param {Number} [greenMultiplier=0] Multiplier for movement of the Green channel. Negative values allowed.
-	 * @param {Number} [blueMultiplier=0] Multiplier for movement of the Blue channel. Negative values allowed.
+	 * @param {Number} [xDir=0] Movement in x at a multiplier of 1, specified in pixels.
+	 * @param {Number} [yDir=0] Movement in y at a multiplier of 1, specified in pixels.
+	 * @param {Number} [redMultiplier=0] Multiplier for the movement of the Red channel. Negative values allowed.
+	 * @param {Number} [greenMultiplier=0] Multiplier for the movement of the Green channel. Negative values allowed.
+	 * @param {Number} [blueMultiplier=0] Multiplier for the movement of the Blue channel. Negative values allowed.
 	 * @param {Number} [originalMix=0] Amount of original image to keep, 0-1.
-	 * @param {Boolean} [alphaMax=false] Calculate combined alpha using maximum value available.
+	 * @param {Boolean} [alphaMax=false] Calculate combined alpha using maximum alpha available. Creates a stronger image.
 	 **/
 	function AberrationFilter(xDir, yDir, redMultiplier, greenMultiplier, blueMultiplier, originalMix, alphaMax) {
 		this.Filter_constructor();

@@ -39,9 +39,11 @@ this.createjs = this.createjs||{};
 
 // constructor:
 	/**
-	 * Base class that all filters should inherit from. Filters need to be applied to objects that have been cached using
-	 * the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method. If an object changes, please cache it again, or use
-	 * {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}. Note that the filters must be applied before caching.
+	 * Base class that all filters should inherit from. Appli
+	 *
+	 * When on a regular Stage apply the Filters and then cache the object using the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method.
+	 * When a cached object changes, please use {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}.
+	 * When on a StageGL simply setting content in the `.filters` array will trigger an automatic and constantly updated cache.
 	 *
 	 * <h4>Example</h4>
 	 *
@@ -57,6 +59,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * Any filter that consumes an external image stretches the image to cover the cached bounds. If this is an undesired
 	 * visual result, then use an intermediary cache to properly size and layout your data before passing it to a filter.
+	 *
 	 *
 	 * <h4>EaselJS Filters</h4>
 	 * EaselJS comes with a number of pre-built filters:
