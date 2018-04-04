@@ -87,6 +87,7 @@ this.createjs = this.createjs||{};
 	 * resize your canvas after making a StageGL instance, this will properly size the WebGL context stored in memory.
 	 * - Best performance in demanding scenarios will come from manual management of texture memory, but it is handled
 	 * automatically by default. See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for details.
+	 * - Disable `directDraw` to get access to cacheless filters and composite oeprations!
 	 *
 	 * <h4>Example</h4>
 	 * This example creates a StageGL instance, adds a child to it, then uses the EaselJS {{#crossLink "Ticker"}}{{/crossLink}}
@@ -117,7 +118,7 @@ this.createjs = this.createjs||{};
 	 * to perform anti-aliasing. This will also enable linear pixel sampling on power-of-two textures (smoother images).
 	 * @param {Boolean} [options.transparent=false] If `true`, the canvas is transparent. This is <strong>very</strong>
 	 * expensive, and should be used with caution.
-	 * @param {Boolean} [options.directDraw=false] If `true`, this will bypass intermediary render-textures when possible
+	 * @param {Boolean} [options.directDraw=true] If `true`, this will bypass intermediary render-textures when possible
 	 * resulting in reduced memory and increased performance, this disables some features. Cache-less filters and some
 	 * {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}} values rely on this being false.
 	 * @param (Boolean} [options.premultiply] @deprecated Upgraded colour & transparency handling have fixed the issue
@@ -210,7 +211,7 @@ this.createjs = this.createjs||{};
 		 * @type {Boolean}
 		 * @default false
 		 */
-		this._directDraw = directDraw;
+		this._directDraw = directDraw === undefined ? true : false;
 
 		/**
 		 * The width in px of the drawing surface saved in memory.
