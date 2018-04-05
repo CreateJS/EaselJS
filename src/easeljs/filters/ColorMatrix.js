@@ -107,6 +107,52 @@ this.createjs = this.createjs||{};
 	ColorMatrix.LENGTH = ColorMatrix.IDENTITY_MATRIX.length;
 
 
+// static methods:
+	/**
+	 * Create an instance of ColorMatrix using the Sepia preset
+	 * @returns {ColorMatrix}
+	 */
+	ColorMatrix.createSepiaPreset = function() {
+		return (new ColorMatrix()).copy([
+			0.4977, 0.9828, 0.1322, 0.0000, 14,
+			0.4977, 0.9828, 0.1322, 0.0000, -14,
+			0.4977, 0.9828, 0.1322, 0.0000, -47,
+			0.0000, 0.0000, 0.0000, 1.0000, 0,
+			0, 0, 0, 0, 1
+		]);
+	};
+
+	/**
+	 * Create an instance of ColorMatrix using an invert color preset
+	 * @returns {ColorMatrix}
+	 */
+	ColorMatrix.createInvertPreset = function() {
+		return (new ColorMatrix()).copy([
+			-1.0000, 0.0000, 0.0000, 0.0000, 255,
+			0.0000, -1.0000, 0.0000, 0.0000, 255,
+			0.0000, 0.0000, -1.0000, 0.0000, 255,
+			0.0000, 0.0000, 0.0000, 1.0000, 0,
+			0, 0, 0, 0, 1
+		]);
+	};
+
+	/**
+	 * Create an instance of ColorMatrix using the Greyscale preset.
+	 * Note: -100 saturation accounts for perceived brightness, the greyscale preset treats all channels equally.
+	 * @returns {ColorMatrix}
+	 */
+	ColorMatrix.createGreyscalePreset = function() {
+		return (new ColorMatrix()).copy([
+			0.3333, 0.3334, 0.3333, 0.0000, 0,
+			0.3333, 0.3334, 0.3333, 0.0000, 0,
+			0.3333, 0.3334, 0.3333, 0.0000, 0,
+			0.0000, 0.0000, 0.0000, 1.0000, 0,
+			0, 0, 0, 0, 1
+		]);
+	};
+
+	//TODO: some "fun" filters
+
 // public methods:
 	/**
 	 * Resets the instance with the specified values.
@@ -169,6 +215,24 @@ this.createjs = this.createjs||{};
 			0,0,0,1,0,
 			0,0,0,0,1
 		]);
+		return this;
+	};
+
+	/**
+	 * Adjusts the colour offset of pixel color by adding the specified value to the red, green and blue channels.
+	 * Positive values will make the image brighter, negative values will make it darker.
+	 * @method adjustBrightness
+	 * @param {Number} r A value between -255 & 255 that will be added to the Red channel.
+	 * @param {Number} g A value between -255 & 255 that will be added to the Green channel.
+	 * @param {Number} b A value between -255 & 255 that will be added to the Blue channel.
+	 * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	 **/
+	p.adjustOffset = function(r,g,b) {
+		if (isNaN(r) || isNaN(g) || isNaN(b)) { return this; }
+		this[4] = this._cleanValue(this[4] + r,255);
+		this[9] = this._cleanValue(this[9] + g,255);
+		this[14] = this._cleanValue(this[14] + b,255);
 		return this;
 	};
 
@@ -313,7 +377,13 @@ this.createjs = this.createjs||{};
 	 * @return {String} a string representation of the instance.
 	 **/
 	p.toString = function() {
-		return "[ColorMatrix]";
+		var sz = "";
+		sz += "    "+ this[0].toFixed(4)+", "+this[1].toFixed(4)+", "+this[2].toFixed(4)+", "+this[3].toFixed(4)+", "+(this[4]|0)+",\n";
+		sz += "    "+ this[5].toFixed(4)+", "+this[6].toFixed(4)+", "+this[7].toFixed(4)+", "+this[8].toFixed(4)+", "+(this[9]|0)+",\n";
+		sz += "    "+ this[10].toFixed(4)+", "+this[11].toFixed(4)+", "+this[12].toFixed(4)+", "+this[13].toFixed(4)+", "+(this[14]|0)+",\n";
+		sz += "    "+ this[15].toFixed(4)+", "+this[16].toFixed(4)+", "+this[17].toFixed(4)+", "+this[18].toFixed(4)+", "+(this[19]|0)+",\n";
+		sz += "    "+ (this[20]|0)+", "+(this[21]|0)+", "+(this[22]|0)+", "+(this[23]|0)+", "+(this[24]|0)+"\n";
+		return "[ColorMatrix] {\n"+ sz +"}";
 	};
 
 
@@ -366,7 +436,6 @@ this.createjs = this.createjs||{};
 		}
 		return matrix;
 	};
-
 
 	createjs.ColorMatrix = ColorMatrix;
 }());

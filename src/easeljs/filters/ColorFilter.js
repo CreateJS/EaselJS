@@ -135,7 +135,7 @@ this.createjs = this.createjs||{};
 			"uniform vec4 uColorOffset;" +
 
 			"void main(void) {" +
-				"vec4 color = texture2D(uSampler, vRenderCoord);" +
+				"vec4 color = texture2D(uSampler, vTextureCoord);" +
 
 				"gl_FragColor = (color * uColorMultiplier) + uColorOffset;" +
 			"}"

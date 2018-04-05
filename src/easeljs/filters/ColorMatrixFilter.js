@@ -56,6 +56,18 @@ this.createjs = this.createjs||{};
 	 *
 	 *      shape.cache(-50, -50, 100, 100);
 	 *
+	 * <h4>Example</h4>
+	 * This example uses a preset to generate a sepia photograph effect
+	 *
+	 *      var shape = new createjs.Shape().set({x:100,y:100});
+	 *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
+	 *
+	 *      shape.filters = [
+	 *          new createjs.ColorMatrixFilter( createjs.ColorMatrix.createSepiaPreset() )
+	 *      ];
+	 *
+	 *      shape.cache(-50, -50, 100, 100);
+	 *
 	 * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
 	 * @class ColorMatrixFilter
 	 * @constructor
@@ -79,14 +91,15 @@ this.createjs = this.createjs||{};
 			"uniform vec4 uColorMatrixOffset;" +
 
 			"void main(void) {" +
-				"vec4 color = texture2D(uSampler, vRenderCoord);" +
+				"vec4 color = texture2D(uSampler, vTextureCoord);" +
 
 				"mat4 m = uColorMatrix;" +
-				"vec4 newColor = vec4(0,0,0,0);" +
-				"newColor.r = color.r*m[0][0] + color.g*m[0][1] + color.b*m[0][2] + color.a*m[0][3];" +
-				"newColor.g = color.r*m[1][0] + color.g*m[1][1] + color.b*m[1][2] + color.a*m[1][3];" +
-				"newColor.b = color.r*m[2][0] + color.g*m[2][1] + color.b*m[2][2] + color.a*m[2][3];" +
-				"newColor.a = color.r*m[3][0] + color.g*m[3][1] + color.b*m[3][2] + color.a*m[3][3];" +
+				"vec4 newColor = vec4(" +
+					"color.r*m[0][0] + color.g*m[0][1] + color.b*m[0][2] + color.a*m[0][3]," +
+					"color.r*m[1][0] + color.g*m[1][1] + color.b*m[1][2] + color.a*m[1][3]," +
+					"color.r*m[2][0] + color.g*m[2][1] + color.b*m[2][2] + color.a*m[2][3]," +
+					"color.r*m[3][0] + color.g*m[3][1] + color.b*m[3][2] + color.a*m[3][3]" +
+				");" +
 
 				"gl_FragColor = newColor + uColorMatrixOffset;" +
 			"}"

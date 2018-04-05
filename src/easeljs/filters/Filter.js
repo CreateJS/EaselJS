@@ -39,9 +39,11 @@ this.createjs = this.createjs||{};
 
 // constructor:
 	/**
-	 * Base class that all filters should inherit from. Filters need to be applied to objects that have been cached using
-	 * the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method. If an object changes, please cache it again, or use
-	 * {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}. Note that the filters must be applied before caching.
+	 * Base class that all filters should inherit from. Appli
+	 *
+	 * When on a regular Stage apply the Filters and then cache the object using the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method.
+	 * When a cached object changes, please use {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}.
+	 * When on a StageGL simply setting content in the `.filters` array will trigger an automatic and constantly updated cache.
 	 *
 	 * <h4>Example</h4>
 	 *
@@ -55,13 +57,20 @@ this.createjs = this.createjs||{};
 	 * margins that need to be applied in order to fully display the filter. For example, the {{#crossLink "BlurFilter"}}{{/crossLink}}
 	 * will cause an object to feather outwards, resulting in a margin around the shape.
 	 *
+	 * Any filter that consumes an external image stretches the image to cover the cached bounds. If this is an undesired
+	 * visual result, then use an intermediary cache to properly size and layout your data before passing it to a filter.
+	 *
+	 *
 	 * <h4>EaselJS Filters</h4>
 	 * EaselJS comes with a number of pre-built filters:
-	 * <ul><li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
-	 *      <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
-	 *      <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
-	 *      <li>{{#crossLink "ColorFilter"}}{{/crossLink}}: Color transform a display object</li>
-	 *      <li>{{#crossLink "ColorMatrixFilter"}}{{/crossLink}}: Transform an image using a {{#crossLink "ColorMatrix"}}{{/crossLink}}</li>
+	 * <ul>
+	 *     <li>{{#crossLink "AberrationFilter"}}{{/crossLink}} : Shift the RGB components separately along a given vector</li>
+	 *     <li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
+	 *     <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
+	 *     <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
+	 *     <li>{{#crossLink "ColorFilter"}}{{/crossLink}}: Color transform a display object</li>
+	 *     <li>{{#crossLink "ColorMatrixFilter"}}{{/crossLink}}: Transform an image using a {{#crossLink "ColorMatrix"}}{{/crossLink}}</li>
+	 *     <li>{{#crossLink "DisplacementFilter"}}{{/crossLink}}: Create localized distortions in supplied display object</li>
 	 * </ul>
 	 *
 	 * @class Filter
@@ -89,7 +98,6 @@ this.createjs = this.createjs||{};
 		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
 		 * This should be based upon StageGL.SHADER_VERTEX_BODY_REGULAR
 		 * @property VTX_SHADER
-		 * @virtual
 		 * @type {String}
 		 * @readonly
 		 */
@@ -99,13 +107,36 @@ this.createjs = this.createjs||{};
 		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
 		 * This should be based upon StageGL.SHADER_FRAGMENT_BODY_REGULAR
 		 * @property FRAG_SHADER
-		 * @virtual
 		 * @type {String}
 		 * @readonly
 		 */
 		this.FRAG_SHADER_BODY = null;
 	}
 	var p = Filter.prototype;
+
+// static methods:
+	/**
+	 * Check to see if an image source being provided is one that is valid.
+	 * <h4>Valid Sources:</h4>
+	 * <ul>
+	 *     <li>Image Object</li>
+	 *     <li>HTML Canvas Element</li>
+	 *     <li>`.cacheCanvas` on an object with the same stage</li>
+	 * </ul>
+	 * WebGLTextures CANNOT be shared between multiple WebGL contexts. This means the only safe source for a WebGLTexture
+	 * is an object cached using the same StageGL as the object trying to use it in a filter. This function does not
+	 * enforce that restriction, as it is difficult or expensive to detect. The render will crash or fail to load the
+	 * image data if the rule isn't followed.
+	 * @param {HTMLImageElement|HTMLCanvasElement|WebGLTexture} src The element to check for validity
+	 * @return Boolean Whether the source is valid
+	 */
+	Filter.isValidImageSource = function(src) {
+		return Boolean(src) && (
+			src instanceof Image ||
+			src instanceof WebGLTexture ||
+			src instanceof HTMLCanvasElement
+		);
+	};
 
 // public methods:
 	/**
@@ -136,23 +167,19 @@ this.createjs = this.createjs||{};
 	 * @param {Number} y The y position to use for the source rect.
 	 * @param {Number} width The width to use for the source rect.
 	 * @param {Number} height The height to use for the source rect.
-	 * @param {CanvasRenderingContext2D} [targetCtx] The 2D context to draw the result to. Defaults to the context passed to ctx.
-	 * @param {Number} [targetX] The x position to draw the result to. Defaults to the value passed to x.
-	 * @param {Number} [targetY] The y position to draw the result to. Defaults to the value passed to y.
+	 * @param {CanvasRenderingContext2D} [targetCtx=ctx] The 2D context to draw the result to. Defaults to the context passed to ctx.
 	 * @return {Boolean} If the filter was applied successfully.
 	 **/
-	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
+	p.applyFilter = function(ctx, x, y, width, height, targetCtx) {
 		// this is the default behaviour because most filters access pixel data. It is overridden when not needed.
 		targetCtx = targetCtx || ctx;
-		if (targetX == null) { targetX = x; }
-		if (targetY == null) { targetY = y; }
 		try {
 			var imageData = ctx.getImageData(x, y, width, height);
 		} catch (e) {
 			return false;
 		}
 		if (this._applyFilter(imageData)) {
-			targetCtx.putImageData(imageData, targetX, targetY);
+			targetCtx.putImageData(imageData, x, y);
 			return true;
 		}
 		return false;

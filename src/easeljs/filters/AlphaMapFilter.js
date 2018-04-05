@@ -64,12 +64,16 @@ this.createjs = this.createjs || {};
 	 * @class AlphaMapFilter
 	 * @extends Filter
 	 * @constructor
-	 * @param {HTMLImageElement|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
+	 * @param {HTMLImageElement|HTMLCanvasElement|WebGLTexture} alphaMap The greyscale image (or canvas) to use as the alpha value for the
 	 * result. This should be exactly the same dimensions as the target.
 	 **/
 	function AlphaMapFilter(alphaMap) {
 		this.Filter_constructor();
-	
+
+		if (!createjs.Filter.isValidImageSource(alphaMap)) {
+			throw "Must provide valid image source for alpha map, see Filter.isValidImageSource";
+		}
+
 	// public properties:
 		/**
 		 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
@@ -79,35 +83,45 @@ this.createjs = this.createjs || {};
 		 **/
 		this.alphaMap = alphaMap;
 		
-		
 	// private properties:
 		/**
-		 * @property _alphaMap
+		 * @property _map
 		 * @protected
 		 * @type HTMLImageElement|HTMLCanvasElement
 		 **/
-		this._alphaMap = null;
+		this._map = null;
 		
 		/**
-		 * @property _mapData
+		 * @property _mapCtx
 		 * @protected
-		 * @type Uint8ClampedArray
+		 * @type CanvasRenderingContext2D
 		 **/
-		this._mapData = null;
+		this._mapCtx = null;
+
+		/**
+		 * @property _mapTexture
+		 * @protected
+		 * @type WebGLTexture
+		 */
 		this._mapTexture = null;
 
 		this.FRAG_SHADER_BODY = (
 			"uniform sampler2D uAlphaSampler;"+
 
 			"void main(void) {" +
-				"vec4 color = texture2D(uSampler, vRenderCoord);" +
+				"vec4 color = texture2D(uSampler, vTextureCoord);" +
 				"vec4 alphaMap = texture2D(uAlphaSampler, vTextureCoord);" +
 
 				// some image formats can have transparent white rgba(1,1,1, 0) when put on the GPU, this means we need a slight tweak
 				// using ceil ensure that the colour will be used so long as it exists but pure transparency will be treated black
-				"gl_FragColor = vec4(color.rgb, color.a * (alphaMap.r * ceil(alphaMap.a)));" +
+				"float newAlpha = alphaMap.r * ceil(alphaMap.a);" +
+				"gl_FragColor = vec4(clamp(color.rgb/color.a, 0.0, 1.0) * newAlpha, newAlpha);" +
 			"}"
 		);
+
+		if(alphaMap instanceof WebGLTexture) {
+			this._mapTexture = alphaMap;
+		}
 	}
 	var p = createjs.extend(AlphaMapFilter, createjs.Filter);
 
@@ -116,12 +130,14 @@ this.createjs = this.createjs || {};
 
 	/** docced in super class **/
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
-		if(!this._mapTexture) { this._mapTexture = gl.createTexture(); }
+		if(this._mapTexture === null) { this._mapTexture = gl.createTexture(); }
 
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, this._mapTexture);
 		stage.setTextureParams(gl);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.alphaMap);
+		if (this.alphaMap !== this._mapTexture) {
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.alphaMap);
+		}
 
 		gl.uniform1i(
 			gl.getUniformLocation(shaderProgram, "uAlphaSampler"),
@@ -133,8 +149,6 @@ this.createjs = this.createjs || {};
 	/** docced in super class **/
 	p.clone = function () {
 		var o = new AlphaMapFilter(this.alphaMap);
-		o._alphaMap = this._alphaMap;
-		o._mapData = this._mapData;
 		return o;
 	};
 
@@ -146,15 +160,43 @@ this.createjs = this.createjs || {};
 
 // private methods:
 	/** docced in super class **/
-	p._applyFilter = function (imageData) {
-		if (!this.alphaMap) { return true; }
+	p._applyFilter = function(imageData) {
 		if (!this._prepAlphaMap()) { return false; }
-		
-		// TODO: update to support scenarios where the target has different dimensions.
-		var data = imageData.data;
-		var map = this._mapData;
-		for(var i=0, l=data.length; i<l; i += 4) { data[i + 3] = map[i] || 0; }
-		
+
+		var outArray = imageData.data;
+		var width = imageData.width;
+		var height = imageData.height;
+		var rowOffset, pixelStart;
+
+		var sampleData = this._mapCtx.getImageData(0,0, this._map.width,this._map.height);
+		var sampleArray = sampleData.data;
+		var sampleWidth = sampleData.width;
+		var sampleHeight = sampleData.height;
+		var sampleRowOffset, samplePixelStart;
+
+		var widthRatio = sampleWidth/width;
+		var heightRatio = sampleHeight/height;
+
+		// performance optimizing lookup
+
+		// the x and y need to stretch separately, nesting the for loops simplifies this logic even if the array is flat
+		for (var i=0; i<height; i++) {
+			rowOffset = i * width;
+			sampleRowOffset = ((i*heightRatio) |0) * sampleWidth;
+
+			// the arrays are int arrays, so a single pixel is [r,g,b,a, ...],so calculate the start of the pixel
+			for (var j=0; j<width; j++) {
+				pixelStart = (rowOffset + j) *4;
+				samplePixelStart = (sampleRowOffset + ((j*widthRatio) |0)) *4;
+
+				// modify the pixels
+				outArray[pixelStart] =   outArray[pixelStart];
+				outArray[pixelStart+1] = outArray[pixelStart+1];
+				outArray[pixelStart+2] = outArray[pixelStart+2];
+				outArray[pixelStart+3] = sampleArray[samplePixelStart];
+			}
+		}
+
 		return true;
 	};
 
@@ -164,10 +206,9 @@ this.createjs = this.createjs || {};
 	 **/
 	p._prepAlphaMap = function () {
 		if (!this.alphaMap) { return false; }
-		if (this.alphaMap == this._alphaMap && this._mapData) { return true; }
+		if (this.alphaMap === this._map && this._mapCtx) { return true; }
 
-		this._mapData = null;
-		var map = this._alphaMap = this.alphaMap;
+		var map = this._map = this.alphaMap;
 		var canvas = map;
 		var ctx;
 		if (map instanceof HTMLCanvasElement) {
@@ -180,14 +221,8 @@ this.createjs = this.createjs || {};
 			ctx.drawImage(map, 0, 0);
 		}
 
-		try {
-			var imgData = ctx.getImageData(0, 0, map.width, map.height);
-		} catch (e) {
-			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
-			return false;
-		}
-		
-		this._mapData = imgData.data;
+		this._mapCtx = ctx;
+
 		return true;
 	};
 

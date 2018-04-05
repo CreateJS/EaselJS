@@ -115,7 +115,7 @@ this.createjs = this.createjs||{};
 
 				"for(int i=0; i<{{blurX}}; i++) {" +
 					"for(int j=0; j<{{blurY}}; j++) {" +
-						"sampleOffset = vRenderCoord + (textureOffset * vec2(float(i)-xAdj, float(j)-yAdj));" +
+						"sampleOffset = vTextureCoord + (textureOffset * vec2(float(i)-xAdj, float(j)-yAdj));" +
 						"color += texture2D(uSampler, sampleOffset) * (xWeight[i] * yWeight[j]);" +
 					"}" +
 				"}" +
@@ -163,7 +163,7 @@ this.createjs = this.createjs||{};
 		}
 		return this._compiledShader;
 	};
-	p._setShader = function() { this._compiledShader; };
+	p._setShader = function(value) { this._compiledShader = value; };
 
 	try {
 		Object.defineProperties(p, {
