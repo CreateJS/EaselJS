@@ -211,7 +211,7 @@ this.createjs = this.createjs||{};
 		 * @type {Boolean}
 		 * @default false
 		 */
-		this._directDraw = directDraw === undefined ? true : false;
+		this._directDraw = directDraw === undefined ? true : (!!directDraw);
 
 		/**
 		 * The width in px of the drawing surface saved in memory.
@@ -1276,6 +1276,8 @@ this.createjs = this.createjs||{};
 				gl.enable(gl.BLEND);
 				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 				gl.clearColor(0.0, 0.0, 0.0, 0);
+				gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+				gl.blendFuncSeparate(gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 				this._createBuffers();
 				this._initMaterials();
@@ -2427,7 +2429,7 @@ this.createjs = this.createjs||{};
 		this._activeShader = this._mainShader;
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
-		gl.clear(gl.COLOR_BUFFER_BIT);
+		if(this._batchTextureOutput._frameBuffer !== null) { gl.clear(gl.COLOR_BUFFER_BIT); }
 
 		this._appendToBatch(content, new createjs.Matrix2D(), this.alpha, ignoreCache);
 
@@ -2543,7 +2545,7 @@ this.createjs = this.createjs||{};
 					item._updateState();
 				}
 
-				if(!ignoreCache && item.cacheCanvas === null && item.filters !== null && item.filters.length) {
+				if(!this._directDraw && (!ignoreCache && item.cacheCanvas === null && item.filters !== null && item.filters.length)) {
 					var bounds;
 					if (item.bitmapCache === null) {
 						bounds = item.getBounds();
