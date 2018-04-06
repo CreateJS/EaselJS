@@ -1,3 +1,18 @@
+Version 1.1.0 (April 05, 2018)
+****************************************************************************************************
+CRITICAL (may break existing content):
+- filters now always stretch loaded images in both GL and Context2D
+
+NEW 
+- Chromatic Abberation Filter (shift independant color channels
+- Displacement Map Filter (reposition portions of the rendered image)
+- StageGL composite operations, avaiable through `StageGL.directDraw = false`
+
+*****
+OTHER:
+- minor bug fixes in StageGL
+
+
 Version 1.0.0 (September 14, 2017)
 ****************************************************************************************************
 CRITICAL (may break existing content):
