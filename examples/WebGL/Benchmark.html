@@ -63,8 +63,8 @@
 		this.objects = MaxPerTick;
 		this.triangles = "";
 
-		this.texture = "Individual";
-		this.particleRender = false;
+		this.texture = "Sprite Sheet";
+		this.directDraw = true;
 		this.allowWebGL = true;
 
 		this.more = handleRelease;	// add event listener for down
@@ -113,7 +113,7 @@
 		propsFolder.open();
 		propsFolder.add(guiProps, "texture", ["Individual", "Sprite Sheet"]).onChange(toggleEffect);
 		propsFolder.add(guiProps, "allowWebGL").onChange(toggleEffect);
-		//propParticle = propsFolder.add(guiProps, "particleRender").onChange(toggleEffect);
+		propsFolder.add(guiProps, "directDraw").onChange(toggleEffect);
 
 		gui.add(guiProps, "reset");
 
@@ -187,8 +187,9 @@
 		canvas.width = CANVAS_WIDTH;
 		canvas.height = CANVAS_HEIGHT;
 		if(guiProps.allowWebGL) {
+			//debugger;
 			// we know we wont be unloading textures, so turn off the cleanup routine to get maximum speed
-			stage = new createjs.StageGL(canvas, {autoPurge: -1});
+			stage = new createjs.StageGL(canvas, {autoPurge: -1, directDraw: guiProps.directDraw});
 			stage.setClearColor(0x000000);
 		} else {
 			stage = new createjs.Stage(canvas);
