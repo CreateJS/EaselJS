@@ -1596,7 +1596,7 @@ this.createjs = this.createjs||{};
 				-1,							1,								0,							1
 			]);
 
-			if (this._bufferTextureOutput !== null) {
+			if (this._bufferTextureOutput !== this && this._bufferTextureOutput !== null) {
 				this.resizeTexture(this._bufferTextureOutput, this._viewportWidth, this._viewportHeight);
 			}
 			if (this._bufferTextureConcat !== null) {
