@@ -53,8 +53,8 @@ this.createjs = this.createjs||{};
 	 * rely on an event object's state outside of the call stack it was received in.
 	 * @class Event
 	 * @param {String} type The event type.
-	 * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
-	 * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
+	 * @param {Boolean} [bubbles=false] Indicates whether the event will bubble through the display list.
+	 * @param {Boolean} [cancelable=false] Indicates whether the default behaviour of this event can be cancelled.
 	 * @constructor
 	 **/
 	function Event(type, bubbles, cancelable) {
