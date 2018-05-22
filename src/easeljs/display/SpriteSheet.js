@@ -369,6 +369,11 @@ this.createjs = this.createjs||{};
 	p._getAnimations = function() {
 		return this._animations.slice();
 	};
+
+	/**
+	 * @method getAnimations
+	 * @deprecated Use the {{#crossLink "SpriteSheet/animations:property"}}{{/crossLink}} property instead.
+	 */
 	// SpriteSheet.getAnimations is @deprecated. Remove for 1.1+
 	p.getAnimations = createjs.deprecate(p._getAnimations, "SpriteSheet.getAnimations");
 

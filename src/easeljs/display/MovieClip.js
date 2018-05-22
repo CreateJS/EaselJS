@@ -337,6 +337,11 @@ this.createjs = this.createjs||{};
 	p._getLabels = function() {
 		return this.timeline.getLabels();
 	};
+
+	/**
+	 * @method getLabels
+	 * @deprecated Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
+	 */
 	// MovieClip.getLabels is @deprecated. Remove for 1.1+
 	p.getLabels = createjs.deprecate(p._getLabels, "MovieClip.getLabels");
 
@@ -349,6 +354,11 @@ this.createjs = this.createjs||{};
 	p._getCurrentLabel = function() {
 		return this.timeline.currentLabel;
 	};
+
+	/**
+	 * @method getCurrentLabel
+	 * @deprecated Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
+	 */
 	// MovieClip.getCurrentLabel is @deprecated. Remove for 1.1+
 	p.getCurrentLabel = createjs.deprecate(p._getCurrentLabel, "MovieClip.getCurrentLabel");
 
@@ -361,6 +371,11 @@ this.createjs = this.createjs||{};
 	p._getDuration = function() {
 		return this.timeline.duration;
 	};
+
+	/**
+	 * @method getDuration
+	 * @deprecated Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
+	 */
 	// MovieClip.getDuration is @deprecated. Remove for 1.1+
 	p.getDuration = createjs.deprecate(p._getDuration, "MovieClip.getDuration");
 

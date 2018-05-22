@@ -103,6 +103,11 @@ this.createjs = this.createjs||{};
 	p._getNumChildren = function() {
 		return this.children.length;
 	};
+
+	/**
+	 * @method getNumChildren
+	 * @deprecated Use the {{#crossLink "Container/numChildren:property"}}{{/crossLink}} property instead.
+	 */
 	// Container.getNumChildren is @deprecated. Remove for 1.1+
 	p.getNumChildren = createjs.deprecate(p._getNumChildren, "Container.getNumChildren");
 
