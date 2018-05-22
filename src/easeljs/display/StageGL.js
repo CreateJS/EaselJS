@@ -50,6 +50,8 @@ this.createjs = this.createjs||{};
  * Render___: actual WebGL draw call
  * Buffer: WebGL array data
  * Cover: A card that covers the entire viewport
+ * Dst: The existing drawing surface in the shader
+ * Src: The new data being provided in the shader
  *
  * - Notes:
  * WebGL treats 0,0 as the bottom left, as such there's a lot of co-ordinate space flipping to make regular canvas
@@ -814,7 +816,7 @@ this.createjs = this.createjs||{};
 				"{{alternates}}" +
 			"}" +
 
-			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
+			"gl_FragColor = vec4(color.rgb * alphaValue, color.a * alphaValue);" +
 		"}"
 	);
 
@@ -2539,6 +2541,7 @@ this.createjs = this.createjs||{};
 			var useCache = (!ignoreCache && item.cacheCanvas) || false;
 
 			if (!(item.visible && concatAlpha > 0.0035)) { continue; }
+			var itemAlpha = item.alpha;
 
 			if (useCache === false) {
 				if (item._updateState){
@@ -2556,11 +2559,13 @@ this.createjs = this.createjs||{};
 						this.batchReason = "cachelessFilterInterupt";
 						this._renderBatch();					// <----------------------------------------------------
 
+						item.alpha = 1;
 						var shaderBackup = this._activeShader;
 						bounds = bounds || item.getBounds();
 						item.bitmapCache.define(item, bounds.x, bounds.y, bounds.width, bounds.height, 1, {useGL:this});
 						useCache = item.bitmapCache._cacheCanvas;
 
+						item.alpha = itemAlpha;
 						this._activeShader = shaderBackup;
 						gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
 					}
@@ -2568,7 +2573,7 @@ this.createjs = this.createjs||{};
 			}
 
 			if (useCache === false && item.children) {
-				this._appendToBatch(item, cMtx, item.alpha * concatAlpha);
+				this._appendToBatch(item, cMtx, itemAlpha * concatAlpha);
 				continue;
 			}
 
@@ -2710,7 +2715,7 @@ this.createjs = this.createjs||{};
 			texI[offV1] = texI[offV1+1] = texI[offV1+2] = texI[offV1+3] = texI[offV1+4] = texI[offV1+5] = texIndex;
 
 			// apply alpha
-			alphas[offV1] = alphas[offV1+1] = alphas[offV1+2] = alphas[offV1+3] = alphas[offV1+4] = alphas[offV1+5] = item.alpha * concatAlpha;
+			alphas[offV1] = alphas[offV1+1] = alphas[offV1+2] = alphas[offV1+3] = alphas[offV1+4] = alphas[offV1+5] = itemAlpha * concatAlpha;
 
 			this._batchVertexCount += StageGL.INDICIES_PER_CARD;
 
