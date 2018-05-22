@@ -106,10 +106,18 @@ this.createjs = this.createjs||{};
 		return img;
 	};
 
+	/**
+	 * @method addFlippedFrames
+	 * @deprecated Use the {{#crossLink "DisplayObject/scaleX:property"}}{{/crossLink}} property instead.
+	 */
 	// SpriteSheetUtils.addFlippedFrames is @deprecated. Remove for 1.1+
 	SpriteSheetUtils.addFlippedFrames = createjs.deprecate(null, "SpriteSheetUtils.addFlippedFrames");
 
-	// SpriteSheetUtils.addFlippedFrames is @deprecated. Remove for 1.1+
+	/**
+	 * @method mergeAlpha
+	 * @deprecated Use the {{#crossLink "AlphaMapFilter"}}{{/crossLink}} instead.
+	 */
+	// SpriteSheetUtils.mergeAlpha is @deprecated. Remove for 1.1+
 	SpriteSheetUtils.mergeAlpha = createjs.deprecate(null, "SpriteSheetUtils.mergeAlpha");
 
 	

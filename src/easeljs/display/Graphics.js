@@ -386,6 +386,11 @@ this.createjs = this.createjs||{};
 		this._updateInstructions();
 		return this._instructions;
 	};
+
+	/**
+	 * @method getInstructions
+	 * @deprecated Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
+	 */
 	// Graphics.getInstructions is @deprecated. Remove for 1.1+
 	p.getInstructions = createjs.deprecate(p._getInstructions, "Graphics.getInstructions");
 

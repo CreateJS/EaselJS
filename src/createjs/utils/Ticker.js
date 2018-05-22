@@ -316,6 +316,11 @@ this.createjs = this.createjs||{};
 		if (!Ticker._inited) { return; }
 		Ticker._setupTick();
 	};
+
+	/**
+	 * @method setInterval
+	 * @deprecated Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
+	 */
 	// Ticker.setInterval is @deprecated. Remove for 1.1+
 	Ticker.setInterval = createjs.deprecate(Ticker._setInterval, "Ticker.setInterval");
 
@@ -329,6 +334,11 @@ this.createjs = this.createjs||{};
 	Ticker._getInterval = function() {
 		return Ticker._interval;
 	};
+
+	/**
+	 * @method getInterval
+	 * @deprecated Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
+	 */
 	// Ticker.getInterval is @deprecated. Remove for 1.1+
 	Ticker.getInterval = createjs.deprecate(Ticker._getInterval, "Ticker.getInterval");
 
@@ -342,6 +352,11 @@ this.createjs = this.createjs||{};
 	Ticker._setFPS = function(value) {
 		Ticker._setInterval(1000/value);
 	};
+
+	/**
+	 * @method setFPS
+	 * @deprecated Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
+	 */
 	// Ticker.setFPS is @deprecated. Remove for 1.1+
 	Ticker.setFPS = createjs.deprecate(Ticker._setFPS, "Ticker.setFPS");
 
@@ -355,6 +370,11 @@ this.createjs = this.createjs||{};
 	Ticker._getFPS = function() {
 		return 1000/Ticker._interval;
 	};
+
+	/**
+	 * @method getFPS
+	 * @deprecated Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
+	 */
 	// Ticker.getFPS is @deprecated. Remove for 1.1+
 	Ticker.getFPS = createjs.deprecate(Ticker._getFPS, "Ticker.getFPS");
 
