@@ -114,7 +114,7 @@ this.createjs = this.createjs || {};
 	// TODO: deprecated
 	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
 		if(!this._mapTexture) { this._mapTexture = gl.createTexture(); }
 
@@ -130,7 +130,7 @@ this.createjs = this.createjs || {};
 	};
 
 // public methods:
-	/** docced in super class **/
+	// Docced in superclass
 	p.clone = function () {
 		var o = new AlphaMapFilter(this.alphaMap);
 		o._alphaMap = this._alphaMap;
@@ -138,16 +138,15 @@ this.createjs = this.createjs || {};
 		return o;
 	};
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.toString = function () {
 		return "[AlphaMapFilter]";
 	};
 
 
 // private methods:
-	/** docced in super class **/
+	// Docced in superclass
 	p._applyFilter = function (imageData) {
-		if (!this.alphaMap) { return true; }
 		if (!this._prepAlphaMap()) { return false; }
 		
 		// TODO: update to support scenarios where the target has different dimensions.

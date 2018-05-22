@@ -118,9 +118,12 @@ this.createjs = this.createjs||{};
 		this.primary = !!primary;
 		
 		/**
-		 * The secondary target for the event, if applicable. This is used for mouseout/rollout
-		 * events to indicate the object that the mouse entered from, mouseover/rollover for the object the mouse exited,
-		 * and stagemousedown/stagemouseup events for the object that was the under the cursor, if any.
+		 * The secondary target for the event, if applicable. This is used for {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}/
+		 * {{#crossLink "DisplayObject/rollout:event"}}{{/crossLink}}
+		 * events to indicate the object that the mouse entered from, {{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}/
+		 * {{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}} for the object the mouse exited,
+		 * and {{#crossLink "Stage/stagemousedown:event"}}{{/crossLink}}/{{#crossLink "Stage/stagemouseup:event"}}{{/crossLink}}
+		 * events for the object that was the under the cursor, if any.
 		 * 
 		 * Only valid interaction targets will be returned (ie. objects with mouse listeners or a cursor set).
 		 * @property relatedTarget

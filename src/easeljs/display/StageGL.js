@@ -936,9 +936,7 @@ this.createjs = this.createjs||{};
 	};
 
 // public methods:
-	/**
-	 * Docced in superclass
-	 */
+	// Docced in superclass
 	p.update = function (props) {
 		if (!this.canvas) { return; }
 		if (this.tickOnUpdate) { this.tick(props); }
@@ -962,9 +960,7 @@ this.createjs = this.createjs||{};
 		this.dispatchEvent("drawend");
 	};
 
-	/**
-	 * Docced in superclass
-	 */
+	// Docced in superclass
 	p.clear = function () {
 		if (!this.canvas) { return; }
 		if (StageGL.isWebGLActive(this._webGLContext)) {
@@ -1459,9 +1455,7 @@ this.createjs = this.createjs||{};
 		this._webGLContext.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
 	};
 
-	/**
-	 * docced in subclass
-	 */
+	// Docced in subclass
 	p.toString = function () {
 		return "[StageGL (name="+  this.name +")]";
 	};
@@ -1829,6 +1823,7 @@ this.createjs = this.createjs||{};
 	 * Necessary to upload the actual image data to the GPU. Without this the texture will be blank. Called automatically
 	 * in most cases due to loading and caching APIs. Flagging an image source with `_invalid = true` will trigger this
 	 * next time the image is rendered.
+	 * @method _updateTextureImageData
 	 * @param {WebGLRenderingContext} gl
 	 * @param {Image | Canvas} image The image data to be uploaded
 	 * @protected

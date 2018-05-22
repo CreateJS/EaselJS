@@ -38,12 +38,11 @@ this.createjs = this.createjs||{};
  * A Container is a nestable display list that allows you to work with compound display elements. For  example you could
  * group arm, leg, torso and head {{#crossLink "Bitmap"}}{{/crossLink}} instances together into a Person Container, and
  * transform them as a group, while still being able to move the individual parts relative to each other. Children of
- * containers have their <code>transform</code> and <code>alpha</code> properties concatenated with their parent
- * Container.
+ * containers have their `transform` and `alpha` properties concatenated with their parent Container.
  *
- * For example, a {{#crossLink "Shape"}}{{/crossLink}} with x=100 and alpha=0.5, placed in a Container with <code>x=50</code>
- * and <code>alpha=0.7</code> will be rendered to the canvas at <code>x=150</code> and <code>alpha=0.35</code>.
- * Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
+ * For example, a {{#crossLink "Shape"}}{{/crossLink}} with `x=100` and `alpha=0.5`, placed in a Container with `x=50`
+ * and `alpha=0.7` will be rendered to the canvas at `x=150` and `alpha=0.35`. Containers have some overhead, so you
+ * generally shouldn't create a Container to hold a single child.
  *
  * <h4>Example</h4>
  *
@@ -105,8 +104,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
+	 * Use the {{#crossLink "Container/numChildren:property"}}{{/crossLink}} property instead.
 	 * @method getNumChildren
-	 * @deprecated Use the {{#crossLink "Container/numChildren:property"}}{{/crossLink}} property instead.
+	 * @deprecated
 	 */
 	// Container.getNumChildren is @deprecated. Remove for 1.1+
 	p.getNumChildren = createjs.deprecate(p._getNumChildren, "Container.getNumChildren");
@@ -358,7 +358,7 @@ this.createjs = this.createjs||{};
 	 *      container.sortChildren(sortFunction);
 	 *
 	 * @method sortChildren
-	 * @param {Function} sortFunction the function to use to sort the child list. See JavaScript's <code>Array.sort</code>
+	 * @param {Function} sortFunction the function to use to sort the child list. See JavaScript's `Array.sort`
 	 * documentation for details.
 	 **/
 	p.sortChildren = function(sortFunction) {
@@ -467,7 +467,7 @@ this.createjs = this.createjs||{};
 	 * list. This routine ignores any display objects with {{#crossLink "DisplayObject/mouseEnabled:property"}}{{/crossLink}}
 	 * set to `false`. The array will be sorted in order of visual depth, with the top-most display object at index 0.
 	 * This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully.
-	 * For example, if testing for objects under the mouse, test on tick (instead of on {{#crossLink "DisplayObject/mousemove:event"}}{{/crossLink}}),
+	 * For example, if testing for objects under the mouse, test on tick (instead of on {{#crossLink "Stage/stagemousemove:event"}}{{/crossLink}}),
 	 * and only if the mouse's position has changed.
 	 * 
 	 * <ul>
@@ -478,7 +478,7 @@ this.createjs = this.createjs||{};
 	 * 	   	listeners or a {{#crossLink "DisplayObject:cursor:property"}}{{/crossLink}} property. That is, only objects
 	 * 	   	that would normally intercept mouse interaction will be included. This can significantly improve performance
 	 * 	   	in some cases by reducing the number of display objects that need to be tested.</li>
-	 * </li>
+	 * </ul>
 	 * 
 	 * This method accounts for both {{#crossLink "DisplayObject/hitArea:property"}}{{/crossLink}} and {{#crossLink "DisplayObject/mask:property"}}{{/crossLink}}.
 	 * @method getObjectsUnderPoint
@@ -496,7 +496,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Similar to {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}, but returns only the top-most display
-	 * object. This runs significantly faster than <code>getObjectsUnderPoint()</code>, but is still potentially an expensive
+	 * object. This runs significantly faster than `getObjectsUnderPoint()`, but is still potentially an expensive
 	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	 * @method getObjectUnderPoint
 	 * @param {Number} x The x position in the container to test.
@@ -509,17 +509,13 @@ this.createjs = this.createjs||{};
 		return this._getObjectsUnderPoint(pt.x, pt.y, null, mode>0, mode==1);
 	};
 	
-	/**
-	 * Docced in superclass.
-	 */
+	// Docced in superclass
 	p.getBounds = function() {
 		return this._getBounds(null, true);
 	};
 	
 	
-	/**
-	 * Docced in superclass.
-	 */
+	// Docced in superclass
 	p.getTransformedBounds = function() {
 		return this._getBounds();
 	};

@@ -154,6 +154,7 @@ this.createjs = this.createjs || {};
 	
 	/**
 	 * Sprite object pool.
+	 * @property _spritePool
 	 * @type {Array}
 	 * @static
 	 * @private
@@ -162,18 +163,14 @@ this.createjs = this.createjs || {};
 
 	
 // public methods:
-	/**
-	 * Docced in superclass.
-	 **/
+	// Docced in superclass
 	p.draw = function(ctx, ignoreCache) {
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return; }
 		this._updateState();
 		this.Container_draw(ctx, ignoreCache);
 	};
 	
-	/**
-	 * Docced in superclass.
-	 **/
+	// Docced in superclass
 	p.getBounds = function() {
 		this._updateText();
 		return this.Container_getBounds();
@@ -219,9 +216,7 @@ this.createjs = this.createjs || {};
 
 
 // private methods:
-	/**
-	 * Docced in superclass.
-	 **/
+	// Docced in superclass
 	p._updateState = function() {
 		this._updateText();
 	};

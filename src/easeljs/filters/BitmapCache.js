@@ -292,7 +292,7 @@ this.createjs = this.createjs||{};
 	 * correctly, and not assume your main context is WebGL.
 	 *
 	 * @public
-	 * @method BitmapCache.cache
+	 * @method define
 	 * @param {Number} x The x coordinate origin for the cache region.
 	 * @param {Number} y The y coordinate origin for the cache region.
 	 * @param {Number} width The width of the cache region.
@@ -413,7 +413,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Determine the bounds of the shape in local space.
 	 * @method getBounds
-	 * @returns {Rectangle}
+	 * @return {Rectangle}
 	 */
 	p.getBounds = function() {
 		var scale = this.scale;

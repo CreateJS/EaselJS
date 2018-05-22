@@ -77,7 +77,7 @@ this.createjs = this.createjs || {};
 		 **/
 		this.mask = mask;
 
-		/** docced in super class **/
+		// Docced in superclass
 		this.usesContext = true;
 
 		this.FRAG_SHADER_BODY = (
@@ -96,7 +96,7 @@ this.createjs = this.createjs || {};
 	// TODO: deprecated
 	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
 		if(!this._mapTexture) { this._mapTexture = gl.createTexture(); }
 
@@ -147,16 +147,15 @@ this.createjs = this.createjs || {};
 		return true;
 	};
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.clone = function () {
 		return new AlphaMaskFilter(this.mask);
 	};
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.toString = function () {
 		return "[AlphaMaskFilter]";
 	};
-
 
 	createjs.AlphaMaskFilter = createjs.promote(AlphaMaskFilter, "Filter");
 }());

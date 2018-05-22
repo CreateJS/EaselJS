@@ -312,7 +312,7 @@ this.createjs = this.createjs||{};
 
 // static properties:
 	/**
-	 * A reusable instance of {{#crossLink "Graphics/BeginPath"}}{{/crossLink}} to avoid
+	 * A reusable instance of {{#crossLink "Graphics.BeginPath"}}{{/crossLink}} to avoid
 	 * unnecessary instantiation.
 	 * @property beginCmd
 	 * @type {Graphics.BeginPath}
@@ -388,8 +388,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
+	 * Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
 	 * @method getInstructions
-	 * @deprecated Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
+	 * @deprecated
 	 */
 	// Graphics.getInstructions is @deprecated. Remove for 1.1+
 	p.getInstructions = createjs.deprecate(p._getInstructions, "Graphics.getInstructions");

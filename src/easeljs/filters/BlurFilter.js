@@ -99,9 +99,7 @@ this.createjs = this.createjs||{};
 		this._quality;
 		this._lastQuality = null;
 
-		/**
-		 * This is a template to generate the shader for {{#crossLink FRAG_SHADER_BODY}}{{/crossLink}}
-		 */
+		// This is a template to generate the shader for BlurFilter.FRAG_SHADER_BODY.
 		this.FRAG_SHADER_TEMPLATE = (
 			"uniform float xWeight[{{blurX}}];" +
 			"uniform float yWeight[{{blurY}}];" +
@@ -208,7 +206,7 @@ this.createjs = this.createjs||{};
 		this.FRAG_SHADER_BODY = result;
 	};
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
 		// load the normalized gaussian weight tables
 		gl.uniform1fv(
@@ -247,7 +245,7 @@ this.createjs = this.createjs||{};
 	BlurFilter.SHG_TABLE = [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9];
 
 // public methods:
-	/** docced in super class **/
+	// Docced in superclass
 	p.getBounds = function (rect) {
 		var x = this.blurX|0, y = this.blurY| 0;
 		if(x <= 0 && y <= 0) { return rect; }
@@ -255,12 +253,12 @@ this.createjs = this.createjs||{};
 		return (rect || new createjs.Rectangle()).pad(y*q+1,x*q+1,y*q+1,x*q+1);
 	};
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.clone = function() {
 		return new BlurFilter(this.blurX, this.blurY, this.quality);
 	};
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.toString = function() {
 		return "[BlurFilter]";
 	};
@@ -268,7 +266,7 @@ this.createjs = this.createjs||{};
 
 // private methods:
 
-	/** docced in super class **/
+	// Docced in superclass
 	p._applyFilter = function (imageData) {
 		var radiusX = this._blurX >> 1;
 		if (isNaN(radiusX) || radiusX < 0) return false;
