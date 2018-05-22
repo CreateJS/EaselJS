@@ -37,7 +37,7 @@
  * <ul>
  *      <li>Images using {{#crossLink "Bitmap"}}{{/crossLink}}</li>
  *      <li>Vector graphics using {{#crossLink "Shape"}}{{/crossLink}} and {{#crossLink "Graphics"}}{{/crossLink}}</li>
- *      <li>Animated bitmaps using {{#crossLink "SpriteSheet"}}{{/crossLink}} and {{#crossLink "Sprite"}}{{/crossLink}}
+ *      <li>Animated bitmaps using {{#crossLink "SpriteSheet"}}{{/crossLink}} and {{#crossLink "Sprite"}}{{/crossLink}}</li>
  *      <li>Simple text instances using {{#crossLink "Text"}}{{/crossLink}}</li>
  *      <li>Containers that hold other DisplayObjects using {{#crossLink "Container"}}{{/crossLink}}</li>
  *      <li>Control HTML DOM elements using {{#crossLink "DOMElement"}}{{/crossLink}}</li>
@@ -45,10 +45,11 @@
  *
  * All display objects can be added to the stage as children, or drawn to a canvas directly.
  *
- * <b>User Interactions</b><br />
- * All display objects on stage (except DOMElement) will dispatch events when interacted with using a mouse or
- * touch. EaselJS supports hover, press, and release events, as well as an easy-to-use drag-and-drop model. Check out
- * {{#crossLink "MouseEvent"}}{{/crossLink}} for more information.
+ * <b>User Interactions</b>
+ *
+ * All display objects on stage (except {{#crossLink "DOMElement"}}{{/crossLink}}) will dispatch events when interacted
+ * with using a mouse or touch. EaselJS supports hover, press, and release events, as well as an easy-to-use
+ * drag-and-drop model. Check out {{#crossLink "MouseEvent"}}{{/crossLink}} for more information.
  *
  * <h4>Simple Example</h4>
  * This example illustrates how to create and position a {{#crossLink "Shape"}}{{/crossLink}} on the {{#crossLink "Stage"}}{{/crossLink}}
@@ -66,7 +67,7 @@
  *	    //Update stage will render next frame
  *	    stage.update();
  *
- * <b>Simple Interaction Example</b><br>
+ * <b>Simple Interaction Example</b>
  *
  *      displayObject.addEventListener("click", handleClick);
  *      function handleClick(event){
@@ -83,7 +84,8 @@
  *          // Check out the DragAndDrop example in GitHub for more
  *      }
  *
- * <b>Simple Animation Example</b><br />
+ * <b>Simple Animation Example</b>
+ *
  * This example moves the shape created in the previous demo across the screen.
  *
  *	    //Update stage will render next frame
@@ -99,14 +101,15 @@
  *
  * <h4>Other Features</h4>
  * EaselJS also has built in support for
- * <ul><li>Canvas features such as {{#crossLink "Shadow"}}{{/crossLink}} and CompositeOperation</li>
- *      <li>{{#crossLink "Ticker"}}{{/crossLink}}, a global heartbeat that objects can subscribe to</li>
- *      <li>Filters, including a provided {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}, {{#crossLink "AlphaMaskFilter"}}{{/crossLink}},
- *      {{#crossLink "AlphaMapFilter"}}{{/crossLink}}, and {{#crossLink "BlurFilter"}}{{/crossLink}}. See {{#crossLink "Filter"}}{{/crossLink}}
- *      for more information</li>
- *      <li>A {{#crossLink "ButtonHelper"}}{{/crossLink}} utility, to easily create interactive buttons</li>
- *      <li>{{#crossLink "SpriteSheetUtils"}}{{/crossLink}} and a {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} to
- *      help build and manage {{#crossLink "SpriteSheet"}}{{/crossLink}} functionality at run-time.</li>
+ * <ul>
+ *     <li>Canvas features such as {{#crossLink "Shadow"}}{{/crossLink}} and CompositeOperation</li>
+ *     <li>{{#crossLink "Ticker"}}{{/crossLink}}, a global heartbeat that objects can subscribe to</li>
+ *     <li>Filters, including a provided {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}, {{#crossLink "AlphaMaskFilter"}}{{/crossLink}},
+ *     {{#crossLink "AlphaMapFilter"}}{{/crossLink}}, and {{#crossLink "BlurFilter"}}{{/crossLink}}. See {{#crossLink "Filter"}}{{/crossLink}}
+ *     for more information</li>
+ *     <li>A {{#crossLink "ButtonHelper"}}{{/crossLink}} utility, to easily create interactive buttons</li>
+ *     <li>{{#crossLink "SpriteSheetUtils"}}{{/crossLink}} and a {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} to
+ *     help build and manage {{#crossLink "SpriteSheet"}}{{/crossLink}} functionality at run-time.</li>
  * </ul>
  *
  * <h4>Browser Support</h4>
@@ -296,7 +299,7 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * Indicates whether this display object should be rendered to the canvas and included when running the Stage
-		 * {{#crossLink "Stage/getObjectsUnderPoint"}}{{/crossLink}} method.
+		 * {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} method.
 		 * @property visible
 		 * @type {Boolean}
 		 * @default true
@@ -341,7 +344,7 @@ this.createjs = this.createjs||{};
 
 		/**
 		 * Indicates whether the display object should be drawn to a whole pixel when
-		 * {{#crossLink "Stage/snapToPixelEnabled"}}{{/crossLink}} is true. To enable/disable snapping on whole
+		 * {{#crossLink "Stage/snapToPixelEnabled:property"}}{{/crossLink}} is true. To enable/disable snapping on whole
 		 * categories of display objects, set this value on the prototype (Ex. Text.prototype.snapToPixel = true).
 		 * @property snapToPixel
 		 * @type {Boolean}
@@ -589,9 +592,10 @@ this.createjs = this.createjs||{};
 	 * 
 	 * For example, myContainer contains two overlapping children: shapeA and shapeB. The user moves their mouse over
 	 * shapeA and then directly on to shapeB. With a listener for {{#crossLink "mouseover:event"}}{{/crossLink}} on
-	 * myContainer, two events would be received, each targeting a child element:<OL>
-	 * <LI>when the mouse enters shapeA (target=shapeA)</LI>
-	 * <LI>when the mouse enters shapeB (target=shapeB)</LI>
+	 * myContainer, two events would be received, each targeting a child element:
+	 * <OL>
+	 * 		<LI>when the mouse enters shapeA (target=shapeA)</LI>
+	 * 		<LI>when the mouse enters shapeB (target=shapeB)</LI>
 	 * </OL>
 	 * However, with a listener for "rollover" instead, only a single event is received when the mouse first enters
 	 * the aggregate myContainer content (target=myContainer).
@@ -609,9 +613,10 @@ this.createjs = this.createjs||{};
 	 * 
 	 * For example, myContainer contains two overlapping children: shapeA and shapeB. The user moves their mouse over
 	 * shapeA, then directly on to shapeB, then off both. With a listener for {{#crossLink "mouseout:event"}}{{/crossLink}}
-	 * on myContainer, two events would be received, each targeting a child element:<OL>
-	 * <LI>when the mouse leaves shapeA (target=shapeA)</LI>
-	 * <LI>when the mouse leaves shapeB (target=shapeB)</LI>
+	 * on myContainer, two events would be received, each targeting a child element:
+	 * <OL>
+	 * 		<LI>when the mouse leaves shapeA (target=shapeA)</LI>
+	 * 		<LI>when the mouse leaves shapeB (target=shapeB)</LI>
 	 * </OL>
 	 * However, with a listener for "rollout" instead, only a single event is received when the mouse leaves
 	 * the aggregate myContainer content (target=myContainer).
@@ -693,8 +698,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
+	 * Use the {{#crossLink "DisplayObject/stage:property"}}{{/crossLink}} property instead.
 	 * @method getStage
-	 * @deprecated Use the {{#crossLink "DisplayObject/stage:property"}}{{/crossLink}} property instead.
+	 * @deprecated
 	 */
 	// DisplayObject.getStage is @deprecated. Remove for 1.1+
 	p.getStage = createjs.deprecate(p._getStage, "DisplayObject.getStage");
@@ -717,7 +723,7 @@ this.createjs = this.createjs||{};
 	 */
 
 	/**
-	 * Set both the {{#crossLink "DisplayObject/scaleX:property"}}{{/crossLink}} and the {{#crossLink "DisplayObject/scaleY"}}{{/crossLink}}
+	 * Set both the {{#crossLink "DisplayObject/scaleX:property"}}{{/crossLink}} and the {{#crossLink "DisplayObject/scaleY:property"}}{{/crossLink}}
 	 * property to the same value. Note that when you get the value, if the `scaleX` and `scaleY` are different values,
 	 * it will return only the `scaleX`.
 	 * @property scale
@@ -754,7 +760,7 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-	 * Returns <code>true</code> if the draw was handled (useful for overriding functionality).
+	 * Returns `true` if the draw was handled (useful for overriding functionality).
 	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @method draw
@@ -808,8 +814,8 @@ this.createjs = this.createjs||{};
 	 * that does not change frequently (ex. a Container with many children that do not move, or a complex vector Shape),
 	 * this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
 	 * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must manually
-	 * update the cache by calling <code>updateCache()</code> again. You must specify the cached area via the x, y, w,
-	 * and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates.
+	 * update the cache by calling `updateCache()` again. You must specify the cached area via the x, y, w, and h
+	 * parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates.
 	 *
 	 * <h4>Example</h4>
 	 * For example if you defined a Shape that drew a circle at 0, 0 with a radius of 25:
@@ -1118,21 +1124,22 @@ this.createjs = this.createjs||{};
 	 * 		the automatic calculations listed below.
 	 * 	</td></tr>
 	 * 	<tr><td><b>Bitmap</b></td><td>
-	 * 		Returns the width and height of the sourceRect (if specified) or image, extending from (x=0,y=0).
+	 * 		Returns the width and height of the {{#crossLink "Bitmap/sourceRect"}}{{/crossLink}} (if specified) or image,
+	 * 		extending from (x=0,y=0).
 	 * 	</td></tr>
 	 * 	<tr><td><b>Sprite</b></td><td>
 	 * 		Returns the bounds of the current frame. May have non-zero x/y if a frame registration point was specified
 	 * 		in the spritesheet data. See also {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}}
 	 * 	</td></tr>
 	 * 	<tr><td><b>Container</b></td><td>
-	 * 		Returns the aggregate (combined) bounds of all children that return a non-null value from getBounds().
+	 * 		Returns the aggregate (combined) bounds of all children that return a non-null value from `getBounds()`.
 	 * 	</td></tr>
 	 * 	<tr><td><b>Shape</b></td><td>
-	 * 		Does not currently support automatic bounds calculations. Use setBounds() to manually define bounds.
+	 * 		Does not currently support automatic bounds calculations. Use `setBounds()` to manually define bounds.
 	 * 	</td></tr>
 	 * 	<tr><td><b>Text</b></td><td>
-	 * 		Returns approximate bounds. Horizontal values (x/width) are quite accurate, but vertical values (y/height) are
-	 * 		not, especially when using textBaseline values other than "top".
+	 * 		Returns approximate bounds. Horizontal values (x/width) are quite accurate, but vertical values (y/height)
+	 * 		are not, especially when using {{#crossLink "Text/textBaseline:property"}}{{/crossLink}} values other than "top".
 	 * 	</td></tr>
 	 * 	<tr><td><b>BitmapText</b></td><td>
 	 * 		Returns approximate bounds. Values will be more accurate if spritesheet frame registration points are close
@@ -1236,6 +1243,7 @@ this.createjs = this.createjs||{};
 	 * present in a {{#crossLink "StageGL"}}{{/crossLink}} instance.
 	 *
 	 * @method _updateState
+	 * @protected
 	 * @default null
 	 */
 	p._updateState = null;

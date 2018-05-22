@@ -98,9 +98,7 @@ this.createjs = this.createjs||{};
 		this.sourceRect = null;
 
 	// private properties:
-		/**
-		 * Docced in superclass.
-		 */
+		// Docced in superclass
 		this._webGLRenderStyle = createjs.DisplayObject._StageGL_BITMAP;
 	}
 	var p = createjs.extend(Bitmap, createjs.DisplayObject);
@@ -193,9 +191,7 @@ this.createjs = this.createjs||{};
 	 * @method uncache
 	 **/
 
-	/**
-	 * Docced in superclass.
-	 */
+	// Docced in superclass
 	p.getBounds = function() {
 		var rect = this.DisplayObject_getBounds();
 		if (rect) { return rect; }

@@ -110,7 +110,7 @@ this.createjs = this.createjs||{};
 	// TODO: deprecated
 	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
 		var mat = this.matrix;
 		var colorMatrix = new Float32Array([
@@ -131,18 +131,18 @@ this.createjs = this.createjs||{};
 	};
 
 // public methods:
-	/** docced in super class **/
+	// Docced in superclass
 	p.toString = function() {
 		return "[ColorMatrixFilter]";
 	};
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.clone = function() {
 		return new ColorMatrixFilter(this.matrix);
 	};
 
 // private methods:
-	/** docced in super class **/
+	// Docced in superclass
 	p._applyFilter = function(imageData) { 
 		var data = imageData.data;
 		var l = data.length;
