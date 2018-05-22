@@ -178,6 +178,11 @@ this.createjs = this.createjs||{};
 			if (o.__reset) { o._reset = o.__reset; delete(o.__reset); }
 		}
 	};
+
+	/**
+	 * @method setEnabled
+	 * @deprecated Use the {{#crossLink "ButtonHelper/enabled:property"}}{{/crossLink}} property instead.
+	 */
 	// ButtonHelper.setEnabled is @deprecated. Remove for 1.1+
 	p.setEnabled = createjs.deprecate(p._setEnabled, "ButtonHelper.setEnabled");
 
@@ -190,6 +195,11 @@ this.createjs = this.createjs||{};
 	p._getEnabled = function() {
 		return this._enabled;
 	};
+
+	/**
+	 * @method getEnabled
+	 * @deprecated Use the {{#crossLink "ButtonHelper/enabled:property"}}{{/crossLink}} property instead.
+	 */
 	// ButtonHelper.getEnabled is @deprecated. Remove for 1.1+
 	p.getEnabled = createjs.deprecate(p._getEnabled, "ButtonHelper.getEnabled");
 

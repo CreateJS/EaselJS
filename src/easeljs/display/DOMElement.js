@@ -39,8 +39,6 @@ this.createjs = this.createjs||{};
 
 // constructor:
 	/**
-	 * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>
-	 *
 	 * A DOMElement allows you to associate a HTMLElement with the display list. It will be transformed
 	 * within the DOM as though it is child of the {{#crossLink "Container"}}{{/crossLink}} it is added to. However, it is
 	 * not rendered to canvas, and as such will retain whatever z-index it has relative to the canvas (ie. it will be
