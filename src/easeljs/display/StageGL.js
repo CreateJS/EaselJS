@@ -1419,6 +1419,7 @@ this.createjs = this.createjs||{};
 		var storeBatchTemp = this._batchTextureTemp;
 
 		var filterCount = manager._filterCount, filtersLeft = filterCount;
+		var backupWidth = this._viewportWidth, backupHeight = this._viewportHeight;
 		this._updateDrawingSurface(manager._drawWidth, manager._drawHeight);
 
 		this._batchTextureOutput = (manager._filterCount%2) ? manager._bufferTextureConcat : manager._bufferTextureOutput;
@@ -1460,7 +1461,7 @@ this.createjs = this.createjs||{};
 		this._batchTextureConcat = storeBatchConcat;
 		this._batchTextureTemp = storeBatchTemp;
 
-		this._updateDrawingSurface();
+		this._updateDrawingSurface(backupWidth, backupHeight);
 		return true;
 	};
 
@@ -1580,8 +1581,8 @@ this.createjs = this.createjs||{};
 	 * @param {int} height The height of the render surface in pixels.
 	 */
 	p.updateViewport = function (width, height) {
-		this._viewportWidth = width|0;
-		this._viewportHeight = height|0;
+		width = Math.abs(width|0) || 1;
+		height = Math.abs(height|0) || 1;
 
 		this._updateDrawingSurface(width, height);
 
@@ -1799,14 +1800,14 @@ this.createjs = this.createjs||{};
 	/**
 	 * Changes the active drawing surface and view matrix to the correct parameters without polluting the concept
 	 * of the current stage size
-	 * @param  {uint} [w=_viewportWidth] The width of the surface in pixels, defaults to _viewportWidth
-	 * @param  {uint} [h=_viewportHeight] The height of the surface in pixels, defaults to _viewportHeight
+	 * @param  {uint} w The width of the surface in pixels, defaults to _viewportWidth
+	 * @param  {uint} h The height of the surface in pixels, defaults to _viewportHeight
 	 */
 	p._updateDrawingSurface = function(w, h) {
-		if(w === undefined){ w = this._viewportWidth; }
-		if(h === undefined){ h = this._viewportHeight; }
+		this._viewportWidth = w;
+		this._viewportHeight = h;
 
-		this._webGLContext.viewport(0, 0, w, h);
+		this._webGLContext.viewport(0, 0, this._viewportWidth, this._viewportHeight);
 
 		// WebGL works with a -1,1 space on its screen. It also follows Y-Up
 		// we need to flip the y, scale and then translate the co-ordinates to match this
