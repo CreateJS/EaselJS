@@ -2816,10 +2816,8 @@ this.createjs = this.createjs||{};
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
 
 		for (var i = 0; i < this._batchTextureCount; i++) {
-			var texture = this._batchTextures[i];
 			gl.activeTexture(gl.TEXTURE0 + i);
-			gl.bindTexture(gl.TEXTURE_2D, texture);
-			this.setTextureParams(gl, texture.isPOT);
+			gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[i]);
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, this._batchVertexCount);
