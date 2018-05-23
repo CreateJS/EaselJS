@@ -1169,7 +1169,7 @@ this.createjs = this.createjs||{};
 	p.getBounds = function() {
 		if (this._bounds) { return this._rectangle.copy(this._bounds); }
 		var cache = this.bitmapCache;
-		if (cache) {
+		if (cache && this.cacheCanvas) {
 			return cache.getBounds();
 		}
 		return null;

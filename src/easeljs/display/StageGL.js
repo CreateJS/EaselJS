@@ -50,6 +50,8 @@ this.createjs = this.createjs||{};
  * Render___: actual WebGL draw call
  * Buffer: WebGL array data
  * Cover: A card that covers the entire viewport
+ * Dst: The existing drawing surface in the shader
+ * Src: The new data being provided in the shader
  *
  * - Notes:
  * WebGL treats 0,0 as the bottom left, as such there's a lot of co-ordinate space flipping to make regular canvas
@@ -814,7 +816,7 @@ this.createjs = this.createjs||{};
 				"{{alternates}}" +
 			"}" +
 
-			"gl_FragColor = vec4(color.rgb, color.a * alphaValue);" +
+			"gl_FragColor = vec4(color.rgb * alphaValue, color.a * alphaValue);" +
 		"}"
 	);
 
@@ -1414,7 +1416,7 @@ this.createjs = this.createjs||{};
 
 		var filterCount = manager._filterCount, filtersLeft = filterCount;
 		var backupWidth = this._viewportWidth, backupHeight = this._viewportHeight;
-		this.updateViewport(manager._drawWidth, manager._drawHeight);
+		this._updateDrawingSurface(manager._drawWidth, manager._drawHeight);
 
 		this._batchTextureOutput = (manager._filterCount%2) ? manager._bufferTextureConcat : manager._bufferTextureOutput;
 		this._batchTextureConcat = (manager._filterCount%2) ? manager._bufferTextureOutput : manager._bufferTextureConcat;
@@ -1455,7 +1457,7 @@ this.createjs = this.createjs||{};
 		this._batchTextureConcat = storeBatchConcat;
 		this._batchTextureTemp = storeBatchTemp;
 
-		this.updateViewport(backupWidth, backupHeight);
+		this._updateDrawingSurface(backupWidth, backupHeight);
 		return true;
 	};
 
@@ -1575,32 +1577,19 @@ this.createjs = this.createjs||{};
 	 * @param {int} height The height of the render surface in pixels.
 	 */
 	p.updateViewport = function (width, height) {
-		this._viewportWidth = width|0;
-		this._viewportHeight = height|0;
-		var gl = this._webGLContext;
+		width = Math.abs(width|0) || 1;
+		height = Math.abs(height|0) || 1;
 
-		if (gl) {
-			gl.viewport(0, 0, this._viewportWidth, this._viewportHeight);
+		this._updateDrawingSurface(width, height);
 
-			// WebGL works with a -1,1 space on its screen. It also follows Y-Up
-			// we need to flip the y, scale and then translate the co-ordinates to match this
-			// additionally we offset into they Y so the polygons are inside the camera's "clipping" plane
-			this._projectionMatrix = new Float32Array([
-				2 / this._viewportWidth,	0,								0,							0,
-				0,							-2 / this._viewportHeight,		0,							0,
-				0,							0,								1,							0,
-				-1,							1,								0,							1
-			]);
-
-			if (this._bufferTextureOutput !== this && this._bufferTextureOutput !== null) {
-				this.resizeTexture(this._bufferTextureOutput, this._viewportWidth, this._viewportHeight);
-			}
-			if (this._bufferTextureConcat !== null) {
-				this.resizeTexture(this._bufferTextureConcat, this._viewportWidth, this._viewportHeight);
-			}
-			if (this._bufferTextureTemp !== null) {
-				this.resizeTexture(this._bufferTextureTemp, this._viewportWidth, this._viewportHeight);
-			}
+		if (this._bufferTextureOutput !== this && this._bufferTextureOutput !== null) {
+			this.resizeTexture(this._bufferTextureOutput, this._viewportWidth, this._viewportHeight);
+		}
+		if (this._bufferTextureConcat !== null) {
+			this.resizeTexture(this._bufferTextureConcat, this._viewportWidth, this._viewportHeight);
+		}
+		if (this._bufferTextureTemp !== null) {
+			this.resizeTexture(this._bufferTextureTemp, this._viewportWidth, this._viewportHeight);
 		}
 	};
 
@@ -1802,6 +1791,29 @@ this.createjs = this.createjs||{};
 	};
 
 // private methods:
+	/**
+	 * Changes the active drawing surface and view matrix to the correct parameters without polluting the concept
+	 * of the current stage size
+	 * @param  {uint} w The width of the surface in pixels, defaults to _viewportWidth
+	 * @param  {uint} h The height of the surface in pixels, defaults to _viewportHeight
+	 */
+	p._updateDrawingSurface = function(w, h) {
+		this._viewportWidth = w;
+		this._viewportHeight = h;
+
+		this._webGLContext.viewport(0, 0, this._viewportWidth, this._viewportHeight);
+
+		// WebGL works with a -1,1 space on its screen. It also follows Y-Up
+		// we need to flip the y, scale and then translate the co-ordinates to match this
+		// additionally we offset into they Y so the polygons are inside the camera's "clipping" plane
+		this._projectionMatrix = new Float32Array([
+			2 / w,		0,			0,			0,
+			0,			-2 / h,		0,			0,
+			0,			0,			1,			0,
+			-1,			1,			0,			1
+		]);
+	};
+
 	/**
 	 * Returns a base texture that has no image or data loaded. Not intended for loading images. In some error cases,
 	 * the texture creation will fail. This function differs from {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}
@@ -2534,6 +2546,7 @@ this.createjs = this.createjs||{};
 			var useCache = (!ignoreCache && item.cacheCanvas) || false;
 
 			if (!(item.visible && concatAlpha > 0.0035)) { continue; }
+			var itemAlpha = item.alpha;
 
 			if (useCache === false) {
 				if (item._updateState){
@@ -2551,11 +2564,13 @@ this.createjs = this.createjs||{};
 						this.batchReason = "cachelessFilterInterupt";
 						this._renderBatch();					// <----------------------------------------------------
 
+						item.alpha = 1;
 						var shaderBackup = this._activeShader;
 						bounds = bounds || item.getBounds();
 						item.bitmapCache.define(item, bounds.x, bounds.y, bounds.width, bounds.height, 1, {useGL:this});
 						useCache = item.bitmapCache._cacheCanvas;
 
+						item.alpha = itemAlpha;
 						this._activeShader = shaderBackup;
 						gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
 					}
@@ -2563,7 +2578,7 @@ this.createjs = this.createjs||{};
 			}
 
 			if (useCache === false && item.children) {
-				this._appendToBatch(item, cMtx, item.alpha * concatAlpha);
+				this._appendToBatch(item, cMtx, itemAlpha * concatAlpha);
 				continue;
 			}
 
@@ -2705,7 +2720,7 @@ this.createjs = this.createjs||{};
 			texI[offV1] = texI[offV1+1] = texI[offV1+2] = texI[offV1+3] = texI[offV1+4] = texI[offV1+5] = texIndex;
 
 			// apply alpha
-			alphas[offV1] = alphas[offV1+1] = alphas[offV1+2] = alphas[offV1+3] = alphas[offV1+4] = alphas[offV1+5] = item.alpha * concatAlpha;
+			alphas[offV1] = alphas[offV1+1] = alphas[offV1+2] = alphas[offV1+3] = alphas[offV1+4] = alphas[offV1+5] = itemAlpha * concatAlpha;
 
 			this._batchVertexCount += StageGL.INDICIES_PER_CARD;
 
@@ -2796,10 +2811,8 @@ this.createjs = this.createjs||{};
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
 
 		for (var i = 0; i < this._batchTextureCount; i++) {
-			var texture = this._batchTextures[i];
 			gl.activeTexture(gl.TEXTURE0 + i);
-			gl.bindTexture(gl.TEXTURE_2D, texture);
-			this.setTextureParams(gl, texture.isPOT);
+			gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[i]);
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, this._batchVertexCount);
