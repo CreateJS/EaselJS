@@ -2587,7 +2587,8 @@ this.createjs = this.createjs||{};
 				continue;
 			}
 
-			if (item.compositeOperation !== null) {
+			var containerRenderMode = this._renderMode;
+			if (item.compositeOperation) {
 				this._updateRenderMode(item.compositeOperation);
 			}
 
@@ -2731,6 +2732,10 @@ this.createjs = this.createjs||{};
 
 			if (this._immediateRender) {
 				this._immediateBatchRender();
+			}
+
+			if (this._renderMode !== containerRenderMode) {
+				this._updateRenderMode(containerRenderMode);
 			}
 		}
 
