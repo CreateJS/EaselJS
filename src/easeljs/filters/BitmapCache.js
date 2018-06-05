@@ -546,8 +546,8 @@ this.createjs = this.createjs||{};
 	p.getBounds = function() {
 		var scale = this.scale;
 		return this._boundRect.setValues(
-			this._filterOffX/scale,		this._filterOffY/scale,
-			this.width/scale,			this.height/scale
+			this.x,					this.y,
+			this.width/scale,		this.height/scale
 		);
 	};
 

@@ -1172,7 +1172,7 @@ this.createjs = this.createjs||{};
 
 		"hue": {
 			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-			"setLum(setSat(srcClr, getSat(dstClr)), getLum(dstClr))"
+				"setLum(setSat(srcClr, getSat(dstClr)), getLum(dstClr))"
 			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
 		"saturation": {
