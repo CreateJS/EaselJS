@@ -1414,6 +1414,12 @@ this.createjs = this.createjs||{};
 			return false;
 		}
 
+		for (var i = 0; i < this._gpuTextureCount; i++) {
+			if(this._batchTextures[i]._frameBuffer) {
+				this._batchTextures[i] = this._baseTextures[i];
+			}
+		}
+
 		var storeBatchOutput = this._batchTextureOutput;
 		var storeBatchConcat = this._batchTextureConcat;
 		var storeBatchTemp = this._batchTextureTemp;
