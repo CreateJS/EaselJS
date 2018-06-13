@@ -111,7 +111,7 @@
 
 		gl.uniform2f(
 			gl.getUniformLocation(shaderProgram, "uColorDirection"),
-			this.xDir*(1/stage._viewportWidth), this.yDir*(1/stage._viewportHeight)
+			this.xDir*(1/stage._viewportWidth), this.yDir*(1/-stage._viewportHeight)
 		);
 
 		gl.uniform3f(
@@ -140,9 +140,9 @@
 			for (var j=0; j<width; j++) {
 				pixel = (offset+j)*4;
 
-				var redX = j+( (this.xDir*-this.redMultiplier) |0), redY = i+( (this.yDir*this.redMultiplier) |0);
-				var grnX = j+( (this.xDir*-this.greenMultiplier) |0), grnY = i+( (this.yDir*this.greenMultiplier) |0);
-				var bluX = j+( (this.xDir*-this.blueMultiplier) |0), bluY = i+( (this.yDir*this.blueMultiplier) |0);
+				var redX = j+( (this.xDir*-this.redMultiplier) |0), redY = i+( (this.yDir*-this.redMultiplier) |0);
+				var grnX = j+( (this.xDir*-this.greenMultiplier) |0), grnY = i+( (this.yDir*-this.greenMultiplier) |0);
+				var bluX = j+( (this.xDir*-this.blueMultiplier) |0), bluY = i+( (this.yDir*-this.blueMultiplier) |0);
 
 				if (redX < 0) { redX = 0; }
 				if (redX >= width) { redX = width-1; }
