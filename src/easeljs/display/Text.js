@@ -247,9 +247,7 @@ this.createjs = this.createjs||{};
 		return this._drawText(null,{}).height;
 	};
 
-	/**
-	 * Docced in superclass.
-	 */
+	// Docced in superclass
 	p.getBounds = function() {
 		var rect = this.DisplayObject_getBounds();
 		if (rect) { return rect; }

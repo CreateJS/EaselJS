@@ -72,15 +72,15 @@ this.createjs = this.createjs||{};
 	 *
 	 *      mc.gotoAndPlay("start");
 	 *
-	 * It is recommended to use <code>tween.to()</code> to animate and set properties (use no duration to have it set
-	 * immediately), and the <code>tween.wait()</code> method to create delays between animations. Note that using the
-	 * <code>tween.set()</code> method to affect properties will likely not provide the desired result.
+	 * It is recommended to use `tween.to()` to animate and set properties (use no duration to have it set
+	 * immediately), and the `tween.wait()`method to create delays between animations. Note that using the
+	 * `tween.set()` method to affect properties will likely not provide the desired result.
 	 *
 	 * @class MovieClip
 	 * @main MovieClip
 	 * @param {Object} [props] The configuration properties to apply to this instance (ex. `{mode:MovieClip.SYNCHED}`).
-	 * Supported props for the MovieClip are listed below. These props are set on the corresponding instance properties except where
-	 * specified.<UL>
+	 * Supported props for the MovieClip are listed below. These props are set on the corresponding instance properties
+	 * except where specified.<UL>
 	 *    <LI> `mode`</LI>
 	 *    <LI> `startPosition`</LI>
 	 *    <LI> `frameBounds`</LI>
@@ -169,12 +169,11 @@ this.createjs = this.createjs||{};
 	
 		/**
 		 * If true, the MovieClip will automatically be reset to its first frame whenever the timeline adds
-		 * it back onto the display list. This only applies to MovieClip instances with mode=INDEPENDENT.
-		 * <br><br>
-		 * For example, if you had a character animation with a "body" child MovieClip instance
-		 * with different costumes on each frame, you could set body.autoReset = false, so that
-		 * you can manually change the frame it is on, without worrying that it will be reset
-		 * automatically.
+		 * it back onto the display list. This only applies to MovieClip instances with `mode` of "INDEPENDENT".
+
+		 * For example, if you had a character animation with a "body" child MovieClip instance with different costumes
+		 * on each frame, you could set `body.autoReset = false`, so that you can manually change the frame it is on,
+		 * without worrying that it will be reset automatically.
 		 * @property autoReset
 		 * @type Boolean
 		 * @default true
@@ -221,9 +220,9 @@ this.createjs = this.createjs||{};
 		 *      mc.timeline.addTween(tween);
 		 *
 		 * Elements can be added and removed from the timeline by toggling an "_off" property
-		 * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
-		 * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
-		 * frame 1. You can use the "visible" property to achieve the same effect.
+		 * using the `tweenInstance.to()` method. Note that using `Tween.set` is not recommended to create MovieClip
+		 * animations. The following example will toggle the target off on frame 0, and then back on for frame 1. You
+		 * can use the "visible" property to achieve the same effect.
 		 *
 		 *      var tween = createjs.Tween.get(target).to({_off:false})
 		 *          .wait(1).to({_off:true})
@@ -339,8 +338,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
+	 * Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
 	 * @method getLabels
-	 * @deprecated Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
+	 * @deprecated
 	 */
 	// MovieClip.getLabels is @deprecated. Remove for 1.1+
 	p.getLabels = createjs.deprecate(p._getLabels, "MovieClip.getLabels");
@@ -356,8 +356,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
+	 * Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
 	 * @method getCurrentLabel
-	 * @deprecated Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
+	 * @deprecated
 	 */
 	// MovieClip.getCurrentLabel is @deprecated. Remove for 1.1+
 	p.getCurrentLabel = createjs.deprecate(p._getCurrentLabel, "MovieClip.getCurrentLabel");
@@ -373,8 +374,9 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
+	 * Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
 	 * @method getDuration
-	 * @deprecated Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
+	 * @deprecated
 	 */
 	// MovieClip.getDuration is @deprecated. Remove for 1.1+
 	p.getDuration = createjs.deprecate(p._getDuration, "MovieClip.getDuration");
@@ -420,9 +422,10 @@ this.createjs = this.createjs||{};
 // public methods:
 	/**
 	 * Constructor alias for backwards compatibility. This method will be removed in future versions.
-	 * Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
+	 * Subclasses should be updated to use {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and
+	 * {{#crossLink "Utility Methods/promote"}}{{/crossLink}} instead.
 	 * @method initialize
-	 * @deprecated in favour of `createjs.promote()`
+	 * @deprecated
 	 **/
 	p.initialize = MovieClip; // TODO: Deprecated. This is for backwards support of Adobe Flash/Animate
 
@@ -536,9 +539,6 @@ this.createjs = this.createjs||{};
 
 
 // private methods:
-	/**
-	 * Docced in superclass.
-	 **/
 	p._updateState = function() {
 		if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) { this._updateTimeline(-1); }
 	};

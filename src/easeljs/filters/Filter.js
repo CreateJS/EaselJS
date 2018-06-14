@@ -152,7 +152,6 @@ this.createjs = this.createjs||{};
 	/**
 	 * Assign any unique uniforms or other setup functionality here.
 	 * @method shaderParamSetup
-	 * @virtual
 	 * @param {WebGLContext} gl The context associated with the stage performing the render.
 	 * @param {StageGL} stage The stage instance that will be rendering.
 	 * @param {ShaderProgram} shaderProgram The compiled shader that is going to be used to perform the render.

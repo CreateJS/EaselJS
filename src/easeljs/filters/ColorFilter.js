@@ -151,7 +151,7 @@ this.createjs = this.createjs||{};
 
 
 // public methods:
-	/** docced in super class **/
+	// Docced in superclass
 	p.shaderParamSetup = function(gl, stage, shaderProgram) {
 		gl.uniform4f(
 			gl.getUniformLocation(shaderProgram, "uColorMultiplier"),
@@ -164,12 +164,12 @@ this.createjs = this.createjs||{};
 		);
 	};
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.toString = function() {
 		return "[ColorFilter]";
 	};
 
-	/** docced in super class **/
+	// Docced in superclass
 	p.clone = function() {
 		return new ColorFilter(
 			this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier,
@@ -178,7 +178,7 @@ this.createjs = this.createjs||{};
 	};
 
 // private methods:
-	/** docced in super class **/
+	// Docced in superclass
 	p._applyFilter = function(imageData) {
 		var data = imageData.data;
 		var l = data.length;

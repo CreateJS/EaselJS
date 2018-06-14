@@ -402,7 +402,7 @@ this.createjs = this.createjs||{};
 	 * to true on your instance. This will trigger it to behave correctly for rendering your output.
 	 *
 	 * @public
-	 * @method BitmapCache.cache
+	 * @method define
 	 * @param {Number} x The x coordinate origin for the cache region.
 	 * @param {Number} y The y coordinate origin for the cache region.
 	 * @param {Number} width The width of the cache region.
@@ -541,7 +541,7 @@ this.createjs = this.createjs||{};
 	/**
 	 * Determine the bounds of the shape in local space.
 	 * @method getBounds
-	 * @returns {Rectangle}
+	 * @return {Rectangle}
 	 */
 	p.getBounds = function() {
 		var scale = this.scale;

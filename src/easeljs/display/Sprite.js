@@ -162,9 +162,7 @@ this.createjs = this.createjs||{};
 		 **/
 		this._skipAdvance = false;
 
-		/**
-		 * Docced in superclass.
-		 */
+		// Docced in superclass
 		this._webGLRenderStyle = createjs.DisplayObject._StageGL_SPRITE;
 
 		if (frameOrAnimation != null) { this.gotoAndPlay(frameOrAnimation); }
