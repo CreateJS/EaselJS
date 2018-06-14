@@ -628,6 +628,46 @@ this.createjs = this.createjs||{};
 			typeof WebGLRenderingContext !== 'undefined';
 	};
 
+	/**
+	 * Utility used to convert the colour values the Context2D API accepts into WebGL color values.
+	 * @param {String | Number} color
+	 * @static
+	 * @return {Object} Object with r, g, b, a in 0-1 values of the color.
+	 */
+	StageGL.colorToObj = function (color) {
+		var r, g, b, a;
+
+		if (typeof color === "string") {
+			if (color.indexOf("#") === 0) {
+				if (color.length === 4) {
+					color = "#" + color.charAt(1)+color.charAt(1) + color.charAt(2)+color.charAt(2) + color.charAt(3)+color.charAt(3)
+				}
+				r = Number("0x"+color.slice(1, 3))/255;
+				g = Number("0x"+color.slice(3, 5))/255;
+				b = Number("0x"+color.slice(5, 7))/255;
+				a = color.length > 7 ? Number("0x"+color.slice(7, 9))/255 : 1;
+			} else if (color.indexOf("rgba(") === 0) {
+				var output = color.slice(5, -1).split(",");
+				r = Number(output[0])/255;
+				g = Number(output[1])/255;
+				b = Number(output[2])/255;
+				a = Number(output[3]);
+			}
+		} else {	// >>> is an unsigned shift which is what we want as 0x80000000 and up are negative values
+			r = ((color & 0xFF000000) >>> 24)/255;
+			g = ((color & 0x00FF0000) >>> 16)/255;
+			b = ((color & 0x0000FF00) >>> 8)/255;
+			a = (color & 0x000000FF)/255;
+		}
+
+		return {
+			r: Math.min(Math.max(0, r), 1),
+			g: Math.min(Math.max(0, g), 1),
+			b: Math.min(Math.max(0, b), 1),
+			a: Math.min(Math.max(0, a), 1)
+		}
+	};
+
 // static properties:
 	/**
 	 * The number of properties defined per vertex (x, y, textureU, textureV, textureIndex, alpha)
@@ -1172,7 +1212,7 @@ this.createjs = this.createjs||{};
 
 		"hue": {
 			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-			"setLum(setSat(srcClr, getSat(dstClr)), getLum(dstClr))"
+				"setLum(setSat(srcClr, getSat(dstClr)), getLum(dstClr))"
 			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
 		},
 		"saturation": {
@@ -1408,6 +1448,12 @@ this.createjs = this.createjs||{};
 		// 2D context fallback
 		if (!StageGL.isWebGLActive(this._webGLContext)) {
 			return false;
+		}
+
+		for (var i = 0; i < this._gpuTextureCount; i++) {
+			if(this._batchTextures[i]._frameBuffer) {
+				this._batchTextures[i] = this._baseTextures[i];
+			}
 		}
 
 		var storeBatchOutput = this._batchTextureOutput;
@@ -1754,35 +1800,64 @@ this.createjs = this.createjs||{};
 	 * @param {String|int} [color=0x00000000] The new color to use as the background
 	 */
 	p.setClearColor = function (color) {
-		var r, g, b, a, output;
+		this._clearColor = StageGL.colorToObj(color);
+	};
 
-		if (typeof color === "string") {
-			if (color.indexOf("#") === 0) {
-				if (color.length === 4) {
-					color = "#" + color.charAt(1)+color.charAt(1) + color.charAt(2)+color.charAt(2) + color.charAt(3)+color.charAt(3)
-				}
-				r = Number("0x"+color.slice(1, 3))/255;
-				g = Number("0x"+color.slice(3, 5))/255;
-				b = Number("0x"+color.slice(5, 7))/255;
-				a = Number("0x"+color.slice(7, 9))/255;
-			} else if (color.indexOf("rgba(") === 0) {
-				output = color.slice(5, -1).split(",");
-				r = Number(output[0])/255;
-				g = Number(output[1])/255;
-				b = Number(output[2])/255;
-				a = Number(output[3]);
-			}
-		} else {	// >>> is an unsigned shift which is what we want as 0x80000000 and up are negative values
-			r = ((color & 0xFF000000) >>> 24)/255;
-			g = ((color & 0x00FF0000) >>> 16)/255;
-			b = ((color & 0x0000FF00) >>> 8)/255;
-			a = (color & 0x000000FF)/255;
+	/**
+	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
+	 * be specified as the src value of an image element. StageGL renders differently than Context2D and the information
+	 * of the last render is harder to get. For best results turn directDraw to false, or preserveBuffer to true and no
+	 * backgorund color.
+	 * @method toDataURL
+	 * @param {String} [backgroundColor=undefined] The background color to be used for the generated image. See setClearColor
+	 * for valid values. A value of undefined will make no adjustments to the existing background which may be significantly faster.
+	 * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
+	 * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
+	 * @return {String} a Base64 encoded image.
+	 **/
+	p.toDataURL = function(backgroundColor, mimeType) {
+		var dataURL, gl = this._webGLContext;
+		this.batchReason = "dataURL";
+		var clearBackup = this._clearColor;
+
+		if (!this.canvas) { return; }
+		if (!StageGL.isWebGLActive(gl)) {
+			return this.Stage_toDataURL(backgroundColor, mimeType);
 		}
 
-		this._clearColor.r = r || 0;
-		this._clearColor.g = g || 0;
-		this._clearColor.b = b || 0;
-		this._clearColor.a = a || 0;
+		// if the buffer is preserved and we don't want a background we can just output what we have, otherwise we'll have to render it
+		if(!this._preserveBuffer || backgroundColor !== undefined) {
+			// render it onto the right background
+			if(backgroundColor !== undefined) {
+				this._clearColor = StageGL.colorToObj(backgroundColor);
+			}
+			this.clear();
+			// if we're not using directDraw then we can just trust the last buffer content
+			if(!this._directDraw) {
+				this._drawCover(null, this._bufferTextureOutput);
+			} else {
+				console.log("No stored/useable gl render info, result may be incorrect if content was changed since render");
+				this.draw(gl);
+			}
+		}
+
+		// create the dataurl
+		dataURL = this.canvas.toDataURL(mimeType||"image/png");
+
+		// reset the picture in the canvas
+		if(!this._preserveBuffer || backgroundColor !== undefined) {
+			if(backgroundColor !== undefined) {
+				this._clearColor = clearBackup;
+			}
+			this.clear();
+			if(!this._directDraw) {
+				this._drawCover(null, this._bufferTextureOutput);
+			} else {
+				this.draw(gl);
+			}
+		}
+
+		return dataURL;
 	};
 
 	// Docced in subclass
@@ -2582,7 +2657,8 @@ this.createjs = this.createjs||{};
 				continue;
 			}
 
-			if (item.compositeOperation !== null) {
+			var containerRenderMode = this._renderMode;
+			if (item.compositeOperation) {
 				this._updateRenderMode(item.compositeOperation);
 			}
 
@@ -2726,6 +2802,10 @@ this.createjs = this.createjs||{};
 
 			if (this._immediateRender) {
 				this._immediateBatchRender();
+			}
+
+			if (this._renderMode !== containerRenderMode) {
+				this._updateRenderMode(containerRenderMode);
 			}
 		}
 
