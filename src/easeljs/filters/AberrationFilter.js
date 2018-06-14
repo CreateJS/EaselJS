@@ -89,14 +89,15 @@
 					"vTextureCoord + (uColorDirection * uColorMultiplier.b)" +
 				");" +
 
+				"float newAlpha = " + (alphaMax ?
+					"max(rSample.a, max(gSample.a, max(bSample.a, sample.a)))" :
+					"(rSample.a + gSample.a + bSample.a) / 3.0"
+				) + ";" +
 				"vec4 result = vec4(" +
-					"rSample.r*rSample.a, " +
-					"gSample.g*gSample.a, " +
-					"bSample.b*bSample.a, " +
-					(alphaMax ?
-							"max(rSample.a, max(gSample.a, max(bSample.a, sample.a)))" :
-							"(rSample.a + gSample.a + bSample.a) / 3.0"
-					) +
+					"min(1.0, rSample.r/(rSample.a+0.00001)) * newAlpha, " +
+					"min(1.0, gSample.g/(gSample.a+0.00001)) * newAlpha, " +
+					"min(1.0, bSample.b/(bSample.a+0.00001)) * newAlpha, " +
+					"newAlpha" +
 				");" +
 				"gl_FragColor = mix(result, sample, uExtraProps[0]*sample.a);" +
 			"}"
