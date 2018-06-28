@@ -2226,7 +2226,7 @@ this.createjs = this.createjs||{};
 	 */
 	p._loadTextureImage = function (gl, image) {
 		var srcPath, texture, msg;
-		if (image instanceof Image && image.src) {
+		if ((image instanceof HTMLImageElement || image instanceof Image) && image.src) {
 			srcPath = image.src;
 		} else if (image instanceof HTMLCanvasElement) {
 			image._isCanvas = true; //canvases are already loaded and assumed unique so note that
