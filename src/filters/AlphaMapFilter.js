@@ -1,4 +1,4 @@
-/*
+/**
  * @license AlphaMapFilter
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
@@ -32,63 +32,53 @@ import Filter from "./Filter";
  * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
  * be copied from the red channel of the map, and the RGB channels will be copied from the target.
  *
- * Generally, it is recommended that you use {{#crossLink "AlphaMaskFilter"}}{{/crossLink}}, because it has much
- * better performance.
+ * Generally, it is recommended that you use {@link easeljs.AlphaMaskFilter}, because it has much better performance.
  *
- * <h4>Example</h4>
- * This example draws a red->blue box, caches it, and then uses the cache canvas as an alpha map on a 100x100 image.
+ * @memberof easeljs
+ * @extends easeljs.Filter
+ * @example *
+ * let box = new Shape();
+ * box.graphics.beginLinearGradientFill(["#ff0000", "#0000ff"], [0, 1], 0, 0, 0, 100)
+ * box.graphics.drawRect(0, 0, 100, 100);
+ * box.cache(0, 0, 100, 100);
+ * let bmp = new Bitmap("path/to/image.jpg");
+ * bmp.filters = [ new AlphaMapFilter(box.cacheCanvas) ];
+ * bmp.cache(0, 0, 100, 100);
  *
- *       var box = new createjs.Shape();
- *       box.graphics.beginLinearGradientFill(["#ff0000", "#0000ff"], [0, 1], 0, 0, 0, 100)
- *       box.graphics.drawRect(0, 0, 100, 100);
- *       box.cache(0, 0, 100, 100);
- *
- *       var bmp = new createjs.Bitmap("path/to/image.jpg");
- *       bmp.filters = [
- *           new createjs.AlphaMapFilter(box.cacheCanvas)
- *       ];
- *       bmp.cache(0, 0, 100, 100);
- *       stage.addChild(bmp);
- *
- * See {{#crossLink "Filter"}}{{/crossLink}} for more information on applying filters.
- * @class AlphaMapFilter
- * @extends Filter
- * @module EaselJS
+ * @param {HTMLImageElement | HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
+ * result. This should be exactly the same dimensions as the target.
  */
 export default class AlphaMapFilter extends Filter {
 
-// constructor:
-	/**
-	 * @constructor
-	 * @param {HTMLImageElement|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
-	 * result. This should be exactly the same dimensions as the target.
-	 */
 	constructor (alphaMap) {
 		super();
 
-// public properties:
 		/**
 		 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
 		 * dimensions as the target.
-		 * @property alphaMap
-		 * @type HTMLImageElement|HTMLCanvasElement
+		 * @type {HTMLImageElement | HTMLCanvasElement}
 		 */
 		this.alphaMap = alphaMap;
 
-// private properties:
 		/**
-		 * @property _alphaMap
 		 * @protected
-		 * @type HTMLImageElement|HTMLCanvasElement
+		 * @type {HTMLImageElement | HTMLCanvasElement}
+		 * @default null
 		 */
 		this._alphaMap = null;
 
 		/**
-		 * @property _mapData
 		 * @protected
-		 * @type Uint8ClampedArray
+		 * @type {Uint8ClampedArray}
+		 * @default null
 		 */
 		this._mapData = null;
+
+		/**
+		 * @protected
+		 * @type {*}
+		 * @default null
+		 */
 		this._mapTexture = null;
 
 		this.FRAG_SHADER_BODY = `
@@ -106,7 +96,10 @@ export default class AlphaMapFilter extends Filter {
 	}
 
 	/**
-	 * TODO: Docs
+	 * @todo docs
+	 * @param {*} gl
+	 * @param {*} stage
+	 * @param {*} shaderProgram
 	 */
 	shaderParamSetup (gl, stage, shaderProgram) {
 		if (!this._mapTexture) { this._mapTexture = gl.createTexture(); }
@@ -122,9 +115,8 @@ export default class AlphaMapFilter extends Filter {
 		);
 	}
 
-// public methods:
 	/**
-	 * Docced in superclass.
+	 * @return {easeljs.AlphaMapFilter}
 	 */
 	clone () {
 		let o = new AlphaMapFilter(this.alphaMap);
@@ -133,11 +125,6 @@ export default class AlphaMapFilter extends Filter {
 		return o;
 	}
 
-
-// private methods:
-	/**
-	 * Docced in superclass.
-	 */
 	_applyFilter (imageData) {
 		if (!this.alphaMap) { return true; }
 		if (!this._prepAlphaMap()) { return false; }
@@ -152,7 +139,6 @@ export default class AlphaMapFilter extends Filter {
 	}
 
 	/**
-	 * @method _prepAlphaMap
 	 * @protected
 	 */
 	_prepAlphaMap () {

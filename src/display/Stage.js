@@ -1,30 +1,30 @@
-/*
-* @license Stage
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2017 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
+/**
+ * @license Stage
+ * Visit http://createjs.com/ for documentation, updates and examples.
+ *
+ * Copyright (c) 2017 gskinner.com, inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import Container from "./Container";
 import DisplayObject from "./DisplayObject";
@@ -32,50 +32,38 @@ import Event from "@createjs/core/src/events/Event";
 import MouseEvent from "../events/MouseEvent";
 
 /**
- * A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
+ * A stage is the root level {@link easeljs.Container} for a display list. Each time its {@link easeljs.Stage#tick}
  * method is called, it will render its display list to its target canvas.
  *
- * <h4>Example</h4>
- * This example creates a stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
- * and redraw the stage using {{#crossLink "Stage/update"}}{{/crossLink}}.
+ * @memberof easeljs
+ * @extends easeljs.Container
+ * @example
+ * let stage = new Stage("canvasElementId");
+ * let image = new Bitmap("imagePath.png");
+ * stage.addChild(image);
+ * Ticker.addEventListener("tick", event => {
+ *   image.x += 10;
+ * 	 stage.update();
+ * });
  *
- *      var stage = new createjs.Stage("canvasElementId");
- *      var image = new createjs.Bitmap("imagePath.png");
- *      stage.addChild(image);
- *      createjs.Ticker.addEventListener("tick", handleTick);
- *      function handleTick(event) {
- *          image.x += 10;
- *          stage.update();
- *      }
- *
- * @class Stage
- * @extends Container
- * @module EaselJS
+ * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
+ * of a canvas object in the current document.
  */
 export default class Stage extends Container {
 
-// constructor:
-	/**
-	 * @constructor
-	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
-	 * of a canvas object in the current document.
-	 */
 	constructor (canvas) {
 		super();
 
-// public properties:
 		/**
-		 * Indicates whether the stage should automatically clear the canvas before each render. You can set this to <code>false</code>
+		 * Indicates whether the stage should automatically clear the canvas before each render. You can set this to `false`
 		 * to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for
 		 * example).
 		 *
-		 * <h4>Example</h4>
+		 * @example
+		 * let stage = new Stage("canvasId");
+		 * stage.autoClear = false;
 		 *
-		 *      var stage = new createjs.Stage("canvasId");
-		 *      stage.autoClear = false;
-		 *
-		 * @property autoClear
-		 * @type Boolean
+		 * @type {Boolean}
 		 * @default true
 		 */
 		this.autoClear = true;
@@ -85,22 +73,22 @@ export default class Stage extends Container {
 		 * first stage that will be ticked (or they will clear each other's render).
 		 *
 		 * When changing the canvas property you must disable the events on the old canvas, and enable events on the
-		 * new canvas or mouse events will not work as expected. For example:
+		 * new canvas or mouse events will not work as expected.
 		 *
-		 *      myStage.enableDOMEvents(false);
-		 *      myStage.canvas = anotherCanvas;
-		 *      myStage.enableDOMEvents(true);
+		 * @example
+		 * stage.enableDOMEvents(false);
+		 * stage.canvas = anotherCanvas;
+		 * stage.enableDOMEvents(true);
 		 *
-		 * @property canvas
-		 * @type HTMLCanvasElement | Object
+		 * @type {HTMLCanvasElement | Object}
 		 */
 		this.canvas = (typeof canvas === "string") ? document.getElementById(canvas) : canvas;
 
 		/**
 		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
 		 * position over the canvas, and mouseInBounds will be set to false.
-		 * @property mouseX
-		 * @type Number
+		 * @type {Number}
+		 * @default 0
 		 * @readonly
 		 */
 		this.mouseX = 0;
@@ -108,8 +96,8 @@ export default class Stage extends Container {
 		/**
 		 * The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
 		 * position over the canvas, and mouseInBounds will be set to false.
-		 * @property mouseY
-		 * @type Number
+		 * @type {Number}
+		 * @default 0
 		 * @readonly
 		 */
 		this.mouseY = 0;
@@ -117,43 +105,36 @@ export default class Stage extends Container {
 		/**
 		 * Specifies the area of the stage to affect when calling update. This can be use to selectively
 		 * re-draw specific regions of the canvas. If null, the whole canvas area is drawn.
-		 * @property drawRect
-		 * @type {Rectangle}
+		 * @type {easeljs.Rectangle}
 		 */
 		this.drawRect = null;
 
 		/**
-		 * Indicates whether display objects should be rendered on whole pixels. You can set the
-		 * {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of
-		 * display objects to false to enable/disable this behaviour on a per instance basis.
-		 * @property snapToPixelEnabled
-		 * @type Boolean
+		 * Indicates whether display objects should be rendered on whole pixels. You can set the {@link easeljs.DisplayObject.snapToPixelEnabled}
+		 * property of display objects to false to enable/disable this behaviour on a per instance basis.
+		 * @type {Boolean}
 		 * @default false
 		 */
 		this.snapToPixelEnabled = false;
 
 		/**
 		 * Indicates whether the mouse is currently within the bounds of the canvas.
-		 * @property mouseInBounds
-		 * @type Boolean
+		 * @type {Boolean}
 		 * @default false
 		 */
 		this.mouseInBounds = false;
 
 		/**
 		 * If true, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas.
-		 * @property tickOnUpdate
-		 * @type Boolean
+		 * @type {Boolean}
 		 * @default true
 		 */
 		this.tickOnUpdate = true;
 
 		/**
-		 * If true, mouse move events will continue to be called when the mouse leaves the target canvas. See
-		 * {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}}, and {{#crossLink "MouseEvent"}}{{/crossLink}}
-		 * x/y/rawX/rawY.
-		 * @property mouseMoveOutside
-		 * @type Boolean
+		 * If true, mouse move events will continue to be called when the mouse leaves the target canvas.
+		 * See {@link easeljs.Stage#mouseInBounds}, and {@link easeljs.MouseEvent} x/y/rawX/rawY.
+		 * @type {Boolean}
 		 * @default false
 		 */
 		this.mouseMoveOutside = false;
@@ -162,8 +143,7 @@ export default class Stage extends Container {
 		/**
 		 * Prevents selection of other elements in the html page if the user clicks and drags, or double clicks on the canvas.
 		 * This works by calling `preventDefault()` on any mousedown events (or touch equivalent) originating on the canvas.
-		 * @property preventSelection
-		 * @type Boolean
+		 * @type {Boolean}
 		 * @default true
 		 */
 		this.preventSelection = true;
@@ -171,15 +151,14 @@ export default class Stage extends Container {
 		/**
 		 * The hitArea property is not supported for Stage.
 		 * @property hitArea
-		 * @type {DisplayObject}
+		 * @override
 		 * @default null
+		 * @private
 		 */
 
-// private properties:
 		/**
 		 * Holds objects with data for each active pointer id. Each object has the following properties:
 		 * x, y, event, target, overTarget, overX, overY, inBounds, posEvtObj (native event that last updated position)
-		 * @property _pointerData
 		 * @type {Object}
 		 * @private
 		 */
@@ -187,79 +166,62 @@ export default class Stage extends Container {
 
 		/**
 		 * Number of active pointers.
-		 * @property _pointerCount
-		 * @type {Object}
+		 * @type {Number}
 		 * @private
 		 */
 		this._pointerCount = 0;
 
 		/**
 		 * The ID of the primary pointer.
-		 * @property _primaryPointerID
-		 * @type {Object}
+		 * @type {String}
 		 * @private
 		 */
 		this._primaryPointerID = null;
 
 		/**
-		 * @property _mouseOverIntervalID
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._mouseOverIntervalID = null;
 
 		/**
-		 * @property _nextStage
 		 * @protected
-		 * @type Stage
+		 * @type {easeljs.Stage}
 		 */
 		this._nextStage = null;
 
 		/**
-		 * @property _prevStage
 		 * @protected
-		 * @type Stage
+		 * @type {easeljs.Stage}
 		 */
 		this._prevStage = null;
 
 		this.enableDOMEvents(true);
 	}
 
-// accessor properties:
 	/**
-	 * Specifies a target stage that will have mouse / touch interactions relayed to it after this stage handles them.
+	 * Specifies a target stage that will have mouse/touch interactions relayed to it after this stage handles them.
 	 * This can be useful in cases where you have multiple layered canvases and want user interactions
-	 * events to pass through. For example, this would relay mouse events from topStage to bottomStage:
-	 *
-	 *      topStage.nextStage = bottomStage;
-	 *
-	 * To disable relaying, set nextStage to null.
+	 * events to pass through.
 	 *
 	 * MouseOver, MouseOut, RollOver, and RollOut interactions are also passed through using the mouse over settings
 	 * of the top-most stage, but are only processed if the target stage has mouse over interactions enabled.
-	 * Considerations when using roll over in relay targets:<OL>
-	 * <LI> The top-most (first) stage must have mouse over interactions enabled (via enableMouseOver)</LI>
-	 * <LI> All stages that wish to participate in mouse over interaction must enable them via enableMouseOver</LI>
-	 * <LI> All relay targets will share the frequency value of the top-most stage</LI>
-	 * </OL>
-	 * To illustrate, in this example the targetStage would process mouse over interactions at 10hz (despite passing
-	 * 30 as it's desired frequency):
-	 * 	topStage.nextStage = targetStage;
-	 * 	topStage.enableMouseOver(10);
-	 * 	targetStage.enableMouseOver(30);
+	 * Considerations when using roll over in relay targets:
+	 * <ol>
+	 *   <li> The top-most (first) stage must have mouse over interactions enabled (via enableMouseOver)</li>
+	 *   <li> All stages that wish to participate in mouse over interaction must enable them via enableMouseOver</li>
+	 *   <li> All relay targets will share the frequency value of the top-most stage</li>
+	 * </ol>
 	 *
-	 * If the target stage's canvas is completely covered by this stage's canvas, you may also want to disable its
-	 * DOM events using:
+	 * @example <caption>Relay mouse events from topStage to bottomStage</caption>
+	 * topStage.nextStage = bottomStage;
 	 *
-	 *	targetStage.enableDOMEvents(false);
+	 * @example <caption>Disable DOM events</caption>
+	 * stage.enableDOMEvents(false);
 	 *
-	 * @property nextStage
-	 * @type {Stage}
+	 * @type {easeljs.Stage}
 	 */
-	get nextStage () {
-		return this._nextStage;
-	}
-
+	get nextStage () { return this._nextStage; }
 	set nextStage (stage) {
 		if (this._nextStage) { this._nextStage._prevStage = null; }
 		if (stage) { stage._prevStage = this; }
@@ -268,12 +230,11 @@ export default class Stage extends Container {
 
 // public methods:
 	/**
-	 * Each time the update method is called, the stage will call {{#crossLink "Stage/tick"}}{{/crossLink}}
-	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false,
+	 * Each time the update method is called, the stage will call {@link easeljs.Stage#tick}
+	 * unless {@link easeljs.Stage#tickOnupdate} is set to false,
 	 * and then render the display list to the canvas.
 	 *
-	 * @method update
-	 * @param {Object} [props] Props object to pass to `tick()`. Should usually be a {{#crossLink "Ticker"}}{{/crossLink}} event object, or similar object with a delta property.
+	 * @param {Object} [props] Props object to pass to `tick()`. Should usually be a {@link core.Ticker} event object, or similar object with a delta property.
 	 */
 	update (props) {
 		if (!this.canvas) { return; }
@@ -299,33 +260,31 @@ export default class Stage extends Container {
 	}
 
 	/**
-	 * Propagates a tick event through the display list. This is automatically called by {{#crossLink "Stage/update"}}{{/crossLink}}
-	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false.
+	 * Propagates a tick event through the display list. This is automatically called by {@link easeljs.Stage#update}
+	 * unless {@link easeljs.Stage#tickOnUpdate} is set to false.
 	 *
 	 * If a props object is passed to `tick()`, then all of its properties will be copied to the event object that is
 	 * propagated to listeners.
 	 *
-	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-	 * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent object with a delta property) be
-	 * passed as the `props` parameter to `tick()`. For example:
+	 * Some time-based features in EaselJS (for example {@link easeljs.Sprite#framerate} require that
+	 * a {@link core.Ticker#event:tick} event object (or equivalent object with a delta property) be
+	 * passed as the `props` parameter to `tick()`.
 	 *
-	 * 	Ticker.on("tick", handleTick);
-	 * 	function handleTick(evtObj) {
-	 * 		// clone the event object from Ticker, and add some custom data to it:
-	 * 		var evt = evtObj.clone().set({greeting:"hello", name:"world"});
+	 * @example
+	 * Ticker.on("tick", (evt) => {
+	 *   // clone the event object from Ticker, and add some custom data to it:
+	 * 	 let data = evt.clone().set({ greeting: "hello", name: "world" });
+	 * 	 // pass it to stage.update():
+	 * 	 stage.update(data); // subsequently calls tick() with the same param
+	 * });
 	 *
-	 * 		// pass it to stage.update():
-	 * 		myStage.update(evt); // subsequently calls tick() with the same param
-	 * 	}
+	 * shape.on("tick", (evt) => {
+	 *   console.log(evt.delta); // the delta property from the Ticker tick event object
+	 * 	 console.log(evt.greeting, evt.name); // custom data: "hello world"
+	 * });
 	 *
-	 * 	// ...
-	 * 	myDisplayObject.on("tick", handleDisplayObjectTick);
-	 * 	function handleDisplayObjectTick(evt) {
-	 * 		console.log(evt.delta); // the delta property from the Ticker tick event object
-	 * 		console.log(evt.greeting, evt.name); // custom data: "hello world"
-	 * 	}
-	 *
-	 * @method tick
+	 * @emits easeljs.Stage#event:tickstart
+	 * @emits easeljs.Stage#event:tickend
 	 * @param {Object} [props] An object with properties that should be copied to the event object. Should usually be a Ticker event object, or similar object with a delta property.
 	 */
 	tick (props) {
@@ -341,24 +300,17 @@ export default class Stage extends Container {
 	}
 
 	/**
-	 * Default event handler that calls the Stage {{#crossLink "Stage/update"}}{{/crossLink}} method when a {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}}
-	 * event is received. This allows you to register a Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}}
-	 * directly, using:
-	 *
-	 *      Ticker.addEventListener("tick", myStage");
-	 *
+	 * Default event handler that calls the Stage {@link easeljs.Stage#update} method when a {@link easeljs.DisplayObject#event:tick}
+	 * event is received. This allows you to register a Stage instance as a event listener on {@link core.Ticker} directly.
 	 * Note that if you subscribe to ticks using this pattern, then the tick event object will be passed through to
-	 * display object tick handlers, instead of <code>delta</code> and <code>paused</code> parameters.
-	 * @property handleEvent
-	 * @type Function
+	 * display object tick handlers, instead of `delta` and `paused` parameters.
 	 */
 	handleEvent (evt) {
 		if (evt.type === "tick") { this.update(evt); }
 	}
 
 	/**
-	 * Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
-	 * @method clear
+	 * Clears the target canvas. Useful if {@link easeljs.State#autoClear} is set to `false`.
 	 */
 	clear () {
 		if (!this.canvas) { return; }
@@ -370,10 +322,10 @@ export default class Stage extends Container {
 	/**
 	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
 	 * be specified as the src value of an image element.
-	 * @method toDataURL
+	 *
 	 * @param {String} [backgroundColor] The background color to be used for the generated image. Any valid CSS color
 	 * value is allowed. The default value is a transparent background.
-	 * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
+	 * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. If an unknown MIME type
 	 * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
 	 * @return {String} a Base64 encoded image.
 	 */
@@ -397,21 +349,19 @@ export default class Stage extends Container {
 		}
 
 		return dataURL;
-	};
+	}
 
 	/**
-	 * Enables or disables (by passing a frequency of 0) mouse over ({{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
-	 * and {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}) and roll over events ({{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}
-	 * and {{#crossLink "DisplayObject/rollout:event"}}{{/crossLink}}) for this stage's display list. These events can
+	 * Enables or disables (by passing a frequency of 0) mouse over {@link easeljs.DisplayObject#event:mouseover}
+	 * and {@link easeljs.DisplayObject#event:mouseout} and roll over events {@link easeljs.DisplayObject#event:rollover}
+	 * and {@link easeljs.DisplayObject#event:rollout} for this stage's display list. These events can
 	 * be expensive to generate, so they are disabled by default. The frequency of the events can be controlled
 	 * independently of mouse move events via the optional `frequency` parameter.
 	 *
-	 * <h4>Example</h4>
+	 * @example
+	 * const stage = new Stage("canvasId");
+	 * stage.enableMouseOver(10); // 10 updates per second
 	 *
-	 *      var stage = new createjs.Stage("canvasId");
-	 *      stage.enableMouseOver(10); // 10 updates per second
-	 *
-	 * @method enableMouseOver
 	 * @param {Number} [frequency=20] Optional param specifying the maximum number of times per second to broadcast
 	 * mouse over/out events. Set to 0 to disable mouse over events completely. Maximum is 50. A lower frequency is less
 	 * responsive, but uses less CPU.
@@ -432,16 +382,15 @@ export default class Stage extends Container {
 	 * Enables or disables the event listeners that stage adds to DOM elements (window, document and canvas). It is good
 	 * practice to disable events when disposing of a Stage instance, otherwise the stage will continue to receive
 	 * events from the page.
-	 *
 	 * When changing the canvas property you must disable the events on the old canvas, and enable events on the
-	 * new canvas or mouse events will not work as expected. For example:
+	 * new canvas or mouse events will not work as expected.
 	 *
-	 *      myStage.enableDOMEvents(false);
-	 *      myStage.canvas = anotherCanvas;
-	 *      myStage.enableDOMEvents(true);
+	 * @example
+	 * stage.enableDOMEvents(false);
+	 * stage.canvas = anotherCanvas;
+	 * stage.enableDOMEvents(true);
 	 *
-	 * @method enableDOMEvents
-	 * @param {Boolean} [enable=true] Indicates whether to enable or disable the events. Default is true.
+	 * @param {Boolean} [enable=true] Indicates whether to enable or disable the events.
 	 */
 	enableDOMEvents (enable = true) {
 		let ls = this._eventListeners;
@@ -468,17 +417,17 @@ export default class Stage extends Container {
 
 	/**
 	 * Stage instances cannot be cloned.
-	 * @method clone
+	 * @throws Stage cannot be cloned
+	 * @override
 	 */
 	clone () {
-		throw("Stage cannot be cloned.");
+		throw "Stage cannot be cloned.";
 	}
 
-// private methods:
 	/**
-	 * @method _getElementRect
 	 * @protected
 	 * @param {HTMLElement} e
+	 * @returns {Object}
 	 */
 	_getElementRect (e) {
 		let bounds;
@@ -504,9 +453,9 @@ export default class Stage extends Container {
 	}
 
 	/**
-	 * @method _getPointerData
 	 * @protected
 	 * @param {Number} id
+	 * @returns {Object}
 	 */
 	_getPointerData (id) {
 		let data = this._pointerData[id];
@@ -515,22 +464,24 @@ export default class Stage extends Container {
 	}
 
 	/**
-	 * @method _handleMouseMove
 	 * @protected
-	 * @param {MouseEvent} [e=window.event]
+	 * @param {easeljs.MouseEvent} [e=window.event]
 	 */
 	_handleMouseMove (e = window.event) {
 		this._handlePointerMove(-1, e, e.pageX, e.pageY);
 	}
 
 	/**
-	 * @method _handlePointerMove
+	 * @emits {@link easeljs.DisplayObject#event:mouseleave}
+	 * @emits {@link easeljs.DisplayObject#event:mouseenter}
+	 * @emits {@link easeljs.DisplayObject#event:pressmove}
+	 * @emits {@link easeljs.Stage#event:stagemousemove}
 	 * @protected
 	 * @param {Number} id
-	 * @param {Event} e
+	 * @param {easeljs.MouseEvent | Event} e
 	 * @param {Number} pageX
 	 * @param {Number} pageY
-	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 * @param {easeljs.Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
 	 */
 	_handlePointerMove (id, e, pageX, pageY, owner) {
 		if (this._prevStage && owner === undefined) { return; } // redundant listener.
@@ -552,10 +503,9 @@ export default class Stage extends Container {
 	}
 
 	/**
-	 * @method _updatePointerPosition
 	 * @protected
 	 * @param {Number} id
-	 * @param {Event} e
+	 * @param {easeljs.MouseEvent | Event} e
 	 * @param {Number} pageX
 	 * @param {Number} pageY
 	 */
@@ -589,21 +539,22 @@ export default class Stage extends Container {
 	}
 
 	/**
-	 * @method _handleMouseUp
 	 * @protected
-	 * @param {MouseEvent} e
+	 * @param {easeljs.MouseEvent} e
 	 */
 	_handleMouseUp (e) {
 		this._handlePointerUp(-1, e, false);
 	}
 
 	/**
-	 * @method _handlePointerUp
+	 * @emits {@link easeljs.Stage#event:stagemouseup}
+	 * @emits {@link easeljs.DisplayObject#event:click}
+	 * @emits {@link easeljs.DisplayObject#event:pressup}
 	 * @protected
 	 * @param {Number} id
-	 * @param {Event} e
+	 * @param {easeljs.MouseEvent | Event} e
 	 * @param {Boolean} clear
-	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 * @param {easeljs.Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
 	 */
 	_handlePointerUp (id, e, clear, owner) {
 		let nextStage = this._nextStage, o = this._getPointerData(id);
@@ -626,22 +577,22 @@ export default class Stage extends Container {
 	}
 
 	/**
-	 * @method _handleMouseDown
 	 * @protected
-	 * @param {MouseEvent} e
+	 * @param {easeljs.MouseEvent} e
 	 */
 	_handleMouseDown (e) {
 		this._handlePointerDown(-1, e, e.pageX, e.pageY);
 	}
 
 	/**
-	 * @method _handlePointerDown
+	 * @emits {@link easeljs.Stage#event:stagemousedown}
+	 * @emits {@link easeljs.DisplayObject#event:mousedown}
 	 * @protected
 	 * @param {Number} id
-	 * @param {Event} e
+	 * @param {easeljs.MouseEvent | Event} e
 	 * @param {Number} pageX
 	 * @param {Number} pageY
-	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 * @param {easeljs.Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
 	 */
 	_handlePointerDown (id, e, pageX, pageY, owner) {
 		if (this.preventSelection) { e.preventDefault(); }
@@ -658,10 +609,13 @@ export default class Stage extends Container {
 	}
 
 	/**
-	 * @method _testMouseOver
+	 * @emits {@link easeljs.DisplayObject#event:mouseout}
+	 * @emits {@link easeljs.DisplayObject#event:rollout}
+	 * @emits {@link easeljs.DisplayObject#event:rollover}
+	 * @emits {@link easeljs.DisplayObject#event:mouseover}
 	 * @param {Boolean} clear If true, clears the mouseover / rollover (ie. no target)
-	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
-	 * @param {Stage} eventTarget The stage that the cursor is actively over.
+	 * @param {easeljs.Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 * @param {easeljs.Stage} eventTarget The stage that the cursor is actively over.
 	 * @protected
 	 */
 	_testMouseOver (clear, owner, eventTarget) {
@@ -727,10 +681,10 @@ export default class Stage extends Container {
 	}
 
 	/**
-	 * @method _handleDoubleClick
+	 * @emits {@link easeljs.DisplayObject#event:dblclick}
 	 * @protected
-	 * @param {MouseEvent} e
-	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 * @param {easeljs.MouseEvent} e
+	 * @param {easeljs.Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
 	 */
 	_handleDoubleClick (e, owner) {
 		let target=null, nextStage=this._nextStage, o=this._getPointerData(-1);
@@ -742,15 +696,14 @@ export default class Stage extends Container {
 	}
 
 	/**
-	 * @method _dispatchMouseEvent
 	 * @protected
-	 * @param {DisplayObject} target
+	 * @param {easeljs.DisplayObject} target
 	 * @param {String} type
 	 * @param {Boolean} bubbles
 	 * @param {Number} pointerId
 	 * @param {Object} o
-	 * @param {MouseEvent} [nativeEvent]
-	 * @param {DisplayObject} [relatedTarget]
+	 * @param {easeljs.MouseEvent} [nativeEvent]
+	 * @param {easeljs.DisplayObject} [relatedTarget]
 	 */
 	_dispatchMouseEvent (target, type, bubbles, pointerId, o, nativeEvent, relatedTarget) {
 		// TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
@@ -767,68 +720,60 @@ export default class Stage extends Container {
 
 }
 
-// events:
 /**
  * Dispatched when the user moves the mouse over the canvas.
- * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
- * @event stagemousemove
+ * @see {@link easeljs.MouseEvent}
+ * @event easeljs.Stage#stagemousemove
  * @since 0.6.0
  */
-
 /**
- * Dispatched when the user presses their left mouse button on the canvas. See the {{#crossLink "MouseEvent"}}{{/crossLink}}
- * class for a listing of event properties.
- * @event stagemousedown
+ * Dispatched when the user presses their left mouse button on the canvas.
+ * You can use {@link easeljs.Stage#mouseInBounds} to check whether the mouse is currently within the stage bounds.
+ * @see {@link easeljs.MouseEvent}
+ * @event easeljs.Stage#stagemousedown
  * @since 0.6.0
  */
-
 /**
  * Dispatched when the user the user presses somewhere on the stage, then releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
- * You can use {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}} to check whether the mouse is currently within the stage bounds.
- * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
- * @event stagemouseup
+ * You can use {@link easeljs.Stage#mouseInBounds} to check whether the mouse is currently within the stage bounds.
+ * @see {@link easeljs.MouseEvent}
+ * @event easeljs.Stage#stagemouseup
  * @since 0.6.0
  */
-
 /**
  * Dispatched when the mouse moves from within the canvas area (mouseInBounds === true) to outside it (mouseInBounds === false).
- * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
- * class for a listing of event properties.
- * @event mouseleave
+ * This is currently only dispatched for mouse input (not touch).
+ * @see {@link easeljs.MouseEvent}
+ * @event easeljs.Stage#mouseleave
  * @since 0.7.0
  */
-
 /**
  * Dispatched when the mouse moves into the canvas area (mouseInBounds === false) from outside it (mouseInBounds === true).
- * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
- * class for a listing of event properties.
- * @event mouseenter
+ * This is currently only dispatched for mouse input (not touch).
+ * @see {@link easeljs.MouseEvent}
+ * @event easeljs.Stage#mouseenter
  * @since 0.7.0
  */
-
 /**
  * Dispatched each update immediately before the tick event is propagated through the display list.
  * You can call preventDefault on the event object to cancel propagating the tick event.
- * @event tickstart
+ * @event easeljs.Stage#tickstart
  * @since 0.7.0
  */
-
 /**
  * Dispatched each update immediately after the tick event is propagated through the display list. Does not fire if
  * tickOnUpdate is false. Precedes the "drawstart" event.
- * @event tickend
+ * @event easeljs.Stage#tickend
  * @since 0.7.0
  */
-
 /**
  * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
  * You can call preventDefault on the event object to cancel the draw.
- * @event drawstart
+ * @event easeljs.Stage#drawstart
  * @since 0.7.0
  */
-
 /**
  * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
- * @event drawend
+ * @event easeljs.Stage#drawend
  * @since 0.7.0
  */

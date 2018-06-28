@@ -1,10 +1,8 @@
 ### 2.0 BETA
 
-This branch is in beta. Reporting issues is appreciated, please mention that it is for 2.0 in the issue body.
+**This branch is in beta. Reporting issues is appreciated, please mention that it is for 2.0 in the issue body.**
 
-EaselJS is currently not on NPM. To use 2.0 in your projects, install with the git commit-ish syntax `npm install github:createjs/easeljs#2.0`
-
-The `StageGL` class went under a heavy rewrite in 1.1 which has not been ported to ES2015 syntax. As such, we have excluded it from this branch for the time being. It will be added back when the class is finalized.
+The `StageGL` class went under a heavy rewrite in 1.1 which has not been ported to ES2015 syntax. We have excluded it from this branch for the time being. It will be added back when the class is finalized.
 
 Canvas-based image comparison unit tests are known to be failing, please don't report issues for this.
 
@@ -19,10 +17,20 @@ list to allow you to manipulate and animate graphics. It also provides a robust 
 interactions.
 
 It is excellent for building games, generative art, ads, data visualization, and other highly graphical experiences. It
-works well alone, or with the rest of the [CreateJS](http://createjs.com/) suite: [SoundJS](http://github.com/createjs/soundjs),
-[PreloadJS](http://github.com/createjs/preloadjs), and [TweenJS](http://github.com/createjs/tweenjs).
+works well alone, or with the rest of the [CreateJS](https://createjs.com/) suite: [SoundJS](https://github.com/createjs/soundjs),
+[PreloadJS](https://github.com/createjs/preloadjs), and [TweenJS](https://github.com/createjs/tweenjs).
 
 It has no external dependencies, and should be compatible with virtually any framework you enjoy using.
+
+## Installation
+
+#### NPM
+
+`npm install @createjs/easeljs --save`
+
+#### CDN
+
+`<script src="https://code.createjs.com/2.0/easeljs.min.js"></script>`
 
 ## Simple Example
 

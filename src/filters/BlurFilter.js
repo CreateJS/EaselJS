@@ -1,4 +1,4 @@
-/*
+/**
  * @license BlurFilter
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
@@ -28,13 +28,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/**
- * @module EaselJS
- */
-
-const _MUL_TABLE = [1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1];
-const _SHG_TABLE = [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9];
-
 import Filter from "./Filter";
 import Rectangle from "../geom/Rectangle";
 
@@ -42,70 +35,74 @@ import Rectangle from "../geom/Rectangle";
  * Applies a box blur to DisplayObjects. Note that this filter is fairly CPU intensive, particularly if the quality is
  * set higher than 1.
  *
- * <h4>Example</h4>
- * This example creates a red circle, and then applies a 5 pixel blur to it. It uses the {{#crossLink "Filter/getBounds"}}{{/crossLink}}
- * method to account for the spread that the blur causes.
+ * @memberof easeljs
+ * @extends easeljs.Filter
+ * @example
+ * let shape = new Shape().set({x:100,y:100});
+ * shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
+ * let blurFilter = new BlurFilter(5, 5, 1);
+ * shape.filters = [blurFilter];
+ * let bounds = blurFilter.getBounds();
+ * shape.cache(-50+bounds.x, -50+bounds.y, 100+bounds.width, 100+bounds.height);
  *
- *      let shape = new createjs.Shape().set({x:100,y:100});
- *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
- *
- *      let blurFilter = new createjs.BlurFilter(5, 5, 1);
- *      shape.filters = [blurFilter];
- *      let bounds = blurFilter.getBounds();
- *
- *      shape.cache(-50+bounds.x, -50+bounds.y, 100+bounds.width, 100+bounds.height);
- *
- * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
- * @class BlurFilter
- * @extends Filter
+ * @param {Number} [blurX=0] The horizontal blur radius in pixels.
+ * @param {Number} [blurY=0] The vertical blur radius in pixels.
+ * @param {Number} [quality=1] The number of blur iterations.
  */
 export default class BlurFilter extends Filter {
 
-// constructor:
-	/**
-	 * @constructor
-	 * @param {Number} [blurX=0] The horizontal blur radius in pixels.
-	 * @param {Number} [blurY=0] The vertical blur radius in pixels.
-	 * @param {Number} [quality=1] The number of blur iterations.
-	 */
 	constructor (blurX = 0, blurY = 0, quality = 1) {
 		super();
 
-// public properties:
 		/**
-		 * Horizontal blur radius in pixels
-		 * @property blurX
+		 * @protected
 		 * @default 0
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._blurX = blurX;
+		/**
+		 * @protected
+		 * @type {Array}
+		 */
 		this._blurXTable = [];
+		/**
+		 * @protected
+		 * @type {Number}
+		 * @default null
+		 */
 		this._lastBlurX = null;
 
 		/**
-		 * Vertical blur radius in pixels
-		 * @property blurY
 		 * @default 0
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._blurY = blurY;
+		/**
+		 * @protected
+		 * @type {Array}
+		 */
 		this._blurYTable = [];
+		/**
+		 * @protected
+		 * @type {Number}
+		 * @default null
+		 */
 		this._lastBlurY = null;
 
 		/**
 		 * Number of blur iterations. For example, a value of 1 will produce a rough blur. A value of 2 will produce a
 		 * smoother blur, but take twice as long to run.
-		 * @property quality
 		 * @default 1
-		 * @type Number
+		 * @type {Number}
 		 */
-		this._quality = isNaN(quality) || quality < 1 ? 1 : quality;
-		this._lastQuality = null;
-		this.quality = this._quality | 0;
-
+		this._quality = (isNaN(quality) || quality < 1) ? 1 : quality;
 		/**
-		 * This is a template to generate the shader for {{#crossLink FRAG_SHADER_BODY}}{{/crossLink}}
+		 * @protected
+		 * @type {Number}
+		 * @default null
 		 */
+		this._lastQuality = null;
+
 		this.FRAG_SHADER_TEMPLATE = `
 			uniform float xWeight[{{blurX}}];
 			uniform float yWeight[{{blurY}}];
@@ -129,54 +126,41 @@ export default class BlurFilter extends Filter {
 		`;
 	}
 
-// constants:
 	/**
-	 * Array of multiply values for blur calculations.
-	 * @property MUL_TABLE
-	 * @type Array
-	 * @protected
-	 * @static
+	 * Horizontal blur radius in pixels.
+	 * @type {Number}
 	 */
-	static get MUL_TABLE () { return _MUL_TABLE; }
-
-	/**
-	 * Array of shift values for blur calculations.
-	 * @property SHG_TABLE
-	 * @type Array
-	 * @protected
-	 * @static
-	 */
-	static get SHG_TABLE () { return _SHG_TABLE; }
-
-// accessor properties:
-// TODO: Docs for these.
-	get blurX () {
-		return this._blurX;
-	}
-
+	get blurX () { return this._blurX; }
 	set blurX (blurX) {
 		if (isNaN(blurX) || blurX < 0) { blurX = 0; }
 		this._blurX = blurX;
 	}
 
-	get blurY () {
-		return this._blurY;
-	}
-
+	/**
+	 * Vertical blur radius in pixels.
+	 * @type {Number}
+	 */
+	get blurY () { return this._blurY; }
 	set blurY (blurY) {
-		if (isNaN(blurY) || blurY < 0){ blurY = 0; }
+		if (isNaN(blurY) || blurY < 0) { blurY = 0; }
 		this._blurY = blurY;
 	}
 
-	get quality () {
-		return this._quality;
-	}
-
+	/**
+	 * Number of blur iterations. For example, a value of 1 will produce a rough blur. A value of 2 will produce a
+	 * smoother blur, but take twice as long to run.
+	 * @type {Number}
+	 */
+	get quality () { return this._quality | 0; }
 	set quality (quality) {
 		if (isNaN(quality) || quality < 0) { quality = 0; }
-		this._quality = quality | 0;
+		this._quality = quality;
 	}
 
+	/**
+	 * @protected
+	 * @type {*}
+	 */
 	get _buildShader () {
 		const xChange = this._lastBlurX !== this._blurX;
 		const yChange = this._lastBlurY !== this._blurY;
@@ -192,15 +176,8 @@ export default class BlurFilter extends Filter {
 		}
 		return this._compiledShader;
 	}
+	set _builtShader (value) { this._compiledShader = value; }
 
-	set _builtShader (value) {
-		this._compiledShader;
-	}
-
-// public methods:
-	/**
-	 * Docced in superclass
-	 */
 	shaderParamSetup (gl, stage, shaderProgram) {
 		// load the normalized gaussian weight tables
 		gl.uniform1fv(
@@ -219,9 +196,6 @@ export default class BlurFilter extends Filter {
 		);
 	}
 
-	/**
-	 * Docced in super class
-	 */
 	getBounds (rect) {
 		let x = this.blurX|0, y = this.blurY| 0;
 		if (x <= 0 && y <= 0) { return rect; }
@@ -230,26 +204,19 @@ export default class BlurFilter extends Filter {
 	}
 
 	/**
-	 * Docced in super class
+	 * @return {easeljs.BlurFilter}
 	 */
 	clone () {
 		return new BlurFilter(this.blurX, this.blurY, this.quality);
 	}
 
-
-// private methods:
-	/**
-	 * Docced in superclass
-	 */
 	_updateShader () {
 		let result = this.FRAG_SHADER_TEMPLATE;
 		result = result.replace(/{{blurX}}/g, this._blurXTable.length.toFixed(0));
 		result = result.replace(/{{blurY}}/g, this._blurYTable.length.toFixed(0));
 		this.FRAG_SHADER_BODY = result;
 	}
-	/**
-	 * Docced in superclass
-	 */
+
 	_getTable (spread) {
 		const EDGE = 4.2;
 		if (spread <= 1) { return [1]; }
@@ -266,9 +233,6 @@ export default class BlurFilter extends Filter {
 		return result.map(currentValue => currentValue / factor);
 	}
 
-	/**
-	 * Docced in super class
-	 */
 	_applyFilter (imageData) {
 		let radiusX = this._blurX >> 1;
 		if (isNaN(radiusX) || radiusX < 0) return false;
@@ -474,3 +438,19 @@ export default class BlurFilter extends Filter {
 	}
 
 }
+
+/**
+ * Array of multiply values for blur calculations.
+ * @type {Array}
+ * @protected
+ * @readonly
+ * @static
+ */
+BlurFilter.MUL_TABLE = [1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1];
+/**
+ * Array of shift values for blur calculations.
+ * @type {Array}
+ * @protected
+ * @static
+ */
+BlurFilter.SHG_TABLE = [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9];

@@ -1,4 +1,17 @@
 /**
+ * The core classes of EaselJS.
+ * @namespace easeljs
+ *
+ * @example
+ * import { Stage, Shape } from "@createjs/easeljs";
+ * const stage = new Stage("myCanvas");
+ * const shape = new Shape();
+ * shape.graphics.beginFill("red").drawCircle(0, 0, 50);
+ * stage.addChild(shape);
+ * stage.update();
+ */
+
+/**
  * README: Export Order
  *
  * Due to some classes having circular import bindings (whether at the top of the import chain or deeper in),
@@ -43,5 +56,6 @@ export { default as Touch } from "./ui/Touch";
 // utils
 export { default as SpriteSheetBuilder } from "./utils/SpriteSheetBuilder";
 export { default as SpriteSheetUtils } from "./utils/SpriteSheetUtils";
-export { default as UID } from "./utils/UID";
+export { default as uid } from "./utils/uid";
+export createCanvas from "./utils/Canvas";
 export { default as WebGLInspector } from "./utils/WebGLInspector";

@@ -26,91 +26,74 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import createCanvas from "./Canvas";
+
 /**
  * The SpriteSheetUtils class is a collection of static methods for working with {{#crossLink "SpriteSheet"}}{{/crossLink}}s.
  * A sprite sheet is a series of images (usually animation frames) combined into a single image on a regular grid. For
  * example, an animation consisting of 8 100x100 images could be combined into a 400x200 sprite sheet (4 frames across
  * by 2 high). The SpriteSheetUtils class uses a static interface and should not be instantiated.
- * @class SpriteSheetUtils
- * @static
- * @module EaselJS
+ *
+ * @memberof easeljs
+ * @name easeljs.SpriteSheetUtils
  */
-export default class SpriteSheetUtils {
+export default SpriteSheetUtils = {
 
-// constructor:
 	/**
-	 * @constructor
+	 * @protected
+	 * @type {HTMLCanvasElement | Object}
 	 */
-	constructor () {
-		throw "SpriteSheetUtils cannot be instantiated";
-	}
+	_workingCanvas: createCanvas(),
 
-// public static methods:
+	/**
+	 * @protected
+	 * @type {CanvasRenderingContext2D}
+	 */
+	get _workingContext () { return this._workingCanvas.getContext("2d"); },
+
 	/**
 	 * Returns a single frame of the specified sprite sheet as a new PNG image. An example of when this may be useful is
 	 * to use a spritesheet frame as the source for a bitmap fill.
 	 *
-	 * <strong>WARNING:</strong> In almost all cases it is better to display a single frame using a {{#crossLink "Sprite"}}{{/crossLink}}
-	 * with a {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} call than it is to slice out a frame using this
-	 * method and display it with a Bitmap instance. You can also crop an image using the {{#crossLink "Bitmap/sourceRect"}}{{/crossLink}}
-	 * property of {{#crossLink "Bitmap"}}{{/crossLink}}.
+	 * <strong>WARNING:</strong> In almost all cases it is better to display a single frame using a {@link easeljs.Sprite}
+	 * with a {@link easeljs.Sprite#gotoAndStop} call than it is to slice out a frame using this
+	 * method and display it with a Bitmap instance. You can also crop an image using the {@link easeljs.Bitmap#sourceRect}
+	 * property of {@link easeljs.Bitmap}.
 	 *
 	 * The extractFrame method may cause cross-domain warnings since it accesses pixels directly on the canvas.
-	 * @method extractFrame
-	 * @static
-	 * @param {SpriteSheet} spriteSheet The SpriteSheet instance to extract a frame from.
-	 * @param {Number|String} frameOrAnimation The frame number or animation name to extract. If an animation
+	 *
+	 * @param {easeljs.SpriteSheet} spriteSheet The SpriteSheet instance to extract a frame from.
+	 * @param {Number | String} frameOrAnimation The frame number or animation name to extract. If an animation
 	 * name is specified, only the first frame of the animation will be extracted.
 	 * @return {HTMLImageElement} a single frame of the specified sprite sheet as a new PNG image.
-	*/
-	static extractFrame (spriteSheet, frameOrAnimation) {
+	 */
+	extractFrame (spriteSheet, frameOrAnimation) {
 		if (isNaN(frameOrAnimation)) {
 			frameOrAnimation = spriteSheet.getAnimation(frameOrAnimation).frames[0];
 		}
 		let data = spriteSheet.getFrame(frameOrAnimation);
 		if (!data) { return null; }
 		let r = data.rect;
-		let canvas = SpriteSheetUtils._workingCanvas;
+		let canvas = this._workingCanvas;
 		canvas.width = r.width;
 		canvas.height = r.height;
-		SpriteSheetUtils._workingContext.drawImage(data.image, r.x, r.y, r.width, r.height, 0, 0, r.width, r.height);
+		this._workingContext.drawImage(data.image, r.x, r.y, r.width, r.height, 0, 0, r.width, r.height);
 		let img = document.createElement("img");
 		img.src = canvas.toDataURL("image/png");
 		return img;
-	}
+	},
 
 	/**
-	 * Merges the rgb channels of one image with the alpha channel of another. This can be used to combine a compressed
-	 * JPEG image containing color data with a PNG32 monochromatic image containing alpha data. With certain types of
-	 * images (those with detail that lend itself to JPEG compression) this can provide significant file size savings
-	 * versus a single RGBA PNG32. This method is very fast (generally on the order of 1-2 ms to run).
-	 * @method mergeAlpha
-	 * @static
-	 * @param {HTMLImageElement} rbgImage The image (or canvas) containing the RGB channels to use.
-	 * @param {HTMLImageElement} alphaImage The image (or canvas) containing the alpha channel to use.
-	 * @param {HTMLCanvasElement} [canvas] If specified, this canvas will be used and returned. If not, a new canvas will be created.
-	 * @return {HTMLCanvasElement} A canvas with the combined image data. This can be used as a source for Bitmap or SpriteSheet.
-	 * @deprecated Tools such as ImageAlpha generally provide better results. This will be moved to sandbox in the future.
-	*/
-	static mergeAlpha (rgbImage, alphaImage, canvas) {
-		if (!canvas) { canvas = window.createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
-		canvas.width = Math.max(alphaImage.width, rgbImage.width);
-		canvas.height = Math.max(alphaImage.height, rgbImage.height);
-		let ctx = canvas.getContext("2d");
-		ctx.save();
-		ctx.drawImage(rgbImage,0,0);
-		ctx.globalCompositeOperation = "destination-in";
-		ctx.drawImage(alphaImage,0,0);
-		ctx.restore();
-		return canvas;
-	}
-
-
-// private static methods:
-	static _flip (spriteSheet, count, h, v) {
+	 * @protected
+	 * @param {easeljs.SpriteSheet} spriteSheet
+	 * @param {Number} count
+	 * @param {Number} h
+	 * @param {Number} v
+	 */
+	_flip (spriteSheet, count, h, v) {
 		let imgs = spriteSheet._images;
-		let canvas = SpriteSheetUtils._workingCanvas;
-		let ctx = SpriteSheetUtils._workingContext;
+		let canvas = this._workingCanvas;
+		let ctx = this._workingContext;
 		const il = imgs.length/count;
 		for (let i=0; i<il; i++) {
 			let src = imgs[i];
@@ -166,26 +149,4 @@ export default class SpriteSheetUtils {
 		}
 	}
 
-}
-
-// private static properties:
-/**
- * @property _workingCanvas
- * @static
- * @type HTMLCanvasElement | Object
- * @protected
-*/
-/**
- * @property _workingContext
- * @static
- * @type CanvasRenderingContext2D
- * @protected
-*/
-{
-	let canvas = (window.createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
-	if (canvas.getContext) {
-		SpriteSheetUtils._workingCanvas = canvas;
-		SpriteSheetUtils._workingContext = canvas.getContext("2d");
-		canvas.width = canvas.height = 1;
-	}
 }

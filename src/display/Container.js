@@ -1,72 +1,63 @@
-/*
-* @license Container
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2017 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
+/**
+ * @license Container
+ * Visit http://createjs.com/ for documentation, updates and examples.
+ *
+ * Copyright (c) 2017 gskinner.com, inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 
-import DisplayObject from './DisplayObject';
+import DisplayObject from "./DisplayObject";
 
 /**
  * A Container is a nestable display list that allows you to work with compound display elements. For  example you could
  * group arm, leg, torso and head {{#crossLink "Bitmap"}}{{/crossLink}} instances together into a Person Container, and
  * transform them as a group, while still being able to move the individual parts relative to each other. Children of
- * containers have their <code>transform</code> and <code>alpha</code> properties concatenated with their parent
+ * containers have their `transform` and `alpha` properties concatenated with their parent
  * Container.
  *
- * For example, a {{#crossLink "Shape"}}{{/crossLink}} with x=100 and alpha=0.5, placed in a Container with <code>x=50</code>
- * and <code>alpha=0.7</code> will be rendered to the canvas at <code>x=150</code> and <code>alpha=0.35</code>.
+ * For example, a {{#crossLink "Shape"}}{{/crossLink}} with x=100 and alpha=0.5, placed in a Container with `x=50`
+ * and `alpha=0.7` will be rendered to the canvas at `x=150` and `alpha=0.35`.
  * Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
  *
- * <h4>Example</h4>
- *
- *      var container = new createjs.Container();
- *      container.addChild(bitmapInstance, shapeInstance);
- *      container.x = 100;
- *
- * @class Container
- * @extends DisplayObject
- * @module EaselJS
+ * @memberof easeljs
+ * @extends easeljs.DisplayObject
+ * @example
+ * import { Container } from "@createjs/easeljs";
+ * const container = new Container();
+ * container.addChild(bitmapInstance, shapeInstance);
+ * container.x = 100;
  */
 export default class Container extends DisplayObject {
 
-// constructor:
-	/**
-	 * @constructor
-	 */
 	constructor () {
 		super();
 
-// public properties:
 		/**
 		 * The array of children in the display list. You should usually use the child management methods such as
-		 * {{#crossLink "Container/addChild"}}{{/crossLink}}, {{#crossLink "Container/removeChild"}}{{/crossLink}},
-		 * {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is
-		 * included for advanced uses.
-		 * @property children
-		 * @type Array
-		 * @default null
+		 * {@link easeljs.Container#addChild}, {@link easeljs.Container#removeChild}, {@link easeljs.Container#swapChildren},
+		 * etc, rather than accessing this directly, but it is included for advanced uses.
+		 * @type {Array}
+		 * @default []
 		 */
 		this.children = [];
 
@@ -74,27 +65,23 @@ export default class Container extends DisplayObject {
 		 * Indicates whether the children of this container are independently enabled for mouse/pointer interaction.
 		 * If false, the children will be aggregated under the container - for example, a click on a child shape would
 		 * trigger a click event on the container.
-		 * @property mouseChildren
-		 * @type Boolean
+		 * @type {Boolean}
 		 * @default true
 		 */
 		this.mouseChildren = true;
 
 		/**
 		 * If false, the tick will not be propagated to children of this Container. This can provide some performance benefits.
-		 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
+		 * In addition to preventing the {@link core.Ticker#event:tick} event from being dispatched, it will also prevent tick related updates
 		 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
-		 * @property tickChildren
-		 * @type Boolean
+		 * @type {Boolean}
 		 * @default true
 		 */
 		this.tickChildren = true;
-		}
+	}
 
-// accessor properties:
 	/**
 	 * Returns the number of children in the container.
-	 * @property numChildren
 	 * @type {Number}
 	 * @readonly
 	 */
@@ -102,31 +89,11 @@ export default class Container extends DisplayObject {
 		return this.children.length;
 	}
 
-// public methods:
-	/**
-	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-	 * This does not account for whether it would be visible within the boundaries of the stage.
-	 *
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * @method isVisible
-	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-	 */
 	isVisible () {
 		let hasContent = this.cacheCanvas || this.children.length;
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	}
 
-	/**
-	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-	 * Returns true if the draw was handled (useful for overriding functionality).
-	 *
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * @method draw
-	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
-	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	 * into itself).
-	 */
 	draw (ctx, ignoreCache = false) {
 		if (super.draw(ctx, ignoreCache)) { return true; }
 
@@ -148,17 +115,13 @@ export default class Container extends DisplayObject {
 	/**
 	 * Adds a child to the top of the display list.
 	 *
-	 * <h4>Example</h4>
+	 * @example
+	 * container.addChild(bitmapInstance);
+	 * // You can also add multiple children at once:
+	 * container.addChild(bitmapInstance, shapeInstance, textInstance);
 	 *
-	 * 		container.addChild(bitmapInstance);
-	 *
-	 * You can also add multiple children at once:
-	 *
-	 * 		container.addChild(bitmapInstance, shapeInstance, textInstance);
-	 *
-	 * @method addChild
-	 * @param {...DisplayObject} children The display object(s) to add.
-	 * @return {DisplayObject} The child that was added, or the last child if multiple children were added.
+	 * @param {...easeljs.DisplayObject} children The display object(s) to add.
+	 * @return {easeljs.DisplayObject} The child that was added, or the last child if multiple children were added.
 	 */
 	addChild (...children) {
 		const l = children.length;
@@ -179,27 +142,19 @@ export default class Container extends DisplayObject {
 
 	/**
 	 * Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and
-	 * setting its parent to this Container.
+	 * setting its parent to this container.
 	 *
-	 * <h4>Example</h4>
+	 * @example
+	 * container.addChildAt(child1, index);
+	 * // You can also add multiple children, such as:
+	 * container.addChildAt(child1, child2, ..., index);
+	 * // The index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list, you could use:
+	 * container.addChildAt(myShape, container.getChildIndex(otherShape));
+	 * // This would also bump otherShape's index up by one. Fails silently if the index is out of range.
 	 *
-	 *      addChildAt(child1, index);
-	 *
-	 * You can also add multiple children, such as:
-	 *
-	 *      addChildAt(child1, child2, ..., index);
-	 *
-	 * The index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list,
-	 * you could use:
-	 *
-	 *      container.addChildAt(myShape, container.getChildIndex(otherShape));
-	 *
-	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
-	 *
-	 * @method addChildAt
-	 * @param {...DisplayObject} children The display object(s) to add.
+	 * @param {...easeljs.DisplayObject} children The display object(s) to add.
 	 * @param {Number} index The index to add the child at.
-	 * @return {DisplayObject} Returns the last child that was added, or the last child if multiple children were added.
+	 * @return {easeljs.DisplayObject} Returns the last child that was added, or the last child if multiple children were added.
 	 */
 	addChildAt (...children) {
 		const l = children.length;
@@ -223,17 +178,12 @@ export default class Container extends DisplayObject {
 	 * Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is
 	 * already known.
 	 *
-	 * <h4>Example</h4>
+	 * @example
+	 * container.removeChild(child);
+	 * // You can also remove multiple children:
+	 * container.removeChild(child1, child2, ...);
 	 *
-	 *      container.removeChild(child);
-	 *
-	 * You can also remove multiple children:
-	 *
-	 *      removeChild(child1, child2, ...);
-	 *
-	 * Returns true if the child (or children) was removed, or false if it was not in the display list.
-	 * @method removeChild
-	 * @param {DisplayObject} children The display object(s) to remove.
+	 * @param {...easeljs.DisplayObject} children The display object(s) to remove.
 	 * @return {Boolean} true if the child (or children) was removed, or false if it was not in the display list.
 	 */
 	removeChild (...children) {
@@ -250,16 +200,11 @@ export default class Container extends DisplayObject {
 	/**
 	 * Removes the child at the specified index from the display list, and sets its parent to null.
 	 *
-	 * <h4>Example</h4>
+	 * @example
+	 * container.removeChildAt(2);
+	 * // You can also remove multiple children:
+	 * container.removeChildAt(2, 7, ...)
 	 *
-	 *      container.removeChildAt(2);
-	 *
-	 * You can also remove multiple children:
-	 *
-	 *      container.removeChild(2, 7, ...)
-	 *
-	 * Returns true if the child (or children) was removed, or false if any index was out of range.
-	 * @method removeChildAt
 	 * @param {...Number} indexes The indexes of children to remove.
 	 * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
 	 */
@@ -277,12 +222,6 @@ export default class Container extends DisplayObject {
 
 	/**
 	 * Removes all children from the display list.
-	 *
-	 * <h4>Example</h4>
-	 *
-	 * 	container.removeAllChildren();
-	 *
-	 * @method removeAllChildren
 	 */
 	removeAllChildren () {
 		let kids = this.children;
@@ -291,14 +230,8 @@ export default class Container extends DisplayObject {
 
 	/**
 	 * Returns the child at the specified index.
-	 *
-	 * <h4>Example</h4>
-	 *
-	 *      container.getChildAt(2);
-	 *
-	 * @method getChildAt
 	 * @param {Number} index The index of the child to return.
-	 * @return {DisplayObject} The child at the specified index. Returns null if there is no child at the index.
+	 * @return {easeljs.DisplayObject} The child at the specified index. Returns null if there is no child at the index.
 	 */
 	getChildAt (index) {
 		return this.children[index];
@@ -306,9 +239,8 @@ export default class Container extends DisplayObject {
 
 	/**
 	 * Returns the child with the specified name.
-	 * @method getChildByName
 	 * @param {String} name The name of the child to return.
-	 * @return {DisplayObject} The child with the specified name.
+	 * @return {easeljs.DisplayObject} The child with the specified name.
 	 */
 	getChildByName (name) {
 		let kids = this.children;
@@ -322,18 +254,16 @@ export default class Container extends DisplayObject {
 	/**
 	 * Performs an array sort operation on the child list.
 	 *
-	 * <h4>Example: Display children with a higher y in front.</h4>
+	 * @example
+	 * // Display children with a higher y in front.
+	 * container.sortChildren((obj1, obj2, options) => {
+	 * 	 if (obj1.y > obj2.y) { return 1; }
+	 *   if (obj1.y < obj2.y) { return -1; }
+	 *   return 0;
+	 * });
 	 *
-	 *      var sortFunction = function(obj1, obj2, options) {
-	 *          if (obj1.y > obj2.y) { return 1; }
-	 *          if (obj1.y < obj2.y) { return -1; }
-	 *          return 0;
-	 *      }
-	 *      container.sortChildren(sortFunction);
-	 *
-	 * @method sortChildren
-	 * @param {Function} sortFunction the function to use to sort the child list. See JavaScript's <code>Array.sort</code>
-	 * documentation for details.
+	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort}
+	 * @param {Function} sortFunction the function to use to sort the child list.
 	 */
 	sortChildren (sortFunction) {
 		this.children.sort(sortFunction);
@@ -341,13 +271,7 @@ export default class Container extends DisplayObject {
 
 	/**
 	 * Returns the index of the specified child in the display list, or -1 if it is not in the display list.
-	 *
-	 * <h4>Example</h4>
-	 *
-	 *      var index = container.getChildIndex(child);
-	 *
-	 * @method getChildIndex
-	 * @param {DisplayObject} child The child to return the index of.
+	 * @param {easeljs.DisplayObject} child The child to return the index of.
 	 * @return {Number} The index of the specified child. -1 if the child is not found.
 	 */
 	getChildIndex (child) {
@@ -356,7 +280,6 @@ export default class Container extends DisplayObject {
 
 	/**
 	 * Swaps the children at the specified indexes. Fails silently if either index is out of range.
-	 * @method swapChildrenAt
 	 * @param {Number} index1
 	 * @param {Number} index2
 	 */
@@ -372,9 +295,8 @@ export default class Container extends DisplayObject {
 	/**
 	 * Swaps the specified children's depth in the display list. Fails silently if either child is not a child of this
 	 * Container.
-	 * @method swapChildren
-	 * @param {DisplayObject} child1
-	 * @param {DisplayObject} child2
+	 * @param {easeljs.DisplayObject} child1
+	 * @param {easeljs.DisplayObject} child2
 	 */
 	swapChildren (child1, child2) {
 		let kids = this.children;
@@ -392,9 +314,8 @@ export default class Container extends DisplayObject {
 
 	/**
 	 * Changes the depth of the specified child. Fails silently if the child is not a child of this container, or the index is out of range.
-	 * @param {DisplayObject} child
+	 * @param {easeljs.DisplayObject} child
 	 * @param {Number} index
-	 * @method setChildIndex
 	 */
 	setChildIndex (child, index) {
 		let kids = this.children;
@@ -411,8 +332,7 @@ export default class Container extends DisplayObject {
 	/**
 	 * Returns true if the specified display object either is this container or is a descendent (child, grandchild, etc)
 	 * of this container.
-	 * @method contains
-	 * @param {DisplayObject} child The DisplayObject to be checked.
+	 * @param {easeljs.DisplayObject} child The DisplayObject to be checked.
 	 * @return {Boolean} true if the specified display object either is this container or is a descendent.
 	 */
 	contains (child) {
@@ -427,7 +347,6 @@ export default class Container extends DisplayObject {
 	 * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the
 	 * specified position). This ignores the alpha, shadow and compositeOperation of the display object, and all
 	 * transform properties including regX/Y.
-	 * @method hitTest
 	 * @param {Number} x The x position to check in the display object's local coordinates.
 	 * @param {Number} y The y position to check in the display object's local coordinates.
 	 * @return {Boolean} A Boolean indicating whether there is a visible section of a DisplayObject that overlaps the specified
@@ -440,28 +359,28 @@ export default class Container extends DisplayObject {
 
 	/**
 	 * Returns an array of all display objects under the specified coordinates that are in this container's display
-	 * list. This routine ignores any display objects with {{#crossLink "DisplayObject/mouseEnabled:property"}}{{/crossLink}}
-	 * set to `false`. The array will be sorted in order of visual depth, with the top-most display object at index 0.
+	 * list. This routine ignores any display objects with {@link easeljs.DisplayObject#mouseEnabled} set to `false`.
+	 * The array will be sorted in order of visual depth, with the top-most display object at index 0.
 	 * This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully.
-	 * For example, if testing for objects under the mouse, test on tick (instead of on {{#crossLink "DisplayObject/mousemove:event"}}{{/crossLink}}),
+	 * For example, if testing for objects under the mouse, test on tick (instead of on {@link easeljs.DisplayObject#event:mousemove}),
 	 * and only if the mouse's position has changed.
 	 *
 	 * <ul>
-	 *     <li>By default (mode=0) this method evaluates all display objects.</li>
-	 *     <li>By setting the `mode` parameter to `1`, the {{#crossLink "DisplayObject/mouseEnabled:property"}}{{/crossLink}}
-	 * 		and {{#crossLink "mouseChildren:property"}}{{/crossLink}} properties will be respected.</li>
-	 * 	   <li>Setting the `mode` to `2` additionally excludes display objects that do not have active mouse event
-	 * 	   	listeners or a {{#crossLink "DisplayObject:cursor:property"}}{{/crossLink}} property. That is, only objects
-	 * 	   	that would normally intercept mouse interaction will be included. This can significantly improve performance
-	 * 	   	in some cases by reducing the number of display objects that need to be tested.</li>
-	 * </li>
+	 *   <li>By default (mode=0) this method evaluates all display objects.</li>
+	 *   <li>By setting the `mode` parameter to `1`, the {@link easeljs.DisplayObject#mouseEnabled}
+	 *       and {@link easeljs.DisplayObject#mouseChildren} properties will be respected.</li>
+	 *   <li>Setting the `mode` to `2` additionally excludes display objects that do not have active mouse event
+	 *       listeners or a {@link easeljs.DisplayObject#cursor} property. That is, only objects
+	 *       that would normally intercept mouse interaction will be included. This can significantly improve performance
+	 *       in some cases by reducing the number of display objects that need to be tested.</li>
+	 * </ul>
 	 *
-	 * This method accounts for both {{#crossLink "DisplayObject/hitArea:property"}}{{/crossLink}} and {{#crossLink "DisplayObject/mask:property"}}{{/crossLink}}.
-	 * @method getObjectsUnderPoint
+	 * This method accounts for both {@link easeljs.DisplayObject#hitArea} and {@link easeljs.DisplayObject#mask}.
+	 *
 	 * @param {Number} x The x position in the container to test.
 	 * @param {Number} y The y position in the container to test.
 	 * @param {Number} [mode=0] The mode to use to determine which display objects to include. 0-all, 1-respect mouseEnabled/mouseChildren, 2-only mouse opaque objects.
-	 * @return {Array} An Array of DisplayObjects under the specified coordinates.
+	 * @return {Array<easeljs.DisplayObject>} An array of DisplayObjects under the specified coordinates.
 	 */
 	getObjectsUnderPoint (x, y, mode = 0) {
 		let arr = [];
@@ -471,42 +390,34 @@ export default class Container extends DisplayObject {
 	}
 
 	/**
-	 * Similar to {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}, but returns only the top-most display
-	 * object. This runs significantly faster than <code>getObjectsUnderPoint()</code>, but is still potentially an expensive
-	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
-	 * @method getObjectUnderPoint
+	 * Similar to {@link easeljs.Container#getObjectsUnderPoint}, but returns only the top-most display
+	 * object. This runs significantly faster than `getObjectsUnderPoint()`, but is still potentially an expensive
+	 * operation.
+	 *
 	 * @param {Number} x The x position in the container to test.
 	 * @param {Number} y The y position in the container to test.
 	 * @param {Number} [mode=0] The mode to use to determine which display objects to include.  0-all, 1-respect mouseEnabled/mouseChildren, 2-only mouse opaque objects.
-	 * @return {DisplayObject} The top-most display object under the specified coordinates.
+	 * @return {easeljs.DisplayObject} The top-most display object under the specified coordinates.
 	 */
 	getObjectUnderPoint (x, y, mode = 0) {
 		let pt = this.localToGlobal(x, y);
 		return this._getObjectsUnderPoint(pt.x, pt.y, null, mode > 0, mode === 1);
 	}
 
-	/**
-	 * Docced in superclass.
-	 */
 	getBounds () {
 		return this._getBounds(null, true);
 	}
 
-
-	/**
-	 * Docced in superclass.
-	 */
 	getTransformedBounds () {
 		return this._getBounds();
 	}
 
 	/**
 	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are
-	 * reverted to their defaults (for example .parent).
-	 * @method clone
+	 * reverted to their defaults (for example `.parent`).
 	 * @param {Boolean} [recursive=false] If true, all of the descendants of this container will be cloned recursively. If false, the
 	 * properties of the container will be cloned, but the new instance will not have any children.
-	 * @return {Container} A clone of the current Container instance.
+	 * @return {easeljs.Container} A clone of the current Container instance.
 	 */
 	clone (recursive = false) {
 		let o = this._cloneProps(new Container());
@@ -514,12 +425,6 @@ export default class Container extends DisplayObject {
 		return o;
 	}
 
-// private methods:
-	/**
-	 * @method _tick
-	 * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
-	 * @protected
-	 */
 	_tick (evtObj) {
 		if (this.tickChildren) {
 			for (let i = this.children.length - 1; i >= 0; i--) {
@@ -532,9 +437,8 @@ export default class Container extends DisplayObject {
 
 	/**
 	 * Recursively clones all children of this container, and adds them to the target container.
-	 * @method cloneChildren
 	 * @protected
-	 * @param {Container} o The target container.
+	 * @param {easeljs.Container} o The target container.
 	 */
 	_cloneChildren (o) {
 		if (o.children.length) { o.removeAllChildren(); }
@@ -550,31 +454,30 @@ export default class Container extends DisplayObject {
   /**
    * Removes the child at the specified index from the display list, and sets its parent to null.
    * Used by `removeChildAt`, `addChild`, and `addChildAt`.
-   * @method removeChildAt
+   *
    * @protected
    * @param {Number} index The index of the child to remove.
-   * @param {Boolean} [silent] Prevents dispatch of `removed` event if true.
+   * @param {Boolean} [silent=false] Prevents dispatch of `removed` event if true.
    * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
-   **/
+   */
   _removeChildAt (index, silent = false) {
-    if (index < 0 || index > this.children.length - 1) { return false; }
-    let child = this.children[index];
-    if (child) { child.parent = null; }
-    this.children.splice(index, 1);
-    if (!silent) { child.dispatchEvent("removed"); }
-    return true;
+		if (index < 0 || index > this.children.length - 1) { return false; }
+		let child = this.children[index];
+		if (child) { child.parent = null; }
+		this.children.splice(index, 1);
+		if (!silent) { child.dispatchEvent("removed"); }
+		return true;
   }
 
 	/**
-	 * @method _getObjectsUnderPoint
+	 * @protected
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Array} arr
 	 * @param {Boolean} mouse If true, it will respect mouse interaction properties like mouseEnabled, mouseChildren, and active listeners.
 	 * @param {Boolean} activeListener If true, there is an active mouse event listener on a parent object.
 	 * @param {Number} [currentDepth=0] Indicates the current depth of the search.
-	 * @return {DisplayObject}
-	 * @protected
+	 * @return {easeljs.DisplayObject}
 	 */
 	_getObjectsUnderPoint (x, y, arr, mouse, activeListener, currentDepth = 0) {
 		if (!currentDepth && !this._testMask(this, x, y)) { return null; }
@@ -620,12 +523,11 @@ export default class Container extends DisplayObject {
 	}
 
 	/**
-	 * @method _testMask
-	 * @param {DisplayObject} target
+	 * @protected
+	 * @param {easeljs.DisplayObject} target
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @return {Boolean} Indicates whether the x/y is within the masked region.
-	 * @protected
 	 */
 	_testMask (target, x, y) {
 		let mask = target.mask;
@@ -651,11 +553,10 @@ export default class Container extends DisplayObject {
 	}
 
 	/**
-	 * @method _getBounds
-	 * @param {Matrix2D} matrix
-	 * @param {Boolean} ignoreTransform If true, does not apply this object's transform.
-	 * @return {Rectangle}
 	 * @protected
+	 * @param {easeljs.Matrix2D} matrix
+	 * @param {Boolean} ignoreTransform If true, does not apply this object's transform.
+	 * @return {easeljs.Rectangle}
 	 */
 	_getBounds (matrix, ignoreTransform) {
 		let bounds = super.getBounds();

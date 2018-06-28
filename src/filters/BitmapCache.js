@@ -1,30 +1,30 @@
-/*
-* @license Filter
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2017 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
+/**
+ * @license BitmapCache
+ * Visit http://createjs.com/ for documentation, updates and examples.
+ *
+ * Copyright (c) 2017 gskinner.com, inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import Filter from "./Filter";
 import Rectangle from "../geom/Rectangle";
@@ -32,41 +32,35 @@ import StageGL from "../display/StageGL";
 
 /**
  * The BitmapCache is an internal representation of all the cache properties and logic required in order to "cache"
- * an object. This information and functionality used to be located on a {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
- * method in {{#crossLink "DisplayObject"}}{{/crossLink}}, but was moved to its own class.
+ * an object. This information and functionality used to be located on a {@link easeljs.DisplayObject#cache}
+ * method in {@link easeljs.DisplayObject}, but was moved to its own class.
  *
  * Caching in this context is purely visual, and will render the DisplayObject out into an image to be used instead
- * of the object. The actual cache itself is still stored on the target with the {{#crossLink "DisplayObject/cacheCanvas:property"}}{{/crossLink}}.
+ * of the object. The actual cache itself is still stored on the target with the {@link easeljs.DisplayObject#cacheCanvas}.
  *
- * Working with a singular image like a {{#crossLink "Bitmap"}}{{/crossLink}}, there is little benefit to performing
+ * Working with a singular image like a {@link easeljs.Bitmap}, there is little benefit to performing
  * a cache operation, as it is already a single image. Caching is best done on containers that have multiple complex
  * parts that do not change often, so that rendering the image will improve overall rendering speed. A cached object
- * will not visually update until explicitly told to do so with a call to {{#crossLink "Stage/update"}}{{/crossLink}},
+ * will not visually update until explicitly told to do so with a call to {@link easeljs.Stage#update},
  * much like a Stage. If a cache is being updated every frame, it is likely not improving rendering performance.
  * Caches are best used when updates will be sparse.
  *
  * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need.
- * The BitmapCache is also responsible for applying filters to objects, and reads each {{#crossLink "Filter"}}{{/crossLink}}.
+ * The BitmapCache is also responsible for applying filters to objects, and reads each {@link easeljs.Filter}.
  * Real-time Filters are not recommended when dealing with a Context2D canvas if performance is a concern. For best
  * performance and to still allow for some visual effects, use a {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}}
  * when possible.
  *
- * @class BitmapCache
- * @module EaselJS
+ * @memberof easeljs
+ * @extends easeljs.Filter
  */
 export default class BitmapCache extends Filter {
 
-// constructor:
-	/**
-	 * @constructor
-	 */
 	constructor () {
 		super();
 
-// public properties:
 		/**
 		 * Width of the cache relative to the target object.
-		 * @property width
 		 * @protected
 		 * @type {Number}
 		 * @default undefined
@@ -75,17 +69,14 @@ export default class BitmapCache extends Filter {
 
 		/**
 		 * Height of the cache relative to the target object.
-		 * @property height
 		 * @protected
 		 * @type {Number}
 		 * @default undefined
-		 * @todo Should the width and height be protected?
 		 */
 		this.height = undefined;
 
 		/**
 		 * Horizontal position of the cache relative to the target's origin.
-		 * @property x
 		 * @protected
 		 * @type {Number}
 		 * @default undefined
@@ -94,7 +85,6 @@ export default class BitmapCache extends Filter {
 
 		/**
 		 * Vertical position of the cache relative to target's origin.
-		 * @property y
 		 * @protected
 		 * @type {Number}
 		 * @default undefined
@@ -105,7 +95,6 @@ export default class BitmapCache extends Filter {
 		 * The internal scale of the cache image, does not affects display size. This is useful to both increase and
 		 * decrease render quality. Objects with increased scales are more likely to look good when scaled up. Objects
 		 * with decreased scales can save on rendering performance.
-		 * @property scale
 		 * @protected
 		 * @type {Number}
 		 * @default 1
@@ -113,9 +102,8 @@ export default class BitmapCache extends Filter {
 		this.scale = 1;
 
 		/**
-		 * The relative offset of the {{#crossLink "BitmapCache/x:property"}}{{/crossLink}} position, used for drawing
+		 * The relative offset of the {@link easeljs.BitmapCache#x} position, used for drawing
 		 * into the cache with the correct offsets. Re-calculated every update call before drawing.
-		 * @property offX
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -123,9 +111,8 @@ export default class BitmapCache extends Filter {
 		this.offX = 0;
 
 		/**
-		 * The relative offset of the {{#crossLink "BitmapCache/y:property"}}{{/crossLink}} position, used for drawing
+		 * The relative offset of the {@link easeljs.BitmapCache#y} position, used for drawing
 		 * into the cache with the correct offsets. Re-calculated every update call before drawing.
-		 * @property offY
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -135,17 +122,14 @@ export default class BitmapCache extends Filter {
 		/**
 		 * Track how many times the cache has been updated, mostly used for preventing duplicate cacheURLs. This can be
 		 * useful to see if a cache has been updated.
-		 * @property cacheID
 		 * @type {Number}
 		 * @default 0
 		 */
 		this.cacheID = 0;
 
-// private properties:
 		/**
 		 * Relative offset of the x position, used for drawing the cache into other scenes.
 		 * Re-calculated every update call before drawing.
-		 * @property _filterOffY
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -156,7 +140,6 @@ export default class BitmapCache extends Filter {
 		/**
 		 * Relative offset of the y position, used for drawing into the cache into other scenes.
 		 * Re-calculated every update call before drawing.
-		 * @property _filterOffY
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -166,7 +149,6 @@ export default class BitmapCache extends Filter {
 
 		/**
 		 * The cacheID when a DataURL was requested.
-		 * @property _cacheDataURLID
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -175,7 +157,6 @@ export default class BitmapCache extends Filter {
 
 		/**
 		 * The cache's DataURL, generated on-demand using the getter.
-		 * @property _cacheDataURL
 		 * @protected
 		 * @type {String}
 		 * @default null
@@ -183,9 +164,7 @@ export default class BitmapCache extends Filter {
 		this._cacheDataURL = null;
 
 		/**
-		 * Internal tracking of final bounding width, approximately `width*scale;` however, filters can complicate the
-		 * actual value.
-		 * @property _drawWidth
+		 * Internal tracking of final bounding width, approximately `width*scale;` however, filters can complicate the actual value.
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -193,9 +172,7 @@ export default class BitmapCache extends Filter {
 		this._drawWidth = 0;
 
 		/**
-		 * Internal tracking of final bounding height, approximately `height*scale;` however, filters can complicate the
-		 * actual value.
-		 * @property _drawHeight
+		 * Internal tracking of final bounding height, approximately `height*scale;` however, filters can complicate the actual value.
 		 * @protected
 		 * @type {Number}
 		 * @default 0
@@ -203,25 +180,20 @@ export default class BitmapCache extends Filter {
 		this._drawHeight = 0;
 
 		/**
-		 * Internal tracking of the last requested bounds, may happen repeadtedly so stored to avoid object creation
-		 * @property _boundRect
+		 * Internal tracking of the last requested bounds, may happen repeadtedly so stored to avoid object creation.
 		 * @protected
-		 * @type {Rectangle}
-		 * @default Rectangle
+		 * @type {easeljs.Rectangle}
+		 * @default easeljs.Rectangle
 		 */
 		this._boundRect = new Rectangle();
 
 	}
 
 	/**
-	 * Returns the bounds that surround all applied filters. This relies on each filter to describe how it changes
-	 * bounds.
-	 * @method getFilterBounds
-	 * @param {DisplayObject} target The object to check the filter bounds for.
-	 * @param {Rectangle} [output=Rectangle] Optional parameter, if provided then calculated bounds will be applied to that
-	 * object.
-	 * @return {Rectangle} a string representation of the instance.
-	 * @todo Please clarify if the return type is a Rectangle or string.
+	 * Returns the bounds that surround all applied filters. This relies on each filter to describe how it changes bounds.
+	 * @param {easeljs.DisplayObject} target The object to check the filter bounds for.
+	 * @param {easeljs.Rectangle} [output] Calculated bounds will be applied to this rect.
+	 * @return {easeljs.Rectangle}
 	 * @static
 	 */
 	static getFilterBounds (target, output = new Rectangle()) {
@@ -244,12 +216,10 @@ export default class BitmapCache extends Filter {
 		return output;
 	}
 
-// public methods:
 	/**
-	 * Directly called via {{#crossLink "DisplayObject/cache:method"}}{{/crossLink}}. Creates and sets properties needed
+	 * Directly called via {@link easeljs.DisplayObject#cache}. Creates and sets properties needed
 	 * for a cache to function, and performs the initial update.
-	 * @method define
-	 * @param {DisplayObject} target The DisplayObject this cache is linked to.
+	 * @param {easeljs.DisplayObject} target The DisplayObject this cache is linked to.
 	 * @param {Number} [x=0] The x coordinate origin for the cache region.
 	 * @param {Number} [y=0] The y coordinate origin for the cache region.
 	 * @param {Number} [width=1] The width of the cache region.
@@ -257,7 +227,7 @@ export default class BitmapCache extends Filter {
 	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape
 	 * using `myShape.cache(0,0,100,100,2)`, then the resulting cacheCanvas will be 200x200 pixels. This lets you scale
 	 * and rotate cached elements with greater fidelity.
-	 * @param {Object} [options] When using things like {{#crossLink "StageGL"}}{{/crossLink}} there may be
+	 * @param {Object} [options] When using things like {@link easeljs.StageGL} there may be
 	 * extra caching opportunities or requirements.
 	 */
 	define (target, x = 0, y = 0, width = 1, height = 1, scale = 1, options) {
@@ -276,12 +246,11 @@ export default class BitmapCache extends Filter {
 	}
 
 	/**
-	 * Directly called via {{#crossLink "DisplayObject/updateCache:method"}}{{/crossLink}}, but also internally. This
+	 * Directly called via {@link easeljs.DisplayObject#updateCache}, but also internally. This
 	 * has the dual responsibility of making sure the surface is ready to be drawn to, and performing the draw. For
-	 * full details of each behaviour, check the protected functions {{#crossLink "BitmapCache/_updateSurface"}}{{/crossLink}}
-	 * and {{#crossLink "BitmapCache/_drawToCache"}}{{/crossLink}} respectively.
-	 * @method update
-	 * @param {String} [compositeOperation=null] The DisplayObject this cache is linked to.
+	 * full details of each behaviour, check the protected functions {@link easeljs.BitmapCache#_updateSurface}
+	 * and {@link easeljs.BitmapCache#_drawToCache} respectively.
+	 * @param {String} [compositeOperation] The DisplayObject this cache is linked to.
 	 */
 	update (compositeOperation) {
 		if (!this.target) { throw "define() must be called before update()"; }
@@ -308,7 +277,6 @@ export default class BitmapCache extends Filter {
 
 	/**
 	 * Reset and release all the properties and memory associated with this cache.
-	 * @method release
 	 */
 	release () {
 		let stage = this.target.stage;
@@ -333,9 +301,8 @@ export default class BitmapCache extends Filter {
 
 	/**
 	 * Returns a data URL for the cache, or `null` if this display object is not cached.
-	 * Uses {{#crossLink "BitmapCache/cacheID:property"}}{{/crossLink}} to ensure a new data URL is not generated if the
+	 * Uses {@link easeljs.BitmapCache#cacheID} to ensure a new data URL is not generated if the
 	 * cache has not changed.
-	 * @method getCacheDataURL
 	 * @return {String} The image data url for the cache.
 	 */
 	getCacheDataURL () {
@@ -350,7 +317,6 @@ export default class BitmapCache extends Filter {
 
 	/**
 	 * Use context2D drawing commands to display the cache canvas being used.
-	 * @method draw
 	 * @param {CanvasRenderingContext2D} ctx The context to draw into.
 	 * @return {Boolean} Whether the draw was handled successfully.
 	 */
@@ -368,8 +334,7 @@ export default class BitmapCache extends Filter {
 
 	/**
 	 * Determine the bounds of the shape in local space.
-	 * @method getBounds
-	 * @returns {Rectangle}
+	 * @returns {easeljs.Rectangle}
 	 */
 	getBounds () {
 		const scale = this.scale;
@@ -381,12 +346,9 @@ export default class BitmapCache extends Filter {
 		);
 	}
 
-
-// private methods:
 	/**
 	 * Basic context2D caching works by creating a new canvas element and setting its physical size. This function will
 	 * create and or size the canvas as needed.
-	 * @method _updateSurface
 	 * @protected
 	 */
 	_updateSurface () {
@@ -443,7 +405,6 @@ export default class BitmapCache extends Filter {
 
 	/**
 	 * Perform the cache draw out for context 2D now that the setup properties have been performed.
-	 * @method _drawToCache
 	 * @protected
 	 */
 	_drawToCache (compositeOperation) {
@@ -482,7 +443,6 @@ export default class BitmapCache extends Filter {
 
 	/**
 	 * Work through every filter and apply its individual transformation to it.
-	 * @method _applyFilters
 	 * @protected
 	 */
 	_applyFilters () {
@@ -508,7 +468,7 @@ export default class BitmapCache extends Filter {
 }
 
 /**
- * Functionality injected to {{#crossLink "BitmapCache"}}{{/crossLink}}. Ensure StageGL is loaded after all other
+ * Functionality injected to {@link easeljs.BitmapCache}. Ensure StageGL is loaded after all other
  * standard EaselJS classes are loaded but before making any DisplayObject instances for injection to take full effect.
  * Replaces the context2D cache draw with the option for WebGL or context2D drawing.
  * If options is set to "true" a StageGL is created and contained on the object for use when rendering a cache.
@@ -516,38 +476,37 @@ export default class BitmapCache extends Filter {
  * If possible it is best to provide the StageGL instance that is a parent to this DisplayObject for performance reasons.
  * A StageGL cache does not infer the ability to draw objects a StageGL cannot currently draw,
  * i.e. do not use a WebGL context cache when caching a Shape, Text, etc.
- * <h4>Example</h4>
- * Using WebGL cache with a 2d context
- *
- *     var stage = new createjs.Stage();
- *     var bmp = new createjs.Bitmap(src);
- *     bmp.cache(0, 0, bmp.width, bmp.height, 1, true);          // no StageGL to use, so make one
- *     var shape = new createjs.Shape();
- *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
- *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
- *
- * <h4>Example</h4>
- * Using WebGL cache with a WebGL context:
- *
- *     var stageGL = new createjs.StageGL();
- *     var bmp = new createjs.Bitmap(src);
- *     bmp.cache(0, 0, bmp.width, bmp.height, 1, stageGL);       // use our StageGL to cache
- *     var shape = new createjs.Shape();
- *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
- *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
  *
  * You can make your own StageGL and have it render to a canvas if you set ".isCacheControlled" to true on your stage.
  * You may wish to create your own StageGL instance to control factors like background color/transparency, AA, and etc.
  * You must set "options" to its own stage if you wish to use the fast Render Textures available only to StageGLs.
  * If you use WebGL cache on a container with Shapes you will have to cache each shape individually before the container,
  * otherwise the WebGL cache will not render the shapes.
- * @method cache
+ *
+ * @name easeljs.BitmapCache#cache
+ *
+ * @example <caption>WebGL cache with 2d context</caption>
+ * let stage = new Stage();
+ * let bmp = new Bitmap(src);
+ * bmp.cache(0, 0, bmp.width, bmp.height, 1, true); // no StageGL to use, so make one
+ * let shape = new Shape();
+ * shape.graphics.clear().fill("red").drawRect(0,0,20,20);
+ * shape.cache(0, 0, 20, 20, 1); // cannot use WebGL cache
+ *
+ * @example <caption>WebGL cache with WebGL context</caption>
+ * let stageGL = new StageGL();
+ * let bmp = new Bitmap(src);
+ * bmp.cache(0, 0, bmp.width, bmp.height, 1, stageGL); // use our StageGL to cache
+ * let shape = new Shape();
+ * shape.graphics.clear().fill("red").drawRect(0,0,20,20);
+ * shape.cache(0, 0, 20, 20, 1); // cannot use WebGL cache
+ *
  * @param {Number} x The x coordinate origin for the cache region.
  * @param {Number} y The y coordinate origin for the cache region.
  * @param {Number} width The width of the cache region.
  * @param {Number} height The height of the cache region.
  * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
  * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
- * 	cached elements with greater fidelity. Default is 1.
- * @param {Boolean|StageGL} [options] Select whether to use context 2D, or WebGL rendering, and whether to make a new stage instance or use an existing one.
+ * 	cached elements with greater fidelity.
+ * @param {Boolean | easeljs.StageGL} [options] Select whether to use context 2D, or WebGL rendering, and whether to make a new stage instance or use an existing one.
  */

@@ -1,30 +1,30 @@
-/*
-* @license Touch
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2017 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
+/**
+ * @license Touch
+ * Visit http://createjs.com/ for documentation, updates and examples.
+ *
+ * Copyright (c) 2017 gskinner.com, inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 /**
  * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API (iOS and
@@ -33,58 +33,39 @@
  * Ensure that you {{#crossLink "Touch/disable"}}{{/crossLink}} touch when cleaning up your application. You do not have
  * to check if touch is supported to enable it, as it will fail gracefully if it is not supported.
  *
- * <h4>Example</h4>
- *
- *      var stage = new createjs.Stage("canvasId");
- *      createjs.Touch.enable(stage);
- *
  * <strong>Note:</strong> It is important to disable Touch on a stage that you are no longer using:
  *
- *      createjs.Touch.disable(stage);
- *
- * @class Touch
- * @static
- * @module EaselJS
+ * @memberof easeljs
+ * @name easeljs.Touch
+ * @example
+ * let stage = new Stage("canvasId");
+ * Touch.enable(stage);
  */
-export default class Touch {
+export default Touch = {
 
-// constructor:
-	/**
-	 * @constructor
-	 */
-	constructor () {
-		throw "Touch cannot be instantiated";
-	}
-
-// public static methods:
 	/**
 	 * Returns `true` if touch is supported in the current browser.
-	 * @method isSupported
 	 * @return {Boolean} Indicates whether touch is supported in the current browser.
-	 * @static
 	 */
-	static isSupported () {
+	isSupported () {
 		return	!!(('ontouchstart' in window) // iOS & Android
 			|| (window.navigator['msPointerEnabled'] && window.navigator['msMaxTouchPoints'] > 0) // IE10
 			|| (window.navigator['pointerEnabled'] && window.navigator['maxTouchPoints'] > 0)); // IE11+
-	}
+	},
 
 	/**
-	 * Enables touch interaction for the specified EaselJS {{#crossLink "Stage"}}{{/crossLink}}. Currently supports iOS
+	 * Enables touch interaction for the specified EaselJS {@link easeljs.Stage}. Currently supports iOS
 	 * (and compatible browsers, such as modern Android browsers), and IE10/11. Supports both single touch and
-	 * multi-touch modes. Extends the EaselJS {{#crossLink "MouseEvent"}}{{/crossLink}} model, but without support for
-	 * double click or over/out events. See the MouseEvent {{#crossLink "MouseEvent/pointerId:property"}}{{/crossLink}}
-	 * for more information.
-	 * @method enable
-	 * @param {Stage} stage The {{#crossLink "Stage"}}{{/crossLink}} to enable touch on.
+	 * multi-touch modes. Extends the EaselJS {@link easeljs.MouseEvent} model, but without support for
+	 * double click or over/out events.
+	 * @param {easeljs.Stage} stage The Stage to enable touch on.
 	 * @param {Boolean} [singleTouch=false] If `true`, only a single touch will be active at a time.
 	 * @param {Boolean} [allowDefault=false] If `true`, then default gesture actions (ex. scrolling, zooming) will be
 	 * allowed when the user is interacting with the target canvas.
 	 * @return {Boolean} Returns `true` if touch was successfully enabled on the target stage.
-	 * @static
 	 */
-	static enable (stage, singleTouch = false, allowDefault = false) {
-		if (!stage || !stage.canvas || !Touch.isSupported()) { return false; }
+	enable (stage, singleTouch = false, allowDefault = false) {
+		if (!stage || !stage.canvas || !this.isSupported()) { return false; }
 		if (stage.__touch) { return true; }
 
 		// inject required properties on stage:
@@ -92,49 +73,40 @@ export default class Touch {
 
 		// note that in the future we may need to disable the standard mouse event model before adding
 		// these to prevent duplicate calls. It doesn't seem to be an issue with iOS devices though.
-		if ('ontouchstart' in window) { Touch._IOS_enable(stage); }
-		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { Touch._IE_enable(stage); }
+		if ('ontouchstart' in window) { this._IOS_enable(stage); }
+		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { this._IE_enable(stage); }
 		return true;
-	}
+	},
 
 	/**
 	 * Removes all listeners that were set up when calling `Touch.enable()` on a stage.
-	 * @method disable
-	 * @param {Stage} stage The {{#crossLink "Stage"}}{{/crossLink}} to disable touch on.
-	 * @static
+	 * @param {easeljs.Stage} stage The Stage to disable touch on.
 	 */
-	static disable (stage) {
+	disable (stage) {
 		if (!stage) { return; }
-		if ('ontouchstart' in window) { Touch._IOS_disable(stage); }
-		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { Touch._IE_disable(stage); }
-
+		if ('ontouchstart' in window) { this._IOS_disable(stage); }
+		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { this._IE_disable(stage); }
 		delete stage.__touch;
-	}
+	},
 
-
-// private static methods:
 	/**
-	 * @method _IOS_enable
-	 * @protected
-	 * @param {Stage} stage
-	 * @static
+	 * @private
+	 * @param {easeljs.Stage} stage
 	 */
-	static _IOS_enable (stage) {
+	_IOS_enable (stage) {
 		let canvas = stage.canvas;
-		let f = stage.__touch.f = e => Touch._IOS_handleEvent(stage, e);
+		let f = stage.__touch.f = e => this._IOS_handleEvent(stage, e);
 		canvas.addEventListener("touchstart", f, false);
 		canvas.addEventListener("touchmove", f, false);
 		canvas.addEventListener("touchend", f, false);
 		canvas.addEventListener("touchcancel", f, false);
-	}
+	},
 
 	/**
-	 * @method _IOS_disable
-	 * @protected
-	 * @param {Stage} stage
-	 * @static
+	 * @private
+	 * @param {easeljs.Stage} stage
 	 */
-	static _IOS_disable (stage) {
+	_IOS_disable (stage) {
 		let canvas = stage.canvas;
 		if (!canvas) { return; }
 		let f = stage.__touch.f;
@@ -142,16 +114,14 @@ export default class Touch {
 		canvas.removeEventListener("touchmove", f, false);
 		canvas.removeEventListener("touchend", f, false);
 		canvas.removeEventListener("touchcancel", f, false);
-	}
+	},
 
 	/**
-	 * @method _IOS_handleEvent
-	 * @param {Stage} stage
+	 * @private
+	 * @param {easeljs.Stage} stage
 	 * @param {Object} e The event to handle
-	 * @protected
-	 * @static
 	 */
-	static _IOS_handleEvent (stage, e) {
+	_IOS_handleEvent (stage, e) {
 		if (!stage) { return; }
 		if (stage.__touch.preventDefault) { e.preventDefault&&e.preventDefault(); }
 		let touches = e.changedTouches;
@@ -169,17 +139,15 @@ export default class Touch {
 				this._handleEnd(stage, id, e);
 			}
 		}
-	}
+	},
 
 	/**
-	 * @method _IE_enable
-	 * @protected
-	 * @param {Stage} stage
-	 * @static
+	 * @private
+	 * @param {easeljs.Stage} stage
 	 */
-	static _IE_enable (stage) {
+	_IE_enable (stage) {
 		let canvas = stage.canvas;
-		let f = stage.__touch.f = e => Touch._IE_handleEvent(stage,e);
+		let f = stage.__touch.f = e => this._IE_handleEvent(stage,e);
 
 		if (window.navigator["pointerEnabled"] === undefined) {
 			canvas.addEventListener("MSPointerDown", f, false);
@@ -196,15 +164,13 @@ export default class Touch {
 
 		}
 		stage.__touch.activeIDs = {};
-	}
+	},
 
 	/**
-	 * @method _IE_disable
-	 * @protected
-	 * @param {Stage} stage
-	 * @static
+	 * @private
+	 * @param {easeljs.Stage} stage
 	 */
-	static _IE_disable (stage) {
+	_IE_disable (stage) {
 		let f = stage.__touch.f;
 
 		if (window.navigator["pointerEnabled"] === undefined) {
@@ -222,16 +188,14 @@ export default class Touch {
 				stage.canvas.removeEventListener("pointerdown", f, false);
 			}
 		}
-	}
+	},
 
 	/**
-	 * @method _IE_handleEvent
-	 * @param {Stage} stage
+	 * @private
+	 * @param {easeljs.Stage} stage
 	 * @param {Object} e The event to handle.
-	 * @protected
-	 * @static
 	 */
-	static _IE_handleEvent (stage, e) {
+	_IE_handleEvent (stage, e) {
 		if (!stage) { return; }
 		if (stage.__touch.preventDefault) { e.preventDefault && e.preventDefault(); }
 		let type = e.type;
@@ -251,18 +215,17 @@ export default class Touch {
 				this._handleEnd(stage, id, e);
 			}
 		}
-	}
+	},
 
 	/**
-	 * @method _handleStart
-	 * @param {Stage} stage
-	 * @param {String|Number} id
+	 * @private
+	 * @param {easeljs.Stage} stage
+	 * @param {String | Number} id
 	 * @param {Object} e
 	 * @param {Number} x
 	 * @param {Number} y
-	 * @protected
 	 */
-	static _handleStart (stage, id, e, x, y) {
+	_handleStart (stage, id, e, x, y) {
 		let props = stage.__touch;
 		if (!props.multitouch && props.count) { return; }
 		let ids = props.pointers;
@@ -270,30 +233,28 @@ export default class Touch {
 		ids[id] = true;
 		props.count++;
 		stage._handlePointerDown(id, e, x, y);
-	}
+	},
 
 	/**
-	 * @method _handleMove
-	 * @param {Stage} stage
-	 * @param {String|Number} id
+	 * @private
+	 * @param {easeljs.Stage} stage
+	 * @param {String | Number} id
 	 * @param {Object} e
 	 * @param {Number} x
 	 * @param {Number} y
-	 * @protected
 	 */
-	static _handleMove (stage, id, e, x, y) {
+	_handleMove (stage, id, e, x, y) {
 		if (!stage.__touch.pointers[id]) { return; }
 		stage._handlePointerMove(id, e, x, y);
-	}
+	},
 
 	/**
-	 * @method _handleEnd
-	 * @param {Stage} stage
-	 * @param {String|Number} id
+	 * @private
+	 * @param {easeljs.Stage} stage
+	 * @param {String | Number} id
 	 * @param {Object} e
-	 * @protected
 	 */
-	static _handleEnd (stage, id, e) {
+	_handleEnd (stage, id, e) {
 		// TODO: cancel should be handled differently for proper UI (ex. an up would trigger a click, a cancel would more closely resemble an out).
 		let props = stage.__touch;
 		let ids = props.pointers;

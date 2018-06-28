@@ -1,4 +1,4 @@
-/*
+/**
  * @license WebGLInspector
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
@@ -26,58 +26,36 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-let _alternateOutput = null;
-
 import EventDispatcher from "@createjs/core/src/events/EventDispatcher";
 
  /**
   * A utility and helper class designed to work with {{#crossLink "StageGL"}}{{/crossLink}} to help investigate and
   * test performance or display problems. It contains logging functions to analyze behaviour and performance testing
   * utilities.
-  * @class WebGLInspector
-  * @extends EventDispatcher
-  * @module EaselJS
+  *
+  * @memberof easeljs
+  * @extends core.EventDispatcher
+  *
+  * @param {StageGL} stage The default stage to use when none is supplied.
   */
 export default class WebGLInspector extends EventDispatcher {
 
-// constructor:
-	/**
-	 * @constructor
-	 * @param {StageGL} stage The default stage to use when none is supplied.
-	 */
 	constructor (stage) {
 		super();
 
-// private properties:
 		/**
 		 * The internal reference to the default stage this Inspector is for.
-		 * @property _stage
 		 * @protected
-		 * @type {StageGL}
+		 * @type {easeljs.StageGL}
 		 */
 		this._stage = stage;
 	}
 
-// static properties:
 	/**
-	 * Alternate output for debugging situations where "console" is not available, i.e. Mobile or remote debugging.
-	 * Expects object with a "log" function that takes any number of params.
-	 * @property alternateOutput
-	 * @type {Console}
-	 * @default null
-	 * @static
-	 * @protected
-	 */
-	static get alternateOutput () { return _alternateOutput; }
-	static set alternateOutput (alternateOutput) { _alternateOutput = alternateOutput; }
-
-// static methods:
-	/**
-	 * Utility function for use with {{#crossLink "logDepth"))((/crossLink}}. Logs an item's position and registration.
+	 * Utility function for use with {@link easeljs.WebGLInspector#logDepth}. Logs an item's position and registration.
 	 * Useful to see if something is being forced off screen or has an integer position.
-	 * @method dispProps
-	 * @param {DisplayObject} item The item we're currently logging about.
-	 * @param {String} [prepend=""] The string to show before the item, usually formatting for a tree view.
+	 * @param {easeljs.DisplayObject} item The item we're currently logging about.
+	 * @param {String} [prepend] The string to show before the item, usually formatting for a tree view.
 	 * @static
 	 */
 	static dispProps (item, prepend = "") {
@@ -86,10 +64,8 @@ export default class WebGLInspector extends EventDispatcher {
 		WebGLInspector._log(prepend, `${item.toString()}\t`, p, r);
 	}
 
-// private static methods:
 	/**
 	 * Log with alternateOutput if available, defaulting to the console.
-	 * @method _log
 	 * @param {...*} info The info to log.
 	 * @static
 	 */
@@ -101,11 +77,9 @@ export default class WebGLInspector extends EventDispatcher {
 		}
 	}
 
-// public methods:
 	/**
 	 * Perform all of the logging reports at once.
-	 * @method log
-	 * @param {StageGL} [stage=this._stage] The stage to log information for.
+	 * @param {easeljs.StageGL} [stage] The stage to log information for.
 	 */
 	log (stage) {
 		if (!stage) { stage = this._stage; }
@@ -116,10 +90,8 @@ export default class WebGLInspector extends EventDispatcher {
 	}
 
 	/**
-	 * Replace the stage's Draw command with an empty draw command. This is useful for testing performance, and ignoring
-	 * rendering.
-	 * @method toggleGPUDraw
-	 * @param {StageGL} [stage=this._stage] The stage to log information for.
+	 * Replace the stage's Draw command with an empty draw command. This is useful for testing performance, and ignoring rendering.
+	 * @param {StageGL} [stage=] The stage to log information for.
 	 * @param {Boolean} [enabled] Force enabled. If left undefined, it will toggle.
 	 */
 	toggleGPUDraw (stage, enabled) {
@@ -144,10 +116,9 @@ export default class WebGLInspector extends EventDispatcher {
 
 	/**
 	 * Recursively walk the entire display tree, log the attached items, and display it in a tree view.
-	 * @method logDepth
-	 * @param {Array} [children=this._stage.children] The children array to walk through.
-	 * @param {String} [prepend=""] What to prepend to this output from this point onwards.
-	 * @param {Function} [logFunc=WebGLInspector._log] Custom logging function, mainly for filtering or formatting output.
+	 * @param {Array} [children] The children array to walk through.
+	 * @param {String} [prepend] What to prepend to this output from this point onwards.
+	 * @param {Function} [logFunc] Custom logging function, mainly for filtering or formatting output.
 	 */
 	logDepth (children, prepend = "", logFunc = WebGLInspector._log) {
 		if (!children) { children = this._stage.children; }
@@ -163,7 +134,6 @@ export default class WebGLInspector extends EventDispatcher {
 
 	/**
 	 * Examine the context and provide information about its capabilities.
-	 * @method logContextInfo
 	 * @param {WebGLRenderingContext} [gl] The WebGL context to inspect.
 	 */
 	logContextInfo (gl) {
@@ -187,8 +157,7 @@ export default class WebGLInspector extends EventDispatcher {
 	 * Simulate renders and watch what happens for textures moving around between draw calls. A texture moving between
 	 * slots means it was removed and then re-added to draw calls. Performance may be better if it was allowed to stay
 	 * in place.
-	 * @method logTextureFill
-	 * @param {StageGL} [stage=this._stage] The stage to log information for.
+	 * @param {StageGL} [stage] The stage to log information for.
 	 */
 	logTextureFill (stage) {
 		if (!stage) { stage = this._stage; }
@@ -220,3 +189,13 @@ export default class WebGLInspector extends EventDispatcher {
 	}
 
 }
+
+/**
+ * Alternate output for debugging situations where "console" is not available, i.e. Mobile or remote debugging.
+ * Expects object with a "log" function that takes any number of params.
+ * @type {Console}
+ * @default null
+ * @static
+ * @protected
+ */
+WebGLInspector.alternateOutput = null;

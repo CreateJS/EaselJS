@@ -1,192 +1,137 @@
-/*
-* @license Text
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2017 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
-
-const _H_OFFSETS = {start: 0, left: 0, center: -0.5, end: -1, right: -1};
-const _V_OFFSETS = {top: 0, hanging: -0.01, middle: -0.4, alphabetic: -0.8, ideographic: -0.85, bottom: -1};
+/**
+ * @license Text
+ * Visit http://createjs.com/ for documentation, updates and examples.
+ *
+ * Copyright (c) 2017 gskinner.com, inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import DisplayObject from "./DisplayObject";
+import createCanvas from "../utils/Canvas";
 
 /**
  * Display one or more lines of dynamic text (not user editable) in the display list. Line wrapping support (using the
  * lineWidth) is very basic, wrapping on spaces and tabs only. Note that as an alternative to Text, you can position HTML
- * text above or below the canvas relative to items in the display list using the {{#crossLink "DisplayObject/localToGlobal"}}{{/crossLink}}
- * method, or using {{#crossLink "DOMElement"}}{{/crossLink}}.
+ * text above or below the canvas relative to items in the display list using the {@link easeljs.DisplayObject#localToGlobal}
+ * method, or using {@link easeljs.DOMElement}.
  *
  * <b>Please note that Text does not support HTML text, and can only display one font style at a time.</b> To use
  * multiple font styles, you will need to create multiple text instances, and position them manually.
- *
- * <h4>Example</h4>
- *
- *      var text = new createjs.Text("Hello World", "20px Arial", "#ff7700");
- *      text.x = 100;
- *      text.textBaseline = "alphabetic";
  *
  * CreateJS Text supports web fonts (the same rules as Canvas). The font must be loaded and supported by the browser
  * before it can be displayed.
  *
  * <strong>Note:</strong> Text can be expensive to generate, so cache instances where possible. Be aware that not all
  * browsers will render Text exactly the same.
- * @class Text
- * @extends DisplayObject
- * @module EaselJS
+ *
+ * @memberof easeljs
+ * @extends easeljs.DisplayObject
+ * @example
+ * let text = new Text("Hello World", "20px Arial", "#ff7700");
+ * text.x = 100;
+ * text.textBaseline = "alphabetic";
+ *
+ * @param {String} [text] The text to display.
+ * @param {String} [font] The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold
+ * 36px Arial").
+ * @param {String} [color] The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex.
+ * "#F00", "red", or "#FF0000").
  */
 export default class Text extends DisplayObject {
 
-// constructor:
-	/**
-	 * @constructor
-	 * @param {String} [text] The text to display.
-	 * @param {String} [font] The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold
-	 * 36px Arial").
-	 * @param {String} [color] The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex.
-	 * "#F00", "red", or "#FF0000").
-	 */
 	constructor (text, font, color) {
 		super();
 
-// public properties:
 		/**
 		 * The text to display.
-		 * @property text
-		 * @type String
+		 * @type {String}
 		 */
 		this.text = text;
 
 		/**
 		 * The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold 36px Arial").
-		 * @property font
-		 * @type String
+		 * @type {String}
 		 */
 		this.font = font;
 
 		/**
 		 * The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). Default is "#000".
 		 * It will also accept valid canvas fillStyle values.
-		 * @property color
-		 * @type String
+		 * @type {String}
 		 */
 		this.color = color;
 
 		/**
-		 * The horizontal text alignment. Any of "start", "end", "left", "right", and "center". For detailed
-		 * information view the
-		 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles">
-		 * whatwg spec</a>. Default is "left".
-		 * @property textAlign
-		 * @type String
+		 * The horizontal text alignment. Any of "start", "end", "left", "right", and "center".
+		 * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles "WHATWG spec"}
+		 * @type {String}
+		 * @default left
 		 */
 		this.textAlign = "left";
 
 		/**
-		 * The vertical alignment point on the font. Any of "top", "hanging", "middle", "alphabetic", "ideographic", or
-		 * "bottom". For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles">
-		 * whatwg spec</a>. Default is "top".
-		 * @property textBaseline
-		 * @type String
+		 * The vertical alignment point on the font. Any of "top", "hanging", "middle", "alphabetic", "ideographic", or "bottom".
+		 * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles "WHATWG spec"}
+		 * @type {String}
+		 * @default top
 		*/
 		this.textBaseline = "top";
 
 		/**
 		 * The maximum width to draw the text. If maxWidth is specified (not null), the text will be condensed or
-		 * shrunk to make it fit in this width. For detailed information view the
-		 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles">
-		 * whatwg spec</a>.
-		 * @property maxWidth
-		 * @type Number
+		 * shrunk to make it fit in this width.
+		 * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles "WHATWG spec"}
+		 * @type {Number}
 		*/
 		this.maxWidth = null;
 
 		/**
 		 * If greater than 0, the text will be drawn as a stroke (outline) of the specified width.
-		 * @property outline
-		 * @type Number
+		 * @type {Number}
 		 */
 		this.outline = 0;
 
 		/**
 		 * Indicates the line height (vertical distance between baselines) for multi-line text. If null or 0,
 		 * the value of getMeasuredLineHeight is used.
-		 * @property lineHeight
-		 * @type Number
+		 * @type {Number}
+		 * @default 0
 		 */
 		this.lineHeight = 0;
 
 		/**
 		 * Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null,
 		 * the text will not be wrapped.
-		 * @property lineWidth
-		 * @type Number
+		 * @type {Number}
 		 */
 		this.lineWidth = null;
 	}
 
-// static constants:
-	/**
-	 * Lookup table for the ratio to offset bounds x calculations based on the textAlign property.
-	 * @property H_OFFSETS
-	 * @type Object
-	 * @protected
-	 * @static
-	 */
-	 static get H_OFFSETS () { return _H_OFFSETS; }
-
-	/**
-	 * Lookup table for the ratio to offset bounds y calculations based on the textBaseline property.
-	 * @property H_OFFSETS
-	 * @type Object
-	 * @protected
-	 * @static
-	 */
-	 static get V_OFFSETS () { return _V_OFFSETS; }
-
-// public methods:
- 	/**
- 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
- 	 * This does not account for whether it would be visible within the boundaries of the stage.
- 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
- 	 * @method isVisible
- 	 * @return {Boolean} Whether the display object would be visible if drawn to a canvas
- 	 */
  	isVisible () {
  		let hasContent = this.cacheCanvas || (this.text != null && this.text !== "");
  		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
  	}
 
- 	/**
- 	 * Draws the Text into the specified context ignoring its visible, alpha, shadow, and transform.
- 	 * Returns true if the draw was handled (useful for overriding functionality).
- 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
- 	 * @method draw
- 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
- 	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
- 	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
- 	 * into itself).
- 	 */
  	draw (ctx, ignoreCache) {
  		if (super.draw(ctx, ignoreCache)) { return true; }
 
@@ -200,7 +145,6 @@ export default class Text extends DisplayObject {
 
  	/**
  	 * Returns the measured, untransformed width of the text without wrapping. Use getBounds for a more robust value.
- 	 * @method getMeasuredWidth
  	 * @return {Number} The measured, untransformed width of the text.
  	 */
  	getMeasuredWidth () {
@@ -210,7 +154,6 @@ export default class Text extends DisplayObject {
  	/**
  	 * Returns an approximate line height of the text, ignoring the lineHeight property. This is based on the measured
  	 * width of a "M" character multiplied by 1.2, which provides an approximate line height for most fonts.
- 	 * @method getMeasuredLineHeight
  	 * @return {Number} an approximate line height of the text, ignoring the lineHeight property. This is
  	 * based on the measured width of a "M" character multiplied by 1.2, which approximates em for most fonts.
  	 */
@@ -220,18 +163,14 @@ export default class Text extends DisplayObject {
 
  	/**
  	 * Returns the approximate height of multi-line text by multiplying the number of lines against either the
- 	 * <code>lineHeight</code> (if specified) or {{#crossLink "Text/getMeasuredLineHeight"}}{{/crossLink}}. Note that
+ 	 * `lineHeight` (if specified) or {@link easeljs.Text#getMeasuredLineHeight}. Note that
  	 * this operation requires the text flowing logic to run, which has an associated CPU cost.
- 	 * @method getMeasuredHeight
  	 * @return {Number} The approximate height of the untransformed multi-line text.
  	 */
  	getMeasuredHeight () {
  		return this._drawText(null, {}).height;
  	}
 
- 	/**
- 	 * Docced in superclass.
- 	 */
  	getBounds () {
  		let rect = super.getBounds();
  		if (rect) { return rect; }
@@ -249,7 +188,6 @@ export default class Text extends DisplayObject {
  	 * of the drawn text. The lines property contains an array of strings, one for
  	 * each line of text that will be drawn, accounting for line breaks and wrapping. These strings have trailing
  	 * whitespace removed.
- 	 * @method getMetrics
  	 * @return {Object} An object with width, height, and lines properties.
  	 */
  	getMetrics () {
@@ -261,8 +199,7 @@ export default class Text extends DisplayObject {
 
  	/**
  	 * Returns a clone of the Text instance.
- 	 * @method clone
- 	 * @return {Text} a clone of the Text instance.
+ 	 * @return {easeljs.Text} a clone of the Text instance.
  	 */
  	clone () {
  		return this._cloneProps(new Text(this.text, this.font, this.color));
@@ -270,19 +207,17 @@ export default class Text extends DisplayObject {
 
  	/**
  	 * Returns a string representation of this object.
- 	 * @method toString
+ 	 * @override
  	 * @return {String} a string representation of the instance.
  	 */
  	toString () {
  		return `[${this.constructor.name} (text=${this.text.length > 20 ? `${this.text.substr(0, 17)}...` : this.text})]`;
  	}
 
-// private methods:
  	/**
- 	 * @method _cloneProps
- 	 * @param {Text} o
+ 	 * @param {easeljs.Text} o
  	 * @protected
- 	 * @return {Text} o
+ 	 * @return {easeljs.Text} o
  	 */
  	_cloneProps (o) {
  		super._cloneProps(o);
@@ -296,7 +231,6 @@ export default class Text extends DisplayObject {
  	}
 
  	/**
- 	 * @method _getWorkingContext
  	 * @param {CanvasRenderingContext2D} ctx
  	 * @return {CanvasRenderingContext2D}
  	 * @protected
@@ -312,7 +246,6 @@ export default class Text extends DisplayObject {
 
 	/**
 	 * Draws multiline text.
-	 * @method _drawText
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @param {Object} o
 	 * @param {Array} lines
@@ -322,7 +255,7 @@ export default class Text extends DisplayObject {
  	_drawText (ctx, o, lines) {
  		const paint = !!ctx;
  		if (!paint) {
- 			ctx = Text._workingContext;
+ 			ctx = Text._ctx;
  			ctx.save();
  			this._prepContext(ctx);
  		}
@@ -373,7 +306,6 @@ export default class Text extends DisplayObject {
  	}
 
  	/**
- 	 * @method _drawTextLine
  	 * @param {CanvasRenderingContext2D} ctx
  	 * @param {String} text
  	 * @param {Number} y
@@ -386,12 +318,11 @@ export default class Text extends DisplayObject {
  	}
 
  	/**
- 	 * @method _getMeasuredWidth
  	 * @param {String} text
  	 * @protected
  	 */
  	_getMeasuredWidth (text) {
- 		let ctx = Text._workingContext;
+ 		let ctx = Text._ctx;
  		ctx.save();
  		let w = this._prepContext(ctx).measureText(text).width;
  		ctx.restore();
@@ -400,16 +331,25 @@ export default class Text extends DisplayObject {
 
 }
 
-{
-	/**
-	 * @property _workingContext
-	 * @type CanvasRenderingContext2D
-	 * @private
-	 * @static
-	 */
-	let canvas = window.createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
-	if (canvas.getContext) {
-		Text._workingContext = canvas.getContext("2d");
-		canvas.width = canvas.height = 1;
-	}
-}
+/**
+ * Lookup table for the ratio to offset bounds x calculations based on the textAlign property.
+ * @type {Object}
+ * @readonly
+ * @static
+ */
+Text.H_OFFSETS = {start: 0, left: 0, center: -0.5, end: -1, right: -1};
+/**
+ * Lookup table for the ratio to offset bounds y calculations based on the textBaseline property.
+ * @type {Object}
+ * @readonly
+ * @static
+ */
+Text.V_OFFSETS = {top: 0, hanging: -0.01, middle: -0.4, alphabetic: -0.8, ideographic: -0.85, bottom: -1};
+
+/**
+ * @property _ctx
+ * @type {CanvasRenderingContext2D}
+ * @private
+ * @static
+ */
+Text._ctx = createCanvas().getContext("2d");

@@ -1,75 +1,58 @@
-/*
-* @license ColorMatrixFilter
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2017 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
-
 /**
- * @module EaselJS
+ * @license ColorMatrixFilter
+ * Visit http://createjs.com/ for documentation, updates and examples.
+ *
+ * Copyright (c) 2017 gskinner.com, inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
  */
 
 import Filter from "./Filter";
 
 /**
  * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
- * {{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors. For an easier color transform,
- * consider the {{#crossLink "ColorFilter"}}{{/crossLink}}.
+ * {@link easeljs.ColorMatrix} for more information on changing colors. For an easier color transform,
+ * consider the {@link easeljs.ColorFilter}.
  *
- * <h4>Example</h4>
- * This example creates a red circle, inverts its hue, and then saturates it to brighten it up.
  *
- *      var shape = new createjs.Shape().set({x:100,y:100});
- *      shape.graphics.beginFill("#ff0000").drawCircle(0,0,50);
+ * @memberof easeljs
+ * @extends easeljs.Filter
+ * @example
+ * let shape = new Shape().set({ x: 100, y: 100 });
+ * shape.graphics.beginFill("#ff0000").drawCircle(0, 0, 50);
+ * let matrix = new ColorMatrix().adjustHue(180).adjustSaturation(100);
+ * shape.filters = [ new ColorMatrixFilter(matrix) ];
+ * shape.cache(-50, -50, 100, 100);
  *
- *      var matrix = new createjs.ColorMatrix().adjustHue(180).adjustSaturation(100);
- *      shape.filters = [
- *          new createjs.ColorMatrixFilter(matrix)
- *      ];
- *
- *      shape.cache(-50, -50, 100, 100);
- *
- * See {{#crossLink "Filter"}}{{/crossLink}} for an more information on applying filters.
- * @class ColorMatrixFilter
- * @extends Filter
+ * @param {Array | easeljs.ColorMatrix} matrix A 4x5 matrix describing the color operation to perform.
  */
 export default class ColorMatrixFilter extends Filter {
 
-// constructor:
-	/**
-	 * @constructor
-	 * @param {Array | ColorMatrix} matrix A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
-	 * class.
-	 */
 	constructor (matrix) {
 		super();
 
-// public properties:
 		/**
-		 * A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
-		 * @property matrix
-		 * @type Array | ColorMatrix
+		 * A 4x5 matrix describing the color operation to perform.
+		 * @type {Array | easeljs.ColorMatrix}
 		 */
 		this.matrix = matrix;
 
@@ -92,7 +75,6 @@ export default class ColorMatrixFilter extends Filter {
 		`;
 	}
 
-// public methods:
 	shaderParamSetup (gl, stage, shaderProgram) {
 		let mat = this.matrix;
 		let colorMatrix = new Float32Array([
@@ -113,16 +95,12 @@ export default class ColorMatrixFilter extends Filter {
 	}
 
 	/**
-	 * Docced in super class
+	 * @return {easeljs.ColorMatrixFilter}
 	 */
 	clone () {
 		return new ColorMatrixFilter(this.matrix);
 	}
 
-// private methods:
-	/**
-	 * Docced in super class
-	 */
 	_applyFilter (imageData) {
 		let data = imageData.data;
 		const l = data.length;

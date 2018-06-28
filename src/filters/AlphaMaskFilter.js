@@ -1,4 +1,4 @@
-/*
+/**
  * @license AlphaMaskFilter
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
@@ -36,44 +36,30 @@ import Filter from "./Filter";
  *
  * <b>IMPORTANT NOTE: This filter currently does not support the targetCtx, or targetX/Y parameters correctly.</b>
  *
- * <h4>Example</h4>
- * This example draws a gradient box, then caches it and uses the "cacheCanvas" as the alpha mask on a 100x100 image.
+ * @memberof easeljs
+ * @extends easeljs.Filter
+ * @example
+ * var box = new Shape();
+ * box.graphics.beginLinearGradientFill(["#000000", "rgba(0, 0, 0, 0)"], [0, 1], 0, 0, 100, 100)
+ * box.graphics.drawRect(0, 0, 100, 100);
+ * box.cache(0, 0, 100, 100);
+ * var bmp = new Bitmap("path/to/image.jpg");
+ * bmp.filters = [ new AlphaMaskFilter(box.cacheCanvas) ];
+ * bmp.cache(0, 0, 100, 100);
  *
- *      var box = new createjs.Shape();
- *      box.graphics.beginLinearGradientFill(["#000000", "rgba(0, 0, 0, 0)"], [0, 1], 0, 0, 100, 100)
- *      box.graphics.drawRect(0, 0, 100, 100);
- *      box.cache(0, 0, 100, 100);
- *
- *      var bmp = new createjs.Bitmap("path/to/image.jpg");
- *      bmp.filters = [
- *          new createjs.AlphaMaskFilter(box.cacheCanvas)
- *      ];
- *      bmp.cache(0, 0, 100, 100);
- *
- * See {{#crossLink "Filter"}}{{/crossLink}} for more information on applying filters.
- * @class AlphaMaskFilter
- * @extends Filter
- * @module EaselJS
+ * @param {HTMLImageElement | HTMLCanvasElement} mask
  */
 export default class AlphaMaskFilter extends Filter {
 
-// constructor:
-	/**
-	 * @constructor
-	 * @param {HTMLImageElement|HTMLCanvasElement} mask
-	 */
 	constructor (mask) {
 		super();
 
-// public properties:
 		/**
 		 * The image (or canvas) to use as the mask.
-		 * @property mask
-		 * @type HTMLImageElement|HTMLCanvasElement
+		 * @type {HTMLImageElement | HTMLCanvasElement}
 		 */
 		this.mask = mask;
 
-		/** docced in super class **/
 		this.usesContext = true;
 
 		this.FRAG_SHADER_BODY = `
@@ -88,13 +74,10 @@ export default class AlphaMaskFilter extends Filter {
 		`;
 	}
 
-// public methods:
 	/**
 	 * Applies the filter to the specified context.
 	 *
-	 * <strong>IMPORTANT NOTE: This filter currently does not support the targetCtx, or targetX/Y parameters
-	 * correctly.</strong>
-	 * @method applyFilter
+	 * <strong>IMPORTANT NOTE: This filter currently does not support the targetCtx, or targetX/Y parameters correctly.</strong>
 	 * @param {CanvasRenderingContext2D} ctx The 2D context to use as the source.
 	 * @param {Number} x The x position to use for the source rect.
 	 * @param {Number} y The y position to use for the source rect.
@@ -125,14 +108,17 @@ export default class AlphaMaskFilter extends Filter {
 	}
 
 	/**
-	 * Docced in superclass
+	 * @return {easeljs.AlphaMaskFilter}
 	 */
 	clone () {
 		return new AlphaMaskFilter(this.mask);
 	}
 
 	/**
-	 * TODO: Doc
+	 * @todo docs
+	 * @param {*} gl
+	 * @param {*} stage
+	 * @param {*} shaderProgram
 	 */
 	shaderParamSetup (gl, stage, shaderProgram) {
 		if(!this._mapTexture) { this._mapTexture = gl.createTexture(); }

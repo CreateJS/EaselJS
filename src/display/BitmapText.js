@@ -1,65 +1,55 @@
-/*
-* @license BitmapText
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2017 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
+/**
+ * @license BitmapText
+ * Visit http://createjs.com/ for documentation, updates and examples.
+ *
+ * Copyright (c) 2017 gskinner.com, inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import Container from "./Container";
 import Sprite from "./Sprite";
 
-// ES6 does not support static properties, this is a work around.
-let _maxPoolSize = 100;
-let _spritePool = [];
-
 /**
  * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported using new line characters,
- * but automatic wrapping is not supported. See the {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
- * property for more information on defining glyphs.
+ * but automatic wrapping is not supported. See the {@link easeljs.BitmapText#spriteSheet} property for more information on defining glyphs.
  *
  * <strong>Important:</strong> While BitmapText extends Container, it is not designed to be used as one.
  * As such, methods like addChild and removeChild are disabled.
  *
- * @class BitmapText
- * @extends Container
- * @module EaselJS
+ * @memberof easeljs
+ * @extends easeljs.Container
+ *
+ * @param {String} [text=""] The text to display.
+ * @param {SpriteSheet} [spriteSheet=null] The spritesheet that defines the character glyphs.
  */
 export default class BitmapText extends Container {
 
-// constructor:
-	/**
-	 * @param {String} [text=""] The text to display.
-	 * @param {SpriteSheet} [spriteSheet=null] The spritesheet that defines the character glyphs.
-	 * @constructor
-	 */
 	constructor (text = "", spriteSheet = null) {
 		super();
-// public properties:
+
 		/**
 		 * The text to display.
-		 * @property text
-		 * @type String
+		 * @type {String}
 		 * @default ""
 		 */
 		this.text = text;
@@ -67,21 +57,19 @@ export default class BitmapText extends Container {
 		/**
 		 * A SpriteSheet instance that defines the glyphs for this bitmap text. Each glyph/character
 		 * should have a single frame animation defined in the sprite sheet named the same as
-		 * corresponding character. For example, the following animation definition:
+		 * corresponding character.
 		 *
-		 * 		"A": {frames: [0]}
-		 *
-		 * would indicate that the frame at index 0 of the spritesheet should be drawn for the "A" character. The short form
-		 * is also acceptable:
-		 *
-		 * 		"A": 0
+		 * @example
+		 * // the following animation definition would indicate that the frame at index 0 of the spritesheet should be drawn for the "A" character.
+		 * "A": {frames: [0]}
+		 * // The short form is also acceptable:
+		 * "A": 0
 		 *
 		 * Note that if a character in the text is not found in the sprite sheet, it will also
 		 * try to use the alternate case (upper or lower).
 		 *
-		 * See SpriteSheet for more information on defining sprite sheet data.
-		 * @property spriteSheet
-		 * @type SpriteSheet
+		 * @see {@link easeljs.SpriteSheet}
+		 * @type {easeljs.SpriteSheet}
 		 * @default null
 		 */
 		this.spriteSheet = spriteSheet;
@@ -91,16 +79,14 @@ export default class BitmapText extends Container {
 		 * by checking for the height of the "1", "T", or "L" character (in that order). If
 		 * those characters are not defined, it will use the height of the first frame of the
 		 * sprite sheet.
-		 * @property lineHeight
-		 * @type Number
+		 * @type {Number}
 		 * @default 0
 		 */
 		this.lineHeight = 0;
 
 		/**
 		 * This spacing (in pixels) will be added after each character in the output.
-		 * @property letterSpacing
-		 * @type Number
+		 * @type {Number}
 		 * @default 0
 		 */
 		this.letterSpacing = 0;
@@ -111,86 +97,44 @@ export default class BitmapText extends Container {
 		 * by checking for the width of the "1", "l", "E", or "A" character (in that order). If
 		 * those characters are not defined, it will use the width of the first frame of the
 		 * sprite sheet.
-		 * @property spaceWidth
-		 * @type Number
+		 * @type {Number}
 		 * @default 0
 		 */
 		this.spaceWidth = 0;
 
-
-// private properties:
 	 	/**
-		 * @property _oldProps
-		 * @type Object
+		 * @type {Object}
 		 * @protected
 		 */
 		this._oldProps = {text:0,spriteSheet:0,lineHeight:0,letterSpacing:0,spaceWidth:0};
 
 		/**
 		 * Used to track the object which this class attached listeners to, helps optimize listener attachment.
-		 * @property _oldStage
-		 * @type Stage
+		 * @type {easeljs.Stage}
 		 * @protected
 		 */
 		this._oldStage = null;
 
 		/**
 		 * The event listener proxy triggered drawing draw for special circumstances.
-		 * @property _drawAction
-		 * @type function
+		 * @type {Function}
 		 * @protected
 		 */
 		this._drawAction = null;
 
 	}
 
-// static properties:
-	/**
-	 * BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains
-	 * an internal object pool of sprite instances to reuse. Increasing this value can cause more sprites to be
-	 * retained, slightly increasing memory use, but reducing instantiation.
-	 * @property maxPoolSize
-	 * @type Number
-	 * @static
-	 * @default 100
-	 */
-	static get maxPoolSize () { return _maxPoolSize; }
-	static set maxPoolSize (maxPoolSize) { _maxPoolSize = maxPoolSize;}
-
-	/**
-	 * Sprite object pool.
-	 * @type {Array}
-	 * @static
-	 * @private
-	 * @readonly
-	 */
-	static get _spritePool () { return _spritePool; }
-
-// public methods:
-	/**
-	 * Docced in superclass.
-	 */
 	draw (ctx, ignoreCache) {
 		if (this.drawCache(ctx, ignoreCache)) { return; }
 		this._updateState();
 		super.draw(ctx, ignoreCache);
 	}
 
-	/**
-	 * Docced in superclass.
-	 */
 	getBounds () {
 		this._updateText();
 		return super.getBounds();
 	}
 
-	/**
-	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-	 * This does not account for whether it would be visible within the boundaries of the stage.
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * @method isVisible
-	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-	 */
 	isVisible () {
 		let hasContent = this.cacheCanvas || (this.spriteSheet && this.spriteSheet.complete && this.text);
 		return !!(this.visible && this.alpha > 0 && this.scaleX !== 0 && this.scaleY !== 0 && hasContent);
@@ -202,46 +146,36 @@ export default class BitmapText extends Container {
 
 	/**
 	 * <strong>Disabled in BitmapText.</strong>
-	 * @method addChild
 	 */
 	addChild () {}
 
 	/**
 	 * <strong>Disabled in BitmapText.</strong>
-	 * @method addChildAt
 	 */
 	addChildAt () {}
 
 	/**
 	 * <strong>Disabled in BitmapText.</strong>
-	 * @method removeChild
 	 */
 	removeChild () {}
 
 	/**
 	 * <strong>Disabled in BitmapText.</strong>
-	 * @method removeChildAt
 	 */
 	removeChildAt () {}
 
 	/**
 	 * <strong>Disabled in BitmapText.</strong>
-	 * @method removeAllChildren
 	 */
 	removeAllChildren () {}
 
-// private methods:
-	/**
-	 * Docced in superclass.
-	 **/
 	_updateState () {
 		this._updateText();
 	}
 
  	/**
-	 * @method _cloneProps
-	 * @param {BitmapText} o
-	 * @return {BitmapText} o
+	 * @param {easeljs.BitmapText} o
+	 * @return {easeljs.BitmapText}
 	 * @protected
 	 */
 	_cloneProps (o) {
@@ -253,9 +187,8 @@ export default class BitmapText extends Container {
 	}
 
 	/**
-	 * @method _getFrameIndex
 	 * @param {String} character
-	 * @param {SpriteSheet} spriteSheet
+	 * @param {easeljs.SpriteSheet} spriteSheet
 	 * @return {Number}
 	 * @protected
 	 */
@@ -269,9 +202,8 @@ export default class BitmapText extends Container {
 	}
 
 	/**
-	 * @method _getFrame
 	 * @param {String} character
-	 * @param {SpriteSheet} spriteSheet
+	 * @param {easeljs.SpriteSheet} spriteSheet
 	 * @return {Object}
 	 * @protected
 	 */
@@ -281,8 +213,7 @@ export default class BitmapText extends Container {
 	}
 
 	/**
-	 * @method _getLineHeight
-	 * @param {SpriteSheet} ss
+	 * @param {easeljs.SpriteSheet} ss
 	 * @return {Number}
 	 * @protected
 	 */
@@ -292,8 +223,7 @@ export default class BitmapText extends Container {
 	}
 
 	/**
-	 * @method _getSpaceWidth
-	 * @param {SpriteSheet} ss
+	 * @param {easeljs.SpriteSheet} ss
 	 * @return {Number}
 	 * @protected
 	 */
@@ -309,7 +239,6 @@ export default class BitmapText extends Container {
 	}
 
 	/**
-	 * @method _updateText
 	 * @protected
 	 */
 	_updateText () {
@@ -369,3 +298,21 @@ export default class BitmapText extends Container {
 	}
 
 }
+
+/**
+ * BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains
+ * an internal object pool of sprite instances to reuse. Increasing this value can cause more sprites to be
+ * retained, slightly increasing memory use, but reducing instantiation.
+ * @type {Number}
+ * @static
+ * @default 100
+ */
+BitmapText.maxPoolSize = 100;
+/**
+ * Sprite object pool.
+ * @type {Array}
+ * @static
+ * @private
+ * @readonly
+ */
+BitmapText._spritePool = [];

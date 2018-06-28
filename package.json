@@ -61,6 +61,7 @@
   },
   "devDependencies": {
     "@createjs/build": "^2.0.0-beta.3",
+		"@createjs/docs": "^2.0.0-beta.1",
     "babel-jest": "^22.4.3",
     "canvas-prebuilt": "^1.6.5-prerelease.1",
     "jest": "^22.4.3"

@@ -1,33 +1,30 @@
-/*
-* @license SpriteSheetBuilder
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2017 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
-
-const _ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
-const _ERR_RUNNING = "a build is already running";
+/**
+ * @license SpriteSheetBuilder
+ * Visit http://createjs.com/ for documentation, updates and examples.
+ *
+ * Copyright (c) 2017 gskinner.com, inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import EventDispatcher from "@createjs/core/src/events/EventDispatcher";
 import Rectangle from "../geom/Rectangle";
@@ -35,7 +32,7 @@ import SpriteSheet from "../display/SpriteSheet";
 import Event from "@createjs/core/src/events/Event";
 
 /**
- * The SpriteSheetBuilder allows you to generate {{#crossLink "SpriteSheet"}}{{/crossLink}} instances at run time
+ * The SpriteSheetBuilder allows you to generate {@link easeljs.SpriteSheet} instances at run time
  * from any display object. This can allow you to maintain your assets as vector graphics (for low file size), and
  * render them at run time as SpriteSheets for better performance.
  *
@@ -43,32 +40,25 @@ import Event from "@createjs/core/src/events/Event";
  * without locking the UI.
  *
  * Note that the "images" used in the generated SpriteSheet are actually canvas elements, and that they will be
- * sized to the nearest power of 2 up to the value of {{#crossLink "SpriteSheetBuilder/maxWidth:property"}}{{/crossLink}}
- * or {{#crossLink "SpriteSheetBuilder/maxHeight:property"}}{{/crossLink}}.
- * @class SpriteSheetBuilder
+ * sized to the nearest power of 2 up to the value of {@link easeljs.SpriteSheetBuilder#maxWidth}
+ * or {@link easeljs.SpriteSheetBuilder#maxHeight}.
+ *
+ * @memberof easeljs
+ * @extends core.EventDispatcher
+ *
  * @param {Number} [framerate=0] The {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} of
- * {{#crossLink "SpriteSheet"}}{{/crossLink}} instances that are created.
- * @extends EventDispatcher
- * @module EaselJS
+ * {@link easeljs.SpriteSheet} instances that are created.
  */
 export default class SpriteSheetBuilder extends EventDispatcher {
 
-// constructor:
-	/**
-	 * @constructor
-	 * @param {Number} [framerate=0] The {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} of
-	 * {{#crossLink "SpriteSheet"}}{{/crossLink}} instances that are created.
-	 */
 	constructor (framerate = 0) {
 		super();
 
-// public properties:
 		/**
 		 * The maximum width for the images (not individual frames) in the generated SpriteSheet. It is recommended to
 		 * use a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max
 		 * dimensions, then additional images will be created as needed.
-		 * @property maxWidth
-		 * @type Number
+		 * @type {Number}
 		 * @default 2048
 		*/
 		this.maxWidth = 2048;
@@ -77,16 +67,14 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 		 * The maximum height for the images (not individual frames) in the generated SpriteSheet. It is recommended to
 		 * use a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max
 		 * dimensions, then additional images will be created as needed.
-		 * @property maxHeight
-		 * @type Number
+		 * @type {Number}
 		 * @default 2048
 		 */
 		this.maxHeight = 2048;
 
 		/**
 		 * The SpriteSheet that was generated. This will be null before a build is completed successfully.
-		 * @property spriteSheet
-		 * @type SpriteSheet
+		 * @type {easeljs.SpriteSheet}
 		 */
 		this.spriteSheet = null;
 
@@ -94,16 +82,14 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 		 * The scale to apply when drawing all frames to the SpriteSheet. This is multiplied against any scale specified
 		 * in the addFrame call. This can be used, for example, to generate a SpriteSheet at run time that is tailored
 		 * to the a specific device resolution (ex. tablet vs mobile).
-		 * @property scale
-		 * @type Number
+		 * @type {Number}
 		 * @default 1
 		 */
 		this.scale = 1;
 
 		/**
 		* The padding to use between frames. This is helpful to preserve antialiasing on drawn vector content.
-		* @property padding
-		* @type Number
+		* @type {Number}
 		* @default 1
 		*/
 		this.padding = 1;
@@ -113,8 +99,7 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 		 * thought of as the number of seconds per second the builder will use. For example, with a timeSlice value of 0.3,
 		 * the builder will run 20 times per second, using approximately 15ms per build (30% of available time, or 0.3s per second).
 		 * Defaults to 0.3.
-		 * @property timeSlice
-		 * @type Number
+		 * @type {Number}
 		 * @default 0.3
 		 */
 		this.timeSlice = 0.3;
@@ -122,91 +107,74 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 		/**
 		 * A value between 0 and 1 that indicates the progress of a build, or -1 if a build has not
 		 * been initiated.
-		 * @property progress
-		 * @type Number
+		 * @type {Number}
 		 * @default -1
 		 * @readonly
 		 */
 		this.progress = -1;
 
 		/**
-		 * A {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}} value that will be passed to new {{#crossLink "SpriteSheet"}}{{/crossLink}} instances that are
-		 * created. If no framerate is specified (or it is 0), then SpriteSheets will use the {{#crossLink "Ticker"}}{{/crossLink}}
-		 * framerate.
-		 * @property framerate
-		 * @type Number
+		 * A {@link easeljs.SpriteSheet#framerate} value that will be passed to new SpriteSheet instances that are
+		 * created. If no framerate is specified (or it is 0), then SpriteSheets will use the {@link core.Ticker} framerate.
+		 * @type {Number}
 		 * @default 0
 		 */
 		this.framerate = framerate;
 
-// private properties:
 		/**
-		 * @property _frames
 		 * @protected
-		 * @type Array
+		 * @type {Array}
 		 */
 		this._frames = [];
 
 		/**
-		 * @property _animations
 		 * @protected
-		 * @type Array
+		 * @type {Array}
 		 */
 		this._animations = {};
 
 		/**
-		 * @property _data
 		 * @protected
-		 * @type Array
+		 * @type {Array}
 		 */
 		this._data = null;
 
 		/**
-		 * @property _nextFrameIndex
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._nextFrameIndex = 0;
 
 		/**
-		 * @property _index
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._index = 0;
 
 		/**
-		 * @property _timerID
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._timerID = null;
 
 		/**
-		 * @property _scale
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._scale = 1;
 	}
 
-// constants:
-	static get ERR_DIMENSIONS () { return _ERR_DIMENSIONS; }
-	static get ERR_RUNNING () { return _ERR_RUNNING; }
-
-// public methods:
 	/**
-	 * Adds a frame to the {{#crossLink "SpriteSheet"}}{{/crossLink}}. Note that the frame will not be drawn until you
-	 * call {{#crossLink "SpriteSheetBuilder/build"}}{{/crossLink}} method. The optional setup params allow you to have
+	 * Adds a frame to the {@link easeljs.SpriteSheet}. Note that the frame will not be drawn until you
+	 * call {@link easeljs.SpriteSheetBuilder#build} method. The optional setup params allow you to have
 	 * a function run immediately before the draw occurs. For example, this allows you to add a single source multiple
 	 * times, but manipulate it or its children to change it to generate different frames.
 	 *
 	 * Note that the source's transformations (x, y, scale, rotate, alpha) will be ignored, except for regX/Y. To apply
-	 * transforms to a source object and have them captured in the SpriteSheet, simply place it into a {{#crossLink "Container"}}{{/crossLink}}
+	 * transforms to a source object and have them captured in the SpriteSheet, simply place it into a {@link easeljs.Container}
 	 * and pass in the Container as the source.
-	 * @method addFrame
-	 * @param {DisplayObject} source The source {{#crossLink "DisplayObject"}}{{/crossLink}}  to draw as the frame.
-	 * @param {Rectangle} [sourceRect] A {{#crossLink "Rectangle"}}{{/crossLink}} defining the portion of the
+	 * @param {easeljs.DisplayObject} source The source {{#crossLink "DisplayObject"}}{{/crossLink}}  to draw as the frame.
+	 * @param {easeljs.Rectangle} [sourceRect] A {{#crossLink "Rectangle"}}{{/crossLink}} defining the portion of the
 	 * source to draw to the frame. If not specified, it will look for a `getBounds` method, bounds property, or
 	 * `nominalBounds` property on the source to use. If one is not found, the frame will be skipped.
 	 * @param {Number} [scale=1] Optional. The scale to draw this frame at. Default is 1.
@@ -218,12 +186,11 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
 		let rect = sourceRect||source.bounds||source.nominalBounds||(source.getBounds&&source.getBounds());
 		if (!rect) { return null; }
-		return this._frames.push({source, sourceRect:rect, scale, funct:setupFunction, data:setupData, index:this._frames.length, height:rect.height*scale})-1;
+		return this._frames.push({ source, sourceRect: rect, scale, funct: setupFunction, data: setupData, index: this._frames.length, height: rect.height*scale }) - 1;
 	}
 
 	/**
-	 * Adds an animation that will be included in the created {{#crossLink "SpriteSheet"}}{{/crossLink}}.
-	 * @method addAnimation
+	 * Adds an animation that will be included in the created {@link easeljs.SpriteSheet}.
 	 * @param {String} name The name for the animation.
 	 * @param {Array} frames An array of frame indexes that comprise the animation. Ex. [3,6,5] would describe an animation
 	 * that played frame indexes 3, 6, and 5 in that order.
@@ -235,21 +202,20 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	 */
 	addAnimation (name, frames, next, speed) {
 		if (this._data) { throw SpriteSheetBuilder.ERR_RUNNING; }
-		this._animations[name] = {frames, next, speed};
+		this._animations[name] = { frames, next, speed };
 	}
 
 	/**
-	 * This will take a {{#crossLink "MovieClip"}}{{/crossLink}} instance, and add its frames and labels to this
+	 * This will take a {@link easeljs.MovieClip} instance, and add its frames and labels to this
 	 * builder. Labels will be added as an animation running from the label index to the next label. For example, if
 	 * there is a label named "foo" at frame 0 and a label named "bar" at frame 10, in a MovieClip with 15 frames, it
 	 * will add an animation named "foo" that runs from frame index 0 to 9, and an animation named "bar" that runs from
 	 * frame index 10 to 14.
 	 *
-	 * Note that this will iterate through the full MovieClip with {{#crossLink "MovieClip/actionsEnabled:property"}}{{/crossLink}}
+	 * Note that this will iterate through the full MovieClip with {@link easeljs.MovieClip#actionsEnabled}
 	 * set to `false`, ending on the last frame.
-	 * @method addMovieClip
-	 * @param {MovieClip} source The source MovieClip instance to add to the SpriteSheet.
-	 * @param {Rectangle} [sourceRect] A {{#crossLink "Rectangle"}}{{/crossLink}} defining the portion of the source to
+	 * @param {easeljs.MovieClip} source The source MovieClip instance to add to the SpriteSheet.
+	 * @param {easeljs.Rectangle} [sourceRect] A Rectangle defining the portion of the source to
 	 * draw to the frame. If not specified, it will look for a {{#crossLink "DisplayObject/getBounds"}}{{/crossLink}}
 	 * method, `frameBounds` Array, `bounds` property, or `nominalBounds` property on the source to use. If one is not
 	 * found, the MovieClip will be skipped.
@@ -296,9 +262,8 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	}
 
 	/**
-	 * Builds a {{#crossLink "SpriteSheet"}}{{/crossLink}} instance based on the current frames.
-	 * @method build
-	 * @return {SpriteSheet} The created SpriteSheet instance, or null if a build is already running or an error
+	 * Builds a {@link easeljs.SpriteSheet} instance based on the current frames.
+	 * @return {easeljs.SpriteSheet} The created SpriteSheet instance, or null if a build is already running or an error
 	 * occurred.
 	 */
 	build () {
@@ -310,10 +275,9 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	}
 
 	/**
-	 * Asynchronously builds a {{#crossLink "SpriteSheet"}}{{/crossLink}} instance based on the current frames. It will
+	 * Asynchronously builds a {@link easeljs.SpriteSheet} instance based on the current frames. It will
 	 * run 20 times per second, using an amount of time defined by `timeSlice`. When it is complete it will call the
 	 * specified callback.
-	 * @method buildAsync
 	 * @param {Number} [timeSlice] Sets the timeSlice property on this instance.
 	 */
 	buildAsync (timeSlice) {
@@ -325,7 +289,6 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 
 	/**
 	 * Stops the current asynchronous build.
-	 * @method stopAsync
 	 */
 	stopAsync () {
 		clearTimeout(this._timerID);
@@ -333,26 +296,15 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	}
 
 	/**
-	 * SpriteSheetBuilder instances cannot be cloned.
-	 * @method clone
-	 */
-	clone () {
-		throw "SpriteSheetBuilder cannot be cloned.";
-	}
-
-	/**
 	 * Returns a string representation of this object.
-	 * @method toString
+	 * @override
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
 		return `[${this.constructor.name}]`;
 	}
 
-
-// private methods:
 	/**
-	 * @method _startBuild
 	 * @protected
 	 */
 	_startBuild () {
@@ -393,7 +345,6 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	};
 
 	/**
-	 * @method _setupMovieClipFrame
 	 * @protected
 	 * @return {Number} The width & height of the row.
 	 */
@@ -406,7 +357,6 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	}
 
 	/**
-	 * @method _getSize
 	 * @protected
 	 * @return {Number} The width & height of the row.
 	 */
@@ -417,13 +367,12 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	};
 
 	/**
-	 * @method _fillRow
+	 * @protected
 	 * @param {Array} frames
 	 * @param {Number} y
 	 * @param {HTMLImageElement} img
 	 * @param {Object} dataFrames
 	 * @param {Number} pad
-	 * @protected
 	 * @return {Number} The width & height of the row.
 	 */
 	_fillRow (frames, y, img, dataFrames, pad) {
@@ -455,7 +404,6 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	}
 
 	/**
-	 * @method _endBuild
 	 * @protected
 	 */
 	_endBuild () {
@@ -466,7 +414,6 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	}
 
 	/**
-	 * @method _run
 	 * @protected
 	 */
 	_run () {
@@ -490,9 +437,8 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 	}
 
 	/**
-	 * @method _drawNext
 	 * @protected
-	 * @return Boolean Returns false if this is the last draw.
+	 * @return {Boolean} Returns false if this is the last draw.
 	 */
 	_drawNext () {
 		let frame = this._frames[this._index];
@@ -515,20 +461,34 @@ export default class SpriteSheetBuilder extends EventDispatcher {
 
 }
 
-// events:
+/**
+ * @static
+ * @readonly
+ * @protected
+ * @type {String}
+ */
+SpriteSheetBuilder.ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
+/**
+ * @static
+ * @readonly
+ * @protected
+ * @type {String}
+ */
+SpriteSheetBuilder.ERR_RUNNING = "a build is already running";
+
 /**
  * Dispatched when a build completes.
- * @event complete
- * @param {Object} target The object that dispatched the event.
- * @param {String} type The event type.
+ * @event easeljs.SpriteSheetBuilder#complete
+ * @property {Object} target The object that dispatched the event.
+ * @property {String} type The event type.
  * @since 0.6.0
  */
 
 /**
  * Dispatched when an asynchronous build has progress.
- * @event progress
- * @param {Object} target The object that dispatched the event.
- * @param {String} type The event type.
- * @param {Number} progress The current progress value (0-1).
+ * @event easeljs.SpriteSheetBuilder#progress
+ * @property {Object} target The object that dispatched the event.
+ * @property {String} type The event type.
+ * @property {Number} progress The current progress value (0-1).
  * @since 0.6.0
  */

@@ -1,4 +1,4 @@
-/*
+/**
  * @license SpriteSheet
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
@@ -34,7 +34,7 @@ import Rectangle from "../geom/Rectangle";
  * Encapsulates the properties and methods associated with a sprite sheet. A sprite sheet is a series of images (usually
  * animation frames) combined into a larger image (or images). For example, an animation consisting of eight 100x100
  * images could be combined into a single 400x200 sprite sheet (4 frames across by 2 high).
- *
+ * <br />
  * The data passed to the SpriteSheet constructor defines:
  * <ol>
  * 	<li> The source image or images to use.</li>
@@ -42,6 +42,7 @@ import Rectangle from "../geom/Rectangle";
  * 	<li> Sequences of frames that form named animations. Optional.</li>
  * 	<li> The target playback framerate. Optional.</li>
  * </ol>
+ *
  * <h3>SpriteSheet Format</h3>
  * SpriteSheets are an object with two required properties (`images` and `frames`), and two optional properties
  * (`framerate` and `animations`). This makes them easy to define in javascript code, or in JSON.
@@ -193,131 +194,107 @@ import Rectangle from "../geom/Rectangle";
  * support cross-origin requests, or this will not work. For more information, check out
  * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS" target="_blank">CORS overview on MDN</a>.
  *
- * @class SpriteSheet
- * @extends EventDispatcher
- * @module EaselJS
+ * @memberof easeljs
+ * @extends core.EventDispatcher
+ * @param {Object} data An object describing the SpriteSheet data.
  */
 export default class SpriteSheet extends EventDispatcher {
 
-// constructor:
-	/**
-	 * @constructor
-   * @param {Object} data An object describing the SpriteSheet data.
-	 */
 	constructor (data) {
 		super();
 
-// public properties:
 		/**
 		 * Indicates whether all images are finished loading.
-		 * @property complete
-		 * @type Boolean
+		 * @type {Boolean}
 		 * @readonly
 		 */
 		this.complete = true;
 
 		/**
 		 * Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See the Sprite class
-		 * {{#crossLink "Sprite/framerate:property"}}{{/crossLink}} for more information.
-		 * @property framerate
+		 * {@link easeljs.Sprite#framerate} for more information.
 		 * @type Number
 		 */
 		this.framerate = 0;
 
-
-		// private properties:
 		/**
-		 * @property _animations
 		 * @protected
-		 * @type Array
+		 * @type {Array}
 		 */
 		this._animations = null;
 
 		/**
-		 * @property _frames
 		 * @protected
-		 * @type Array
+		 * @type {Array}
 		 */
 		this._frames = null;
 
 		/**
-		 * @property _images
 		 * @protected
-		 * @type Array
+		 * @type {Array}
 		 */
 		this._images = null;
 
 		/**
-		 * @property _data
 		 * @protected
-		 * @type Object
+		 * @type {Object}
 		 */
 		this._data = null;
 
 		/**
-		 * @property _loadCount
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._loadCount = 0;
 
 		// only used for simple frame defs:
 		/**
-		 * @property _frameHeight
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._frameHeight = 0;
 
 		/**
-		 * @property _frameWidth
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._frameWidth = 0;
 
 		/**
-		 * @property _numFrames
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._numFrames = 0;
 
 		/**
-		 * @property _regX
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._regX = 0;
 
 		/**
-		 * @property _regY
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._regY = 0;
 
 		/**
-		 * @property _spacing
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._spacing = 0;
 
 		/**
-		 * @property _margin
 		 * @protected
-		 * @type Number
+		 * @type {Number}
 		 */
 		this._margin = 0;
 
 		this._parseData(data);
 	}
 
-// accessor properties:
 	/**
 	 * Returns an array of all available animation names available on this sprite sheet as strings.
-	 * @property animations
 	 * @type {Array}
 	 * @readonly
 	 */
@@ -325,12 +302,10 @@ export default class SpriteSheet extends EventDispatcher {
 		return this._animations.slice();
 	}
 
-// public methods:
 	/**
 	 * Returns the total number of frames in the specified animation, or in the whole sprite
 	 * sheet if the animation param is omitted. Returns 0 if the spritesheet relies on calculated frame counts, and
 	 * the images have not been fully loaded.
-	 * @method getNumFrames
 	 * @param {String} animation The name of the animation to get a frame count for.
 	 * @return {Number} The number of frames in the animation, or in the entire sprite sheet if the animation param is omitted.
 	 */
@@ -345,14 +320,13 @@ export default class SpriteSheet extends EventDispatcher {
 	}
 
 	/**
-	 * Returns an object defining the specified animation. The returned object contains:<UL>
+	 * Returns an object defining the specified animation. The returned object contains:
+	 * <ul>
 	 * 	<li>frames: an array of the frame ids in the animation</li>
 	 * 	<li>speed: the playback speed for this animation</li>
 	 * 	<li>name: the name of the animation</li>
-	 * 	<li>next: the default animation to play next. If the animation loops, the name and next property will be the
-	 * 	same.</li>
-	 * </UL>
-	 * @method getAnimation
+	 * 	<li>next: the default animation to play next. If the animation loops, the name and next property will be the same.</li>
+	 * </ul>
 	 * @param {String} name The name of the animation to get.
 	 * @return {Object} a generic object with frames, speed, name, and next properties.
 	 */
@@ -361,13 +335,12 @@ export default class SpriteSheet extends EventDispatcher {
 	}
 
 	/**
-	 * Returns an object specifying the image and source rect of the specified frame. The returned object has:<UL>
+	 * Returns an object specifying the image and source rect of the specified frame. The returned object has:
+	 * <ul>
 	 * 	<li>an image property holding a reference to the image object in which the frame is found</li>
-	 * 	<li>a rect property containing a Rectangle instance which defines the boundaries for the frame within that
-	 * 	image.</li>
+	 * 	<li>a rect property containing a Rectangle instance which defines the boundaries for the frame within that image.</li>
 	 * 	<li> A regX and regY property corresponding to the regX/Y values for the frame.
-	 * </UL>
-	 * @method getFrame
+	 * </ul>
 	 * @param {Number} frameIndex The index of the frame.
 	 * @return {Object} a generic object with image and rect properties. Returns null if the frame does not exist.
 	 */
@@ -378,15 +351,12 @@ export default class SpriteSheet extends EventDispatcher {
 	}
 
 	/**
-	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative
-	 * to the origin. For example, a 90 x 70 frame with a regX of 50 and a regY of 40 would return:
+	 * Returns a {@link easeljs.Rectangle} instance defining the bounds of the specified frame relative
+	 * to the origin.
 	 *
-	 * 	[x=-50, y=-40, width=90, height=70]
-	 *
-	 * @method getFrameBounds
 	 * @param {Number} frameIndex The index of the frame.
-	 * @param {Rectangle} [rectangle=Rectangle] A Rectangle instance to copy the values into. By default a new instance is created.
-	 * @return {Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.
+	 * @param {easeljs.Rectangle} [rectangle] A Rectangle instance to copy the values into. By default a new instance is created.
+	 * @return {easeljs.Rectangle} A Rectangle instance. Returns null if the frame does not exist, or the image is not fully loaded.
 	 */
 	getFrameBounds (frameIndex, rectangle = new Rectangle()) {
 		let frame = this.getFrame(frameIndex);
@@ -395,7 +365,6 @@ export default class SpriteSheet extends EventDispatcher {
 
 	/**
 	 * Returns a string representation of this object.
-	 * @method toString
 	 * @return {String} a string representation of the instance.
 	 */
 	toString () {
@@ -404,16 +373,14 @@ export default class SpriteSheet extends EventDispatcher {
 
 	/**
 	 * SpriteSheet cannot be cloned. A SpriteSheet can be shared by multiple Sprite instances without cloning it.
-	 * @method clone
+	 * @override
+	 * @throws SpriteSheet cannot be cloned.
 	 */
 	clone () {
-		// TODO-ES6: Add throw docs
-		throw("SpriteSheet cannot be cloned.")
+		throw "SpriteSheet cannot be cloned.";
 	}
 
-// private methods:
 	/**
-	 * @method _parseData
 	 * @param {Object} data An object describing the SpriteSheet data.
 	 * @protected
 	 */
@@ -498,8 +465,9 @@ export default class SpriteSheet extends EventDispatcher {
 	}
 
 	/**
-	 * @method _handleImageLoad
+	 * @emits easeljs.SpriteSheet#event:complete
 	 * @protected
+	 * @param {Object} src
 	 */
 	 _handleImageLoad (src) {
 		if (--this._loadCount === 0) {
@@ -510,8 +478,10 @@ export default class SpriteSheet extends EventDispatcher {
 	}
 
 	/**
-	 * @method _handleImageError
+	 * @emits easeljs.SpriteSheet#event:complete
+	 * @emits easeljs.SpriteSheet#event:error
 	 * @protected
+	 * @param {Object} src
 	 */
 	_handleImageError (src) {
 		let errorEvent = new Event("error");
@@ -525,7 +495,6 @@ export default class SpriteSheet extends EventDispatcher {
 	}
 
 	/**
-	 * @method _calculateFrames
 	 * @protected
 	 */
 	_calculateFrames () {
@@ -565,7 +534,6 @@ export default class SpriteSheet extends EventDispatcher {
 
 }
 
-// events:
 /**
  * Dispatched when all images are loaded.  Note that this only fires if the images
  * were not fully loaded when the sprite sheet was initialized. You should check the complete property
@@ -577,25 +545,25 @@ export default class SpriteSheet extends EventDispatcher {
  * 		sheet.addEventListener("complete", handler);
  * 	}
  *
- * @event complete
- * @param {Object} target The object that dispatched the event.
- * @param {String} type The event type.
+ * @event easeljs.SpriteSheet#complete
+ * @property {Object} target The object that dispatched the event.
+ * @property {String} type The event type.
  * @since 0.6.0
  */
 
 /**
- * Dispatched when getFrame is called with a valid frame index. This is primarily intended for use by {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}}
+ * Dispatched when getFrame is called with a valid frame index. This is primarily intended for use by {@link easeljs.SpriteSheetBuilder}
  * when doing on-demand rendering.
- * @event getframe
- * @param {Number} index The frame index.
- * @param {Object} frame The frame object that getFrame will return.
+ * @event easeljs.SpriteSheet#getframe
+ * @property {Number} index The frame index.
+ * @property {Object} frame The frame object that getFrame will return.
  */
 
 /**
  * Dispatched when an image encounters an error. A SpriteSheet will dispatch an error event for each image that
- * encounters an error, and will still dispatch a {{#crossLink "SpriteSheet/complete:event"}}{{/crossLink}}
+ * encounters an error, and will still dispatch a {@link easeljs.SpriteSheet#event:complete}
  * event once all images are finished processing, even if an error is encountered.
- * @event error
- * @param {String} src The source of the image that failed to load.
+ * @event easeljs.SpriteSheet#error
+ * @property {String} src The source of the image that failed to load.
  * @since 0.8.2
  */

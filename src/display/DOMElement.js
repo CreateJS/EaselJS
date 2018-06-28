@@ -1,30 +1,30 @@
-/*
-* @license DOMElement
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2017 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
+/**
+ * @license DOMElement
+ * Visit http://createjs.com/ for documentation, updates and examples.
+ *
+ * Copyright (c) 2017 gskinner.com, inc.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import DisplayObject from "./DisplayObject";
 import DisplayProps from "../geom/DisplayProps";
@@ -60,82 +60,55 @@ import DisplayProps from "../geom/DisplayProps";
  * if you call stage.update, calling stage.draw or disabling tickEnabled will miss important steps and it will render
  * stale information.
  *
- * @class DOMElement
+ * @memberof easeljs
  * @extends DisplayObject
- * @module EaselJS
+ * @param {HTMLElement | String} htmlElement A reference or id for the DOM element to manage.
  */
 export default class DOMElement extends DisplayObject {
 
-// constructor:
-	/**
-	 * @constructor
-	 * @param {HTMLElement|String} htmlElement A reference or id for the DOM element to manage.
-	 */
 	constructor (htmlElement) {
 		super();
 
-		if (typeof(htmlElement) === "string") { htmlElement = document.getElementById(htmlElement); }
+		if (typeof htmlElement === "string") { htmlElement = document.getElementById(htmlElement); }
 		this.mouseEnabled = false;
 
 		let style = htmlElement.style;
 		style.position = "absolute";
 		style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
 
-// public properties:
 		/**
 		 * The DOM object to manage.
-		 * @property htmlElement
-		 * @type HTMLElement
+		 * @type {HTMLElement}
 		 */
 		this.htmlElement = htmlElement;
 
-// private properties:
 		/**
-		 * @property _oldMtx
-		 * @type Matrix2D
+		 * @type {easeljs.Matrix2D}
+		 * @default null
 		 * @protected
 		 */
 		this._oldProps = null;
 
 		/**
 		 * Used to track the object which this class attached listeners to, helps optimize listener attachment.
-		 * @property _oldStage
-		 * @type Stage
+		 * @type {easeljs.Stage}
+		 * @default null
 		 * @protected
 		 */
 		this._oldStage = null;
 		/**
 		 * The event listener proxy triggered drawing draw for special circumstances.
-		 * @property _drawAction
-		 * @type function
+		 * @type {Function}
+		 * @default null
 		 * @protected
 		 */
 		this._drawAction = null;
 	}
 
-// public methods:
-	/**
-	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-	 * This does not account for whether it would be visible within the boundaries of the stage.
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * @method isVisible
-	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-	 */
 	isVisible () {
 		return this.htmlElement != null;
 	}
 
-	/**
-	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-	 * Returns true if the draw was handled (useful for overriding functionality).
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 * @method draw
-	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
-	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	 * into itself).
-	 * @return {Boolean}
-	 */
 	draw (ctx, ignoreCache) {
 		// this relies on the _tick method because draw isn't called if the parent is not visible.
 		// the actual update happens in _handleDrawEnd
@@ -143,62 +116,48 @@ export default class DOMElement extends DisplayObject {
 	}
 
 	/**
-	 * Not applicable to DOMElement.
-	 * @method cache
+	 * Disabled in DOMElement.
 	 */
 	cache () {}
 
 	/**
-	 * Not applicable to DOMElement.
-	 * @method uncache
+	 * Disabled in DOMElement.
 	 */
 	uncache () {}
 
 	/**
-	 * Not applicable to DOMElement.
-	 * @method updateCache
+	 * Disabled in DOMElement.
 	 */
 	updateCache () {}
 
 	/**
-	 * Not applicable to DOMElement.
-	 * @method hitTest
+	 * Disabled in DOMElement.
 	 */
 	hitTest () {}
 
 	/**
-	 * Not applicable to DOMElement.
-	 * @method localToGlobal
+	 * Disabled in DOMElement.
 	 */
 	localToGlobal () {}
 
 	/**
-	 * Not applicable to DOMElement.
-	 * @method globalToLocal
+	 * Disabled in DOMElement.
 	 */
 	globalToLocal () {}
 
 	/**
-	 * Not applicable to DOMElement.
-	 * @method localToLocal
+	 * Disabled in DOMElement.
 	 */
 	localToLocal () {}
 
 	/**
-	 * DOMElement cannot be cloned. Throws an error.
-	 * @method clone
+	 * DOMElement cannot be cloned.
+	 * @throws DOMElement cannot be cloned
 	 */
 	clone () {
-		throw("DOMElement cannot be cloned.")
+		throw "DOMElement cannot be cloned.";
 	}
 
-// private methods:
-	/**
-	 * @method _tick
-	 * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
-	 * function.
-	 * @protected
-	 */
 	_tick (evtObj) {
 		let stage = this.stage;
 		if (stage != null && stage !== this._oldStage) {
@@ -210,8 +169,7 @@ export default class DOMElement extends DisplayObject {
 	}
 
 	/**
-	 * @method _handleDrawEnd
-	 * @param {Event} evt
+	 * @param {core.Event} evt
 	 * @protected
 	 */
 	_handleDrawEnd (evt) {
@@ -247,28 +205,28 @@ export default class DOMElement extends DisplayObject {
 /**
  * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
  * are not full EaselJS display objects and do not participate in EaselJS mouse events.
- * @event click
+ * @event easeljs.DOMElement#click
  */
 
 /**
  * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
  * are not full EaselJS display objects and do not participate in EaselJS mouse events.
- * @event dblClick
+ * @event easeljs.DOMElement#dblClick
  */
 
 /**
  * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
  * are not full EaselJS display objects and do not participate in EaselJS mouse events.
- * @event mousedown
+ * @event easeljs.DOMElement#mousedown
  */
 
 /**
- * The HTMLElement can listen for the mouseover event, not the DOMElement instance.
- * Since DOMElement instances are not full EaselJS display objects and do not participate in EaselJS mouse events.
- * @event mouseover
+ * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
+ * are not full EaselJS display objects and do not participate in EaselJS mouse events.
+ * @event easeljs.DOMElement#mouseover
  */
 
 /**
- * Not applicable to DOMElement.
- * @event tick
+ * Disabled in DOMElement.
+ * @event easeljs.DOMElement#tick
  */

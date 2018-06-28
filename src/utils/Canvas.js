@@ -1,5 +1,5 @@
 /**
- * @license uid
+ * @license Canvas
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
  * Copyright (c) 2017 gskinner.com, inc.
@@ -26,22 +26,26 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/** @ignore */
-let _nextId = 0;
-
 /**
- * Global utility for generating sequential unique ID numbers.
- *
+ * Global utility for creating canvases.
  * @memberof easeljs
- * @name easeljs.uid
- * @example
- * import { uid } from "@createjs/easeljs";
- * var ids = [];
- * while (ids.length <= 3) {
- *   ids.push(uid());
- * }
- * // ids == [0, 1, 2, 3]
+ * @name easeljs.createCanvas
+ * @param {Number} [width=1]
+ * @param {Number} [height=1]
  */
-export default function uid () {
-	return _nextId++;
+export default function createCanvas (width=1, height=1) {
+	let c;
+	if (window.createjs !== undefined && window.createjs.createCanvas !== undefined) {
+		c = window.createjs.createCanvas();
+	}
+	if (HTMLCanvasElement) {
+		c = new HTMLCanvasElement();
+	}
+	if (c !== undefined) {
+		c.width = width;
+		c.height = height;
+		return c;
+	}
+
+	throw "Canvas not supported in this environment.";
 }
