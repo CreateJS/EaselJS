@@ -460,6 +460,14 @@ this.createjs = this.createjs||{};
 		 */
 		this._baseTextures = [];
 
+        /**
+         * Stack of active masks being applied during the draw process
+		 * @property _masks
+		 * @protected
+		 * @type {Array}
+        **/
+		this._masks = [];
+
 		/**
 		 * Texture slots for a draw
 		 * @property _gpuTextureCount
@@ -2579,6 +2587,26 @@ this.createjs = this.createjs||{};
 		return mtx;
 	};
 
+    /**
+    * intersection of all active masks
+    **/
+    p._getCombinedMasks = function () {
+        var topMask = this._masks[0];
+        var p1x = topMask.x;
+        var p1y = topMask.y;
+        var p2x = p1x + topMask.width;
+        var p2y = p1y + topMask.height;
+
+        for (var i = 1; i < this._masks.length; i++) {
+            var mask = this._masks[i];
+            p1x=Math.max(p1x,mask.x)
+            p1y=Math.max(p1y,mask.y)
+            p2x=Math.min(p2x,mask.x + mask.width)
+            p2y=Math.min(p2y,mask.y + mask.height)
+        }
+        return new createjs.Rectangle(p1x,p1y,Math.max(0,p2x-p1x),Math.max(p2y-p1y))
+    }
+
 	/**
 	 * Add all the contents of a container to the pending buffers, called recursively on each container. This may
 	 * trigger a draw if a buffer runs out of space. This is the main workforce of the render loop.
@@ -2609,31 +2637,23 @@ this.createjs = this.createjs||{};
 		// SCISSOR MASKING
 		var applyMask = false;
 		if (container.mask!==null){
-			var recursiveParent = container.parent;
-			var nestedMask = false
-			while (recursiveParent!=null && !nestedMask){
-				if (recursiveParent.mask!=null){
-					nestedMask=true;
-					console.warn("nested masks not supported yet");
-				}
-			recursiveParent=recursiveParent.parent;
-			}
-			
 			var isRotated  = (cMtx.c!=0 || cMtx.b!=0);
 			if (isRotated){
 				console.warn("mask cannot be added to rotated objects");
 			}
-			applyMask= (!nestedMask && !isRotated)
-						
+			applyMask= !isRotated;
 			if (applyMask){
 				var maskBounds = container.mask.getBounds();
 				var point1 = cMtx.transformPoint(maskBounds.x,maskBounds.y);
 				var point2 = cMtx.transformPoint(maskBounds.x+maskBounds.width,maskBounds.y+maskBounds.height);
 				var canvasHeight = this.canvas.height;
+				var rectangle = new createjs.Rectangle(point1.x,(canvasHeight-point1.y-(point2.y-point1.y)),(point2.x-point1.x),(point2.y-point1.y))
 				this.batchReason = "applyMaskBefore";
-				this._renderBatch();	
+				this._renderBatch();
 				gl.enable(gl.SCISSOR_TEST);
-				gl.scissor(point1.x,canvasHeight-point1.y-(point2.y-point1.y),(point2.x-point1.x),(point2.y-point1.y));
+				this._masks.push(rectangle);
+				var combined = this._getCombinedMasks()
+				gl.scissor(combined.x,combined.y,combined.width,combined.height);
 				}
 		}
 
@@ -2847,8 +2867,18 @@ this.createjs = this.createjs||{};
 		// SCISSOR MASKING FINISH
 		if (applyMask){
 			this.batchReason = "applyMaskAfter";
-			this._renderBatch();					// <------------------------------------------------------------
-			gl.disable(gl.SCISSOR_TEST);
+			this._renderBatch();
+			this._masks.pop();
+			if (this._masks.length==0)
+			{
+			    //disable masks
+			    gl.disable(gl.SCISSOR_TEST);
+			}
+			else{
+			    //restore previous mask combinations
+				var combined = this._getCombinedMasks()
+				gl.scissor(combined.x,combined.y,combined.width,combined.height);
+			}
 		}
 	};
 
