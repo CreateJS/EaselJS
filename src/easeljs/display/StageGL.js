@@ -703,7 +703,7 @@ this.createjs = this.createjs||{};
 	 * @default 10000
 	 * @readonly
 	 */
-	StageGL.DEFAULT_MAX_BATCH_SIZE = 10920;
+	StageGL.DEFAULT_MAX_BATCH_SIZE = 1024;
 
 	/**
 	 * The maximum size WebGL allows for element index numbers. Uses a 16 bit unsigned integer. It takes 6 indices to
