@@ -1668,7 +1668,7 @@ class RoundRect {
 	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
  	exec (ctx) {
- 		let max = (w<h?w:h)/2;
+ 		let max = (this.w<this.h?this.w:this.h)/2;
 	 	let mTL=0, mTR=0, mBR=0, mBL=0;
 	 	let x = this.x, y = this.y, w = this.w, h = this.h;
 	 	let rTL = this.radiusTL, rTR = this.radiusTR, rBR = this.radiusBR, rBL = this.radiusBL;
