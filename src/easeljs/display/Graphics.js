@@ -2205,7 +2205,7 @@ this.createjs = this.createjs||{};
 		this.radiusTL = radiusTL; this.radiusTR = radiusTR;
 		this.radiusBR = radiusBR; this.radiusBL = radiusBL;
 	}).prototype.exec = function(ctx) {
-		var max = (w<h?w:h)/2;
+		var max = (this.w<this.h?this.w:this.h)/2;
 		var mTL=0, mTR=0, mBR=0, mBL=0;
 		var x = this.x, y = this.y, w = this.w, h = this.h;
 		var rTL = this.radiusTL, rTR = this.radiusTR, rBR = this.radiusBR, rBL = this.radiusBL;
