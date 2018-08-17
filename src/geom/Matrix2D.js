@@ -300,7 +300,7 @@ export default class Matrix2D {
 
 	/**
 	 * Applies a clockwise rotation transformation to the matrix.
-	 * @param {Number} angle The angle to rotate by, in degrees. To use a value in radians, multiply it by `180/Math.PI`.
+	 * @param {Number} angle The angle to rotate by, in degrees. To use a value in radians, multiply it by `Math.PI/180`.
 	 * @return {easeljs.Matrix2D} This matrix. Useful for chaining method calls.
 	 * @chainable
 	 */
@@ -321,7 +321,7 @@ export default class Matrix2D {
 
 	/**
 	 * Applies a skew transformation to the matrix.
-	 * @param {Number} skewX The amount to skew horizontally in degrees. To use a value in radians, multiply it by `180/Math.PI`.
+	 * @param {Number} skewX The amount to skew horizontally in degrees. To use a value in radians, multiply it by `Math.PI/180`.
 	 * @param {Number} skewY The amount to skew vertically in degrees.
 	 * @return {easeljs.Matrix2D} This matrix. Useful for chaining method calls.
 	 * @chainable
