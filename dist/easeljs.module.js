@@ -249,25 +249,14 @@ class EventDispatcher {
   }
 }
 
-let _nextID = 0;
+let _nextId = 0;
 
-class UID {
-  constructor() {
-    throw "UID cannot be instantiated";
-  }
-  static get _nextID() {
-    return _nextID;
-  }
-  static set _nextID(nextID) {
-    _nextID = nextID;
-  }
-  static get() {
-    return UID._nextID++;
-  }
+function uid() {
+  return _nextId++;
 }
 
 class Point {
-  constructor(x = 0, y = 0) {
+  constructor(x, y) {
     this.setValues(x, y);
   }
   setValues(x = 0, y = 0) {
@@ -289,7 +278,7 @@ class Point {
 }
 
 class Matrix2D {
-  constructor(a = 1, b = 0, c = 0, d = 1, tx = 0, ty = 0) {
+  constructor(a, b, c, d, tx, ty) {
     this.setValues(a, b, c, d, tx, ty);
   }
   setValues(a = 1, b = 0, c = 0, d = 1, tx = 0, ty = 0) {
@@ -474,13 +463,12 @@ class Matrix2D {
   }
 }
 
-{
-  Matrix2D.DEG_TO_RAD = Math.PI / 180;
-  Matrix2D.identity = new Matrix2D();
-}
+Matrix2D.DEG_TO_RAD = Math.PI / 180;
+
+Matrix2D.identity = new Matrix2D();
 
 class DisplayProps {
-  constructor(visible = true, alpha = 1, shadow, compositeOperation, matrix) {
+  constructor(visible, alpha, shadow, compositeOperation, matrix) {
     this.setValues(visible, alpha, shadow, compositeOperation, matrix);
   }
   setValues(visible = true, alpha = 1, shadow, compositeOperation, matrix) {
@@ -520,7 +508,7 @@ class DisplayProps {
 }
 
 class Rectangle {
-  constructor(x = 0, y = 0, width = 0, height = 0) {
+  constructor(x, y, width, height) {
     this.setValues(x, y, width, height);
   }
   setValues(x = 0, y = 0, width = 0, height = 0) {
@@ -554,8 +542,8 @@ class Rectangle {
     this.height += top + bottom;
     return this;
   }
-  copy(rectangle) {
-    return this.setValues(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+  copy(rect) {
+    return this.setValues(rect.x, rect.y, rect.width, rect.height);
   }
   contains(x, y, width = 0, height = 0) {
     return x >= this.x && x + width <= this.x + this.width && y >= this.y && y + height <= this.y + this.height;
@@ -600,9 +588,7 @@ class Filter {
     this.VTX_SHADER_BODY = null;
     this.FRAG_SHADER_BODY = null;
   }
-  getBounds(rect) {
-    return rect;
-  }
+  getBounds(rect) {}
   shaderParamSetup(gl, stage, shaderProgram) {}
   applyFilter(ctx, x, y, width, height, targetCtx, targetX, targetY) {
     targetCtx = targetCtx || ctx;
@@ -627,9 +613,7 @@ class Filter {
   clone() {
     return new Filter();
   }
-  _applyFilter(imageData) {
-    return true;
-  }
+  _applyFilter(imageData) {}
 }
 
 class BitmapCache extends Filter {
@@ -845,7 +829,7 @@ class DisplayObject extends EventDispatcher {
     this.alpha = 1;
     this.cacheCanvas = null;
     this.bitmapCache = null;
-    this.id = UID.get();
+    this.id = uid();
     this.mouseEnabled = true;
     this.tickEnabled = true;
     this.name = null;
@@ -883,11 +867,11 @@ class DisplayObject extends EventDispatcher {
     }
     return null;
   }
-  get scale() {
-    return this.scaleX;
-  }
   set scale(value) {
     this.scaleX = this.scaleY = value;
+  }
+  get scale() {
+    return this.scaleX;
   }
   isVisible() {
     return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0);
@@ -935,7 +919,7 @@ class DisplayObject extends EventDispatcher {
   }
   updateCache(compositeOperation) {
     if (!this.bitmapCache) {
-      throw "cache() must be called before updateCache()";
+      throw "No cache found. cache() must be called before updateCache()";
     }
     this.bitmapCache.update(compositeOperation);
   }
@@ -1023,7 +1007,7 @@ class DisplayObject extends EventDispatcher {
   }
   setBounds(x, y, width, height) {
     if (x == null) {
-      this._bounds = x;
+      this._bounds = null;
     }
     this._bounds = (this._bounds || new Rectangle()).setValues(x, y, width, height);
   }
@@ -1153,13 +1137,19 @@ class DisplayObject extends EventDispatcher {
     DisplayObject._hitTestContext = canvas.getContext("2d");
     canvas.width = canvas.height = 1;
   }
-  DisplayObject._MOUSE_EVENTS = [ "click", "dblclick", "mousedown", "mouseout", "mouseover", "pressmove", "pressup", "rollout", "rollover" ];
-  DisplayObject.suppressCrossDomainErrors = false;
-  DisplayObject.snapToPixelEnabled = false;
-  DisplayObject._StageGL_NONE = 0;
-  DisplayObject._StageGL_SPRITE = 1;
-  DisplayObject._StageGL_BITMAP = 2;
 }
+
+DisplayObject._MOUSE_EVENTS = [ "click", "dblclick", "mousedown", "mouseout", "mouseover", "pressmove", "pressup", "rollout", "rollover" ];
+
+DisplayObject.suppressCrossDomainErrors = false;
+
+DisplayObject.snapToPixelEnabled = false;
+
+DisplayObject._StageGL_NONE = 0;
+
+DisplayObject._StageGL_SPRITE = 1;
+
+DisplayObject._StageGL_BITMAP = 2;
 
 class Container extends DisplayObject {
   constructor() {
@@ -1905,6 +1895,22 @@ class Stage extends Container {
   }
 }
 
+function createCanvas(width = 1, height = 1) {
+  let c;
+  if (window.createjs !== undefined && window.createjs.createCanvas !== undefined) {
+    c = window.createjs.createCanvas();
+  }
+  if (HTMLCanvasElement) {
+    c = new HTMLCanvasElement();
+  }
+  if (c !== undefined) {
+    c.width = width;
+    c.height = height;
+    return c;
+  }
+  throw "Canvas not supported in this environment.";
+}
+
 class VideoBuffer {
   constructor(video) {
     this.readyState = video.readyState;
@@ -1921,7 +1927,7 @@ class VideoBuffer {
     }
     let canvas = this._canvas, video = this._video;
     if (!canvas) {
-      canvas = this._canvas = document.createElement("canvas");
+      canvas = this._canvas = createCanvas();
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
     }
@@ -2149,7 +2155,7 @@ class Sprite extends DisplayObject {
     }
     return changed;
   }
-  _goto(frameOrAnimation, frame) {
+  _goto(frameOrAnimation, frame = 0) {
     this.currentAnimationFrame = 0;
     if (isNaN(frameOrAnimation)) {
       let data = this.spriteSheet.getAnimation(frameOrAnimation);
@@ -2165,10 +2171,6 @@ class Sprite extends DisplayObject {
     }
   }
 }
-
-let _maxPoolSize = 100;
-
-let _spritePool = [];
 
 class BitmapText extends Container {
   constructor(text = "", spriteSheet = null) {
@@ -2187,15 +2189,6 @@ class BitmapText extends Container {
     };
     this._oldStage = null;
     this._drawAction = null;
-  }
-  static get maxPoolSize() {
-    return _maxPoolSize;
-  }
-  static set maxPoolSize(maxPoolSize) {
-    _maxPoolSize = maxPoolSize;
-  }
-  static get _spritePool() {
-    return _spritePool;
   }
   draw(ctx, ignoreCache) {
     if (this.drawCache(ctx, ignoreCache)) {
@@ -2318,6 +2311,10 @@ class BitmapText extends Container {
   }
 }
 
+BitmapText.maxPoolSize = 100;
+
+BitmapText._spritePool = [];
+
 class DOMElement extends DisplayObject {
   constructor(htmlElement) {
     super();
@@ -2398,10 +2395,10 @@ class Graphics {
     this._oldStrokeStyle = null;
     this._strokeDash = null;
     this._oldStrokeDash = null;
-    this._strokeIgnoreScale = false;
     this._fill = null;
-    this._instructions = [];
+    this._strokeIgnoreScale = false;
     this._commitIndex = 0;
+    this._instructions = [];
     this._activeInstructions = [];
     this._dirty = false;
     this._storeIndex = 0;
@@ -2586,14 +2583,14 @@ class Graphics {
     const l = str.length;
     let params = [];
     let x = 0, y = 0;
-    let base64 = Graphics.BASE_64;
+    let base64 = Graphics._BASE_64;
     while (i < l) {
       let c = str.charAt(i);
       let n = base64[c];
       let fi = n >> 3;
       let f = instructions[fi];
       if (!f || n & 3) {
-        throw `bad path data (@${i}):c`;
+        throw `Bad path data (@${i}):c`;
       }
       const pl = paramCount[fi];
       if (!fi) {
@@ -2781,13 +2778,13 @@ class ArcTo {
 }
 
 class Arc {
-  constructor(x, y, radius, startAngle, endAngle, anticlockwise) {
+  constructor(x, y, radius, startAngle, endAngle, anticlockwise = false) {
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.startAngle = startAngle;
     this.endAngle = endAngle;
-    this.anticlockwise = !!anticlockwise;
+    this.anticlockwise = anticlockwise;
   }
   exec(ctx) {
     ctx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle, this.anticlockwise);
@@ -2916,8 +2913,9 @@ class Fill {
   }
 }
 
-class Stroke {
+class Stroke extends Fill {
   constructor(style, ignoreScale) {
+    super();
     this.style = style;
     this.ignoreScale = ignoreScale;
     this.path = false;
@@ -2936,19 +2934,10 @@ class Stroke {
       ctx.restore();
     }
   }
-  linearGradient(...args) {
-    Fill.prototype.linearGradient.apply(this, args);
-  }
-  radialGradient(...args) {
-    Fill.prototype.radialGradient.apply(this, args);
-  }
-  bitmap(...args) {
-    Fill.prototype.bitmap.apply(this, args);
-  }
 }
 
 class StrokeStyle {
-  constructor(width, caps = "butt", joints = "miter", miterLimit = 10, ignoreScale = false) {
+  constructor(width = 1, caps = "butt", joints = "miter", miterLimit = 10, ignoreScale = false) {
     this.width = width;
     this.caps = caps;
     this.joints = joints;
@@ -2958,20 +2947,17 @@ class StrokeStyle {
   }
   exec(ctx) {
     ctx.lineWidth = this.width;
-    ctx.lineCap = isNaN(this.caps) ? this.caps : Graphics.STROKE_CAPS_MAP[this.caps];
-    ctx.lineJoin = isNaN(this.joints) ? this.joints : Graphics.STROKE_JOINTS_MAP[this.joints];
+    ctx.lineCap = isNaN(this.caps) ? this.caps : Graphics._STROKE_CAPS_MAP[this.caps];
+    ctx.lineJoin = isNaN(this.joints) ? this.joints : Graphics._STROKE_JOINTS_MAP[this.joints];
     ctx.miterLimit = this.miterLimit;
     ctx.ignoreScale = this.ignoreScale;
   }
 }
 
 class StrokeDash {
-  constructor(segments = StrokeDash.EMPTY_SEGMENTS, offset = 0) {
+  constructor(segments = [], offset = 0) {
     this.segments = segments;
     this.offset = offset;
-  }
-  static get EMPTY_SEGMENTS() {
-    return _EMPTY_SEGMENTS;
   }
   exec(ctx) {
     if (ctx.setLineDash) {
@@ -2993,7 +2979,7 @@ class RoundRect {
     this.radiusBL = radiusBL;
   }
   exec(ctx) {
-    let max = (w < h ? w : h) / 2;
+    let max = (this.w < this.h ? this.w : this.h) / 2;
     let mTL = 0, mTR = 0, mBR = 0, mBL = 0;
     let x = this.x, y = this.y, w = this.w, h = this.h;
     let rTL = this.radiusTL, rTR = this.radiusTR, rBR = this.radiusBR, rBL = this.radiusBL;
@@ -3098,102 +3084,100 @@ class PolyStar {
   }
 }
 
-{
-  let canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-  if (canvas.getContext) {
-    Graphics._ctx = canvas.getContext("2d");
-    canvas.width = canvas.height = 1;
-  }
-  Graphics.beginCmd = new BeginPath();
-  Graphics.BASE_64 = {
-    A: 0,
-    B: 1,
-    C: 2,
-    D: 3,
-    E: 4,
-    F: 5,
-    G: 6,
-    H: 7,
-    I: 8,
-    J: 9,
-    K: 10,
-    L: 11,
-    M: 12,
-    N: 13,
-    O: 14,
-    P: 15,
-    Q: 16,
-    R: 17,
-    S: 18,
-    T: 19,
-    U: 20,
-    V: 21,
-    W: 22,
-    X: 23,
-    Y: 24,
-    Z: 25,
-    a: 26,
-    b: 27,
-    c: 28,
-    d: 29,
-    e: 30,
-    f: 31,
-    g: 32,
-    h: 33,
-    i: 34,
-    j: 35,
-    k: 36,
-    l: 37,
-    m: 38,
-    n: 39,
-    o: 40,
-    p: 41,
-    q: 42,
-    r: 43,
-    s: 44,
-    t: 45,
-    u: 46,
-    v: 47,
-    w: 48,
-    x: 49,
-    y: 50,
-    z: 51,
-    0: 52,
-    1: 53,
-    2: 54,
-    3: 55,
-    4: 56,
-    5: 57,
-    6: 58,
-    7: 59,
-    8: 60,
-    9: 61,
-    "+": 62,
-    "/": 63
-  };
-  Graphics.STROKE_CAPS_MAP = [ "butt", "round", "square" ];
-  Graphics.STROKE_JOINTS_MAP = [ "miter", "round", "bevel" ];
-  Graphics.EMPTY_SEGMENTS = [];
-}
+Graphics.beginCmd = new BeginPath();
+
+Graphics._BASE_64 = {
+  A: 0,
+  B: 1,
+  C: 2,
+  D: 3,
+  E: 4,
+  F: 5,
+  G: 6,
+  H: 7,
+  I: 8,
+  J: 9,
+  K: 10,
+  L: 11,
+  M: 12,
+  N: 13,
+  O: 14,
+  P: 15,
+  Q: 16,
+  R: 17,
+  S: 18,
+  T: 19,
+  U: 20,
+  V: 21,
+  W: 22,
+  X: 23,
+  Y: 24,
+  Z: 25,
+  a: 26,
+  b: 27,
+  c: 28,
+  d: 29,
+  e: 30,
+  f: 31,
+  g: 32,
+  h: 33,
+  i: 34,
+  j: 35,
+  k: 36,
+  l: 37,
+  m: 38,
+  n: 39,
+  o: 40,
+  p: 41,
+  q: 42,
+  r: 43,
+  s: 44,
+  t: 45,
+  u: 46,
+  v: 47,
+  w: 48,
+  x: 49,
+  y: 50,
+  z: 51,
+  0: 52,
+  1: 53,
+  2: 54,
+  3: 55,
+  4: 56,
+  5: 57,
+  6: 58,
+  7: 59,
+  8: 60,
+  9: 61,
+  "+": 62,
+  "/": 63
+};
+
+Graphics._STROKE_CAPS_MAP = [ "butt", "round", "square" ];
+
+Graphics._STROKE_JOINTS_MAP = [ "miter", "round", "bevel" ];
+
+Graphics._ctx = createCanvas().getContext("2d");
 
 class MovieClip extends Container {
-  constructor({mode: mode = MovieClip.INDEPENDENT, startPosition: startPosition = 0, loop: loop = -1, paused: paused = false, frameBounds: frameBounds = null, labels: labels = null}) {
+  constructor(props) {
     super();
     !MovieClip.inited && MovieClip.init();
-    this.mode = mode;
-    this.startPosition = startPosition;
-    this.loop = loop === true ? -1 : loop || 0;
+    this.mode = props.mode != null ? props.mode : MovieClip.INDEPENDENT;
+    this.startPosition = props.startPosition != null ? props.startPosition : 0;
+    if (typeof props.loop === "number") {
+      this.loop = props.loop;
+    } else if (props.loop === false) {
+      this.loop = 0;
+    } else {
+      this.loop = -1;
+    }
     this.currentFrame = 0;
-    this.timeline = new Timeline({
+    this.timeline = new Timeline(Object.assign({
       useTicks: true,
-      paused: true,
-      mode: mode,
-      startPosition: startPosition,
-      loop: loop,
-      frameBounds: frameBounds,
-      labels: labels
-    });
-    this.paused = paused;
+      paused: true
+    }, props));
+    this.paused = props.paused != null ? props.paused : false;
     this.actionsEnabled = true;
     this.autoReset = true;
     this.frameBounds = this.frameBounds || props.frameBounds;
@@ -3215,7 +3199,7 @@ class MovieClip extends Container {
     return this.timeline.labels;
   }
   get currentLabel() {
-    return this.timeline.getCurrentLabel();
+    return this.timeline.currentLabel;
   }
   get duration() {
     return this.timeline.duration;
@@ -3241,21 +3225,20 @@ class MovieClip extends Container {
     this.paused = true;
   }
   gotoAndPlay(positionOrLabel) {
-    this.paused = false;
+    this.play();
     this._goto(positionOrLabel);
   }
   gotoAndStop(positionOrLabel) {
-    this.paused = true;
+    this.stop();
     this._goto(positionOrLabel);
   }
   advance(time) {
-    let INDEPENDENT = MovieClip.INDEPENDENT;
-    if (this.mode !== INDEPENDENT) {
+    if (this.mode !== MovieClip.INDEPENDENT) {
       return;
     }
     let o = this, fps = o.framerate;
     while ((o = o.parent) && fps === null) {
-      if (o.mode === INDEPENDENT) {
+      if (o.mode === MovieClip.INDEPENDENT) {
         fps = o._framerate;
       }
     }
@@ -3382,12 +3365,13 @@ class MovieClip extends Container {
   }
 }
 
-{
-  MovieClip.INDEPENDENT = "independent";
-  MovieClip.SINGLE_FRAME = "single";
-  MovieClip.SYNCHED = "synched";
-  MovieClip.inited = false;
-}
+MovieClip.INDEPENDENT = "independent";
+
+MovieClip.SINGLE_FRAME = "single";
+
+MovieClip.SYNCHED = "synched";
+
+MovieClip.inited = false;
 
 class MovieClipPlugin {
   constructor() {
@@ -3407,11 +3391,9 @@ class MovieClipPlugin {
   }
 }
 
-{
-  MovieClipPlugin.priority = 100;
-}
+MovieClipPlugin.priority = 100;
 
-class Shadow$1 {
+class Shadow {
   constructor(color = "black", offsetX = 0, offsetY = 0, blur = 0) {
     this.color = color;
     this.offsetX = offsetX;
@@ -3422,13 +3404,11 @@ class Shadow$1 {
     return `[${this.constructor.name}]`;
   }
   clone() {
-    return new Shadow$1(this.color, this.offsetX, this.offsetY, this.blur);
+    return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);
   }
 }
 
-{
-  Shadow$1.identity = new Shadow$1("transparent");
-}
+Shadow.identity = new Shadow("transparent");
 
 class Shape extends DisplayObject {
   constructor(graphics = new Graphics()) {
@@ -3645,23 +3625,6 @@ class SpriteSheet extends EventDispatcher {
   }
 }
 
-const _H_OFFSETS = {
-  start: 0,
-  left: 0,
-  center: -.5,
-  end: -1,
-  right: -1
-};
-
-const _V_OFFSETS = {
-  top: 0,
-  hanging: -.01,
-  middle: -.4,
-  alphabetic: -.8,
-  ideographic: -.85,
-  bottom: -1
-};
-
 class Text extends DisplayObject {
   constructor(text, font, color) {
     super();
@@ -3674,12 +3637,6 @@ class Text extends DisplayObject {
     this.outline = 0;
     this.lineHeight = 0;
     this.lineWidth = null;
-  }
-  static get H_OFFSETS() {
-    return _H_OFFSETS;
-  }
-  static get V_OFFSETS() {
-    return _V_OFFSETS;
   }
   isVisible() {
     let hasContent = this.cacheCanvas || this.text != null && this.text !== "";
@@ -3758,7 +3715,7 @@ class Text extends DisplayObject {
   _drawText(ctx, o, lines) {
     const paint = !!ctx;
     if (!paint) {
-      ctx = Text._workingContext;
+      ctx = Text._ctx;
       ctx.save();
       this._prepContext(ctx);
     }
@@ -3824,7 +3781,7 @@ class Text extends DisplayObject {
     }
   }
   _getMeasuredWidth(text) {
-    let ctx = Text._workingContext;
+    let ctx = Text._ctx;
     ctx.save();
     let w = this._prepContext(ctx).measureText(text).width;
     ctx.restore();
@@ -3832,13 +3789,24 @@ class Text extends DisplayObject {
   }
 }
 
-{
-  let canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-  if (canvas.getContext) {
-    Text._workingContext = canvas.getContext("2d");
-    canvas.width = canvas.height = 1;
-  }
-}
+Text.H_OFFSETS = {
+  start: 0,
+  left: 0,
+  center: -.5,
+  end: -1,
+  right: -1
+};
+
+Text.V_OFFSETS = {
+  top: 0,
+  hanging: -.01,
+  middle: -.4,
+  alphabetic: -.8,
+  ideographic: -.85,
+  bottom: -1
+};
+
+Text._ctx = createCanvas().getContext("2d");
 
 class AlphaMapFilter extends Filter {
   constructor(alphaMap) {
@@ -3951,10 +3919,6 @@ class AlphaMaskFilter extends Filter {
   }
 }
 
-const _MUL_TABLE = [ 1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1 ];
-
-const _SHG_TABLE = [ 0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9 ];
-
 class BlurFilter extends Filter {
   constructor(blurX = 0, blurY = 0, quality = 1) {
     super();
@@ -3966,14 +3930,7 @@ class BlurFilter extends Filter {
     this._lastBlurY = null;
     this._quality = isNaN(quality) || quality < 1 ? 1 : quality;
     this._lastQuality = null;
-    this.quality = this._quality | 0;
     this.FRAG_SHADER_TEMPLATE = `\n\t\t\tuniform float xWeight[{{blurX}}];\n\t\t\tuniform float yWeight[{{blurY}}];\n\t\t\tuniform vec2 textureOffset;\n\t\t\tvoid main (void) {\n\t\t\t\tvec4 color = vec4(0.0);\n\n\t\t\t\tfloat xAdj = ({{blurX}}.0-1.0)/2.0;\n\t\t\t\tfloat yAdj = ({{blurY}}.0-1.0)/2.0;\n\t\t\t\tvec2 sampleOffset;\n\n\t\t\t\tfor(int i=0; i<{{blurX}}; i++) {\n\t\t\t\t\tfor(int j=0; j<{{blurY}}; j++) {\n\t\t\t\t\t\tsampleOffset = vRenderCoord + (textureOffset * vec2(float(i)-xAdj, float(j)-yAdj));\n\t\t\t\t\t\tcolor += texture2D(uSampler, sampleOffset) * (xWeight[i] * yWeight[j]);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tgl_FragColor = color.rgba;\n\t\t\t}\n\t\t`;
-  }
-  static get MUL_TABLE() {
-    return _MUL_TABLE;
-  }
-  static get SHG_TABLE() {
-    return _SHG_TABLE;
   }
   get blurX() {
     return this._blurX;
@@ -3994,13 +3951,13 @@ class BlurFilter extends Filter {
     this._blurY = blurY;
   }
   get quality() {
-    return this._quality;
+    return this._quality | 0;
   }
   set quality(quality) {
     if (isNaN(quality) || quality < 0) {
       quality = 0;
     }
-    this._quality = quality | 0;
+    this._quality = quality;
   }
   get _buildShader() {
     const xChange = this._lastBlurX !== this._blurX;
@@ -4022,7 +3979,7 @@ class BlurFilter extends Filter {
     return this._compiledShader;
   }
   set _builtShader(value) {
-    this._compiledShader;
+    this._compiledShader = value;
   }
   shaderParamSetup(gl, stage, shaderProgram) {
     gl.uniform1fv(gl.getUniformLocation(shaderProgram, "xWeight"), this._blurXTable);
@@ -4236,6 +4193,10 @@ class BlurFilter extends Filter {
   }
 }
 
+BlurFilter.MUL_TABLE = [ 1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1 ];
+
+BlurFilter.SHG_TABLE = [ 0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9 ];
+
 class ColorFilter extends Filter {
   constructor(redMultiplier = 1, greenMultiplier = 1, blueMultiplier = 1, alphaMultiplier = 1, redOffset = 0, greenOffset = 0, blueOffset = 0, alphaOffset = 0) {
     super();
@@ -4269,24 +4230,9 @@ class ColorFilter extends Filter {
   }
 }
 
-const _DELTA_INDEX = [ 0, .01, .02, .04, .05, .06, .07, .08, .1, .11, .12, .14, .15, .16, .17, .18, .2, .21, .22, .24, .25, .27, .28, .3, .32, .34, .36, .38, .4, .42, .44, .46, .48, .5, .53, .56, .59, .62, .65, .68, .71, .74, .77, .8, .83, .86, .89, .92, .95, .98, 1, 1.06, 1.12, 1.18, 1.24, 1.3, 1.36, 1.42, 1.48, 1.54, 1.6, 1.66, 1.72, 1.78, 1.84, 1.9, 1.96, 2, 2.12, 2.25, 2.37, 2.5, 2.62, 2.75, 2.87, 3, 3.2, 3.4, 3.6, 3.8, 4, 4.3, 4.7, 4.9, 5, 5.5, 6, 6.5, 6.8, 7, 7.3, 7.5, 7.8, 8, 8.4, 8.7, 9, 9.4, 9.6, 9.8, 10 ];
-
-const _IDENTITY_MATRIX = [ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 ];
-
-const _LENGTH = 25;
-
 class ColorMatrix {
   constructor(brightness, contrast, saturation, hue) {
     this.setColor(brightness, contrast, saturation, hue);
-  }
-  static get DELTA_INDEX() {
-    return _DELTA_INDEX;
-  }
-  static get IDENTITY_MATRIX() {
-    return _IDENTITY_MATRIX;
-  }
-  static get LENGTH() {
-    return _LENGTH;
   }
   setColor(brightness, contrast, saturation, hue) {
     return this.reset().adjustColor(brightness, contrast, saturation, hue);
@@ -4295,10 +4241,7 @@ class ColorMatrix {
     return this.copy(ColorMatrix.IDENTITY_MATRIX);
   }
   adjustColor(brightness, contrast, saturation, hue) {
-    this.adjustHue(hue);
-    this.adjustContrast(contrast);
-    this.adjustBrightness(brightness);
-    return this.adjustSaturation(saturation);
+    return this.adjustBrightness(brightness).adjustContrast(contrast).adjustSaturation(saturation).adjustHue(hue);
   }
   adjustBrightness(value) {
     if (value === 0 || isNaN(value)) {
@@ -4365,7 +4308,7 @@ class ColorMatrix {
     return new ColorMatrix().copy(this);
   }
   toArray() {
-    let arr = [];
+    const arr = [];
     const l = ColorMatrix.LENGTH;
     for (let i = 0; i < l; i++) {
       arr[i] = this[i];
@@ -4412,6 +4355,12 @@ class ColorMatrix {
     return matrix;
   }
 }
+
+ColorMatrix.DELTA_INDEX = Object.freeze([ 0, .01, .02, .04, .05, .06, .07, .08, .1, .11, .12, .14, .15, .16, .17, .18, .2, .21, .22, .24, .25, .27, .28, .3, .32, .34, .36, .38, .4, .42, .44, .46, .48, .5, .53, .56, .59, .62, .65, .68, .71, .74, .77, .8, .83, .86, .89, .92, .95, .98, 1, 1.06, 1.12, 1.18, 1.24, 1.3, 1.36, 1.42, 1.48, 1.54, 1.6, 1.66, 1.72, 1.78, 1.84, 1.9, 1.96, 2, 2.12, 2.25, 2.37, 2.5, 2.62, 2.75, 2.87, 3, 3.2, 3.4, 3.6, 3.8, 4, 4.3, 4.7, 4.9, 5, 5.5, 6, 6.5, 6.8, 7, 7.3, 7.5, 7.8, 8, 8.4, 8.7, 9, 9.4, 9.6, 9.8, 10 ]);
+
+ColorMatrix.IDENTITY_MATRIX = Object.freeze([ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 ]);
+
+ColorMatrix.LENGTH = 25;
 
 class ColorMatrixFilter extends Filter {
   constructor(matrix) {
@@ -4537,15 +4486,12 @@ class ButtonHelper {
   }
 }
 
-class Touch {
-  constructor() {
-    throw "Touch cannot be instantiated";
-  }
-  static isSupported() {
+var Touch = Touch = {
+  isSupported() {
     return !!("ontouchstart" in window || window.navigator["msPointerEnabled"] && window.navigator["msMaxTouchPoints"] > 0 || window.navigator["pointerEnabled"] && window.navigator["maxTouchPoints"] > 0);
-  }
-  static enable(stage, singleTouch = false, allowDefault = false) {
-    if (!stage || !stage.canvas || !Touch.isSupported()) {
+  },
+  enable(stage, singleTouch = false, allowDefault = false) {
+    if (!stage || !stage.canvas || !this.isSupported()) {
       return false;
     }
     if (stage.__touch) {
@@ -4558,32 +4504,32 @@ class Touch {
       count: 0
     };
     if ("ontouchstart" in window) {
-      Touch._IOS_enable(stage);
+      this._IOS_enable(stage);
     } else if (window.navigator["msPointerEnabled"] || window.navigator["pointerEnabled"]) {
-      Touch._IE_enable(stage);
+      this._IE_enable(stage);
     }
     return true;
-  }
-  static disable(stage) {
+  },
+  disable(stage) {
     if (!stage) {
       return;
     }
     if ("ontouchstart" in window) {
-      Touch._IOS_disable(stage);
+      this._IOS_disable(stage);
     } else if (window.navigator["msPointerEnabled"] || window.navigator["pointerEnabled"]) {
-      Touch._IE_disable(stage);
+      this._IE_disable(stage);
     }
     delete stage.__touch;
-  }
-  static _IOS_enable(stage) {
+  },
+  _IOS_enable(stage) {
     let canvas = stage.canvas;
-    let f = stage.__touch.f = (e => Touch._IOS_handleEvent(stage, e));
+    let f = stage.__touch.f = (e => this._IOS_handleEvent(stage, e));
     canvas.addEventListener("touchstart", f, false);
     canvas.addEventListener("touchmove", f, false);
     canvas.addEventListener("touchend", f, false);
     canvas.addEventListener("touchcancel", f, false);
-  }
-  static _IOS_disable(stage) {
+  },
+  _IOS_disable(stage) {
     let canvas = stage.canvas;
     if (!canvas) {
       return;
@@ -4593,8 +4539,8 @@ class Touch {
     canvas.removeEventListener("touchmove", f, false);
     canvas.removeEventListener("touchend", f, false);
     canvas.removeEventListener("touchcancel", f, false);
-  }
-  static _IOS_handleEvent(stage, e) {
+  },
+  _IOS_handleEvent(stage, e) {
     if (!stage) {
       return;
     }
@@ -4617,10 +4563,10 @@ class Touch {
         this._handleEnd(stage, id, e);
       }
     }
-  }
-  static _IE_enable(stage) {
+  },
+  _IE_enable(stage) {
     let canvas = stage.canvas;
-    let f = stage.__touch.f = (e => Touch._IE_handleEvent(stage, e));
+    let f = stage.__touch.f = (e => this._IE_handleEvent(stage, e));
     if (window.navigator["pointerEnabled"] === undefined) {
       canvas.addEventListener("MSPointerDown", f, false);
       window.addEventListener("MSPointerMove", f, false);
@@ -4639,8 +4585,8 @@ class Touch {
       }
     }
     stage.__touch.activeIDs = {};
-  }
-  static _IE_disable(stage) {
+  },
+  _IE_disable(stage) {
     let f = stage.__touch.f;
     if (window.navigator["pointerEnabled"] === undefined) {
       window.removeEventListener("MSPointerMove", f, false);
@@ -4657,8 +4603,8 @@ class Touch {
         stage.canvas.removeEventListener("pointerdown", f, false);
       }
     }
-  }
-  static _IE_handleEvent(stage, e) {
+  },
+  _IE_handleEvent(stage, e) {
     if (!stage) {
       return;
     }
@@ -4682,8 +4628,8 @@ class Touch {
         this._handleEnd(stage, id, e);
       }
     }
-  }
-  static _handleStart(stage, id, e, x, y) {
+  },
+  _handleStart(stage, id, e, x, y) {
     let props = stage.__touch;
     if (!props.multitouch && props.count) {
       return;
@@ -4695,14 +4641,14 @@ class Touch {
     ids[id] = true;
     props.count++;
     stage._handlePointerDown(id, e, x, y);
-  }
-  static _handleMove(stage, id, e, x, y) {
+  },
+  _handleMove(stage, id, e, x, y) {
     if (!stage.__touch.pointers[id]) {
       return;
     }
     stage._handlePointerMove(id, e, x, y);
-  }
-  static _handleEnd(stage, id, e) {
+  },
+  _handleEnd(stage, id, e) {
     let props = stage.__touch;
     let ids = props.pointers;
     if (!ids[id]) {
@@ -4712,11 +4658,7 @@ class Touch {
     stage._handlePointerUp(id, e, true);
     delete ids[id];
   }
-}
-
-const _ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
-
-const _ERR_RUNNING = "a build is already running";
+};
 
 class SpriteSheetBuilder extends EventDispatcher {
   constructor(framerate = 0) {
@@ -4736,12 +4678,6 @@ class SpriteSheetBuilder extends EventDispatcher {
     this._index = 0;
     this._timerID = null;
     this._scale = 1;
-  }
-  static get ERR_DIMENSIONS() {
-    return _ERR_DIMENSIONS;
-  }
-  static get ERR_RUNNING() {
-    return _ERR_RUNNING;
   }
   addFrame(source, sourceRect, scale = 1, setupFunction, setupData) {
     if (this._data) {
@@ -4838,9 +4774,6 @@ class SpriteSheetBuilder extends EventDispatcher {
   stopAsync() {
     clearTimeout(this._timerID);
     this._data = null;
-  }
-  clone() {
-    throw "SpriteSheetBuilder cannot be cloned.";
   }
   toString() {
     return `[${this.constructor.name}]`;
@@ -4977,11 +4910,16 @@ class SpriteSheetBuilder extends EventDispatcher {
   }
 }
 
-class SpriteSheetUtils {
-  constructor() {
-    throw "SpriteSheetUtils cannot be instantiated";
-  }
-  static extractFrame(spriteSheet, frameOrAnimation) {
+SpriteSheetBuilder.ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
+
+SpriteSheetBuilder.ERR_RUNNING = "a build is already running";
+
+var SpriteSheetUtils = SpriteSheetUtils = {
+  _workingCanvas: createCanvas(),
+  get _workingContext() {
+    return this._workingCanvas.getContext("2d");
+  },
+  extractFrame(spriteSheet, frameOrAnimation) {
     if (isNaN(frameOrAnimation)) {
       frameOrAnimation = spriteSheet.getAnimation(frameOrAnimation).frames[0];
     }
@@ -4990,32 +4928,18 @@ class SpriteSheetUtils {
       return null;
     }
     let r = data.rect;
-    let canvas = SpriteSheetUtils._workingCanvas;
+    let canvas = this._workingCanvas;
     canvas.width = r.width;
     canvas.height = r.height;
-    SpriteSheetUtils._workingContext.drawImage(data.image, r.x, r.y, r.width, r.height, 0, 0, r.width, r.height);
+    this._workingContext.drawImage(data.image, r.x, r.y, r.width, r.height, 0, 0, r.width, r.height);
     let img = document.createElement("img");
     img.src = canvas.toDataURL("image/png");
     return img;
-  }
-  static mergeAlpha(rgbImage, alphaImage, canvas) {
-    if (!canvas) {
-      canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-    }
-    canvas.width = Math.max(alphaImage.width, rgbImage.width);
-    canvas.height = Math.max(alphaImage.height, rgbImage.height);
-    let ctx = canvas.getContext("2d");
-    ctx.save();
-    ctx.drawImage(rgbImage, 0, 0);
-    ctx.globalCompositeOperation = "destination-in";
-    ctx.drawImage(alphaImage, 0, 0);
-    ctx.restore();
-    return canvas;
-  }
-  static _flip(spriteSheet, count, h, v) {
+  },
+  _flip(spriteSheet, count, h, v) {
     let imgs = spriteSheet._images;
-    let canvas = SpriteSheetUtils._workingCanvas;
-    let ctx = SpriteSheetUtils._workingContext;
+    let canvas = this._workingCanvas;
+    let ctx = this._workingContext;
     const il = imgs.length / count;
     for (let i = 0; i < il; i++) {
       let src = imgs[i];
@@ -5078,29 +5002,12 @@ class SpriteSheetUtils {
       names.push(anim.name);
     }
   }
-}
-
-{
-  let canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-  if (canvas.getContext) {
-    SpriteSheetUtils._workingCanvas = canvas;
-    SpriteSheetUtils._workingContext = canvas.getContext("2d");
-    canvas.width = canvas.height = 1;
-  }
-}
-
-let _alternateOutput = null;
+};
 
 class WebGLInspector extends EventDispatcher {
   constructor(stage) {
     super();
     this._stage = stage;
-  }
-  static get alternateOutput() {
-    return _alternateOutput;
-  }
-  static set alternateOutput(alternateOutput) {
-    _alternateOutput = alternateOutput;
   }
   static dispProps(item, prepend = "") {
     let p = `\tP: ${item.x.toFixed(2)}x${item.y.toFixed(2)}\t`;
@@ -5199,7 +5106,9 @@ class WebGLInspector extends EventDispatcher {
   }
 }
 
-export { StageGL, Stage, Container, DisplayObject, Bitmap, BitmapText, DOMElement, Graphics, MovieClip, Shadow$1 as Shadow, Shape, Sprite, SpriteSheet, Text, MouseEvent, AlphaMapFilter, AlphaMaskFilter, BitmapCache, BlurFilter, ColorFilter, ColorMatrix, ColorMatrixFilter, Filter, DisplayProps, Matrix2D, Point, Rectangle, ButtonHelper, Touch, SpriteSheetBuilder, SpriteSheetUtils, UID, WebGLInspector };
+WebGLInspector.alternateOutput = null;
+
+export { StageGL, Stage, Container, DisplayObject, Bitmap, BitmapText, DOMElement, Graphics, MovieClip, Shadow as Shadow, Shape, Sprite, SpriteSheet, Text, MouseEvent, AlphaMapFilter, AlphaMaskFilter, BitmapCache, BlurFilter, ColorFilter, ColorMatrix, ColorMatrixFilter, Filter, DisplayProps, Matrix2D, Point, Rectangle, ButtonHelper, Touch as Touch, SpriteSheetBuilder, SpriteSheetUtils as SpriteSheetUtils, uid, createCanvas, WebGLInspector };
 
 export { Event, EventDispatcher, Ticker };
 
