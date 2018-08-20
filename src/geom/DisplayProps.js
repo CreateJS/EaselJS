@@ -30,6 +30,7 @@ import Matrix2D from "./Matrix2D";
 
 /**
  * Used for calculating and encapsulating display related properties.
+ * @memberof easeljs
  * @param {Number} [visible] Visible value.
  * @param {Number} [alpha] Alpha value.
  * @param {Number} [shadow] A Shadow instance or null.

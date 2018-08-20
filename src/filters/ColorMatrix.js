@@ -30,6 +30,7 @@
  * Provides helper functions for assembling a matrix for use with the {@link easeljs.ColorMatrixFilter}.
  * Most methods return the instance to facilitate chained calls.
  *
+ * @memberof easeljs
  * @example
  * colorMatrix.adjustHue(20).adjustBrightness(50);
  *
