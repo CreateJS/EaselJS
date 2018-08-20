@@ -57,5 +57,5 @@ export { default as Touch } from "./ui/Touch";
 export { default as SpriteSheetBuilder } from "./utils/SpriteSheetBuilder";
 export { default as SpriteSheetUtils } from "./utils/SpriteSheetUtils";
 export { default as uid } from "./utils/uid";
-export createCanvas from "./utils/Canvas";
+export { default as createCanvas } from "./utils/Canvas";
 export { default as WebGLInspector } from "./utils/WebGLInspector";

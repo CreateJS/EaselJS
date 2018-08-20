@@ -1507,6 +1507,7 @@ class Fill {
  */
 class Stroke extends Fill {
 	constructor (style, ignoreScale) {
+		super();
 		/**
 		 * A valid Context2D strokeStyle.
 		 * @type {Object}
