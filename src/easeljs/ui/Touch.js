@@ -70,9 +70,9 @@ this.createjs = this.createjs||{};
 	 * @static
 	 **/
 	Touch.isSupported = function() {
-		return	!!(('ontouchstart' in window) // iOS & Android
-			|| (window.navigator['msPointerEnabled'] && window.navigator['msMaxTouchPoints'] > 0) // IE10
-			|| (window.navigator['pointerEnabled'] && window.navigator['maxTouchPoints'] > 0)); // IE11+
+		return !!(('ontouchstart' in window) // iOS & Android
+			|| (window.MSPointerEvent && window.navigator.msMaxTouchPoints > 0) // IE10
+			|| (window.PointerEvent && window.navigator.maxTouchPoints > 0)); // IE11+
 	};
 
 	/**
