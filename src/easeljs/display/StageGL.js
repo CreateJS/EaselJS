@@ -703,7 +703,7 @@ this.createjs = this.createjs||{};
 	 * @default 10000
 	 * @readonly
 	 */
-	StageGL.DEFAULT_MAX_BATCH_SIZE = 10920;
+	StageGL.DEFAULT_MAX_BATCH_SIZE = 1024;
 
 	/**
 	 * The maximum size WebGL allows for element index numbers. Uses a 16 bit unsigned integer. It takes 6 indices to
@@ -777,7 +777,7 @@ this.createjs = this.createjs||{};
 	 * @readonly
 	 */
 	StageGL.REGULAR_VARYING_HEADER = (
-		"precision highp float;" +
+		"precision mediump float;" +
 
 		"varying vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
@@ -872,7 +872,7 @@ this.createjs = this.createjs||{};
 	 * @readonly
 	 */
 	StageGL.COVER_VARYING_HEADER = (
-		"precision highp float;" +	//this is usually essential for filter math
+		"precision mediump float;" +	//this is usually essential for filter math
 
 		"varying vec2 vTextureCoord;"
 	);
@@ -2226,7 +2226,7 @@ this.createjs = this.createjs||{};
 	 */
 	p._loadTextureImage = function (gl, image) {
 		var srcPath, texture, msg;
-		if (image instanceof Image && image.src) {
+		if ((image instanceof HTMLImageElement || image instanceof Image) && image.src) {
 			srcPath = image.src;
 		} else if (image instanceof HTMLCanvasElement) {
 			image._isCanvas = true; //canvases are already loaded and assumed unique so note that
@@ -2605,6 +2605,37 @@ this.createjs = this.createjs||{};
 				container.regX, container.regY
 			);
 		}
+		
+		// SCISSOR MASKING
+		var applyMask = false;
+		if (container.mask!==null){
+			var recursiveParent = container.parent;
+			var nestedMask = false
+			while (recursiveParent!=null && !nestedMask){
+				if (recursiveParent.mask!=null){
+					nestedMask=true;
+					console.warn("nested masks not supported yet");
+				}
+			recursiveParent=recursiveParent.parent;
+			}
+			
+			var isRotated  = (cMtx.c!=0 || cMtx.b!=0);
+			if (isRotated){
+				console.warn("mask cannot be added to rotated objects");
+			}
+			applyMask= (!nestedMask && !isRotated)
+						
+			if (applyMask){
+				var maskBounds = container.mask.getBounds();
+				var point1 = cMtx.transformPoint(maskBounds.x,maskBounds.y);
+				var point2 = cMtx.transformPoint(maskBounds.x+maskBounds.width,maskBounds.y+maskBounds.height);
+				var canvasHeight = this.canvas.height;
+				this.batchReason = "applyMaskBefore";
+				this._renderBatch();	
+				gl.enable(gl.SCISSOR_TEST);
+				gl.scissor(point1.x,canvasHeight-point1.y-(point2.y-point1.y),(point2.x-point1.x),(point2.y-point1.y));
+				}
+		}
 
 		var previousRenderMode = this._renderMode;
 		if (container.compositeOperation) {
@@ -2811,6 +2842,13 @@ this.createjs = this.createjs||{};
 
 		if (this._renderMode !== previousRenderMode) {
 			this._updateRenderMode(previousRenderMode);
+		}
+		
+		// SCISSOR MASKING FINISH
+		if (applyMask){
+			this.batchReason = "applyMaskAfter";
+			this._renderBatch();					// <------------------------------------------------------------
+			gl.disable(gl.SCISSOR_TEST);
 		}
 	};
 

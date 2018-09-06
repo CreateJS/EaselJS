@@ -516,7 +516,7 @@ this.createjs = this.createjs||{};
 		var frames = t|0;
 		this._t = t-frames; // leftover time, save to add to next advance.
 		
-		while (frames--) { this._updateTimeline(this._rawPosition+1, false); }
+		while (frames-- && !this.paused) { this._updateTimeline(this._rawPosition+1, false); }
 	};
 	
 	/**
