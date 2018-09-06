@@ -167,11 +167,11 @@ this.createjs = this.createjs||{};
 			var id = touch.identifier;
 			if (touch.target != stage.canvas) { continue; }
 
-			if (type == "touchstart") {
+			if (type === "touchstart") {
 				this._handleStart(stage, id, e, touch.pageX, touch.pageY);
-			} else if (type == "touchmove") {
+			} else if (type === "touchmove") {
 				this._handleMove(stage, id, e, touch.pageX, touch.pageY);
-			} else if (type == "touchend" || type == "touchcancel") {
+			} else if (type === "touchend" || type === "touchcancel") {
 				this._handleEnd(stage, id, e);
 			}
 		}
@@ -244,15 +244,15 @@ this.createjs = this.createjs||{};
 		var id = e.pointerId;
 		var ids = stage.__touch.activeIDs;
 
-		if (type == "MSPointerDown" || type == "pointerdown") {
+		if (type === "MSPointerDown" || type === "pointerdown") {
 			if (e.srcElement != stage.canvas) { return; }
 			ids[id] = true;
 			this._handleStart(stage, id, e, e.pageX, e.pageY);
 		} else if (ids[id]) { // it's an id we're watching
-			if (type == "MSPointerMove" || type == "pointermove") {
+			if (type === "MSPointerMove" || type === "pointermove") {
 				this._handleMove(stage, id, e, e.pageX, e.pageY);
-			} else if (type == "MSPointerUp" || type == "MSPointerCancel"
-					|| type == "pointerup" || type == "pointercancel") {
+			} else if (type === "MSPointerUp" || type === "MSPointerCancel"
+					|| type === "pointerup" || type === "pointercancel") {
 				delete(ids[id]);
 				this._handleEnd(stage, id, e);
 			}
