@@ -99,7 +99,7 @@ this.createjs = this.createjs||{};
 		// note that in the future we may need to disable the standard mouse event model before adding
 		// these to prevent duplicate calls. It doesn't seem to be an issue with iOS devices though.
 		if ('ontouchstart' in window) { Touch._IOS_enable(stage); }
-		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { Touch._IE_enable(stage); }
+		else if (window.PointerEvent || window.MSPointerEvent) { Touch._IE_enable(stage); }
 		return true;
 	};
 
@@ -112,7 +112,7 @@ this.createjs = this.createjs||{};
 	Touch.disable = function(stage) {
 		if (!stage) { return; }
 		if ('ontouchstart' in window) { Touch._IOS_disable(stage); }
-		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { Touch._IE_disable(stage); }
+		else if (window.PointerEvent || window.MSPointerEvent) { Touch._IE_disable(stage); }
 		
 		delete stage.__touch;
 	};
@@ -187,7 +187,7 @@ this.createjs = this.createjs||{};
 		var canvas = stage.canvas;
 		var f = stage.__touch.f = function(e) { Touch._IE_handleEvent(stage,e); };
 
-		if (window.navigator["pointerEnabled"] === undefined) {
+		if (window.PointerEvent === undefined) {
 			canvas.addEventListener("MSPointerDown", f, false);
 			window.addEventListener("MSPointerMove", f, false);
 			window.addEventListener("MSPointerUp", f, false);
@@ -213,7 +213,7 @@ this.createjs = this.createjs||{};
 	Touch._IE_disable = function(stage) {
 		var f = stage.__touch.f;
 
-		if (window.navigator["pointerEnabled"] === undefined) {
+		if (window.PointerEvent === undefined) {
 			window.removeEventListener("MSPointerMove", f, false);
 			window.removeEventListener("MSPointerUp", f, false);
 			window.removeEventListener("MSPointerCancel", f, false);
