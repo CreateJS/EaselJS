@@ -49,8 +49,8 @@ export default Touch = {
 	 */
 	isSupported () {
 		return	!!(('ontouchstart' in window) // iOS & Android
-			|| (window.navigator['msPointerEnabled'] && window.navigator['msMaxTouchPoints'] > 0) // IE10
-			|| (window.navigator['pointerEnabled'] && window.navigator['maxTouchPoints'] > 0)); // IE11+
+			|| (window.MSPointerEvent && window.navigator.msMaxTouchPoints > 0) // IE10
+			|| (window.PointerEvent && window.navigator.maxTouchPoints > 0)); // IE11+
 	},
 
 	/**
@@ -74,7 +74,7 @@ export default Touch = {
 		// note that in the future we may need to disable the standard mouse event model before adding
 		// these to prevent duplicate calls. It doesn't seem to be an issue with iOS devices though.
 		if ('ontouchstart' in window) { this._IOS_enable(stage); }
-		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { this._IE_enable(stage); }
+		else if (window.PointerEvent || window.MSPointerEvent) { this._IE_enable(stage); }
 		return true;
 	},
 
@@ -85,7 +85,7 @@ export default Touch = {
 	disable (stage) {
 		if (!stage) { return; }
 		if ('ontouchstart' in window) { this._IOS_disable(stage); }
-		else if (window.navigator['msPointerEnabled'] || window.navigator["pointerEnabled"]) { this._IE_disable(stage); }
+		else if (window.PointerEvent || window.MSPointerEvent) { this._IE_disable(stage); }
 		delete stage.__touch;
 	},
 
@@ -149,7 +149,7 @@ export default Touch = {
 		let canvas = stage.canvas;
 		let f = stage.__touch.f = e => this._IE_handleEvent(stage,e);
 
-		if (window.navigator["pointerEnabled"] === undefined) {
+		if (window.PointerEvent === undefined) {
 			canvas.addEventListener("MSPointerDown", f, false);
 			window.addEventListener("MSPointerMove", f, false);
 			window.addEventListener("MSPointerUp", f, false);
@@ -173,7 +173,7 @@ export default Touch = {
 	_IE_disable (stage) {
 		let f = stage.__touch.f;
 
-		if (window.navigator["pointerEnabled"] === undefined) {
+		if (window.PointerEvent === undefined) {
 			window.removeEventListener("MSPointerMove", f, false);
 			window.removeEventListener("MSPointerUp", f, false);
 			window.removeEventListener("MSPointerCancel", f, false);
