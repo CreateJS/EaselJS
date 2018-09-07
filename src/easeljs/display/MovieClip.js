@@ -509,14 +509,12 @@ this.createjs = this.createjs||{};
 		while ((o = o.parent) && fps === null) { if (o.mode === independent) { fps = o._framerate; } }
 		this._framerate = fps;
 		
-		if (this.paused) { return; }
-		
 		// calculate how many frames to advance:
 		var t = (fps !== null && fps !== -1 && time !== null) ? time/(1000/fps) + this._t : 1;
 		var frames = t|0;
 		this._t = t-frames; // leftover time, save to add to next advance.
 		
-		while (frames--) { this._updateTimeline(this._rawPosition+1, false); }
+		while (!this.paused && frames--) { this._updateTimeline(this._rawPosition+1, false); }
 	};
 	
 	/**
