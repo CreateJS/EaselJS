@@ -1083,7 +1083,8 @@ this.createjs = this.createjs||{};
 	p.hitTest = function(x, y) {
 		var ctx = DisplayObject._hitTestContext;
 		ctx.setTransform(1, 0, 0, 1, -x, -y);
-		this.draw(ctx);
+		// hit tests occur in a 2D context, so don't attempt to draw a GL only Texture into a 2D context
+		this.draw(ctx, !(this.bitmapCache && !(this.bitmapCache._cacheCanvas instanceof WebGLTexture) ));
 
 		var hit = this._testHit(ctx);
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
