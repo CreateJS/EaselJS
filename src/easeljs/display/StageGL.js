@@ -535,6 +535,15 @@ this.createjs = this.createjs||{};
 		this._drawID = 0;
 
 		/**
+		 * Tracks how many renders have occurred this draw, used for performance monitoring and empty draw avoidance.
+		 * @property _renderPerDraw
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._renderPerDraw = 0;
+
+		/**
 		 * Used to prevent textures in certain GPU slots from being replaced by an insert.
 		 * @property _slotBlackList
 		 * @protected
@@ -1397,6 +1406,7 @@ this.createjs = this.createjs||{};
 		var storeBatchTemp = this._batchTextureTemp;
 
 		// Use WebGL
+		this._renderPerDraw = 0;
 		this._batchVertexCount = 0;
 		this._drawID++;
 
@@ -1415,7 +1425,9 @@ this.createjs = this.createjs||{};
 		if (!this._directDraw) {
 			if (this.autoClear) { this.clear(); }
 			this.batchReason = "finalOutput";
-			this._drawCover(null, this._batchTextureOutput);
+			if(this._renderPerDraw) {
+				this._drawCover(null, this._batchTextureOutput);
+			}
 		}
 
 		// batches may generate or swap around textures. To be sure we capture them, store them back into buffer
@@ -2860,6 +2872,7 @@ this.createjs = this.createjs||{};
 	p._renderBatch = function () {
 		if (this._batchVertexCount <= 0) { return; }	// prevents error logs on stages filled with un-renederable content.
 		var gl = this._webGLContext;
+		this._renderPerDraw++;
 
 		if (this.vocalDebug) {
 			console.log("Batch["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
@@ -2908,6 +2921,7 @@ this.createjs = this.createjs||{};
 	 */
 	p._renderCover = function () {
 		var gl = this._webGLContext;
+		this._renderPerDraw++;
 
 		if (this.vocalDebug) {
 			console.log("Cover["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
