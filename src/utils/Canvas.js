@@ -33,19 +33,21 @@
  * @param {Number} [width=1]
  * @param {Number} [height=1]
  */
-export default function createCanvas (width=1, height=1) {
+export default function createCanvas(width = 1, height = 1) {
 	let c;
 	if (window.createjs !== undefined && window.createjs.createCanvas !== undefined) {
 		c = window.createjs.createCanvas();
 	}
-	if (HTMLCanvasElement) {
-		c = new HTMLCanvasElement();
+
+	if (c === undefined) {
+		c = document.createElement('canvas');
 	}
+
 	if (c !== undefined) {
 		c.width = width;
 		c.height = height;
 		return c;
 	}
 
-	throw "Canvas not supported in this environment.";
+	throw 'Canvas not supported in this environment.';
 }
