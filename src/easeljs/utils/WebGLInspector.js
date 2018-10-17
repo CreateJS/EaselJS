@@ -82,7 +82,7 @@ this.createjs = this.createjs||{};
 	WebGLInspector.logAll = function(stage) {
 		if (!stage){ stage = WebGLInspector.stage; }
 
-		WebGLInspector.log("Batches Per Draw", (stage._batchID/stage._drawID).toFixed(4));
+		WebGLInspector.log("Average batches Per Draw", (stage._batchID/stage._drawID).toFixed(4));
 		WebGLInspector.logContextInfo(stage._webGLContext);
 		WebGLInspector.logDepth(stage.children, "");
 		WebGLInspector.logTextureFill(stage);
@@ -229,6 +229,22 @@ this.createjs = this.createjs||{};
 		var r = "\tR:"+ item.regX.toFixed(2)+"x"+item.regY.toFixed(2) +"\t";
 
 		WebGLInspector.log(prepend, item.toString()+"\t", p,r);
+	};
+
+	/**
+	 * Utility function for use with {{#crossLink "replaceRenderBatchCall"))((/crossLink}}.
+	 * Tracks the highest element per batch count any render has achieved, useful for fine tuning max performance.
+	 * Use `WebGLInspector.__lastHighest;` to inspect value.
+	 * Warning, this will not show values higher than your current batchSize.
+	 */
+	WebGLInspector.trackMaxBatchDraw = function() {
+		var cardCount = this._batchVertexCount/createjs.StageGL.INDICIES_PER_CARD;
+		if(!(cardCount < WebGLInspector.__lastHighest)) { //backwards handles NaNs inline
+			WebGLInspector.__lastHighest = cardCount;
+		}
+
+		// don't break regular behavior
+		stage._renderBatch_();
 	};
 
 	/**

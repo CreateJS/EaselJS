@@ -130,11 +130,14 @@ this.createjs = this.createjs||{};
 	 * for more information on texture purging.
 	 * @param {String|int} [options.clearColor=undefined] Automatically calls {{#crossLink "StageGL/setClearColor"}}{{/crossLink}}
 	 * after init is complete, can be overridden and changed manually later.
+	 * @param {String|int} [options.batchSize=DEFAULT_MAX_BATCH_SIZE] The size of the buffer used to retain a batch.
+	 * Making it smaller reduces GPU load, but making it too small adds extra GPU calls. Figure out your maximum batch
+	 * count and set it to a small buffer above that per-project. Check src/utils/WebGLInspector to track.
 	 */
 	function StageGL(canvas, options) {
 		this.Stage_constructor(canvas);
 
-		var transparent, antialias, preserveBuffer, autoPurge, directDraw;
+		var transparent, antialias, preserveBuffer, autoPurge, directDraw, batchSize;
 		if (options !== undefined) {
 			if (typeof options !== "object"){ throw("Invalid options object"); }
 			transparent = options.transparent;
@@ -142,6 +145,7 @@ this.createjs = this.createjs||{};
 			preserveBuffer = options.preserveBuffer;
 			autoPurge = options.autoPurge;
 			directDraw = options.directDraw;
+			batchSize = options.batchSize;
 		}
 
 // public properties:
@@ -269,14 +273,18 @@ this.createjs = this.createjs||{};
 		this._clearColor = {r: 0.50, g: 0.50, b: 0.50, a: 0.00};
 
 		/**
-		 * The maximum number of cards (aka a single sprite) that can be drawn in one draw call. Use getter/setters to
-		 * modify otherwise internal buffers may be incorrect sizes.
+		 * The maximum number of verticies (6 make a single sprite) that can be drawn in one draw call. Use constructor props
+		 * to modify otherwise internal buffers may be invalid sizes.
 		 * @property _maxBatchVertexCount
 		 * @protected
 		 * @type {Number}
 		 * @default StageGL.DEFAULT_MAX_BATCH_SIZE * StageGL.INDICIES_PER_CARD
 		 */
-		this._maxBatchVertexCount = StageGL.DEFAULT_MAX_BATCH_SIZE * StageGL.INDICIES_PER_CARD;
+		this._maxBatchVertexCount = Math.max(
+			Math.min(
+				Number(batchSize) || StageGL.DEFAULT_MAX_BATCH_SIZE,
+				StageGL.DEFAULT_MAX_BATCH_SIZE)
+			, StageGL.DEFAULT_MIN_BATCH_SIZE) * StageGL.INDICIES_PER_CARD;
 
 		/**
 		 * The shader program used to draw the current batch.
@@ -705,14 +713,27 @@ this.createjs = this.createjs||{};
 	/**
 	 * The default value for the maximum number of cards we want to process in a batch. See
 	 * {{#crossLink "StageGL/WEBGL_MAX_INDEX_NUM:property"}}{{/crossLink}} for a hard limit.
+	 * this value comes is designed to sneak under that limit.
 	 * @property DEFAULT_MAX_BATCH_SIZE
 	 * @static
 	 * @final
 	 * @type {Number}
-	 * @default 10000
+	 * @default 10920
 	 * @readonly
 	 */
 	StageGL.DEFAULT_MAX_BATCH_SIZE = 10920;
+
+	/**
+	 * The default value for the minimum number of cards we want to process in a batch. Less
+	 * max cards can mean better performance, but anything below this is probably not worth it.
+	 * @property DEFAULT_MIN_BATCH_SIZE
+	 * @static
+	 * @final
+	 * @type {Number}
+	 * @default 170
+	 * @readonly
+	 */
+	StageGL.DEFAULT_MIN_BATCH_SIZE = 170;
 
 	/**
 	 * The maximum size WebGL allows for element index numbers. Uses a 16 bit unsigned integer. It takes 6 indices to
