@@ -2807,29 +2807,33 @@ this.createjs = this.createjs||{};
 			// These must be calculated here else a forced draw might happen after they're set
 			var offV1 = this._batchVertexCount;					// offset for 1 component vectors
 			var offV2 = offV1*2;								// offset for 2 component vectors
+			var vtxOff = offV2;
+			var uvOff = offV2;
+			var aOff = offV1;
+			var texOff = offV1;
 
 			//DHG: See Matrix2D.transformPoint for why this math specifically
 			// apply vertices
-			vertices[offV2] =		subL *iMtx.a + subT *iMtx.c +iMtx.tx;		vertices[offV2+1] =		subL *iMtx.b + subT *iMtx.d +iMtx.ty;
-			vertices[offV2+2] =		subL *iMtx.a + subB *iMtx.c +iMtx.tx;		vertices[offV2+3] =		subL *iMtx.b + subB *iMtx.d +iMtx.ty;
-			vertices[offV2+4] =		subR *iMtx.a + subT *iMtx.c +iMtx.tx;		vertices[offV2+5] =		subR *iMtx.b + subT *iMtx.d +iMtx.ty;
-			vertices[offV2+6] =		vertices[offV2+2];							vertices[offV2+7] =		vertices[offV2+3];
-			vertices[offV2+8] =		vertices[offV2+4];							vertices[offV2+9] =		vertices[offV2+5];
-			vertices[offV2+10] =	subR *iMtx.a + subB *iMtx.c +iMtx.tx;		vertices[offV2+11] =	subR *iMtx.b + subB *iMtx.d +iMtx.ty;
+			vertices[vtxOff] =		subL *iMtx.a + subT *iMtx.c +iMtx.tx;		vertices[vtxOff+1] =	subL *iMtx.b + subT *iMtx.d +iMtx.ty;
+			vertices[vtxOff+2] =	subL *iMtx.a + subB *iMtx.c +iMtx.tx;		vertices[vtxOff+3] =	subL *iMtx.b + subB *iMtx.d +iMtx.ty;
+			vertices[vtxOff+4] =	subR *iMtx.a + subT *iMtx.c +iMtx.tx;		vertices[vtxOff+5] =	subR *iMtx.b + subT *iMtx.d +iMtx.ty;
+			vertices[vtxOff+6] =	vertices[vtxOff+2];							vertices[vtxOff+7] =	vertices[vtxOff+3];
+			vertices[vtxOff+8] =	vertices[vtxOff+4];							vertices[vtxOff+9] =	vertices[vtxOff+5];
+			vertices[vtxOff+10] =	subR *iMtx.a + subB *iMtx.c +iMtx.tx;		vertices[vtxOff+11] =	subR *iMtx.b + subB *iMtx.d +iMtx.ty;
 
 			// apply uvs
-			uvs[offV2] =	uvRect.l;			uvs[offV2+1] =	uvRect.t;
-			uvs[offV2+2] =	uvRect.l;			uvs[offV2+3] =	uvRect.b;
-			uvs[offV2+4] =	uvRect.r;			uvs[offV2+5] =	uvRect.t;
-			uvs[offV2+6] =	uvRect.l;			uvs[offV2+7] =	uvRect.b;
-			uvs[offV2+8] =	uvRect.r;			uvs[offV2+9] =	uvRect.t;
-			uvs[offV2+10] =	uvRect.r;			uvs[offV2+11] =	uvRect.b;
+			uvs[uvOff] =	uvRect.l;			uvs[uvOff+1] =	uvRect.t;
+			uvs[uvOff+2] =	uvRect.l;			uvs[uvOff+3] =	uvRect.b;
+			uvs[uvOff+4] =	uvRect.r;			uvs[uvOff+5] =	uvRect.t;
+			uvs[uvOff+6] =	uvRect.l;			uvs[uvOff+7] =	uvRect.b;
+			uvs[uvOff+8] =	uvRect.r;			uvs[uvOff+9] =	uvRect.t;
+			uvs[uvOff+10] =	uvRect.r;			uvs[uvOff+11] =	uvRect.b;
 
 			// apply texture
-			texI[offV1] = texI[offV1+1] = texI[offV1+2] = texI[offV1+3] = texI[offV1+4] = texI[offV1+5] = texIndex;
+			texI[texOff] = texI[texOff+1] = texI[texOff+2] = texI[texOff+3] = texI[texOff+4] = texI[texOff+5] = texIndex;
 
 			// apply alpha
-			alphas[offV1] = alphas[offV1+1] = alphas[offV1+2] = alphas[offV1+3] = alphas[offV1+4] = alphas[offV1+5] = itemAlpha * concatAlpha;
+			alphas[aOff] = alphas[aOff+1] = alphas[aOff+2] = alphas[aOff+3] = alphas[aOff+4] = alphas[aOff+5] = itemAlpha * concatAlpha;
 
 			this._batchVertexCount += StageGL.INDICIES_PER_CARD;
 
