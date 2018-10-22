@@ -375,6 +375,15 @@ this.createjs = this.createjs||{};
 		this._alphaAttribute = null;
 
 		/**
+		 * All the different vertex attribute sets that can be used with the render buffer. Currently only internal,
+		 * if/when alternate main shaders are possible, they'll register themselves here.
+		 * @property _attributeConfig
+		 * @protected
+		 * @type {Object}
+		 */
+		this._attributeConfig = {};
+
+		/**
 		 * One of the major render buffers used in composite blending drawing. Do not expect this to always be the same object.
 		 * "What you're drawing to", object occasionally swaps with concat.
 		 * @property _bufferTextureOutput
@@ -2128,7 +2137,7 @@ this.createjs = this.createjs||{};
 	p._createBuffers = function () {
 		var gl = this._webGLContext;
 		var groupCount = this._maxBatchVertexCount;
-		var groupSize, i, l;
+		var groupSize, i, l, config, atrBuffer, stride;
 
 		// INFO:
 		// all buffers are created using this pattern
@@ -2155,37 +2164,46 @@ this.createjs = this.createjs||{};
 		// }
 		// TODO benchmark and test using unified buffer
 
+		config = this._attributeConfig["default"] = {};
+		stride = 0;
+
 		// the actual position information
-		var vertexPositionBuffer = this._vertexPositionAttribute = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-		groupSize = 2;
+		atrBuffer = this._vertexPositionAttribute = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
+		stride += 4 * (groupSize = 2);
 		var vertices = this._vertices = new Float32Array(groupCount * groupSize);
 		for (i=0, l=vertices.length; i<l; i+=groupSize) { vertices[i] = vertices[i+1] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
+		config["position"] = { array: vertices, buffer: atrBuffer, offset: 0, size: groupSize };
 
 		// where on the texture it gets its information
-		var uvPositionBuffer = this._uvPositionAttribute = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
-		groupSize = 2;
+		atrBuffer = this._uvPositionAttribute = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
+		stride += 4 * (groupSize = 2);
 		var uvs = this._uvs = new Float32Array(groupCount * groupSize);
 		for (i=0, l=uvs.length; i<l; i+=groupSize) { uvs[i] = uvs[i+1] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
+		config["uv"] = { array: uvs, buffer: atrBuffer, offset: 0, size: groupSize };
 
 		// what texture it should use
-		var textureIndexBuffer = this._textureIndexAttribute = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
-		groupSize = 1;
+		atrBuffer = this._textureIndexAttribute = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
+		stride += 4 * (groupSize = 1);
 		var indices = this._indices = new Float32Array(groupCount * groupSize);
 		for (i=0, l=indices.length; i<l; i++) { indices[i] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW);
+		config["texture"] = { array: indices, buffer: atrBuffer, offset: 0, size: groupSize };
 
 		// what alpha it should have
-		var alphaBuffer = this._alphaAttribute = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
-		groupSize = 1;
+		atrBuffer = this._alphaAttribute = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
+		stride += 4 * (groupSize = 1);
 		var alphas = this._alphas = new Float32Array(groupCount * groupSize);
-		for (i=0, l=alphas.length; i<l; i++) { alphas[i] = 1; }
+		for (i=0, l=alphas.length; i<l; i++) { alphas[i] = 1.0; }
 		gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
+		config["alpha"] = { array: alphas, buffer: atrBuffer, offset: 0, size: groupSize };
+
+		config["_shared_"] = { stride: stride };
 	};
 
 	/**
