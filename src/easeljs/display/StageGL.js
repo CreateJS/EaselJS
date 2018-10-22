@@ -312,13 +312,13 @@ this.createjs = this.createjs||{};
 		this._vertices = null;
 
 		/**
-		 * The WebGL buffer attached to {{#crossLink "StageGL/_vertices:property"}}{{/crossLink}}.
-		 * @property _vertexPositionBuffer
+		 * The WebGL vertex attribute buffer attached to {{#crossLink "StageGL/_vertices:property"}}{{/crossLink}}.
+		 * @property _vertexPositionAttribute
 		 * @protected
 		 * @type {WebGLBuffer}
 		 * @default null
 		 */
-		this._vertexPositionBuffer = null;
+		this._vertexPositionAttribute = null;
 
 		/**
 		 * The vertex UV data for the current draw call.
@@ -330,13 +330,13 @@ this.createjs = this.createjs||{};
 		this._uvs = null;
 
 		/**
-		 * The WebGL buffer attached to {{#crossLink "StageGL/_uvs:property"}}{{/crossLink}}.
-		 * @property _uvPositionBuffer
+		 * The WebGL vertex attribute buffer attached to {{#crossLink "StageGL/_uvs:property"}}{{/crossLink}}.
+		 * @property _uvPositionAttribute
 		 * @protected
 		 * @type {WebGLBuffer}
 		 * @default null
 		 */
-		this._uvPositionBuffer = null;
+		this._uvPositionAttribute = null;
 
 		/**
 		 * The vertex indices data for the current draw call.
@@ -348,13 +348,13 @@ this.createjs = this.createjs||{};
 		this._indices = null;
 
 		/**
-		 * The WebGL buffer attached to {{#crossLink "StageGL/_indices:property"}}{{/crossLink}}.
-		 * @property _textureIndexBuffer
+		 * The WebGL vertex attribute buffer attached to {{#crossLink "StageGL/_indices:property"}}{{/crossLink}}.
+		 * @property _textureIndexAttribute
 		 * @protected
 		 * @type {WebGLBuffer}
 		 * @default null
 		 */
-		this._textureIndexBuffer = null;
+		this._textureIndexAttribute = null;
 
 		/**
 		 * The vertices data for the current draw call.
@@ -366,13 +366,13 @@ this.createjs = this.createjs||{};
 		this._alphas = null;
 
 		/**
-		 * The WebGL buffer attached to {{#crossLink "StageGL/_alphas:property"}}{{/crossLink}}.
-		 * @property _alphaBuffer
+		 * The WebGL vertex attribute buffer attached to {{#crossLink "StageGL/_alphas:property"}}{{/crossLink}}.
+		 * @property _alphaAttribute
 		 * @protected
 		 * @type {WebGLBuffer}
 		 * @default null
 		 */
-		this._alphaBuffer = null;
+		this._alphaAttribute = null;
 
 		/**
 		 * One of the major render buffers used in composite blending drawing. Do not expect this to always be the same object.
@@ -2043,8 +2043,8 @@ this.createjs = this.createjs||{};
 
 		// get the places in memory the shader is stored so we can feed information into them
 		// then save it off on the shader because it's so tied to the shader itself
-		shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-		gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+		shaderProgram.positionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
+		gl.enableVertexAttribArray(shaderProgram.positionAttribute);
 
 		shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
 		gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
@@ -2153,49 +2153,39 @@ this.createjs = this.createjs||{};
 		// 	vertexData[i+4] = 0;
 		// 	vertexData[i+5] = 1;
 		// }
-		// vertexBuffer.itemSize = groupSize;
-		// vertexBuffer.numItems = groupCount;
 		// TODO benchmark and test using unified buffer
 
 		// the actual position information
-		var vertexPositionBuffer = this._vertexPositionBuffer = gl.createBuffer();
+		var vertexPositionBuffer = this._vertexPositionAttribute = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 		groupSize = 2;
 		var vertices = this._vertices = new Float32Array(groupCount * groupSize);
 		for (i=0, l=vertices.length; i<l; i+=groupSize) { vertices[i] = vertices[i+1] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
-		vertexPositionBuffer.itemSize = groupSize;
-		vertexPositionBuffer.numItems = groupCount;
 
 		// where on the texture it gets its information
-		var uvPositionBuffer = this._uvPositionBuffer = gl.createBuffer();
+		var uvPositionBuffer = this._uvPositionAttribute = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
 		groupSize = 2;
 		var uvs = this._uvs = new Float32Array(groupCount * groupSize);
 		for (i=0, l=uvs.length; i<l; i+=groupSize) { uvs[i] = uvs[i+1] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
-		uvPositionBuffer.itemSize = groupSize;
-		uvPositionBuffer.numItems = groupCount;
 
 		// what texture it should use
-		var textureIndexBuffer = this._textureIndexBuffer = gl.createBuffer();
+		var textureIndexBuffer = this._textureIndexAttribute = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
 		groupSize = 1;
 		var indices = this._indices = new Float32Array(groupCount * groupSize);
 		for (i=0, l=indices.length; i<l; i++) { indices[i] = 0; }
 		gl.bufferData(gl.ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW);
-		textureIndexBuffer.itemSize = groupSize;
-		textureIndexBuffer.numItems = groupCount;
 
 		// what alpha it should have
-		var alphaBuffer = this._alphaBuffer = gl.createBuffer();
+		var alphaBuffer = this._alphaAttribute = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
 		groupSize = 1;
 		var alphas = this._alphas = new Float32Array(groupCount * groupSize);
 		for (i=0, l=alphas.length; i<l; i++) { alphas[i] = 1; }
 		gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
-		alphaBuffer.itemSize = groupSize;
-		alphaBuffer.numItems = groupCount;
 	};
 
 	/**
@@ -2903,27 +2893,27 @@ this.createjs = this.createjs||{};
 			console.log("Batch["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
 		}
 		var shaderProgram = this._activeShader;
-		var vertexPositionBuffer = this._vertexPositionBuffer;
-		var textureIndexBuffer = this._textureIndexBuffer;
-		var uvPositionBuffer = this._uvPositionBuffer;
-		var alphaBuffer = this._alphaBuffer;
+		var vertexPositionBuffer = this._vertexPositionAttribute;
+		var textureIndexBuffer = this._textureIndexAttribute;
+		var uvPositionBuffer = this._uvPositionAttribute;
+		var alphaBuffer = this._alphaAttribute;
 
 		gl.useProgram(shaderProgram);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(shaderProgram.positionAttribute, 2, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._vertices);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
-		gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, textureIndexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, 1, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._indices);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
-		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._uvs);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
-		gl.vertexAttribPointer(shaderProgram.alphaAttribute, alphaBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(shaderProgram.alphaAttribute, 1, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._alphas);
 
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
@@ -2952,16 +2942,16 @@ this.createjs = this.createjs||{};
 			console.log("Cover["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
 		}
 		var shaderProgram = this._activeShader;
-		var vertexPositionBuffer = this._vertexPositionBuffer;
-		var uvPositionBuffer = this._uvPositionBuffer;
+		var vertexPositionBuffer = this._vertexPositionAttribute;
+		var uvPositionBuffer = this._uvPositionAttribute;
 
 		gl.useProgram(shaderProgram);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(shaderProgram.positionAttribute, 2, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_VERT);
 		gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
-		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_UV);
 
 		gl.uniform1i(shaderProgram.samplerUniform, 0);
