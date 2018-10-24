@@ -303,42 +303,6 @@ this.createjs = this.createjs||{};
 		this._mainShader = null;
 
 		/**
-		 * The vertex position data for the current draw call.
-		 * @property _vertices
-		 * @protected
-		 * @type {Float32Array}
-		 * @default null
-		 */
-		this._vertices = null;
-
-		/**
-		 * The vertex UV data for the current draw call.
-		 * @property _uvs
-		 * @protected
-		 * @type {Float32Array}
-		 * @default null
-		 */
-		this._uvs = null;
-
-		/**
-		 * The vertex indices data for the current draw call.
-		 * @property _indices
-		 * @protected
-		 * @type {Float32Array}
-		 * @default null
-		 */
-		this._indices = null;
-
-		/**
-		 * The vertices data for the current draw call.
-		 * @property _alphas
-		 * @protected
-		 * @type {Float32Array}
-		 * @default null
-		 */
-		this._alphas = null;
-
-		/**
 		 * All the different vertex attribute sets that can be used with the render buffer. Currently only internal,
 		 * if/when alternate main shaders are possible, they'll register themselves here.
 		 * @property _attributeConfig
@@ -1127,7 +1091,7 @@ this.createjs = this.createjs||{};
 		},
 		"destination-atop": {
 			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-			"gl_FragColor = vec4(dst.rgb * src.a + src.rgb * (1.0 - dst.a), src.a);" +
+				"gl_FragColor = vec4(dst.rgb * src.a + src.rgb * (1.0 - dst.a), src.a);" +
 			"}")
 		},
 		"destination-atop_cheap": {
@@ -2113,42 +2077,39 @@ this.createjs = this.createjs||{};
 
 		// TODO benchmark and test using unified main buffer
 
+		// regular
 		config = this._attributeConfig["default"] = {};
 
-		// the actual position information
 		groupSize = 2;
 		var vertices = new Float32Array(groupCount * groupSize);
-		for (i=0, l=vertices.length; i<l; i+=groupSize) { vertices[i] = vertices[i+1] = 0; }
+		for (i=0, l=vertices.length; i<l; i+=groupSize) { vertices[i] = vertices[i+1] = 0.0; }
 		atrBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
 		config["position"] = { array: vertices,
-			buffer: atrBuffer, type: gl.FLOAT, size: groupSize, spacing: groupSize, stride: 0, offset: 0
+			buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
 		};
 
-		// where on the texture it gets its information
 		groupSize = 2;
 		var uvs = new Float32Array(groupCount * groupSize);
-		for (i=0, l=uvs.length; i<l; i+=groupSize) { uvs[i] = uvs[i+1] = 0; }
+		for (i=0, l=uvs.length; i<l; i+=groupSize) { uvs[i] = uvs[i+1] = 0.0; }
 		atrBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
 		config["uv"] = { array: uvs,
-			buffer: atrBuffer, type: gl.FLOAT, size: groupSize, spacing: groupSize, stride: 0, offset: 0
+			buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
 		};
 
-		// what texture it should use
 		groupSize = 1;
 		var indices = new Float32Array(groupCount * groupSize);
-		for (i=0, l=indices.length; i<l; i++) { indices[i] = 0; }
+		for (i=0, l=indices.length; i<l; i++) { indices[i] = 0.0; }
 		atrBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW);
 		config["texture"] = { array: indices,
-			buffer: atrBuffer, type: gl.FLOAT, size: groupSize, spacing: groupSize, stride: 0, offset: 0
+			buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
 		};
 
-		// what alpha it should have
 		groupSize = 1;
 		var alphas = new Float32Array(groupCount * groupSize);
 		for (i=0, l=alphas.length; i<l; i++) { alphas[i] = 1.0; }
@@ -2156,14 +2117,45 @@ this.createjs = this.createjs||{};
 		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
 		config["alpha"] = { array: alphas,
-			buffer: atrBuffer, type: gl.FLOAT, size: groupSize, spacing: groupSize, stride: 0, offset: 0
+			buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
 		};
 
-		this._activeConfig = config;
-		this._vertices = vertices;
-		this._indices = indices;
-		this._alphas = alphas;
-		this._uvs = uvs;
+		// micro
+		config = this._attributeConfig["micro"] = {};
+		groupCount = 5; // we probably do not need this much space, but it's safer and barely more expensive
+		groupSize = 2 + 2 + 1 + 1;
+		var stride = groupSize * 4; // they're all floats, so 4 bytes each
+
+		var microArray = new Float32Array(groupCount * groupSize);
+		for (i=0, l=microArray.length; i<l; i+=groupSize) {
+			microArray[i]   = microArray[i+1] = 0.0; // vertex
+			microArray[i+1] = microArray[i+2] = 0.0; // uv
+			microArray[i+3] = 0.0;                   // texture
+			microArray[i+4] = 1.0;                   // alpha
+		}
+		atrBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, microArray, gl.DYNAMIC_DRAW);
+
+		config["position"] = {
+			array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
+			offset: 0, offB: 0, size: 2
+		};
+		config["uv"] = {
+			array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
+			offset: 2, offB: 2*4, size: 2
+		};
+		config["texture"] = {
+			array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
+			offset: 4, offB: 4*4, size: 1
+		};
+		config["alpha"] = {
+			array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
+			offset: 5, offB: 5*4, size: 1
+		};
+
+		// defaults
+		this._activeConfig = this._attributeConfig["default"];
 	};
 
 	/**
@@ -2702,11 +2694,6 @@ this.createjs = this.createjs||{};
 			}
 			if (!image) { continue; }
 
-			var uvs = this._uvs;
-			var vertices = this._vertices;
-			var texI = this._indices;
-			var alphas = this._alphas;
-
 			// calculate texture
 			if (image._storeID === undefined) {
 				// this texture is new to us so load it and add it to the batch
@@ -2772,36 +2759,72 @@ this.createjs = this.createjs||{};
 				subR = rect.width-frame.regX;					subB = rect.height-frame.regY;
 			}
 
-			// These must be calculated here else a forced draw might happen after they're set
-			var offV1 = this._batchVertexCount;					// offset for 1 component vectors
-			var offV2 = offV1*2;								// offset for 2 component vectors
-			var vtxOff = offV2;
-			var uvOff = offV2;
-			var aOff = offV1;
-			var texOff = offV1;
+			var spacing = 0;
+			var cfg =  this._activeConfig;
+			var vpos = cfg.position.array;
+			var uvs = cfg.uv.array;
+			var texI = cfg.texture.array;
+			var alphas = cfg.alpha.array;
 
-			//DHG: See Matrix2D.transformPoint for why this math specifically
 			// apply vertices
-			vertices[vtxOff] =		subL *iMtx.a + subT *iMtx.c +iMtx.tx;		vertices[vtxOff+1] =	subL *iMtx.b + subT *iMtx.d +iMtx.ty;
-			vertices[vtxOff+2] =	subL *iMtx.a + subB *iMtx.c +iMtx.tx;		vertices[vtxOff+3] =	subL *iMtx.b + subB *iMtx.d +iMtx.ty;
-			vertices[vtxOff+4] =	subR *iMtx.a + subT *iMtx.c +iMtx.tx;		vertices[vtxOff+5] =	subR *iMtx.b + subT *iMtx.d +iMtx.ty;
-			vertices[vtxOff+6] =	vertices[vtxOff+2];							vertices[vtxOff+7] =	vertices[vtxOff+3];
-			vertices[vtxOff+8] =	vertices[vtxOff+4];							vertices[vtxOff+9] =	vertices[vtxOff+5];
-			vertices[vtxOff+10] =	subR *iMtx.a + subB *iMtx.c +iMtx.tx;		vertices[vtxOff+11] =	subR *iMtx.b + subB *iMtx.d +iMtx.ty;
+			spacing = cfg.position.spacing;
+			var vtxOff = this._batchVertexCount * spacing + cfg.position.offset;
+			vpos[vtxOff] = subL*iMtx.a + subT*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subL*iMtx.b + subT*iMtx.d + iMtx.ty;
+			vtxOff += spacing;
+			vpos[vtxOff] = subL*iMtx.a + subB*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subL*iMtx.b + subB*iMtx.d + iMtx.ty;
+			vtxOff += spacing;
+			vpos[vtxOff] = subR*iMtx.a + subT*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subR*iMtx.b + subT*iMtx.d + iMtx.ty;
+			vtxOff += spacing;
+			vpos[vtxOff] = subL*iMtx.a + subB*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subL*iMtx.b + subB*iMtx.d + iMtx.ty;
+			vtxOff += spacing;
+			vpos[vtxOff] = subR*iMtx.a + subT*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subR*iMtx.b + subT*iMtx.d + iMtx.ty;
+			vtxOff += spacing;
+			vpos[vtxOff] = subR*iMtx.a + subB*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subR*iMtx.b + subB*iMtx.d + iMtx.ty;
 
 			// apply uvs
-			uvs[uvOff] =	uvRect.l;			uvs[uvOff+1] =	uvRect.t;
-			uvs[uvOff+2] =	uvRect.l;			uvs[uvOff+3] =	uvRect.b;
-			uvs[uvOff+4] =	uvRect.r;			uvs[uvOff+5] =	uvRect.t;
-			uvs[uvOff+6] =	uvRect.l;			uvs[uvOff+7] =	uvRect.b;
-			uvs[uvOff+8] =	uvRect.r;			uvs[uvOff+9] =	uvRect.t;
-			uvs[uvOff+10] =	uvRect.r;			uvs[uvOff+11] =	uvRect.b;
+			spacing = cfg.uv.spacing;
+			var uvOff = this._batchVertexCount * spacing + cfg.uv.offset;
+			uvs[uvOff] = uvRect.l;        uvs[uvOff+1] = uvRect.t;
+			uvOff += spacing;
+			uvs[uvOff] = uvRect.l;        uvs[uvOff+1] = uvRect.b;
+			uvOff += spacing;
+			uvs[uvOff] = uvRect.r;        uvs[uvOff+1] = uvRect.t;
+			uvOff += spacing;
+			uvs[uvOff] = uvRect.l;        uvs[uvOff+1] = uvRect.b;
+			uvOff += spacing;
+			uvs[uvOff] = uvRect.r;        uvs[uvOff+1] = uvRect.t;
+			uvOff += spacing;
+			uvs[uvOff] = uvRect.r;        uvs[uvOff+1] = uvRect.b;
 
 			// apply texture
-			texI[texOff] = texI[texOff+1] = texI[texOff+2] = texI[texOff+3] = texI[texOff+4] = texI[texOff+5] = texIndex;
+			spacing = cfg.texture.spacing;
+			var texOff = this._batchVertexCount * spacing + cfg.texture.offset;
+			texI[texOff] = texIndex;
+			texOff += spacing;
+			texI[texOff] = texIndex;
+			texOff += spacing;
+			texI[texOff] = texIndex;
+			texOff += spacing;
+			texI[texOff] = texIndex;
+			texOff += spacing;
+			texI[texOff] = texIndex;
+			texOff += spacing;
+			texI[texOff] = texIndex;
 
 			// apply alpha
-			alphas[aOff] = alphas[aOff+1] = alphas[aOff+2] = alphas[aOff+3] = alphas[aOff+4] = alphas[aOff+5] = itemAlpha * concatAlpha;
+			spacing = cfg.alpha.spacing;
+			var aOff = this._batchVertexCount * spacing + cfg.alpha.offset;
+			alphas[aOff] = itemAlpha * concatAlpha;
+			aOff += spacing;
+			alphas[aOff] = itemAlpha * concatAlpha;
+			aOff += spacing;
+			alphas[aOff] = itemAlpha * concatAlpha;
+			aOff += spacing;
+			alphas[aOff] = itemAlpha * concatAlpha;
+			aOff += spacing;
+			alphas[aOff] = itemAlpha * concatAlpha;
+			aOff += spacing;
+			alphas[aOff] = itemAlpha * concatAlpha;
 
 			this._batchVertexCount += StageGL.INDICIES_PER_CARD;
 
@@ -2877,22 +2900,22 @@ this.createjs = this.createjs||{};
 
 		pc = config.position;
 		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-		gl.vertexAttribPointer(shaderProgram.positionAttribute, pc.size, pc.type, false, pc.stride, pc.offset);
+		gl.vertexAttribPointer(shaderProgram.positionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
 
 		pc = config.texture;
 		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-		gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, pc.size, pc.type, false, pc.stride, pc.offset);
+		gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
 
 		pc = config.uv;
 		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, pc.size, pc.type, false, pc.stride, pc.offset);
+		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
 
 		pc = config.alpha;
 		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-		gl.vertexAttribPointer(shaderProgram.alphaAttribute, pc.size, pc.type, false, pc.stride, pc.offset);
+		gl.vertexAttribPointer(shaderProgram.alphaAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
 
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
@@ -2927,12 +2950,12 @@ this.createjs = this.createjs||{};
 
 		pc = config.position;
 		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-		gl.vertexAttribPointer(shaderProgram.positionAttribute, pc.size, pc.type, false, pc.stride, pc.offset);
+		gl.vertexAttribPointer(shaderProgram.positionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_VERT);
 
 		pc = config.uv;
 		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, pc.size, pc.type, false, pc.stride, pc.offset);
+		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_UV);
 
 		gl.uniform1i(shaderProgram.samplerUniform, 0);
