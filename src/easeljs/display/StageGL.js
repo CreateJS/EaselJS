@@ -2307,7 +2307,7 @@ this.createjs = this.createjs||{};
 
 		if (this.vocalDebug) {
 			if (isNPOT && this._antialias) {
-				console.warn("NPOT(Non Power of Two) Texture w/ antialias on: "+ image.src);
+				console.warn("NPOT(Non Power of Two) Texture with context.antialias true: "+ image.src);
 			}
 			if (image.width > gl.MAX_TEXTURE_SIZE || image.height > gl.MAX_TEXTURE_SIZE){
 				console && console.error("Oversized Texture: "+ image.width+"x"+image.height +" vs "+ gl.MAX_TEXTURE_SIZE +"max");
@@ -2475,9 +2475,12 @@ this.createjs = this.createjs||{};
 			}
 		}
 
-		if (shaderData.immediate && this._directDraw) {
-			if (this.vocalDebug) { console.log("Illegal compositeOperation ["+ newMode +"] due to StageGL.directDraw = true, reverting to default"); }
-			return;
+		if (shaderData.immediate) {
+			if (this._directDraw) {
+				if (this.vocalDebug) { console.log("Illegal compositeOperation ["+ newMode +"] due to StageGL.directDraw = true, reverting to default"); }
+				return;
+			}
+			this._activeConfig = this._attributeConfig["micro"];
 		}
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
@@ -2829,6 +2832,7 @@ this.createjs = this.createjs||{};
 			this._batchVertexCount += StageGL.INDICIES_PER_CARD;
 
 			if (this._immediateRender) {
+				this._activeConfig = this._attributeConfig["default"];
 				this._immediateBatchRender();
 			}
 
