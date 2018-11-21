@@ -10,7 +10,7 @@ Renders a bitmap texture by breaking up an image into a 3x3 grid to create a sca
 Example using a 100x100 image:
 
 	var sb = new createjs.ScaleBitmap(imagePathOrSrc, new createjs.Rectangle(10,10,80,80));
-	sb.setDrawSize
+	sb.setDrawSize(newWidth, newHeight);
 	stage.addChild(sb);
 
 
