@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import Event from "@createjs/core/src/events/Event";
+import { Event } from "@createjs/core";
 
 /**
  * Passed as the parameter to all mouse/pointer/touch related events. For a listing of mouse events and their properties,

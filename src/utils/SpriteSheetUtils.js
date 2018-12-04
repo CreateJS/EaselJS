@@ -37,7 +37,7 @@ import createCanvas from "./Canvas";
  * @memberof easeljs
  * @name easeljs.SpriteSheetUtils
  */
-export default SpriteSheetUtils = {
+export default {
 
 	/**
 	 * @protected

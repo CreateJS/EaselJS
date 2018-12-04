@@ -1,7 +1,5 @@
 /**
- * @license
- *
- * Slider
+ * @license Slider
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
  * Copyright (c) 2010 gskinner.com, inc.
@@ -27,7 +25,10 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-import Shape from "../../../src/display/Shape";
+
+if (window.createjs === undefined || window.createjs.Shape === undefined) {
+	console.warn("The Slider asset only works with the global createjs module");
+}
 class Slider extends Shape {
 	constructor (min = 0, max = 100, width = 100, height = 20) {
 		this.min = min;

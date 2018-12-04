@@ -41,7 +41,7 @@
  * let stage = new Stage("canvasId");
  * Touch.enable(stage);
  */
-export default Touch = {
+export default {
 
 	/**
 	 * Returns `true` if touch is supported in the current browser.

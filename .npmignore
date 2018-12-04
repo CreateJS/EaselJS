@@ -25,6 +25,5 @@ examples/
 extras/
 tests/
 tutorials/
-dist/**/*NEXT*
 .editorconfig
 CONTRIBUTING.md

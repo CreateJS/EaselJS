@@ -26,8 +26,7 @@
  * OTHER DEAliNGS IN THE SOFTWARE.
  */
 
-import EventDispatcher from "@createjs/core/src/events/EventDispatcher";
-import Event from "@createjs/core/src/events/Event";
+import { EventDispatcher, Event } from "@createjs/core";
 import Rectangle from "../geom/Rectangle";
 
 /**

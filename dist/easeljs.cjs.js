@@ -1,6 +1,5 @@
 /**
- * @license
- * EaselJS
+ * @license EaselJS
  * Visit https://createjs.com for documentation, updates and examples.
  *
  * Copyright (c) 2017 gskinner.com, inc.
@@ -26,75 +25,22 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-"use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+'use strict';
 
-function _interopDefault(ex) {
-  return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
-}
+Object.defineProperty(exports, '__esModule', { value: true });
 
-var Tween = _interopDefault(require("@createjs/tweenjs/src/Tween"));
+var tweenjs = require('@createjs/tweenjs');
 
-var Timeline = _interopDefault(require("@createjs/tweenjs/src/Timeline"));
-
-var classCallCheck = function(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function() {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
+var Event =
+function () {
+  function Event(type, bubbles, cancelable) {
+    if (bubbles === void 0) {
+      bubbles = false;
     }
-  }
-  return function(Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-var inherits = function(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
+    if (cancelable === void 0) {
+      cancelable = false;
     }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-var possibleConstructorReturn = function(self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-var StageGL = function StageGL() {
-  classCallCheck(this, StageGL);
-  throw new Error("\n\t\t\tStageGL is not currently supported on the EaselJS 2.0 branch.\n\t\t\tEnd of Q1 2018 is targetted for StageGL support.\n\t\t\tFollow @CreateJS on Twitter for updates.\n\t\t");
-};
-
-var Event = function() {
-  function Event(type) {
-    var bubbles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    var cancelable = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    classCallCheck(this, Event);
     this.type = type;
     this.target = null;
     this.currentTarget = null;
@@ -107,23 +53,24 @@ var Event = function() {
     this.immediatePropagationStopped = false;
     this.removed = false;
   }
-  Event.prototype.preventDefault = function preventDefault() {
+  var _proto = Event.prototype;
+  _proto.preventDefault = function preventDefault() {
     this.defaultPrevented = this.cancelable;
     return this;
   };
-  Event.prototype.stopPropagation = function stopPropagation() {
+  _proto.stopPropagation = function stopPropagation() {
     this.propagationStopped = true;
     return this;
   };
-  Event.prototype.stopImmediatePropagation = function stopImmediatePropagation() {
+  _proto.stopImmediatePropagation = function stopImmediatePropagation() {
     this.immediatePropagationStopped = this.propagationStopped = true;
     return this;
   };
-  Event.prototype.remove = function remove() {
+  _proto.remove = function remove() {
     this.removed = true;
     return this;
   };
-  Event.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     var event = new Event(this.type, this.bubbles, this.cancelable);
     for (var n in this) {
       if (this.hasOwnProperty(n)) {
@@ -132,19 +79,20 @@ var Event = function() {
     }
     return event;
   };
-  Event.prototype.set = function set(props) {
+  _proto.set = function set(props) {
     for (var n in props) {
       this[n] = props[n];
     }
     return this;
   };
-  Event.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + " (type=" + this.type + ")]";
   };
   return Event;
 }();
 
-var EventDispatcher = function() {
+var EventDispatcher =
+function () {
   EventDispatcher.initialize = function initialize(target) {
     var p = EventDispatcher.prototype;
     target.addEventListener = p.addEventListener;
@@ -157,13 +105,15 @@ var EventDispatcher = function() {
     target.willTrigger = p.willTrigger;
   };
   function EventDispatcher() {
-    classCallCheck(this, EventDispatcher);
     this._listeners = null;
     this._captureListeners = null;
   }
-  EventDispatcher.prototype.addEventListener = function addEventListener(type, listener) {
-    var useCapture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    var listeners = void 0;
+  var _proto = EventDispatcher.prototype;
+  _proto.addEventListener = function addEventListener(type, listener, useCapture) {
+    if (useCapture === void 0) {
+      useCapture = false;
+    }
+    var listeners;
     if (useCapture) {
       listeners = this._captureListeners = this._captureListeners || {};
     } else {
@@ -177,27 +127,37 @@ var EventDispatcher = function() {
     if (arr) {
       arr.push(listener);
     } else {
-      listeners[type] = [ listener ];
+      listeners[type] = [listener];
     }
     return listener;
   };
-  EventDispatcher.prototype.on = function on(type, listener) {
-    var scope = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-    var once = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    var data = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
-    var useCapture = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+  _proto.on = function on(type, listener, scope, once, data, useCapture) {
+    if (scope === void 0) {
+      scope = null;
+    }
+    if (once === void 0) {
+      once = false;
+    }
+    if (data === void 0) {
+      data = {};
+    }
+    if (useCapture === void 0) {
+      useCapture = false;
+    }
     if (listener.handleEvent) {
       scope = scope || listener;
       listener = listener.handleEvent;
     }
     scope = scope || this;
-    return this.addEventListener(type, function(evt) {
+    return this.addEventListener(type, function (evt) {
       listener.call(scope, evt, data);
       once && evt.remove();
     }, useCapture);
   };
-  EventDispatcher.prototype.removeEventListener = function removeEventListener(type, listener) {
-    var useCapture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  _proto.removeEventListener = function removeEventListener(type, listener, useCapture) {
+    if (useCapture === void 0) {
+      useCapture = false;
+    }
     var listeners = useCapture ? this._captureListeners : this._listeners;
     if (!listeners) {
       return;
@@ -211,19 +171,24 @@ var EventDispatcher = function() {
       if (arr[i] === listener) {
         if (l === 1) {
           delete listeners[type];
-        } else {
-          arr.splice(i, 1);
         }
+        else {
+            arr.splice(i, 1);
+          }
         break;
       }
     }
   };
-  EventDispatcher.prototype.off = function off(type, listener) {
-    var useCapture = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  _proto.off = function off(type, listener, useCapture) {
+    if (useCapture === void 0) {
+      useCapture = false;
+    }
     this.removeEventListener(type, listener, useCapture);
   };
-  EventDispatcher.prototype.removeAllEventListeners = function removeAllEventListeners() {
-    var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  _proto.removeAllEventListeners = function removeAllEventListeners(type) {
+    if (type === void 0) {
+      type = null;
+    }
     if (type) {
       if (this._listeners) {
         delete this._listeners[type];
@@ -235,9 +200,13 @@ var EventDispatcher = function() {
       this._listeners = this._captureListeners = null;
     }
   };
-  EventDispatcher.prototype.dispatchEvent = function dispatchEvent(eventObj) {
-    var bubbles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    var cancelable = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  _proto.dispatchEvent = function dispatchEvent(eventObj, bubbles, cancelable) {
+    if (bubbles === void 0) {
+      bubbles = false;
+    }
+    if (cancelable === void 0) {
+      cancelable = false;
+    }
     if (typeof eventObj === "string") {
       var listeners = this._listeners;
       if (!bubbles && (!listeners || !listeners[eventObj])) {
@@ -254,12 +223,12 @@ var EventDispatcher = function() {
       this._dispatchEvent(eventObj, 2);
     } else {
       var top = this;
-      var list = [ top ];
+      var list = [top];
       while (top.parent) {
         list.push(top = top.parent);
       }
       var l = list.length;
-      var i = void 0;
+      var i;
       for (i = l - 1; i >= 0 && !eventObj.propagationStopped; i--) {
         list[i]._dispatchEvent(eventObj, 1 + (i == 0));
       }
@@ -269,11 +238,12 @@ var EventDispatcher = function() {
     }
     return !eventObj.defaultPrevented;
   };
-  EventDispatcher.prototype.hasEventListener = function hasEventListener(type) {
-    var listeners = this._listeners, captureListeners = this._captureListeners;
+  _proto.hasEventListener = function hasEventListener(type) {
+    var listeners = this._listeners,
+        captureListeners = this._captureListeners;
     return !!(listeners && listeners[type] || captureListeners && captureListeners[type]);
   };
-  EventDispatcher.prototype.willTrigger = function willTrigger(type) {
+  _proto.willTrigger = function willTrigger(type) {
     var o = this;
     while (o) {
       if (o.hasEventListener(type)) {
@@ -283,14 +253,14 @@ var EventDispatcher = function() {
     }
     return false;
   };
-  EventDispatcher.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + (this.constructor.name + this.name ? " " + this.name : "") + "]";
   };
-  EventDispatcher.prototype._dispatchEvent = function _dispatchEvent(eventObj, eventPhase) {
+  _proto._dispatchEvent = function _dispatchEvent(eventObj, eventPhase) {
     var listeners = eventPhase === 1 ? this._captureListeners : this._listeners;
     if (eventObj && listeners) {
       var arr = listeners[eventObj.type];
-      var l = void 0;
+      var l;
       if (!arr || (l = arr.length) === 0) {
         return;
       }
@@ -319,50 +289,427 @@ var EventDispatcher = function() {
   return EventDispatcher;
 }();
 
-var _nextId = 0;
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
 
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+  subClass.__proto__ = superClass;
+}
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+var Ticker =
+function (_EventDispatcher) {
+  _inheritsLoose(Ticker, _EventDispatcher);
+  _createClass(Ticker, null, [{
+    key: "RAF_SYNCHED",
+    get: function get() {
+      return "synched";
+    }
+  }, {
+    key: "RAF",
+    get: function get() {
+      return "raf";
+    }
+  }, {
+    key: "TIMEOUT",
+    get: function get() {
+      return "timeout";
+    }
+  }]);
+  function Ticker(name) {
+    var _this;
+    _this = _EventDispatcher.call(this) || this;
+    _this.name = name;
+    _this.timingMode = Ticker.TIMEOUT;
+    _this.maxDelta = 0;
+    _this.paused = false;
+    _this._inited = false;
+    _this._startTime = 0;
+    _this._pausedTime = 0;
+    _this._ticks = 0;
+    _this._pausedTicks = 0;
+    _this._interval = 50;
+    _this._lastTime = 0;
+    _this._times = null;
+    _this._tickTimes = null;
+    _this._timerId = null;
+    _this._raf = true;
+    return _this;
+  }
+  var _proto = Ticker.prototype;
+  _proto.init = function init() {
+    if (this._inited) {
+      return;
+    }
+    this._inited = true;
+    this._times = [];
+    this._tickTimes = [];
+    this._startTime = this._getTime();
+    this._times.push(this._lastTime = 0);
+    this._setupTick();
+  };
+  _proto.reset = function reset() {
+    if (this._raf) {
+      var f = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.oCancelAnimationFrame || window.msCancelAnimationFrame;
+      f && f(this._timerId);
+    } else {
+      clearTimeout(this._timerId);
+    }
+    this.removeAllEventListeners("tick");
+    this._timerId = this._times = this._tickTimes = null;
+    this._startTime = this._lastTime = this._ticks = 0;
+    this._inited = false;
+  };
+  _proto.addEventListener = function addEventListener(type, listener, useCapture) {
+    !this._inited && this.init();
+    return _EventDispatcher.prototype.addEventListener.call(this, type, listener, useCapture);
+  };
+  _proto.getMeasuredTickTime = function getMeasuredTickTime(ticks) {
+    if (ticks === void 0) {
+      ticks = null;
+    }
+    var times = this._tickTimes;
+    if (!times || times.length < 1) {
+      return -1;
+    }
+    ticks = Math.min(times.length, ticks || this.framerate | 0);
+    return times.reduce(function (a, b) {
+      return a + b;
+    }, 0) / ticks;
+  };
+  _proto.getMeasuredFPS = function getMeasuredFPS(ticks) {
+    if (ticks === void 0) {
+      ticks = null;
+    }
+    var times = this._times;
+    if (!times || times.length < 2) {
+      return -1;
+    }
+    ticks = Math.min(times.length - 1, ticks || this.framerate | 0);
+    return 1000 / ((times[0] - times[ticks]) / ticks);
+  };
+  _proto.getTime = function getTime(runTime) {
+    if (runTime === void 0) {
+      runTime = false;
+    }
+    return this._startTime ? this._getTime() - (runTime ? this._pausedTime : 0) : -1;
+  };
+  _proto.getEventTime = function getEventTime(runTime) {
+    if (runTime === void 0) {
+      runTime = false;
+    }
+    return this._startTime ? (this._lastTime || this._startTime) - (runTime ? this._pausedTime : 0) : -1;
+  };
+  _proto.getTicks = function getTicks(pauseable) {
+    if (pauseable === void 0) {
+      pauseable = false;
+    }
+    return this._ticks - (pauseable ? this._pausedTicks : 0);
+  };
+  _proto._handleSynch = function _handleSynch() {
+    this._timerId = null;
+    this._setupTick();
+    if (this._getTime() - this._lastTime >= (this._interval - 1) * 0.97) {
+      this._tick();
+    }
+  };
+  _proto._handleRAF = function _handleRAF() {
+    this._timerId = null;
+    this._setupTick();
+    this._tick();
+  };
+  _proto._handleTimeout = function _handleTimeout() {
+    this._timerId = null;
+    this._setupTick();
+    this._tick();
+  };
+  _proto._setupTick = function _setupTick() {
+    if (this._timerId != null) {
+      return;
+    }
+    var mode = this.timingMode || this._raf && Ticker.RAF;
+    if (mode === Ticker.RAF_SYNCHED || mode === Ticker.RAF) {
+      var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+      if (f) {
+        this._timerId = f(mode === Ticker.RAF ? this._handleRAF.bind(this) : this._handleSynch.bind(this));
+        this._raf = true;
+        return;
+      }
+    }
+    this._raf = false;
+    this._timerId = setTimeout(this._handleTimeout.bind(this), this._interval);
+  };
+  _proto._tick = function _tick() {
+    var paused = this.paused,
+        time = this._getTime(),
+        elapsedTime = time - this._lastTime;
+    this._lastTime = time;
+    this._ticks++;
+    if (paused) {
+      this._pausedTicks++;
+      this._pausedTime += elapsedTime;
+    }
+    if (this.hasEventListener("tick")) {
+      var event = new Event("tick");
+      var maxDelta = this.maxDelta;
+      event.delta = maxDelta && elapsedTime > maxDelta ? maxDelta : elapsedTime;
+      event.paused = paused;
+      event.time = time;
+      event.runTime = time - this._pausedTime;
+      this.dispatchEvent(event);
+    }
+    this._tickTimes.unshift(this._getTime() - time);
+    while (this._tickTimes.length > 100) {
+      this._tickTimes.pop();
+    }
+    this._times.unshift(time);
+    while (this._times.length > 100) {
+      this._times.pop();
+    }
+  };
+  _proto._getTime = function _getTime() {
+    var now = window.performance && window.performance.now;
+    return (now && now.call(performance) || new Date().getTime()) - this._startTime;
+  };
+  Ticker.on = function on(type, listener, scope, once, data, useCapture) {
+    return _instance.on(type, listener, scope, once, data, useCapture);
+  };
+  Ticker.removeEventListener = function removeEventListener(type, listener, useCapture) {
+    _instance.removeEventListener(type, listener, useCapture);
+  };
+  Ticker.off = function off(type, listener, useCapture) {
+    _instance.off(type, listener, useCapture);
+  };
+  Ticker.removeAllEventListeners = function removeAllEventListeners(type) {
+    _instance.removeAllEventListeners(type);
+  };
+  Ticker.dispatchEvent = function dispatchEvent(eventObj, bubbles, cancelable) {
+    return _instance.dispatchEvent(eventObj, bubbles, cancelable);
+  };
+  Ticker.hasEventListener = function hasEventListener(type) {
+    return _instance.hasEventListener(type);
+  };
+  Ticker.willTrigger = function willTrigger(type) {
+    return _instance.willTrigger(type);
+  };
+  Ticker.toString = function toString() {
+    return _instance.toString();
+  };
+  Ticker.init = function init() {
+    _instance.init();
+  };
+  Ticker.reset = function reset() {
+    _instance.reset();
+  };
+  Ticker.addEventListener = function addEventListener(type, listener, useCapture) {
+    _instance.addEventListener(type, listener, useCapture);
+  };
+  Ticker.getMeasuredTickTime = function getMeasuredTickTime(ticks) {
+    return _instance.getMeasuredTickTime(ticks);
+  };
+  Ticker.getMeasuredFPS = function getMeasuredFPS(ticks) {
+    return _instance.getMeasuredFPS(ticks);
+  };
+  Ticker.getTime = function getTime(runTime) {
+    return _instance.getTime(runTime);
+  };
+  Ticker.getEventTime = function getEventTime(runTime) {
+    return _instance.getEventTime(runTime);
+  };
+  Ticker.getTicks = function getTicks(pauseable) {
+    return _instance.getTicks(pauseable);
+  };
+  _createClass(Ticker, [{
+    key: "interval",
+    get: function get() {
+      return this._interval;
+    },
+    set: function set(interval) {
+      this._interval = interval;
+      if (!this._inited) {
+        return;
+      }
+      this._setupTick();
+    }
+  }, {
+    key: "framerate",
+    get: function get() {
+      return 1000 / this._interval;
+    },
+    set: function set(framerate) {
+      this.interval = 1000 / framerate;
+    }
+  }], [{
+    key: "interval",
+    get: function get() {
+      return _instance.interval;
+    },
+    set: function set(interval) {
+      _instance.interval = interval;
+    }
+  }, {
+    key: "framerate",
+    get: function get() {
+      return _instance.framerate;
+    },
+    set: function set(framerate) {
+      _instance.framerate = framerate;
+    }
+  }, {
+    key: "name",
+    get: function get() {
+      return _instance.name;
+    },
+    set: function set(name) {
+      _instance.name = name;
+    }
+  }, {
+    key: "timingMode",
+    get: function get() {
+      return _instance.timingMode;
+    },
+    set: function set(timingMode) {
+      _instance.timingMode = timingMode;
+    }
+  }, {
+    key: "maxDelta",
+    get: function get() {
+      return _instance.maxDelta;
+    },
+    set: function set(maxDelta) {
+      _instance.maxDelta = maxDelta;
+    }
+  }, {
+    key: "paused",
+    get: function get() {
+      return _instance.paused;
+    },
+    set: function set(paused) {
+      _instance.paused = paused;
+    }
+  }]);
+  return Ticker;
+}(EventDispatcher);
+var _instance = new Ticker("createjs.global");
+
+var StageGL = function StageGL() {
+  throw new Error("\n\t\t\tStageGL is not currently supported on the EaselJS 2.0 branch.\n\t\t\tEnd of Q1 2018 is targetted for StageGL support.\n\t\t\tFollow @CreateJS on Twitter for updates.\n\t\t");
+};
+
+var Shadow =
+function () {
+  function Shadow(color, offsetX, offsetY, blur) {
+    if (color === void 0) {
+      color = "black";
+    }
+    if (offsetX === void 0) {
+      offsetX = 0;
+    }
+    if (offsetY === void 0) {
+      offsetY = 0;
+    }
+    if (blur === void 0) {
+      blur = 0;
+    }
+    this.color = color;
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+    this.blur = blur;
+  }
+  var _proto = Shadow.prototype;
+  _proto.toString = function toString() {
+    return "[" + this.constructor.name + "]";
+  };
+  _proto.clone = function clone() {
+    return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);
+  };
+  return Shadow;
+}();
+Shadow.identity = new Shadow("transparent");
+
+var _nextId = 0;
 function uid() {
   return _nextId++;
 }
 
-var Point = function() {
+var Point =
+function () {
   function Point(x, y) {
-    classCallCheck(this, Point);
     this.setValues(x, y);
   }
-  Point.prototype.setValues = function setValues() {
-    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var _proto = Point.prototype;
+  _proto.setValues = function setValues(x, y) {
+    if (x === void 0) {
+      x = 0;
+    }
+    if (y === void 0) {
+      y = 0;
+    }
     this.x = x;
     this.y = y;
     return this;
   };
-  Point.prototype.copy = function copy(point) {
+  _proto.copy = function copy(point) {
     this.x = point.x;
     this.y = point.y;
     return this;
   };
-  Point.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return new Point(this.x, this.y);
   };
-  Point.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + " (x=" + this.x + " y=" + this.y + ")]";
   };
   return Point;
 }();
 
-var Matrix2D = function() {
+var Matrix2D =
+function () {
   function Matrix2D(a, b, c, d, tx, ty) {
-    classCallCheck(this, Matrix2D);
     this.setValues(a, b, c, d, tx, ty);
   }
-  Matrix2D.prototype.setValues = function setValues() {
-    var a = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-    var b = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var c = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    var d = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-    var tx = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
-    var ty = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
+  var _proto = Matrix2D.prototype;
+  _proto.setValues = function setValues(a, b, c, d, tx, ty) {
+    if (a === void 0) {
+      a = 1;
+    }
+    if (b === void 0) {
+      b = 0;
+    }
+    if (c === void 0) {
+      c = 0;
+    }
+    if (d === void 0) {
+      d = 1;
+    }
+    if (tx === void 0) {
+      tx = 0;
+    }
+    if (ty === void 0) {
+      ty = 0;
+    }
     this.a = a;
     this.b = b;
     this.c = c;
@@ -371,7 +718,7 @@ var Matrix2D = function() {
     this.ty = ty;
     return this;
   };
-  Matrix2D.prototype.append = function append(a, b, c, d, tx, ty) {
+  _proto.append = function append(a, b, c, d, tx, ty) {
     var a1 = this.a;
     var b1 = this.b;
     var c1 = this.c;
@@ -386,7 +733,7 @@ var Matrix2D = function() {
     this.ty = b1 * tx + d1 * ty + this.ty;
     return this;
   };
-  Matrix2D.prototype.prepend = function prepend(a, b, c, d, tx, ty) {
+  _proto.prepend = function prepend(a, b, c, d, tx, ty) {
     var a1 = this.a;
     var c1 = this.c;
     var tx1 = this.tx;
@@ -398,14 +745,14 @@ var Matrix2D = function() {
     this.ty = b * tx1 + d * this.ty + ty;
     return this;
   };
-  Matrix2D.prototype.appendMatrix = function appendMatrix(matrix) {
+  _proto.appendMatrix = function appendMatrix(matrix) {
     return this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
   };
-  Matrix2D.prototype.prependMatrix = function prependMatrix(matrix) {
+  _proto.prependMatrix = function prependMatrix(matrix) {
     return this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
   };
-  Matrix2D.prototype.appendTransform = function appendTransform(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-    var r = void 0, cos = void 0, sin = void 0;
+  _proto.appendTransform = function appendTransform(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+    var r, cos, sin;
     if (rotation % 360) {
       r = rotation * Matrix2D.DEG_TO_RAD;
       cos = Math.cos(r);
@@ -428,8 +775,8 @@ var Matrix2D = function() {
     }
     return this;
   };
-  Matrix2D.prototype.prependTransform = function prependTransform(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-    var r = void 0, cos = void 0, sin = void 0;
+  _proto.prependTransform = function prependTransform(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+    var r, cos, sin;
     if (rotation % 360) {
       r = rotation * Matrix2D.DEG_TO_RAD;
       cos = Math.cos(r);
@@ -452,7 +799,7 @@ var Matrix2D = function() {
     }
     return this;
   };
-  Matrix2D.prototype.rotate = function rotate(angle) {
+  _proto.rotate = function rotate(angle) {
     angle *= Matrix2D.DEG_TO_RAD;
     var cos = Math.cos(angle);
     var sin = Math.sin(angle);
@@ -464,30 +811,30 @@ var Matrix2D = function() {
     this.d = -b1 * sin + this.d * cos;
     return this;
   };
-  Matrix2D.prototype.skew = function skew(skewX, skewY) {
+  _proto.skew = function skew(skewX, skewY) {
     skewX *= Matrix2D.DEG_TO_RAD;
     skewY *= Matrix2D.DEG_TO_RAD;
     this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
     return this;
   };
-  Matrix2D.prototype.scale = function scale(x, y) {
+  _proto.scale = function scale(x, y) {
     this.a *= x;
     this.b *= x;
     this.c *= y;
     this.d *= y;
     return this;
   };
-  Matrix2D.prototype.translate = function translate(x, y) {
+  _proto.translate = function translate(x, y) {
     this.tx += this.a * x + this.c * y;
     this.ty += this.b * x + this.d * y;
     return this;
   };
-  Matrix2D.prototype.identity = function identity() {
+  _proto.identity = function identity() {
     this.a = this.d = 1;
     this.b = this.c = this.tx = this.ty = 0;
     return this;
   };
-  Matrix2D.prototype.invert = function invert() {
+  _proto.invert = function invert() {
     var a1 = this.a;
     var b1 = this.b;
     var c1 = this.c;
@@ -502,20 +849,24 @@ var Matrix2D = function() {
     this.ty = -(a1 * this.ty - b1 * tx1) / n;
     return this;
   };
-  Matrix2D.prototype.isIdentity = function isIdentity() {
+  _proto.isIdentity = function isIdentity() {
     return this.tx === 0 && this.ty === 0 && this.a === 1 && this.b === 0 && this.c === 0 && this.d === 1;
   };
-  Matrix2D.prototype.equals = function equals(matrix) {
+  _proto.equals = function equals(matrix) {
     return this.tx === matrix.tx && this.ty === matrix.ty && this.a === matrix.a && this.b === matrix.b && this.c === matrix.c && this.d === matrix.d;
   };
-  Matrix2D.prototype.transformPoint = function transformPoint(x, y) {
-    var pt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : new Point();
+  _proto.transformPoint = function transformPoint(x, y, pt) {
+    if (pt === void 0) {
+      pt = new Point();
+    }
     pt.x = x * this.a + y * this.c + this.tx;
     pt.y = x * this.b + y * this.d + this.ty;
     return pt;
   };
-  Matrix2D.prototype.decompose = function decompose() {
-    var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  _proto.decompose = function decompose(target) {
+    if (target === void 0) {
+      target = {};
+    }
     target.x = this.tx;
     target.y = this.ty;
     target.scaleX = Math.sqrt(this.a * this.a + this.b * this.b);
@@ -523,7 +874,7 @@ var Matrix2D = function() {
     var skewX = Math.atan2(-this.c, this.d);
     var skewY = Math.atan2(this.b, this.a);
     var delta = Math.abs(1 - skewX / skewY);
-    if (delta < 1e-5) {
+    if (delta < 0.00001) {
       target.rotation = skewY / Matrix2D.DEG_TO_RAD;
       if (this.a < 0 && this.d >= 0) {
         target.rotation += target.rotation <= 0 ? 180 : -180;
@@ -535,33 +886,33 @@ var Matrix2D = function() {
     }
     return target;
   };
-  Matrix2D.prototype.copy = function copy(matrix) {
+  _proto.copy = function copy(matrix) {
     return this.setValues(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
   };
-  Matrix2D.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
   };
-  Matrix2D.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + " (a=" + this.a + " b=" + this.b + " c=" + this.c + " d=" + this.d + " tx=" + this.tx + " ty=" + this.ty + ")]";
   };
   return Matrix2D;
 }();
-
 Matrix2D.DEG_TO_RAD = Math.PI / 180;
-
 Matrix2D.identity = new Matrix2D();
 
-var DisplayProps = function() {
+var DisplayProps =
+function () {
   function DisplayProps(visible, alpha, shadow, compositeOperation, matrix) {
-    classCallCheck(this, DisplayProps);
     this.setValues(visible, alpha, shadow, compositeOperation, matrix);
   }
-  DisplayProps.prototype.setValues = function setValues() {
-    var visible = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-    var alpha = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-    var shadow = arguments[2];
-    var compositeOperation = arguments[3];
-    var matrix = arguments[4];
+  var _proto = DisplayProps.prototype;
+  _proto.setValues = function setValues(visible, alpha, shadow, compositeOperation, matrix) {
+    if (visible === void 0) {
+      visible = true;
+    }
+    if (alpha === void 0) {
+      alpha = 1;
+    }
     this.visible = visible;
     this.alpha = alpha;
     this.shadow = shadow;
@@ -569,7 +920,7 @@ var DisplayProps = function() {
     this.matrix = matrix || this.matrix && this.matrix.identity() || new Matrix2D();
     return this;
   };
-  DisplayProps.prototype.append = function append(visible, alpha, shadow, compositeOperation, matrix) {
+  _proto.append = function append(visible, alpha, shadow, compositeOperation, matrix) {
     this.alpha *= alpha;
     this.shadow = shadow || this.shadow;
     this.compositeOperation = compositeOperation || this.compositeOperation;
@@ -577,7 +928,7 @@ var DisplayProps = function() {
     matrix && this.matrix.appendMatrix(matrix);
     return this;
   };
-  DisplayProps.prototype.prepend = function prepend(visible, alpha, shadow, compositeOperation, matrix) {
+  _proto.prepend = function prepend(visible, alpha, shadow, compositeOperation, matrix) {
     this.alpha *= alpha;
     this.shadow = this.shadow || shadow;
     this.compositeOperation = this.compositeOperation || compositeOperation;
@@ -585,38 +936,51 @@ var DisplayProps = function() {
     matrix && this.matrix.prependMatrix(matrix);
     return this;
   };
-  DisplayProps.prototype.identity = function identity() {
+  _proto.identity = function identity() {
     this.visible = true;
     this.alpha = 1;
     this.shadow = this.compositeOperation = null;
     this.matrix.identity();
     return this;
   };
-  DisplayProps.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return new DisplayProps(this.alpha, this.shadow, this.compositeOperation, this.visible, this.matrix.clone());
   };
   return DisplayProps;
 }();
 
-var Rectangle = function() {
+var Rectangle =
+function () {
   function Rectangle(x, y, width, height) {
-    classCallCheck(this, Rectangle);
     this.setValues(x, y, width, height);
   }
-  Rectangle.prototype.setValues = function setValues() {
-    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var width = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    var height = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  var _proto = Rectangle.prototype;
+  _proto.setValues = function setValues(x, y, width, height) {
+    if (x === void 0) {
+      x = 0;
+    }
+    if (y === void 0) {
+      y = 0;
+    }
+    if (width === void 0) {
+      width = 0;
+    }
+    if (height === void 0) {
+      height = 0;
+    }
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     return this;
   };
-  Rectangle.prototype.extend = function extend(x, y) {
-    var width = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    var height = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  _proto.extend = function extend(x, y, width, height) {
+    if (width === void 0) {
+      width = 0;
+    }
+    if (height === void 0) {
+      height = 0;
+    }
     if (x + width > this.x + this.width) {
       this.width = x + width - this.x;
     }
@@ -633,26 +997,33 @@ var Rectangle = function() {
     }
     return this;
   };
-  Rectangle.prototype.pad = function pad(top, left, bottom, right) {
+  _proto.pad = function pad(top, left, bottom, right) {
     this.x -= left;
     this.y -= top;
     this.width += left + right;
     this.height += top + bottom;
     return this;
   };
-  Rectangle.prototype.copy = function copy(rect) {
+  _proto.copy = function copy(rect) {
     return this.setValues(rect.x, rect.y, rect.width, rect.height);
   };
-  Rectangle.prototype.contains = function contains(x, y) {
-    var width = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    var height = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  _proto.contains = function contains(x, y, width, height) {
+    if (width === void 0) {
+      width = 0;
+    }
+    if (height === void 0) {
+      height = 0;
+    }
     return x >= this.x && x + width <= this.x + this.width && y >= this.y && y + height <= this.y + this.height;
   };
-  Rectangle.prototype.union = function union(rect) {
+  _proto.union = function union(rect) {
     return this.clone().extend(rect.x, rect.y, rect.width, rect.height);
   };
-  Rectangle.prototype.intersection = function intersection(rect) {
-    var x1 = rect.x, y1 = rect.y, x2 = x1 + rect.width, y2 = y1 + rect.height;
+  _proto.intersection = function intersection(rect) {
+    var x1 = rect.x,
+        y1 = rect.y,
+        x2 = x1 + rect.width,
+        y2 = y1 + rect.height;
     if (this.x > x1) {
       x1 = this.x;
     }
@@ -667,32 +1038,33 @@ var Rectangle = function() {
     }
     return x2 <= x1 || y2 <= y1 ? null : new Rectangle(x1, y1, x2 - x1, y2 - y1);
   };
-  Rectangle.prototype.intersects = function intersects(rect) {
+  _proto.intersects = function intersects(rect) {
     return rect.x <= this.x + this.width && this.x <= rect.x + rect.width && rect.y <= this.y + this.height && this.y <= rect.y + rect.height;
   };
-  Rectangle.prototype.isEmpty = function isEmpty() {
+  _proto.isEmpty = function isEmpty() {
     return this.width <= 0 || this.height <= 0;
   };
-  Rectangle.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return new Rectangle(this.x, this.y, this.width, this.height);
   };
-  Rectangle.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + " (x=" + this.x + " y=" + this.y + " width=" + this.width + " height=" + this.height + ")]";
   };
   return Rectangle;
 }();
 
-var Filter = function() {
+var Filter =
+function () {
   function Filter() {
-    classCallCheck(this, Filter);
     this.usesContext = false;
     this._multiPass = null;
     this.VTX_SHADER_BODY = null;
     this.FRAG_SHADER_BODY = null;
   }
-  Filter.prototype.getBounds = function getBounds(rect) {};
-  Filter.prototype.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {};
-  Filter.prototype.applyFilter = function applyFilter(ctx, x, y, width, height, targetCtx, targetX, targetY) {
+  var _proto = Filter.prototype;
+  _proto.getBounds = function getBounds(rect) {};
+  _proto.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {};
+  _proto.applyFilter = function applyFilter(ctx, x, y, width, height, targetCtx, targetX, targetY) {
     targetCtx = targetCtx || ctx;
     if (targetX == null) {
       targetX = x;
@@ -709,21 +1081,22 @@ var Filter = function() {
     } catch (e) {}
     return false;
   };
-  Filter.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + "]";
   };
-  Filter.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return new Filter();
   };
-  Filter.prototype._applyFilter = function _applyFilter(imageData) {};
+  _proto._applyFilter = function _applyFilter(imageData) {};
   return Filter;
 }();
 
-var BitmapCache = function(_Filter) {
-  inherits(BitmapCache, _Filter);
+var BitmapCache =
+function (_Filter) {
+  _inheritsLoose(BitmapCache, _Filter);
   function BitmapCache() {
-    classCallCheck(this, BitmapCache);
-    var _this = possibleConstructorReturn(this, _Filter.call(this));
+    var _this;
+    _this = _Filter.call(this) || this;
     _this.width = undefined;
     _this.height = undefined;
     _this.x = undefined;
@@ -741,8 +1114,10 @@ var BitmapCache = function(_Filter) {
     _this._boundRect = new Rectangle();
     return _this;
   }
-  BitmapCache.getFilterBounds = function getFilterBounds(target) {
-    var output = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Rectangle();
+  BitmapCache.getFilterBounds = function getFilterBounds(target, output) {
+    if (output === void 0) {
+      output = new Rectangle();
+    }
     var filters = target.filters;
     var filterCount = filters && filters.length;
     if (!!filterCount <= 0) {
@@ -765,13 +1140,23 @@ var BitmapCache = function(_Filter) {
     }
     return output;
   };
-  BitmapCache.prototype.define = function define(target) {
-    var x = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var y = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    var width = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-    var height = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
-    var scale = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 1;
-    var options = arguments[6];
+  var _proto = BitmapCache.prototype;
+  _proto.define = function define(target, x, y, width, height, scale, options) {
+    if (x === void 0) {
+      x = 0;
+    }
+    if (y === void 0) {
+      y = 0;
+    }
+    if (width === void 0) {
+      width = 1;
+    }
+    if (height === void 0) {
+      height = 1;
+    }
+    if (scale === void 0) {
+      scale = 1;
+    }
     if (!target) {
       throw "No symbol to cache";
     }
@@ -785,7 +1170,7 @@ var BitmapCache = function(_Filter) {
     this.scale = scale;
     this.update();
   };
-  BitmapCache.prototype.update = function update(compositeOperation) {
+  _proto.update = function update(compositeOperation) {
     if (!this.target) {
       throw "define() must be called before update()";
     }
@@ -803,7 +1188,7 @@ var BitmapCache = function(_Filter) {
     this._drawToCache(compositeOperation);
     this.cacheID = this.cacheID ? this.cacheID + 1 : 1;
   };
-  BitmapCache.prototype.release = function release() {
+  _proto.release = function release() {
     var stage = this.target.stage;
     if (this._useWebGL && this._webGLCache) {
       if (!this._webGLCache.isCacheControlled) {
@@ -829,7 +1214,7 @@ var BitmapCache = function(_Filter) {
     this.width = this.height = this.x = this.y = this.offX = this.offY = 0;
     this.scale = 1;
   };
-  BitmapCache.prototype.getCacheDataURL = function getCacheDataURL() {
+  _proto.getCacheDataURL = function getCacheDataURL() {
     var cacheCanvas = this.target && this.target.cacheCanvas;
     if (!cacheCanvas) {
       return null;
@@ -840,19 +1225,19 @@ var BitmapCache = function(_Filter) {
     }
     return this._cacheDataURL;
   };
-  BitmapCache.prototype.draw = function draw(ctx) {
+  _proto.draw = function draw(ctx) {
     if (!this.target) {
       return false;
     }
     ctx.drawImage(this.target.cacheCanvas, this.x + this._filterOffX / this.scale, this.y + this._filterOffY / this.scale, this._drawWidth / this.scale, this._drawHeight / this.scale);
     return true;
   };
-  BitmapCache.prototype.getBounds = function getBounds() {
+  _proto.getBounds = function getBounds() {
     var scale = this.scale;
     return this._boundRect.setValue(this._filterOffX / scale, this._filterOffY / scale, this.width / scale, this.height / scale);
   };
-  BitmapCache.prototype._updateSurface = function _updateSurface() {
-    var surface = void 0;
+  _proto._updateSurface = function _updateSurface() {
+    var surface;
     if (!this._useWebGL) {
       surface = this.target.cacheCanvas;
       if (!surface) {
@@ -895,7 +1280,7 @@ var BitmapCache = function(_Filter) {
       stageGL.getTargetRenderTexture(this.target, this._drawWidth, this._drawHeight);
     }
   };
-  BitmapCache.prototype._drawToCache = function _drawToCache(compositeOperation) {
+  _proto._drawToCache = function _drawToCache(compositeOperation) {
     var target = this.target;
     var surface = target.cacheCanvas;
     var webGL = this._webGLCache;
@@ -922,7 +1307,7 @@ var BitmapCache = function(_Filter) {
     surface.height = this._drawHeight;
     surface._invalid = true;
   };
-  BitmapCache.prototype._applyFilters = function _applyFilters() {
+  _proto._applyFilters = function _applyFilters() {
     var surface = this.target.cacheCanvas;
     var filters = this.target.filters;
     var w = this._drawWidth;
@@ -937,11 +1322,12 @@ var BitmapCache = function(_Filter) {
   return BitmapCache;
 }(Filter);
 
-var DisplayObject = function(_EventDispatcher) {
-  inherits(DisplayObject, _EventDispatcher);
+var DisplayObject =
+function (_EventDispatcher) {
+  _inheritsLoose(DisplayObject, _EventDispatcher);
   function DisplayObject() {
-    classCallCheck(this, DisplayObject);
-    var _this = possibleConstructorReturn(this, _EventDispatcher.call(this));
+    var _this;
+    _this = _EventDispatcher.call(this) || this;
     _this.alpha = 1;
     _this.cacheCanvas = null;
     _this.bitmapCache = null;
@@ -974,23 +1360,30 @@ var DisplayObject = function(_EventDispatcher) {
     _this._webGLRenderStyle = DisplayObject._StageGL_NONE;
     return _this;
   }
-  DisplayObject.prototype.isVisible = function isVisible() {
+  var _proto = DisplayObject.prototype;
+  _proto.isVisible = function isVisible() {
     return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0);
   };
-  DisplayObject.prototype.draw = function draw(ctx) {
-    var ignoreCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  _proto.draw = function draw(ctx, ignoreCache) {
+    if (ignoreCache === void 0) {
+      ignoreCache = false;
+    }
     return this.drawCache(ctx, ignoreCache);
   };
-  DisplayObject.prototype.drawCache = function drawCache(ctx) {
-    var ignoreCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  _proto.drawCache = function drawCache(ctx, ignoreCache) {
+    if (ignoreCache === void 0) {
+      ignoreCache = false;
+    }
     var cache = this.bitmapCache;
     if (cache && !ignoreCache) {
       return cache.draw(ctx);
     }
     return false;
   };
-  DisplayObject.prototype.updateContext = function updateContext(ctx) {
-    var o = this, mask = o.mask, mtx = o._props.matrix;
+  _proto.updateContext = function updateContext(ctx) {
+    var o = this,
+        mask = o.mask,
+        mtx = o._props.matrix;
     if (mask && mask.graphics && !mask.graphics.isEmpty()) {
       mask.getMatrix(mtx);
       ctx.transform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
@@ -1000,10 +1393,11 @@ var DisplayObject = function(_EventDispatcher) {
       ctx.transform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
     }
     this.getMatrix(mtx);
-    var tx = mtx.tx, ty = mtx.ty;
+    var tx = mtx.tx,
+        ty = mtx.ty;
     if (DisplayObject._snapToPixelEnabled && o.snapToPixel) {
-      tx = tx + (tx < 0 ? -.5 : .5) | 0;
-      ty = ty + (ty < 0 ? -.5 : .5) | 0;
+      tx = tx + (tx < 0 ? -0.5 : 0.5) | 0;
+      ty = ty + (ty < 0 ? -0.5 : 0.5) | 0;
     }
     ctx.transform(mtx.a, mtx.b, mtx.c, mtx.d, tx, ty);
     ctx.globalAlpha *= o.alpha;
@@ -1014,51 +1408,74 @@ var DisplayObject = function(_EventDispatcher) {
       this._applyShadow(ctx, o.shadow);
     }
   };
-  DisplayObject.prototype.cache = function cache(x, y, width, height) {
-    var scale = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
-    var options = arguments[5];
+  _proto.cache = function cache(x, y, width, height, scale, options) {
+    if (scale === void 0) {
+      scale = 1;
+    }
     if (!this.bitmapCache) {
       this.bitmapCache = new BitmapCache();
     }
     this.bitmapCache.define(this, x, y, width, height, scale, options);
   };
-  DisplayObject.prototype.updateCache = function updateCache(compositeOperation) {
+  _proto.updateCache = function updateCache(compositeOperation) {
     if (!this.bitmapCache) {
       throw "No cache found. cache() must be called before updateCache()";
     }
     this.bitmapCache.update(compositeOperation);
   };
-  DisplayObject.prototype.uncache = function uncache() {
+  _proto.uncache = function uncache() {
     if (this.bitmapCache) {
       this.bitmapCache.release();
       this.bitmapCache = undefined;
     }
   };
-  DisplayObject.prototype.getCacheDataURL = function getCacheDataURL() {
+  _proto.getCacheDataURL = function getCacheDataURL() {
     return this.bitmapCache ? this.bitmapCache.getDataURL() : null;
   };
-  DisplayObject.prototype.localToGlobal = function localToGlobal(x, y) {
-    var pt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : new Point();
+  _proto.localToGlobal = function localToGlobal(x, y, pt) {
+    if (pt === void 0) {
+      pt = new Point();
+    }
     return this.getConcatenatedMatrix(this._props.matrix).transformPoint(x, y, pt);
   };
-  DisplayObject.prototype.globalToLocal = function globalToLocal(x, y) {
-    var pt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : new Point();
+  _proto.globalToLocal = function globalToLocal(x, y, pt) {
+    if (pt === void 0) {
+      pt = new Point();
+    }
     return this.getConcatenatedMatrix(this._props.matrix).invert().transformPoint(x, y, pt);
   };
-  DisplayObject.prototype.localToLocal = function localToLocal(x, y, target, pt) {
+  _proto.localToLocal = function localToLocal(x, y, target, pt) {
     pt = this.localToGlobal(x, y, pt);
     return target.globalToLocal(pt.x, pt.y, pt);
   };
-  DisplayObject.prototype.setTransform = function setTransform() {
-    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var scaleX = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-    var scaleY = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-    var rotation = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
-    var skewX = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
-    var skewY = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 0;
-    var regX = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 0;
-    var regY = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : 0;
+  _proto.setTransform = function setTransform(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+    if (x === void 0) {
+      x = 0;
+    }
+    if (y === void 0) {
+      y = 0;
+    }
+    if (scaleX === void 0) {
+      scaleX = 1;
+    }
+    if (scaleY === void 0) {
+      scaleY = 1;
+    }
+    if (rotation === void 0) {
+      rotation = 0;
+    }
+    if (skewX === void 0) {
+      skewX = 0;
+    }
+    if (skewY === void 0) {
+      skewY = 0;
+    }
+    if (regX === void 0) {
+      regX = 0;
+    }
+    if (regY === void 0) {
+      regY = 0;
+    }
     this.x = x;
     this.y = y;
     this.scaleX = scaleX;
@@ -1070,20 +1487,23 @@ var DisplayObject = function(_EventDispatcher) {
     this.regY = regY;
     return this;
   };
-  DisplayObject.prototype.getMatrix = function getMatrix(matrix) {
-    var o = this, mtx = matrix && matrix.identity() || new Matrix2D();
+  _proto.getMatrix = function getMatrix(matrix) {
+    var o = this,
+        mtx = matrix && matrix.identity() || new Matrix2D();
     return o.transformMatrix ? mtx.copy(o.transformMatrix) : mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
   };
-  DisplayObject.prototype.getConcatenatedMatrix = function getConcatenatedMatrix(matrix) {
-    var o = this, mtx = this.getMatrix(matrix);
+  _proto.getConcatenatedMatrix = function getConcatenatedMatrix(matrix) {
+    var o = this,
+        mtx = this.getMatrix(matrix);
     while (o = o.parent) {
       mtx.prependMatrix(o.getMatrix(o._props.matrix));
     }
     return mtx;
   };
-  DisplayObject.prototype.getConcatenatedDisplayProps = function getConcatenatedDisplayProps(props) {
+  _proto.getConcatenatedDisplayProps = function getConcatenatedDisplayProps(props) {
     props = props ? props.identity() : new DisplayProps();
-    var o = this, mtx = o.getMatrix(props.matrix);
+    var o = this,
+        mtx = o.getMatrix(props.matrix);
     do {
       props.prepend(o.visible, o.alpha, o.shadow, o.compositeOperation);
       if (o != this) {
@@ -1092,7 +1512,7 @@ var DisplayObject = function(_EventDispatcher) {
     } while (o = o.parent);
     return props;
   };
-  DisplayObject.prototype.hitTest = function hitTest(x, y) {
+  _proto.hitTest = function hitTest(x, y) {
     var ctx = DisplayObject._hitTestContext;
     ctx.setTransform(1, 0, 0, 1, -x, -y);
     this.draw(ctx);
@@ -1101,13 +1521,13 @@ var DisplayObject = function(_EventDispatcher) {
     ctx.clearRect(0, 0, 2, 2);
     return hit;
   };
-  DisplayObject.prototype.set = function set(props) {
+  _proto.set = function set(props) {
     for (var n in props) {
       this[n] = props[n];
     }
     return this;
   };
-  DisplayObject.prototype.getBounds = function getBounds() {
+  _proto.getBounds = function getBounds() {
     if (this._bounds) {
       return this._rectangle.copy(this._bounds);
     }
@@ -1118,22 +1538,22 @@ var DisplayObject = function(_EventDispatcher) {
     }
     return null;
   };
-  DisplayObject.prototype.getTransformedBounds = function getTransformedBounds() {
+  _proto.getTransformedBounds = function getTransformedBounds() {
     return this._getBounds();
   };
-  DisplayObject.prototype.setBounds = function setBounds(x, y, width, height) {
+  _proto.setBounds = function setBounds(x, y, width, height) {
     if (x == null) {
       this._bounds = null;
     }
     this._bounds = (this._bounds || new Rectangle()).setValues(x, y, width, height);
   };
-  DisplayObject.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return this._cloneProps(new DisplayObject());
   };
-  DisplayObject.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + (this.name ? " (name=" + this.name + ")" : "") + "]";
   };
-  DisplayObject.prototype._cloneProps = function _cloneProps(o) {
+  _proto._cloneProps = function _cloneProps(o) {
     o.alpha = this.alpha;
     o.mouseEnabled = this.mouseEnabled;
     o.tickEnabled = this.tickEnabled;
@@ -1158,15 +1578,17 @@ var DisplayObject = function(_EventDispatcher) {
     o._bounds = this._bounds;
     return o;
   };
-  DisplayObject.prototype._applyShadow = function _applyShadow(ctx) {
-    var shadow = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Shadow.identity;
+  _proto._applyShadow = function _applyShadow(ctx, shadow) {
+    if (shadow === void 0) {
+      shadow = Shadow.identity;
+    }
     shadow = shadow;
     ctx.shadowColor = shadow.color;
     ctx.shadowOffsetX = shadow.offsetX;
     ctx.shadowOffsetY = shadow.offsetY;
     ctx.shadowBlur = shadow.blur;
   };
-  DisplayObject.prototype._tick = function _tick(evtObj) {
+  _proto._tick = function _tick(evtObj) {
     var ls = this._listeners;
     if (ls && ls["tick"]) {
       evtObj.target = null;
@@ -1174,7 +1596,7 @@ var DisplayObject = function(_EventDispatcher) {
       this.dispatchEvent(evtObj);
     }
   };
-  DisplayObject.prototype._testHit = function _testHit(ctx) {
+  _proto._testHit = function _testHit(ctx) {
     try {
       return ctx.getImageData(0, 0, 1, 1).data[3] > 1;
     } catch (e) {
@@ -1184,14 +1606,17 @@ var DisplayObject = function(_EventDispatcher) {
       return false;
     }
   };
-  DisplayObject.prototype._getBounds = function _getBounds(matrix, ignoreTransform) {
+  _proto._getBounds = function _getBounds(matrix, ignoreTransform) {
     return this._transformBounds(this.getBounds(), matrix, ignoreTransform);
   };
-  DisplayObject.prototype._transformBounds = function _transformBounds(bounds, matrix, ignoreTransform) {
+  _proto._transformBounds = function _transformBounds(bounds, matrix, ignoreTransform) {
     if (!bounds) {
       return bounds;
     }
-    var x = bounds.x, y = bounds.y, width = bounds.width, height = bounds.height;
+    var x = bounds.x,
+        y = bounds.y,
+        width = bounds.width,
+        height = bounds.height;
     var mtx = this._props.matrix;
     mtx = ignoreTransform ? mtx.identity() : this.getMatrix(mtx);
     if (x || y) {
@@ -1200,10 +1625,16 @@ var DisplayObject = function(_EventDispatcher) {
     if (matrix) {
       mtx.prependMatrix(matrix);
     }
-    var x_a = width * mtx.a, x_b = width * mtx.b;
-    var y_c = height * mtx.c, y_d = height * mtx.d;
-    var tx = mtx.tx, ty = mtx.ty;
-    var minX = tx, maxX = tx, minY = ty, maxY = ty;
+    var x_a = width * mtx.a,
+        x_b = width * mtx.b;
+    var y_c = height * mtx.c,
+        y_d = height * mtx.d;
+    var tx = mtx.tx,
+        ty = mtx.ty;
+    var minX = tx,
+        maxX = tx,
+        minY = ty,
+        maxY = ty;
     if ((x = x_a + tx) < minX) {
       minX = x;
     } else if (x > maxX) {
@@ -1236,7 +1667,7 @@ var DisplayObject = function(_EventDispatcher) {
     }
     return bounds.setValues(minX, minY, maxX - minX, maxY - minY);
   };
-  DisplayObject.prototype._hasMouseEventListener = function _hasMouseEventListener() {
+  _proto._hasMouseEventListener = function _hasMouseEventListener() {
     var evts = DisplayObject._MOUSE_EVENTS;
     for (var i = 0, l = evts.length; i < l; i++) {
       if (this.hasEventListener(evts[i])) {
@@ -1245,7 +1676,7 @@ var DisplayObject = function(_EventDispatcher) {
     }
     return !!this.cursor;
   };
-  createClass(DisplayObject, [ {
+  _createClass(DisplayObject, [{
     key: "stage",
     get: function get() {
       var o = this;
@@ -1265,10 +1696,9 @@ var DisplayObject = function(_EventDispatcher) {
     get: function get() {
       return this.scaleX;
     }
-  } ]);
+  }]);
   return DisplayObject;
 }(EventDispatcher);
-
 {
   var canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
   if (canvas.getContext) {
@@ -1277,35 +1707,33 @@ var DisplayObject = function(_EventDispatcher) {
     canvas.width = canvas.height = 1;
   }
 }
-
-DisplayObject._MOUSE_EVENTS = [ "click", "dblclick", "mousedown", "mouseout", "mouseover", "pressmove", "pressup", "rollout", "rollover" ];
-
+DisplayObject._MOUSE_EVENTS = ["click", "dblclick", "mousedown", "mouseout", "mouseover", "pressmove", "pressup", "rollout", "rollover"];
 DisplayObject.suppressCrossDomainErrors = false;
-
 DisplayObject.snapToPixelEnabled = false;
-
 DisplayObject._StageGL_NONE = 0;
-
 DisplayObject._StageGL_SPRITE = 1;
-
 DisplayObject._StageGL_BITMAP = 2;
 
-var Container = function(_DisplayObject) {
-  inherits(Container, _DisplayObject);
+var Container =
+function (_DisplayObject) {
+  _inheritsLoose(Container, _DisplayObject);
   function Container() {
-    classCallCheck(this, Container);
-    var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
+    var _this;
+    _this = _DisplayObject.call(this) || this;
     _this.children = [];
     _this.mouseChildren = true;
     _this.tickChildren = true;
     return _this;
   }
-  Container.prototype.isVisible = function isVisible() {
+  var _proto = Container.prototype;
+  _proto.isVisible = function isVisible() {
     var hasContent = this.cacheCanvas || this.children.length;
     return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
   };
-  Container.prototype.draw = function draw(ctx) {
-    var ignoreCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  _proto.draw = function draw(ctx, ignoreCache) {
+    if (ignoreCache === void 0) {
+      ignoreCache = false;
+    }
     if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache)) {
       return true;
     }
@@ -1322,22 +1750,20 @@ var Container = function(_DisplayObject) {
     }
     return true;
   };
-  Container.prototype.addChild = function addChild() {
-    for (var _len = arguments.length, children = Array(_len), _key = 0; _key < _len; _key++) {
-      children[_key] = arguments[_key];
-    }
-    var l = children.length;
+  _proto.addChild = function addChild() {
+    var l = arguments.length;
     if (l === 0) {
       return null;
     }
-    var child = children[0];
+    var child = arguments.length <= 0 ? undefined : arguments[0];
     if (l > 1) {
       for (var i = 0; i < l; i++) {
-        child = this.addChild(children[i]);
+        child = this.addChild(i < 0 || arguments.length <= i ? undefined : arguments[i]);
       }
       return child;
     }
-    var parent = child.parent, silent = parent === this;
+    var parent = child.parent,
+        silent = parent === this;
     parent && parent._removeChildAt(parent.children.indexOf(child), silent);
     child.parent = this;
     this.children.push(child);
@@ -1346,9 +1772,9 @@ var Container = function(_DisplayObject) {
     }
     return child;
   };
-  Container.prototype.addChildAt = function addChildAt() {
-    for (var _len2 = arguments.length, children = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      children[_key2] = arguments[_key2];
+  _proto.addChildAt = function addChildAt() {
+    for (var _len = arguments.length, children = new Array(_len), _key = 0; _key < _len; _key++) {
+      children[_key] = arguments[_key];
     }
     var l = children.length;
     if (l === 0) {
@@ -1365,7 +1791,8 @@ var Container = function(_DisplayObject) {
       return children[l - 2];
     }
     var child = children[0];
-    var parent = child.parent, silent = parent === this;
+    var parent = child.parent,
+        silent = parent === this;
     parent && parent._removeChildAt(parent.children.indexOf(child), silent);
     child.parent = this;
     this.children.splice(index++, 0, child);
@@ -1374,33 +1801,30 @@ var Container = function(_DisplayObject) {
     }
     return child;
   };
-  Container.prototype.removeChild = function removeChild() {
-    for (var _len3 = arguments.length, children = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      children[_key3] = arguments[_key3];
-    }
-    var l = children.length;
+  _proto.removeChild = function removeChild() {
+    var l = arguments.length;
     if (l === 0) {
       return true;
     }
     if (l > 1) {
       var good = true;
       for (var i = 0; i < l; i++) {
-        good = good && this.removeChild(children[i]);
+        good = good && this.removeChild(i < 0 || arguments.length <= i ? undefined : arguments[i]);
       }
       return good;
     }
-    return this._removeChildAt(this.children.indexOf(children[0]));
+    return this._removeChildAt(this.children.indexOf(arguments.length <= 0 ? undefined : arguments[0]));
   };
-  Container.prototype.removeChildAt = function removeChildAt() {
-    for (var _len4 = arguments.length, indexes = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-      indexes[_key4] = arguments[_key4];
+  _proto.removeChildAt = function removeChildAt() {
+    for (var _len2 = arguments.length, indexes = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      indexes[_key2] = arguments[_key2];
     }
     var l = indexes.length;
     if (l === 0) {
       return true;
     }
     if (l > 1) {
-      indexes.sort(function(a, b) {
+      indexes.sort(function (a, b) {
         return b - a;
       });
       var good = true;
@@ -1411,16 +1835,16 @@ var Container = function(_DisplayObject) {
     }
     return this._removeChildAt(indexes[0]);
   };
-  Container.prototype.removeAllChildren = function removeAllChildren() {
+  _proto.removeAllChildren = function removeAllChildren() {
     var kids = this.children;
     while (kids.length) {
       this._removeChildAt(0);
     }
   };
-  Container.prototype.getChildAt = function getChildAt(index) {
+  _proto.getChildAt = function getChildAt(index) {
     return this.children[index];
   };
-  Container.prototype.getChildByName = function getChildByName(name) {
+  _proto.getChildByName = function getChildByName(name) {
     var kids = this.children;
     var l = kids.length;
     for (var i = 0; i < l; i++) {
@@ -1430,13 +1854,13 @@ var Container = function(_DisplayObject) {
     }
     return null;
   };
-  Container.prototype.sortChildren = function sortChildren(sortFunction) {
+  _proto.sortChildren = function sortChildren(sortFunction) {
     this.children.sort(sortFunction);
   };
-  Container.prototype.getChildIndex = function getChildIndex(child) {
+  _proto.getChildIndex = function getChildIndex(child) {
     return this.children.indexOf(child);
   };
-  Container.prototype.swapChildrenAt = function swapChildrenAt(index1, index2) {
+  _proto.swapChildrenAt = function swapChildrenAt(index1, index2) {
     var kids = this.children;
     var o1 = kids[index1];
     var o2 = kids[index2];
@@ -1446,10 +1870,10 @@ var Container = function(_DisplayObject) {
     kids[index1] = o2;
     kids[index2] = o1;
   };
-  Container.prototype.swapChildren = function swapChildren(child1, child2) {
+  _proto.swapChildren = function swapChildren(child1, child2) {
     var kids = this.children;
     var l = kids.length;
-    var index1 = void 0, index2 = void 0;
+    var index1, index2;
     for (var i = 0; i < l; i++) {
       if (kids[i] === child1) {
         index1 = i;
@@ -1467,7 +1891,7 @@ var Container = function(_DisplayObject) {
     kids[index1] = child2;
     kids[index2] = child1;
   };
-  Container.prototype.setChildIndex = function setChildIndex(child, index) {
+  _proto.setChildIndex = function setChildIndex(child, index) {
     var kids = this.children;
     var l = kids.length;
     if (child.parent != this || index < 0 || index >= l) {
@@ -1484,7 +1908,7 @@ var Container = function(_DisplayObject) {
     kids.splice(i, 1);
     kids.splice(index, 0, child);
   };
-  Container.prototype.contains = function contains(child) {
+  _proto.contains = function contains(child) {
     while (child) {
       if (child === this) {
         return true;
@@ -1493,36 +1917,42 @@ var Container = function(_DisplayObject) {
     }
     return false;
   };
-  Container.prototype.hitTest = function hitTest(x, y) {
+  _proto.hitTest = function hitTest(x, y) {
     return this.getObjectUnderPoint(x, y) != null;
   };
-  Container.prototype.getObjectsUnderPoint = function getObjectsUnderPoint(x, y) {
-    var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  _proto.getObjectsUnderPoint = function getObjectsUnderPoint(x, y, mode) {
+    if (mode === void 0) {
+      mode = 0;
+    }
     var arr = [];
     var pt = this.localToGlobal(x, y);
     this._getObjectsUnderPoint(pt.x, pt.y, arr, mode > 0, mode === 1);
     return arr;
   };
-  Container.prototype.getObjectUnderPoint = function getObjectUnderPoint(x, y) {
-    var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  _proto.getObjectUnderPoint = function getObjectUnderPoint(x, y, mode) {
+    if (mode === void 0) {
+      mode = 0;
+    }
     var pt = this.localToGlobal(x, y);
     return this._getObjectsUnderPoint(pt.x, pt.y, null, mode > 0, mode === 1);
   };
-  Container.prototype.getBounds = function getBounds() {
+  _proto.getBounds = function getBounds() {
     return this._getBounds(null, true);
   };
-  Container.prototype.getTransformedBounds = function getTransformedBounds() {
+  _proto.getTransformedBounds = function getTransformedBounds() {
     return this._getBounds();
   };
-  Container.prototype.clone = function clone() {
-    var recursive = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  _proto.clone = function clone(recursive) {
+    if (recursive === void 0) {
+      recursive = false;
+    }
     var o = this._cloneProps(new Container());
     if (recursive) {
       this._cloneChildren(o);
     }
     return o;
   };
-  Container.prototype._tick = function _tick(evtObj) {
+  _proto._tick = function _tick(evtObj) {
     if (this.tickChildren) {
       for (var i = this.children.length - 1; i >= 0; i--) {
         var child = this.children[i];
@@ -1533,7 +1963,7 @@ var Container = function(_DisplayObject) {
     }
     _DisplayObject.prototype._tick.call(this, evtObj);
   };
-  Container.prototype._cloneChildren = function _cloneChildren(o) {
+  _proto._cloneChildren = function _cloneChildren(o) {
     if (o.children.length) {
       o.removeAllChildren();
     }
@@ -1545,8 +1975,10 @@ var Container = function(_DisplayObject) {
       arr.push(clone);
     }
   };
-  Container.prototype._removeChildAt = function _removeChildAt(index) {
-    var silent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  _proto._removeChildAt = function _removeChildAt(index, silent) {
+    if (silent === void 0) {
+      silent = false;
+    }
     if (index < 0 || index > this.children.length - 1) {
       return false;
     }
@@ -1560,12 +1992,15 @@ var Container = function(_DisplayObject) {
     }
     return true;
   };
-  Container.prototype._getObjectsUnderPoint = function _getObjectsUnderPoint(x, y, arr, mouse, activeListener) {
-    var currentDepth = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
+  _proto._getObjectsUnderPoint = function _getObjectsUnderPoint(x, y, arr, mouse, activeListener, currentDepth) {
+    if (currentDepth === void 0) {
+      currentDepth = 0;
+    }
     if (!currentDepth && !this._testMask(this, x, y)) {
       return null;
     }
-    var mtx = void 0, ctx = DisplayObject._hitTestContext;
+    var mtx,
+        ctx = DisplayObject._hitTestContext;
     activeListener = activeListener || mouse && this._hasMouseEventListener();
     var children = this.children;
     var l = children.length;
@@ -1610,12 +2045,13 @@ var Container = function(_DisplayObject) {
     }
     return null;
   };
-  Container.prototype._testMask = function _testMask(target, x, y) {
+  _proto._testMask = function _testMask(target, x, y) {
     var mask = target.mask;
     if (!mask || !mask.graphics || mask.graphics.isEmpty()) {
       return true;
     }
-    var mtx = this._props.matrix, parent = target.parent;
+    var mtx = this._props.matrix,
+        parent = target.parent;
     mtx = parent ? parent.getConcatenatedMatrix(mtx) : mtx.identity();
     mtx = mask.getMatrix(mask._props.matrix).prependMatrix(mtx);
     var ctx = DisplayObject._hitTestContext;
@@ -1630,7 +2066,7 @@ var Container = function(_DisplayObject) {
     ctx.clearRect(0, 0, 2, 2);
     return true;
   };
-  Container.prototype._getBounds = function _getBounds(matrix, ignoreTransform) {
+  _proto._getBounds = function _getBounds(matrix, ignoreTransform) {
     var bounds = _DisplayObject.prototype.getBounds.call(this);
     if (bounds) {
       return this._transformBounds(bounds, matrix, ignoreTransform);
@@ -1655,20 +2091,21 @@ var Container = function(_DisplayObject) {
     }
     return rect;
   };
-  createClass(Container, [ {
+  _createClass(Container, [{
     key: "numChildren",
     get: function get() {
       return this.children.length;
     }
-  } ]);
+  }]);
   return Container;
 }(DisplayObject);
 
-var MouseEvent = function(_Event) {
-  inherits(MouseEvent, _Event);
+var MouseEvent =
+function (_Event) {
+  _inheritsLoose(MouseEvent, _Event);
   function MouseEvent(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY, relatedTarget) {
-    classCallCheck(this, MouseEvent);
-    var _this = possibleConstructorReturn(this, _Event.call(this, type, bubbles, cancelable));
+    var _this;
+    _this = _Event.call(this, type, bubbles, cancelable) || this;
     _this.stageX = stageX;
     _this.stageY = stageY;
     _this.rawX = rawX == null ? stageX : rawX;
@@ -1679,13 +2116,14 @@ var MouseEvent = function(_Event) {
     _this.relatedTarget = relatedTarget;
     return _this;
   }
-  MouseEvent.prototype.clone = function clone() {
+  var _proto = MouseEvent.prototype;
+  _proto.clone = function clone() {
     return new MouseEvent(this.type, this.bubbles, this.cancelable, this.stageX, this.stageY, this.nativeEvent, this.pointerID, this.primary, this.rawX, this.rawY);
   };
-  MouseEvent.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + " (type=" + this.type + " stageX=" + this.stageX + " stageY=" + this.stageY + ")]";
   };
-  createClass(MouseEvent, [ {
+  _createClass(MouseEvent, [{
     key: "localX",
     get: function get() {
       return this.currentTarget.globalToLocal(this.rawX, this.rawY).x;
@@ -1700,15 +2138,16 @@ var MouseEvent = function(_Event) {
     get: function get() {
       return this.pointerID !== -1;
     }
-  } ]);
+  }]);
   return MouseEvent;
 }(Event);
 
-var Stage = function(_Container) {
-  inherits(Stage, _Container);
+var Stage =
+function (_Container) {
+  _inheritsLoose(Stage, _Container);
   function Stage(canvas) {
-    classCallCheck(this, Stage);
-    var _this = possibleConstructorReturn(this, _Container.call(this));
+    var _this;
+    _this = _Container.call(this) || this;
     _this.autoClear = true;
     _this.canvas = typeof canvas === "string" ? document.getElementById(canvas) : canvas;
     _this.mouseX = 0;
@@ -1728,7 +2167,8 @@ var Stage = function(_Container) {
     _this.enableDOMEvents(true);
     return _this;
   }
-  Stage.prototype.update = function update(props) {
+  var _proto = Stage.prototype;
+  _proto.update = function update(props) {
     if (!this.canvas) {
       return;
     }
@@ -1739,7 +2179,8 @@ var Stage = function(_Container) {
       return;
     }
     DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
-    var r = this.drawRect, ctx = this.canvas.getContext("2d");
+    var r = this.drawRect,
+        ctx = this.canvas.getContext("2d");
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     if (this.autoClear) {
       if (r) {
@@ -1759,7 +2200,7 @@ var Stage = function(_Container) {
     ctx.restore();
     this.dispatchEvent("drawend");
   };
-  Stage.prototype.tick = function tick(props) {
+  _proto.tick = function tick(props) {
     if (!this.tickEnabled || this.dispatchEvent("tickstart", false, true) === false) {
       return;
     }
@@ -1774,12 +2215,12 @@ var Stage = function(_Container) {
     this._tick(evtObj);
     this.dispatchEvent("tickend");
   };
-  Stage.prototype.handleEvent = function handleEvent(evt) {
+  _proto.handleEvent = function handleEvent(evt) {
     if (evt.type === "tick") {
       this.update(evt);
     }
   };
-  Stage.prototype.clear = function clear() {
+  _proto.clear = function clear() {
     if (!this.canvas) {
       return;
     }
@@ -1787,9 +2228,14 @@ var Stage = function(_Container) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
   };
-  Stage.prototype.toDataURL = function toDataURL(backgroundColor) {
-    var mimeType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "image/png";
-    var data = void 0, ctx = this.canvas.getContext("2d"), w = this.canvas.width, h = this.canvas.height;
+  _proto.toDataURL = function toDataURL(backgroundColor, mimeType) {
+    if (mimeType === void 0) {
+      mimeType = "image/png";
+    }
+    var data,
+        ctx = this.canvas.getContext('2d'),
+        w = this.canvas.width,
+        h = this.canvas.height;
     if (backgroundColor) {
       data = ctx.getImageData(0, 0, w, h);
       var compositeOperation = ctx.globalCompositeOperation;
@@ -1804,9 +2250,11 @@ var Stage = function(_Container) {
     }
     return dataURL;
   };
-  Stage.prototype.enableMouseOver = function enableMouseOver() {
+  _proto.enableMouseOver = function enableMouseOver(frequency) {
     var _this2 = this;
-    var frequency = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 20;
+    if (frequency === void 0) {
+      frequency = 20;
+    }
     if (this._mouseOverIntervalID) {
       clearInterval(this._mouseOverIntervalID);
       this._mouseOverIntervalID = null;
@@ -1817,13 +2265,15 @@ var Stage = function(_Container) {
     if (frequency <= 0) {
       return;
     }
-    this._mouseOverIntervalID = setInterval(function() {
+    this._mouseOverIntervalID = setInterval(function () {
       return _this2._testMouseOver();
-    }, 1e3 / Math.min(50, frequency));
+    }, 1000 / Math.min(50, frequency));
   };
-  Stage.prototype.enableDOMEvents = function enableDOMEvents() {
+  _proto.enableDOMEvents = function enableDOMEvents(enable) {
     var _this3 = this;
-    var enable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+    if (enable === void 0) {
+      enable = true;
+    }
     var ls = this._eventListeners;
     if (!enable && ls) {
       for (var n in ls) {
@@ -1865,14 +2315,15 @@ var Stage = function(_Container) {
       }
     }
   };
-  Stage.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     throw "Stage cannot be cloned.";
   };
-  Stage.prototype._getElementRect = function _getElementRect(e) {
-    var bounds = void 0;
+  _proto._getElementRect = function _getElementRect(e) {
+    var bounds;
     try {
       bounds = e.getBoundingClientRect();
-    } catch (err) {
+    }
+    catch (err) {
       bounds = {
         top: e.offsetTop,
         left: e.offsetLeft,
@@ -1894,7 +2345,7 @@ var Stage = function(_Container) {
       bottom: bounds.bottom + offY - padB
     };
   };
-  Stage.prototype._getPointerData = function _getPointerData(id) {
+  _proto._getPointerData = function _getPointerData(id) {
     var data = this._pointerData[id];
     if (!data) {
       data = this._pointerData[id] = {
@@ -1904,18 +2355,21 @@ var Stage = function(_Container) {
     }
     return data;
   };
-  Stage.prototype._handleMouseMove = function _handleMouseMove() {
-    var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window.event;
+  _proto._handleMouseMove = function _handleMouseMove(e) {
+    if (e === void 0) {
+      e = window.event;
+    }
     this._handlePointerMove(-1, e, e.pageX, e.pageY);
   };
-  Stage.prototype._handlePointerMove = function _handlePointerMove(id, e, pageX, pageY, owner) {
+  _proto._handlePointerMove = function _handlePointerMove(id, e, pageX, pageY, owner) {
     if (this._prevStage && owner === undefined) {
       return;
     }
     if (!this.canvas) {
       return;
     }
-    var nextStage = this._nextStage, o = this._getPointerData(id);
+    var nextStage = this._nextStage,
+        o = this._getPointerData(id);
     var inBounds = o.inBounds;
     this._updatePointerPosition(id, e, pageX, pageY);
     if (inBounds || o.inBounds || this.mouseMoveOutside) {
@@ -1927,7 +2381,7 @@ var Stage = function(_Container) {
     }
     nextStage && nextStage._handlePointerMove(id, e, pageX, pageY, null);
   };
-  Stage.prototype._updatePointerPosition = function _updatePointerPosition(id, e, pageX, pageY) {
+  _proto._updatePointerPosition = function _updatePointerPosition(id, e, pageX, pageY) {
     var rect = this._getElementRect(this.canvas);
     pageX -= rect.left;
     pageY -= rect.top;
@@ -1952,15 +2406,17 @@ var Stage = function(_Container) {
       this.mouseInBounds = o.inBounds;
     }
   };
-  Stage.prototype._handleMouseUp = function _handleMouseUp(e) {
+  _proto._handleMouseUp = function _handleMouseUp(e) {
     this._handlePointerUp(-1, e, false);
   };
-  Stage.prototype._handlePointerUp = function _handlePointerUp(id, e, clear, owner) {
-    var nextStage = this._nextStage, o = this._getPointerData(id);
+  _proto._handlePointerUp = function _handlePointerUp(id, e, clear, owner) {
+    var nextStage = this._nextStage,
+        o = this._getPointerData(id);
     if (this._prevStage && owner === undefined) {
       return;
     }
-    var target = null, oTarget = o.target;
+    var target = null,
+        oTarget = o.target;
     if (!owner && (oTarget || nextStage)) {
       target = this._getObjectsUnderPoint(o.x, o.y, null, true);
     }
@@ -1982,10 +2438,10 @@ var Stage = function(_Container) {
     }
     nextStage && nextStage._handlePointerUp(id, e, clear, owner || target && this);
   };
-  Stage.prototype._handleMouseDown = function _handleMouseDown(e) {
+  _proto._handleMouseDown = function _handleMouseDown(e) {
     this._handlePointerDown(-1, e, e.pageX, e.pageY);
   };
-  Stage.prototype._handlePointerDown = function _handlePointerDown(id, e, pageX, pageY, owner) {
+  _proto._handlePointerDown = function _handlePointerDown(id, e, pageX, pageY, owner) {
     if (this.preventSelection) {
       e.preventDefault();
     }
@@ -1995,7 +2451,9 @@ var Stage = function(_Container) {
     if (pageY != null) {
       this._updatePointerPosition(id, e, pageX, pageY);
     }
-    var target = null, nextStage = this._nextStage, o = this._getPointerData(id);
+    var target = null,
+        nextStage = this._nextStage,
+        o = this._getPointerData(id);
     if (!owner) {
       target = o.target = this._getObjectsUnderPoint(o.x, o.y, null, true);
     }
@@ -2006,7 +2464,7 @@ var Stage = function(_Container) {
     this._dispatchMouseEvent(target, "mousedown", true, id, o, e);
     nextStage && nextStage._handlePointerDown(id, e, pageX, pageY, owner || target && this);
   };
-  Stage.prototype._testMouseOver = function _testMouseOver(clear, owner, eventTarget) {
+  _proto._testMouseOver = function _testMouseOver(clear, owner, eventTarget) {
     if (this._prevStage && owner === undefined) {
       return;
     }
@@ -2021,7 +2479,9 @@ var Stage = function(_Container) {
     }
     var e = o.posEvtObj;
     var isEventTarget = eventTarget || e && e.target === this.canvas;
-    var target = null, common = -1, cursor = "";
+    var target = null,
+        common = -1,
+        cursor = "";
     if (!owner && (clear || this.mouseInBounds && isEventTarget)) {
       target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
       this._mouseOverX = this.mouseX;
@@ -2062,22 +2522,24 @@ var Stage = function(_Container) {
     }
     nextStage && nextStage._testMouseOver(clear, owner || target && this, eventTarget || isEventTarget && this);
   };
-  Stage.prototype._handleDoubleClick = function _handleDoubleClick(e, owner) {
-    var target = null, nextStage = this._nextStage, o = this._getPointerData(-1);
+  _proto._handleDoubleClick = function _handleDoubleClick(e, owner) {
+    var target = null,
+        nextStage = this._nextStage,
+        o = this._getPointerData(-1);
     if (!owner) {
       target = this._getObjectsUnderPoint(o.x, o.y, null, true);
       this._dispatchMouseEvent(target, "dblclick", true, -1, o, e);
     }
     nextStage && nextStage._handleDoubleClick(e, owner || target && this);
   };
-  Stage.prototype._dispatchMouseEvent = function _dispatchMouseEvent(target, type, bubbles, pointerId, o, nativeEvent, relatedTarget) {
+  _proto._dispatchMouseEvent = function _dispatchMouseEvent(target, type, bubbles, pointerId, o, nativeEvent, relatedTarget) {
     if (!target || !bubbles && !target.hasEventListener(type)) {
       return;
     }
     var evt = new MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId === this._primaryPointerID || pointerId === -1, o.rawX, o.rawY, relatedTarget);
     target.dispatchEvent(evt);
   };
-  createClass(Stage, [ {
+  _createClass(Stage, [{
     key: "nextStage",
     get: function get() {
       return this._nextStage;
@@ -2091,19 +2553,23 @@ var Stage = function(_Container) {
       }
       this._nextStage = stage;
     }
-  } ]);
+  }]);
   return Stage;
 }(Container);
 
-function createCanvas() {
-  var width = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-  var height = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-  var c = void 0;
+function createCanvas(width, height) {
+  if (width === void 0) {
+    width = 1;
+  }
+  if (height === void 0) {
+    height = 1;
+  }
+  var c;
   if (window.createjs !== undefined && window.createjs.createCanvas !== undefined) {
     c = window.createjs.createCanvas();
   }
-  if (HTMLCanvasElement) {
-    c = new HTMLCanvasElement();
+  if (window.document !== undefined && window.document.createElement !== undefined) {
+    c = document.createElement("canvas");
   }
   if (c !== undefined) {
     c.width = width;
@@ -2113,9 +2579,9 @@ function createCanvas() {
   throw "Canvas not supported in this environment.";
 }
 
-var VideoBuffer = function() {
+var VideoBuffer =
+function () {
   function VideoBuffer(video) {
-    classCallCheck(this, VideoBuffer);
     this.readyState = video.readyState;
     this._video = video;
     this._canvas = null;
@@ -2124,11 +2590,13 @@ var VideoBuffer = function() {
       video.addEventListener("canplaythrough", this._videoReady.bind(this));
     }
   }
-  VideoBuffer.prototype.getImage = function getImage() {
+  var _proto = VideoBuffer.prototype;
+  _proto.getImage = function getImage() {
     if (this.readyState < 2) {
       return;
     }
-    var canvas = this._canvas, video = this._video;
+    var canvas = this._canvas,
+        video = this._video;
     if (!canvas) {
       canvas = this._canvas = createCanvas();
       canvas.width = video.videoWidth;
@@ -2142,17 +2610,18 @@ var VideoBuffer = function() {
     }
     return canvas;
   };
-  VideoBuffer.prototype._videoReady = function _videoReady() {
+  _proto._videoReady = function _videoReady() {
     this.readyState = 2;
   };
   return VideoBuffer;
 }();
 
-var Bitmap = function(_DisplayObject) {
-  inherits(Bitmap, _DisplayObject);
+var Bitmap =
+function (_DisplayObject) {
+  _inheritsLoose(Bitmap, _DisplayObject);
   function Bitmap(imageOrUri) {
-    classCallCheck(this, Bitmap);
-    var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
+    var _this;
+    _this = _DisplayObject.call(this) || this;
     if (typeof imageOrUri === "string") {
       _this.image = document.createElement("img");
       _this.image.src = imageOrUri;
@@ -2163,17 +2632,21 @@ var Bitmap = function(_DisplayObject) {
     _this._webGLRenderStyle = DisplayObject._StageGL_BITMAP;
     return _this;
   }
-  Bitmap.prototype.isVisible = function isVisible() {
+  var _proto = Bitmap.prototype;
+  _proto.isVisible = function isVisible() {
     var image = this.image;
     var hasContent = this.cacheCanvas || image && (image.naturalWidth || image.getContext || image.readyState >= 2);
     return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
   };
-  Bitmap.prototype.draw = function draw(ctx) {
-    var ignoreCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  _proto.draw = function draw(ctx, ignoreCache) {
+    if (ignoreCache === void 0) {
+      ignoreCache = false;
+    }
     if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache)) {
       return true;
     }
-    var img = this.image, rect = this.sourceRect;
+    var img = this.image,
+        rect = this.sourceRect;
     if (img instanceof VideoBuffer) {
       img = img.getImage();
     }
@@ -2181,7 +2654,14 @@ var Bitmap = function(_DisplayObject) {
       return true;
     }
     if (rect) {
-      var x1 = rect.x, y1 = rect.y, x2 = x1 + rect.width, y2 = y1 + rect.height, x = 0, y = 0, w = img.width, h = img.height;
+      var x1 = rect.x,
+          y1 = rect.y,
+          x2 = x1 + rect.width,
+          y2 = y1 + rect.height,
+          x = 0,
+          y = 0,
+          w = img.width,
+          h = img.height;
       if (x1 < 0) {
         x -= x1;
         x1 = 0;
@@ -2202,16 +2682,17 @@ var Bitmap = function(_DisplayObject) {
     }
     return true;
   };
-  Bitmap.prototype.getBounds = function getBounds() {
+  _proto.getBounds = function getBounds() {
     var rect = _DisplayObject.prototype.getBounds.call(this);
     if (rect) {
       return rect;
     }
-    var image = this.image, o = this.sourceRect || image;
+    var image = this.image,
+        o = this.sourceRect || image;
     var hasContent = image && (image.naturalWidth || image.getContext || image.readyState >= 2);
     return hasContent ? this._rectangle.setValues(0, 0, o.width, o.height) : null;
   };
-  Bitmap.prototype.clone = function clone(node) {
+  _proto.clone = function clone(node) {
     var img = this.image;
     if (img != null && node != null) {
       img = img.cloneNode();
@@ -2226,11 +2707,12 @@ var Bitmap = function(_DisplayObject) {
   return Bitmap;
 }(DisplayObject);
 
-var Sprite = function(_DisplayObject) {
-  inherits(Sprite, _DisplayObject);
+var Sprite =
+function (_DisplayObject) {
+  _inheritsLoose(Sprite, _DisplayObject);
   function Sprite(spriteSheet, frameOrAnimation) {
-    classCallCheck(this, Sprite);
-    var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
+    var _this;
+    _this = _DisplayObject.call(this) || this;
     _this.currentFrame = 0;
     _this.currentAnimation = null;
     _this.paused = true;
@@ -2246,11 +2728,12 @@ var Sprite = function(_DisplayObject) {
     }
     return _this;
   }
-  Sprite.prototype.isVisible = function isVisible() {
+  var _proto = Sprite.prototype;
+  _proto.isVisible = function isVisible() {
     var hasContent = this.cacheCanvas || this.spriteSheet.complete;
     return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
   };
-  Sprite.prototype.draw = function draw(ctx, ignoreCache) {
+  _proto.draw = function draw(ctx, ignoreCache) {
     if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache)) {
       return true;
     }
@@ -2265,33 +2748,33 @@ var Sprite = function(_DisplayObject) {
     }
     return true;
   };
-  Sprite.prototype.play = function play() {
+  _proto.play = function play() {
     this.paused = false;
   };
-  Sprite.prototype.stop = function stop() {
+  _proto.stop = function stop() {
     this.paused = true;
   };
-  Sprite.prototype.gotoAndPlay = function gotoAndPlay(frameOrAnimation) {
+  _proto.gotoAndPlay = function gotoAndPlay(frameOrAnimation) {
     this.paused = false;
     this._skipAdvance = true;
     this._goto(frameOrAnimation);
   };
-  Sprite.prototype.gotoAndStop = function gotoAndStop(frameOrAnimation) {
+  _proto.gotoAndStop = function gotoAndStop(frameOrAnimation) {
     this.paused = true;
     this._goto(frameOrAnimation);
   };
-  Sprite.prototype.advance = function advance(time) {
+  _proto.advance = function advance(time) {
     var fps = this.framerate || this.spriteSheet.framerate;
-    var t = fps && time != null ? time / (1e3 / fps) : 1;
+    var t = fps && time != null ? time / (1000 / fps) : 1;
     this._normalizeFrame(t);
   };
-  Sprite.prototype.getBounds = function getBounds() {
+  _proto.getBounds = function getBounds() {
     return _DisplayObject.prototype.getBounds.call(this) || this.spriteSheet.getFrameBounds(this.currentFrame, this._rectangle);
   };
-  Sprite.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return this._cloneProps(new Sprite(this.spriteSheet));
   };
-  Sprite.prototype._cloneProps = function _cloneProps(o) {
+  _proto._cloneProps = function _cloneProps(o) {
     _DisplayObject.prototype._cloneProps.call(this, o);
     o.currentFrame = this.currentFrame;
     o.currentAnimation = this.currentAnimation;
@@ -2303,7 +2786,7 @@ var Sprite = function(_DisplayObject) {
     o._skipAdvance = this._skipAdvance;
     return o;
   };
-  Sprite.prototype._tick = function _tick(evtObj) {
+  _proto._tick = function _tick(evtObj) {
     if (!this.paused) {
       if (!this._skipAdvance) {
         this.advance(evtObj && evtObj.delta);
@@ -2312,8 +2795,10 @@ var Sprite = function(_DisplayObject) {
     }
     _DisplayObject.prototype._tick.call(this, evtObj);
   };
-  Sprite.prototype._normalizeFrame = function _normalizeFrame() {
-    var frameDelta = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  _proto._normalizeFrame = function _normalizeFrame(frameDelta) {
+    if (frameDelta === void 0) {
+      frameDelta = 0;
+    }
     var animation = this._animation;
     var paused = this.paused;
     var frame = this._currentFrame;
@@ -2353,7 +2838,7 @@ var Sprite = function(_DisplayObject) {
       this.dispatchEvent("change");
     }
   };
-  Sprite.prototype._dispatchAnimationEnd = function _dispatchAnimationEnd(animation, frame, paused, next, end) {
+  _proto._dispatchAnimationEnd = function _dispatchAnimationEnd(animation, frame, paused, next, end) {
     var name = animation ? animation.name : null;
     if (this.hasEventListener("animationend")) {
       var evt = new Event("animationend");
@@ -2368,8 +2853,10 @@ var Sprite = function(_DisplayObject) {
     }
     return changed;
   };
-  Sprite.prototype._goto = function _goto(frameOrAnimation) {
-    var frame = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  _proto._goto = function _goto(frameOrAnimation, frame) {
+    if (frame === void 0) {
+      frame = 0;
+    }
     this.currentAnimationFrame = 0;
     if (isNaN(frameOrAnimation)) {
       var data = this.spriteSheet.getAnimation(frameOrAnimation);
@@ -2387,13 +2874,18 @@ var Sprite = function(_DisplayObject) {
   return Sprite;
 }(DisplayObject);
 
-var BitmapText = function(_Container) {
-  inherits(BitmapText, _Container);
-  function BitmapText() {
-    var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    var spriteSheet = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    classCallCheck(this, BitmapText);
-    var _this = possibleConstructorReturn(this, _Container.call(this));
+var BitmapText =
+function (_Container) {
+  _inheritsLoose(BitmapText, _Container);
+  function BitmapText(text, spriteSheet) {
+    var _this;
+    if (text === void 0) {
+      text = "";
+    }
+    if (spriteSheet === void 0) {
+      spriteSheet = null;
+    }
+    _this = _Container.call(this) || this;
     _this.text = text;
     _this.spriteSheet = spriteSheet;
     _this.lineHeight = 0;
@@ -2410,41 +2902,43 @@ var BitmapText = function(_Container) {
     _this._drawAction = null;
     return _this;
   }
-  BitmapText.prototype.draw = function draw(ctx, ignoreCache) {
+  var _proto = BitmapText.prototype;
+  _proto.draw = function draw(ctx, ignoreCache) {
     if (this.drawCache(ctx, ignoreCache)) {
       return;
     }
     this._updateState();
     _Container.prototype.draw.call(this, ctx, ignoreCache);
   };
-  BitmapText.prototype.getBounds = function getBounds() {
+  _proto.getBounds = function getBounds() {
     this._updateText();
     return _Container.prototype.getBounds.call(this);
   };
-  BitmapText.prototype.isVisible = function isVisible() {
+  _proto.isVisible = function isVisible() {
     var hasContent = this.cacheCanvas || this.spriteSheet && this.spriteSheet.complete && this.text;
     return !!(this.visible && this.alpha > 0 && this.scaleX !== 0 && this.scaleY !== 0 && hasContent);
   };
-  BitmapText.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return this._cloneProps(new BitmapText(this.text, this.spriteSheet));
   };
-  BitmapText.prototype.addChild = function addChild() {};
-  BitmapText.prototype.addChildAt = function addChildAt() {};
-  BitmapText.prototype.removeChild = function removeChild() {};
-  BitmapText.prototype.removeChildAt = function removeChildAt() {};
-  BitmapText.prototype.removeAllChildren = function removeAllChildren() {};
-  BitmapText.prototype._updateState = function _updateState() {
+  _proto.addChild = function addChild() {};
+  _proto.addChildAt = function addChildAt() {};
+  _proto.removeChild = function removeChild() {};
+  _proto.removeChildAt = function removeChildAt() {};
+  _proto.removeAllChildren = function removeAllChildren() {};
+  _proto._updateState = function _updateState() {
     this._updateText();
   };
-  BitmapText.prototype._cloneProps = function _cloneProps(o) {
+  _proto._cloneProps = function _cloneProps(o) {
     _Container.prototype._cloneProps.call(this, o);
     o.lineHeight = this.lineHeight;
     o.letterSpacing = this.letterSpacing;
     o.spaceWidth = this.spaceWidth;
     return o;
   };
-  BitmapText.prototype._getFrameIndex = function _getFrameIndex(character, spriteSheet) {
-    var c = void 0, o = spriteSheet.getAnimation(character);
+  _proto._getFrameIndex = function _getFrameIndex(character, spriteSheet) {
+    var c,
+        o = spriteSheet.getAnimation(character);
     if (!o) {
       character != (c = character.toUpperCase()) || character != (c = character.toLowerCase()) || (c = null);
       if (c) {
@@ -2453,26 +2947,36 @@ var BitmapText = function(_Container) {
     }
     return o && o.frames[0];
   };
-  BitmapText.prototype._getFrame = function _getFrame(character, spriteSheet) {
+  _proto._getFrame = function _getFrame(character, spriteSheet) {
     var index = this._getFrameIndex(character, spriteSheet);
     return index == null ? index : spriteSheet.getFrame(index);
   };
-  BitmapText.prototype._getLineHeight = function _getLineHeight(ss) {
+  _proto._getLineHeight = function _getLineHeight(ss) {
     var frame = this._getFrame("1", ss) || this._getFrame("T", ss) || this._getFrame("L", ss) || ss.getFrame(0);
     return frame ? frame.rect.height : 1;
   };
-  BitmapText.prototype._getSpaceWidth = function _getSpaceWidth(ss) {
+  _proto._getSpaceWidth = function _getSpaceWidth(ss) {
     var frame = this._getFrame("1", ss) || this._getFrame("l", ss) || this._getFrame("e", ss) || this._getFrame("a", ss) || ss.getFrame(0);
     return frame ? frame.rect.width : 1;
   };
-  BitmapText.prototype._tick = function _tick(evtObj) {
+  _proto._tick = function _tick(evtObj) {
     var stage = this.stage;
     stage && stage.on("drawstart", this._updateText, this, true);
     _Container.prototype._tick.call(this, evtObj);
   };
-  BitmapText.prototype._updateText = function _updateText() {
-    var x = 0, y = 0, o = this._oldProps, change = false, spaceW = this.spaceWidth, lineH = this.lineHeight, ss = this.spriteSheet;
-    var pool = BitmapText._spritePool, kids = this.children, childIndex = 0, numKids = kids.length, sprite = void 0;
+  _proto._updateText = function _updateText() {
+    var x = 0,
+        y = 0,
+        o = this._oldProps,
+        change = false,
+        spaceW = this.spaceWidth,
+        lineH = this.lineHeight,
+        ss = this.spriteSheet;
+    var pool = BitmapText._spritePool,
+        kids = this.children,
+        childIndex = 0,
+        numKids = kids.length,
+        sprite;
     for (var n in o) {
       if (o[n] != this[n]) {
         o[n] = this[n];
@@ -2531,16 +3035,15 @@ var BitmapText = function(_Container) {
   };
   return BitmapText;
 }(Container);
-
 BitmapText.maxPoolSize = 100;
-
 BitmapText._spritePool = [];
 
-var DOMElement = function(_DisplayObject) {
-  inherits(DOMElement, _DisplayObject);
+var DOMElement =
+function (_DisplayObject) {
+  _inheritsLoose(DOMElement, _DisplayObject);
   function DOMElement(htmlElement) {
-    classCallCheck(this, DOMElement);
-    var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
+    var _this;
+    _this = _DisplayObject.call(this) || this;
     if (typeof htmlElement === "string") {
       htmlElement = document.getElementById(htmlElement);
     }
@@ -2554,23 +3057,24 @@ var DOMElement = function(_DisplayObject) {
     _this._drawAction = null;
     return _this;
   }
-  DOMElement.prototype.isVisible = function isVisible() {
+  var _proto = DOMElement.prototype;
+  _proto.isVisible = function isVisible() {
     return this.htmlElement != null;
   };
-  DOMElement.prototype.draw = function draw(ctx, ignoreCache) {
+  _proto.draw = function draw(ctx, ignoreCache) {
     return true;
   };
-  DOMElement.prototype.cache = function cache() {};
-  DOMElement.prototype.uncache = function uncache() {};
-  DOMElement.prototype.updateCache = function updateCache() {};
-  DOMElement.prototype.hitTest = function hitTest() {};
-  DOMElement.prototype.localToGlobal = function localToGlobal() {};
-  DOMElement.prototype.globalToLocal = function globalToLocal() {};
-  DOMElement.prototype.localToLocal = function localToLocal() {};
-  DOMElement.prototype.clone = function clone() {
+  _proto.cache = function cache() {};
+  _proto.uncache = function uncache() {};
+  _proto.updateCache = function updateCache() {};
+  _proto.hitTest = function hitTest() {};
+  _proto.localToGlobal = function localToGlobal() {};
+  _proto.globalToLocal = function globalToLocal() {};
+  _proto.localToLocal = function localToLocal() {};
+  _proto.clone = function clone() {
     throw "DOMElement cannot be cloned.";
   };
-  DOMElement.prototype._tick = function _tick(evtObj) {
+  _proto._tick = function _tick(evtObj) {
     var stage = this.stage;
     if (stage != null && stage !== this._oldStage) {
       this._drawAction && stage.off("drawend", this._drawAction);
@@ -2579,13 +3083,14 @@ var DOMElement = function(_DisplayObject) {
     }
     _DisplayObject.prototype._tick.call(this, evtObj);
   };
-  DOMElement.prototype._handleDrawEnd = function _handleDrawEnd(evt) {
+  _proto._handleDrawEnd = function _handleDrawEnd(evt) {
     var o = this.htmlElement;
     if (!o) {
       return;
     }
     var style = o.style;
-    var props = this.getConcatenatedDisplayProps(this._props), mtx = props.matrix;
+    var props = this.getConcatenatedDisplayProps(this._props),
+        mtx = props.matrix;
     var visibility = props.visible ? "visible" : "hidden";
     if (visibility != style.visibility) {
       style.visibility = visibility;
@@ -2593,12 +3098,13 @@ var DOMElement = function(_DisplayObject) {
     if (!props.visible) {
       return;
     }
-    var oldProps = this._oldProps, oldMtx = oldProps && oldProps.matrix;
-    var n = 1e4;
+    var oldProps = this._oldProps,
+        oldMtx = oldProps && oldProps.matrix;
+    var n = 10000;
     if (!oldMtx || !oldMtx.equals(mtx)) {
-      var str = "matrix(" + (mtx.a * n | 0) / n + "," + (mtx.b * n | 0) / n + "," + (mtx.c * n | 0) / n + "," + (mtx.d * n | 0) / n + "," + (mtx.tx + .5 | 0);
-      style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str + "," + (mtx.ty + .5 | 0) + ")";
-      style.MozTransform = str + "px," + (mtx.ty + .5 | 0) + "px)";
+      var str = "matrix(" + (mtx.a * n | 0) / n + "," + (mtx.b * n | 0) / n + "," + (mtx.c * n | 0) / n + "," + (mtx.d * n | 0) / n + "," + (mtx.tx + 0.5 | 0);
+      style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str + "," + (mtx.ty + 0.5 | 0) + ")";
+      style.MozTransform = str + "px," + (mtx.ty + 0.5 | 0) + "px)";
       if (!oldProps) {
         oldProps = this._oldProps = new DisplayProps(true, null);
       }
@@ -2612,9 +3118,9 @@ var DOMElement = function(_DisplayObject) {
   return DOMElement;
 }(DisplayObject);
 
-var Graphics = function() {
+var Graphics =
+function () {
   function Graphics() {
-    classCallCheck(this, Graphics);
     this.command = null;
     this._stroke = null;
     this._strokeStyle = null;
@@ -2663,9 +3169,9 @@ var Graphics = function() {
   Graphics.getRGB = function getRGB(r, g, b, alpha) {
     if (r != null && b == null) {
       alpha = g;
-      b = r & 255;
-      g = r >> 8 & 255;
-      r = r >> 16 & 255;
+      b = r & 0xFF;
+      g = r >> 8 & 0xFF;
+      r = r >> 16 & 0xFF;
     }
     if (alpha == null) {
       return "rgb(" + r + "," + g + "," + b + ")";
@@ -2680,10 +3186,11 @@ var Graphics = function() {
       return "hsl(" + hue % 360 + "," + saturation + "%," + lightness + "%," + alpha + ")";
     }
   };
-  Graphics.prototype.isEmpty = function isEmpty() {
+  var _proto = Graphics.prototype;
+  _proto.isEmpty = function isEmpty() {
     return !(this._instructions.length || this._activeInstructions.length);
   };
-  Graphics.prototype.draw = function draw(ctx, data) {
+  _proto.draw = function draw(ctx, data) {
     this._updateInstructions();
     var instr = this._instructions;
     var l = instr.length;
@@ -2691,9 +3198,10 @@ var Graphics = function() {
       instr[i].exec(ctx, data);
     }
   };
-  Graphics.prototype.drawAsPath = function drawAsPath(ctx) {
+  _proto.drawAsPath = function drawAsPath(ctx) {
     this._updateInstructions();
-    var instr = void 0, instrs = this._instructions;
+    var instr,
+        instrs = this._instructions;
     var l = instrs.length;
     for (var i = this._storeIndex; i < l; i++) {
       if ((instr = instrs[i]).path !== false) {
@@ -2701,56 +3209,64 @@ var Graphics = function() {
       }
     }
   };
-  Graphics.prototype.moveTo = function moveTo(x, y) {
+  _proto.moveTo = function moveTo(x, y) {
     return this.append(new MoveTo(x, y), true);
   };
-  Graphics.prototype.lineTo = function lineTo(x, y) {
+  _proto.lineTo = function lineTo(x, y) {
     return this.append(new LineTo(x, y));
   };
-  Graphics.prototype.arcTo = function arcTo(x1, y1, x2, y2, radius) {
+  _proto.arcTo = function arcTo(x1, y1, x2, y2, radius) {
     return this.append(new ArcTo(x1, y1, x2, y2, radius));
   };
-  Graphics.prototype.arc = function arc(x, y, radius, startAngle, endAngle, anticlockwise) {
+  _proto.arc = function arc(x, y, radius, startAngle, endAngle, anticlockwise) {
     return this.append(new Arc(x, y, radius, startAngle, endAngle, anticlockwise));
   };
-  Graphics.prototype.quadraticCurveTo = function quadraticCurveTo(cpx, cpy, x, y) {
+  _proto.quadraticCurveTo = function quadraticCurveTo(cpx, cpy, x, y) {
     return this.append(new QuadraticCurveTo(cpx, cpy, x, y));
   };
-  Graphics.prototype.bezierCurveTo = function bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) {
+  _proto.bezierCurveTo = function bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) {
     return this.append(new BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y));
   };
-  Graphics.prototype.rect = function rect(x, y, w, h) {
+  _proto.rect = function rect(x, y, w, h) {
     return this.append(new Rect(x, y, w, h));
   };
-  Graphics.prototype.closePath = function closePath() {
+  _proto.closePath = function closePath() {
     return this._activeInstructions.length ? this.append(new ClosePath()) : this;
   };
-  Graphics.prototype.clear = function clear() {
+  _proto.clear = function clear() {
     this._instructions.length = this._activeInstructions.length = this._commitIndex = 0;
     this._strokeStyle = this._oldStrokeStyle = this._stroke = this._fill = this._strokeDash = this._oldStrokeDash = null;
     this._dirty = this._strokeIgnoreScale = false;
     return this;
   };
-  Graphics.prototype.beginFill = function beginFill(color) {
+  _proto.beginFill = function beginFill(color) {
     return this._setFill(color ? new Fill(color) : null);
   };
-  Graphics.prototype.beginLinearGradientFill = function beginLinearGradientFill(colors, ratios, x0, y0, x1, y1) {
+  _proto.beginLinearGradientFill = function beginLinearGradientFill(colors, ratios, x0, y0, x1, y1) {
     return this._setFill(new Fill().linearGradient(colors, ratios, x0, y0, x1, y1));
   };
-  Graphics.prototype.beginRadialGradientFill = function beginRadialGradientFill(colors, ratios, x0, y0, r0, x1, y1, r1) {
+  _proto.beginRadialGradientFill = function beginRadialGradientFill(colors, ratios, x0, y0, r0, x1, y1, r1) {
     return this._setFill(new Fill().radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1));
   };
-  Graphics.prototype.beginBitmapFill = function beginBitmapFill(image, repetition, matrix) {
+  _proto.beginBitmapFill = function beginBitmapFill(image, repetition, matrix) {
     return this._setFill(new Fill(null, matrix).bitmap(image, repetition));
   };
-  Graphics.prototype.endFill = function endFill() {
+  _proto.endFill = function endFill() {
     return this.beginFill();
   };
-  Graphics.prototype.setStrokeStyle = function setStrokeStyle(thickness) {
-    var caps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var joints = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    var miterLimit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10;
-    var ignoreScale = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  _proto.setStrokeStyle = function setStrokeStyle(thickness, caps, joints, miterLimit, ignoreScale) {
+    if (caps === void 0) {
+      caps = 0;
+    }
+    if (joints === void 0) {
+      joints = 0;
+    }
+    if (miterLimit === void 0) {
+      miterLimit = 10;
+    }
+    if (ignoreScale === void 0) {
+      ignoreScale = false;
+    }
     this._updateInstructions(true);
     this._strokeStyle = this.command = new StrokeStyle(thickness, caps, joints, miterLimit, ignoreScale);
     if (this._stroke) {
@@ -2759,44 +3275,48 @@ var Graphics = function() {
     this._strokeIgnoreScale = ignoreScale;
     return this;
   };
-  Graphics.prototype.setStrokeDash = function setStrokeDash(segments) {
-    var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  _proto.setStrokeDash = function setStrokeDash(segments, offset) {
+    if (offset === void 0) {
+      offset = 0;
+    }
     this._updateInstructions(true);
     this._strokeDash = this.command = new StrokeDash(segments, offset);
     return this;
   };
-  Graphics.prototype.beginStroke = function beginStroke(color) {
+  _proto.beginStroke = function beginStroke(color) {
     return this._setStroke(color ? new Stroke(color) : null);
   };
-  Graphics.prototype.beginLinearGradientStroke = function beginLinearGradientStroke(colors, ratios, x0, y0, x1, y1) {
+  _proto.beginLinearGradientStroke = function beginLinearGradientStroke(colors, ratios, x0, y0, x1, y1) {
     return this._setStroke(new Stroke().linearGradient(colors, ratios, x0, y0, x1, y1));
   };
-  Graphics.prototype.beginRadialGradientStroke = function beginRadialGradientStroke(colors, ratios, x0, y0, r0, x1, y1, r1) {
+  _proto.beginRadialGradientStroke = function beginRadialGradientStroke(colors, ratios, x0, y0, r0, x1, y1, r1) {
     return this._setStroke(new Stroke().radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1));
   };
-  Graphics.prototype.beginBitmapStroke = function beginBitmapStroke(image) {
-    var repetition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "repeat";
+  _proto.beginBitmapStroke = function beginBitmapStroke(image, repetition) {
+    if (repetition === void 0) {
+      repetition = "repeat";
+    }
     return this._setStroke(new Stroke().bitmap(image, repetition));
   };
-  Graphics.prototype.endStroke = function endStroke() {
+  _proto.endStroke = function endStroke() {
     return this.beginStroke();
   };
-  Graphics.prototype.drawRoundRect = function drawRoundRect(x, y, w, h, radius) {
+  _proto.drawRoundRect = function drawRoundRect(x, y, w, h, radius) {
     return this.drawRoundRectComplex(x, y, w, h, radius, radius, radius, radius);
   };
-  Graphics.prototype.drawRoundRectComplex = function drawRoundRectComplex(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
+  _proto.drawRoundRectComplex = function drawRoundRectComplex(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
     return this.append(new RoundRect(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL));
   };
-  Graphics.prototype.drawCircle = function drawCircle(x, y, radius) {
+  _proto.drawCircle = function drawCircle(x, y, radius) {
     return this.append(new Circle(x, y, radius));
   };
-  Graphics.prototype.drawEllipse = function drawEllipse(x, y, w, h) {
+  _proto.drawEllipse = function drawEllipse(x, y, w, h) {
     return this.append(new Ellipse(x, y, w, h));
   };
-  Graphics.prototype.drawPolyStar = function drawPolyStar(x, y, radius, sides, pointSize, angle) {
+  _proto.drawPolyStar = function drawPolyStar(x, y, radius, sides, pointSize, angle) {
     return this.append(new PolyStar(x, y, radius, sides, pointSize, angle));
   };
-  Graphics.prototype.append = function append(command, clean) {
+  _proto.append = function append(command, clean) {
     this._activeInstructions.push(command);
     this.command = command;
     if (!clean) {
@@ -2804,13 +3324,14 @@ var Graphics = function() {
     }
     return this;
   };
-  Graphics.prototype.decodePath = function decodePath(str) {
-    var instructions = [ this.moveTo, this.lineTo, this.quadraticCurveTo, this.bezierCurveTo, this.closePath ];
-    var paramCount = [ 2, 2, 4, 6, 0 ];
+  _proto.decodePath = function decodePath(str) {
+    var instructions = [this.moveTo, this.lineTo, this.quadraticCurveTo, this.bezierCurveTo, this.closePath];
+    var paramCount = [2, 2, 4, 6, 0];
     var i = 0;
     var l = str.length;
     var params = [];
-    var x = 0, y = 0;
+    var x = 0,
+        y = 0;
     var base64 = Graphics._BASE_64;
     while (i < l) {
       var c = str.charAt(i);
@@ -2847,16 +3368,16 @@ var Graphics = function() {
     }
     return this;
   };
-  Graphics.prototype.store = function store() {
+  _proto.store = function store() {
     this._updateInstructions(true);
     this._storeIndex = this._instructions.length;
     return this;
   };
-  Graphics.prototype.unstore = function unstore() {
+  _proto.unstore = function unstore() {
     this._storeIndex = 0;
     return this;
   };
-  Graphics.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     var o = new Graphics();
     o.command = this.command;
     o._stroke = this._stroke;
@@ -2871,15 +3392,18 @@ var Graphics = function() {
     o._storeIndex = this._storeIndex;
     return o;
   };
-  Graphics.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + "]";
   };
-  Graphics.prototype._updateInstructions = function _updateInstructions(commit) {
-    var instr = this._instructions, active = this._activeInstructions, commitIndex = this._commitIndex;
+  _proto._updateInstructions = function _updateInstructions(commit) {
+    var instr = this._instructions,
+        active = this._activeInstructions,
+        commitIndex = this._commitIndex;
     if (this._dirty && active.length) {
       instr.length = commitIndex;
       instr.push(Graphics.beginCmd);
-      var l = active.length, ll = instr.length;
+      var l = active.length,
+          ll = instr.length;
       instr.length = ll + l;
       for (var i = 0; i < l; i++) {
         instr[i + ll] = active[i];
@@ -2907,25 +3431,25 @@ var Graphics = function() {
       this._commitIndex = instr.length;
     }
   };
-  Graphics.prototype._setFill = function _setFill(fill) {
+  _proto._setFill = function _setFill(fill) {
     this._updateInstructions(true);
     this.command = this._fill = fill;
     return this;
   };
-  Graphics.prototype._setStroke = function _setStroke(stroke) {
+  _proto._setStroke = function _setStroke(stroke) {
     this._updateInstructions(true);
     if (this.command = this._stroke = stroke) {
       stroke.ignoreScale = this._strokeIgnoreScale;
     }
     return this;
   };
-  createClass(Graphics, [ {
+  _createClass(Graphics, [{
     key: "instructions",
     get: function get() {
       this._updateInstructions();
       return this._instructions;
     }
-  } ], [ {
+  }], [{
     key: "LineTo",
     get: function get() {
       return LineTo;
@@ -3010,53 +3534,54 @@ var Graphics = function() {
     get: function get() {
       return PolyStar;
     }
-  } ]);
+  }]);
   return Graphics;
 }();
-
-var LineTo = function() {
+var LineTo =
+function () {
   function LineTo(x, y) {
-    classCallCheck(this, LineTo);
     this.x = x;
     this.y = y;
   }
-  LineTo.prototype.exec = function exec(ctx) {
+  var _proto2 = LineTo.prototype;
+  _proto2.exec = function exec(ctx) {
     ctx.lineTo(this.x, this.y);
   };
   return LineTo;
 }();
-
-var MoveTo = function() {
+var MoveTo =
+function () {
   function MoveTo(x, y) {
-    classCallCheck(this, MoveTo);
     this.x = x;
     this.y = y;
   }
-  MoveTo.prototype.exec = function exec(ctx) {
+  var _proto3 = MoveTo.prototype;
+  _proto3.exec = function exec(ctx) {
     ctx.moveTo(this.x, this.y);
   };
   return MoveTo;
 }();
-
-var ArcTo = function() {
+var ArcTo =
+function () {
   function ArcTo(x1, y1, x2, y2, radius) {
-    classCallCheck(this, ArcTo);
     this.x1 = x1;
     this.y1 = y1;
     this.x2 = x2;
     this.y2 = y2;
     this.radius = radius;
   }
-  ArcTo.prototype.exec = function exec(ctx) {
+  var _proto4 = ArcTo.prototype;
+  _proto4.exec = function exec(ctx) {
     ctx.arcTo(this.x1, this.y1, this.x2, this.y2, this.radius);
   };
   return ArcTo;
 }();
-
-var Arc = function() {
-  function Arc(x, y, radius, startAngle, endAngle) {
-    var anticlockwise = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-    classCallCheck(this, Arc);
+var Arc =
+function () {
+  function Arc(x, y, radius, startAngle, endAngle, anticlockwise) {
+    if (anticlockwise === void 0) {
+      anticlockwise = false;
+    }
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -3064,29 +3589,29 @@ var Arc = function() {
     this.endAngle = endAngle;
     this.anticlockwise = anticlockwise;
   }
-  Arc.prototype.exec = function exec(ctx) {
+  var _proto5 = Arc.prototype;
+  _proto5.exec = function exec(ctx) {
     ctx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle, this.anticlockwise);
   };
   return Arc;
 }();
-
-var QuadraticCurveTo = function() {
+var QuadraticCurveTo =
+function () {
   function QuadraticCurveTo(cpx, cpy, x, y) {
-    classCallCheck(this, QuadraticCurveTo);
     this.cpx = cpx;
     this.cpy = cpy;
     this.x = x;
     this.y = y;
   }
-  QuadraticCurveTo.prototype.exec = function exec(ctx) {
+  var _proto6 = QuadraticCurveTo.prototype;
+  _proto6.exec = function exec(ctx) {
     ctx.quadraticCurveTo(this.cpx, this.cpy, this.x, this.y);
   };
   return QuadraticCurveTo;
 }();
-
-var BezierCurveTo = function() {
+var BezierCurveTo =
+function () {
   function BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) {
-    classCallCheck(this, BezierCurveTo);
     this.cp1x = cp1x;
     this.cp1y = cp1y;
     this.cp2x = cp2x;
@@ -3094,54 +3619,53 @@ var BezierCurveTo = function() {
     this.x = x;
     this.y = y;
   }
-  BezierCurveTo.prototype.exec = function exec(ctx) {
+  var _proto7 = BezierCurveTo.prototype;
+  _proto7.exec = function exec(ctx) {
     ctx.bezierCurveTo(this.cp1x, this.cp1y, this.cp2x, this.cp2y, this.x, this.y);
   };
   return BezierCurveTo;
 }();
-
-var Rect = function() {
+var Rect =
+function () {
   function Rect(x, y, w, h) {
-    classCallCheck(this, Rect);
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
   }
-  Rect.prototype.exec = function exec(ctx) {
+  var _proto8 = Rect.prototype;
+  _proto8.exec = function exec(ctx) {
     ctx.rect(this.x, this.y, this.w, this.h);
   };
   return Rect;
 }();
-
-var ClosePath = function() {
-  function ClosePath() {
-    classCallCheck(this, ClosePath);
-  }
-  ClosePath.prototype.exec = function exec(ctx) {
+var ClosePath =
+function () {
+  function ClosePath() {}
+  var _proto9 = ClosePath.prototype;
+  _proto9.exec = function exec(ctx) {
     ctx.closePath();
   };
   return ClosePath;
 }();
-
-var BeginPath = function() {
-  function BeginPath() {
-    classCallCheck(this, BeginPath);
-  }
-  BeginPath.prototype.exec = function exec(ctx) {
+var BeginPath =
+function () {
+  function BeginPath() {}
+  var _proto10 = BeginPath.prototype;
+  _proto10.exec = function exec(ctx) {
     ctx.beginPath();
   };
   return BeginPath;
 }();
-
-var Fill = function() {
+var Fill =
+function () {
   function Fill(style, matrix) {
-    classCallCheck(this, Fill);
     this.style = style;
     this.matrix = matrix;
     this.path = false;
   }
-  Fill.prototype.exec = function exec(ctx) {
+  var _proto11 = Fill.prototype;
+  _proto11.exec = function exec(ctx) {
     if (!this.style) {
       return;
     }
@@ -3156,7 +3680,7 @@ var Fill = function() {
       ctx.restore();
     }
   };
-  Fill.prototype.linearGradient = function linearGradient(colors, ratios, x0, y0, x1, y1) {
+  _proto11.linearGradient = function linearGradient(colors, ratios, x0, y0, x1, y1) {
     var o = this.style = Graphics._ctx.createLinearGradient(x0, y0, x1, y1);
     var l = colors.length;
     for (var i = 0; i < l; i++) {
@@ -3173,7 +3697,7 @@ var Fill = function() {
     };
     return this;
   };
-  Fill.prototype.radialGradient = function radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1) {
+  _proto11.radialGradient = function radialGradient(colors, ratios, x0, y0, r0, x1, y1, r1) {
     var o = this.style = Graphics._ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
     var l = colors.length;
     for (var i = 0; i < l; i++) {
@@ -3192,8 +3716,10 @@ var Fill = function() {
     };
     return this;
   };
-  Fill.prototype.bitmap = function bitmap(image) {
-    var repetition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+  _proto11.bitmap = function bitmap(image, repetition) {
+    if (repetition === void 0) {
+      repetition = "";
+    }
     if (image.naturalWidth || image.getContext || image.readyState >= 2) {
       var o = this.style = Graphics._ctx.createPattern(image, repetition);
       o.props = {
@@ -3206,18 +3732,19 @@ var Fill = function() {
   };
   return Fill;
 }();
-
-var Stroke = function(_Fill) {
-  inherits(Stroke, _Fill);
+var Stroke =
+function (_Fill) {
+  _inheritsLoose(Stroke, _Fill);
   function Stroke(style, ignoreScale) {
-    classCallCheck(this, Stroke);
-    var _this = possibleConstructorReturn(this, _Fill.call(this));
+    var _this;
+    _this = _Fill.call(this) || this;
     _this.style = style;
     _this.ignoreScale = ignoreScale;
     _this.path = false;
     return _this;
   }
-  Stroke.prototype.exec = function exec(ctx) {
+  var _proto12 = Stroke.prototype;
+  _proto12.exec = function exec(ctx) {
     if (!this.style) {
       return;
     }
@@ -3233,15 +3760,24 @@ var Stroke = function(_Fill) {
   };
   return Stroke;
 }(Fill);
-
-var StrokeStyle = function() {
-  function StrokeStyle() {
-    var width = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-    var caps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "butt";
-    var joints = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "miter";
-    var miterLimit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10;
-    var ignoreScale = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-    classCallCheck(this, StrokeStyle);
+var StrokeStyle =
+function () {
+  function StrokeStyle(width, caps, joints, miterLimit, ignoreScale) {
+    if (width === void 0) {
+      width = 1;
+    }
+    if (caps === void 0) {
+      caps = "butt";
+    }
+    if (joints === void 0) {
+      joints = "miter";
+    }
+    if (miterLimit === void 0) {
+      miterLimit = 10;
+    }
+    if (ignoreScale === void 0) {
+      ignoreScale = false;
+    }
     this.width = width;
     this.caps = caps;
     this.joints = joints;
@@ -3249,7 +3785,8 @@ var StrokeStyle = function() {
     this.ignoreScale = ignoreScale;
     this.path = false;
   }
-  StrokeStyle.prototype.exec = function exec(ctx) {
+  var _proto13 = StrokeStyle.prototype;
+  _proto13.exec = function exec(ctx) {
     ctx.lineWidth = this.width;
     ctx.lineCap = isNaN(this.caps) ? this.caps : Graphics._STROKE_CAPS_MAP[this.caps];
     ctx.lineJoin = isNaN(this.joints) ? this.joints : Graphics._STROKE_JOINTS_MAP[this.joints];
@@ -3258,16 +3795,20 @@ var StrokeStyle = function() {
   };
   return StrokeStyle;
 }();
-
-var StrokeDash = function() {
-  function StrokeDash() {
-    var segments = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    classCallCheck(this, StrokeDash);
+var StrokeDash =
+function () {
+  function StrokeDash(segments, offset) {
+    if (segments === void 0) {
+      segments = [];
+    }
+    if (offset === void 0) {
+      offset = 0;
+    }
     this.segments = segments;
     this.offset = offset;
   }
-  StrokeDash.prototype.exec = function exec(ctx) {
+  var _proto14 = StrokeDash.prototype;
+  _proto14.exec = function exec(ctx) {
     if (ctx.setLineDash) {
       ctx.setLineDash(this.segments);
       ctx.lineDashOffset = this.offset;
@@ -3275,10 +3816,9 @@ var StrokeDash = function() {
   };
   return StrokeDash;
 }();
-
-var RoundRect = function() {
+var RoundRect =
+function () {
   function RoundRect(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
-    classCallCheck(this, RoundRect);
     this.x = x;
     this.y = y;
     this.w = w;
@@ -3288,11 +3828,21 @@ var RoundRect = function() {
     this.radiusBR = radiusBR;
     this.radiusBL = radiusBL;
   }
-  RoundRect.prototype.exec = function exec(ctx) {
+  var _proto15 = RoundRect.prototype;
+  _proto15.exec = function exec(ctx) {
     var max = (this.w < this.h ? this.w : this.h) / 2;
-    var mTL = 0, mTR = 0, mBR = 0, mBL = 0;
-    var x = this.x, y = this.y, w = this.w, h = this.h;
-    var rTL = this.radiusTL, rTR = this.radiusTR, rBR = this.radiusBR, rBL = this.radiusBL;
+    var mTL = 0,
+        mTR = 0,
+        mBR = 0,
+        mBL = 0;
+    var x = this.x,
+        y = this.y,
+        w = this.w,
+        h = this.h;
+    var rTL = this.radiusTL,
+        rTR = this.radiusTR,
+        rBR = this.radiusBR,
+        rBL = this.radiusBL;
     if (rTL < 0) {
       rTL *= mTL = -1;
     }
@@ -3329,32 +3879,34 @@ var RoundRect = function() {
   };
   return RoundRect;
 }();
-
-var Circle = function() {
+var Circle =
+function () {
   function Circle(x, y, radius) {
-    classCallCheck(this, Circle);
     this.x = x;
     this.y = y;
     this.radius = radius;
   }
-  Circle.prototype.exec = function exec(ctx) {
+  var _proto16 = Circle.prototype;
+  _proto16.exec = function exec(ctx) {
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
   };
   return Circle;
 }();
-
-var Ellipse = function() {
+var Ellipse =
+function () {
   function Ellipse(x, y, w, h) {
-    classCallCheck(this, Ellipse);
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
   }
-  Ellipse.prototype.exec = function exec(ctx) {
-    var x = this.x, y = this.y;
-    var w = this.w, h = this.h;
-    var k = .5522848;
+  var _proto17 = Ellipse.prototype;
+  _proto17.exec = function exec(ctx) {
+    var x = this.x,
+        y = this.y;
+    var w = this.w,
+        h = this.h;
+    var k = 0.5522848;
     var ox = w / 2 * k;
     var oy = h / 2 * k;
     var xe = x + w;
@@ -3369,12 +3921,15 @@ var Ellipse = function() {
   };
   return Ellipse;
 }();
-
-var PolyStar = function() {
-  function PolyStar(x, y, radius, sides) {
-    var pointSize = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
-    var angle = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
-    classCallCheck(this, PolyStar);
+var PolyStar =
+function () {
+  function PolyStar(x, y, radius, sides, pointSize, angle) {
+    if (pointSize === void 0) {
+      pointSize = 0;
+    }
+    if (angle === void 0) {
+      angle = 0;
+    }
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -3382,8 +3937,10 @@ var PolyStar = function() {
     this.pointSize = pointSize;
     this.angle = angle;
   }
-  PolyStar.prototype.exec = function exec(ctx) {
-    var x = this.x, y = this.y;
+  var _proto18 = PolyStar.prototype;
+  _proto18.exec = function exec(ctx) {
+    var x = this.x,
+        y = this.y;
     var radius = this.radius;
     var angle = this.angle / 180 * Math.PI;
     var sides = this.sides;
@@ -3402,87 +3959,83 @@ var PolyStar = function() {
   };
   return PolyStar;
 }();
-
 Graphics.beginCmd = new BeginPath();
-
 Graphics._BASE_64 = {
-  A: 0,
-  B: 1,
-  C: 2,
-  D: 3,
-  E: 4,
-  F: 5,
-  G: 6,
-  H: 7,
-  I: 8,
-  J: 9,
-  K: 10,
-  L: 11,
-  M: 12,
-  N: 13,
-  O: 14,
-  P: 15,
-  Q: 16,
-  R: 17,
-  S: 18,
-  T: 19,
-  U: 20,
-  V: 21,
-  W: 22,
-  X: 23,
-  Y: 24,
-  Z: 25,
-  a: 26,
-  b: 27,
-  c: 28,
-  d: 29,
-  e: 30,
-  f: 31,
-  g: 32,
-  h: 33,
-  i: 34,
-  j: 35,
-  k: 36,
-  l: 37,
-  m: 38,
-  n: 39,
-  o: 40,
-  p: 41,
-  q: 42,
-  r: 43,
-  s: 44,
-  t: 45,
-  u: 46,
-  v: 47,
-  w: 48,
-  x: 49,
-  y: 50,
-  z: 51,
-  0: 52,
-  1: 53,
-  2: 54,
-  3: 55,
-  4: 56,
-  5: 57,
-  6: 58,
-  7: 59,
-  8: 60,
-  9: 61,
+  "A": 0,
+  "B": 1,
+  "C": 2,
+  "D": 3,
+  "E": 4,
+  "F": 5,
+  "G": 6,
+  "H": 7,
+  "I": 8,
+  "J": 9,
+  "K": 10,
+  "L": 11,
+  "M": 12,
+  "N": 13,
+  "O": 14,
+  "P": 15,
+  "Q": 16,
+  "R": 17,
+  "S": 18,
+  "T": 19,
+  "U": 20,
+  "V": 21,
+  "W": 22,
+  "X": 23,
+  "Y": 24,
+  "Z": 25,
+  "a": 26,
+  "b": 27,
+  "c": 28,
+  "d": 29,
+  "e": 30,
+  "f": 31,
+  "g": 32,
+  "h": 33,
+  "i": 34,
+  "j": 35,
+  "k": 36,
+  "l": 37,
+  "m": 38,
+  "n": 39,
+  "o": 40,
+  "p": 41,
+  "q": 42,
+  "r": 43,
+  "s": 44,
+  "t": 45,
+  "u": 46,
+  "v": 47,
+  "w": 48,
+  "x": 49,
+  "y": 50,
+  "z": 51,
+  "0": 52,
+  "1": 53,
+  "2": 54,
+  "3": 55,
+  "4": 56,
+  "5": 57,
+  "6": 58,
+  "7": 59,
+  "8": 60,
+  "9": 61,
   "+": 62,
   "/": 63
 };
-
-Graphics._STROKE_CAPS_MAP = [ "butt", "round", "square" ];
-
-Graphics._STROKE_JOINTS_MAP = [ "miter", "round", "bevel" ];
-
+Graphics._STROKE_CAPS_MAP = ["butt", "round", "square"];
+Graphics._STROKE_JOINTS_MAP = ["miter", "round", "bevel"];
 Graphics._ctx = createCanvas().getContext("2d");
 
-var MovieClip = function(_Container) {
-  inherits(MovieClip, _Container);
+var MovieClip =
+function (_Container) {
+  _inheritsLoose(MovieClip, _Container);
   function MovieClip(props) {
-    classCallCheck(this, MovieClip);
-    var _this = possibleConstructorReturn(this, _Container.call(this));
+    var _this;
+    _this = _Container.call(this) || this;
     !MovieClip.inited && MovieClip.init();
     _this.mode = props.mode != null ? props.mode : MovieClip.INDEPENDENT;
     _this.startPosition = props.startPosition != null ? props.startPosition : 0;
@@ -3494,7 +4047,7 @@ var MovieClip = function(_Container) {
       _this.loop = -1;
     }
     _this.currentFrame = 0;
-    _this.timeline = new Timeline(Object.assign({
+    _this.timeline = new tweenjs.Timeline(Object.assign({
       useTicks: true,
       paused: true
     }, props));
@@ -3507,7 +4060,7 @@ var MovieClip = function(_Container) {
     _this._rawPosition = -1;
     _this._t = 0;
     _this._managed = {};
-    _this._bound_resolveState = _this._resolveState.bind(_this);
+    _this._bound_resolveState = _this._resolveState.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
   MovieClip.init = function init() {
@@ -3517,10 +4070,11 @@ var MovieClip = function(_Container) {
     MovieClipPlugin.install();
     MovieClip.inited = true;
   };
-  MovieClip.prototype.isVisible = function isVisible() {
+  var _proto = MovieClip.prototype;
+  _proto.isVisible = function isVisible() {
     return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0);
   };
-  MovieClip.prototype.draw = function draw(ctx, ignoreCache) {
+  _proto.draw = function draw(ctx, ignoreCache) {
     if (this.drawCache(ctx, ignoreCache)) {
       return true;
     }
@@ -3528,25 +4082,26 @@ var MovieClip = function(_Container) {
     _Container.prototype.draw.call(this, ctx, ignoreCache);
     return true;
   };
-  MovieClip.prototype.play = function play() {
+  _proto.play = function play() {
     this.paused = false;
   };
-  MovieClip.prototype.stop = function stop() {
+  _proto.stop = function stop() {
     this.paused = true;
   };
-  MovieClip.prototype.gotoAndPlay = function gotoAndPlay(positionOrLabel) {
+  _proto.gotoAndPlay = function gotoAndPlay(positionOrLabel) {
     this.play();
     this._goto(positionOrLabel);
   };
-  MovieClip.prototype.gotoAndStop = function gotoAndStop(positionOrLabel) {
+  _proto.gotoAndStop = function gotoAndStop(positionOrLabel) {
     this.stop();
     this._goto(positionOrLabel);
   };
-  MovieClip.prototype.advance = function advance(time) {
+  _proto.advance = function advance(time) {
     if (this.mode !== MovieClip.INDEPENDENT) {
       return;
     }
-    var o = this, fps = o.framerate;
+    var o = this,
+        fps = o.framerate;
     while ((o = o.parent) && fps === null) {
       if (o.mode === MovieClip.INDEPENDENT) {
         fps = o._framerate;
@@ -3556,26 +4111,26 @@ var MovieClip = function(_Container) {
     if (this.paused) {
       return;
     }
-    var t = fps !== null && fps !== -1 && time !== null ? time / (1e3 / fps) + this._t : 1;
+    var t = fps !== null && fps !== -1 && time !== null ? time / (1000 / fps) + this._t : 1;
     var frames = t | 0;
     this._t = t - frames;
     while (frames--) {
       this._updateTimeline(this._rawPosition + 1, false);
     }
   };
-  MovieClip.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     throw "MovieClip cannot be cloned.";
   };
-  MovieClip.prototype._updateState = function _updateState() {
+  _proto._updateState = function _updateState() {
     if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) {
       this._updateTimeline(-1);
     }
   };
-  MovieClip.prototype._tick = function _tick(evtObj) {
+  _proto._tick = function _tick(evtObj) {
     this.advance(evtObj && evtObj.delta);
     _Container.prototype._tick.call(this, evtObj);
   };
-  MovieClip.prototype._goto = function _goto(positionOrLabel) {
+  _proto._goto = function _goto(positionOrLabel) {
     var pos = this.timeline.resolve(positionOrLabel);
     if (pos == null) {
       return;
@@ -3583,13 +4138,14 @@ var MovieClip = function(_Container) {
     this._t = 0;
     this._updateTimeline(pos, true);
   };
-  MovieClip.prototype._reset = function _reset() {
+  _proto._reset = function _reset() {
     this._rawPosition = -1;
     this._t = this.currentFrame = 0;
     this.paused = false;
   };
-  MovieClip.prototype._updateTimeline = function _updateTimeline(rawPosition, jump) {
-    var synced = this.mode !== MovieClip.INDEPENDENT, tl = this.timeline;
+  _proto._updateTimeline = function _updateTimeline(rawPosition, jump) {
+    var synced = this.mode !== MovieClip.INDEPENDENT,
+        tl = this.timeline;
     if (synced) {
       rawPosition = this.startPosition + (this.mode === MovieClip.SINGLE_FRAME ? 0 : this._synchOffset);
     }
@@ -3603,19 +4159,20 @@ var MovieClip = function(_Container) {
     tl.loop = this.loop;
     tl.setPosition(rawPosition, synced || !this.actionsEnabled, jump, this._bound_resolveState);
   };
-  MovieClip.prototype._renderFirstFrame = function _renderFirstFrame() {
-    var tl = this.timeline, pos = tl.rawPosition;
+  _proto._renderFirstFrame = function _renderFirstFrame() {
+    var tl = this.timeline,
+        pos = tl.rawPosition;
     tl.setPosition(0, true, true, this._bound_resolveState);
     tl.rawPosition = pos;
   };
-  MovieClip.prototype._resolveState = function _resolveState() {
+  _proto._resolveState = function _resolveState() {
     var tl = this.timeline;
     this.currentFrame = tl.position;
     for (var n in this._managed) {
       this._managed[n] = 1;
     }
     var tweens = tl.tweens;
-    for (var _iterator = tweens, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator](); ;) {
+    for (var _iterator = tweens, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
       var _ref;
       if (_isArray) {
         if (_i >= _iterator.length) break;
@@ -3646,7 +4203,7 @@ var MovieClip = function(_Container) {
       }
     }
   };
-  MovieClip.prototype._setState = function _setState(state, offset) {
+  _proto._setState = function _setState(state, offset) {
     if (!state) {
       return;
     }
@@ -3660,7 +4217,7 @@ var MovieClip = function(_Container) {
       this._addManagedChild(target, offset);
     }
   };
-  MovieClip.prototype._addManagedChild = function _addManagedChild(child, offset) {
+  _proto._addManagedChild = function _addManagedChild(child, offset) {
     if (child._off) {
       return;
     }
@@ -3673,7 +4230,7 @@ var MovieClip = function(_Container) {
     }
     this._managed[child.id] = 2;
   };
-  MovieClip.prototype._getBounds = function _getBounds(matrix, ignoreTransform) {
+  _proto._getBounds = function _getBounds(matrix, ignoreTransform) {
     var bounds = this.getBounds();
     if (!bounds && this.frameBounds) {
       bounds = this._rectangle.copy(this.frameBounds[this.currentFrame]);
@@ -3683,7 +4240,7 @@ var MovieClip = function(_Container) {
     }
     return _Container.prototype._getBounds.call(this, matrix, ignoreTransform);
   };
-  createClass(MovieClip, [ {
+  _createClass(MovieClip, [{
     key: "labels",
     get: function get() {
       return this.timeline.labels;
@@ -3703,25 +4260,20 @@ var MovieClip = function(_Container) {
     get: function get() {
       return this.duration;
     }
-  } ]);
+  }]);
   return MovieClip;
 }(Container);
-
 MovieClip.INDEPENDENT = "independent";
-
 MovieClip.SINGLE_FRAME = "single";
-
 MovieClip.SYNCHED = "synched";
-
 MovieClip.inited = false;
-
-var MovieClipPlugin = function() {
+var MovieClipPlugin =
+function () {
   function MovieClipPlugin() {
-    classCallCheck(this, MovieClipPlugin);
     throw "MovieClipPlugin cannot be instantiated.";
   }
   MovieClipPlugin.install = function install() {
-    Tween.installPlugin(MovieClipPlugin);
+    tweenjs.Tween.installPlugin(MovieClipPlugin);
   };
   MovieClipPlugin.init = function init(tween, prop, value) {
     return value;
@@ -3734,66 +4286,51 @@ var MovieClipPlugin = function() {
   };
   return MovieClipPlugin;
 }();
-
 MovieClipPlugin.priority = 100;
 
-var Shadow = function() {
-  function Shadow() {
-    var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "black";
-    var offsetX = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var offsetY = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    var blur = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-    classCallCheck(this, Shadow);
-    this.color = color;
-    this.offsetX = offsetX;
-    this.offsetY = offsetY;
-    this.blur = blur;
-  }
-  Shadow.prototype.toString = function toString() {
-    return "[" + this.constructor.name + "]";
-  };
-  Shadow.prototype.clone = function clone() {
-    return new Shadow(this.color, this.offsetX, this.offsetY, this.blur);
-  };
-  return Shadow;
-}();
-
-Shadow.identity = new Shadow("transparent");
-
-var Shape = function(_DisplayObject) {
-  inherits(Shape, _DisplayObject);
-  function Shape() {
-    var graphics = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Graphics();
-    classCallCheck(this, Shape);
-    var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
+var Shape =
+function (_DisplayObject) {
+  _inheritsLoose(Shape, _DisplayObject);
+  function Shape(graphics) {
+    var _this;
+    if (graphics === void 0) {
+      graphics = new Graphics();
+    }
+    _this = _DisplayObject.call(this) || this;
     _this.graphics = graphics;
     return _this;
   }
-  Shape.prototype.isVisible = function isVisible() {
+  var _proto = Shape.prototype;
+  _proto.isVisible = function isVisible() {
     var hasContent = this.cacheCanvas || this.graphics && !this.graphics.isEmpty();
     return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
   };
-  Shape.prototype.draw = function draw(ctx) {
-    var ignoreCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  _proto.draw = function draw(ctx, ignoreCache) {
+    if (ignoreCache === void 0) {
+      ignoreCache = false;
+    }
     if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache)) {
       return true;
     }
     this.graphics.draw(ctx, this);
     return true;
   };
-  Shape.prototype.clone = function clone() {
-    var recursive = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  _proto.clone = function clone(recursive) {
+    if (recursive === void 0) {
+      recursive = false;
+    }
     var g = recursive && this.graphics ? this.graphics.clone() : this.graphics;
     return this._cloneProps(new Shape(g));
   };
   return Shape;
 }(DisplayObject);
 
-var SpriteSheet = function(_EventDispatcher) {
-  inherits(SpriteSheet, _EventDispatcher);
+var SpriteSheet =
+function (_EventDispatcher) {
+  _inheritsLoose(SpriteSheet, _EventDispatcher);
   function SpriteSheet(data) {
-    classCallCheck(this, SpriteSheet);
-    var _this = possibleConstructorReturn(this, _EventDispatcher.call(this));
+    var _this;
+    _this = _EventDispatcher.call(this) || this;
     _this.complete = true;
     _this.framerate = 0;
     _this._animations = null;
@@ -3811,7 +4348,8 @@ var SpriteSheet = function(_EventDispatcher) {
     _this._parseData(data);
     return _this;
   }
-  SpriteSheet.prototype.getNumFrames = function getNumFrames(animation) {
+  var _proto = SpriteSheet.prototype;
+  _proto.getNumFrames = function getNumFrames(animation) {
     if (animation == null) {
       return this._frames ? this._frames.length : this._numFrames || 0;
     } else {
@@ -3823,73 +4361,75 @@ var SpriteSheet = function(_EventDispatcher) {
       }
     }
   };
-  SpriteSheet.prototype.getAnimation = function getAnimation(name) {
+  _proto.getAnimation = function getAnimation(name) {
     return this._data[name];
   };
-  SpriteSheet.prototype.getFrame = function getFrame(frameIndex) {
-    var frame = void 0;
+  _proto.getFrame = function getFrame(frameIndex) {
+    var frame;
     if (this._frames && (frame = this._frames[frameIndex])) {
       return frame;
     }
     return null;
   };
-  SpriteSheet.prototype.getFrameBounds = function getFrameBounds(frameIndex) {
-    var rectangle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Rectangle();
+  _proto.getFrameBounds = function getFrameBounds(frameIndex, rectangle) {
+    if (rectangle === void 0) {
+      rectangle = new Rectangle();
+    }
     var frame = this.getFrame(frameIndex);
     return frame ? rectangle.setValues(-frame.regX, -frame.regY, frame.rect.width, frame.rect.height) : null;
   };
-  SpriteSheet.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + "]";
   };
-  SpriteSheet.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     throw "SpriteSheet cannot be cloned.";
   };
-  SpriteSheet.prototype._parseData = function _parseData(data) {
+  _proto._parseData = function _parseData(data) {
     var _this2 = this;
     if (data == null) {
       return;
     }
     this.framerate = data.framerate || 0;
     if (data.images) {
-      var _loop = function _loop(_img) {
-        var a = _this2._images = [];
-        var src = void 0;
-        if (typeof _img === "string") {
-          src = _img;
-          _img = document.createElement("img");
-          _img.src = src;
-        }
-        a.push(_img);
-        if (!_img.getContext && !_img.naturalWidth) {
-          _this2._loadCount++;
-          _this2.complete = false;
-          _img.onload = function() {
-            return _this2._handleImageLoad(src);
-          };
-          _img.onerror = function() {
-            return _this2._handleImageError(src);
-          };
-        }
-        img = _img;
-      };
-      for (var _iterator = data.images, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator](); ;) {
-        var _ref;
+      var _loop = function _loop() {
         if (_isArray) {
-          if (_i >= _iterator.length) break;
+          if (_i >= _iterator.length) return "break";
           _ref = _iterator[_i++];
         } else {
           _i = _iterator.next();
-          if (_i.done) break;
+          if (_i.done) return "break";
           _ref = _i.value;
         }
         var img = _ref;
-        _loop(img);
+        var a = _this2._images = [];
+        var src = void 0;
+        if (typeof img === "string") {
+          src = img;
+          img = document.createElement("img");
+          img.src = src;
+        }
+        a.push(img);
+        if (!img.getContext && !img.naturalWidth) {
+          _this2._loadCount++;
+          _this2.complete = false;
+          img.onload = function () {
+            return _this2._handleImageLoad(src);
+          };
+          img.onerror = function () {
+            return _this2._handleImageError(src);
+          };
+        }
+      };
+      for (var _iterator = data.images, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+        var _ref;
+        var _ret = _loop();
+        if (_ret === "break") break;
       }
     }
     if (data.frames != null) {
       if (Array.isArray(data.frames)) {
         this._frames = [];
-        for (var _iterator2 = data.frames, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator](); ;) {
+        for (var _iterator2 = data.frames, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
           var _ref2;
           if (_isArray2) {
             if (_i2 >= _iterator2.length) break;
@@ -3932,10 +4472,10 @@ var SpriteSheet = function(_EventDispatcher) {
         var obj = _o[name];
         var a = void 0;
         if (typeof obj === "number") {
-          a = anim.frames = [ obj ];
+          a = anim.frames = [obj];
         } else if (Array.isArray(obj)) {
           if (obj.length === 1) {
-            anim.frames = [ obj[0] ];
+            anim.frames = [obj[0]];
           } else {
             anim.speed = obj[3];
             anim.next = obj[2];
@@ -3948,7 +4488,7 @@ var SpriteSheet = function(_EventDispatcher) {
           anim.speed = obj.speed;
           anim.next = obj.next;
           var frames = obj.frames;
-          a = anim.frames = typeof frames === "number" ? [ frames ] : frames.slice(0);
+          a = anim.frames = typeof frames === "number" ? [frames] : frames.slice(0);
         }
         if (anim.next === true || anim.next === undefined) {
           anim.next = name;
@@ -3964,14 +4504,14 @@ var SpriteSheet = function(_EventDispatcher) {
       }
     }
   };
-  SpriteSheet.prototype._handleImageLoad = function _handleImageLoad(src) {
+  _proto._handleImageLoad = function _handleImageLoad(src) {
     if (--this._loadCount === 0) {
       this._calculateFrames();
       this.complete = true;
       this.dispatchEvent("complete");
     }
   };
-  SpriteSheet.prototype._handleImageError = function _handleImageError(src) {
+  _proto._handleImageError = function _handleImageError(src) {
     var errorEvent = new Event("error");
     errorEvent.src = src;
     this.dispatchEvent(errorEvent);
@@ -3979,16 +4519,21 @@ var SpriteSheet = function(_EventDispatcher) {
       this.dispatchEvent("complete");
     }
   };
-  SpriteSheet.prototype._calculateFrames = function _calculateFrames() {
+  _proto._calculateFrames = function _calculateFrames() {
     if (this._frames || this._frameWidth === 0) {
       return;
     }
     this._frames = [];
-    var maxFrames = this._numFrames || 1e5;
-    var frameCount = 0, frameWidth = this._frameWidth, frameHeight = this._frameHeight;
-    var spacing = this._spacing, margin = this._margin;
+    var maxFrames = this._numFrames || 100000;
+    var frameCount = 0,
+        frameWidth = this._frameWidth,
+        frameHeight = this._frameHeight;
+    var spacing = this._spacing,
+        margin = this._margin;
     imgLoop: for (var i = 0, imgs = this._images, l = imgs.length; i < l; i++) {
-      var _img2 = imgs[i], imgW = _img2.width || _img2.naturalWidth, imgH = _img2.height || _img2.naturalHeight;
+      var img = imgs[i],
+          imgW = img.width || img.naturalWidth,
+          imgH = img.height || img.naturalHeight;
       var y = margin;
       while (y <= imgH - margin - frameHeight) {
         var x = margin;
@@ -3998,7 +4543,7 @@ var SpriteSheet = function(_EventDispatcher) {
           }
           frameCount++;
           this._frames.push({
-            image: _img2,
+            image: img,
             rect: new Rectangle(x, y, frameWidth, frameHeight),
             regX: this._regX,
             regY: this._regY
@@ -4010,20 +4555,21 @@ var SpriteSheet = function(_EventDispatcher) {
     }
     this._numFrames = frameCount;
   };
-  createClass(SpriteSheet, [ {
+  _createClass(SpriteSheet, [{
     key: "animations",
     get: function get() {
       return this._animations.slice();
     }
-  } ]);
+  }]);
   return SpriteSheet;
 }(EventDispatcher);
 
-var Text = function(_DisplayObject) {
-  inherits(Text, _DisplayObject);
+var Text =
+function (_DisplayObject) {
+  _inheritsLoose(Text, _DisplayObject);
   function Text(text, font, color) {
-    classCallCheck(this, Text);
-    var _this = possibleConstructorReturn(this, _DisplayObject.call(this));
+    var _this;
+    _this = _DisplayObject.call(this) || this;
     _this.text = text;
     _this.font = font;
     _this.color = color;
@@ -4035,11 +4581,12 @@ var Text = function(_DisplayObject) {
     _this.lineWidth = null;
     return _this;
   }
-  Text.prototype.isVisible = function isVisible() {
+  var _proto = Text.prototype;
+  _proto.isVisible = function isVisible() {
     var hasContent = this.cacheCanvas || this.text != null && this.text !== "";
     return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
   };
-  Text.prototype.draw = function draw(ctx, ignoreCache) {
+  _proto.draw = function draw(ctx, ignoreCache) {
     if (_DisplayObject.prototype.draw.call(this, ctx, ignoreCache)) {
       return true;
     }
@@ -4053,16 +4600,16 @@ var Text = function(_DisplayObject) {
     this._drawText(this._prepContext(ctx));
     return true;
   };
-  Text.prototype.getMeasuredWidth = function getMeasuredWidth() {
+  _proto.getMeasuredWidth = function getMeasuredWidth() {
     return this._getMeasuredWidth(this.text);
   };
-  Text.prototype.getMeasuredLineHeight = function getMeasuredLineHeight() {
+  _proto.getMeasuredLineHeight = function getMeasuredLineHeight() {
     return this._getMeasuredWidth("M") * 1.2;
   };
-  Text.prototype.getMeasuredHeight = function getMeasuredHeight() {
+  _proto.getMeasuredHeight = function getMeasuredHeight() {
     return this._drawText(null, {}).height;
   };
-  Text.prototype.getBounds = function getBounds() {
+  _proto.getBounds = function getBounds() {
     var rect = _DisplayObject.prototype.getBounds.call(this);
     if (rect) {
       return rect;
@@ -4077,7 +4624,7 @@ var Text = function(_DisplayObject) {
     var y = lineHeight * Text.V_OFFSETS[this.textBaseline || "top"];
     return this._rectangle.setValues(x, y, w, o.height);
   };
-  Text.prototype.getMetrics = function getMetrics() {
+  _proto.getMetrics = function getMetrics() {
     var o = {
       lines: []
     };
@@ -4085,13 +4632,13 @@ var Text = function(_DisplayObject) {
     o.vOffset = o.lineHeight * Text.V_OFFSETS[this.textBaseline || "top"];
     return this._drawText(null, o, o.lines);
   };
-  Text.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return this._cloneProps(new Text(this.text, this.font, this.color));
   };
-  Text.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + " (text=" + (this.text.length > 20 ? this.text.substr(0, 17) + "..." : this.text) + ")]";
   };
-  Text.prototype._cloneProps = function _cloneProps(o) {
+  _proto._cloneProps = function _cloneProps(o) {
     _DisplayObject.prototype._cloneProps.call(this, o);
     o.textAlign = this.textAlign;
     o.textBaseline = this.textBaseline;
@@ -4101,7 +4648,7 @@ var Text = function(_DisplayObject) {
     o.lineWidth = this.lineWidth;
     return o;
   };
-  Text.prototype._prepContext = function _prepContext(ctx) {
+  _proto._prepContext = function _prepContext(ctx) {
     ctx.font = this.font || "10px sans-serif";
     ctx.textAlign = this.textAlign || "left";
     ctx.textBaseline = this.textBaseline || "top";
@@ -4109,7 +4656,7 @@ var Text = function(_DisplayObject) {
     ctx.miterLimit = 2.5;
     return ctx;
   };
-  Text.prototype._drawText = function _drawText(ctx, o, lines) {
+  _proto._drawText = function _drawText(ctx, o, lines) {
     var paint = !!ctx;
     if (!paint) {
       ctx = Text._ctx;
@@ -4117,9 +4664,10 @@ var Text = function(_DisplayObject) {
       this._prepContext(ctx);
     }
     var lineHeight = this.lineHeight || this.getMeasuredLineHeight();
-    var maxW = 0, count = 0;
+    var maxW = 0,
+        count = 0;
     var hardLines = String(this.text).split(/(?:\r\n|\r|\n)/);
-    for (var _iterator = hardLines, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator](); ;) {
+    for (var _iterator = hardLines, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
       var _ref;
       if (_isArray) {
         if (_i >= _iterator.length) break;
@@ -4180,14 +4728,14 @@ var Text = function(_DisplayObject) {
     }
     return o;
   };
-  Text.prototype._drawTextLine = function _drawTextLine(ctx, text, y) {
+  _proto._drawTextLine = function _drawTextLine(ctx, text, y) {
     if (this.outline) {
-      ctx.strokeText(text, 0, y, this.maxWidth || 65535);
+      ctx.strokeText(text, 0, y, this.maxWidth || 0xFFFF);
     } else {
-      ctx.fillText(text, 0, y, this.maxWidth || 65535);
+      ctx.fillText(text, 0, y, this.maxWidth || 0xFFFF);
     }
   };
-  Text.prototype._getMeasuredWidth = function _getMeasuredWidth(text) {
+  _proto._getMeasuredWidth = function _getMeasuredWidth(text) {
     var ctx = Text._ctx;
     ctx.save();
     var w = this._prepContext(ctx).measureText(text).width;
@@ -4196,31 +4744,29 @@ var Text = function(_DisplayObject) {
   };
   return Text;
 }(DisplayObject);
-
 Text.H_OFFSETS = {
   start: 0,
   left: 0,
-  center: -.5,
+  center: -0.5,
   end: -1,
   right: -1
 };
-
 Text.V_OFFSETS = {
   top: 0,
-  hanging: -.01,
-  middle: -.4,
-  alphabetic: -.8,
-  ideographic: -.85,
+  hanging: -0.01,
+  middle: -0.4,
+  alphabetic: -0.8,
+  ideographic: -0.85,
   bottom: -1
 };
-
 Text._ctx = createCanvas().getContext("2d");
 
-var AlphaMapFilter = function(_Filter) {
-  inherits(AlphaMapFilter, _Filter);
+var AlphaMapFilter =
+function (_Filter) {
+  _inheritsLoose(AlphaMapFilter, _Filter);
   function AlphaMapFilter(alphaMap) {
-    classCallCheck(this, AlphaMapFilter);
-    var _this = possibleConstructorReturn(this, _Filter.call(this));
+    var _this;
+    _this = _Filter.call(this) || this;
     _this.alphaMap = alphaMap;
     _this._alphaMap = null;
     _this._mapData = null;
@@ -4228,7 +4774,8 @@ var AlphaMapFilter = function(_Filter) {
     _this.FRAG_SHADER_BODY = "\n\t\t\tuniform sampler2D uAlphaSampler;\n\n\t\t\tvoid main (void) {\n\t\t\t\tvec4 color = texture2D(uSampler, vRenderCoord);\n\t\t\t\tvec4 alphaMap = texture2D(uAlphaSampler, vTextureCoord);\n\n\t\t\t\t// some image formats can have transparent white rgba(1,1,1, 0) when put on the GPU, this means we need a slight tweak\n\t\t\t\t// using ceil ensure that the colour will be used so long as it exists but pure transparency will be treated black\n\t\t\t\tgl_FragColor = vec4(color.rgb, color.a * (alphaMap.r * ceil(alphaMap.a)));\n\t\t\t}\n\t\t";
     return _this;
   }
-  AlphaMapFilter.prototype.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {
+  var _proto = AlphaMapFilter.prototype;
+  _proto.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {
     if (!this._mapTexture) {
       this._mapTexture = gl.createTexture();
     }
@@ -4238,13 +4785,13 @@ var AlphaMapFilter = function(_Filter) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.alphaMap);
     gl.uniform1i(gl.getUniformLocation(shaderProgram, "uAlphaSampler"), 1);
   };
-  AlphaMapFilter.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     var o = new AlphaMapFilter(this.alphaMap);
     o._alphaMap = this._alphaMap;
     o._mapData = this._mapData;
     return o;
   };
-  AlphaMapFilter.prototype._applyFilter = function _applyFilter(imageData) {
+  _proto._applyFilter = function _applyFilter(imageData) {
     if (!this.alphaMap) {
       return true;
     }
@@ -4259,7 +4806,7 @@ var AlphaMapFilter = function(_Filter) {
     }
     return true;
   };
-  AlphaMapFilter.prototype._prepAlphaMap = function _prepAlphaMap() {
+  _proto._prepAlphaMap = function _prepAlphaMap() {
     if (!this.alphaMap) {
       return false;
     }
@@ -4269,7 +4816,7 @@ var AlphaMapFilter = function(_Filter) {
     this._mapData = null;
     var map = this._alphaMap = this.alphaMap;
     var canvas = map;
-    var ctx = void 0;
+    var ctx;
     if (map instanceof HTMLCanvasElement) {
       ctx = canvas.getContext("2d");
     } else {
@@ -4289,17 +4836,19 @@ var AlphaMapFilter = function(_Filter) {
   return AlphaMapFilter;
 }(Filter);
 
-var AlphaMaskFilter = function(_Filter) {
-  inherits(AlphaMaskFilter, _Filter);
+var AlphaMaskFilter =
+function (_Filter) {
+  _inheritsLoose(AlphaMaskFilter, _Filter);
   function AlphaMaskFilter(mask) {
-    classCallCheck(this, AlphaMaskFilter);
-    var _this = possibleConstructorReturn(this, _Filter.call(this));
+    var _this;
+    _this = _Filter.call(this) || this;
     _this.mask = mask;
     _this.usesContext = true;
     _this.FRAG_SHADER_BODY = "\n\t\t\tuniform sampler2D uAlphaSampler;\n\n\t\t\tvoid main (void) {\n\t\t\t\tvec4 color = texture2D(uSampler, vRenderCoord);\n\t\t\t\tvec4 alphaMap = texture2D(uAlphaSampler, vTextureCoord);\n\n\t\t\t\tgl_FragColor = vec4(color.rgb, color.a * alphaMap.a);\n\t\t\t}\n\t\t";
     return _this;
   }
-  AlphaMaskFilter.prototype.applyFilter = function applyFilter(ctx, x, y, width, height, targetCtx, targetX, targetY) {
+  var _proto = AlphaMaskFilter.prototype;
+  _proto.applyFilter = function applyFilter(ctx, x, y, width, height, targetCtx, targetX, targetY) {
     if (!this.mask) {
       return true;
     }
@@ -4319,10 +4868,10 @@ var AlphaMaskFilter = function(_Filter) {
     targetCtx.restore();
     return true;
   };
-  AlphaMaskFilter.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return new AlphaMaskFilter(this.mask);
   };
-  AlphaMaskFilter.prototype.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {
+  _proto.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {
     if (!this._mapTexture) {
       this._mapTexture = gl.createTexture();
     }
@@ -4335,14 +4884,21 @@ var AlphaMaskFilter = function(_Filter) {
   return AlphaMaskFilter;
 }(Filter);
 
-var BlurFilter = function(_Filter) {
-  inherits(BlurFilter, _Filter);
-  function BlurFilter() {
-    var blurX = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-    var blurY = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var quality = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-    classCallCheck(this, BlurFilter);
-    var _this = possibleConstructorReturn(this, _Filter.call(this));
+var BlurFilter =
+function (_Filter) {
+  _inheritsLoose(BlurFilter, _Filter);
+  function BlurFilter(blurX, blurY, quality) {
+    var _this;
+    if (blurX === void 0) {
+      blurX = 0;
+    }
+    if (blurY === void 0) {
+      blurY = 0;
+    }
+    if (quality === void 0) {
+      quality = 1;
+    }
+    _this = _Filter.call(this) || this;
     _this._blurX = blurX;
     _this._blurXTable = [];
     _this._lastBlurX = null;
@@ -4354,32 +4910,34 @@ var BlurFilter = function(_Filter) {
     _this.FRAG_SHADER_TEMPLATE = "\n\t\t\tuniform float xWeight[{{blurX}}];\n\t\t\tuniform float yWeight[{{blurY}}];\n\t\t\tuniform vec2 textureOffset;\n\t\t\tvoid main (void) {\n\t\t\t\tvec4 color = vec4(0.0);\n\n\t\t\t\tfloat xAdj = ({{blurX}}.0-1.0)/2.0;\n\t\t\t\tfloat yAdj = ({{blurY}}.0-1.0)/2.0;\n\t\t\t\tvec2 sampleOffset;\n\n\t\t\t\tfor(int i=0; i<{{blurX}}; i++) {\n\t\t\t\t\tfor(int j=0; j<{{blurY}}; j++) {\n\t\t\t\t\t\tsampleOffset = vRenderCoord + (textureOffset * vec2(float(i)-xAdj, float(j)-yAdj));\n\t\t\t\t\t\tcolor += texture2D(uSampler, sampleOffset) * (xWeight[i] * yWeight[j]);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tgl_FragColor = color.rgba;\n\t\t\t}\n\t\t";
     return _this;
   }
-  BlurFilter.prototype.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {
+  var _proto = BlurFilter.prototype;
+  _proto.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {
     gl.uniform1fv(gl.getUniformLocation(shaderProgram, "xWeight"), this._blurXTable);
     gl.uniform1fv(gl.getUniformLocation(shaderProgram, "yWeight"), this._blurYTable);
     gl.uniform2f(gl.getUniformLocation(shaderProgram, "textureOffset"), 2 / (stage._viewportWidth * this._quality), 2 / (stage._viewportHeight * this._quality));
   };
-  BlurFilter.prototype.getBounds = function getBounds(rect) {
-    var x = this.blurX | 0, y = this.blurY | 0;
+  _proto.getBounds = function getBounds(rect) {
+    var x = this.blurX | 0,
+        y = this.blurY | 0;
     if (x <= 0 && y <= 0) {
       return rect;
     }
-    var q = Math.pow(this.quality, .2);
+    var q = Math.pow(this.quality, 0.2);
     return (rect || new Rectangle()).pad(y * q + 1, x * q + 1, y * q + 1, x * q + 1);
   };
-  BlurFilter.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return new BlurFilter(this.blurX, this.blurY, this.quality);
   };
-  BlurFilter.prototype._updateShader = function _updateShader() {
+  _proto._updateShader = function _updateShader() {
     var result = this.FRAG_SHADER_TEMPLATE;
     result = result.replace(/{{blurX}}/g, this._blurXTable.length.toFixed(0));
     result = result.replace(/{{blurY}}/g, this._blurYTable.length.toFixed(0));
     this.FRAG_SHADER_BODY = result;
   };
-  BlurFilter.prototype._getTable = function _getTable(spread) {
+  _proto._getTable = function _getTable(spread) {
     var EDGE = 4.2;
     if (spread <= 1) {
-      return [ 1 ];
+      return [1];
     }
     var result = [];
     var count = Math.ceil(spread * 2);
@@ -4389,14 +4947,14 @@ var BlurFilter = function(_Filter) {
       var x = i / adjust * EDGE;
       result.push(1 / Math.sqrt(2 * Math.PI) * Math.pow(Math.E, -(Math.pow(x, 2) / 4)));
     }
-    var factor = result.reduce(function(a, b) {
+    var factor = result.reduce(function (a, b) {
       return a + b;
     }, 0);
-    return result.map(function(currentValue) {
+    return result.map(function (currentValue) {
       return currentValue / factor;
     });
   };
-  BlurFilter.prototype._applyFilter = function _applyFilter(imageData) {
+  _proto._applyFilter = function _applyFilter(imageData) {
     var radiusX = this._blurX >> 1;
     if (isNaN(radiusX) || radiusX < 0) return false;
     var radiusY = this._blurY >> 1;
@@ -4408,7 +4966,21 @@ var BlurFilter = function(_Filter) {
     if (iterations > 3) iterations = 3;
     if (iterations < 1) iterations = 1;
     var px = imageData.data;
-    var x = 0, y = 0, i = 0, p = 0, yp = 0, yi = 0, yw = 0, r = 0, g = 0, b = 0, a = 0, pr = 0, pg = 0, pb = 0, pa = 0;
+    var x = 0,
+        y = 0,
+        i = 0,
+        p = 0,
+        yp = 0,
+        yi = 0,
+        yw = 0,
+        r = 0,
+        g = 0,
+        b = 0,
+        a = 0,
+        pr = 0,
+        pg = 0,
+        pb = 0,
+        pa = 0;
     var divx = radiusX + radiusX + 1 | 0;
     var divy = radiusY + radiusY + 1 | 0;
     var w = imageData.width | 0;
@@ -4458,13 +5030,13 @@ var BlurFilter = function(_Filter) {
       yw = yi = 0;
       var ms = mtx;
       var ss = stx;
-      for (y = h; --y > -1; ) {
+      for (y = h; --y > -1;) {
         r = rxp1 * (pr = px[yi | 0]);
         g = rxp1 * (pg = px[yi + 1 | 0]);
         b = rxp1 * (pb = px[yi + 2 | 0]);
         a = rxp1 * (pa = px[yi + 3 | 0]);
         sx = ssx;
-        for (i = rxp1; --i > -1; ) {
+        for (i = rxp1; --i > -1;) {
           sx.r = pr;
           sx.g = pg;
           sx.b = pb;
@@ -4568,7 +5140,7 @@ var BlurFilter = function(_Filter) {
     }
     return true;
   };
-  createClass(BlurFilter, [ {
+  _createClass(BlurFilter, [{
     key: "blurX",
     get: function get() {
       return this._blurX;
@@ -4627,27 +5199,42 @@ var BlurFilter = function(_Filter) {
     set: function set(value) {
       this._compiledShader = value;
     }
-  } ]);
+  }]);
   return BlurFilter;
 }(Filter);
+BlurFilter.MUL_TABLE = [1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1];
+BlurFilter.SHG_TABLE = [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9];
 
-BlurFilter.MUL_TABLE = [ 1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1 ];
-
-BlurFilter.SHG_TABLE = [ 0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9 ];
-
-var ColorFilter = function(_Filter) {
-  inherits(ColorFilter, _Filter);
-  function ColorFilter() {
-    var redMultiplier = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-    var greenMultiplier = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-    var blueMultiplier = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-    var alphaMultiplier = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-    var redOffset = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
-    var greenOffset = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
-    var blueOffset = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 0;
-    var alphaOffset = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 0;
-    classCallCheck(this, ColorFilter);
-    var _this = possibleConstructorReturn(this, _Filter.call(this));
+var ColorFilter =
+function (_Filter) {
+  _inheritsLoose(ColorFilter, _Filter);
+  function ColorFilter(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
+    var _this;
+    if (redMultiplier === void 0) {
+      redMultiplier = 1;
+    }
+    if (greenMultiplier === void 0) {
+      greenMultiplier = 1;
+    }
+    if (blueMultiplier === void 0) {
+      blueMultiplier = 1;
+    }
+    if (alphaMultiplier === void 0) {
+      alphaMultiplier = 1;
+    }
+    if (redOffset === void 0) {
+      redOffset = 0;
+    }
+    if (greenOffset === void 0) {
+      greenOffset = 0;
+    }
+    if (blueOffset === void 0) {
+      blueOffset = 0;
+    }
+    if (alphaOffset === void 0) {
+      alphaOffset = 0;
+    }
+    _this = _Filter.call(this) || this;
     _this.redMultiplier = redMultiplier;
     _this.greenMultiplier = greenMultiplier;
     _this.blueMultiplier = blueMultiplier;
@@ -4659,14 +5246,15 @@ var ColorFilter = function(_Filter) {
     _this.FRAG_SHADER_BODY = "\n\t\t\tuniform vec4 uColorMultiplier;\n\t\t\tuniform vec4 uColorOffset;\n\n\t\t\tvoid main (void) {\n\t\t\t\tvec4 color = texture2D(uSampler, vRenderCoord);\n\n\t\t\t\tgl_FragColor = (color * uColorMultiplier) + uColorOffset;\n\t\t\t}\n\t\t";
     return _this;
   }
-  ColorFilter.prototype.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {
+  var _proto = ColorFilter.prototype;
+  _proto.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {
     gl.uniform4f(gl.getUniformLocation(shaderProgram, "uColorMultiplier"), this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier);
     gl.uniform4f(gl.getUniformLocation(shaderProgram, "uColorOffset"), this.redOffset / 255, this.greenOffset / 255, this.blueOffset / 255, this.alphaOffset / 255);
   };
-  ColorFilter.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return new ColorFilter(this.redMultiplier, this.greenMultiplier, this.blueMultiplier, this.alphaMultiplier, this.redOffset, this.greenOffset, this.blueOffset, this.alphaOffset);
   };
-  ColorFilter.prototype._applyFilter = function _applyFilter(imageData) {
+  _proto._applyFilter = function _applyFilter(imageData) {
     var data = imageData.data;
     var l = data.length;
     for (var i = 0; i < l; i += 4) {
@@ -4680,34 +5268,35 @@ var ColorFilter = function(_Filter) {
   return ColorFilter;
 }(Filter);
 
-var ColorMatrix = function() {
+var ColorMatrix =
+function () {
   function ColorMatrix(brightness, contrast, saturation, hue) {
-    classCallCheck(this, ColorMatrix);
     this.setColor(brightness, contrast, saturation, hue);
   }
-  ColorMatrix.prototype.setColor = function setColor(brightness, contrast, saturation, hue) {
+  var _proto = ColorMatrix.prototype;
+  _proto.setColor = function setColor(brightness, contrast, saturation, hue) {
     return this.reset().adjustColor(brightness, contrast, saturation, hue);
   };
-  ColorMatrix.prototype.reset = function reset() {
+  _proto.reset = function reset() {
     return this.copy(ColorMatrix.IDENTITY_MATRIX);
   };
-  ColorMatrix.prototype.adjustColor = function adjustColor(brightness, contrast, saturation, hue) {
+  _proto.adjustColor = function adjustColor(brightness, contrast, saturation, hue) {
     return this.adjustBrightness(brightness).adjustContrast(contrast).adjustSaturation(saturation).adjustHue(hue);
   };
-  ColorMatrix.prototype.adjustBrightness = function adjustBrightness(value) {
+  _proto.adjustBrightness = function adjustBrightness(value) {
     if (value === 0 || isNaN(value)) {
       return this;
     }
     value = this._cleanValue(value, 255);
-    this._multiplyMatrix([ 1, 0, 0, 0, value, 0, 1, 0, 0, value, 0, 0, 1, 0, value, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 ]);
+    this._multiplyMatrix([1, 0, 0, 0, value, 0, 1, 0, 0, value, 0, 0, 1, 0, value, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
     return this;
   };
-  ColorMatrix.prototype.adjustContrast = function adjustContrast(value) {
+  _proto.adjustContrast = function adjustContrast(value) {
     if (value === 0 || isNaN(value)) {
       return this;
     }
     value = this._cleanValue(value, 100);
-    var x = void 0;
+    var x;
     if (value < 0) {
       x = 127 + value / 100 * 127;
     } else {
@@ -4719,35 +5308,35 @@ var ColorMatrix = function() {
       }
       x = x * 127 + 127;
     }
-    this._multiplyMatrix([ x / 127, 0, 0, 0, .5 * (127 - x), 0, x / 127, 0, 0, .5 * (127 - x), 0, 0, x / 127, 0, .5 * (127 - x), 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 ]);
+    this._multiplyMatrix([x / 127, 0, 0, 0, 0.5 * (127 - x), 0, x / 127, 0, 0, 0.5 * (127 - x), 0, 0, x / 127, 0, 0.5 * (127 - x), 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
     return this;
   };
-  ColorMatrix.prototype.adjustSaturation = function adjustSaturation(value) {
+  _proto.adjustSaturation = function adjustSaturation(value) {
     if (value === 0 || isNaN(value)) {
       return this;
     }
     value = this._cleanValue(value, 100);
     var x = 1 + (value > 0 ? 3 * value / 100 : value / 100);
-    var lumR = .3086;
-    var lumG = .6094;
-    var lumB = .082;
-    this._multiplyMatrix([ lumR * (1 - x) + x, lumG * (1 - x), lumB * (1 - x), 0, 0, lumR * (1 - x), lumG * (1 - x) + x, lumB * (1 - x), 0, 0, lumR * (1 - x), lumG * (1 - x), lumB * (1 - x) + x, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 ]);
+    var lumR = 0.3086;
+    var lumG = 0.6094;
+    var lumB = 0.0820;
+    this._multiplyMatrix([lumR * (1 - x) + x, lumG * (1 - x), lumB * (1 - x), 0, 0, lumR * (1 - x), lumG * (1 - x) + x, lumB * (1 - x), 0, 0, lumR * (1 - x), lumG * (1 - x), lumB * (1 - x) + x, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
     return this;
   };
-  ColorMatrix.prototype.adjustHue = function adjustHue(value) {
+  _proto.adjustHue = function adjustHue(value) {
     if (value === 0 || isNaN(value)) {
       return this;
     }
     value = this._cleanValue(value, 180) / 180 * Math.PI;
     var cosVal = Math.cos(value);
     var sinVal = Math.sin(value);
-    var lumR = .213;
-    var lumG = .715;
-    var lumB = .072;
-    this._multiplyMatrix([ lumR + cosVal * (1 - lumR) + sinVal * -lumR, lumG + cosVal * -lumG + sinVal * -lumG, lumB + cosVal * -lumB + sinVal * (1 - lumB), 0, 0, lumR + cosVal * -lumR + sinVal * .143, lumG + cosVal * (1 - lumG) + sinVal * .14, lumB + cosVal * -lumB + sinVal * -.283, 0, 0, lumR + cosVal * -lumR + sinVal * -(1 - lumR), lumG + cosVal * -lumG + sinVal * lumG, lumB + cosVal * (1 - lumB) + sinVal * lumB, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 ]);
+    var lumR = 0.213;
+    var lumG = 0.715;
+    var lumB = 0.072;
+    this._multiplyMatrix([lumR + cosVal * (1 - lumR) + sinVal * -lumR, lumG + cosVal * -lumG + sinVal * -lumG, lumB + cosVal * -lumB + sinVal * (1 - lumB), 0, 0, lumR + cosVal * -lumR + sinVal * 0.143, lumG + cosVal * (1 - lumG) + sinVal * 0.140, lumB + cosVal * -lumB + sinVal * -0.283, 0, 0, lumR + cosVal * -lumR + sinVal * -(1 - lumR), lumG + cosVal * -lumG + sinVal * lumG, lumB + cosVal * (1 - lumB) + sinVal * lumB, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
     return this;
   };
-  ColorMatrix.prototype.concat = function concat(matrix) {
+  _proto.concat = function concat(matrix) {
     matrix = this._fixMatrix(matrix);
     if (matrix.length != ColorMatrix.LENGTH) {
       return this;
@@ -4755,10 +5344,10 @@ var ColorMatrix = function() {
     this._multiplyMatrix(matrix);
     return this;
   };
-  ColorMatrix.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return new ColorMatrix().copy(this);
   };
-  ColorMatrix.prototype.toArray = function toArray() {
+  _proto.toArray = function toArray() {
     var arr = [];
     var l = ColorMatrix.LENGTH;
     for (var i = 0; i < l; i++) {
@@ -4766,17 +5355,17 @@ var ColorMatrix = function() {
     }
     return arr;
   };
-  ColorMatrix.prototype.copy = function copy(matrix) {
+  _proto.copy = function copy(matrix) {
     var l = ColorMatrix.LENGTH;
     for (var i = 0; i < l; i++) {
       this[i] = matrix[i];
     }
     return this;
   };
-  ColorMatrix.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + "]";
   };
-  ColorMatrix.prototype._multiplyMatrix = function _multiplyMatrix(matrix) {
+  _proto._multiplyMatrix = function _multiplyMatrix(matrix) {
     var col = [];
     for (var i = 0; i < 5; i++) {
       for (var j = 0; j < 5; j++) {
@@ -4791,10 +5380,10 @@ var ColorMatrix = function() {
       }
     }
   };
-  ColorMatrix.prototype._cleanValue = function _cleanValue(value, limit) {
+  _proto._cleanValue = function _cleanValue(value, limit) {
     return Math.min(limit, Math.max(-limit, value));
   };
-  ColorMatrix.prototype._fixMatrix = function _fixMatrix(matrix) {
+  _proto._fixMatrix = function _fixMatrix(matrix) {
     if (matrix instanceof ColorMatrix) {
       matrix = matrix.toArray();
     }
@@ -4807,40 +5396,55 @@ var ColorMatrix = function() {
   };
   return ColorMatrix;
 }();
-
-ColorMatrix.DELTA_INDEX = Object.freeze([ 0, .01, .02, .04, .05, .06, .07, .08, .1, .11, .12, .14, .15, .16, .17, .18, .2, .21, .22, .24, .25, .27, .28, .3, .32, .34, .36, .38, .4, .42, .44, .46, .48, .5, .53, .56, .59, .62, .65, .68, .71, .74, .77, .8, .83, .86, .89, .92, .95, .98, 1, 1.06, 1.12, 1.18, 1.24, 1.3, 1.36, 1.42, 1.48, 1.54, 1.6, 1.66, 1.72, 1.78, 1.84, 1.9, 1.96, 2, 2.12, 2.25, 2.37, 2.5, 2.62, 2.75, 2.87, 3, 3.2, 3.4, 3.6, 3.8, 4, 4.3, 4.7, 4.9, 5, 5.5, 6, 6.5, 6.8, 7, 7.3, 7.5, 7.8, 8, 8.4, 8.7, 9, 9.4, 9.6, 9.8, 10 ]);
-
-ColorMatrix.IDENTITY_MATRIX = Object.freeze([ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 ]);
-
+ColorMatrix.DELTA_INDEX = Object.freeze([0, 0.01, 0.02, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1, 0.11, 0.12, 0.14, 0.15, 0.16, 0.17, 0.18, 0.20, 0.21, 0.22, 0.24, 0.25, 0.27, 0.28, 0.30, 0.32, 0.34, 0.36, 0.38, 0.40, 0.42, 0.44, 0.46, 0.48, 0.5, 0.53, 0.56, 0.59, 0.62, 0.65, 0.68, 0.71, 0.74, 0.77, 0.80, 0.83, 0.86, 0.89, 0.92, 0.95, 0.98, 1.0, 1.06, 1.12, 1.18, 1.24, 1.30, 1.36, 1.42, 1.48, 1.54, 1.60, 1.66, 1.72, 1.78, 1.84, 1.90, 1.96, 2.0, 2.12, 2.25, 2.37, 2.50, 2.62, 2.75, 2.87, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, 4.3, 4.7, 4.9, 5.0, 5.5, 6.0, 6.5, 6.8, 7.0, 7.3, 7.5, 7.8, 8.0, 8.4, 8.7, 9.0, 9.4, 9.6, 9.8, 10.0]);
+ColorMatrix.IDENTITY_MATRIX = Object.freeze([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
 ColorMatrix.LENGTH = 25;
 
-var ColorMatrixFilter = function(_Filter) {
-  inherits(ColorMatrixFilter, _Filter);
+var ColorMatrixFilter =
+function (_Filter) {
+  _inheritsLoose(ColorMatrixFilter, _Filter);
   function ColorMatrixFilter(matrix) {
-    classCallCheck(this, ColorMatrixFilter);
-    var _this = possibleConstructorReturn(this, _Filter.call(this));
+    var _this;
+    _this = _Filter.call(this) || this;
     _this.matrix = matrix;
     _this.FRAG_SHADER_BODY = "\n\t\t\tuniform mat4 uColorMatrix;\n\t\t\tuniform vec4 uColorMatrixOffset;\n\n\t\t\tvoid main (void) {\n\t\t\t\tvec4 color = texture2D(uSampler, vRenderCoord);\n\n\t\t\t\tmat4 m = uColorMatrix;\n\t\t\t\tvec4 newColor = vec4(0,0,0,0);\n\t\t\t\tnewColor.r = color.r*m[0][0] + color.g*m[0][1] + color.b*m[0][2] + color.a*m[0][3];\n\t\t\t\tnewColor.g = color.r*m[1][0] + color.g*m[1][1] + color.b*m[1][2] + color.a*m[1][3];\n\t\t\t\tnewColor.b = color.r*m[2][0] + color.g*m[2][1] + color.b*m[2][2] + color.a*m[2][3];\n\t\t\t\tnewColor.a = color.r*m[3][0] + color.g*m[3][1] + color.b*m[3][2] + color.a*m[3][3];\n\n\t\t\t\tgl_FragColor = newColor + uColorMatrixOffset;\n\t\t\t}\n\t\t";
     return _this;
   }
-  ColorMatrixFilter.prototype.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {
+  var _proto = ColorMatrixFilter.prototype;
+  _proto.shaderParamSetup = function shaderParamSetup(gl, stage, shaderProgram) {
     var mat = this.matrix;
-    var colorMatrix = new Float32Array([ mat[0], mat[1], mat[2], mat[3], mat[5], mat[6], mat[7], mat[8], mat[10], mat[11], mat[12], mat[13], mat[15], mat[16], mat[17], mat[18] ]);
+    var colorMatrix = new Float32Array([mat[0], mat[1], mat[2], mat[3], mat[5], mat[6], mat[7], mat[8], mat[10], mat[11], mat[12], mat[13], mat[15], mat[16], mat[17], mat[18]]);
     gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram, "uColorMatrix"), false, colorMatrix);
     gl.uniform4f(gl.getUniformLocation(shaderProgram, "uColorMatrixOffset"), mat[4] / 255, mat[9] / 255, mat[14] / 255, mat[19] / 255);
   };
-  ColorMatrixFilter.prototype.clone = function clone() {
+  _proto.clone = function clone() {
     return new ColorMatrixFilter(this.matrix);
   };
-  ColorMatrixFilter.prototype._applyFilter = function _applyFilter(imageData) {
+  _proto._applyFilter = function _applyFilter(imageData) {
     var data = imageData.data;
     var l = data.length;
-    var r = void 0, g = void 0, b = void 0, a = void 0;
+    var r, g, b, a;
     var mtx = this.matrix;
-    var m0 = mtx[0], m1 = mtx[1], m2 = mtx[2], m3 = mtx[3], m4 = mtx[4];
-    var m5 = mtx[5], m6 = mtx[6], m7 = mtx[7], m8 = mtx[8], m9 = mtx[9];
-    var m10 = mtx[10], m11 = mtx[11], m12 = mtx[12], m13 = mtx[13], m14 = mtx[14];
-    var m15 = mtx[15], m16 = mtx[16], m17 = mtx[17], m18 = mtx[18], m19 = mtx[19];
+    var m0 = mtx[0],
+        m1 = mtx[1],
+        m2 = mtx[2],
+        m3 = mtx[3],
+        m4 = mtx[4];
+    var m5 = mtx[5],
+        m6 = mtx[6],
+        m7 = mtx[7],
+        m8 = mtx[8],
+        m9 = mtx[9];
+    var m10 = mtx[10],
+        m11 = mtx[11],
+        m12 = mtx[12],
+        m13 = mtx[13],
+        m14 = mtx[14];
+    var m15 = mtx[15],
+        m16 = mtx[16],
+        m17 = mtx[17],
+        m18 = mtx[18],
+        m19 = mtx[19];
     for (var i = 0; i < l; i += 4) {
       r = data[i];
       g = data[i + 1];
@@ -4856,15 +5460,21 @@ var ColorMatrixFilter = function(_Filter) {
   return ColorMatrixFilter;
 }(Filter);
 
-var ButtonHelper = function() {
-  function ButtonHelper(target) {
-    var outLabel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "out";
-    var overLabel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "over";
-    var downLabel = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "down";
-    var play = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-    var hitArea = arguments[5];
-    var hitLabel = arguments[6];
-    classCallCheck(this, ButtonHelper);
+var ButtonHelper =
+function () {
+  function ButtonHelper(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
+    if (outLabel === void 0) {
+      outLabel = "out";
+    }
+    if (overLabel === void 0) {
+      overLabel = "over";
+    }
+    if (downLabel === void 0) {
+      downLabel = "down";
+    }
+    if (play === void 0) {
+      play = false;
+    }
     if (!target.addEventListener) {
       return;
     }
@@ -4887,11 +5497,14 @@ var ButtonHelper = function() {
       target.hitArea = hitArea;
     }
   }
-  ButtonHelper.prototype.toString = function toString() {
+  var _proto = ButtonHelper.prototype;
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + "]";
   };
-  ButtonHelper.prototype.handleEvent = function handleEvent(evt) {
-    var label = void 0, t = this.target, type = evt.type;
+  _proto.handleEvent = function handleEvent(evt) {
+    var label,
+        t = this.target,
+        type = evt.type;
     if (type === "mousedown") {
       this._isPressed = true;
       label = this.downLabel;
@@ -4911,12 +5524,12 @@ var ButtonHelper = function() {
       t.gotoAndStop && t.gotoAndStop(label);
     }
   };
-  ButtonHelper.prototype._reset = function _reset() {
+  _proto._reset = function _reset() {
     var p = this.paused;
     this.__reset();
     this.paused = p;
   };
-  createClass(ButtonHelper, [ {
+  _createClass(ButtonHelper, [{
     key: "enabled",
     get: function get() {
       return this._enabled;
@@ -4949,17 +5562,23 @@ var ButtonHelper = function() {
         }
       }
     }
-  } ]);
+  }]);
   return ButtonHelper;
 }();
 
-var Touch = Touch = {
+var Touch = {
   isSupported: function isSupported() {
-    return !!("ontouchstart" in window || window.navigator["msPointerEnabled"] && window.navigator["msMaxTouchPoints"] > 0 || window.navigator["pointerEnabled"] && window.navigator["maxTouchPoints"] > 0);
+    return !!('ontouchstart' in window ||
+    window.MSPointerEvent && window.navigator.msMaxTouchPoints > 0
+    || window.PointerEvent && window.navigator.maxTouchPoints > 0);
   },
-  enable: function enable(stage) {
-    var singleTouch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    var allowDefault = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  enable: function enable(stage, singleTouch, allowDefault) {
+    if (singleTouch === void 0) {
+      singleTouch = false;
+    }
+    if (allowDefault === void 0) {
+      allowDefault = false;
+    }
     if (!stage || !stage.canvas || !this.isSupported()) {
       return false;
     }
@@ -4972,9 +5591,9 @@ var Touch = Touch = {
       preventDefault: !allowDefault,
       count: 0
     };
-    if ("ontouchstart" in window) {
+    if ('ontouchstart' in window) {
       this._IOS_enable(stage);
-    } else if (window.navigator["msPointerEnabled"] || window.navigator["pointerEnabled"]) {
+    } else if (window.PointerEvent || window.MSPointerEvent) {
       this._IE_enable(stage);
     }
     return true;
@@ -4983,9 +5602,9 @@ var Touch = Touch = {
     if (!stage) {
       return;
     }
-    if ("ontouchstart" in window) {
+    if ('ontouchstart' in window) {
       this._IOS_disable(stage);
-    } else if (window.navigator["msPointerEnabled"] || window.navigator["pointerEnabled"]) {
+    } else if (window.PointerEvent || window.MSPointerEvent) {
       this._IE_disable(stage);
     }
     delete stage.__touch;
@@ -4993,7 +5612,7 @@ var Touch = Touch = {
   _IOS_enable: function _IOS_enable(stage) {
     var _this = this;
     var canvas = stage.canvas;
-    var f = stage.__touch.f = function(e) {
+    var f = stage.__touch.f = function (e) {
       return _this._IOS_handleEvent(stage, e);
     };
     canvas.addEventListener("touchstart", f, false);
@@ -5022,7 +5641,7 @@ var Touch = Touch = {
     var touches = e.changedTouches;
     var type = e.type;
     var l = touches.length;
-    for (var _iterator = touches, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator](); ;) {
+    for (var _iterator = touches, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
       var _ref;
       if (_isArray) {
         if (_i >= _iterator.length) break;
@@ -5049,10 +5668,10 @@ var Touch = Touch = {
   _IE_enable: function _IE_enable(stage) {
     var _this2 = this;
     var canvas = stage.canvas;
-    var f = stage.__touch.f = function(e) {
+    var f = stage.__touch.f = function (e) {
       return _this2._IE_handleEvent(stage, e);
     };
-    if (window.navigator["pointerEnabled"] === undefined) {
+    if (window.PointerEvent === undefined) {
       canvas.addEventListener("MSPointerDown", f, false);
       window.addEventListener("MSPointerMove", f, false);
       window.addEventListener("MSPointerUp", f, false);
@@ -5073,7 +5692,7 @@ var Touch = Touch = {
   },
   _IE_disable: function _IE_disable(stage) {
     var f = stage.__touch.f;
-    if (window.navigator["pointerEnabled"] === undefined) {
+    if (window.PointerEvent === undefined) {
       window.removeEventListener("MSPointerMove", f, false);
       window.removeEventListener("MSPointerUp", f, false);
       window.removeEventListener("MSPointerCancel", f, false);
@@ -5145,18 +5764,21 @@ var Touch = Touch = {
   }
 };
 
-var SpriteSheetBuilder = function(_EventDispatcher) {
-  inherits(SpriteSheetBuilder, _EventDispatcher);
-  function SpriteSheetBuilder() {
-    var framerate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-    classCallCheck(this, SpriteSheetBuilder);
-    var _this = possibleConstructorReturn(this, _EventDispatcher.call(this));
+var SpriteSheetBuilder =
+function (_EventDispatcher) {
+  _inheritsLoose(SpriteSheetBuilder, _EventDispatcher);
+  function SpriteSheetBuilder(framerate) {
+    var _this;
+    if (framerate === void 0) {
+      framerate = 0;
+    }
+    _this = _EventDispatcher.call(this) || this;
     _this.maxWidth = 2048;
     _this.maxHeight = 2048;
     _this.spriteSheet = null;
     _this.scale = 1;
     _this.padding = 1;
-    _this.timeSlice = .3;
+    _this.timeSlice = 0.3;
     _this.progress = -1;
     _this.framerate = framerate;
     _this._frames = [];
@@ -5168,10 +5790,11 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
     _this._scale = 1;
     return _this;
   }
-  SpriteSheetBuilder.prototype.addFrame = function addFrame(source, sourceRect) {
-    var scale = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-    var setupFunction = arguments[3];
-    var setupData = arguments[4];
+  var _proto = SpriteSheetBuilder.prototype;
+  _proto.addFrame = function addFrame(source, sourceRect, scale, setupFunction, setupData) {
+    if (scale === void 0) {
+      scale = 1;
+    }
     if (this._data) {
       throw SpriteSheetBuilder.ERR_RUNNING;
     }
@@ -5189,7 +5812,7 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
       height: rect.height * scale
     }) - 1;
   };
-  SpriteSheetBuilder.prototype.addAnimation = function addAnimation(name, frames, next, speed) {
+  _proto.addAnimation = function addAnimation(name, frames, next, speed) {
     if (this._data) {
       throw SpriteSheetBuilder.ERR_RUNNING;
     }
@@ -5199,11 +5822,10 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
       speed: speed
     };
   };
-  SpriteSheetBuilder.prototype.addMovieClip = function addMovieClip(source, sourceRect) {
-    var scale = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-    var setupFunction = arguments[3];
-    var setupData = arguments[4];
-    var labelFunction = arguments[5];
+  _proto.addMovieClip = function addMovieClip(source, sourceRect, scale, setupFunction, setupData, labelFunction) {
+    if (scale === void 0) {
+      scale = 1;
+    }
     if (this._data) {
       throw SpriteSheetBuilder.ERR_RUNNING;
     }
@@ -5231,7 +5853,7 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
       });
     }
     if (lbls.length) {
-      lbls.sort(function(a, b) {
+      lbls.sort(function (a, b) {
         return a.index - b.index;
       });
       for (var _i = 0, l = lbls.length; _i < l; _i++) {
@@ -5252,7 +5874,7 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
       }
     }
   };
-  SpriteSheetBuilder.prototype.build = function build() {
+  _proto.build = function build() {
     if (this._data) {
       throw SpriteSheetBuilder.ERR_RUNNING;
     }
@@ -5261,25 +5883,25 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
     this._endBuild();
     return this.spriteSheet;
   };
-  SpriteSheetBuilder.prototype.buildAsync = function buildAsync(timeSlice) {
+  _proto.buildAsync = function buildAsync(timeSlice) {
     var _this2 = this;
     if (this._data) {
       throw SpriteSheetBuilder.ERR_RUNNING;
     }
     this.timeSlice = timeSlice;
     this._startBuild();
-    this._timerID = setTimeout(function() {
+    this._timerID = setTimeout(function () {
       return _this2._run();
-    }, 50 - Math.max(.01, Math.min(.99, this.timeSlice || .3)) * 50);
+    }, 50 - Math.max(0.01, Math.min(0.99, this.timeSlice || 0.3)) * 50);
   };
-  SpriteSheetBuilder.prototype.stopAsync = function stopAsync() {
+  _proto.stopAsync = function stopAsync() {
     clearTimeout(this._timerID);
     this._data = null;
   };
-  SpriteSheetBuilder.prototype.toString = function toString() {
+  _proto.toString = function toString() {
     return "[" + this.constructor.name + "]";
   };
-  SpriteSheetBuilder.prototype._startBuild = function _startBuild() {
+  _proto._startBuild = function _startBuild() {
     var pad = this.padding || 0;
     this.progress = 0;
     this.spriteSheet = null;
@@ -5293,13 +5915,14 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
       animations: this._animations
     };
     var frames = this._frames.slice();
-    frames.sort(function(a, b) {
+    frames.sort(function (a, b) {
       return a.height <= b.height ? -1 : 1;
     });
     if (frames[frames.length - 1].height + pad * 2 > this.maxHeight) {
       throw SpriteSheetBuilder.ERR_DIMENSIONS;
     }
-    var y = 0, x = 0;
+    var y = 0,
+        x = 0;
     var img = 0;
     while (frames.length) {
       var o = this._fillRow(frames, y, img, dataFrames, pad);
@@ -5319,19 +5942,19 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
       }
     }
   };
-  SpriteSheetBuilder.prototype._setupMovieClipFrame = function _setupMovieClipFrame(source, data) {
+  _proto._setupMovieClipFrame = function _setupMovieClipFrame(source, data) {
     var ae = source.actionsEnabled;
     source.actionsEnabled = false;
     source.gotoAndStop(data.i);
     source.actionsEnabled = ae;
     data.f && data.f(source, data.d, data.i);
   };
-  SpriteSheetBuilder.prototype._getSize = function _getSize(size, max) {
+  _proto._getSize = function _getSize(size, max) {
     var pow = 4;
     while (Math.pow(2, ++pow) < size) {}
     return Math.min(max, Math.pow(2, pow));
   };
-  SpriteSheetBuilder.prototype._fillRow = function _fillRow(frames, y, img, dataFrames, pad) {
+  _proto._fillRow = function _fillRow(frames, y, img, dataFrames, pad) {
     var w = this.maxWidth;
     var maxH = this.maxHeight;
     y += pad;
@@ -5357,7 +5980,7 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
       frame.rect = new Rectangle(x, y, rw, rh);
       height = height || rh;
       frames.splice(i, 1);
-      dataFrames[frame.index] = [ x, y, rw, rh, img, Math.round(-rx + sc * source.regX - pad), Math.round(-ry + sc * source.regY - pad) ];
+      dataFrames[frame.index] = [x, y, rw, rh, img, Math.round(-rx + sc * source.regX - pad), Math.round(-ry + sc * source.regY - pad)];
       x += rw;
     }
     return {
@@ -5365,15 +5988,15 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
       h: height
     };
   };
-  SpriteSheetBuilder.prototype._endBuild = function _endBuild() {
+  _proto._endBuild = function _endBuild() {
     this.spriteSheet = new SpriteSheet(this._data);
     this._data = null;
     this.progress = 1;
     this.dispatchEvent("complete");
   };
-  SpriteSheetBuilder.prototype._run = function _run() {
+  _proto._run = function _run() {
     var _this3 = this;
-    var ts = Math.max(.01, Math.min(.99, this.timeSlice || .3)) * 50;
+    var ts = Math.max(0.01, Math.min(0.99, this.timeSlice || 0.3)) * 50;
     var t = new Date().getTime() + ts;
     var complete = false;
     while (t > new Date().getTime()) {
@@ -5385,7 +6008,7 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
     if (complete) {
       this._endBuild();
     } else {
-      this._timerID = setTimeout(function() {
+      this._timerID = setTimeout(function () {
         return _this3._run();
       }, 50 - ts);
     }
@@ -5396,7 +6019,7 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
       this.dispatchEvent(evt);
     }
   };
-  SpriteSheetBuilder.prototype._drawNext = function _drawNext() {
+  _proto._drawNext = function _drawNext() {
     var frame = this._frames[this._index];
     var sc = frame.scale * this._scale;
     var rect = frame.rect;
@@ -5416,12 +6039,10 @@ var SpriteSheetBuilder = function(_EventDispatcher) {
   };
   return SpriteSheetBuilder;
 }(EventDispatcher);
-
 SpriteSheetBuilder.ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
-
 SpriteSheetBuilder.ERR_RUNNING = "a build is already running";
 
-var SpriteSheetUtils = SpriteSheetUtils = {
+var SpriteSheetUtils = {
   _workingCanvas: createCanvas(),
   get _workingContext() {
     return this._workingCanvas.getContext("2d");
@@ -5511,16 +6132,19 @@ var SpriteSheetUtils = SpriteSheetUtils = {
   }
 };
 
-var WebGLInspector = function(_EventDispatcher) {
-  inherits(WebGLInspector, _EventDispatcher);
+var WebGLInspector =
+function (_EventDispatcher) {
+  _inheritsLoose(WebGLInspector, _EventDispatcher);
   function WebGLInspector(stage) {
-    classCallCheck(this, WebGLInspector);
-    var _this = possibleConstructorReturn(this, _EventDispatcher.call(this));
+    var _this;
+    _this = _EventDispatcher.call(this) || this;
     _this._stage = stage;
     return _this;
   }
-  WebGLInspector.dispProps = function dispProps(item) {
-    var prepend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+  WebGLInspector.dispProps = function dispProps(item, prepend) {
+    if (prepend === void 0) {
+      prepend = "";
+    }
     var p = "\tP: " + item.x.toFixed(2) + "x" + item.y.toFixed(2) + "\t";
     var r = "\tR: " + item.regX.toFixed(2) + "x" + item.regY.toFixed(2) + "\t";
     WebGLInspector._log(prepend, item.toString() + "\t", p, r);
@@ -5534,7 +6158,8 @@ var WebGLInspector = function(_EventDispatcher) {
       (_console = console).log.apply(_console, arguments);
     }
   };
-  WebGLInspector.prototype.log = function log(stage) {
+  var _proto = WebGLInspector.prototype;
+  _proto.log = function log(stage) {
     if (!stage) {
       stage = this._stage;
     }
@@ -5543,7 +6168,7 @@ var WebGLInspector = function(_EventDispatcher) {
     this.logDepth(stage.children, "");
     this.logTextureFill(stage);
   };
-  WebGLInspector.prototype.toggleGPUDraw = function toggleGPUDraw(stage, enabled) {
+  _proto.toggleGPUDraw = function toggleGPUDraw(stage, enabled) {
     if (!stage) {
       stage = this._stage;
     }
@@ -5562,9 +6187,13 @@ var WebGLInspector = function(_EventDispatcher) {
       };
     }
   };
-  WebGLInspector.prototype.logDepth = function logDepth(children) {
-    var prepend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
-    var logFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : WebGLInspector._log;
+  _proto.logDepth = function logDepth(children, prepend, logFunc) {
+    if (prepend === void 0) {
+      prepend = "";
+    }
+    if (logFunc === void 0) {
+      logFunc = WebGLInspector._log;
+    }
     if (!children) {
       children = this._stage.children;
     }
@@ -5577,14 +6206,14 @@ var WebGLInspector = function(_EventDispatcher) {
       }
     }
   };
-  WebGLInspector.prototype.logContextInfo = function logContextInfo(gl) {
+  _proto.logContextInfo = function logContextInfo(gl) {
     if (!gl) {
       gl = this._stage._webGLContext;
     }
     var data = "\n\t\t\t== LOG:\n\n\t\t\tMax textures per draw: " + gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) + "\n\n\t\t\tMax textures active: " + gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS) + "\n\n\t\t\t\n\n\t\t\tMax texture size: " + gl.getParameter(gl.MAX_TEXTURE_SIZE) / 2 + "\n\n\t\t\tMax cache size: " + gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) / 2 + "\n\n\t\t\t\n\n\t\t\tMax attributes per vertex: " + gl.getParameter(gl.MAX_VERTEX_ATTRIBS) + "\n\n\t\t\tWebGL Version string: " + gl.getParameter(gl.VERSION) + "\n\n\t\t\t======\n\t\t";
     WebGLInspector._log(data);
   };
-  WebGLInspector.prototype.logTextureFill = function logTextureFill(stage) {
+  _proto.logTextureFill = function logTextureFill(stage) {
     if (!stage) {
       stage = this._stage;
     }
@@ -5603,7 +6232,7 @@ var WebGLInspector = function(_EventDispatcher) {
       });
       tex._lastActiveIndex = tex._activeIndex;
     }
-    output.sort(function(a, b) {
+    output.sort(function (a, b) {
       if (a.element._drawID === stage._drawID) {
         return 1;
       }
@@ -5621,86 +6250,49 @@ var WebGLInspector = function(_EventDispatcher) {
   };
   return WebGLInspector;
 }(EventDispatcher);
-
 WebGLInspector.alternateOutput = null;
 
+exports.Event = Event;
+exports.EventDispatcher = EventDispatcher;
+exports.Ticker = Ticker;
 exports.StageGL = StageGL;
-
 exports.Stage = Stage;
-
 exports.Container = Container;
-
 exports.DisplayObject = DisplayObject;
-
 exports.Bitmap = Bitmap;
-
 exports.BitmapText = BitmapText;
-
 exports.DOMElement = DOMElement;
-
 exports.Graphics = Graphics;
-
 exports.MovieClip = MovieClip;
-
 exports.Shadow = Shadow;
-
 exports.Shape = Shape;
-
 exports.Sprite = Sprite;
-
 exports.SpriteSheet = SpriteSheet;
-
 exports.Text = Text;
-
 exports.MouseEvent = MouseEvent;
-
 exports.AlphaMapFilter = AlphaMapFilter;
-
 exports.AlphaMaskFilter = AlphaMaskFilter;
-
 exports.BitmapCache = BitmapCache;
-
 exports.BlurFilter = BlurFilter;
-
 exports.ColorFilter = ColorFilter;
-
 exports.ColorMatrix = ColorMatrix;
-
 exports.ColorMatrixFilter = ColorMatrixFilter;
-
 exports.Filter = Filter;
-
 exports.DisplayProps = DisplayProps;
-
 exports.Matrix2D = Matrix2D;
-
 exports.Point = Point;
-
 exports.Rectangle = Rectangle;
-
 exports.ButtonHelper = ButtonHelper;
-
 exports.Touch = Touch;
-
 exports.SpriteSheetBuilder = SpriteSheetBuilder;
-
 exports.SpriteSheetUtils = SpriteSheetUtils;
-
 exports.uid = uid;
-
 exports.createCanvas = createCanvas;
-
 exports.WebGLInspector = WebGLInspector;
 
-exports.Event = Event;
 
-exports.EventDispatcher = EventDispatcher;
-
-exports.Ticker = Ticker;
-
-var cjs = window.createjs = window.createjs || {};
-
-var v = cjs.v = cjs.v || {};
-
+					var cjs = window.createjs = window.createjs || {};
+					var v = cjs.v = cjs.v || {};
+				
 v.easeljs = "NEXT";
-//# sourceMappingURL=maps/easeljs.common.js.map
+//# sourceMappingURL=easeljs.cjs.js.map

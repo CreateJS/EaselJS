@@ -1,6 +1,6 @@
 {
   "name": "@createjs/easeljs",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.4",
   "description": "The Easel JavaScript library provides a full, hierarchical display list, a core interaction model, and helper classes to make working with the HTML5 Canvas element much easier. Part of the CreateJS suite of libraries.",
   "keywords": [
     "html5",
@@ -25,15 +25,30 @@
     "Patrick McGuckin <p.mcgooks@gmail.com> (https://github.com/tehvgg)",
     "David Gillen <david@gskinner.com> (https://github.com/davidhgillen)"
   ],
-  "main": "dist/easeljs.common.js",
-  "module": "dist/easeljs.module.js",
-  "browser": "dist/easeljs.min.js",
+  "main": "dist/easeljs.cjs.js",
+  "module": "src/main.js",
   "logo": "assets/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/createjs/easeljs.git"
   },
-  "npmName": "easeljs",
+  "scripts": {
+		"test": "cd node_modules/@createjs/build && npm test",
+    "dev": "cd node_modules/@createjs/build && gulp dev --format=iife",
+    "build": "cd node_modules/@createjs/build && gulp build",
+    "docs": "cd node_modules/@createjs/docs && npm run gen"
+  },
+  "dependencies": {
+    "@createjs/core": "^2.0.0-beta.4",
+    "@createjs/tweenjs": "^2.0.0-beta.4"
+  },
+  "devDependencies": {
+    "@createjs/build": "^2.0.0-beta.4",
+		"@createjs/docs": "^2.0.0-beta.4",
+    "canvas-prebuilt": "^1.6.5-prerelease.1"
+  },
+  "engine": "node >= 8.9.0",
+	"npmName": "easeljs",
   "npmFileMap": [
     {
       "basePath": "dist",
@@ -47,24 +62,5 @@
     "example": "examples",
     "lib": "dist",
     "test": "tests"
-  },
-  "scripts": {
-    "test": "jest -c ./tests/jest.config.js",
-    "lint": "cd node_modules/@createjs/build && gulp lint",
-    "dev": "cd node_modules/@createjs/build && gulp dev --format=global",
-    "build": "cd node_modules/@createjs/build && gulp build",
-    "docs": "cd node_modules/@createjs/docs && npm run gen"
-  },
-  "dependencies": {
-    "@createjs/core": "^2.0.0-beta.1",
-    "@createjs/tweenjs": "^2.0.0-beta.1"
-  },
-  "devDependencies": {
-    "@createjs/build": "^2.0.0-beta.3",
-		"@createjs/docs": "^2.0.0-beta.1",
-    "babel-jest": "^22.4.3",
-    "canvas-prebuilt": "^1.6.5-prerelease.1",
-    "jest": "^22.4.3"
-  },
-  "engine": "node >= 8.9.4"
+  }
 }

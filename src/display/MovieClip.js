@@ -28,8 +28,7 @@
 
 import Container from "./Container";
 import DisplayObject from "./DisplayObject";
-import Tween from "@createjs/tweenjs/src/Tween";
-import Timeline from "@createjs/tweenjs/src/Timeline";
+import { Tween, Timeline } from "@createjs/tweenjs";
 
 /**
  * The MovieClip class associates a TweenJS Timeline with an EaselJS {@link easeljs.Container}. It allows

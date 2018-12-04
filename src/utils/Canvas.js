@@ -38,16 +38,14 @@ export default function createCanvas(width = 1, height = 1) {
 	if (window.createjs !== undefined && window.createjs.createCanvas !== undefined) {
 		c = window.createjs.createCanvas();
 	}
-
-	if (c === undefined) {
-		c = document.createElement('canvas');
+	if (window.document !== undefined && window.document.createElement !== undefined) {
+		c = document.createElement("canvas");
 	}
-
 	if (c !== undefined) {
 		c.width = width;
 		c.height = height;
 		return c;
 	}
 
-	throw 'Canvas not supported in this environment.';
+	throw "Canvas not supported in this environment.";
 }

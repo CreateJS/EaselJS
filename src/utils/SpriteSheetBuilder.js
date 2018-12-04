@@ -26,10 +26,9 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import EventDispatcher from "@createjs/core/src/events/EventDispatcher";
+import { EventDispatcher, Event } from "@createjs/core";
 import Rectangle from "../geom/Rectangle";
 import SpriteSheet from "../display/SpriteSheet";
-import Event from "@createjs/core/src/events/Event";
 
 /**
  * The SpriteSheetBuilder allows you to generate {@link easeljs.SpriteSheet} instances at run time

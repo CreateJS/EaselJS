@@ -26,7 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import EventDispatcher from "@createjs/core/src/events/EventDispatcher";
+import { EventDispatcher } from "@createjs/core";
+import Shadow from "./Shadow";
 import uid from "../utils/uid";
 import DisplayProps from "../geom/DisplayProps";
 import Rectangle from "../geom/Rectangle";
