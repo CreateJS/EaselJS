@@ -260,14 +260,31 @@ this.createjs = this.createjs||{};
 			sin = 0;
 		}
 
+		var a = cos * scaleX;
+		var b = sin * scaleX;
+		var c = -sin * scaleY;
+		var d = cos * scaleY;
+
 		if (skewX || skewY) {
-			// TODO: can this be combined into a single append operation?
-			skewX *= Matrix2D.DEG_TO_RAD;
-			skewY *= Matrix2D.DEG_TO_RAD;
-			this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
-			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
+		    var b1 = Math.tan(skewY * Matrix2D.DEG_TO_RAD);
+		    var c1 = Math.tan(skewX * Matrix2D.DEG_TO_RAD);
+		    this.append(
+			a + c1 * b,
+			b1 * a + b,
+			c + c1 * d,
+			b1 * c + d,
+			x,
+			y
+		    );
 		} else {
-			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		    this.append(
+			a,
+			b,
+			c,
+			d,
+			x,
+			y
+		    );
 		}
 		
 		if (regX || regY) {
@@ -317,14 +334,18 @@ this.createjs = this.createjs||{};
 			// prepend the registration offset:
 			this.tx -= regX; this.ty -= regY;
 		}
+		
+		var a = cos * scaleX;
+		var b = sin * scaleX;
+		var c = -sin * scaleY;
+		var d = cos * scaleY;
+
 		if (skewX || skewY) {
-			// TODO: can this be combined into a single prepend operation?
-			skewX *= Matrix2D.DEG_TO_RAD;
-			skewY *= Matrix2D.DEG_TO_RAD;
-			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
-			this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
+			var b1 = Math.tan(skewY * Matrix2D.DEG_TO_RAD);
+			var c1 = Math.tan(skewX * Matrix2D.DEG_TO_RAD);
+			this.prepend(a+c1*b, b1*a+b, c+c1*d, b1*c+d, x, y);
 		} else {
-			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+			this.prepend(a, b, c, d, x, y);
 		}
 		return this;
 	};
@@ -360,7 +381,7 @@ this.createjs = this.createjs||{};
 	p.skew = function(skewX, skewY) {
 		skewX = skewX*Matrix2D.DEG_TO_RAD;
 		skewY = skewY*Matrix2D.DEG_TO_RAD;
-		this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
+		this.append(1, Math.tan(skewY), Math.tan(skewX), 1, 0, 0);
 		return this;
 	};
 
@@ -477,8 +498,8 @@ this.createjs = this.createjs||{};
 		target.scaleX = Math.sqrt(this.a * this.a + this.b * this.b);
 		target.scaleY = Math.sqrt(this.c * this.c + this.d * this.d);
 
-		var skewX = Math.atan2(-this.c, this.d);
-		var skewY = Math.atan2(this.b, this.a);
+		var skewX = Math.atan(this.c);
+		var skewY = Math.atan(this.b);
 
 		var delta = Math.abs(1-skewX/skewY);
 		if (delta < 0.00001) { // effectively identical, can use rotation:
