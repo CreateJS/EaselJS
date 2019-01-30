@@ -57,7 +57,7 @@ this.createjs = this.createjs||{};
 	 **/
 	function SpriteSheetBuilder(framerate) {
 		this.EventDispatcher_constructor();
-		
+
 	// public properties:
 		/**
 		 * The maximum width for the images (not individual frames) in the generated SpriteSheet. It is recommended to
@@ -68,7 +68,7 @@ this.createjs = this.createjs||{};
 		 * @default 2048
 		*/
 		this.maxWidth = 2048;
-	
+
 		/**
 		 * The maximum height for the images (not individual frames) in the generated SpriteSheet. It is recommended to
 		 * use a power of 2 for this value (ex. 1024, 2048, 4096). If the frames cannot all fit within the max
@@ -78,14 +78,14 @@ this.createjs = this.createjs||{};
 		 * @default 2048
 		 **/
 		this.maxHeight = 2048;
-	
+
 		/**
 		 * The SpriteSheet that was generated. This will be null before a build is completed successfully.
 		 * @property spriteSheet
 		 * @type SpriteSheet
 		 **/
 		this.spriteSheet = null;
-	
+
 		/**
 		 * The scale to apply when drawing all frames to the SpriteSheet. This is multiplied against any scale specified
 		 * in the addFrame call. This can be used, for example, to generate a SpriteSheet at run time that is tailored
@@ -95,7 +95,7 @@ this.createjs = this.createjs||{};
 		 * @default 1
 		 **/
 		this.scale = 1;
-	
+
 		/**
 		* The padding to use between frames. This is helpful to preserve antialiasing on drawn vector content.
 		* @property padding
@@ -103,7 +103,7 @@ this.createjs = this.createjs||{};
 		* @default 1
 		**/
 		this.padding = 1;
-	
+
 		/**
 		 * A number from 0.01 to 0.99 that indicates what percentage of time the builder can use. This can be
 		 * thought of as the number of seconds per second the builder will use. For example, with a timeSlice value of 0.3,
@@ -114,7 +114,7 @@ this.createjs = this.createjs||{};
 		 * @default 0.3
 		 **/
 		this.timeSlice = 0.3;
-	
+
 		/**
 		 * A value between 0 and 1 that indicates the progress of a build, or -1 if a build has not
 		 * been initiated.
@@ -134,8 +134,8 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 */
 		this.framerate = framerate || 0;
-	
-	
+
+
 	// private properties:
 		/**
 		 * @property _frames
@@ -143,42 +143,42 @@ this.createjs = this.createjs||{};
 		 * @type Array
 		 **/
 		this._frames = [];
-	
+
 		/**
 		 * @property _animations
 		 * @protected
 		 * @type Array
 		 **/
 		this._animations = {};
-	
+
 		/**
 		 * @property _data
 		 * @protected
 		 * @type Array
 		 **/
 		this._data = null;
-	
+
 		/**
 		 * @property _nextFrameIndex
 		 * @protected
 		 * @type Number
 		 **/
 		this._nextFrameIndex = 0;
-	
+
 		/**
 		 * @property _index
 		 * @protected
 		 * @type Number
 		 **/
 		this._index = 0;
-	
+
 		/**
 		 * @property _timerID
 		 * @protected
 		 * @type Number
 		 **/
 		this._timerID = null;
-	
+
 		/**
 		 * @property _scale
 		 * @protected
@@ -412,7 +412,7 @@ this.createjs = this.createjs||{};
 			}
 		}
 	};
-	
+
 	/**
 	 * @method _setupMovieClipFrame
 	 * @protected
@@ -532,6 +532,12 @@ this.createjs = this.createjs||{};
 		ctx.scale(sc,sc);
 		frame.source.draw(ctx); // display object will draw itself.
 		ctx.restore();
+
+		//now replace canvas with simple image. Frames from it draws much faster
+		var img = new Image();
+		img.src = canvas.toDataURL();
+		this._data.images[frame.img] = img;
+
 		return (++this._index) < this._frames.length;
 	};
 
