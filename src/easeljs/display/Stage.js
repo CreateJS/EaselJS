@@ -805,10 +805,11 @@ this.createjs = this.createjs||{};
 		var list = this._mouseOverTarget = [];
 
 		// generate ancestor list and check for cursor:
+		// Note: Internet Explorer won't update null or undefined cursor properties
 		t = target;
 		while (t) {
 			list.unshift(t);
-			if (!cursor) { cursor = t.cursor; }
+			if (!cursor && t.cursor) { cursor = t.cursor; }
 			t = t.parent;
 		}
 		this.canvas.style.cursor = cursor;
