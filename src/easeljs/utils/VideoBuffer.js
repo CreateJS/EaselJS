@@ -44,7 +44,7 @@ this.createjs = this.createjs||{};
 	 * this issue by drawing each frame to an off-screen canvas and preserving the prior frame during a seek.
 	 * 
 	 * 	var myBuffer = new createjs.VideoBuffer(myVideo);
-	 * 	var myBitmap = new Bitmap(myBuffer);
+	 * 	var myBitmap = new createjs.Bitmap(myBuffer);
 	 * 
 	 * @class VideoBuffer
 	 * @param {HTMLVideoElement} video The HTML video element to buffer.
