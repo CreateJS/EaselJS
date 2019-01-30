@@ -1791,16 +1791,18 @@ this.createjs = this.createjs||{};
 	 * for valid values. A value of undefined will make no adjustments to the existing background which may be significantly faster.
 	 * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
 	 * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
+	 * @param {Number} [encoderOptions=0.92] A Number between 0 and 1 indicating the image quality to use for image
+	 * formats that use lossy  compression such as image/jpeg and image/webp.
 	 * @return {String} a Base64 encoded image.
 	 **/
-	p.toDataURL = function(backgroundColor, mimeType) {
+	p.toDataURL = function(backgroundColor, mimeType, encoderOptions) {
 		var dataURL, gl = this._webGLContext;
 		this.batchReason = "dataURL";
 		var clearBackup = this._clearColor;
 
 		if (!this.canvas) { return; }
 		if (!StageGL.isWebGLActive(gl)) {
-			return this.Stage_toDataURL(backgroundColor, mimeType);
+			return this.Stage_toDataURL(backgroundColor, mimeType, encoderOptions);
 		}
 
 		// if the buffer is preserved and we don't want a background we can just output what we have, otherwise we'll have to render it
@@ -1820,7 +1822,7 @@ this.createjs = this.createjs||{};
 		}
 
 		// create the dataurl
-		dataURL = this.canvas.toDataURL(mimeType||"image/png");
+		dataURL = this.canvas.toDataURL(mimeType||"image/png", encoderOptions);
 
 		// reset the picture in the canvas
 		if(!this._preserveBuffer || backgroundColor !== undefined) {

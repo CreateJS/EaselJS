@@ -513,12 +513,12 @@ this.createjs = this.createjs||{};
 	 * @method getCacheDataURL
 	 * @return {String} The image data url for the cache.
 	 **/
-	p.getCacheDataURL = function() {
+	p.getCacheDataURL = function(type, encoderOptions) {
 		var cacheCanvas = this.target && this._cacheCanvas;
 		if (!cacheCanvas) { return null; }
 		if (this.cacheID !== this._cacheDataURLID) {
 			this._cacheDataURLID = this.cacheID;
-			this._cacheDataURL = cacheCanvas.toDataURL ? cacheCanvas.toDataURL() : null;
+			this._cacheDataURL = cacheCanvas.toDataURL ? cacheCanvas.toDataURL(type, encoderOptions) : null;
 		}
 		return this._cacheDataURL;
 	};

@@ -900,8 +900,8 @@ this.createjs = this.createjs||{};
 	 * @method getCacheDataURL
 	 * @return {String} The image data url for the cache.
 	 **/
-	p.getCacheDataURL = function() {
-		return this.bitmapCache?this.bitmapCache.getCacheDataURL():null;
+	p.getCacheDataURL = function(type, encoderOptions) {
+		return this.bitmapCache?this.bitmapCache.getCacheDataURL(type, encoderOptions):null;
 	};
 
 	/**

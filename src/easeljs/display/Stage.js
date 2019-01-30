@@ -471,9 +471,11 @@ this.createjs = this.createjs||{};
 	 * value is allowed. The default value is a transparent background.
 	 * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
 	 * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
+	 * @param {Number} [encoderOptions=0.92] A Number between 0 and 1 indicating the image quality to use for image
+	 * formats that use lossy  compression such as image/jpeg and image/webp.
 	 * @return {String} a Base64 encoded image.
 	 **/
-	p.toDataURL = function(backgroundColor, mimeType) {
+	p.toDataURL = function(backgroundColor, mimeType, encoderOptions) {
 		var data, ctx = this.canvas.getContext('2d'), w = this.canvas.width, h = this.canvas.height;
 
 		if (backgroundColor) {
@@ -485,7 +487,7 @@ this.createjs = this.createjs||{};
 			ctx.fillRect(0, 0, w, h);
 		}
 
-		var dataURL = this.canvas.toDataURL(mimeType||"image/png");
+		var dataURL = this.canvas.toDataURL(mimeType||"image/png", encoderOptions);
 
 		if(backgroundColor) {
 			ctx.putImageData(data, 0, 0);
