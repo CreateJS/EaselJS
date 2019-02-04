@@ -1,5 +1,9 @@
 VERSION NEXT (unreleased)
 ****************************************************************************************************
+
+
+Version 1.1.0 (Feb 4, 2019)
+****************************************************************************************************
 CRITICAL (may break existing content):
 - filters now always stretch loaded images in both GL and Context2D
 
@@ -7,12 +11,20 @@ NEW
 - Chromatic Abberation Filter (shift independent color channels
 - Displacement Map Filter (reposition portions of the rendered image)
 - StageGL composite operations, available through `StageGL.directDraw = false`
+- Added image type and encoding options to stage toDataURL and cache getCacheDataURL() methods
+- Added static utility methods to Point (thanks @Jacob Schatz)
 
 *****
 OTHER:
+- Tons of StageGL fixes and improvements
 - Fixed touch support in Edge 16
 - Fixed issue with StageGL pre-multiplied alpha
 - Fixed toDataURL support in StageGL
+- Fixed null cursor in IE11 (thanks @champasaur)
+- Fixed issue where the MovieClips advanced past stop actions
+- Fixed issue with max values in Graphics.drawRoundRect
+- Documentation updates and fixes (many thanks to @fumio)
+- Fixed SVG color issue
 
 
 Version 1.0.0 (September 14, 2017)
