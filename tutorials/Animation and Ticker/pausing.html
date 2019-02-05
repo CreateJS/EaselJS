@@ -36,12 +36,12 @@
 			goCircle.x += 10;
 			if (goCircle.x > stage.canvas.width) { goCircle.x = 0; }
 
-            if (!createjs.Ticker.getPaused()) {
+            if (!createjs.Ticker.paused) {
                 pauseCircle.x += 10;
                 if (pauseCircle.x > stage.canvas.width) { pauseCircle.x = 0; }
             }
 			
-			output.text = "getPaused()    = "+createjs.Ticker.getPaused()+"\n"+
+			output.text = "getPaused()    = "+createjs.Ticker.paused+"\n"+
 				"getTime(true)  = "+createjs.Ticker.getTime(true)+"\n"+
 				"getTime(false) = "+createjs.Ticker.getTime(false);
 			
@@ -49,8 +49,7 @@
 		}
 		
 		function togglePause() {
-			var paused = !createjs.Ticker.getPaused();
-			createjs.Ticker.setPaused(paused);
+			var paused = createjs.Ticker.paused = !createjs.Ticker.paused;
 			document.getElementById("pauseBtn").value = paused ? "unpause" : "pause";
 		}
 	</script>

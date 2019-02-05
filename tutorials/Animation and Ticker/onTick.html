@@ -19,8 +19,7 @@
 			// Stage will pass delta when it calls stage.update(arg)
 			// which will pass them to tick event handlers for us in time based animation.
 			circle.on("tick", function(event) {
-                var tickerEvent = event.params[0];
-                var delta = tickerEvent.delta;
+                var delta = event.delta;
                 circle.x += delta/1000*100;
                 if (circle.x > stage.canvas.width) { circle.x = 0; }
             });
