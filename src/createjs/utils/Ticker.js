@@ -192,6 +192,12 @@ this.createjs = this.createjs||{};
 	 **/
 	Ticker.paused = false;
 
+	// Deprecated Paused methods
+	Ticker._setPaused = function(value) { Ticker.paused = value; };
+	Ticker._getPaused = function() { return Ticker.paused; };
+	Ticker.getPaused = createjs.deprecate(Ticker._getPaused, "Ticker.getPaused");
+	Ticker.setPaused = createjs.deprecate(Ticker._setPaused, "Ticker.getPaused");
+
 
 // mix-ins:
 	// EventDispatcher methods:
