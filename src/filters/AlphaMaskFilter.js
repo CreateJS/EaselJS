@@ -47,12 +47,16 @@ import Filter from "./Filter";
  * bmp.filters = [ new AlphaMaskFilter(box.cacheCanvas) ];
  * bmp.cache(0, 0, 100, 100);
  *
- * @param {HTMLImageElement | HTMLCanvasElement} mask
+ * @param {HTMLImageElement|HTMLCanvasElement|WebGLTexture} mask
  */
 export default class AlphaMaskFilter extends Filter {
 
 	constructor (mask) {
 		super();
+
+		if (!Filter.isValidImageSource(mask)) {
+			throw "Must provide valid image source for alpha mask, see Filter.isValidImageSource";
+		}
 
 		/**
 		 * The image (or canvas) to use as the mask.
@@ -66,10 +70,10 @@ export default class AlphaMaskFilter extends Filter {
 			uniform sampler2D uAlphaSampler;
 
 			void main (void) {
-				vec4 color = texture2D(uSampler, vRenderCoord);
+				vec4 color = texture2D(uSampler, vTextureCoord);
 				vec4 alphaMap = texture2D(uAlphaSampler, vTextureCoord);
 
-				gl_FragColor = vec4(color.rgb, color.a * alphaMap.a);
+				gl_FragColor = vec4(color.rgb * alphaMap.a, color.a * alphaMap.a);
 			}
 		`;
 	}
@@ -83,26 +87,22 @@ export default class AlphaMaskFilter extends Filter {
 	 * @param {Number} y The y position to use for the source rect.
 	 * @param {Number} width The width to use for the source rect.
 	 * @param {Number} height The height to use for the source rect.
-	 * @param {CanvasRenderingContext2D} [targetCtx] NOT SUPPORTED IN THIS FILTER. The 2D context to draw the result to. Defaults to the context passed to ctx.
-	 * @param {Number} [targetX] NOT SUPPORTED IN THIS FILTER. The x position to draw the result to. Defaults to the value passed to x.
-	 * @param {Number} [targetY] NOT SUPPORTED IN THIS FILTER. The y position to draw the result to. Defaults to the value passed to y.
+	 * @param {CanvasRenderingContext2D} [targetCtx] The 2D context to draw the result to. Defaults to the context passed to ctx.
 	 * @return {Boolean} If the filter was applied successfully.
 	 */
-	applyFilter (ctx, x, y, width, height, targetCtx, targetX, targetY) {
+	applyFilter (ctx, x, y, width, height, targetCtx) {
 		if (!this.mask) { return true; }
-		targetCtx = targetCtx || ctx;
-		if (targetX == null) { targetX = x; }
-		if (targetY == null) { targetY = y; }
 
-		targetCtx.save();
-		if (ctx != targetCtx) {
-			// TODO: support targetCtx and targetX/Y
-			// clearRect, then draw the ctx in?
-			return false;
+		if (targetCtx === undefined) { targetCtx = ctx; }
+		if (targetCtx !== ctx) {
+			targetCtx.drawImage(ctx.canvas,
+				0, 0, ctx.canvas.width, ctx.canvas.height,
+				0, 0, targetCtx.canvas.width, targetCtx.canvas.height
+			);
 		}
 
 		targetCtx.globalCompositeOperation = "destination-in";
-		targetCtx.drawImage(this.mask, targetX, targetY);
+		targetCtx.drawImage(this.mask, 0, 0, this.mask.width,  this.mask.height, x, y, width, height);
 		targetCtx.restore();
 		return true;
 	}
@@ -126,7 +126,9 @@ export default class AlphaMaskFilter extends Filter {
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, this._mapTexture);
 		stage.setTextureParams(gl);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.mask);
+		if (this.mask !== this._mapTexture) {
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.mask);
+		}
 
 		gl.uniform1i(
 			gl.getUniformLocation(shaderProgram, "uAlphaSampler"),

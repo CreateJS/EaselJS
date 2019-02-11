@@ -116,7 +116,7 @@ export default class BlurFilter extends Filter {
 
 				for(int i=0; i<{{blurX}}; i++) {
 					for(int j=0; j<{{blurY}}; j++) {
-						sampleOffset = vRenderCoord + (textureOffset * vec2(float(i)-xAdj, float(j)-yAdj));
+						sampleOffset = vTextureCoord + (textureOffset * vec2(float(i)-xAdj, float(j)-yAdj));
 						color += texture2D(uSampler, sampleOffset) * (xWeight[i] * yWeight[j]);
 					}
 				}

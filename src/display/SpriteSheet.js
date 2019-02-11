@@ -185,7 +185,7 @@ import Rectangle from "../geom/Rectangle";
  * You can get around this by setting `crossOrigin` property on your images before passing them to EaselJS, or
  * setting the `crossOrigin` property on PreloadJS' LoadQueue or LoadItems.
  *
- * 		var image = new Image();
+ * 		const img = new Image();
  * 		img.crossOrigin="Anonymous";
  * 		img.src = "http://server-with-CORS-support.com/path/to/image.jpg";
  *

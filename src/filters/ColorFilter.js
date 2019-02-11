@@ -110,9 +110,11 @@ export default class ColorFilter extends Filter {
 			uniform vec4 uColorOffset;
 
 			void main (void) {
-				vec4 color = texture2D(uSampler, vRenderCoord);
+				vec4 color = texture2D(uSampler, vTextureCoord);
 
-				gl_FragColor = (color * uColorMultiplier) + uColorOffset;
+				color = clamp(vec4(0.0), vec4(1.0), vec4(vec3(color.rgb / color.a), color.a));
+				color = clamp(vec4(0.0), vec4(1.0), color * uColorMultiplier + uColorOffset);
+				gl_FragColor = vec4(color.rgb * color.a, color.a);
 			}
 		`;
 

@@ -2,7 +2,7 @@
  * Bitmap
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
- * Copyright (c) 2010 gskinner.com, inc.
+ * Copyright (c) 2019 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -147,14 +147,6 @@ export default class Bitmap extends DisplayObject {
 		if (this.sourceRect) { o.sourceRect = this.sourceRect.clone(); }
 		this._cloneProps(o);
 		return o;
-	}
-
-	/**
-	 * Returns a string representation of this object.
-	 * @return {String} a string representation of the instance.
-	 */
-	toString() {
-		return `[Bitmap (name=${this.name})]`;
 	}
 
 	// Note, the doc sections below document using the specified APIs (from DisplayObject) from

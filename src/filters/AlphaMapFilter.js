@@ -45,7 +45,7 @@ import Filter from "./Filter";
  * bmp.filters = [ new AlphaMapFilter(box.cacheCanvas) ];
  * bmp.cache(0, 0, 100, 100);
  *
- * @param {HTMLImageElement | HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
+ * @param {HTMLImageElement|HTMLCanvasElement|WebGLTexture} alphaMap The greyscale image (or canvas) to use as the alpha value for the
  * result. This should be exactly the same dimensions as the target.
  */
 export default class AlphaMapFilter extends Filter {
@@ -53,30 +53,34 @@ export default class AlphaMapFilter extends Filter {
 	constructor (alphaMap) {
 		super();
 
+		if (!Filter.isValidImageSource(alphaMap)) {
+			throw "Must provide valid image source for alpha map, see Filter.isValidImageSource";
+		}
+
 		/**
 		 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
 		 * dimensions as the target.
-		 * @type {HTMLImageElement | HTMLCanvasElement}
+		 * @type {HTMLImageElement|HTMLCanvasElement|WebGLTexture}
 		 */
 		this.alphaMap = alphaMap;
 
 		/**
 		 * @protected
-		 * @type {HTMLImageElement | HTMLCanvasElement}
+		 * @type {HTMLImageElement|HTMLCanvasElement}
 		 * @default null
 		 */
-		this._alphaMap = null;
+		this._map = null;
 
 		/**
 		 * @protected
-		 * @type {Uint8ClampedArray}
+		 * @type {CanvasRenderingContext2D}
 		 * @default null
 		 */
-		this._mapData = null;
+		this._mapCtx = null;
 
 		/**
 		 * @protected
-		 * @type {*}
+		 * @type {WebGLTexture}
 		 * @default null
 		 */
 		this._mapTexture = null;
@@ -85,14 +89,19 @@ export default class AlphaMapFilter extends Filter {
 			uniform sampler2D uAlphaSampler;
 
 			void main (void) {
-				vec4 color = texture2D(uSampler, vRenderCoord);
+				vec4 color = texture2D(uSampler, vTextureCoord);
 				vec4 alphaMap = texture2D(uAlphaSampler, vTextureCoord);
 
 				// some image formats can have transparent white rgba(1,1,1, 0) when put on the GPU, this means we need a slight tweak
 				// using ceil ensure that the colour will be used so long as it exists but pure transparency will be treated black
-				gl_FragColor = vec4(color.rgb, color.a * (alphaMap.r * ceil(alphaMap.a)));
+				float newAlpha = alphaMap.r * ceil(alphaMap.a);
+				gl_FragColor = vec4(clamp(color.rgb/color.a, 0.0, 1.0) * newAlpha, newAlpha);
 			}
 		`;
+
+		if (alphaMap instanceof WebGLTexture) {
+			this._mapTexture = alphaMap;
+		}
 	}
 
 	/**
@@ -102,12 +111,15 @@ export default class AlphaMapFilter extends Filter {
 	 * @param {*} shaderProgram
 	 */
 	shaderParamSetup (gl, stage, shaderProgram) {
-		if (!this._mapTexture) { this._mapTexture = gl.createTexture(); }
+		if (this._mapTexture === null) { this._mapTexture = gl.createTexture(); }
 
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, this._mapTexture);
 		stage.setTextureParams(gl);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.alphaMap);
+
+		if (this.alphaMap !== this._mapTexture) {
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.alphaMap);
+		}
 
 		gl.uniform1i(
 			gl.getUniformLocation(shaderProgram, "uAlphaSampler"),
@@ -119,23 +131,46 @@ export default class AlphaMapFilter extends Filter {
 	 * @return {easeljs.AlphaMapFilter}
 	 */
 	clone () {
-		let o = new AlphaMapFilter(this.alphaMap);
-		o._alphaMap = this._alphaMap;
-		o._mapData = this._mapData;
-		return o;
+		return new AlphaMapFilter(this.alphaMap);
 	}
 
-	_applyFilter (imageData) {
-		if (!this.alphaMap) { return true; }
+	_applyFilter(imageData) {
 		if (!this._prepAlphaMap()) { return false; }
 
-		// TODO: update to support scenarios where the target has different dimensions.
-		let data = imageData.data;
-		let map = this._mapData;
-		const l = data.length;
-		for (let i=0; i<l; i += 4) { data[i + 3] = map[i] || 0; }
+ 		const { data: outArray, width, height } = imageData;
+ 		let rowOffset, pixelStart;
 
-		return true;
+ 		const {
+			data: sampleData,
+			width: sampleWidth,
+			height: sampleHeight
+		} = this._mapCtx.getImageData(0,0, this._map.width,this._map.height);
+		let sampleRowOffset, samplePixelStart;
+
+ 		const widthRatio = sampleWidth/width;
+		const heightRatio = sampleHeight/height;
+
+ 		// performance optimizing lookup
+
+ 		// the x and y need to stretch separately, nesting the for loops simplifies this logic even if the array is flat
+		for (let i=0; i<height; i++) {
+			rowOffset = i * width;
+			sampleRowOffset = ((i*heightRatio) |0) * sampleWidth;
+
+ 			// the arrays are int arrays, so a single pixel is [r,g,b,a, ...],so calculate the start of the pixel
+			for (let j=0; j<width; j++) {
+				pixelStart = (rowOffset + j) *4;
+				samplePixelStart = (sampleRowOffset + ((j*widthRatio) |0)) *4;
+
+ 				// modify the pixels
+				outArray[pixelStart] =   outArray[pixelStart];
+				outArray[pixelStart+1] = outArray[pixelStart+1];
+				outArray[pixelStart+2] = outArray[pixelStart+2];
+				outArray[pixelStart+3] = sampleArray[samplePixelStart];
+			}
+		}
+
+ 		return true;
 	}
 
 	/**
@@ -143,29 +178,17 @@ export default class AlphaMapFilter extends Filter {
 	 */
 	_prepAlphaMap () {
 		if (!this.alphaMap) { return false; }
-		if (this.alphaMap === this._alphaMap && this._mapData) { return true; }
-		this._mapData = null;
-
-		let map = this._alphaMap = this.alphaMap;
-		let canvas = map;
+		if (this.alphaMap === this._map && this._mapCtx) { return true; }
+		const map = this._map = this.alphaMap;
 		let ctx;
 		if (map instanceof HTMLCanvasElement) {
-			ctx = canvas.getContext("2d");
+			ctx = map.getContext("2d");
 		} else {
-			canvas = window.createjs && createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-			canvas.width = map.width;
-			canvas.height = map.height;
-			ctx = canvas.getContext("2d");
+			ctx = createCanvas(map.width, map.height).getContext("2d");
 			ctx.drawImage(map, 0, 0);
 		}
-
-		try {
-			this._mapData = ctx.getImageData(0, 0, map.width, map.height).data
-			return true;
-		} catch (e) {
-			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
-			return false;
-		}
+		this._mapCtx = ctx;
+		return true;
 	}
 
 }

@@ -43,7 +43,17 @@ import Filter from "./Filter";
  * shape.filters = [ new ColorMatrixFilter(matrix) ];
  * shape.cache(-50, -50, 100, 100);
  *
- * @param {Array | easeljs.ColorMatrix} matrix A 4x5 matrix describing the color operation to perform.
+ * @example <caption>Use a preset to generate a sepia photograph effect</caption>
+ * const shape = new Shape().set({ x: 100, y: 100 });
+ * shape.graphics.beginFill("#ff0000").drawCircle(0, 0, 50);
+ *
+ * shape.filters = [
+ *   new ColorMatrixFilter(ColorMatrix.createSepiaPreset())
+ * ];
+ *
+ * shape.cache(-50, -50, 100, 100);
+ *
+ * @param {Array|easeljs.ColorMatrix} matrix A 4x5 matrix describing the color operation to perform.
  */
 export default class ColorMatrixFilter extends Filter {
 
@@ -61,14 +71,15 @@ export default class ColorMatrixFilter extends Filter {
 			uniform vec4 uColorMatrixOffset;
 
 			void main (void) {
-				vec4 color = texture2D(uSampler, vRenderCoord);
+				vec4 color = texture2D(uSampler, vTextureCoord);
 
 				mat4 m = uColorMatrix;
-				vec4 newColor = vec4(0,0,0,0);
-				newColor.r = color.r*m[0][0] + color.g*m[0][1] + color.b*m[0][2] + color.a*m[0][3];
-				newColor.g = color.r*m[1][0] + color.g*m[1][1] + color.b*m[1][2] + color.a*m[1][3];
-				newColor.b = color.r*m[2][0] + color.g*m[2][1] + color.b*m[2][2] + color.a*m[2][3];
-				newColor.a = color.r*m[3][0] + color.g*m[3][1] + color.b*m[3][2] + color.a*m[3][3];
+				vec4 newColor = vec4(
+					color.r*m[0][0] + color.g*m[0][1] + color.b*m[0][2] + color.a*m[0][3],
+					color.r*m[1][0] + color.g*m[1][1] + color.b*m[1][2] + color.a*m[1][3],
+					color.r*m[2][0] + color.g*m[2][1] + color.b*m[2][2] + color.a*m[2][3],
+					color.r*m[3][0] + color.g*m[3][1] + color.b*m[3][2] + color.a*m[3][3]
+				);
 
 				gl_FragColor = newColor + uColorMatrixOffset;
 			}

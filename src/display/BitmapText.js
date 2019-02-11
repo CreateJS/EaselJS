@@ -1,8 +1,8 @@
 /**
- * @license BitmapText
+ * BitmapText
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
- * Copyright (c) 2017 gskinner.com, inc.
+ * Copyright (c) 2019 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,6 +24,8 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * @license
  */
 
 import Container from "./Container";
@@ -38,13 +40,14 @@ import Sprite from "./Sprite";
  *
  * @memberof easeljs
  * @extends easeljs.Container
- *
- * @param {String} [text=""] The text to display.
- * @param {SpriteSheet} [spriteSheet=null] The spritesheet that defines the character glyphs.
  */
 export default class BitmapText extends Container {
 
-	constructor (text = "", spriteSheet = null) {
+	/**
+	 * @param {String} [text=""] The text to display.
+	 * @param {SpriteSheet} [spriteSheet] The spritesheet that defines the character glyphs.
+	 */
+	constructor(text="", spriteSheet = null) {
 		super();
 
 		/**
@@ -57,7 +60,7 @@ export default class BitmapText extends Container {
 		/**
 		 * A SpriteSheet instance that defines the glyphs for this bitmap text. Each glyph/character
 		 * should have a single frame animation defined in the sprite sheet named the same as
-		 * corresponding character.
+		 * corresponding character. For example, the following animation definition:
 		 *
 		 * @example
 		 * // the following animation definition would indicate that the frame at index 0 of the spritesheet should be drawn for the "A" character.
@@ -79,6 +82,7 @@ export default class BitmapText extends Container {
 		 * by checking for the height of the "1", "T", or "L" character (in that order). If
 		 * those characters are not defined, it will use the height of the first frame of the
 		 * sprite sheet.
+		 *
 		 * @type {Number}
 		 * @default 0
 		 */
@@ -121,55 +125,40 @@ export default class BitmapText extends Container {
 		 * @protected
 		 */
 		this._drawAction = null;
-
 	}
 
-	draw (ctx, ignoreCache) {
+	draw(ctx, ignoreCache = false) {
 		if (this.drawCache(ctx, ignoreCache)) { return; }
 		this._updateState();
 		super.draw(ctx, ignoreCache);
-	}
+	};
 
-	getBounds () {
+	getBounds() {
 		this._updateText();
 		return super.getBounds();
 	}
 
-	isVisible () {
-		let hasContent = this.cacheCanvas || (this.spriteSheet && this.spriteSheet.complete && this.text);
+	isVisible() {
+		const hasContent = this.cacheCanvas || (this.spriteSheet && this.spriteSheet.complete && this.text);
 		return !!(this.visible && this.alpha > 0 && this.scaleX !== 0 && this.scaleY !== 0 && hasContent);
 	}
 
-	clone () {
+	clone() {
 		return this._cloneProps(new BitmapText(this.text, this.spriteSheet));
 	}
 
-	/**
-	 * <strong>Disabled in BitmapText.</strong>
-	 */
-	addChild () {}
+	/** <strong>Disabled in BitmapText.</strong> */
+	addChild() {}
+	/** <strong>Disabled in BitmapText.</strong> */
+	addChildAt() {}
+	/** <strong>Disabled in BitmapText.</strong> */
+	removeChild() {}
+	/** <strong>Disabled in BitmapText.</strong> */
+	removeChildAt() {}
+	/** <strong>Disabled in BitmapText.</strong> */
+	removeAllChildren() {}
 
-	/**
-	 * <strong>Disabled in BitmapText.</strong>
-	 */
-	addChildAt () {}
-
-	/**
-	 * <strong>Disabled in BitmapText.</strong>
-	 */
-	removeChild () {}
-
-	/**
-	 * <strong>Disabled in BitmapText.</strong>
-	 */
-	removeChildAt () {}
-
-	/**
-	 * <strong>Disabled in BitmapText.</strong>
-	 */
-	removeAllChildren () {}
-
-	_updateState () {
+	_updateState() {
 		this._updateText();
 	}
 
@@ -178,7 +167,7 @@ export default class BitmapText extends Container {
 	 * @return {easeljs.BitmapText}
 	 * @protected
 	 */
-	_cloneProps (o) {
+	_cloneProps(o) {
 		super._cloneProps(o);
 		o.lineHeight = this.lineHeight;
 		o.letterSpacing = this.letterSpacing;
@@ -192,10 +181,10 @@ export default class BitmapText extends Container {
 	 * @return {Number}
 	 * @protected
 	 */
-	_getFrameIndex (character, spriteSheet) {
+	_getFrameIndex(character, spriteSheet) {
 		let c, o = spriteSheet.getAnimation(character);
 		if (!o) {
-			(character != (c = character.toUpperCase())) || (character != (c = character.toLowerCase())) || (c = null);
+			(character != (c = character.toUpperCase())) || (character != (c = character.toLowerCase())) || (c=null);
 			if (c) { o = spriteSheet.getAnimation(c); }
 		}
 		return o && o.frames[0];
@@ -207,8 +196,8 @@ export default class BitmapText extends Container {
 	 * @return {Object}
 	 * @protected
 	 */
-	_getFrame (character, spriteSheet) {
-		let index = this._getFrameIndex(character, spriteSheet);
+	_getFrame(character, spriteSheet) {
+		const index = this._getFrameIndex(character, spriteSheet);
 		return index == null ? index : spriteSheet.getFrame(index);
 	}
 
@@ -217,8 +206,8 @@ export default class BitmapText extends Container {
 	 * @return {Number}
 	 * @protected
 	 */
-	_getLineHeight (ss) {
-		let frame = this._getFrame("1", ss) || this._getFrame("T", ss) || this._getFrame("L", ss) || ss.getFrame(0);
+	_getLineHeight(ss) {
+		const frame = this._getFrame("1",ss) || this._getFrame("T",ss) || this._getFrame("L",ss) || ss.getFrame(0);
 		return frame ? frame.rect.height : 1;
 	}
 
@@ -227,23 +216,28 @@ export default class BitmapText extends Container {
 	 * @return {Number}
 	 * @protected
 	 */
-	_getSpaceWidth (ss) {
-		let frame = this._getFrame("1", ss) || this._getFrame("l", ss) || this._getFrame("e", ss) || this._getFrame("a", ss) || ss.getFrame(0);
+	_getSpaceWidth(ss) {
+		const frame = this._getFrame("1",ss) || this._getFrame("l",ss) || this._getFrame("e",ss) || this._getFrame("a",ss) || ss.getFrame(0);
 		return frame ? frame.rect.width : 1;
-	}
-
-	_tick (evtObj) {
-		let stage = this.stage;
-		stage && stage.on("drawstart", this._updateText, this, true);
-		super._tick(evtObj);
 	}
 
 	/**
 	 * @protected
 	 */
-	_updateText () {
-		let x = 0, y = 0, o = this._oldProps, change = false, spaceW = this.spaceWidth, lineH = this.lineHeight, ss = this.spriteSheet;
-		let pool = BitmapText._spritePool, kids = this.children, childIndex = 0, numKids = kids.length, sprite;
+	_updateText() {
+		let x = 0,
+				y = 0,
+				childIndex = 0,
+				numKids = kids.length,
+				o = this._oldProps,
+				change = false,
+				spaceW = this.spaceWidth,
+				lineH = this.lineHeight,
+				ss = this.spriteSheet,
+				sprite;
+
+		const pool = BitmapText._spritePool,
+					kids = this.children;
 
 		for (let n in o) {
 			if (o[n] != this[n]) {
@@ -253,23 +247,23 @@ export default class BitmapText extends Container {
 		}
 		if (!change) { return; }
 
-		let hasSpace = !!this._getFrame(" ", ss);
+		const hasSpace = !!this._getFrame(" ", ss);
 		if (!hasSpace && !spaceW) { spaceW = this._getSpaceWidth(ss); }
 		if (!lineH) { lineH = this._getLineHeight(ss); }
 
 		for (let i = 0, l = this.text.length; i < l; i++) {
-			let character = this.text.charAt(i);
-			if (character === " " && !hasSpace) {
+			const character = this.text.charAt(i);
+			if (character == " " && !hasSpace) {
 				x += spaceW;
 				continue;
-			} else if (character === "\n" || character === "\r") {
-				if (character === "\r" && this.text.charAt(i+1) === "\n") { i++; } // crlf
+			} else if (character=="\n" || character=="\r") {
+				if (character=="\r" && this.text.charAt(i+1) == "\n") { i++; } // crlf
 				x = 0;
 				y += lineH;
 				continue;
 			}
 
-			let index = this._getFrameIndex(character, ss);
+			const index = this._getFrameIndex(character, ss);
 			if (index == null) { continue; }
 
 			if (childIndex < numKids) {
@@ -294,6 +288,7 @@ export default class BitmapText extends Container {
 			sprite.parent = null;
 			numKids--;
 		}
+
 		if (pool.length > BitmapText.maxPoolSize) { pool.length = BitmapText.maxPoolSize; }
 	}
 
@@ -308,11 +303,11 @@ export default class BitmapText extends Container {
  * @default 100
  */
 BitmapText.maxPoolSize = 100;
+
 /**
  * Sprite object pool.
  * @type {Array}
  * @static
  * @private
- * @readonly
  */
 BitmapText._spritePool = [];

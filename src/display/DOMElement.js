@@ -1,8 +1,8 @@
 /**
- * @license DOMElement
+ * DOMElement
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
- * Copyright (c) 2017 gskinner.com, inc.
+ * Copyright (c) 2019 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,14 +24,14 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * @license
  */
 
 import DisplayObject from "./DisplayObject";
 import DisplayProps from "../geom/DisplayProps";
 
 /**
- * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>
- *
  * A DOMElement allows you to associate a HTMLElement with the display list. It will be transformed
  * within the DOM as though it is child of the {{#crossLink "Container"}}{{/crossLink}} it is added to. However, it is
  * not rendered to canvas, and as such will retain whatever z-index it has relative to the canvas (ie. it will be
@@ -61,12 +61,14 @@ import DisplayProps from "../geom/DisplayProps";
  * stale information.
  *
  * @memberof easeljs
- * @extends DisplayObject
- * @param {HTMLElement | String} htmlElement A reference or id for the DOM element to manage.
+ * @extends easeljs.DisplayObject
  */
 export default class DOMElement extends DisplayObject {
 
-	constructor (htmlElement) {
+	/**
+	 * @param {HTMLElement|String} htmlElement A reference or id for the DOM element to manage.
+	 */
+	constructor(htmlElement) {
 		super();
 
 		if (typeof htmlElement === "string") { htmlElement = document.getElementById(htmlElement); }
@@ -105,61 +107,47 @@ export default class DOMElement extends DisplayObject {
 		this._drawAction = null;
 	}
 
-	isVisible () {
+	isVisible() {
 		return this.htmlElement != null;
 	}
 
-	draw (ctx, ignoreCache) {
+	draw(ctx, ignoreCache) {
 		// this relies on the _tick method because draw isn't called if the parent is not visible.
 		// the actual update happens in _handleDrawEnd
 		return true;
 	}
 
-	/**
-	 * Disabled in DOMElement.
-	 */
-	cache () {}
+	/** Disabled in DOMElement. */
+	cache() {}
 
-	/**
-	 * Disabled in DOMElement.
-	 */
-	uncache () {}
+	/** Disabled in DOMElement. */
+	uncache() {}
 
-	/**
-	 * Disabled in DOMElement.
-	 */
-	updateCache () {}
+	/** Disabled in DOMElement. */
+	updateCache() {}
 
-	/**
-	 * Disabled in DOMElement.
-	 */
-	hitTest () {}
+	/** Disabled in DOMElement. */
+	hitTest() {}
 
-	/**
-	 * Disabled in DOMElement.
-	 */
-	localToGlobal () {}
+	/** Disabled in DOMElement. */
+	localToGlobal() {}
 
-	/**
-	 * Disabled in DOMElement.
-	 */
-	globalToLocal () {}
+	/** Disabled in DOMElement. */
+	globalToLocal() {}
 
-	/**
-	 * Disabled in DOMElement.
-	 */
-	localToLocal () {}
+	/** Disabled in DOMElement. */
+	localToLocal() {}
 
 	/**
 	 * DOMElement cannot be cloned.
 	 * @throws DOMElement cannot be cloned
 	 */
-	clone () {
+	clone() {
 		throw "DOMElement cannot be cloned.";
 	}
 
-	_tick (evtObj) {
-		let stage = this.stage;
+	_tick(evtObj) {
+		const stage = this.stage;
 		if (stage != null && stage !== this._oldStage) {
 			this._drawAction && stage.off("drawend", this._drawAction);
 			this._drawAction = stage.on("drawend", this._handleDrawEnd, this);
@@ -172,24 +160,25 @@ export default class DOMElement extends DisplayObject {
 	 * @param {core.Event} evt
 	 * @protected
 	 */
-	_handleDrawEnd (evt) {
-		let o = this.htmlElement;
+	_handleDrawEnd(evt) {
+		const o = this.htmlElement;
 		if (!o) { return; }
-		let style = o.style;
+		const style = o.style;
 
-		let props = this.getConcatenatedDisplayProps(this._props), mtx = props.matrix;
+		const props = this.getConcatenatedDisplayProps(this._props), mtx = props.matrix;
 
-		let visibility = props.visible ? "visible" : "hidden";
-		if (visibility != style.visibility) { style.visibility = visibility; }
+		const visibility = props.visible ? "visible" : "hidden";
+		if (visibility !== style.visibility) { style.visibility = visibility; }
 		if (!props.visible) { return; }
 
-		let oldProps = this._oldProps, oldMtx = oldProps&&oldProps.matrix;
+		let oldProps = this._oldProps;
+		const oldMtx = oldProps && oldProps.matrix;
 		let n = 10000; // precision
 
 		if (!oldMtx || !oldMtx.equals(mtx)) {
-			let str = "matrix(" + (mtx.a*n|0)/n +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n +","+ (mtx.tx+0.5|0);
-			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty+0.5|0) +")";
-			style.MozTransform = str +"px,"+ (mtx.ty+0.5|0) +"px)";
+			const str = `matrix(${(mtx.a*n|0)/n},${(mtx.b*n|0)/n},${(mtx.c*n|0)/n},${(mtx.d*n|0)/n},${mtx.tx+0.5|0}`;
+			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = `${str},${mtx.ty+0.5|0})`;
+			style.MozTransform = `${str}px,${mtx.ty+0.5|0}px)`;
 			if (!oldProps) { oldProps = this._oldProps = new DisplayProps(true, null); }
 			oldProps.matrix.copy(mtx);
 		}

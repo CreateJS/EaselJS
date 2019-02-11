@@ -1,8 +1,8 @@
 /**
- * @license DisplayObject
+ * DisplayObject
  * Visit http://createjs.com/ for documentation, updates and examples.
  *
- * Copyright (c) 2017 gskinner.com, inc.
+ * Copyright (c) 2019 gskinner.com, inc.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,6 +24,8 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * @license
  */
 
 import { EventDispatcher } from "@createjs/core";
@@ -35,20 +37,20 @@ import Point from "../geom/Point";
 import Matrix2D from "../geom/Matrix2D";
 import BitmapCache from "../filters/BitmapCache";
 
-/**
- * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
- * {@link easeljs.Container}, {@link easeljs.Bitmap}, and {@link easeljs.Shape}.
- * DisplayObject is the base class for all display classes in the EaselJS library. It defines the core properties and
- * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
- * caching, and mouse handlers.
- *
- * @memberof easeljs
- * @extends EventDispatcher
- */
-export default class DisplayObject extends EventDispatcher {
+ /**
+  * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
+  * {@link easeljs.Container}, {@link easeljs.Bitmap}, and {@link easeljs.Shape}.
+  * DisplayObject is the base class for all display classes in the EaselJS library. It defines the core properties and
+  * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
+  * caching, and mouse handlers.
+  *
+  * @memberof easeljs
+  * @extends core.EventDispatcher
+  */
+ export default class DisplayObject extends EventDispatcher {
 
-	constructor () {
-		super();
+ 	constructor () {
+ 		super();
 
 		/**
 		 * The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque.
@@ -59,9 +61,9 @@ export default class DisplayObject extends EventDispatcher {
 
 		/**
 		 * If a cache is active, this returns the canvas that holds the image of this display object.
-		 * Use this to display the result of a cache. This will be a HTMLCanvasElement unless special cache rules have been deliberately enabled for this cache.
+		 * This will be a HTMLCanvasElement unless special cache rules have been deliberately enabled for this cache.
 		 * @see {@link easeljs.DisplayObject#cache}
-		 * @type {HTMLCanvasElement | Object}
+		 * @type {HTMLCanvasElement|WebGLTexture|Object}
 		 * @default null
 		 * @readonly
 		 */
@@ -69,6 +71,7 @@ export default class DisplayObject extends EventDispatcher {
 
 		/**
 		 * If a cache has been made, this returns the class that is managing the cacheCanvas and its properties.
+		 * Use this to control, inspect, and change the cache. In special circumstances this may be a modified or subclassed BitmapCache.
 		 * @see {@link easeljs.BitmapCache}
 		 * @type {easeljs.BitmapCache}
 		 * @default null
@@ -79,17 +82,15 @@ export default class DisplayObject extends EventDispatcher {
 		/**
 		 * Unique ID for this display object. Makes display objects easier for some uses.
 		 * @type {Number}
+		 * @default -1
 		 */
-		this.id = uid();
+		this.id = uid.get();
 
 		/**
 		 * Indicates whether to include this object when running mouse interactions. Setting this to `false` for children
 		 * of a {@link easeljs.Container} will cause events on the Container to not fire when that child is
 		 * clicked. Setting this property to `false` does not prevent the {@link easeljs.Container#getObjectsUnderPoint}
 		 * method from returning the child.
-		 *
-		 * <strong>Note:</strong> In EaselJS 0.7.0, the `mouseEnabled` property will not work properly with nested Containers.
-		 *
 		 * @type {Boolean}
 		 * @default true
 		 */
@@ -97,15 +98,15 @@ export default class DisplayObject extends EventDispatcher {
 
 		/**
 		 * If false, the tick will not run on this display object (or its children). This can provide some performance benefits.
-		 * In addition to preventing the {@link core.Ticker#event:tick} event from being dispatched, it will also prevent tick related updates
-		 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+		 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
+		 * on some display objects (ex. Sprite & MovieClip frame advancing, and DOMElement display properties).
 		 * @type Boolean
 		 * @default true
 		 */
 		this.tickEnabled = true;
 
 		/**
-		 * An optional name for this display object. Included in {@link easeljs.DisplayObject#toString}. Useful for debugging.
+		 * An optional name for this display object. Included in {@link easeljs.DisplayObject#toString}.
 		 * @type {String}
 		 * @default null
 		 */
@@ -114,7 +115,7 @@ export default class DisplayObject extends EventDispatcher {
 		/**
 		 * A reference to the {@link easeljs.Container} or {@link easeljs.Stage} object that
 		 * contains this display object, or null if it has not been added to one.
-		 * @type {easeljs.Container}
+		 * @type {Container}
 		 * @default null
 		 * @readonly
 		 */
@@ -123,6 +124,7 @@ export default class DisplayObject extends EventDispatcher {
 		/**
 		 * The left offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate
 		 * around its center, you would set regX and {@link easeljs.DisplayObject#regY} to 50.
+		 * Cached object's registration points should be set based on pre-cache conditions, not cached size.
 		 * @type {Number}
 		 * @default 0
 		 */
@@ -131,6 +133,7 @@ export default class DisplayObject extends EventDispatcher {
 		/**
 		 * The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
 		 * its center, you would set {@link easeljs.DisplayObject#regX} and regY to 50.
+		 * Cached object's registration points should be set based on pre-cache conditions, not cached size.
 		 * @type {Number}
 		 * @default 0
 		 */
@@ -183,7 +186,7 @@ export default class DisplayObject extends EventDispatcher {
 
 		/**
 		 * Indicates whether this display object should be rendered to the canvas and included when running the Stage
-		 * {@link easeljs.Stage#getObjectsUnderPoint} method.
+		 * {@link easeljs.Container#getObjectsUnderPoint} method.
 		 * @type {Boolean}
 		 * @default true
 		 */
@@ -196,8 +199,7 @@ export default class DisplayObject extends EventDispatcher {
 		 */
 		this.x = 0;
 
-		/**
-		 * The y (vertical) position of the display object, relative to its parent.
+		/** The y (vertical) position of the display object, relative to its parent.
 		 * @type {Number}
 		 * @default 0
 		 */
@@ -214,22 +216,24 @@ export default class DisplayObject extends EventDispatcher {
 		/**
 		 * The composite operation indicates how the pixels of this display object will be composited with the elements
 		 * behind it. If `null`, this property is inherited from the parent container.
-		 * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing "WHATWG spec on compositing"}
+		 * @see {@link https://html.spec.whatwg.org/multipage/scripting.html#dom-context-2d-globalcompositeoperation "WHATWG spec on compositing"}
+		 * @see {@link https://drafts.fxtf.org/compositing/ "W3C draft on compositing and blending"}
 		 * @type {String}
 		 * @default null
 		 */
 		this.compositeOperation = null;
 
 		/**
-		 * Indicates whether the display object should be drawn to a whole pixel when {@link easeljs.Stage#snapToPixelEnabled} is true.
-		 * To enable/disable snapping on whole categories of display objects, set this value on the prototype (Ex. Text.prototype.snapToPixel = true).
+		 * Indicates whether the display object should be drawn to a whole pixel when {@link easeljs.Stage.snapToPixelEnabled} is true.
+		 * To enable/disable snapping on whole categories of display objects, set this value on the prototype.
+		 * (ex. Text.prototype.snapToPixel = true).
 		 * @type {Boolean}
 		 * @default true
 		 */
 		this.snapToPixel = true;
 
 		/**
-		 * An array of Filter objects to apply to this display object. Filters are only applied / updated when {@link easeljs.DisplayObject#cache}
+		 * An array of {@link easeljs.Filter} objects to apply to this display object. Filters are only applied/updated when {@link easeljs.DisplayObject#cache}
 		 * or {@link easeljs.DisplayObject#updateCache} is called on the display object, and only apply to the area that is cached.
 		 * @type {Array<easeljs.Filter>}
 		 * @default null
@@ -237,7 +241,7 @@ export default class DisplayObject extends EventDispatcher {
 		this.filters = null;
 
 		/**
-		 * A Shape instance that defines a vector mask (clipping path) for this display object.  The shape's transformation
+		 * A Shape instance that defines a vector mask (clipping path) for this display object. The shape's transformation
 		 * will be applied relative to the display object's parent coordinates (as if it were a child of the parent).
 		 * @type {easeljs.Shape}
 		 * @default null
@@ -255,7 +259,6 @@ export default class DisplayObject extends EventDispatcher {
 		 * This is similar to setting {@link easeljs.DisplayObject#mouseChildren} to false.
 		 *
 		 * Note that hitArea is NOT currently used by the `hitTest()` method, nor is it supported for {@link easeljs.Stage}.
-		 *
 		 * @type {easeljs.DisplayObject}
 		 * @default null
 		 */
@@ -265,7 +268,6 @@ export default class DisplayObject extends EventDispatcher {
 		 * A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display
 		 * object. You must enable mouseover events using the {@link easeljs.Stage#enableMouseOver} method to
 		 * use this property. Setting a non-null cursor on a Container will override the cursor set on its descendants.
-		 *
 		 * @type {String}
 		 * @default null
 		 */
@@ -274,12 +276,14 @@ export default class DisplayObject extends EventDispatcher {
 		/**
 		 * @protected
 		 * @type {easeljs.DisplayProps}
+		 * @default {easeljs.DisplayProps}
 		 */
 		this._props = new DisplayProps();
 
 		/**
 		 * @protected
 		 * @type {easeljs.Rectangle}
+		 * @default {easeljs.Rectangle}
 		 */
 		this._rectangle = new Rectangle();
 
@@ -298,6 +302,14 @@ export default class DisplayObject extends EventDispatcher {
 		 * @default 0
 		 */
 		this._webGLRenderStyle = DisplayObject._StageGL_NONE;
+
+		/**
+		 * Storage for the calculated position of an object in StageGL. If not using StageGL, you can null it to save memory.
+		 * @protected
+		 * @type {easeljsMatrix2D}
+		 * @default {easeljs.Matrix2D}
+		 */
+		this._glMtx = new Matrix2D();
 	}
 
 	/**
@@ -315,33 +327,34 @@ export default class DisplayObject extends EventDispatcher {
 
 	/**
 	 * Set both the {@link easeljs.DisplayObject#scaleX} and the {@link easeljs.DisplayObject#scaleY} property to the same value.
-	 * Note that when you get the value, if the `scaleX` and `scaleY` are different values, it will return only the `scaleX`.
 	 * @type {Number}
 	 * @default 1
 	 */
-	set scale (value) { this.scaleX = this.scaleY = value; }
-	get scale () { return this.scaleX; }
+	set scale(value) {
+		this.scaleX = this.scaleY = value;
+	}
 
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.
+	 *
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
 	 */
-	isVisible () {
+	isVisible() {
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0);
 	}
 
 	/**
-	 * Alias for drawCache(). Used by grandchildren (or deeper) in their draw method to directly
-	 * call {@link easeljs.DisplayObject#drawCache}, bypassing their parent(s).
+	 * Alias for {@link easeljs.DisplayObject#drawCache}. Use drawCache() directly from a grandchild to bypass
+	 * the middle parent's draw().
 	 *
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
 	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache. For example,
 	 * used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
 	 * @return {Boolean}
 	 */
-	draw (ctx, ignoreCache = false) {
+	draw(ctx, ignoreCache = false) {
 		return this.drawCache(ctx, ignoreCache);
 	}
 
@@ -355,8 +368,8 @@ export default class DisplayObject extends EventDispatcher {
 	 * used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
 	 * @return {Boolean}
 	 */
-	drawCache (ctx, ignoreCache = false) {
-		let cache = this.bitmapCache;
+	drawCache(ctx, ignoreCache = false) {
+		const cache = this.bitmapCache;
 		if (cache && !ignoreCache) {
 			return cache.draw(ctx);
 		}
@@ -364,16 +377,17 @@ export default class DisplayObject extends EventDispatcher {
 	}
 
 	/**
-	 * Applies this display object's transformation, alpha, globalCompositeOperation, clipping path (mask), and shadow
+	 * Applies this display object's `transformation`, `alpha`, `globalCompositeOperation`, `mask` (clipping path), and `shadow`
 	 * to the specified context. This is typically called prior to {@link easeljs.DisplayObject#draw}.
 	 * @param {CanvasRenderingContext2D} ctx The canvas 2D to update.
 	 */
-	updateContext (ctx) {
-		let o=this, mask=o.mask, mtx=o._props.matrix;
+	updateContext(ctx) {
+		const mask = this.mask,
+					mtx = this._props.matrix;
 
 		if (mask && mask.graphics && !mask.graphics.isEmpty()) {
 			mask.getMatrix(mtx);
-			ctx.transform(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+			ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 
 			mask.graphics.drawAsPath(ctx);
 			ctx.clip();
@@ -384,37 +398,37 @@ export default class DisplayObject extends EventDispatcher {
 
 		this.getMatrix(mtx);
 		let tx = mtx.tx, ty = mtx.ty;
-		if (DisplayObject._snapToPixelEnabled && o.snapToPixel) {
+		if (DisplayObject._snapToPixelEnabled && this.snapToPixel) {
 			tx = tx + (tx < 0 ? -0.5 : 0.5) | 0;
 			ty = ty + (ty < 0 ? -0.5 : 0.5) | 0;
 		}
 		ctx.transform(mtx.a,  mtx.b, mtx.c, mtx.d, tx, ty);
-		ctx.globalAlpha *= o.alpha;
-		if (o.compositeOperation) { ctx.globalCompositeOperation = o.compositeOperation; }
-		if (o.shadow) { this._applyShadow(ctx, o.shadow); }
-	}
+		ctx.globalAlpha *= this.alpha;
+		if (this.compositeOperation) { ctx.globalCompositeOperation = this.compositeOperation; }
+		if (this.shadow) { this._applyShadow(ctx, this.shadow); }
+	};
 
 	/**
 	 * Draws the display object into a new element, which is then used for subsequent draws. Intended for complex content
 	 * that does not change frequently (ex. a Container with many children that do not move, or a complex vector Shape),
 	 * this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
 	 * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must manually
-	 * update the cache by calling `updateCache()` again. You must specify the cached area via the x, y, w,
-	 * and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates.
+	 * update the cache by calling `updateCache()` again. You must specify the cached area via the x, y, w, and h
+	 * parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates.
 	 *
-	 * Note that filters need to be defined <em>before</em> the cache is applied or you will have to call updateCache after
+	 * Filters need to be defined <em>before</em> the cache is applied or you will have to call updateCache after
 	 * application. Check out the {@link easeljs.Filter} class for more information. Some filters
 	 * (ex. {@link easeljs.BlurFilter}) may not work as expected in conjunction with the scale param.
 	 *
-	 * Usually, the resulting cacheCanvas will have the dimensions width*scale by height*scale, however some filters (ex. BlurFilter)
+	 * Usually, the resulting cacheCanvas will have the dimensions width * scale, height * scale, however some filters (ex. BlurFilter)
 	 * will add padding to the canvas dimensions.
 	 *
-	 * Actual implementation of the caching mechanism can change with a {@link easeljs.StageGL} and so
-	 * all caching and filter behaviour has been moved to the {@link easeljs.BitmapCache}
+	 * In previous versions, caching was handled on DisplayObject but has since been moved to {@link easeljs.BitmapCache}.
+	 * This allows for easier interaction and alternate cache methods like WebGL with {@link easeljs.StageGL}.
+	 * For more information on the options object, see the {@link easeljs.BitmapCache#define}.
 	 *
 	 * @example
-	 * // If you defined a Shape that drew a circle at 0, 0 with a radius of 25:
-	 * var shape = new createjs.Shape();
+	 * const shape = new Shape();
 	 * shape.graphics.beginFill("#ff0000").drawCircle(0, 0, 25);
 	 * shape.cache(-25, -25, 50, 50);
 	 *
@@ -424,47 +438,49 @@ export default class DisplayObject extends EventDispatcher {
 	 * @param {Number} height The height of the cache region.
 	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape using
 	 * 	myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and rotate
-	 * 	cached elements with greater fidelity. Default is 1.
-	 * @param {Object} [options] When using alternate displays there may be extra caching opportunities or needs.
+	 * 	cached elements with greater fidelity.
+	 * @param {Object} [options] Specify additional parameters for the cache logic
 	 */
-	cache (x, y, width, height, scale = 1, options) {
+	cache(x, y, width, height, scale = 1, options) {
 		if (!this.bitmapCache) {
-			this.bitmapCache = new BitmapCache();
+			this.bitmapCache = new createjs.BitmapCache();
+		} else {
+			this.bitmapCache._autoGenerated = false;
 		}
 		this.bitmapCache.define(this, x, y, width, height, scale, options);
 	}
 
 	/**
 	 * Redraws the display object to its cache. Calling updateCache without an active cache will throw an error.
-	 * If compositeOperation is null the current cache will be cleared prior to drawing. Otherwise the display object
-	 * will be drawn over the existing cache using the specified compositeOperation.
+	 * If `compositeOperation` is null the current cache will be cleared prior to drawing. Otherwise the display object
+	 * will be drawn over the existing cache using the specified `compositeOperation`.
 	 *
-	 * Actual implementation of the caching mechanism can change with a {@link easeljs.StageGL} and so
-	 * all caching and filter behaviour has been moved to the {@link easeljs.BitmapCache}
+	 * In previous versions caching was handled on DisplayObject but has since been moved to {@link easeljs.BitmapCache}
+	 * This allows for easier interaction and alternate cache methods like WebGL and {@link easeljs.StageGL}.
 	 *
 	 * @example
 	 * // clear current graphics
 	 * shapeInstance.clear();
-	 * // draw new instructions
-	 * shapeInstance.setStrokeStyle(3).beginStroke("#FF0000").moveTo(100, 100).lineTo(200,200);
-	 * // update cache, drawing new line on top of old one
+	 * // draw some new instructions
+	 * shapeInstance.setStrokeStyle(3).beginStroke("#ff0000").moveTo(100, 100).lineTo(200,200);
+	 * // update cache, new line will be drawn on top of the old one
 	 * shapeInstance.updateCache();
 	 *
-	 * @see {@link http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing "WHATWG spec on compositing"}
-	 * @param {String} compositeOperation The compositeOperation to use, or null to clear the cache and redraw it.
+	 * @see {@link https://html.spec.whatwg.org/multipage/scripting.html#dom-context-2d-globalcompositeoperation "WHATWG spec on compositing"}
+	 * @param {String} [compositeOperation] The composite operation to use, or nul to clear it
 	 */
-	updateCache (compositeOperation) {
+	updateCache(compositeOperation) {
 		if (!this.bitmapCache) {
-			throw "No cache found. cache() must be called before updateCache()";
+			throw "cache() must be called before updateCache()";
 		}
 		this.bitmapCache.update(compositeOperation);
 	}
 
 	/**
 	 * Clears the current cache.
-	 * @see {@link easeljs.DisplayObject.#cache}
+	 * @see {@link easeljs.DisplayObject#cache}
 	 */
-	uncache () {
+	uncache() {
 		if (this.bitmapCache) {
 			this.bitmapCache.release();
 			this.bitmapCache = undefined;
@@ -474,10 +490,12 @@ export default class DisplayObject extends EventDispatcher {
 	/**
 	 * Returns a data URL for the cache, or null if this display object is not cached.
 	 * Only generated if the cache has changed, otherwise returns last result.
+	 * @param {} type
+	 * @params {} encoderOptions
 	 * @return {String} The image data url for the cache.
 	 */
-	getCacheDataURL () {
-		return this.bitmapCache ? this.bitmapCache.getDataURL() : null;
+	getCacheDataURL(type, encoderOptions) {
+		return this.bitmapCache ? this.bitmapCache.getCacheDataURL(type, encoderOptions) : null;
 	}
 
 	/**
@@ -490,16 +508,16 @@ export default class DisplayObject extends EventDispatcher {
 	 * displayObject.x = 300;
 	 * displayObject.y = 200;
 	 * stage.addChild(displayObject);
-	 * let point = displayObject.localToGlobal(100, 100);
-	 * // Results in x=400, y=300
+	 * const point = displayObject.localToGlobal(100, 100);
+	 * // x=400, y=300
 	 *
 	 * @param {Number} x The x position in the source display object to transform.
 	 * @param {Number} y The y position in the source display object to transform.
-	 * @param {easeljs.Point | Object} [pt=Point] An object to copy the result into. If omitted a new Point object with x/y properties will be returned.
+	 * @param {easeljs.Point|Object} [pt=easeljs.Point] An object to copy the result into.
 	 * @return {easeljs.Point} A Point instance with x and y properties correlating to the transformed coordinates
 	 * on the stage.
 	 */
-	localToGlobal (x, y, pt = new Point()) {
+	localToGlobal(x, y, pt = new Point()) {
 		return this.getConcatenatedMatrix(this._props.matrix).transformPoint(x, y, pt);
 	}
 
@@ -513,16 +531,17 @@ export default class DisplayObject extends EventDispatcher {
 	 * displayObject.x = 300;
 	 * displayObject.y = 200;
 	 * stage.addChild(displayObject);
-	 * let point = displayObject.globalToLocal(100, 100);
-	 * // Results in x=-200, y=-100
+	 * const point = displayObject.globalToLocal(100, 100);
+	 * // x=-200, y=-100
 	 *
+	 * @method globalToLocal
 	 * @param {Number} x The x position on the stage to transform.
 	 * @param {Number} y The y position on the stage to transform.
-	 * @param {easeljs.Point | Object} [pt=Point] An object to copy the result into. If omitted a new Point object with x/y properties will be returned.
+	 * @param {easeljs.Point|Object} [pt=easeljs.Point] An object to copy the result into.
 	 * @return {easeljs.Point} A Point instance with x and y properties correlating to the transformed position in the
 	 * display object's coordinate space.
 	 */
-	globalToLocal (x, y, pt = new Point()) {
+	globalToLocal(x, y, pt = new Point()) {
 		return this.getConcatenatedMatrix(this._props.matrix).invert().transformPoint(x, y, pt);
 	}
 
@@ -533,20 +552,17 @@ export default class DisplayObject extends EventDispatcher {
 	 * {@link easeljs.DisplayObject#localToGlobal} and {@link easeljs.DisplayObject#globalToLocal}.
 	 *
 	 * @example
-	 * // long way
 	 * let pt = this.localToGlobal(x, y);
 	 * pt = target.globalToLocal(pt.x, pt.y);
-	 * // shorthand
-	 * let pt = this.localToLocal(x, y, target);
 	 *
 	 * @param {Number} x The x position in the source display object to transform.
 	 * @param {Number} y The y position on the source display object to transform.
 	 * @param {easeljs.DisplayObject} target The target display object to which the coordinates will be transformed.
-	 * @param {easeljs.Point | Object} [pt] An object to copy the result into. If omitted a new Point object with x/y properties will be returned.
+	 * @param {easeljs.Point|Object} [pt=easeljs.Point] An object to copy the result into.
 	 * @return {easeljs.Point} Returns a Point instance with x and y properties correlating to the transformed position
 	 * in the target's coordinate space.
 	 */
-	localToLocal (x, y, target, pt) {
+	localToLocal(x, y, target, pt = new Point()) {
 		pt = this.localToGlobal(x, y, pt);
 		return target.globalToLocal(pt.x, pt.y, pt);
 	}
@@ -558,7 +574,7 @@ export default class DisplayObject extends EventDispatcher {
 	 * @example
 	 * displayObject.setTransform(100, 100, 2, 2);
 	 *
-	 * @param {Number} [x=0] The horizontal translation (x position) in pixels
+	 * @param {Number|Object} [x=0] The horizontal translation (x position) in pixels
 	 * @param {Number} [y=0] The vertical translation (y position) in pixels
 	 * @param {Number} [scaleX=1] The horizontal scale, as a percentage of 1
 	 * @param {Number} [scaleY=1] the vertical scale, as a percentage of 1
@@ -568,28 +584,35 @@ export default class DisplayObject extends EventDispatcher {
 	 * @param {Number} [regX=0] The horizontal registration point in pixels
 	 * @param {Number} [regY=0] The vertical registration point in pixels
 	 * @return {easeljs.DisplayObject} Returns this instance. Useful for chaining commands.
+	 * @chainable
 	*/
-	setTransform (x=0, y=0, scaleX=1, scaleY=1, rotation=0, skewX=0, skewY=0, regX=0, regY=0) {
-		this.x = x;
-		this.y = y;
-		this.scaleX = scaleX;
-		this.scaleY = scaleY;
-		this.rotation = rotation;
-		this.skewX = skewX;
-		this.skewY = skewY;
-		this.regX = regX;
-		this.regY = regY;
+	setTransform(xOrParams = 0, y = 0, scaleX = 1, scaleY = 1, rotation = 0, skewX = 0, skewY = 0, regX = 0, regY = 0) {
+		if (typeof x !== "number") {
+			this.set(xOrParams);
+		} else {
+			this.x = x;
+			this.y = y;
+			this.scaleX = scaleX;
+			this.scaleY = scaleY;
+			this.rotation = rotation;
+			this.skewX = skewX;
+			this.skewY = skewY;
+			this.regX = regX;
+			this.regY = regY;
+		}
 		return this;
 	}
 
 	/**
 	 * Returns a matrix based on this object's current transform.
-	 * @param {easeljs.Matrix2D} [matrix] A Matrix2D object to populate with the calculated values. If null, a new Matrix object is returned.
+	 * @param {easeljs.Matrix2D} [matrix=easeljs.Matrix2D] A Matrix2D object to populate with the calculated values. If null, a new
+	 * Matrix object is returned.
 	 * @return {easeljs.Matrix2D} A matrix representing this display object's transform.
 	 */
-	getMatrix (matrix) {
-		let o = this, mtx = matrix&&matrix.identity() || new Matrix2D();
-		return o.transformMatrix ?  mtx.copy(o.transformMatrix) : mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+	getMatrix(matrix = new Matrix2D()) {
+		const o = this;
+		return o.transformMatrix ? matrix.copy(o.transformMatrix) :
+			(matrix.identity() && matrix.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY));
 	}
 
 	/**
@@ -597,12 +620,13 @@ export default class DisplayObject extends EventDispatcher {
 	 * parent Containers up to the highest level ancestor (usually the {@link easeljs.Stage}). This can
 	 * be used to transform positions between coordinate spaces, such as with {@link easeljs.DisplayObject#localToGlobal}
 	 * and {@link easeljs.DisplayObject#globalToLocal}.
-	 *
-	 * @param {easeljs.Matrix2D} [matrix] A Matrix2D object to populate with the calculated values. If null, a new Matrix2D object is returned.
+	 * @param {easeljs.Matrix2D} [matrix=easeljs.Matrix2D] A Matrix2D object to populate with the calculated values.
+	 * If null, a new Matrix2D object is returned.
 	 * @return {easeljs.Matrix2D} The combined matrix.
 	 */
-	getConcatenatedMatrix (matrix) {
-		let o = this, mtx = this.getMatrix(matrix);
+	getConcatenatedMatrix(matrix = new Matrix2D()) {
+		const mtx = this.getMatrix(matrix);
+		let o;
 		while (o = o.parent) {
 			mtx.prependMatrix(o.getMatrix(o._props.matrix));
 		}
@@ -612,15 +636,16 @@ export default class DisplayObject extends EventDispatcher {
 	/**
 	 * Generates a DisplayProps object representing the combined display properties of the  object and all of its
 	 * parent Containers up to the highest level ancestor (usually the {@link easeljs.Stage}).
-	 * @param {easeljs.DisplayProps} [props] A DisplayProps object to populate with the calculated values. If null, a new DisplayProps object is returned.
+	 * @param {easeljs.DisplayProps} [props=easeljs.DisplayProps] A DisplayProps object to populate with the calculated values.
+	 * If null, a new DisplayProps object is returned.
 	 * @return {easeljs.DisplayProps} The combined display properties.
 	 */
-	getConcatenatedDisplayProps (props) {
-		props = props ? props.identity() : new DisplayProps();
-		let o = this, mtx = o.getMatrix(props.matrix);
+	getConcatenatedDisplayProps(props = new DisplayProps()) {
+		props = props.identity();
+		const mtx = o.getMatrix(props.matrix);
+		let o = this;
 		do {
 			props.prepend(o.visible, o.alpha, o.shadow, o.compositeOperation);
-
 			// we do this to avoid problems with the matrix being used for both operations when o._props.matrix is passed in as the props param.
 			// this could be simplified (ie. just done as part of the prepend above) if we switched to using a pool.
 			if (o != this) { mtx.prependMatrix(o.getMatrix(o._props.matrix)); }
@@ -636,8 +661,7 @@ export default class DisplayObject extends EventDispatcher {
 	 *
 	 * @example
 	 * stage.addEventListener("stagemousedown", event => {
-	 *   let hit = shape.hitTest(event.stageX, event.stageY);
-	 *   // hit == true when shape is clicked
+	 *   const didHit = myShape.hitTest(event.stageX, event.stageY);
 	 * });
 	 *
 	 * @param {Number} x The x position to check in the display object's local coordinates.
@@ -645,12 +669,12 @@ export default class DisplayObject extends EventDispatcher {
 	 * @return {Boolean} A Boolean indicating whether a visible portion of the DisplayObject intersect the specified
 	 * local Point.
 	*/
-	hitTest (x, y) {
-		let ctx = DisplayObject._hitTestContext;
+	hitTest(x, y) {
+		const ctx = DisplayObject._hitTestContext;
 		ctx.setTransform(1, 0, 0, 1, -x, -y);
-		this.draw(ctx);
-
-		let hit = this._testHit(ctx);
+		// hit tests occur in a 2D context, so don't attempt to draw a GL only Texture into a 2D context
+		this.draw(ctx, !(this.bitmapCache && !(this.bitmapCache._cacheCanvas instanceof WebGLTexture)));
+		const hit = this._testHit(ctx);
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, 2, 2);
 		return hit;
@@ -660,15 +684,15 @@ export default class DisplayObject extends EventDispatcher {
 	 * Provides a chainable shortcut method for setting a number of properties on the instance.
 	 *
 	 * @example
-	 * let graphics = new Graphics().beginFill("#ff0000").drawCircle(0, 0, 25);
-	 * let shape = stage.addChild(new Shape()).set({ graphics, x: 100, y: 100, alpha: 0.5 });
+	 * const myGraphics = new Graphics().beginFill("#ff0000").drawCircle(0, 0, 25);
+	 * const shape = new Shape().set({ graphics: myGraphics, x: 100, y: 100, alpha: 0.5 });
 	 *
 	 * @param {Object} props A generic object containing properties to copy to the DisplayObject instance.
 	 * @return {easeljs.DisplayObject} Returns the instance the method is called on (useful for chaining calls.)
 	 * @chainable
 	*/
-	set (props) {
-		for (let n in props) { this[n] = props[n]; }
+	set(props) {
+		for (var n in props) { this[n] = props[n]; }
 		return this;
 	}
 
@@ -686,21 +710,22 @@ export default class DisplayObject extends EventDispatcher {
 	 * 		the automatic calculations listed below.
 	 * 	</td></tr>
 	 * 	<tr><td><b>Bitmap</b></td><td>
-	 * 		Returns the width and height of the sourceRect (if specified) or image, extending from (x=0,y=0).
+	 * 		Returns the width and height of the {{#crossLink "Bitmap/sourceRect"}}{{/crossLink}} (if specified) or image,
+	 * 		extending from (x=0,y=0).
 	 * 	</td></tr>
 	 * 	<tr><td><b>Sprite</b></td><td>
 	 * 		Returns the bounds of the current frame. May have non-zero x/y if a frame registration point was specified
-	 * 		in the spritesheet data. See also {@link easeljs.SpriteSheet#getFrameBounds}
+	 * 		in the spritesheet data. See also {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}}
 	 * 	</td></tr>
 	 * 	<tr><td><b>Container</b></td><td>
-	 * 		Returns the aggregate (combined) bounds of all children that return a non-null value from getBounds().
+	 * 		Returns the aggregate (combined) bounds of all children that return a non-null value from `getBounds()`.
 	 * 	</td></tr>
 	 * 	<tr><td><b>Shape</b></td><td>
-	 * 		Does not currently support automatic bounds calculations. Use setBounds() to manually define bounds.
+	 * 		Does not currently support automatic bounds calculations. Use `setBounds()` to manually define bounds.
 	 * 	</td></tr>
 	 * 	<tr><td><b>Text</b></td><td>
-	 * 		Returns approximate bounds. Horizontal values (x/width) are quite accurate, but vertical values (y/height) are
-	 * 		not, especially when using textBaseline values other than "top".
+	 * 		Returns approximate bounds. Horizontal values (x/width) are quite accurate, but vertical values (y/height)
+	 * 		are not, especially when using {{#crossLink "Text/textBaseline:property"}}{{/crossLink}} values other than "top".
 	 * 	</td></tr>
 	 * 	<tr><td><b>BitmapText</b></td><td>
 	 * 		Returns approximate bounds. Values will be more accurate if spritesheet frame registration points are close
@@ -708,28 +733,29 @@ export default class DisplayObject extends EventDispatcher {
 	 * 	</td></tr>
 	* </table>
 	 *
-	 * @example
-	 * /* Bounds can be expensive to calculate for some objects (ex. text, or containers with many children), and
+	 * @example <caption>Bounds can be expensive to calculate for some objects (ex. text, or containers with many children), and
 	 * are recalculated each time you call getBounds(). You can prevent recalculation on static objects by setting the
-	 * bounds explicitly. *\/
-	 * let bounds = obj.getBounds();
+	 * bounds explicitly<caption>
+	 *
+	 * const bounds = obj.getBounds();
 	 * obj.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
 	 * // getBounds will now use the set values, instead of recalculating
 	 *
-	 * @example
-	 * // To reduce memory impact, the returned Rectangle instance may be reused internally
-	 * let bounds = obj.getBounds().clone();
-	 * // OR:
-	 * rect.copy(obj.getBounds());
+	 * @example <caption>To reduce memory impact, the returned Rectangle instance may be reused internally; clone the instance or copy its
+	 * values if you need to retain it</caption>
 	 *
-	 * @return {easeljs.Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this object.
+	 * const bounds = obj.getBounds().clone();
+	 * // OR:
+	 * myRect.copy(obj.getBounds());
+	 *
+	 * @return {Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this
+	 * object.
 	 */
-	getBounds () {
+	getBounds() {
 		if (this._bounds) { return this._rectangle.copy(this._bounds); }
-		let cacheCanvas = this.cacheCanvas;
-		if (cacheCanvas) {
-			let scale = this._cacheScale;
-			return this._rectangle.setValues(this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width/scale, cacheCanvas.height/scale);
+		const cache = this.bitmapCache;
+		if (cache && this.cacheCanvas) {
+			return cache.getBounds();
 		}
 		return null;
 	}
@@ -739,7 +765,8 @@ export default class DisplayObject extends EventDispatcher {
 	 * Objects that have been cached will return the transformed bounds of the cache.
 	 *
 	 * Not all display objects can calculate their own bounds (ex. Shape). For these objects, you can use
-	 * {@link easeljs.DisplayObject#setBounds} so that they are included when calculating Container bounds.
+	 * {@link easeljs.DisplayObject#setBounds} so that they are included when calculating Container
+	 * bounds.
 	 *
 	 * To reduce memory impact, the returned Rectangle instance may be reused internally; clone the instance or copy its
 	 * values if you need to retain it.
@@ -747,7 +774,7 @@ export default class DisplayObject extends EventDispatcher {
 	 * Container instances calculate aggregate bounds for all children that return bounds via getBounds.
 	 * @return {easeljs.Rectangle} A Rectangle instance representing the bounds, or null if bounds are not available for this object.
 	 */
-	getTransformedBounds () {
+	getTransformedBounds() {
 		return this._getBounds();
 	}
 
@@ -758,14 +785,16 @@ export default class DisplayObject extends EventDispatcher {
 	 *
 	 * The bounds should be specified in the object's local (untransformed) coordinates. For example, a Shape instance
 	 * with a 25px radius circle centered at 0,0 would have bounds of (-25, -25, 50, 50).
-	 *
 	 * @param {Number} x The x origin of the bounds. Pass null to remove the manual bounds.
 	 * @param {Number} y The y origin of the bounds.
 	 * @param {Number} width The width of the bounds.
 	 * @param {Number} height The height of the bounds.
 	 */
-	setBounds (x, y, width, height) {
-		if (x == null) { this._bounds = null; }
+	setBounds(x, y, width, height) {
+		if (x == null) {
+			this._bounds = x;
+			return;
+		}
 		this._bounds = (this._bounds || new Rectangle()).setValues(x, y, width, height);
 	}
 
@@ -773,10 +802,9 @@ export default class DisplayObject extends EventDispatcher {
 	 * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
 	 * reverted to their defaults (for example .parent). Caches are not maintained across clones, and some elements
 	 * are copied by reference (masks, individual filter instances, hit area)
-	 *
 	 * @return {easeljs.DisplayObject} A clone of the current DisplayObject instance.
 	 */
-	clone () {
+	clone() {
 		return this._cloneProps(new DisplayObject());
 	}
 
@@ -784,17 +812,30 @@ export default class DisplayObject extends EventDispatcher {
 	 * Returns a string representation of this object.
 	 * @return {String} a string representation of the instance.
 	 */
-	toString () {
-		return `[${this.constructor.name}${this.name ? ` (name=${this.name})` : ""}]`;
+	toString() {
+		return `[${this.constructor.name} (name=${this.name})]`;
 	}
 
 	/**
+	 * Called before the object gets drawn and is a chance to ensure the display state of the object is correct.
+	 * Mostly used by {@link easeljs.MovieClip} and {@link easeljs.BitmapText} to
+	 * correct their internal state and children prior to being drawn.
+	 *
+	 * Is manually called via draw in a {@link easeljs.Stage} but is automatically called when
+	 * present in a {@link easeljs.StageGL} instance.
+	 *
+	 * @method _updateState
 	 * @protected
+	 */
+	_updateState() {}
+
+	/**
 	 * @param {easeljs.DisplayObject} o The DisplayObject instance which will have properties from the current DisplayObject
 	 * instance copied into.
 	 * @return {easeljs.DisplayObject} o
+	 * @protected
 	 */
-	_cloneProps (o) {
+	_cloneProps(o) {
 		o.alpha = this.alpha;
 		o.mouseEnabled = this.mouseEnabled;
 		o.tickEnabled = this.tickEnabled;
@@ -812,21 +853,21 @@ export default class DisplayObject extends EventDispatcher {
 		o.y = this.y;
 		o.compositeOperation = this.compositeOperation;
 		o.snapToPixel = this.snapToPixel;
-		o.filters = this.filters==null?null:this.filters.slice(0);
+		o.filters = this.filters == null ? null : this.filters.slice();
 		o.mask = this.mask;
 		o.hitArea = this.hitArea;
 		o.cursor = this.cursor;
 		o._bounds = this._bounds;
+		o._webGLRenderStyle = this._webGLRenderStyle;
 		return o;
 	}
 
 	/**
 	 * @protected
 	 * @param {CanvasRenderingContext2D} ctx
-	 * @param {easeljs.Shadow} [shadow=Shadow]
+	 * @param {easeljs.Shadow} shadow
 	 */
-	_applyShadow (ctx, shadow = Shadow.identity) {
-		shadow = shadow;
+	_applyShadow(ctx, shadow = Shadow.identity) {
 		ctx.shadowColor = shadow.color;
 		ctx.shadowOffsetX = shadow.offsetX;
 		ctx.shadowOffsetY = shadow.offsetY;
@@ -834,17 +875,17 @@ export default class DisplayObject extends EventDispatcher {
 	}
 
 	/**
+	 * @param {Object} evt An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
 	 * @protected
-	 * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
 	 */
-	_tick (evtObj) {
+	_tick(evt) {
 		// because tick can be really performance sensitive, check for listeners before calling dispatchEvent.
-		let ls = this._listeners;
-		if (ls && ls["tick"]) {
+		const ls = this._listeners;
+		if (ls && ls.tick) {
 			// reset & reuse the event object to avoid construction / GC costs:
-			evtObj.target = null;
-			evtObj.propagationStopped = evtObj.immediatePropagationStopped = false;
-			this.dispatchEvent(evtObj);
+			evt.target = null;
+			evt.propagationStopped = evt.immediatePropagationStopped = false;
+			this.dispatchEvent(evt);
 		}
 	}
 
@@ -853,48 +894,55 @@ export default class DisplayObject extends EventDispatcher {
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @return {Boolean}
 	 */
-	_testHit (ctx) {
+	_testHit(ctx) {
+		let hit;
 		try {
-			return ctx.getImageData(0, 0, 1, 1).data[3] > 1;
+			hit = ctx.getImageData(0, 0, 1, 1).data[3] > 1;
 		} catch (e) {
 			if (!DisplayObject.suppressCrossDomainErrors) {
 				throw "An error has occurred. This is most likely due to security restrictions on reading canvas pixel data with local or cross-domain images.";
 			}
-			return false;
 		}
+		return hit;
 	}
 
 	/**
-	 * @protected
 	 * @param {easeljs.Matrix2D} matrix
 	 * @param {Boolean} ignoreTransform If true, does not apply this object's transform.
 	 * @return {easeljs.Rectangle}
+	 * @protected
 	 */
-	_getBounds (matrix, ignoreTransform) {
+	_getBounds(matrix, ignoreTransform){
 		return this._transformBounds(this.getBounds(), matrix, ignoreTransform);
 	}
 
 	/**
-	 * @protected
 	 * @param {easeljs.Rectangle} bounds
 	 * @param {easeljs.Matrix2D} matrix
 	 * @param {Boolean} ignoreTransform
 	 * @return {easeljs.Rectangle}
+	 * @protected
 	 */
-	_transformBounds (bounds, matrix, ignoreTransform) {
+	_transformBounds(bounds, matrix, ignoreTransform) {
 		if (!bounds) { return bounds; }
-		let { x, y, width, height } = bounds;
-		let mtx = this._props.matrix;
-		mtx = ignoreTransform ? mtx.identity() : this.getMatrix(mtx);
+		let { x, y } = bounds;
+		const { width, height } = bounds;
+		const mtx = ignoreTransform ? this._props.matrix.identity() : this.getMatrix(this._props.matrix);
 
-		if (x || y) { mtx.appendTransform(0,0,1,1,0,0,0,-x,-y); } // TODO: simplify this.
+		if (x || y) { mtx.appendTransform(0, 0, 1, 1, 0, 0, 0, -x, -y); } // TODO: simplify this.
 		if (matrix) { mtx.prependMatrix(matrix); }
 
-		let x_a = width*mtx.a, x_b = width*mtx.b;
-		let y_c = height*mtx.c, y_d = height*mtx.d;
-		let tx = mtx.tx, ty = mtx.ty;
+		const x_a = width*mtx.a,
+					x_b = width*mtx.b,
+					y_c = height*mtx.c,
+					y_d = height*mtx.d,
+					tx = mtx.tx,
+					ty = mtx.ty;
 
-		let minX = tx, maxX = tx, minY = ty, maxY = ty;
+		let minX = tx,
+				maxX = tx,
+				minY = ty,
+				maxY = ty;
 
 		if ((x = x_a + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
 		if ((x = x_a + y_c + tx) < minX) { minX = x; } else if (x > maxX) { maxX = x; }
@@ -904,17 +952,17 @@ export default class DisplayObject extends EventDispatcher {
 		if ((y = x_b + y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 		if ((y = y_d + ty) < minY) { minY = y; } else if (y > maxY) { maxY = y; }
 
-		return bounds.setValues(minX, minY, maxX-minX, maxY-minY);
+		return bounds.setValues(minX, minY, maxX - minX, maxY - minY);
 	}
 
 	/**
 	 * Indicates whether the display object has any mouse event listeners or a cursor.
-	 * @protected
 	 * @return {Boolean}
+	 * @protected
 	 */
-	_hasMouseEventListener () {
-		let evts = DisplayObject._MOUSE_EVENTS;
-		for (let i=0, l=evts.length; i<l; i++) {
+	_hasMouseEventListener() {
+		const evts = DisplayObject._MOUSE_EVENTS;
+		for (let i = 0, l = evts.length; i < l; i++) {
 			if (this.hasEventListener(evts[i])) { return true; }
 		}
 		return !!this.cursor;
@@ -922,33 +970,16 @@ export default class DisplayObject extends EventDispatcher {
 
 }
 
-{
-	let canvas = window.createjs && createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); // prevent errors on load in browsers without canvas.
-	if (canvas.getContext) {
-		/**
-		 * @type {HTMLCanvasElement | Object}
-		 * @static
-		 */
-		DisplayObject._hitTestCanvas = canvas;
-		/**
-		 * @type {CanvasRenderingContext2D}
-		 * @static
-		 */
-		DisplayObject._hitTestContext = canvas.getContext("2d");
-		canvas.width = canvas.height = 1;
-	}
-}
-
 /**
  * Listing of mouse event names. Used in _hasMouseEventListener.
+ * @protected
  * @static
- * @type {Array<String>}
- * @readonly
+ * @type {Array}
  */
 DisplayObject._MOUSE_EVENTS = ["click","dblclick","mousedown","mouseout","mouseover","pressmove","pressup","rollout","rollover"];
 
 /**
- * Suppresses errors generated when using features like hitTest, mouse events, and {{#crossLink "getObjectsUnderPoint"}}{{/crossLink}}
+ * Suppresses errors generated when using features like hitTest, mouse events, and {@link easeljs.Container#getObjectsUnderPoint}
  * with cross domain content.
  * @static
  * @type {Boolean}
@@ -957,14 +988,17 @@ DisplayObject._MOUSE_EVENTS = ["click","dblclick","mousedown","mouseout","mouseo
 DisplayObject.suppressCrossDomainErrors = false;
 
 /**
+ * {@link easeljs.Stage#snapToPixelEnabled} is temporarily copied here during a draw to provide global access.
+ * @protected
  * @static
  * @type {Boolean}
  * @default false
  */
-DisplayObject.snapToPixelEnabled = false;
+DisplayObject._snapToPixelEnabled = false;
 
 /**
  * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+ * @protected
  * @static
  * @type {Number}
  */
@@ -972,6 +1006,7 @@ DisplayObject._StageGL_NONE = 0;
 
 /**
  * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+ * @protected
  * @static
  * @type {Number}
  */
@@ -979,10 +1014,27 @@ DisplayObject._StageGL_SPRITE = 1;
 
 /**
  * Enum like property for determining StageGL render lookup, i.e. where to expect properties.
+ * @protected
  * @static
  * @type {Number}
  */
 DisplayObject._StageGL_BITMAP = 2;
+
+const canvas = createCanvas();
+
+/**
+ * @type {HTMLCanvasElement|Object}
+ * @static
+ * @protected
+ */
+DisplayObject._hitTestCanvas = canvas;
+
+/**
+ * @type {CanvasRenderingContext2D}
+ * @static
+ * @protected
+ */
+DisplayObject._hitTestContext = canvas.getContext("2d");
 
 /**
  * Dispatched when the user presses their left mouse button over the display object.

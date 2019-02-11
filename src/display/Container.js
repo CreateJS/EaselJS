@@ -49,7 +49,7 @@ import DisplayObject from "./DisplayObject";
  */
 export default class Container extends DisplayObject {
 
-	constructor () {
+	constructor() {
 		super();
 
 		/**
@@ -89,12 +89,12 @@ export default class Container extends DisplayObject {
 		return this.children.length;
 	}
 
-	isVisible () {
+	isVisible() {
 		let hasContent = this.cacheCanvas || this.children.length;
 		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
 	}
 
-	draw (ctx, ignoreCache = false) {
+	draw(ctx, ignoreCache = false) {
 		if (super.draw(ctx, ignoreCache)) { return true; }
 
 		// this ensures we don't have issues with display list changes that occur during a draw:
@@ -123,7 +123,7 @@ export default class Container extends DisplayObject {
 	 * @param {...easeljs.DisplayObject} children The display object(s) to add.
 	 * @return {easeljs.DisplayObject} The child that was added, or the last child if multiple children were added.
 	 */
-	addChild (...children) {
+	addChild(...children) {
 		const l = children.length;
 		if (l === 0) { return null; }
 		let child = children[0];
@@ -156,7 +156,7 @@ export default class Container extends DisplayObject {
 	 * @param {Number} index The index to add the child at.
 	 * @return {easeljs.DisplayObject} Returns the last child that was added, or the last child if multiple children were added.
 	 */
-	addChildAt (...children) {
+	addChildAt(...children) {
 		const l = children.length;
     if (l === 0) { return null; }
     let index = children.pop();
@@ -186,7 +186,7 @@ export default class Container extends DisplayObject {
 	 * @param {...easeljs.DisplayObject} children The display object(s) to remove.
 	 * @return {Boolean} true if the child (or children) was removed, or false if it was not in the display list.
 	 */
-	removeChild (...children) {
+	removeChild(...children) {
 		const l = children.length;
     if (l === 0) { return true; }
 		if (l > 1) {
@@ -208,7 +208,7 @@ export default class Container extends DisplayObject {
 	 * @param {...Number} indexes The indexes of children to remove.
 	 * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
 	 */
-	removeChildAt (...indexes) {
+	removeChildAt(...indexes) {
 		const l = indexes.length;
     if (l === 0) { return true; }
 		if (l > 1) {
@@ -223,7 +223,7 @@ export default class Container extends DisplayObject {
 	/**
 	 * Removes all children from the display list.
 	 */
-	removeAllChildren () {
+	removeAllChildren() {
 		let kids = this.children;
 		while (kids.length) { this._removeChildAt(0); }
 	}
@@ -233,7 +233,7 @@ export default class Container extends DisplayObject {
 	 * @param {Number} index The index of the child to return.
 	 * @return {easeljs.DisplayObject} The child at the specified index. Returns null if there is no child at the index.
 	 */
-	getChildAt (index) {
+	getChildAt(index) {
 		return this.children[index];
 	}
 
@@ -242,7 +242,7 @@ export default class Container extends DisplayObject {
 	 * @param {String} name The name of the child to return.
 	 * @return {easeljs.DisplayObject} The child with the specified name.
 	 */
-	getChildByName (name) {
+	getChildByName(name) {
 		let kids = this.children;
 		const l = kids.length;
 		for (let i = 0; i < l; i++) {
@@ -265,7 +265,7 @@ export default class Container extends DisplayObject {
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort}
 	 * @param {Function} sortFunction the function to use to sort the child list.
 	 */
-	sortChildren (sortFunction) {
+	sortChildren(sortFunction) {
 		this.children.sort(sortFunction);
 	}
 
@@ -274,7 +274,7 @@ export default class Container extends DisplayObject {
 	 * @param {easeljs.DisplayObject} child The child to return the index of.
 	 * @return {Number} The index of the specified child. -1 if the child is not found.
 	 */
-	getChildIndex (child) {
+	getChildIndex(child) {
 		return this.children.indexOf(child);
 	}
 
@@ -283,7 +283,7 @@ export default class Container extends DisplayObject {
 	 * @param {Number} index1
 	 * @param {Number} index2
 	 */
-	swapChildrenAt (index1, index2) {
+	swapChildrenAt(index1, index2) {
 		let kids = this.children;
 		let o1 = kids[index1];
 		let o2 = kids[index2];
@@ -298,7 +298,7 @@ export default class Container extends DisplayObject {
 	 * @param {easeljs.DisplayObject} child1
 	 * @param {easeljs.DisplayObject} child2
 	 */
-	swapChildren (child1, child2) {
+	swapChildren(child1, child2) {
 		let kids = this.children;
 		const l = kids.length;
 		let index1,index2;
@@ -317,7 +317,7 @@ export default class Container extends DisplayObject {
 	 * @param {easeljs.DisplayObject} child
 	 * @param {Number} index
 	 */
-	setChildIndex (child, index) {
+	setChildIndex(child, index) {
 		let kids = this.children;
 		const l = kids.length;
 		if (child.parent != this || index < 0 || index >= l) { return; }
@@ -335,7 +335,7 @@ export default class Container extends DisplayObject {
 	 * @param {easeljs.DisplayObject} child The DisplayObject to be checked.
 	 * @return {Boolean} true if the specified display object either is this container or is a descendent.
 	 */
-	contains (child) {
+	contains(child) {
 		while (child) {
 			if (child === this) { return true; }
 			child = child.parent;
@@ -352,7 +352,7 @@ export default class Container extends DisplayObject {
 	 * @return {Boolean} A Boolean indicating whether there is a visible section of a DisplayObject that overlaps the specified
 	 * coordinates.
 	 */
-	hitTest (x, y) {
+	hitTest(x, y) {
 		// TODO: optimize to use the fast cache check where possible.
 		return this.getObjectUnderPoint(x, y) != null;
 	}
@@ -382,7 +382,7 @@ export default class Container extends DisplayObject {
 	 * @param {Number} [mode=0] The mode to use to determine which display objects to include. 0-all, 1-respect mouseEnabled/mouseChildren, 2-only mouse opaque objects.
 	 * @return {Array<easeljs.DisplayObject>} An array of DisplayObjects under the specified coordinates.
 	 */
-	getObjectsUnderPoint (x, y, mode = 0) {
+	getObjectsUnderPoint(x, y, mode = 0) {
 		let arr = [];
 		let pt = this.localToGlobal(x, y);
 		this._getObjectsUnderPoint(pt.x, pt.y, arr, mode > 0, mode === 1);
@@ -399,16 +399,16 @@ export default class Container extends DisplayObject {
 	 * @param {Number} [mode=0] The mode to use to determine which display objects to include.  0-all, 1-respect mouseEnabled/mouseChildren, 2-only mouse opaque objects.
 	 * @return {easeljs.DisplayObject} The top-most display object under the specified coordinates.
 	 */
-	getObjectUnderPoint (x, y, mode = 0) {
+	getObjectUnderPoint(x, y, mode = 0) {
 		let pt = this.localToGlobal(x, y);
 		return this._getObjectsUnderPoint(pt.x, pt.y, null, mode > 0, mode === 1);
 	}
 
-	getBounds () {
+	getBounds() {
 		return this._getBounds(null, true);
 	}
 
-	getTransformedBounds () {
+	getTransformedBounds() {
 		return this._getBounds();
 	}
 
@@ -419,13 +419,13 @@ export default class Container extends DisplayObject {
 	 * properties of the container will be cloned, but the new instance will not have any children.
 	 * @return {easeljs.Container} A clone of the current Container instance.
 	 */
-	clone (recursive = false) {
+	clone(recursive = false) {
 		let o = this._cloneProps(new Container());
 		if (recursive) { this._cloneChildren(o); }
 		return o;
 	}
 
-	_tick (evtObj) {
+	_tick(evtObj) {
 		if (this.tickChildren) {
 			for (let i = this.children.length - 1; i >= 0; i--) {
 				let child = this.children[i];
@@ -440,7 +440,7 @@ export default class Container extends DisplayObject {
 	 * @protected
 	 * @param {easeljs.Container} o The target container.
 	 */
-	_cloneChildren (o) {
+	_cloneChildren(o) {
 		if (o.children.length) { o.removeAllChildren(); }
 		let arr = o.children;
 		const l = this.children.length;
@@ -460,7 +460,7 @@ export default class Container extends DisplayObject {
    * @param {Boolean} [silent=false] Prevents dispatch of `removed` event if true.
    * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
    */
-  _removeChildAt (index, silent = false) {
+	_removeChildAt(index, silent = false) {
 		if (index < 0 || index > this.children.length - 1) { return false; }
 		let child = this.children[index];
 		if (child) { child.parent = null; }
@@ -479,7 +479,7 @@ export default class Container extends DisplayObject {
 	 * @param {Number} [currentDepth=0] Indicates the current depth of the search.
 	 * @return {easeljs.DisplayObject}
 	 */
-	_getObjectsUnderPoint (x, y, arr, mouse, activeListener, currentDepth = 0) {
+	_getObjectsUnderPoint(x, y, arr, mouse, activeListener, currentDepth = 0) {
 		if (!currentDepth && !this._testMask(this, x, y)) { return null; }
 		let mtx, ctx = DisplayObject._hitTestContext;
 		activeListener = activeListener || (mouse && this._hasMouseEventListener());
@@ -529,7 +529,7 @@ export default class Container extends DisplayObject {
 	 * @param {Number} y
 	 * @return {Boolean} Indicates whether the x/y is within the masked region.
 	 */
-	_testMask (target, x, y) {
+	_testMask(target, x, y) {
 		let mask = target.mask;
 		if (!mask || !mask.graphics || mask.graphics.isEmpty()) { return true; }
 
@@ -558,7 +558,7 @@ export default class Container extends DisplayObject {
 	 * @param {Boolean} ignoreTransform If true, does not apply this object's transform.
 	 * @return {easeljs.Rectangle}
 	 */
-	_getBounds (matrix, ignoreTransform) {
+	_getBounds(matrix, ignoreTransform) {
 		let bounds = super.getBounds();
 		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
 

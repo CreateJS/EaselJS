@@ -55,6 +55,55 @@ export default class Point {
 		 */
 	}
 
+ 	/**
+	 * Converts a pair of polar coordinates to a Cartesian point coordinate.
+	 * @param {Number} len The length coordinate of the polar pair.
+	 * @param {Number} angle The angle, in radians, of the polar pair.
+	 * @param {easeljs.Point|Object} [pt=easeljs.Point] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
+	 * @return {easeljs.Point} The new, interpolated point.
+	 * @static
+	 * @chainable
+	*/
+	static polar(len, angle, pt = new Point()) {
+		pt.x = len * Math.cos(angle);
+		pt.y = len * Math.sin(angle);
+		return pt;
+	}
+
+ 	/**
+	 * Determines a point between two specified points. The parameter `f` determines where the new interpolated
+	 * point is located relative to the two end points specified by parameters `pt1` and `pt2`. The closer the
+	 * value of the parameter `f` is to 1.0, the closer the interpolated point is to the first point (parameter `pt1`).
+	 * The closer the value of the parameter `f` is to 0, the closer the interpolated point is to the second point (parameter `pt2`).
+	 * @param {easeljs.Point|Object} pt1 The first point as a Point or generic object.
+	 * @param {easeljs.Point|Object} pt2 The second point as a Point or generic object.
+	 * @param {Number} f The level of interpolation between the two points. Indicates where the new point
+	 * will be, along the line between `pt1` and `pt2`. If `f=1`, `pt1` is returned; if `f=0`, `pt2` is returned.
+	 * @param {easeljs.Point|Object} [pt=easeljs.Point] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
+	 * @return {easeljs.Point} The new, interpolated point.
+	 * @static
+	 * @chainable
+	*/
+	static interpolate(pt1, pt2, f, pt = new Point()) {
+		pt.x = pt2.x + (f * (pt1.x - pt2.x));
+		pt.y = pt2.y + (f * (pt1.y - pt2.y));
+		return pt;
+	}
+
+	/**
+	 * Offsets the Point object by the specified amount. The value of dx is added to the original value of x
+	 * to create the new x value. The value of dy is added to the original value of y to create the new y value.
+	 * @param {Number} dx The amount by which to offset the horizontal coordinate, x.
+	 * @param {Number} dy The amount by which to offset the vertical coordinate, y.
+	 * @return {easeljs.Point} This instance. Useful for chaining method calls.
+	 * @chainable
+	*/
+	offset(dx, dy) {
+		this.x += dx;
+		this.y += dy;
+		return this;
+	}
+
 	/**
 	 * Sets the specified values on this instance.
 	 * @param {Number} [x=0] X position.

@@ -120,7 +120,7 @@ import createCanvas from "../utils/Canvas";
  */
 export default class Graphics {
 
-	constructor () {
+	constructor() {
 		/**
 		 * Holds a reference to the last command that was created or appended. For example, you could retain a reference
 		 * to a Fill command in order to dynamically update the color later by using:
@@ -135,8 +135,6 @@ export default class Graphics {
 		 */
 		this.command = null;
 
-
-	// private properties
 		/**
 		 * @protected
 		 * @type {easeljs.Graphics.Stroke}
