@@ -1531,6 +1531,7 @@ this.createjs = this.createjs||{};
 		} else if (item._webGLRenderStyle === 2) {
 			// this is a Bitmap class
 			foundImage = item.image;
+			if (foundImage.getImage) { foundImage = foundImage.getImage(); }
 		} else if (item._webGLRenderStyle === 1) {
 			// this is a SpriteSheet, we can't tell which image we used from the list easily so remove them all!
 			for (i = 0, l = item.spriteSheet._images.length; i < l; i++) {
