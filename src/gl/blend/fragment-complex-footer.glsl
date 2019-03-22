@@ -1,0 +1,4 @@
+			)
+		) * totalAlpha, totalAlpha
+	);
+}

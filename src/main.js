@@ -53,6 +53,8 @@ export { default as DisplayProps } from "./geom/DisplayProps";
 export { default as Matrix2D } from "./geom/Matrix2D";
 export { default as Point } from "./geom/Point";
 export { default as Rectangle } from "./geom/Rectangle";
+// gl
+export { * as shaders } from "./gl/shaders";
 // ui
 export { default as ButtonHelper } from "./ui/ButtonHelper";
 export { default as Touch } from "./ui/Touch";
