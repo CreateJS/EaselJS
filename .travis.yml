@@ -1,0 +1,17 @@
+language: node_js
+
+node_js:
+  - 10
+stages:
+  - test
+install:
+  - gem install sass
+  - npm install --global grunt-cli
+  - (cd build && npm install)
+  - (cd tests && npm install)
+before_script:
+  - (cd build && grunt build)
+jobs:
+  include:
+    - stage: test
+      script: (cd tests && grunt)
