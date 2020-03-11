@@ -5,7 +5,6 @@ node_js:
 stages:
   - test
 install:
-  - echo "installing"
   - gem install sass
   - npm install --global grunt-cli
   - (cd build && npm install)
