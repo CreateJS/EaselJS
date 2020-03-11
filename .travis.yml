@@ -14,4 +14,4 @@ before_script:
 jobs:
   include:
     - stage: test
-      script: (cd tests && grunt)
+      script: (cd tests && grunt headless)
