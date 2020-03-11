@@ -1,3 +1,5 @@
+let PORT = 8000;
+
 module.exports = function (grunt) {
 	grunt.initConfig(
 		{
@@ -22,8 +24,7 @@ module.exports = function (grunt) {
 							'../_assets/libs/tweenjs-NEXT.min.js',
 							'../_assets/libs/preloadjs-NEXT.min.js'
 						],
-						host : 'http://127.0.0.1:<%=connect.phantom.options.port%>/',
-						styles: "styles.css"
+						host: 'http://127.0.0.1:' + PORT
 					}
 				}
 			},
@@ -39,11 +40,11 @@ module.exports = function (grunt) {
 							}
 						}, '..'],
 						useAvailablePort: true,
-						port: 8000,
+						port: PORT,
 						open: true
 					}
 				},
-				phantom: {
+				chrome: {
 					options: {
 						base: [{
 							path: __dirname,
@@ -52,7 +53,7 @@ module.exports = function (grunt) {
 							}
 						}, '..'],
 						useAvailablePort: true,
-						port: 8000
+						port: PORT
 					}
 				}
 			},
@@ -74,6 +75,5 @@ module.exports = function (grunt) {
 
 	grunt.registerTask("default", "Launches browser-based tests","serve");
 	grunt.registerTask("serve", "Launches browser-based tests", ["jasmine:run:build", "listips", "connect"]);
-	grunt.registerTask("headless", "phantom");
-	grunt.registerTask("phantom", "Launches phantom-based tests", ["connect:phantom", "jasmine"]);
+	grunt.registerTask("headless", "Launches chrome headless tests", ["connect:chrome", "jasmine"]);
 };
