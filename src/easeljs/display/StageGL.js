@@ -752,7 +752,11 @@ this.createjs = this.createjs||{};
 	 * @readonly
 	 */
 	StageGL.REGULAR_VARYING_HEADER = (
-		"precision highp float;" +
+		"#ifdef GL_FRAGMENT_PRECISION_HIGH \n"+
+		"precision highp float; \n"+
+		"#else \n"+
+		"precision mediump float; \n"+
+		"#endif \n"+
 
 		"varying vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
@@ -847,7 +851,11 @@ this.createjs = this.createjs||{};
 	 * @readonly
 	 */
 	StageGL.COVER_VARYING_HEADER = (
-		"precision highp float;" +	//this is usually essential for filter math
+		"#ifdef GL_FRAGMENT_PRECISION_HIGH \n"+
+		"precision highp float; \n"+
+		"#else \n"+
+		"precision mediump float; \n"+
+		"#endif \n"+
 
 		"varying vec2 vTextureCoord;"
 	);
