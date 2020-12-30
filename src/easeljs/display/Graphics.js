@@ -1978,9 +1978,11 @@ this.createjs = this.createjs||{};
 	 * @method bitmap
 	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image  Must be loaded prior to creating a bitmap fill, or the fill will be empty.
 	 * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
+	 * @param {Matrix2D} [matrix] Optional. Specifies a transformation matrix for the bitmap fill. This transformation will be applied relative to the parent transform.
 	 * @return {Fill} Returns this Fill object for chaining or assignment.
 	 */
-	p.bitmap = function(image, repetition) {
+	p.bitmap = function(image, repetition, matrix) {
+		if (matrix) this.matrix = matrix; // Dan Zen 2020
 		if (image.naturalWidth || image.getContext || image.readyState >= 2) {
 			var o = this.style = Graphics._ctx.createPattern(image, repetition || "");
 			o.props = {image: image, repetition: repetition, type: "bitmap"};
