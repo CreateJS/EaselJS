@@ -353,7 +353,7 @@ this.createjs = this.createjs||{};
 			
 			if (this.lineWidth != null && (w = ctx.measureText(str).width) > this.lineWidth) {
 				// text wrapping:
-				var words = str.split(/(\s)/);
+				var words = this._splitWords(str);
 				str = words[0];
 				w = ctx.measureText(str).width;
 				
@@ -387,6 +387,19 @@ this.createjs = this.createjs||{};
 		}
 		if (!paint) { ctx.restore(); }
 		return o;
+	};
+
+	/**
+	 * Split string into words
+	 * @param {string} str
+	 * @returns {Array}
+	 * @private
+	 */
+	p._splitWords = function(str) {
+		// originally the string was split on \s, but we don't want to break on non breaking spaces
+		// \s is: /(\f\n\r\t\v\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff)/
+		// we are removing no-break space u00a0
+		return str.split(/(\f\n\r\t\v\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff)/);
 	};
 
 	/**
