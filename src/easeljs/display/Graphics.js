@@ -2369,10 +2369,13 @@ this.createjs = this.createjs||{};
 		var a = Math.PI/sides;
 
 		ctx.moveTo(x+Math.cos(angle)*radius, y+Math.sin(angle)*radius);
-		for (var i=0; i<sides; i++) {
+		// Adjusted by DAN ZEN 3/27/21 to continue around to next point
+        	// so last connection gets consistent bevel or miter
+       		for (var i=0; i<sides+1; i++) {
 			angle += a;
 			if (ps != 1) {
 				ctx.lineTo(x+Math.cos(angle)*radius*ps, y+Math.sin(angle)*radius*ps);
+				if (i==sides) break; // DAN ZEN 3/27/21
 			}
 			angle += a;
 			ctx.lineTo(x+Math.cos(angle)*radius, y+Math.sin(angle)*radius);
