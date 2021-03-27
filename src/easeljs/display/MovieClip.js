@@ -509,6 +509,9 @@ this.createjs = this.createjs||{};
 		while ((o = o.parent) && fps === null) { if (o.mode === independent) { fps = o._framerate; } }
 		this._framerate = fps;
 		
+		// adjusted by Dan Zen 3/27/21 for https://github.com/CreateJS/EaselJS/issues/1048
+		if (this.totalFrames <= 1) { return; }
+		
 		// calculate how many frames to advance:
 		var t = (fps !== null && fps !== -1 && time !== null) ? time/(1000/fps) + this._t : 1;
 		var frames = t|0;
