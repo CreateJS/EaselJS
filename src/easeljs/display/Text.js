@@ -399,7 +399,7 @@ this.createjs = this.createjs||{};
 		// originally the string was split on \s, but we don't want to break on non breaking spaces
 		// \s is: /(\f\n\r\t\v\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff)/
 		// we are removing no-break space u00a0
-		return str.split(/(\f\n\r\t\v\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff)/);
+		return str.split(/([ \f\n\r\t\v\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff])/);
 	};
 
 	/**
