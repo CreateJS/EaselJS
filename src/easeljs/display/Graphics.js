@@ -123,6 +123,7 @@ this.createjs = this.createjs||{};
 	 *     <tr><td>dc</td><td>{{#crossLink "Graphics/drawCircle"}}{{/crossLink}} </td>
 	 *     <td>de</td><td>{{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} </td></tr>
 	 *     <tr><td>dp</td><td>{{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} </td>
+	 *     <tr><td>dp</td><td>{{#crossLink "Graphics/drawPolygon"}}{{/crossLink}} </td>
 	 *     <td>p</td><td>{{#crossLink "Graphics/decodePath"}}{{/crossLink}} </td></tr>
 	 * </table>
 	 *
@@ -973,6 +974,25 @@ this.createjs = this.createjs||{};
 	p.drawPolyStar = function(x, y, radius, sides, pointSize, angle) {
 		return this.append(new G.PolyStar(x, y, radius, sides, pointSize, angle));
 	};
+	
+	/**
+	* Draws a polygon from array of point arrays.
+	*
+	*      myGraphics.beginFill("#FF0").drawPolygon([100, 100], [150, 50], [200,100], [200,200], [100,200]);
+	*      // makes a house shape
+	*
+	* A tiny API method "pg" also exists.
+	*
+	* @method drawPolygon
+	* @param {Array} points An array of [x,y] points.
+	* @param {Boolean} close Whether to close the polygon - default is true.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	* @chainable
+	**/
+
+	p.drawPolygon = function(points, close) { // Dan Zen 4/2/21
+		return this.append(new G.Polygon(points, close));
+	};
 
 	/**
 	 * Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
@@ -1540,6 +1560,18 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p.dp = p.drawPolyStar;
+	
+	 /**
+	 * Shortcut to drawPolygon.
+	 * @method pg
+	 * @param {Array} points An array of [x,y] points.
+	 * @param {Boolean} close Whether to close the polygon - default is true.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	 * @protected
+	 **/
+	p.pg = p.drawPolygon;
+
 
 	/**
 	 * Shortcut to decodePath.
@@ -2382,6 +2414,49 @@ this.createjs = this.createjs||{};
 		}
 		ctx.closePath();
 	};
+	
+	/**
+     	* Graphics command object. See {{#crossLink "Graphics/drawPolygon"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+     	* @class Polygon
+     	* @constructor
+     	* @param {Array} points
+     	* @param {Boolean} close
+     	**/
+    	/**
+     	* @property points
+     	* @type Array
+     	*/
+   	/**
+     	* @property close
+     	* @type Boolean
+     	*/
+    	/**
+     	* Execute the Graphics command in the provided Canvas context.
+     	* @method exec
+     	* @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     	*/
+	(G.Polygon = function(points, close) { // Dan Zen 4/2/21
+		this.points = points; 
+		if (close==null) close=true;
+		this.close = close;
+	}).prototype.exec = function(ctx) {
+		var points = this.points, close = this.close;
+
+		var p, fp, sp;
+		fp = points[0];
+		ctx.moveTo(fp[0], fp[1]);			
+		for (var i=1; i<points.length; i++) {
+			p = points[i];			
+			if (i==1) sp = [p[0], p[1]];
+			ctx.lineTo(p[0], p[1]);								
+		}	
+		if (close) {
+			ctx.lineTo(fp[0], fp[1]);
+			ctx.lineTo(sp[0], sp[1]); // go around to second point to get correct end bevel/miter
+			ctx.closePath();
+		}
+		
+	};	
 
 	// docced above.
 	Graphics.beginCmd = new G.BeginPath(); // so we don't have to instantiate multiple instances.
