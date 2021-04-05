@@ -2636,7 +2636,7 @@ this.createjs = this.createjs||{};
 				}
 
 				if(!this._directDraw && (!ignoreCache && item.cacheCanvas === null && item.filters !== null && item.filters.length)) {
-					var bounds;
+					var bounds = null;
 					if (item.bitmapCache === null) {
 						bounds = item.getBounds();
 						item.bitmapCache = new createjs.BitmapCache();
