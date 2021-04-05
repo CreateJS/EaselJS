@@ -10,7 +10,7 @@ describe("Utlity Methods", function () {
 		expect(createjs.indexOf(arr, 3)).toBe(2);
 	});
 
-	describe("Ticker", function () {
+	xdescribe("Ticker", function () {
 		it("createjs.Ticker.addEventListener(tick) evt.time", function (done) {
 			setTimeout(function () {
 				var tick = function (evt) {
