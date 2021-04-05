@@ -633,7 +633,9 @@ this.createjs = this.createjs||{};
 	 **/
 	p._handleMouseMove = function(e) {
 		if(!e){ e = window.event; }
-		this._handlePointerMove(-1, e, e.pageX, e.pageY);
+
+        // make sure the mouse id is <0 (means its not touch)
+		this._handlePointerMove(-(event.button + 1), e, e.pageX, e.pageY);
 	};
 
 	/**
@@ -707,7 +709,8 @@ this.createjs = this.createjs||{};
 	 * @param {MouseEvent} e
 	 **/
 	p._handleMouseUp = function(e) {
-		this._handlePointerUp(-1, e, false);
+        // make sure the mouse id is <0 (means its not touch)
+		this._handlePointerUp(-(event.button + 1), e, false);
 	};
 
 	/**
@@ -744,7 +747,8 @@ this.createjs = this.createjs||{};
 	 * @param {MouseEvent} e
 	 **/
 	p._handleMouseDown = function(e) {
-		this._handlePointerDown(-1, e, e.pageX, e.pageY);
+        // make sure the mouse id is <0 (means its not touch)
+		this._handlePointerDown(-(event.button + 1), e, e.pageX, e.pageY);
 	};
 
 	/**
