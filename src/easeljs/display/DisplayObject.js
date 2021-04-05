@@ -314,7 +314,8 @@ this.createjs = this.createjs||{};
 		 **/
 		this.x = 0;
 
-		/** The y (vertical) position of the display object, relative to its parent.
+		/** 
+		 * The y (vertical) position of the display object, relative to its parent.
 		 * @property y
 		 * @type {Number}
 		 * @default 0
