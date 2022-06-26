@@ -786,55 +786,57 @@ this.createjs = this.createjs||{};
 			nextStage&&nextStage._testMouseOver(clear, owner, eventTarget);
 			return;
 		}
-		var o = this._getPointerData(-1);
-		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
-		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
+		if (this.canvas) { // Jeff Peck change from CreateJS Slack
+			var o = this._getPointerData(-1);
+			// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
+			if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
+
+			var e = o.posEvtObj;
+			var isEventTarget = eventTarget || e&&(e.target == this.canvas);
+			var target=null, common = -1, cursor="", t, i, l;
 		
-		var e = o.posEvtObj;
-		var isEventTarget = eventTarget || e&&(e.target == this.canvas);
-		var target=null, common = -1, cursor="", t, i, l;
-		
-		if (!owner && (clear || this.mouseInBounds && isEventTarget)) {
-			target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
-			this._mouseOverX = this.mouseX;
-			this._mouseOverY = this.mouseY;
-		}
+			if (!owner && (clear || this.mouseInBounds && isEventTarget)) {
+				target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
+				this._mouseOverX = this.mouseX;
+				this._mouseOverY = this.mouseY;
+			}
 
-		var oldList = this._mouseOverTarget||[];
-		var oldTarget = oldList[oldList.length-1];
-		var list = this._mouseOverTarget = [];
+			var oldList = this._mouseOverTarget||[];
+			var oldTarget = oldList[oldList.length-1];
+			var list = this._mouseOverTarget = [];
 
-		// generate ancestor list and check for cursor:
-		// Note: Internet Explorer won't update null or undefined cursor properties
-		t = target;
-		while (t) {
-			list.unshift(t);
-			if (!cursor && t.cursor) { cursor = t.cursor; }
-			t = t.parent;
-		}
-		this.canvas.style.cursor = cursor;
-		if (!owner && eventTarget) { eventTarget.canvas.style.cursor = cursor; }
+			// generate ancestor list and check for cursor:
+			// Note: Internet Explorer won't update null or undefined cursor properties
+			t = target;
+			while (t) {
+				list.unshift(t);
+				if (!cursor && t.cursor) { cursor = t.cursor; }
+				t = t.parent;
+			}
+			this.canvas.style.cursor = cursor;
+			if (!owner && eventTarget) { eventTarget.canvas.style.cursor = cursor; }
 
-		// find common ancestor:
-		for (i=0,l=list.length; i<l; i++) {
-			if (list[i] != oldList[i]) { break; }
-			common = i;
-		}
+			// find common ancestor:
+			for (i=0,l=list.length; i<l; i++) {
+				if (list[i] != oldList[i]) { break; }
+				common = i;
+			}
 
-		if (oldTarget != target) {
-			this._dispatchMouseEvent(oldTarget, "mouseout", true, -1, o, e, target);
-		}
+			if (oldTarget != target) {
+				this._dispatchMouseEvent(oldTarget, "mouseout", true, -1, o, e, target);
+			}
 
-		for (i=oldList.length-1; i>common; i--) {
-			this._dispatchMouseEvent(oldList[i], "rollout", false, -1, o, e, target);
-		}
+			for (i=oldList.length-1; i>common; i--) {
+				this._dispatchMouseEvent(oldList[i], "rollout", false, -1, o, e, target);
+			}
 
-		for (i=list.length-1; i>common; i--) {
-			this._dispatchMouseEvent(list[i], "rollover", false, -1, o, e, oldTarget);
-		}
+			for (i=list.length-1; i>common; i--) {
+				this._dispatchMouseEvent(list[i], "rollover", false, -1, o, e, oldTarget);
+			}
 
-		if (oldTarget != target) {
-			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e, oldTarget);
+			if (oldTarget != target) {
+				this._dispatchMouseEvent(target, "mouseover", true, -1, o, e, oldTarget);
+			}
 		}
 		
 		nextStage&&nextStage._testMouseOver(clear, owner || target && this, eventTarget || isEventTarget && this);
