@@ -6,9 +6,9 @@
   "logo": "assets/docs-icon-EaselJS.png",
   "devDependencies": {
     "canvas-prebuilt": "1.6.5-prerelease.1",
-    "grunt": "~0.4.5",
-    "grunt-contrib-connect": "^0.9.0",
-    "grunt-contrib-jasmine": "^0.8.1"
+    "grunt": "^1.0.4",
+    "grunt-contrib-connect": "^2.1.0",
+    "grunt-contrib-jasmine": "^2.1.0"
   },
   "engine": "node >= 0.10.22"
 }
