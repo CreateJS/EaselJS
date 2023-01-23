@@ -466,6 +466,8 @@ this.createjs = this.createjs||{};
 				this._animation = data;
 				this.currentAnimation = frameOrAnimation;
 				this._normalizeFrame(frame);
+			} else {
+				console.error('no frame or animation named:' + frameOrAnimation)
 			}
 		} else {
 			this.currentAnimation = this._animation = null;
