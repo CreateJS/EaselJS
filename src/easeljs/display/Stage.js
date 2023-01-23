@@ -94,7 +94,7 @@ this.createjs = this.createjs||{};
 		 *      myStage.enableDOMEvents(true);
 		 *
 		 * @property canvas
-		 * @type HTMLCanvasElement | Object
+		 * @type HTMLCanvasElement
 		 **/
 		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
 	
