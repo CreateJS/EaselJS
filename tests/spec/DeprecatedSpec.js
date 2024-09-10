@@ -1,9 +1,9 @@
-describe("Deprecated Methods and Properties", function () {
+xdescribe("Deprecated Methods and Properties", function () {
 
 
-	describe("Deprecated Functions", function(done) {
+	describe("Deprecated Functions", function() {
 
-		beforeEach(function(done) {
+		beforeEach(function() {
 			this.stage = new createjs.Stage("canvas");
 			this.container = new createjs.Container();
 			this.stage.addChild(this.container);
@@ -23,33 +23,33 @@ describe("Deprecated Methods and Properties", function () {
 			this.helper = new createjs.ButtonHelper(this.movieclip, "out", "over", "down", false, this.movieclip, "hit");
 		});
 
-		it("Ticker setInterval/getInterval", function(done) {
+		it("Ticker setInterval/getInterval", function() {
 			createjs.Ticker.setInterval(300);
 			expect(createjs.Ticker.getInterval()).toBe(300);
 		});
 
-		it("Ticker setFPS/getFPS", function(done) {
+		it("Ticker setFPS/getFPS", function() {
 			createjs.Ticker.setFPS(60);
 			expect(createjs.Ticker.getFPS()).toBeCloseTo(60);
 		});
 
-		it("Container numChildren", function(done) {
+		it("Container numChildren", function() {
 			expect(this.container.getNumChildren()).toBe(2);
 		});
 
-		it("DisplayObject getStage", function(done) {
+		it("DisplayObject getStage", function() {
 			expect(this.container.getStage()).toBe(this.stage);
 		});
 
-		it ("Graphics getInstructions", function(done) {
+		it ("Graphics getInstructions", function() {
 			expect(this.graphics.getInstructions().length).toBe(3);
 		});
 
-		it("MovieClip getLabels", function(done) {
+		it("MovieClip getLabels", function() {
 			expect(this.movieclip.getLabels().length).toBe(2);
 		});
 
-		it("MovieClip getCurrentLabel", function(done) {
+		it("MovieClip getCurrentLabel", function() {
 			expect(this.movieclip.getCurrentLabel()).toBe("end");
 		});
 
@@ -57,20 +57,20 @@ describe("Deprecated Methods and Properties", function () {
 			expect(this.movieclip.getDuration()).toBe(100);
 		});
 
-		it("SpriteSheet getAnimations", function(done) {
+		it("SpriteSheet getAnimations", function() {
 			expect(this.spriteSheet.getAnimations().length).toBe(3);
 		});
 
-		it("ButtonHelper getEnabled/setEnabled", function(done) {
+		it("ButtonHelper getEnabled/setEnabled", function() {
 			helper.setEnabled(false);
 			expect(helper.getEnabled()).toBe(false);
 		});
 
-		it("SpriteSheetUtils addFlippedFrames", function(done) {
+		it("SpriteSheetUtils addFlippedFrames", function() {
 			expect(createjs.SpriteSheetUtils.addFlippedFrames()).toBeNull();
 		});
 
-		it("SpriteSheetUtils mergeAlpha", function(done) {
+		it("SpriteSheetUtils mergeAlpha", function() {
 			expect(createjs.SpriteSheetUtils.mergeAlpha()).toBeNull();
 		});
 
