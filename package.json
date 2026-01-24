@@ -1,7 +1,7 @@
 {
   "name": "easeljs",
   "npmName": "easeljs",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "EaselJS is a library for building high-performance interactive 2D content in HTML5. It provides a feature-rich display  list to allow you to manipulate and animate graphics. It also provides a robust interactive model for mouse and touch  interactions.",
   "main": "lib/easeljs.js",
   "jsdelivr": "lib/easeljs.min.js",
