@@ -145,6 +145,20 @@ this.createjs = this.createjs||{};
 		 * @type Number
 		 **/
 		this.lineWidth = null;
+
+		/**
+		 * The type of corner created, when two lines meet.  Any of "bevel", "round", and "miter". Default is "miter".
+		 * @property lineJoin
+		 * @type String
+		 **/
+		this.lineJoin = "miter";
+
+		/**
+		 * The miter length is the distance between the inner corner and the outer corner where two lines meet. Default is 10.
+		 * @property miterLimit
+		 * @type Number
+		 **/
+		this.miterLimit = 10;
 	}
 	var p = createjs.extend(Text, createjs.DisplayObject);
 
@@ -209,7 +223,7 @@ this.createjs = this.createjs||{};
 		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
 
 		var col = this.color || "#000";
-		if (this.outline) { ctx.strokeStyle = col; ctx.lineWidth = this.outline*1; }
+		if (this.outline) { ctx.strokeStyle = col; ctx.lineWidth = this.outline*1; ctx.miterLimit = this.miterLimit; ctx.lineJoin = this.lineJoin; }
 		else { ctx.fillStyle = col; }
 		
 		this._drawText(this._prepContext(ctx));
