@@ -551,8 +551,10 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p._tick = function(evtObj) {
+            if (!this.paused) {
 		this.advance(evtObj&&evtObj.delta);
-		this.Container__tick(evtObj);
+            }
+	    this.Container__tick(evtObj);
 	};
 	
 	/**
