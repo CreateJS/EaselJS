@@ -490,6 +490,7 @@ this.createjs = this.createjs||{};
 		} else {
 			target.skewX = skewX/Matrix2D.DEG_TO_RAD;
 			target.skewY = skewY/Matrix2D.DEG_TO_RAD;
+			target.rotation = 0;
 		}
 		return target;
 	};
